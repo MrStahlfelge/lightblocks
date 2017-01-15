@@ -3,6 +3,7 @@ package de.golfgl.lightblocks;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -22,15 +23,17 @@ public class LightBlocksGame extends Game {
     public Skin skin;
     public AssetManager assetManager;
     public I18NBundle TEXTS;
+    public Preferences prefs;
 
     public MainMenuScreen mainMenuScreen;
 
     public static final int nativeGameWidth = 480;
-    public static final int nativeGameHeight = 900;
+    public static final int nativeGameHeight = 800;
 
     @Override
 	public void create () {
 		batch = new SpriteBatch();
+        prefs = Gdx.app.getPreferences("lightblocks");
 
         skin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
 
