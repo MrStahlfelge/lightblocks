@@ -17,7 +17,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
  */
 
 public class BlockActor extends Actor {
-    public final static int blockWidth = 33;
+    public final static int blockWidth = 34;
     private final static float dislighentedAlpha = .4f;
 
     /**
@@ -56,7 +56,7 @@ public class BlockActor extends Actor {
     }
 
     Image imBlock;
-    Image imBlockDeactivated;
+    //Image imBlockDeactivated;
     Image imBlockEnlightened;
 
     private boolean isEnlightened = false;
@@ -90,7 +90,7 @@ public class BlockActor extends Actor {
      */
     public BlockActor (LightBlocksGame app) {
         imBlock = new Image(app.trBlock);
-        imBlockDeactivated = new Image(app.trBlockDeactivated);
+        //imBlockDeactivated = new Image(app.trBlockDeactivated);
         imBlockEnlightened = new Image(app.trBlockEnlightened);
         imBlockEnlightened.setColor(1, 1, 1, dislighentedAlpha);
 
@@ -100,7 +100,7 @@ public class BlockActor extends Actor {
     public void act(float delta) {
         super.act(delta);
         imBlock.act(delta);
-        imBlockDeactivated.act(delta);
+        //imBlockDeactivated.act(delta);
         imBlockEnlightened.act(delta);
     }
 
@@ -114,16 +114,17 @@ public class BlockActor extends Actor {
         // nur im Draw steht in getX und getY die tatsächliche Position mit offset :-/
         imBlock.setX(newX);
         imBlock.setY(newY);
-        imBlockDeactivated.setY(newY);
-        imBlockDeactivated.setX(newX);
+        //imBlockDeactivated.setY(newY);
+        //imBlockDeactivated.setX(newX);
         imBlockEnlightened.setY(newY);
         imBlockEnlightened.setX(newX);
 
         if (!drawGlow) {
             imBlock.draw(batch, parentAlpha * getColor().a);
-            imBlockDeactivated.draw(batch, parentAlpha * getColor().a);
-        } else
-        imBlockEnlightened.draw(batch, parentAlpha * getColor().a);
+            //imBlockDeactivated.draw(batch, parentAlpha * getColor().a);
+        } else {
+            imBlockEnlightened.draw(batch, parentAlpha * getColor().a);
+        }
 
         drawGlow = !drawGlow;
     }
@@ -137,7 +138,7 @@ public class BlockActor extends Actor {
     public void setColor(float r, float g, float b, float a) {
         super.setColor(r, g, b, a);
         imBlock.setColor(r, g, b, a);
-        imBlockDeactivated.setColor(r, g, b, a);
+        //imBlockDeactivated.setColor(r, g, b, a);
         imBlockEnlightened.setColor(r,g,b, imBlockEnlightened.getColor().a);
     }
 }

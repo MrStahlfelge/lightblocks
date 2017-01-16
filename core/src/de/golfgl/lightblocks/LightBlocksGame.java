@@ -32,7 +32,6 @@ public class LightBlocksGame extends Game {
 
     // these resources are used in the whole game... so we are loading them here
     public TextureRegion trBlock;
-    public TextureRegion trBlockDeactivated;
     public TextureRegion trBlockEnlightened;
     public Sound switchSound;
 
@@ -58,8 +57,8 @@ public class LightBlocksGame extends Game {
         assetManager.finishLoading();
 
         TEXTS = assetManager.get("i18n/strings", I18NBundle.class);
-        trBlock = new TextureRegion(assetManager.get("raw/block.png", Texture.class));
-        trBlockDeactivated = new TextureRegion(assetManager.get("raw/block-deactivated.png", Texture.class));
+        //trBlock = new TextureRegion(assetManager.get("raw/block.png", Texture.class));
+        trBlock = new TextureRegion(assetManager.get("raw/block-deactivated.png", Texture.class));
         trBlockEnlightened = new TextureRegion(assetManager.get("raw/block-light.png", Texture.class));
         switchSound = assetManager.get("sound/switchon.ogg", Sound.class);
 

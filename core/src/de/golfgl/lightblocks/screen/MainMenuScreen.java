@@ -36,7 +36,6 @@ public class MainMenuScreen implements Screen {
     private final LightBlocksGame app;
     private final CheckBox menuMusicButton;
     private Stage stage;
-    final Table mainTable;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
         this.app = lightBlocksGame;
@@ -44,7 +43,7 @@ public class MainMenuScreen implements Screen {
         stage = new Stage(new FitViewport(LightBlocksGame.nativeGameWidth, LightBlocksGame.nativeGameHeight));
 
         // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
-        mainTable = new Table();
+        final Table mainTable = new Table();
         mainTable.setFillParent(true);
 
         stage.addActor(mainTable);
@@ -83,8 +82,8 @@ public class MainMenuScreen implements Screen {
 //                                   }
 
                                    Gdx.input.setInputProcessor(null);
-
-                                   mainTable.addAction(sequence(fadeOut(.5f), Actions.run(new Runnable() {
+                                   stage.getRoot().clearActions();
+                                   stage.getRoot().addAction(sequence(fadeOut(.5f), Actions.run(new Runnable() {
                                        @Override
                                        public void run() {
                                            app.setScreen(new PlayScreen(app));
@@ -105,7 +104,7 @@ public class MainMenuScreen implements Screen {
         menuMusicButton.setChecked(app.prefs.getBoolean("musicPlayback", true));
         mainTable.add(menuMusicButton).minHeight(30);
 
-        mainTable.setColor(Color.CLEAR);
+        stage.getRoot().setColor(Color.CLEAR);
 
         constructBlockAnimation(blockGroup);
 
@@ -142,7 +141,7 @@ public class MainMenuScreen implements Screen {
                     })));
         }
 
-        stage.addAction(sequence(delay(10), forever(sequence(run(new Runnable() {
+        blockGroup.addAction(sequence(delay(10), forever(sequence(run(new Runnable() {
             @Override
             public void run() {
                 BlockActor block = (BlockActor) blockGroup.getChildren().get(MathUtils.random(0, 3));
@@ -154,7 +153,8 @@ public class MainMenuScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
-        mainTable.addAction(Actions.fadeIn(2));
+        Gdx.input.setCatchBackKey(false);
+        stage.getRoot().addAction(Actions.fadeIn(2));
 
 
     }
