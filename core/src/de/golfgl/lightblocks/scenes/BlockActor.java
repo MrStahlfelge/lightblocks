@@ -3,28 +3,30 @@ package de.golfgl.lightblocks.scenes;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
-import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+
+import de.golfgl.lightblocks.LightBlocksGame;
 
 /**
  * Created by Benjamin Schulte on 15.01.2017.
  */
 
-public class BlockActor extends Group {
-    private TextureRegion trBlock;
-    private TextureRegion trBlockDeactivated;
-    private TextureRegion trBlockEnlightened;
-
+public class BlockActor extends Actor {
     public final static int blockWidth = 33;
     private final static float dislighentedAlpha = .4f;
+
+    /**
+     * Damit der Glow immer auf den Steinen ist, ruft die BockGroup die draw-Methode aller
+     * Steine zweimal auf. Das erste Mal wird der Stein gezeichnet, das zweite Mal der Glow-Effekt
+     * drübergelegt. Dieser Bool schaltet um, da die draw-Methode hier nicht übersteuert wurde
+     * - der Aufruf steckt zu tief in Group.draw drin. Das ist ein Hack. :-(
+     */
+    private boolean drawGlow;
 
     /**
      * accessor for getting enlightenment action
@@ -59,8 +61,6 @@ public class BlockActor extends Group {
 
     private boolean isEnlightened = false;
 
-    Animation<Integer> normalLightAnimation;
-
     private static final int shapeSize = 20;
 
     public boolean isEnlightened() {
@@ -74,12 +74,10 @@ public class BlockActor extends Group {
             if (sollwert) {
                 action.setAlpha(1);
                 imBlockEnlightened.addAction(action);
-                toFront();
             }
             else {
                 action.setAlpha(dislighentedAlpha);
                 imBlockEnlightened.addAction(action);
-                toBack();
             }
         }
 
@@ -87,27 +85,59 @@ public class BlockActor extends Group {
     }
 
 
-    public BlockActor (AssetManager assetManager) {
-        trBlock = new TextureRegion(assetManager.get("raw/block.png", Texture.class));
-        trBlockDeactivated = new TextureRegion(assetManager.get("raw/block-deactivated.png", Texture.class));
-        trBlockEnlightened = new TextureRegion(assetManager.get("raw/block-light.png", Texture.class));
-
-        imBlock = new Image(trBlock);
-        imBlock.setX(shapeSize * -1);
-        imBlock.setY(shapeSize * -1);
-        imBlockDeactivated = new Image(trBlockDeactivated);
-        imBlockDeactivated.setY(shapeSize * -1);
-        imBlockDeactivated.setX(shapeSize * -1);
-        imBlockEnlightened = new Image(trBlockEnlightened);
-        imBlockEnlightened.setY(shapeSize * -1);
-        imBlockEnlightened.setX(shapeSize * -1);
+    /**
+     * constructor adds the Textures and Images
+     */
+    public BlockActor (LightBlocksGame app) {
+        imBlock = new Image(app.trBlock);
+        imBlockDeactivated = new Image(app.trBlockDeactivated);
+        imBlockEnlightened = new Image(app.trBlockEnlightened);
         imBlockEnlightened.setColor(1, 1, 1, dislighentedAlpha);
 
-        this.addActor(imBlock);
-        this.addActor(imBlockDeactivated);
-        this.addActor(imBlockEnlightened);
+       }
 
-        this.setTransform(false);
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        imBlock.act(delta);
+        imBlockDeactivated.act(delta);
+        imBlockEnlightened.act(delta);
     }
 
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+
+        float newX = getX() - shapeSize;
+        float newY = getY() - shapeSize;
+
+        // nur im Draw steht in getX und getY die tatsächliche Position mit offset :-/
+        imBlock.setX(newX);
+        imBlock.setY(newY);
+        imBlockDeactivated.setY(newY);
+        imBlockDeactivated.setX(newX);
+        imBlockEnlightened.setY(newY);
+        imBlockEnlightened.setX(newX);
+
+        if (!drawGlow) {
+            imBlock.draw(batch, parentAlpha * getColor().a);
+            imBlockDeactivated.draw(batch, parentAlpha * getColor().a);
+        } else
+        imBlockEnlightened.draw(batch, parentAlpha * getColor().a);
+
+        drawGlow = !drawGlow;
+    }
+
+    @Override
+    public void setColor(Color color) {
+        setColor(color.r,color.g,color.b,color.a);
+    }
+
+    @Override
+    public void setColor(float r, float g, float b, float a) {
+        super.setColor(r, g, b, a);
+        imBlock.setColor(r, g, b, a);
+        imBlockDeactivated.setColor(r, g, b, a);
+        imBlockEnlightened.setColor(r,g,b, imBlockEnlightened.getColor().a);
+    }
 }

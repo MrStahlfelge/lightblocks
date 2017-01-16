@@ -6,16 +6,20 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 
 import de.golfgl.lightblocks.screen.MainMenuScreen;
+
+import static com.badlogic.gdx.Gdx.app;
 
 public class LightBlocksGame extends Game {
 	public SpriteBatch batch;
@@ -24,6 +28,13 @@ public class LightBlocksGame extends Game {
     public AssetManager assetManager;
     public I18NBundle TEXTS;
     public Preferences prefs;
+    private FPSLogger fpsLogger;
+
+    // these resources are used in the whole game... so we are loading them here
+    public TextureRegion trBlock;
+    public TextureRegion trBlockDeactivated;
+    public TextureRegion trBlockEnlightened;
+    public Sound switchSound;
 
     public MainMenuScreen mainMenuScreen;
 
@@ -33,7 +44,8 @@ public class LightBlocksGame extends Game {
     @Override
 	public void create () {
 		batch = new SpriteBatch();
-        prefs = Gdx.app.getPreferences("lightblocks");
+        fpsLogger = new FPSLogger();
+        prefs = app.getPreferences("lightblocks");
 
         skin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
 
@@ -46,6 +58,10 @@ public class LightBlocksGame extends Game {
         assetManager.finishLoading();
 
         TEXTS = assetManager.get("i18n/strings", I18NBundle.class);
+        trBlock = new TextureRegion(assetManager.get("raw/block.png", Texture.class));
+        trBlockDeactivated = new TextureRegion(assetManager.get("raw/block-deactivated.png", Texture.class));
+        trBlockEnlightened = new TextureRegion(assetManager.get("raw/block-light.png", Texture.class));
+        switchSound = assetManager.get("sound/switchon.ogg", Sound.class);
 
         mainMenuScreen = new MainMenuScreen(this);
         this.setScreen(mainMenuScreen);
@@ -54,6 +70,7 @@ public class LightBlocksGame extends Game {
 	@Override
 	public void render () {
 		super.render(); //important!
+        fpsLogger.log();
 	}
 	
 	@Override
