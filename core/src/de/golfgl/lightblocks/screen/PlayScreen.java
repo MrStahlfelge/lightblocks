@@ -1,15 +1,10 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -17,20 +12,21 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
-import jdk.nashorn.internal.ir.Block;
 
 /**
+ * The main playing screen
+ *
  * Created by Benjamin Schulte on 16.01.2017.
  */
 
-public class PlayScreen extends InputAdapter implements Screen {
-    private final LightBlocksGame app;
-    private Stage stage;
+public class PlayScreen extends AbstractScreen {
+
+    PlayScreenInput inputAdapter;
 
     public PlayScreen(LightBlocksGame app) {
-        this.app = app;
+        super(app);
 
-        stage = new Stage(new FitViewport(LightBlocksGame.nativeGameWidth, LightBlocksGame.nativeGameHeight));
+        inputAdapter = new PlayScreenInput(this);
 
         // Die Blockgroup nimmt die Steinanimation auf
         final BlockGroup blockGroup = new BlockGroup();
@@ -56,54 +52,14 @@ public class PlayScreen extends InputAdapter implements Screen {
     }
 
     @Override
-    public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.ESCAPE || keycode == Input.Keys.BACK) {
-            app.setScreen(app.mainMenuScreen);
-            stage.dispose();
-            return true;
-        }
-
-        return super.keyDown(keycode);
-    }
-
-    @Override
     public void show() {
         Gdx.input.setCatchBackKey(true);
-        Gdx.input.setInputProcessor(this);
-        stage.getRoot().addAction(Actions.fadeIn(2));
+        Gdx.input.setInputProcessor(inputAdapter);
+        stage.getRoot().addAction(Actions.fadeIn(1));
     }
 
-    @Override
-    public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        stage.act(Math.min(delta, 1 / 30f));
-        stage.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
-    public void dispose() {
+    public void goBackToMenu() {
+        app.setScreen(app.mainMenuScreen);
         stage.dispose();
     }
 }
