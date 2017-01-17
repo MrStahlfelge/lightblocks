@@ -19,6 +19,8 @@ import de.golfgl.lightblocks.LightBlocksGame;
 public class BlockActor extends Actor {
     public final static int blockWidth = 34;
     private final static float dislighentedAlpha = .4f;
+    private final static float timeToEnlighten = .2f;
+    private final static float timeToDislighten = .6f;
 
     /**
      * Damit der Glow immer auf den Steinen ist, ruft die BockGroup die draw-Methode aller
@@ -70,12 +72,17 @@ public class BlockActor extends Actor {
     public void setEnlightened(boolean sollwert) {
         if (isEnlightened != sollwert) {
             AlphaAction action = Actions.action(AlphaAction.class);
-            action.setDuration(.2f);
+
+            // solange auf dem Enlightenblock nur FadeActions laufen reicht das
+            imBlockEnlightened.clearActions();
+
             if (sollwert) {
+                action.setDuration(timeToEnlighten);
                 action.setAlpha(1);
                 imBlockEnlightened.addAction(action);
             }
             else {
+                action.setDuration(timeToDislighten);
                 action.setAlpha(dislighentedAlpha);
                 imBlockEnlightened.addAction(action);
             }
