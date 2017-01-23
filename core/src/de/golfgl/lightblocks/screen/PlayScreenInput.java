@@ -22,7 +22,41 @@ public class PlayScreenInput extends InputAdapter {
             return true;
         }
 
+        if (keycode == Input.Keys.DOWN) {
+            playScreen.setSoftDrop(true);
+            return true;
+        }
+
+        if (keycode == Input.Keys.LEFT) {
+            playScreen.setMoveHorizontal(true, true);
+            return true;
+        }
+
+        if (keycode == Input.Keys.RIGHT) {
+            playScreen.setMoveHorizontal(false, true);
+            return true;
+        }
+
         return super.keyDown(keycode);
     }
 
+    @Override
+    public boolean keyUp(int keycode) {
+        if (keycode == Input.Keys.DOWN) {
+            playScreen.setSoftDrop(false);
+            return true;
+        }
+
+        if (keycode == Input.Keys.LEFT) {
+            playScreen.setMoveHorizontal(true, false);
+            return true;
+        }
+
+        if (keycode == Input.Keys.RIGHT) {
+            playScreen.setMoveHorizontal(false, false);
+            return true;
+        }
+
+        return super.keyUp(keycode);
+    }
 }
