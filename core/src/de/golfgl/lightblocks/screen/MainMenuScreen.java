@@ -30,6 +30,8 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 public class MainMenuScreen extends AbstractScreen {
     private final CheckBox menuMusicButton;
 
+    private PlayScreen currentGame;
+
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
         super(lightBlocksGame);
@@ -64,25 +66,24 @@ public class MainMenuScreen extends AbstractScreen {
         mainTable.row();
 
         // Play the game!
-        final TextButton button = new TextButton(app.TEXTS.get("menuPlayButton"), app.skin);
+        TextButton button = new TextButton(app.TEXTS.get("menuPlayButton"), app.skin);
         button.addListener(new ChangeListener() {
                                public void changed (ChangeEvent event, Actor actor) {
-
-                                   // falls die anfangsanimation noch läuft, unterbrechen
-//                                   for (Actor block : blockGroup.getChildren()) {
-//                                       block.clearActions();
-//                                   }
-
-                                   Gdx.input.setInputProcessor(null);
-                                   stage.getRoot().clearActions();
-                                   stage.getRoot().addAction(sequence(fadeOut(.5f), Actions.run(new Runnable() {
-                                       @Override
-                                       public void run() {
-                                           app.setScreen(new PlayScreen(app));
-                                       }
-                                   })));
+                                   gotoPlayScreen(false);
                                }}
                                );
+
+        mainTable.add(button).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2);
+
+        mainTable.row();
+
+        // Resume the game
+        button = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
+        button.addListener(new ChangeListener() {
+            public void changed (ChangeEvent event, Actor actor) {
+                gotoPlayScreen(true);
+            }}
+        );
 
         mainTable.add(button).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2);
 
@@ -100,6 +101,24 @@ public class MainMenuScreen extends AbstractScreen {
 
         constructBlockAnimation(blockGroup);
 
+    }
+
+    private void gotoPlayScreen(boolean lastScreen) {
+        // falls die anfangsanimation noch läuft, unterbrechen
+//                                   for (Actor block : blockGroup.getChildren()) {
+//                                       block.clearActions();
+//                                   }
+        if (!lastScreen || currentGame == null)
+            currentGame = new PlayScreen(app);
+
+        Gdx.input.setInputProcessor(null);
+        stage.getRoot().clearActions();
+        stage.getRoot().addAction(sequence(fadeOut(.5f), Actions.run(new Runnable() {
+            @Override
+            public void run() {
+                app.setScreen(currentGame);
+            }
+        })));
     }
 
     /**

@@ -1,13 +1,14 @@
 package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.IntArray;
 
 /**
  * Created by Benjamin Schulte on 23.01.2017.
  */
 
 public class Gameboard {
-    public static final int GAMEBOARD_ROWS = 20;
+    public static final int GAMEBOARD_ROWS = 22;
     public static final int GAMEBOARD_COLUMNS = 10;
 
     // Der Tetromino-Index an dieser Position (wird bei Lightblocks derzeit nicht genutzt)
@@ -29,49 +30,39 @@ public class Gameboard {
     }
 
     /**
-     * Bewegt den Tetromino maximal die übergebene Distanz herunter.
+     * Bewegt den Tetromino maximal die übergebene Distanz.
      *
      * @return
-     *     Die tatsächliche Anzahl bewegte Zeilen
+     *     Die tatsächliche Anzahl bewegte Einheiten
      */
-    public int moveDown(int distance, Tetromino activeTetromino) {
+    public int checkPossibleMoveDistance(boolean horizontal, int distance, Tetromino activeTetromino) {
 
         boolean canMove = true;
         int i;
-        for (i = 1; i <= distance; i++) {
-            tempPos.set(activeTetromino.getPosition().x, activeTetromino.getPosition().y - i);
+        int signum = (distance < 0 ? -1 : 1);
+
+        for (i = 1; i <= Math.abs(distance); i++) {
+            tempPos.set(activeTetromino.getPosition().x + i * (horizontal ? signum : 0),
+                        activeTetromino.getPosition().y + i * (!horizontal ? signum : 0));
             if (!isValidPosition(activeTetromino, tempPos, activeTetromino.getCurrentRotation())) {
                 canMove = false;
                 break;
             }
         }
 
-        int clampedDistance = canMove ? distance : i - 1;
-
-        if (clampedDistance > 0)
-            activeTetromino.getPosition().y -= clampedDistance;
+        int clampedDistance = canMove ? distance : (i - 1) * signum;
 
         return clampedDistance;
-    }
-
-    /**
-     * prüft ob der übergebene Tetromino eine valide Position hat
-     */
-    public boolean isValidPosition(Tetromino activeTetromino) {
-        final Vector2 testPosition = activeTetromino.getPosition();
-        final int testRotation = activeTetromino.getCurrentRotation();
-
-        return isValidPosition(activeTetromino, testPosition, testRotation);
     }
 
     /**
      * prüft ob der übergebene Tetromino an der übergebenen Position
      * mit der übergebenen Rotation eine valide Position hätte
      */
-    private boolean isValidPosition(Tetromino activeTetromino, Vector2 testPosition, int testRotation) {
-        for (Vector2 coord : activeTetromino.getRotationVectors(testRotation)) {
+    public boolean isValidPosition(Tetromino tetromino, Vector2 testPosition, int testRotation) {
+        for (Integer[] coord : tetromino.getBlockPositions(testPosition, testRotation)) {
             if (!isValidCoordinate(
-                    testPosition.x + coord.x, testPosition.y + coord.y)) {
+                    coord[0], coord[1])) {
                 return false;
             }
         }
@@ -79,7 +70,18 @@ public class Gameboard {
         return true;
     }
 
-    private boolean isValidCoordinate(float x, float y) {
+    public boolean isRowFull(int row) {
+        for (int j = 0; j < GAMEBOARD_COLUMNS; j++) {
+            if (gameboardSquare[row][j] == SQUARE_EMPTY) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    private boolean isValidCoordinate(int x, int y) {
         if (x < 0 || x >= GAMEBOARD_COLUMNS) {
             return false;
         }
@@ -88,7 +90,7 @@ public class Gameboard {
             return false;
         }
 
-        return gameboardSquare[(int) y][(int) x] == SQUARE_EMPTY;
+        return gameboardSquare[y][x] == SQUARE_EMPTY;
     }
 
     public void pinTetromino(Tetromino activeTetromino) {
@@ -98,5 +100,19 @@ public class Gameboard {
             gameboardSquare[y][x] = activeTetromino.getIndex();
         }
 
+    }
+
+    public void clearLines(IntArray linesToRemove) {
+        for (int i = linesToRemove.size - 1; i >= 0; i--) {
+
+            for (int y = linesToRemove.get(i); y < GAMEBOARD_ROWS; y++) {
+                for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
+                    if (y == GAMEBOARD_ROWS - 1)
+                        gameboardSquare[y][x] = SQUARE_EMPTY;
+                    else
+                        gameboardSquare[y][x] = gameboardSquare[y + 1][x];
+                }
+            }
+        }
     }
 }

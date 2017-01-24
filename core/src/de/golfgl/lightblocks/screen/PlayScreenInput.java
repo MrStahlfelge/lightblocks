@@ -3,6 +3,8 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 
+import de.golfgl.lightblocks.LightBlocksGame;
+
 /**
  * Created by Benjamin Schulte on 17.01.2017.
  */
@@ -23,17 +25,27 @@ public class PlayScreenInput extends InputAdapter {
         }
 
         if (keycode == Input.Keys.DOWN) {
-            playScreen.setSoftDrop(true);
+            playScreen.gameModel.setSoftDrop(true);
             return true;
         }
 
         if (keycode == Input.Keys.LEFT) {
-            playScreen.setMoveHorizontal(true, true);
+            playScreen.gameModel.startMoveHorizontal(true);
             return true;
         }
 
         if (keycode == Input.Keys.RIGHT) {
-            playScreen.setMoveHorizontal(false, true);
+            playScreen.gameModel.startMoveHorizontal(false);
+            return true;
+        }
+
+        if (keycode == Input.Keys.CONTROL_LEFT) {
+            playScreen.gameModel.setRotate(false);
+            return true;
+        }
+
+        if (keycode == Input.Keys.SHIFT_LEFT) {
+            playScreen.gameModel.setRotate(true);
             return true;
         }
 
@@ -41,22 +53,32 @@ public class PlayScreenInput extends InputAdapter {
     }
 
     @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+
+         playScreen.gameModel.setRotate(screenX > LightBlocksGame.nativeGameWidth / 2);
+
+        return true;
+    }
+
+    @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.DOWN) {
-            playScreen.setSoftDrop(false);
+            playScreen.gameModel.setSoftDrop(false);
             return true;
         }
 
         if (keycode == Input.Keys.LEFT) {
-            playScreen.setMoveHorizontal(true, false);
+            playScreen.gameModel.endMoveHorizontal(true);
             return true;
         }
 
         if (keycode == Input.Keys.RIGHT) {
-            playScreen.setMoveHorizontal(false, false);
+            playScreen.gameModel.endMoveHorizontal(false);
             return true;
         }
 
         return super.keyUp(keycode);
     }
+
+
 }

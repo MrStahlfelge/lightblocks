@@ -34,6 +34,7 @@ public class LightBlocksGame extends Game {
     public TextureRegion trBlock;
     public TextureRegion trBlockEnlightened;
     public Sound switchSound;
+    public Sound rotateSound;
 
     public MainMenuScreen mainMenuScreen;
 
@@ -54,6 +55,7 @@ public class LightBlocksGame extends Game {
         assetManager.load("raw/block-deactivated.png", Texture.class);
         assetManager.load("raw/block-light.png", Texture.class);
         assetManager.load("sound/switchon.ogg", Sound.class);
+        assetManager.load("sound/switchflip.ogg", Sound.class);
         assetManager.finishLoading();
 
         TEXTS = assetManager.get("i18n/strings", I18NBundle.class);
@@ -61,6 +63,7 @@ public class LightBlocksGame extends Game {
         trBlock = new TextureRegion(assetManager.get("raw/block-deactivated.png", Texture.class));
         trBlockEnlightened = new TextureRegion(assetManager.get("raw/block-light.png", Texture.class));
         switchSound = assetManager.get("sound/switchon.ogg", Sound.class);
+        rotateSound = assetManager.get("sound/switchflip.ogg", Sound.class);
 
         mainMenuScreen = new MainMenuScreen(this);
         this.setScreen(mainMenuScreen);

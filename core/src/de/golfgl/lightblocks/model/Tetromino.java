@@ -47,18 +47,33 @@ public class Tetromino {
     private int currentRotation;
     private final Vector2 position;
 
+    // wird immer wieder verwendet um Garbage Collection zu verhindern
+    // also aufpassen und ggf. kopieren
+    private final Integer[][] blockPosition;
+
     Tetromino(int index) {
         this.tetrominoIndex = index;
+        this.blockPosition  = new Integer[4][2];
 
         // Die Startposition jedes Tetrominos
-        this.position = new Vector2(GAMEBOARD_COLUMNS / 2 - 2, GAMEBOARD_ROWS - 3);
+        this.position = new Vector2(GAMEBOARD_COLUMNS / 2 - 2, GAMEBOARD_ROWS - 5);
         currentRotation = 0;
     }
 
     public Vector2[] getRotationVectors(int rotation) {
+        rotation = normalizeRotation(rotation);
+        return tetrominoTemplates[tetrominoIndex][rotation];
+    }
+
+    /**
+     * Prüft ob die Rotation innerhalb der Arraygrenzen liegt
+     */
+    private int normalizeRotation(int rotation) {
         final Vector2[][] thisTetromino = tetrominoTemplates[tetrominoIndex];
+        if (rotation < 0)
+            rotation = rotation + thisTetromino.length;
         rotation = rotation % thisTetromino.length;
-        return thisTetromino[rotation];
+        return rotation;
     }
 
     public int getCurrentRotation() {
@@ -77,4 +92,25 @@ public class Tetromino {
         return getRotationVectors(getCurrentRotation());
     }
 
+    public Integer[][] getCurrentBlockPositions() {
+        return getBlockPositions(position, currentRotation);
+    }
+
+    public Integer[][] getBlockPositions(Vector2 position, int rotation) {
+        int i = 0;
+        for (Vector2 v : getRotationVectors(rotation)) {
+            blockPosition[i][0] = ((int) v.x + (int) position.x);
+            blockPosition[i][1] = ((int) v.y + (int) position.y);
+            i++;
+        }
+        return blockPosition;
+
+    }
+
+    public int setRotation(int newRotation) {
+
+        currentRotation = normalizeRotation(newRotation);
+
+        return currentRotation;
+    }
 }

@@ -1,7 +1,7 @@
 package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.IntArray;
 
 /**
  * Created by Benjamin Schulte on 23.01.2017.
@@ -18,6 +18,9 @@ public class GameModel {
     private int nextTetromino;
     private Gameboard gameboard;
 
+    // Speicherhaltung
+    private final IntArray linesToRemove;
+
     // der aktuelle Punktestand
     private int score;
      // die abgebauten Reihen
@@ -31,15 +34,15 @@ public class GameModel {
     private static final float SOFT_DROP_SPEED = 30.0f;
 
     // Verzögerung bei gedrückter Taste
-    private float rotatingCountdown;
     private float movingCountdown;
 
     private boolean isGameOver;
 
     //vom Input geschrieben
-    public boolean isSoftDrop;
-    public boolean isMovingLeft;
-    public boolean isMovingRight;
+    private boolean isSoftDrop;
+    private int isRotate;
+    private boolean isMovingLeft;
+    private boolean isMovingRight;
 
     public GameModel(IGameModelListener listener) {
 
@@ -47,6 +50,7 @@ public class GameModel {
         this.listener = listener;
 
         score = 0;
+        linesToRemove = new IntArray(Gameboard.GAMEBOARD_ROWS);
         setClearedLines(0);
 
         //TODO hier muss noch der Sack mit den sieben gewürfelten implementiert werden
@@ -61,6 +65,11 @@ public class GameModel {
     public void update(float delta) {
 
         if (isGameOver) return;
+
+        if (isRotate != 0) {
+            rotate(isRotate > 0);
+            isRotate = 0;
+        }
 
         if (isMovingLeft && !isMovingRight) {
             movingCountdown -= delta;
@@ -80,42 +89,52 @@ public class GameModel {
 
         float speed = isSoftDrop ? SOFT_DROP_SPEED : currentSpeed;
         distanceRemainder += delta * speed;
-        if (distanceRemainder >= 1.0f) {
-            int distance = (int) distanceRemainder;
+        if (distanceRemainder >= 1.0f)
+            moveDown((int) distanceRemainder);
+    }
 
-            int movedDistance = gameboard.moveDown(distance, activeTetromino);
+    private void moveDown(int distance) {
+        int maxDistance = (-1) * gameboard.checkPossibleMoveDistance(false, -distance, activeTetromino);
 
-            // wenn bewegt, dann die Oberfläche informieren
-            if (movedDistance > 0 || movedDistance < distance)
-                for (Vector2 v : activeTetromino.getCurrentRotationVectors()) {
-                    final int xBeforeMove = (int) activeTetromino.getPosition().x + (int) v.x;
-                    final int yBeforeMove = (int) activeTetromino.getPosition().y + (int) v.y + movedDistance;
-                    if (movedDistance < distance)
-                        listener.setBlockActivated(xBeforeMove, yBeforeMove, false);
-                    if (movedDistance > 0)
-                        listener.moveBlock(xBeforeMove, yBeforeMove, 0, -movedDistance);
-                }
+        if (maxDistance > 0) {
+            listener.moveBlocks(activeTetromino.getCurrentBlockPositions(), 0, -maxDistance);
+            activeTetromino.getPosition().y -= maxDistance;
+        }
 
-            if (movedDistance < distance) {
+        // wenn nicht bewegen konnte, dann festnageln und nächsten aktivieren
+        if (maxDistance < distance) {
 
-                gameboard.pinTetromino(activeTetromino);
-                listener.playSound(IGameModelListener.SOUND_DROP);
+            gameboard.pinTetromino(activeTetromino);
+            listener.playSound(IGameModelListener.SOUND_DROP);
+            for (Integer[] vAfterMove : activeTetromino.getCurrentBlockPositions())
+                listener.setBlockActivated(vAfterMove[0], vAfterMove[1], false);
 
-                addDropScore();
-                removeFullLines();
+            addDropScore();
+            removeFullLines();
 
-                // hiernach keine Zugriffe mehr auf activeTetromino!
-                activateNextTetromino();
-            } else {
-                distanceRemainder -= distance;
-            }
-
-
+            // hiernach keine Zugriffe mehr auf activeTetromino!
+            activateNextTetromino();
+        } else {
+            distanceRemainder -= distance;
         }
     }
 
     private void removeFullLines() {
-        //TODO
+        linesToRemove.clear();
+
+        for (int i = 0; i < Gameboard.GAMEBOARD_ROWS; i++) {
+            if (gameboard.isRowFull(i)) {
+                linesToRemove.add(i);
+            }
+        }
+
+        int lineCount = linesToRemove.size;
+        if (lineCount == 0) {
+            return;
+        }
+
+        gameboard.clearLines(linesToRemove);
+        listener.clearLines(linesToRemove);
     }
 
     private void addDropScore() {
@@ -123,7 +142,33 @@ public class GameModel {
     }
 
     private void moveHorizontal(int distance) {
-        //TODO
+        int maxDistance = gameboard.checkPossibleMoveDistance(true, distance, activeTetromino);
+
+        if (maxDistance != 0) {
+            listener.moveBlocks(activeTetromino.getCurrentBlockPositions(), maxDistance, 0);
+            activeTetromino.getPosition().x += maxDistance;
+        }
+    }
+
+    private void rotate(boolean clockwise) {
+        int newRotation = activeTetromino.getCurrentRotation() + (clockwise ? 1 : -1);
+
+        if (gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
+                newRotation)) {
+
+            // Die Position und auch die Einzelteile darin muss geclonet werden, um nicht
+            // durch die Rotation verloren zu gehen
+            Integer[][] oldBlockPositions = activeTetromino.getCurrentBlockPositions().clone();
+            for (int i = 0; i < oldBlockPositions.length; i++)
+                oldBlockPositions[i] = oldBlockPositions[i].clone();
+
+            activeTetromino.setRotation(newRotation);
+
+            listener.moveBlocks(oldBlockPositions, activeTetromino.getCurrentBlockPositions());
+            listener.playSound(IGameModelListener.SOUND_ROTATE);
+
+
+        }
     }
 
     private void activateNextTetromino() {
@@ -135,17 +180,17 @@ public class GameModel {
         activeTetromino = new Tetromino(nextTetromino);
 
         // ins Display damit
-        for (Vector2 v : activeTetromino.getCurrentRotationVectors()) {
-            final int x = (int) v.x + (int) activeTetromino.getPosition().x;
-            final int y = (int) v.y + (int) activeTetromino.getPosition().y;
-            listener.insertNewBlock(x, y);
-            listener.setBlockActivated(x, y, true);
+        for (Integer[] v : activeTetromino.getCurrentBlockPositions()) {
+            listener.insertNewBlock(v[0], v[1]);
+            listener.setBlockActivated(v[0], v[1], true);
         }
 
         distanceRemainder = 0.0f;
         nextTetromino = MathUtils.random(Tetromino.COUNT - 1);
 
-        if (!gameboard.isValidPosition(activeTetromino))
+        // Wenn der neu eingefügte Tetromino keinen Platz mehr hat, ist das Spiel zu Ende
+        if (!gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
+                activeTetromino.getCurrentRotation()))
             isGameOver = true;
 
     }
@@ -159,6 +204,10 @@ public class GameModel {
 
     public void setSoftDrop(boolean newVal) {
         isSoftDrop = newVal;
+    }
+
+    public void setRotate(boolean clockwise) {
+        isRotate = (clockwise ? 1 : -1);
     }
 
     public void startMoveHorizontal(boolean isLeft) {
