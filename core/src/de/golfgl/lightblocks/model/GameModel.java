@@ -36,13 +36,15 @@ public class GameModel {
     // Verzögerung bei gedrückter Taste
     private float movingCountdown;
 
+    private float freezeCountdown;
+
     private boolean isGameOver;
 
     //vom Input geschrieben
     private boolean isSoftDrop;
     private int isRotate;
-    private boolean isMovingLeft;
-    private boolean isMovingRight;
+    private int isMovingLeft; // 0: nein, 1: ja, 2: gerade begonnen
+    private int isMovingRight;
 
     public GameModel(IGameModelListener listener) {
 
@@ -66,23 +68,38 @@ public class GameModel {
 
         if (isGameOver) return;
 
+        if (freezeCountdown > 0)
+            freezeCountdown -= delta;
+
+        if (freezeCountdown > 0)
+                return;
+
         if (isRotate != 0) {
             rotate(isRotate > 0);
             isRotate = 0;
         }
 
-        if (isMovingLeft && !isMovingRight) {
-            movingCountdown -= delta;
-            if (movingCountdown <= 0.0f) {
-                moveHorizontal(-1);
-                movingCountdown += REPEAT_INTERVAL;
-            }
-        }
+        // horizontale Bewegung - nicht wenn beide Tasten gedrückt
+        if (((isMovingLeft > 0) && (isMovingRight == 0)) ||
+                (isMovingLeft == 0 && isMovingRight > 0)) {
 
-        if (isMovingRight && !isMovingLeft) {
-            movingCountdown -= delta;
+            if (isMovingLeft >= 2 || isMovingRight >= 2) {
+                movingCountdown = REPEAT_START_OFFSET;
+
+                if (isMovingLeft > 0) {
+                    moveHorizontal(-1);
+                    isMovingLeft = 1;
+                }
+                else {
+                    moveHorizontal(1);
+                    isMovingRight = 1;
+                }
+
+            } else
+                movingCountdown -= delta;
+
             if (movingCountdown <= 0.0f) {
-                moveHorizontal(1);
+                moveHorizontal(isMovingLeft > 0 ? -1 : 1);
                 movingCountdown += REPEAT_INTERVAL;
             }
         }
@@ -171,6 +188,10 @@ public class GameModel {
         }
     }
 
+    public void setFreezeInterval(float time) {
+        freezeCountdown = time;
+    }
+
     private void activateNextTetromino() {
         isSoftDrop = false;
 
@@ -190,8 +211,10 @@ public class GameModel {
 
         // Wenn der neu eingefügte Tetromino keinen Platz mehr hat, ist das Spiel zu Ende
         if (!gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
-                activeTetromino.getCurrentRotation()))
+                activeTetromino.getCurrentRotation())) {
             isGameOver = true;
+            listener.setGameOver(true);
+        }
 
     }
 
@@ -211,21 +234,25 @@ public class GameModel {
     }
 
     public void startMoveHorizontal(boolean isLeft) {
-        moveHorizontal(isLeft ? -1 : 1);
         if (isLeft)
-            isMovingLeft = true;
+            isMovingLeft = 2;
         else
-            isMovingRight = true;
+            isMovingRight = 2;
         movingCountdown = REPEAT_START_OFFSET;
     }
 
     public void endMoveHorizontal(boolean isLeft) {
         if (isLeft)
-            isMovingLeft = false;
+            isMovingLeft = 0;
         else
-            isMovingRight = false;
+            isMovingRight = 0;
 
         movingCountdown = 0.0f;
     }
 
+    public void fromPause() {
+        // wenn während der Pause ein Knopf für Rotation gedrückt wurde, ist das
+        // nicht zu beachten
+        isRotate = 0;
+    }
 }

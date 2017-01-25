@@ -22,4 +22,6 @@ public interface IGameModelListener {
     void playSound(int sound);
 
     void clearLines(IntArray linesToRemove);
+
+    void setGameOver(boolean b);
 }

@@ -1,13 +1,16 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -29,6 +32,16 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  */
 public class MainMenuScreen extends AbstractScreen {
     private final CheckBox menuMusicButton;
+    private final ButtonGroup inputChoseField;
+    private int inputChosen;
+
+    class ValueCheckBox<T> extends CheckBox {
+        public T value;
+
+        public ValueCheckBox(String text, Skin skin, String styleName) {
+            super(text, skin, styleName);
+        }
+    }
 
     private PlayScreen currentGame;
 
@@ -91,6 +104,45 @@ public class MainMenuScreen extends AbstractScreen {
         mainTable.add(new Label(app.TEXTS.get("menuPlayerNameField") + ":", app.skin));
         mainTable.add(new TextField(null, app.skin));
 
+        // die möglichen Inputs aufzählen
+        inputChoseField = new ButtonGroup();
+
+        inputChosen = app.prefs.getInteger ("inputType", 0);
+        if (!PlayScreenInput.inputAvailable(inputChosen))
+            inputChosen = 0;
+
+        int i = 0;
+        while (true) {
+            try {
+                Input.Peripheral ic = PlayScreenInput.peripheralFromInt(i);
+                ValueCheckBox<Integer> input = new ValueCheckBox<Integer>(app.TEXTS.get(PlayScreenInput.inputName(i)), app.skin, "radio");
+                input.setDisabled(!PlayScreenInput.inputAvailable(i));
+                input.value = i;
+
+                if (inputChosen == i) {
+                    if (input.isDisabled())
+                        inputChosen++;
+                    else
+                        input.setChecked(true);
+                }
+
+                inputChoseField.add(input);
+
+                mainTable.row();
+                if (i==0)
+                    mainTable.add(new Label(app.TEXTS.get("menuInputControl") + ":", app.skin));
+                else
+                    mainTable.add();
+
+                mainTable.add(input).minHeight(30).left();
+
+                i++;
+            } catch (Throwable t) {
+                break;
+            }
+        }
+
+
         mainTable.row();
         mainTable.add();
         menuMusicButton = new CheckBox(app.TEXTS.get("menuMusicButton"), app.skin);
@@ -108,8 +160,12 @@ public class MainMenuScreen extends AbstractScreen {
 //                                   for (Actor block : blockGroup.getChildren()) {
 //                                       block.clearActions();
 //                                   }
-        if (!lastScreen || currentGame == null)
-            currentGame = new PlayScreen(app);
+        if (!lastScreen || currentGame == null) {
+            inputChosen = ((ValueCheckBox<Integer>) inputChoseField.getChecked()).value;
+            currentGame = new PlayScreen(app, PlayScreenInput.getPlayInput(inputChosen));
+        }
+
+        currentGame.setMusic(menuMusicButton.isChecked());
 
         Gdx.input.setInputProcessor(null);
         stage.getRoot().clearActions();
@@ -142,7 +198,7 @@ public class MainMenuScreen extends AbstractScreen {
                         }
                     }),
                     Actions.delay(0.1f),
-                    run((i < 3) ? block.dislightenAction : new Runnable() {
+                    run((i < 3) ? block.getDislightenAction() : new Runnable() {
                         @Override
                         public void run() {
                             // Beim letzen Block die anderen alle anschalten

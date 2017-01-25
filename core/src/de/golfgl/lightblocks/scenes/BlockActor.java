@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
@@ -23,6 +24,12 @@ public class BlockActor extends Actor {
     private final static float timeToDislighten = .6f;
 
     /**
+     * wenn der Stein gerade bewegt wird, ist dies hier die Action die ihn bewegt.
+     * Das dient dazu, sie ggf. wieder zu entfernen wenn eine andere Bewegung nötig wird.
+     */
+    private Action moveAction;
+
+    /**
      * Damit der Glow immer auf den Steinen ist, ruft die BockGroup die draw-Methode aller
      * Steine zweimal auf. Das erste Mal wird der Stein gezeichnet, das zweite Mal der Glow-Effekt
      * drübergelegt. Dieser Bool schaltet um, da die draw-Methode hier nicht übersteuert wurde
@@ -31,10 +38,11 @@ public class BlockActor extends Actor {
     private boolean drawGlow;
 
     /**
-     * accessor for getting enlightenment action
+     * accessor for getting enlightenment action (Main menu)
      */
-    public RunEnlightenment enlightenAction = new RunEnlightenment(this, true);
-    public RunEnlightenment dislightenAction = new RunEnlightenment(this, false);
+    public RunEnlightenment getDislightenAction() {
+        return new RunEnlightenment(this, false);
+    }
 
     /**
      * Class for giving this to the action sequences
@@ -67,6 +75,20 @@ public class BlockActor extends Actor {
 
     public boolean isEnlightened() {
         return isEnlightened;
+    }
+
+    /**
+     * sets the move action for this block after deleting a still existing move action
+     *
+     * @param newMoveAction
+     */
+    public void setMoveAction(Action newMoveAction) {
+        if (moveAction != null && moveAction.getTarget() != null)
+            this.removeAction(moveAction);
+
+        this.addAction(newMoveAction);
+        moveAction = newMoveAction;
+
     }
 
     public void setEnlightened(boolean sollwert) {

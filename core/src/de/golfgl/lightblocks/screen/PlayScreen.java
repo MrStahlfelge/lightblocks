@@ -1,18 +1,12 @@
 package de.golfgl.lightblocks.screen;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
@@ -20,7 +14,6 @@ import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
-import jdk.nashorn.internal.ir.Block;
 
 /**
  * The main playing screen
@@ -35,17 +28,22 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     PlayScreenInput inputAdapter;
     public GameModel gameModel;
 
+    Music music;
+
     private final BlockGroup blockGroup;
     private final BlockActor[][] blockMatrix;
 
     float lastAccX = 0;
 
-    public PlayScreen(LightBlocksGame app) {
+    private boolean isPaused = true;
+
+    public PlayScreen(LightBlocksGame app, PlayScreenInput inputAdapter) {
         super(app);
 
         blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ROWS];
 
-        inputAdapter = new PlayScreenInput(this);
+        inputAdapter.setPlayScreen(this);
+        this.inputAdapter = inputAdapter;
 
         // Die Blockgroup nimmt die Steinanimation auf
         blockGroup = new BlockGroup();
@@ -79,21 +77,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void render(float delta) {
         delta = Math.min(delta, 1 / 30f);
 
-        if (Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer)) {
-            gameModel.setSoftDrop(Gdx.input.getAccelerometerY() > 9);
-
-            if (Gdx.input.getAccelerometerX() < -1 && lastAccX >= -1)
-                gameModel.startMoveHorizontal(false);
-            if (Gdx.input.getAccelerometerX() >= -1 && lastAccX < -1)
-                gameModel.endMoveHorizontal(false);
-
-            if (Gdx.input.getAccelerometerX() > 1 && lastAccX <= 1)
-                gameModel.startMoveHorizontal(true);
-            if (Gdx.input.getAccelerometerX() < 1 && lastAccX >= 1)
-                gameModel.endMoveHorizontal(true);
-        }
-
-        gameModel.update(delta);
+        if (!isPaused)
+            gameModel.update(delta);
 
         super.render(delta);
     }
@@ -107,7 +92,54 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     public void goBackToMenu() {
         app.setScreen(app.mainMenuScreen);
+        if (music != null)
+            music.dispose();
+
         stage.dispose();
+    }
+
+    @Override
+    public void pause() {
+        super.pause();
+
+        blockGroup.getColor().a = 0;
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+
+        if (!isPaused)
+            switchPause();
+    }
+
+    public void switchPause() {
+        isPaused = !isPaused;
+
+        //inform input adapter, too
+        inputAdapter.isPaused = isPaused;
+
+        blockGroup.clearActions();
+
+        if (!isPaused) {
+
+            if (music!=null)
+                music.play();
+
+            if (blockGroup.getColor().a < 1) {
+                blockGroup.addAction(Actions.fadeIn(.2f));
+                gameModel.setFreezeInterval(.2f);
+            }
+
+            //inform the game model that there was a pause
+            gameModel.fromPause();
+        }
+        else {
+            blockGroup.addAction(Actions.fadeOut(.2f));
+            if (music!=null)
+                music.pause();
+
+        }
     }
 
     @Override
@@ -131,7 +163,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 BlockActor block = blocks.get(i);
                 int x = v[i][0];
                 int y = v[i][1];
-                block.addAction(Actions.moveTo((x + dx) * BlockActor.blockWidth, (y + dy) * BlockActor.blockWidth, 1 / 30f));
+                block.setMoveAction(Actions.moveTo((x + dx) * BlockActor.blockWidth, (y + dy) * BlockActor.blockWidth, 1 / 30f));
                 blockMatrix[x + dx][y + dy] = block;
             }
         }
@@ -160,7 +192,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             BlockActor block = blocks.get(i);
             int newx = vNew[i][0];
             int newy = vNew[i][1];
-            block.addAction(Actions.moveTo((newx) * BlockActor.blockWidth, (newy) * BlockActor.blockWidth, 1 / 10f));
+            block.setMoveAction(Actions.moveTo((newx) * BlockActor.blockWidth, (newy) * BlockActor.blockWidth, 1 / 10f));
             blockMatrix[newx][newy] = block;
         }
 
@@ -189,7 +221,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     @Override
     public void clearLines(IntArray linesToRemove) {
 
-        //TODO Gameplay muss freezen
+        final float removeDelayTime = .3f;
+        final float moveActorsTime  = .1f;
+
+        gameModel.setFreezeInterval(removeDelayTime);
+
+        // Vorbereitung zum Heraussuchen der Zeilen, die welche ersetzen
         IntArray lineMove = new IntArray(Gameboard.GAMEBOARD_ROWS);
         for (int i = 0; i < Gameboard.GAMEBOARD_ROWS; i++)
             lineMove.add(i);
@@ -198,15 +235,23 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         for (int i = linesToRemove.size - 1; i >= 0; i--) {
             int y = linesToRemove.get(i);
 
+            // die zu entfernende Zeile durchgehen und alle Blöcke erleuchten
+            // und entfernen
             for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
                 BlockActor block = blockMatrix[x][y];
                 blockMatrix[x][y] = null;
                 block.setEnlightened(true);
-                block.addAction(Actions.sequence(Actions.delay(.5f),
-                        //Actions.fadeOut(.5f),
+
+                // die untersten zusammenhängenden Zeilen rausschieben
+               if (y == i)
+                    block.setMoveAction(Actions.sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -(i+1) * BlockActor.blockWidth, moveActorsTime)));
+
+                block.addAction(Actions.sequence(Actions.delay(removeDelayTime),
+                        Actions.fadeOut(.2f),
                         Actions.removeActor()));
             }
 
+            // heraussuchen durch weile Zeile diese hier ersetzt wird
             for (int higherY = y; higherY < Gameboard.GAMEBOARD_ROWS; higherY++)
                 if (higherY < Gameboard.GAMEBOARD_ROWS - 1)
                     lineMove.set(higherY, lineMove.get(higherY + 1));
@@ -223,13 +268,29 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     blockMatrix[x][lineMove.get(i)] = null;
                     blockMatrix[x][i] = block;
                     if (block != null)
-                        block.addAction(Actions.sequence(Actions.delay(.5f), (Actions.moveTo((x) * BlockActor.blockWidth, (i) * BlockActor.blockWidth, 1 / 10f))));
+                        block.setMoveAction(Actions.sequence(Actions.delay(removeDelayTime), (Actions.moveTo((x) * BlockActor.blockWidth, (i) * BlockActor.blockWidth, moveActorsTime))));
                 }
 
             }
         }
 
 
+
+    }
+
+    @Override
+    public void setGameOver(boolean b) {
+        if (music != null)
+            music.stop();
+    }
+
+    public void setMusic(boolean playMusic) {
+        if (playMusic) {
+            music = Gdx.audio.newMusic(Gdx.files.internal("sound/dd.ogg"));
+            music.setVolume(1f);                 // sets the volume to half the maximum volume
+            music.setLooping(true);
+        } else if (music != null)
+            music.dispose();
 
     }
 }
