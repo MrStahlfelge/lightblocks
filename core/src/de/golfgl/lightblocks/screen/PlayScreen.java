@@ -17,22 +17,19 @@ import de.golfgl.lightblocks.scenes.BlockGroup;
 
 /**
  * The main playing screen
- *
+ * <p>
  * Übernimmt auch den Adapter zwischen GameModel und Input/GUI
- *
+ * <p>
  * Created by Benjamin Schulte on 16.01.2017.
  */
 
 public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
-    PlayScreenInput inputAdapter;
-    public GameModel gameModel;
-
-    Music music;
-
     private final BlockGroup blockGroup;
     private final BlockActor[][] blockMatrix;
-
+    public GameModel gameModel;
+    PlayScreenInput inputAdapter;
+    Music music;
     float lastAccX = 0;
 
     private boolean isPaused = true;
@@ -123,7 +120,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         if (!isPaused) {
 
-            if (music!=null)
+            if (music != null)
                 music.play();
 
             if (blockGroup.getColor().a < 1) {
@@ -133,10 +130,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
             //inform the game model that there was a pause
             gameModel.fromPause();
-        }
-        else {
+        } else {
             blockGroup.addAction(Actions.fadeOut(.2f));
-            if (music!=null)
+            if (music != null)
                 music.pause();
 
         }
@@ -222,7 +218,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void clearLines(IntArray linesToRemove) {
 
         final float removeDelayTime = .3f;
-        final float moveActorsTime  = .1f;
+        final float removeFadeOutTime = .2f;
+        final float moveActorsTime = .1f;
 
         gameModel.setFreezeInterval(removeDelayTime);
 
@@ -243,11 +240,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 block.setEnlightened(true);
 
                 // die untersten zusammenhängenden Zeilen rausschieben
-               if (y == i)
-                    block.setMoveAction(Actions.sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -(i+1) * BlockActor.blockWidth, moveActorsTime)));
+                if (y == i)
+                    block.setMoveAction(Actions.sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -(i + 1) * BlockActor.blockWidth, moveActorsTime)));
 
+                app.removeSound.play();
                 block.addAction(Actions.sequence(Actions.delay(removeDelayTime),
-                        Actions.fadeOut(.2f),
+                        Actions.fadeOut(removeFadeOutTime),
                         Actions.removeActor()));
             }
 
@@ -273,7 +271,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
             }
         }
-
 
 
     }
