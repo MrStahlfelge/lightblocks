@@ -62,7 +62,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             }
         }
 
-        if (screenY - this.screenY < -100 & !isPaused) {
+        if (screenY - this.screenY < -200 & !isPaused) {
             playScreen.switchPause();
         }
 

@@ -15,6 +15,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     public boolean keyDown(int keycode) {
         switch (keycode) {
             case Input.Keys.ESCAPE:
+                playScreen.goBackToMenu();
                 return true;
 
             case Input.Keys.ENTER:
