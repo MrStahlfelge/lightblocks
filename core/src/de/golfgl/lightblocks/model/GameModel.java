@@ -8,22 +8,20 @@ import com.badlogic.gdx.utils.IntArray;
  */
 
 public class GameModel {
-    IGameModelListener listener;
-
     // Für die Steuerung
     private static final float REPEAT_START_OFFSET = 0.5f;
     private static final float REPEAT_INTERVAL = 0.05f;
-
-    private Tetromino activeTetromino;
-    private int nextTetromino;
-    private Gameboard gameboard;
-
+    private static final float SOFT_DROP_SPEED = 30.0f;
     // Speicherhaltung
     private final IntArray linesToRemove;
-
+    IGameModelListener listener;
+    TetrominoDrawyer drawyer;
+    private Tetromino activeTetromino;
+    private Tetromino nextTetromino;
+    private Gameboard gameboard;
     // der aktuelle Punktestand
     private int score;
-     // die abgebauten Reihen
+    // die abgebauten Reihen
     private int clearedLines;
     // Level
     private int level;
@@ -31,8 +29,6 @@ public class GameModel {
     private float currentSpeed;
     // wieviel ist schon gefallen
     private float distanceRemainder;
-    private static final float SOFT_DROP_SPEED = 30.0f;
-
     // Verzögerung bei gedrückter Taste
     private float movingCountdown;
 
@@ -55,12 +51,13 @@ public class GameModel {
         linesToRemove = new IntArray(Gameboard.GAMEBOARD_ROWS);
         setClearedLines(0);
 
-        //TODO hier muss noch der Sack mit den sieben gewürfelten implementiert werden
-        nextTetromino = MathUtils.random(Tetromino.COUNT - 1);
         activeTetromino = null;
         isGameOver = false;
 
+        drawyer = new TetrominoDrawyer();
+        nextTetromino = drawyer.getNextTetromino();
         activateNextTetromino();
+
 
     }
 
@@ -72,7 +69,7 @@ public class GameModel {
             freezeCountdown -= delta;
 
         if (freezeCountdown > 0)
-                return;
+            return;
 
         if (isRotate != 0) {
             rotate(isRotate > 0);
@@ -89,8 +86,7 @@ public class GameModel {
                 if (isMovingLeft > 0) {
                     moveHorizontal(-1);
                     isMovingLeft = 1;
-                }
-                else {
+                } else {
                     moveHorizontal(1);
                     isMovingRight = 1;
                 }
@@ -198,7 +194,7 @@ public class GameModel {
         endMoveHorizontal(true);
         endMoveHorizontal(false);
 
-        activeTetromino = new Tetromino(nextTetromino);
+        activeTetromino = nextTetromino;
 
         // ins Display damit
         for (Integer[] v : activeTetromino.getCurrentBlockPositions()) {
@@ -207,7 +203,7 @@ public class GameModel {
         }
 
         distanceRemainder = 0.0f;
-        nextTetromino = MathUtils.random(Tetromino.COUNT - 1);
+        nextTetromino = drawyer.getNextTetromino();
 
         // Wenn der neu eingefügte Tetromino keinen Platz mehr hat, ist das Spiel zu Ende
         if (!gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
