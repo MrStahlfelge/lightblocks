@@ -14,7 +14,7 @@ public class GameModel {
     // das Spielgeschehen
     public static final String GAMEMODEL_VERSION = "1.0.0";
     // Für die Steuerung
-    private static final float REPEAT_START_OFFSET = 0.5f;
+    private static final float REPEAT_START_OFFSET = 0.4f;
     private static final float REPEAT_INTERVAL = 0.05f;
     private static final float SOFT_DROP_SPEED = 30.0f;
     // Speicherhaltung
