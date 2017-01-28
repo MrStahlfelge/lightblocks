@@ -171,13 +171,16 @@ public class GameModel {
 
             // Die Position und auch die Einzelteile darin muss geclonet werden, um nicht
             // durch die Rotation verloren zu gehen
-            Integer[][] oldBlockPositions = activeTetromino.getCurrentBlockPositions().clone();
-            for (int i = 0; i < oldBlockPositions.length; i++)
-                oldBlockPositions[i] = oldBlockPositions[i].clone();
+            Integer[][] oldBlockPositionsReference = activeTetromino.getCurrentBlockPositions();
+            Integer[][] oldBlockPositionsNewArray = new Integer[oldBlockPositionsReference.length][2];
+            for (int i = 0; i < oldBlockPositionsReference.length; i++) {
+                oldBlockPositionsNewArray[i][0] = new Integer(oldBlockPositionsReference[i][0]);
+                oldBlockPositionsNewArray[i][1] = new Integer(oldBlockPositionsReference[i][1]);
+            }
 
             activeTetromino.setRotation(newRotation);
 
-            listener.moveBlocks(oldBlockPositions, activeTetromino.getCurrentBlockPositions());
+            listener.moveBlocks(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions());
             listener.playSound(IGameModelListener.SOUND_ROTATE);
 
 
