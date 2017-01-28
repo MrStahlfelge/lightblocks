@@ -54,13 +54,10 @@ public class MainMenuScreen extends AbstractScreen {
         // Der Titel
         mainTable.row();
 
-        final Label gameTitle = new Label(app.TEXTS.get("gameTitle").toUpperCase(), app.skin);
-        gameTitle.setFontScaleX(1.4f);
-        gameTitle.setFontScaleY(1.2f);
+        final Label gameTitle = new Label(app.TEXTS.get("gameTitle").toUpperCase(), app.skin, "big");
         mainTable.add(gameTitle).colspan(2).spaceTop(LightBlocksGame.nativeGameWidth / 12);
         mainTable.row();
         final Label gameAuthor = new Label(app.TEXTS.get("gameAuthor"), app.skin);
-        gameAuthor.setFontScale(0.8f);
         mainTable.add(gameAuthor).colspan(2).
                 spaceBottom(LightBlocksGame.nativeGameWidth / 12).top();
 

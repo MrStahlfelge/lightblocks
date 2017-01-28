@@ -10,7 +10,10 @@ import com.badlogic.gdx.utils.JsonValue;
  */
 
 public class Gameboard implements Json.Serializable {
-    public static final int GAMEBOARD_ROWS = 22;
+    public static final int GAMEBOARD_ALLROWS = 22;
+    // normalerweise sind nur 20 Zeilen im Spiel, die 2 oberen sind nur
+    // nötig im Multiplayer wenn hochgedrückt wird
+    public static final int GAMEBOARD_NORMALROWS = GAMEBOARD_ALLROWS - 2;
     public static final int GAMEBOARD_COLUMNS = 10;
     public static final int SQUARE_EMPTY = -1;
 
@@ -20,8 +23,8 @@ public class Gameboard implements Json.Serializable {
     Vector2 tempPos;
 
     Gameboard() {
-        gameboardSquare = new int[GAMEBOARD_ROWS][GAMEBOARD_COLUMNS];
-        for (int i = 0; i < GAMEBOARD_ROWS; i++) {
+        gameboardSquare = new int[GAMEBOARD_ALLROWS][GAMEBOARD_COLUMNS];
+        for (int i = 0; i < GAMEBOARD_ALLROWS; i++) {
             for (int j = 0; j < GAMEBOARD_COLUMNS; j++) {
                 gameboardSquare[i][j] = SQUARE_EMPTY;
             }
@@ -91,7 +94,7 @@ public class Gameboard implements Json.Serializable {
             return false;
         }
 
-        if (y < 0 || y >= GAMEBOARD_ROWS) {
+        if (y < 0 || y >= GAMEBOARD_ALLROWS) {
             return false;
         }
 
@@ -110,9 +113,9 @@ public class Gameboard implements Json.Serializable {
     public void clearLines(IntArray linesToRemove) {
         for (int i = linesToRemove.size - 1; i >= 0; i--) {
 
-            for (int y = linesToRemove.get(i); y < GAMEBOARD_ROWS; y++) {
+            for (int y = linesToRemove.get(i); y < GAMEBOARD_ALLROWS; y++) {
                 for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
-                    if (y == GAMEBOARD_ROWS - 1)
+                    if (y == GAMEBOARD_ALLROWS - 1)
                         gameboardSquare[y][x] = SQUARE_EMPTY;
                     else
                         gameboardSquare[y][x] = gameboardSquare[y + 1][x];
@@ -128,7 +131,7 @@ public class Gameboard implements Json.Serializable {
     @Override
     public void write(Json json) {
         String jsonString = "";
-        for (int y = 0; y < GAMEBOARD_ROWS; y++) {
+        for (int y = 0; y < GAMEBOARD_ALLROWS; y++) {
             for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
                 if (gameboardSquare[y][x] == SQUARE_EMPTY)
                     jsonString += ' ';
@@ -142,7 +145,7 @@ public class Gameboard implements Json.Serializable {
     @Override
     public void read(Json json, JsonValue jsonData) {
         String jsonString = jsonData.getString("fields");
-        for (int y = 0; y < GAMEBOARD_ROWS; y++) {
+        for (int y = 0; y < GAMEBOARD_ALLROWS; y++) {
             for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
                 char block = jsonString.charAt(y * GAMEBOARD_COLUMNS + x);
                 if (block == ' ')

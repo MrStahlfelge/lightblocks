@@ -3,7 +3,7 @@ package de.golfgl.lightblocks.model;
 import com.badlogic.gdx.math.Vector2;
 
 import static de.golfgl.lightblocks.model.Gameboard.GAMEBOARD_COLUMNS;
-import static de.golfgl.lightblocks.model.Gameboard.GAMEBOARD_ROWS;
+import static de.golfgl.lightblocks.model.Gameboard.GAMEBOARD_NORMALROWS;
 
 /**
  * Created by Benjamin Schulte on 23.01.2017.
@@ -57,7 +57,7 @@ public class Tetromino {
         this.blockPosition = new Integer[TETROMINO_BLOCKCOUNT][2];
 
         // Die Startposition jedes Tetrominos
-        this.position = new Vector2(GAMEBOARD_COLUMNS / 2 - 2, GAMEBOARD_ROWS - 5);
+        this.position = new Vector2(GAMEBOARD_COLUMNS / 2 - 2, GAMEBOARD_NORMALROWS - 3);
         currentRotation = 0;
     }
 

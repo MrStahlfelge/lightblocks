@@ -3,8 +3,12 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 
@@ -31,17 +35,22 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final BlockGroup blockGroup;
     private final BlockActor[][] blockMatrix;
     private final BlockActor[] nextTetro;
+    private final Label scoreNum;
+    private final Label levelNum;
+    private final Label linesNum;
+
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
     Music music;
     float lastAccX = 0;
 
     private boolean isPaused = true;
+    private int shownScore = 0;
 
     public PlayScreen(LightBlocksGame app, PlayScreenInput inputAdapter) {
         super(app);
 
-        blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ROWS];
+        blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ALLROWS];
         nextTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
 
         inputAdapter.setPlayScreen(this);
@@ -52,22 +61,55 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         blockGroup.setTransform(false);
 
         // 10 Steine breit, 20 Steine hoch
-        blockGroup.setX((LightBlocksGame.nativeGameWidth - Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth) / 4);
-        blockGroup.setY((LightBlocksGame.nativeGameHeight - (Gameboard.GAMEBOARD_ROWS - 1) * BlockActor.blockWidth) /
+        blockGroup.setX((LightBlocksGame.nativeGameWidth - Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth) / 2);
+        blockGroup.setY((LightBlocksGame.nativeGameHeight - (Gameboard.GAMEBOARD_ALLROWS) * BlockActor.blockWidth) /
                 2);
 
-        // mit Quatsch initialisieren
-//        for (int i = 0; i < 10; i++) {
-//            for (int j = 0; j < 20; j++) {
-//                BlockActor block = new BlockActor(app);
-//                block.setX(i * BlockActor.blockWidth);
-//                block.setY(j * BlockActor.blockWidth);
-//                block.setEnlightened(MathUtils.random(0, 1) == 0);
-//                blockGroup.addActor(block);
-//            }
-//        }
-
         stage.addActor(blockGroup);
+
+        // Begrenzungen um die BlockGroup
+        final int ninePatchBorderSize = 5;
+        NinePatch line = new NinePatch(app.trGlowingLine, ninePatchBorderSize, ninePatchBorderSize, ninePatchBorderSize,
+                ninePatchBorderSize);
+        Image imLine = new Image(line);
+
+        imLine.setX(blockGroup.getX() + Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth);
+        imLine.setY(blockGroup.getY() - ninePatchBorderSize);
+        imLine.addAction(Actions.sizeTo(imLine.getWidth(), (Gameboard.GAMEBOARD_NORMALROWS) * BlockActor.blockWidth +
+                2 * ninePatchBorderSize, 1f, Interpolation.circleOut));
+        imLine.setColor(.9f, .9f, .9f, 1);
+        stage.addActor(imLine);
+
+        imLine = new Image(line);
+        imLine.setY(blockGroup.getY() - ninePatchBorderSize);
+        imLine.setX(blockGroup.getX() - imLine.getWidth() - 2);
+        imLine.addAction(Actions.sizeTo(imLine.getWidth(), (Gameboard.GAMEBOARD_NORMALROWS) * BlockActor.blockWidth +
+                2 * ninePatchBorderSize, 1f, Interpolation.circleOut));
+        imLine.setColor(.9f, .9f, .9f, 1);
+        stage.addActor(imLine);
+
+        // Labels
+        final Table mainTable = new Table();
+
+        mainTable.row();
+        Label scoreLabel = new Label(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
+        mainTable.add(scoreLabel).right().top();
+        scoreNum = new Label("0000000000", app.skin, "big");
+        mainTable.add(scoreNum).left().colspan(3);
+        mainTable.row();
+        Label levelLabel = new Label(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
+        mainTable.add(levelLabel).right().bottom();
+        levelNum = new Label("00", app.skin, "big");
+        mainTable.add(levelNum).left();
+        Label linesLabel = new Label(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
+        mainTable.add(linesLabel).right().bottom().spaceLeft(5);
+        linesNum = new Label("000", app.skin, "big");
+        mainTable.add(linesNum).left();
+
+        mainTable.setY(LightBlocksGame.nativeGameHeight - mainTable.getPrefHeight() / 2 - 5);
+        mainTable.setX(mainTable.getPrefWidth() / 2 + 5);
+
+        stage.addActor(mainTable);
 
         stage.getRoot().setColor(Color.CLEAR);
 
@@ -78,7 +120,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             gameModel.loadGameModel(app.savegame.loadGame());
         else
             gameModel.startNewGame();
-
+        setShownScore(10000); // nur zum Test TODO
     }
 
     @Override
@@ -228,8 +270,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameModel.setFreezeInterval(removeDelayTime);
 
         // Vorbereitung zum Heraussuchen der Zeilen, die welche ersetzen
-        IntArray lineMove = new IntArray(Gameboard.GAMEBOARD_ROWS);
-        for (int i = 0; i < Gameboard.GAMEBOARD_ROWS; i++)
+        IntArray lineMove = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
+        for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++)
             lineMove.add(i);
 
 
@@ -254,8 +296,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             }
 
             // heraussuchen durch weile Zeile diese hier ersetzt wird
-            for (int higherY = y; higherY < Gameboard.GAMEBOARD_ROWS; higherY++)
-                if (higherY < Gameboard.GAMEBOARD_ROWS - 1)
+            for (int higherY = y; higherY < Gameboard.GAMEBOARD_ALLROWS; higherY++)
+                if (higherY < Gameboard.GAMEBOARD_ALLROWS - 1)
                     lineMove.set(higherY, lineMove.get(higherY + 1));
                 else
                     lineMove.set(higherY, -1);
@@ -293,9 +335,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Er wird aber zunächst nicht der Blockgroup hinzugefügt, damit er wenn er einfliegt keine Steine auf dem
         // Spielfeld überlagert
 
-        final float offsetX = LightBlocksGame.nativeGameWidth - (Tetromino.TETROMINO_BLOCKCOUNT + .5f) * BlockActor
+        final float offsetX = LightBlocksGame.nativeGameWidth - blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT -
+                .3f) * BlockActor
                 .blockWidth;
-        final float offsetY = (Gameboard.GAMEBOARD_ROWS - 3.5f) * BlockActor.blockWidth;
+        final float offsetY = (Gameboard.GAMEBOARD_NORMALROWS - .7f) * BlockActor.blockWidth;
 
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
             nextTetro[i] = new BlockActor(app);
@@ -352,5 +395,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         } else if (music != null)
             music.dispose();
 
+    }
+
+    public void setShownScore(int newScore) {
+        scoreNum.setText(String.format("%010d", newScore));
+        this.shownScore = newScore;
     }
 }

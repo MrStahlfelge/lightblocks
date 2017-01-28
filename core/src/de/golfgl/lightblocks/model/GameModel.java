@@ -51,7 +51,7 @@ public class GameModel {
     public GameModel(IGameModelListener userInterface) {
 
         this.userInterface = userInterface;
-        linesToRemove = new IntArray(Gameboard.GAMEBOARD_ROWS);
+        linesToRemove = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
         isGameOver = false;
 
     }
@@ -128,7 +128,7 @@ public class GameModel {
     private void removeFullLines() {
         linesToRemove.clear();
 
-        for (int i = 0; i < Gameboard.GAMEBOARD_ROWS; i++) {
+        for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
             if (gameboard.isRowFull(i)) {
                 linesToRemove.add(i);
             }

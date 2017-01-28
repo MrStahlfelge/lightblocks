@@ -9,6 +9,12 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 	font-pressed: {
 		file: font-pressed-export.fnt
 	}
+	qs-25-bold: {
+		file: raw/qs-25-bold.fnt
+	}
+	qs-outline-40-bold: {
+		file: raw/qs-outline-40-bold.fnt
+	}
 }
 com.badlogic.gdx.graphics.Color: {
 	color: {
@@ -291,6 +297,14 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	}
 	pressed: {
 		font: font-pressed
+		fontColor: text
+	}
+	big: {
+		font: qs-25-bold
+		fontColor: text
+	}
+	bigbigoutline: {
+		font: qs-outline-40-bold
 		fontColor: text
 	}
 }
