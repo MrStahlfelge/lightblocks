@@ -1,6 +1,5 @@
 package de.golfgl.lightblocks.model;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntArray;
 
 /**
@@ -9,19 +8,19 @@ import com.badlogic.gdx.utils.IntArray;
 
 public interface IGameModelListener {
 
-    public static int SOUND_DROP = 1;
-    public static int SOUND_ROTATE = 2;
-
     void insertNewBlock(int x, int y);
 
-    void moveBlocks(Integer[][] v, int dx, int dy);
-    void moveBlocks(Integer[][] vOld, Integer[][] vNew);
+    void moveTetro(Integer[][] v, int dx, int dy);
 
-    void setBlockActivated(int x, int y, boolean activated);
-
-    void playSound(int sound);
+    void rotateTetro(Integer[][] vOld, Integer[][] vNew);
 
     void clearLines(IntArray linesToRemove);
 
     void setGameOver(boolean b);
+
+    void showNextTetro(Integer[][] relativeBlockPositions);
+
+    void activateNextTetro(Integer[][] boardBlockPositions);
+
+    void pinTetromino(Integer[][] currentBlockPositions);
 }

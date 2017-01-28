@@ -12,7 +12,7 @@ public class Tetromino {
     // es gibt sieben verschiedene Tetrominos
     public static final int TETROMINO_NUMBER = 7;
     // und jeder besteht aus vier Blöcken
-    public static final int TETROMINO_BLOCKS = 4;
+    public static final int TETROMINO_BLOCKCOUNT = 4;
 
     //Die 7 Tetrominos
     private static Vector2[][][] tetrominoTemplates = {
@@ -54,7 +54,7 @@ public class Tetromino {
 
     Tetromino(int index) {
         this.tetrominoIndex = index;
-        this.blockPosition = new Integer[TETROMINO_BLOCKS][2];
+        this.blockPosition = new Integer[TETROMINO_BLOCKCOUNT][2];
 
         // Die Startposition jedes Tetrominos
         this.position = new Vector2(GAMEBOARD_COLUMNS / 2 - 2, GAMEBOARD_ROWS - 5);

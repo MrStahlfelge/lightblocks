@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
@@ -11,8 +12,11 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.IGameModelListener;
+import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
+
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 /**
  * The main playing screen
@@ -26,6 +30,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     private final BlockGroup blockGroup;
     private final BlockActor[][] blockMatrix;
+    private final BlockActor[] nextTetro;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
     Music music;
@@ -37,6 +42,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         super(app);
 
         blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ROWS];
+        nextTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
 
         inputAdapter.setPlayScreen(this);
         this.inputAdapter = inputAdapter;
@@ -46,8 +52,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         blockGroup.setTransform(false);
 
         // 10 Steine breit, 20 Steine hoch
-        blockGroup.setX((LightBlocksGame.nativeGameWidth - 10 * BlockActor.blockWidth) / 2);
-        blockGroup.setY((LightBlocksGame.nativeGameHeight - 20 * BlockActor.blockWidth) / 2);
+        blockGroup.setX((LightBlocksGame.nativeGameWidth - Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth) / 4);
+        blockGroup.setY((LightBlocksGame.nativeGameHeight - (Gameboard.GAMEBOARD_ROWS - 1) * BlockActor.blockWidth) /
+                2);
 
         // mit Quatsch initialisieren
 //        for (int i = 0; i < 10; i++) {
@@ -68,7 +75,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameModel = new GameModel(this);
 
         if (app.savegame.hasSavedGame())
-                gameModel.loadGameModel(app.savegame.loadGame());
+            gameModel.loadGameModel(app.savegame.loadGame());
         else
             gameModel.startNewGame();
 
@@ -111,6 +118,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     public void switchPause(boolean immediately) {
+
+        if (gameModel.isGameOver())
+            return;
+
         isPaused = !isPaused;
 
         final float fadingInterval = immediately ? 0 : .2f;
@@ -138,14 +149,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 music.pause();
 
             // Spielstand speichern
-            if (!gameModel.isGameOver())
-                app.savegame.saveGame(gameModel.saveGameModel());
+            app.savegame.saveGame(gameModel.saveGameModel());
         }
     }
 
     @Override
     public void insertNewBlock(int x, int y) {
         BlockActor block = new BlockActor(app);
+        insertBlock(x, y, block);
+    }
+
+    private void insertBlock(int x, int y, BlockActor block) {
         block.setX(x * BlockActor.blockWidth);
         block.setY(y * BlockActor.blockWidth);
         blockGroup.addActor(block);
@@ -153,7 +167,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void moveBlocks(Integer[][] v, int dx, int dy) {
+    public void moveTetro(Integer[][] v, int dx, int dy) {
         if (dx != 0 || dy != 0) {
             // erst alle vom Spielbrett einsammeln...
             Array<BlockActor> blocks = removeBlockActorsFromMatrix(v);
@@ -185,7 +199,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void moveBlocks(Integer[][] vOld, Integer[][] vNew) {
+    public void rotateTetro(Integer[][] vOld, Integer[][] vNew) {
+        app.rotateSound.play();
+
         // erst alle vom Spielbrett einsammeln...
         Array<BlockActor> blocks = removeBlockActorsFromMatrix(vOld);
 
@@ -200,25 +216,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         }
 
 
-    }
-
-    @Override
-    public void setBlockActivated(int x, int y, boolean activated) {
-        BlockActor block = blockMatrix[x][y];
-        block.setEnlightened(activated);
-    }
-
-    @Override
-    public void playSound(int sound) {
-        switch (sound) {
-            case IGameModelListener.SOUND_DROP:
-                app.switchSound.play();
-                break;
-            case IGameModelListener.SOUND_ROTATE:
-                app.rotateSound.play();
-                break;
-
-        }
     }
 
     @Override
@@ -248,11 +245,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
                 // die untersten zusammenhängenden Zeilen rausschieben
                 if (y == i)
-                    block.setMoveAction(Actions.sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -(i + 1) *
+                    block.setMoveAction(sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -(i + 1) *
                             BlockActor.blockWidth, moveActorsTime)));
 
                 app.removeSound.play();
-                block.addAction(Actions.sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
+                block.addAction(sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
                         Actions.removeActor()));
             }
 
@@ -273,7 +270,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     blockMatrix[x][lineMove.get(i)] = null;
                     blockMatrix[x][i] = block;
                     if (block != null)
-                        block.setMoveAction(Actions.sequence(Actions.delay(removeDelayTime), (Actions.moveTo((x) *
+                        block.setMoveAction(sequence(Actions.delay(removeDelayTime), (Actions.moveTo((x) *
                                 BlockActor.blockWidth, (i) * BlockActor.blockWidth, moveActorsTime))));
                 }
 
@@ -288,6 +285,63 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (music != null)
             music.stop();
         app.savegame.resetGame();
+    }
+
+    @Override
+    public void showNextTetro(Integer[][] relativeBlockPositions) {
+        // ein neuer nächster-Stein wurde bestimmt. Wir zeigen ihn einfach über dem Spielfeld an
+        // Er wird aber zunächst nicht der Blockgroup hinzugefügt, damit er wenn er einfliegt keine Steine auf dem
+        // Spielfeld überlagert
+
+        final float offsetX = LightBlocksGame.nativeGameWidth - (Tetromino.TETROMINO_BLOCKCOUNT + .5f) * BlockActor
+                .blockWidth;
+        final float offsetY = (Gameboard.GAMEBOARD_ROWS - 3.5f) * BlockActor.blockWidth;
+
+        for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
+            nextTetro[i] = new BlockActor(app);
+            nextTetro[i].setPosition((i == 0 || i == 2) ? -BlockActor.blockWidth : LightBlocksGame.nativeGameWidth +
+                            BlockActor.blockWidth,
+                    (i >= 2) ? 0 : LightBlocksGame.nativeGameHeight);
+            nextTetro[i].setMoveAction(Actions.moveTo(offsetX + relativeBlockPositions[i][0] * BlockActor.blockWidth,
+                    offsetY + relativeBlockPositions[i][1] * BlockActor.blockWidth, .5f, Interpolation.fade));
+            nextTetro[i].addAction(Actions.alpha(.5f, .5f, Interpolation.fade));
+            nextTetro[i].getColor().a = 0;
+
+            blockGroup.addActorAt(0, nextTetro[i]);
+        }
+    }
+
+    @Override
+    public void activateNextTetro(Integer[][] boardBlockPositions) {
+
+        for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
+            // den bereits in nextTetro instantiierten Block ins Spielfeld an die gewünschte Stelle bringen
+            BlockActor block = nextTetro[i];
+
+            final int x = boardBlockPositions[i][0];
+            final int y = boardBlockPositions[i][1];
+
+            if (block == null) {
+                //beim Spielstart noch nicht gesetzt und die Animation macht auch keinen Sinn,
+                //dann gleich an Zielposition instanziieren
+                block = new BlockActor(app);
+                insertBlock(x, y, block);
+            } else {
+                nextTetro[i] = null;
+                blockMatrix[x][y] = block;
+                block.addAction(Actions.fadeIn(.1f));
+                block.setMoveAction(Actions.moveTo(x * BlockActor.blockWidth, y * BlockActor.blockWidth, .1f,
+                        Interpolation.fade));
+            }
+            block.setEnlightened(true);
+        }
+    }
+
+    @Override
+    public void pinTetromino(Integer[][] currentBlockPositions) {
+        app.dropSound.play();
+        for (Integer[] vAfterMove : currentBlockPositions)
+            blockMatrix[vAfterMove[0]][vAfterMove[1]].setEnlightened(false);
     }
 
     public void setMusic(boolean playMusic) {

@@ -19,7 +19,7 @@ public class GameModel {
     private static final float SOFT_DROP_SPEED = 30.0f;
     // Speicherhaltung
     private final IntArray linesToRemove;
-    IGameModelListener listener;
+    IGameModelListener userInterface;
     TetrominoDrawyer drawyer;
     private Tetromino activeTetromino;
     private Tetromino nextTetromino;
@@ -48,9 +48,9 @@ public class GameModel {
     // Verzögerung bei gedrückter Taste
     private float movingCountdown;
 
-    public GameModel(IGameModelListener listener) {
+    public GameModel(IGameModelListener userInterface) {
 
-        this.listener = listener;
+        this.userInterface = userInterface;
         linesToRemove = new IntArray(Gameboard.GAMEBOARD_ROWS);
         isGameOver = false;
 
@@ -105,7 +105,7 @@ public class GameModel {
         int maxDistance = (-1) * gameboard.checkPossibleMoveDistance(false, -distance, activeTetromino);
 
         if (maxDistance > 0) {
-            listener.moveBlocks(activeTetromino.getCurrentBlockPositions(), 0, -maxDistance);
+            userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), 0, -maxDistance);
             activeTetromino.getPosition().y -= maxDistance;
         }
 
@@ -113,9 +113,7 @@ public class GameModel {
         if (maxDistance < distance) {
 
             gameboard.pinTetromino(activeTetromino);
-            listener.playSound(IGameModelListener.SOUND_DROP);
-            for (Integer[] vAfterMove : activeTetromino.getCurrentBlockPositions())
-                listener.setBlockActivated(vAfterMove[0], vAfterMove[1], false);
+            userInterface.pinTetromino(activeTetromino.getCurrentBlockPositions());
 
             addDropScore();
             removeFullLines();
@@ -142,7 +140,7 @@ public class GameModel {
         }
 
         gameboard.clearLines(linesToRemove);
-        listener.clearLines(linesToRemove);
+        userInterface.clearLines(linesToRemove);
     }
 
     private void addDropScore() {
@@ -153,7 +151,7 @@ public class GameModel {
         int maxDistance = gameboard.checkPossibleMoveDistance(true, distance, activeTetromino);
 
         if (maxDistance != 0) {
-            listener.moveBlocks(activeTetromino.getCurrentBlockPositions(), maxDistance, 0);
+            userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), maxDistance, 0);
             activeTetromino.getPosition().x += maxDistance;
         }
     }
@@ -175,15 +173,12 @@ public class GameModel {
 
             activeTetromino.setRotation(newRotation);
 
-            listener.moveBlocks(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions());
-            listener.playSound(IGameModelListener.SOUND_ROTATE);
-
-
+            userInterface.rotateTetro(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions());
         }
     }
 
     public void setFreezeInterval(float time) {
-        freezeCountdown = time;
+        freezeCountdown = Math.max(time, freezeCountdown);
     }
 
     private void activateNextTetromino() {
@@ -193,23 +188,28 @@ public class GameModel {
         endMoveHorizontal(false);
 
         activeTetromino = nextTetromino;
+        nextTetromino = drawyer.getNextTetromino();
 
-        // ins Display damit
-        for (Integer[] v : activeTetromino.getCurrentBlockPositions()) {
-            listener.insertNewBlock(v[0], v[1]);
-            listener.setBlockActivated(v[0], v[1], true);
-        }
+        // ins Display mit beiden
+        fireUserInterfaceTetrominoSwap();
 
         distanceRemainder = 0.0f;
-        nextTetromino = drawyer.getNextTetromino();
 
         // Wenn der neu eingefügte Tetromino keinen Platz mehr hat, ist das Spiel zu Ende
         if (!gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
                 activeTetromino.getCurrentRotation())) {
             isGameOver = true;
-            listener.setGameOver(true);
+            userInterface.setGameOver(true);
         }
 
+    }
+
+    /**
+     * die Methode aktiviert den bisherigen "Next" Tetromino im UI und zeichnet den nächsten next-Tetromino
+     */
+    private void fireUserInterfaceTetrominoSwap() {
+        userInterface.activateNextTetro(activeTetromino.getCurrentBlockPositions());
+        userInterface.showNextTetro(nextTetromino.getBlockPositions(new Vector2(0, 0), 0));
     }
 
     public boolean isGameOver() {
@@ -278,20 +278,16 @@ public class GameModel {
 
         json.fromJson(GameModel.class, jsonString);
 
-        // in das UI alle Blöcke einfügen
+        // in das UI alle inaktiven Blöcke einfügen
         int[][] blockSquares = gameboard.getGameboardSquares();
 
         for (int y = 0; y < blockSquares.length; y++)
             for (int x = 0; x < blockSquares[y].length; x++)
                 if (blockSquares[y][x] != Gameboard.SQUARE_EMPTY)
-                    listener.insertNewBlock(x, y);
+                    userInterface.insertNewBlock(x, y);
 
-        // und auch den aktiven Tetromino
-        for (Integer[] v : activeTetromino.getCurrentBlockPositions()) {
-            listener.insertNewBlock(v[0], v[1]);
-            listener.setBlockActivated(v[0], v[1], true);
-        }
-
+        // und auch die aktiven Tetrominos
+        fireUserInterfaceTetrominoSwap();
     }
 
 

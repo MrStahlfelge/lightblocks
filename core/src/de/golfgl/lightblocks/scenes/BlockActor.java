@@ -1,10 +1,7 @@
 package de.golfgl.lightblocks.scenes;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -22,13 +19,15 @@ public class BlockActor extends Actor {
     private final static float dislighentedAlpha = .4f;
     private final static float timeToEnlighten = .2f;
     private final static float timeToDislighten = .6f;
-
+    private static final int shapeSize = 20;
+    Image imBlock;
+    //Image imBlockDeactivated;
+    Image imBlockEnlightened;
     /**
      * wenn der Stein gerade bewegt wird, ist dies hier die Action die ihn bewegt.
      * Das dient dazu, sie ggf. wieder zu entfernen wenn eine andere Bewegung nötig wird.
      */
     private Action moveAction;
-
     /**
      * Damit der Glow immer auf den Steinen ist, ruft die BockGroup die draw-Methode aller
      * Steine zweimal auf. Das erste Mal wird der Stein gezeichnet, das zweite Mal der Glow-Effekt
@@ -36,6 +35,17 @@ public class BlockActor extends Actor {
      * - der Aufruf steckt zu tief in Group.draw drin. Das ist ein Hack. :-(
      */
     private boolean drawGlow;
+    private boolean isEnlightened = false;
+    /**
+     * constructor adds the Textures and Images
+     */
+    public BlockActor(LightBlocksGame app) {
+        imBlock = new Image(app.trBlock);
+        //imBlockDeactivated = new Image(app.trBlockDeactivated);
+        imBlockEnlightened = new Image(app.trBlockEnlightened);
+        imBlockEnlightened.setColor(1, 1, 1, dislighentedAlpha);
+
+    }
 
     /**
      * accessor for getting enlightenment action (Main menu)
@@ -44,37 +54,33 @@ public class BlockActor extends Actor {
         return new RunEnlightenment(this, false);
     }
 
-    /**
-     * Class for giving this to the action sequences
-     */
-    public static class RunEnlightenment implements Runnable {
-
-        BlockActor block;
-        boolean enlightenment;
-
-        // this is private to avoid constructing from other classes.
-        // Use the public static field here.
-        private RunEnlightenment(BlockActor block, boolean enlightenment) {
-            this.enlightenment = enlightenment;
-            this.block = block;
-        }
-
-        @Override
-        public void run() {
-            block.setEnlightened(enlightenment);
-        }
+    public RunEnlightenment getEnlightenAction() {
+        return new RunEnlightenment(this, true);
     }
-
-    Image imBlock;
-    //Image imBlockDeactivated;
-    Image imBlockEnlightened;
-
-    private boolean isEnlightened = false;
-
-    private static final int shapeSize = 20;
 
     public boolean isEnlightened() {
         return isEnlightened;
+    }
+
+    public void setEnlightened(boolean sollwert) {
+        if (isEnlightened != sollwert) {
+            AlphaAction action = Actions.action(AlphaAction.class);
+
+            // solange auf dem Enlightenblock nur FadeActions laufen reicht das
+            imBlockEnlightened.clearActions();
+
+            if (sollwert) {
+                action.setDuration(timeToEnlighten);
+                action.setAlpha(1);
+                imBlockEnlightened.addAction(action);
+            } else {
+                action.setDuration(timeToDislighten);
+                action.setAlpha(dislighentedAlpha);
+                imBlockEnlightened.addAction(action);
+            }
+        }
+
+        isEnlightened = sollwert;
     }
 
     /**
@@ -90,40 +96,6 @@ public class BlockActor extends Actor {
         moveAction = newMoveAction;
 
     }
-
-    public void setEnlightened(boolean sollwert) {
-        if (isEnlightened != sollwert) {
-            AlphaAction action = Actions.action(AlphaAction.class);
-
-            // solange auf dem Enlightenblock nur FadeActions laufen reicht das
-            imBlockEnlightened.clearActions();
-
-            if (sollwert) {
-                action.setDuration(timeToEnlighten);
-                action.setAlpha(1);
-                imBlockEnlightened.addAction(action);
-            }
-            else {
-                action.setDuration(timeToDislighten);
-                action.setAlpha(dislighentedAlpha);
-                imBlockEnlightened.addAction(action);
-            }
-        }
-
-        isEnlightened = sollwert;
-    }
-
-
-    /**
-     * constructor adds the Textures and Images
-     */
-    public BlockActor (LightBlocksGame app) {
-        imBlock = new Image(app.trBlock);
-        //imBlockDeactivated = new Image(app.trBlockDeactivated);
-        imBlockEnlightened = new Image(app.trBlockEnlightened);
-        imBlockEnlightened.setColor(1, 1, 1, dislighentedAlpha);
-
-       }
 
     @Override
     public void act(float delta) {
@@ -160,7 +132,7 @@ public class BlockActor extends Actor {
 
     @Override
     public void setColor(Color color) {
-        setColor(color.r,color.g,color.b,color.a);
+        setColor(color.r, color.g, color.b, color.a);
     }
 
     @Override
@@ -168,6 +140,27 @@ public class BlockActor extends Actor {
         super.setColor(r, g, b, a);
         imBlock.setColor(r, g, b, a);
         //imBlockDeactivated.setColor(r, g, b, a);
-        imBlockEnlightened.setColor(r,g,b, imBlockEnlightened.getColor().a);
+        imBlockEnlightened.setColor(r, g, b, imBlockEnlightened.getColor().a);
+    }
+
+    /**
+     * Class for giving this to the action sequences
+     */
+    public static class RunEnlightenment implements Runnable {
+
+        BlockActor block;
+        boolean enlightenment;
+
+        // this is private to avoid constructing from other classes.
+        // Use the public static field here.
+        private RunEnlightenment(BlockActor block, boolean enlightenment) {
+            this.enlightenment = enlightenment;
+            this.block = block;
+        }
+
+        @Override
+        public void run() {
+            block.setEnlightened(enlightenment);
+        }
     }
 }

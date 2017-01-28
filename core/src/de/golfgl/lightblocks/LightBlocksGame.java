@@ -26,7 +26,7 @@ public class LightBlocksGame extends Game {
     // these resources are used in the whole game... so we are loading them here
     public TextureRegion trBlock;
     public TextureRegion trBlockEnlightened;
-    public Sound switchSound;
+    public Sound dropSound;
     public Sound rotateSound;
     public Sound removeSound;
 
@@ -54,7 +54,7 @@ public class LightBlocksGame extends Game {
         //trBlock = new TextureRegion(assetManager.get("raw/block.png", Texture.class));
         trBlock = new TextureRegion(assetManager.get("raw/block-deactivated.png", Texture.class));
         trBlockEnlightened = new TextureRegion(assetManager.get("raw/block-light.png", Texture.class));
-        switchSound = assetManager.get("sound/switchon.ogg", Sound.class);
+        dropSound = assetManager.get("sound/switchon.ogg", Sound.class);
         rotateSound = assetManager.get("sound/switchflip.ogg", Sound.class);
         removeSound = assetManager.get("sound/glow05.ogg", Sound.class);
 
