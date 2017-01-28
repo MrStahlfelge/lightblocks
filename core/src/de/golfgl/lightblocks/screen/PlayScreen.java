@@ -1,7 +1,6 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -68,6 +67,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Game Model erst hinzufügen, wenn die blockgroup schon steht
         gameModel = new GameModel(this);
 
+        if (app.savegame.hasSavedGame())
+                gameModel.loadGameModel(app.savegame.loadGame());
+        else
+            gameModel.startNewGame();
+
     }
 
     @Override
@@ -88,6 +92,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     public void goBackToMenu() {
+        if (!gameModel.isGameOver())
+            app.savegame.saveGame(gameModel.saveGameModel());
+
         app.setScreen(app.mainMenuScreen);
         if (music != null)
             music.dispose();
@@ -99,19 +106,14 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void pause() {
         super.pause();
 
-        blockGroup.getColor().a = 0;
-    }
-
-    @Override
-    public void resume() {
-        super.resume();
-
         if (!isPaused)
-            switchPause();
+            switchPause(true);
     }
 
-    public void switchPause() {
+    public void switchPause(boolean immediately) {
         isPaused = !isPaused;
+
+        final float fadingInterval = immediately ? 0 : .2f;
 
         //inform input adapter, too
         inputAdapter.isPaused = isPaused;
@@ -124,17 +126,20 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 music.play();
 
             if (blockGroup.getColor().a < 1) {
-                blockGroup.addAction(Actions.fadeIn(.2f));
-                gameModel.setFreezeInterval(.2f);
+                blockGroup.addAction(Actions.fadeIn(fadingInterval));
+                gameModel.setFreezeInterval(fadingInterval);
             }
 
             //inform the game model that there was a pause
             gameModel.fromPause();
         } else {
-            blockGroup.addAction(Actions.fadeOut(.2f));
+            blockGroup.addAction(Actions.fadeOut(fadingInterval));
             if (music != null)
                 music.pause();
 
+            // Spielstand speichern
+            if (!gameModel.isGameOver())
+                app.savegame.saveGame(gameModel.saveGameModel());
         }
     }
 
@@ -159,7 +164,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 BlockActor block = blocks.get(i);
                 int x = v[i][0];
                 int y = v[i][1];
-                block.setMoveAction(Actions.moveTo((x + dx) * BlockActor.blockWidth, (y + dy) * BlockActor.blockWidth, 1 / 30f));
+                block.setMoveAction(Actions.moveTo((x + dx) * BlockActor.blockWidth, (y + dy) * BlockActor
+                        .blockWidth, 1 / 30f));
                 blockMatrix[x + dx][y + dy] = block;
             }
         }
@@ -188,7 +194,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             BlockActor block = blocks.get(i);
             int newx = vNew[i][0];
             int newy = vNew[i][1];
-            block.setMoveAction(Actions.moveTo((newx) * BlockActor.blockWidth, (newy) * BlockActor.blockWidth, 1 / 10f));
+            block.setMoveAction(Actions.moveTo((newx) * BlockActor.blockWidth, (newy) * BlockActor.blockWidth, 1 /
+                    10f));
             blockMatrix[newx][newy] = block;
         }
 
@@ -241,11 +248,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
                 // die untersten zusammenhängenden Zeilen rausschieben
                 if (y == i)
-                    block.setMoveAction(Actions.sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -(i + 1) * BlockActor.blockWidth, moveActorsTime)));
+                    block.setMoveAction(Actions.sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -(i + 1) *
+                            BlockActor.blockWidth, moveActorsTime)));
 
                 app.removeSound.play();
-                block.addAction(Actions.sequence(Actions.delay(removeDelayTime),
-                        Actions.fadeOut(removeFadeOutTime),
+                block.addAction(Actions.sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
                         Actions.removeActor()));
             }
 
@@ -266,7 +273,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     blockMatrix[x][lineMove.get(i)] = null;
                     blockMatrix[x][i] = block;
                     if (block != null)
-                        block.setMoveAction(Actions.sequence(Actions.delay(removeDelayTime), (Actions.moveTo((x) * BlockActor.blockWidth, (i) * BlockActor.blockWidth, moveActorsTime))));
+                        block.setMoveAction(Actions.sequence(Actions.delay(removeDelayTime), (Actions.moveTo((x) *
+                                BlockActor.blockWidth, (i) * BlockActor.blockWidth, moveActorsTime))));
                 }
 
             }
@@ -279,6 +287,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void setGameOver(boolean b) {
         if (music != null)
             music.stop();
+        app.savegame.resetGame();
     }
 
     public void setMusic(boolean playMusic) {

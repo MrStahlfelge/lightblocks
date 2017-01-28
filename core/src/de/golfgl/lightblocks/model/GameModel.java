@@ -1,13 +1,18 @@
 package de.golfgl.lightblocks.model;
 
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
 
 /**
  * Created by Benjamin Schulte on 23.01.2017.
  */
 
 public class GameModel {
+    // das Spielgeschehen
+    public static final String GAMEMODEL_VERSION = "1.0.0";
     // Für die Steuerung
     private static final float REPEAT_START_OFFSET = 0.5f;
     private static final float REPEAT_INTERVAL = 0.05f;
@@ -19,21 +24,20 @@ public class GameModel {
     private Tetromino activeTetromino;
     private Tetromino nextTetromino;
     private Gameboard gameboard;
+
     // der aktuelle Punktestand
     private int score;
     // die abgebauten Reihen
     private int clearedLines;
     // Level
     private int level;
-    // Fallgeschwindigkeit
+
+    // Fallgeschwindigkeit - wird von clearedLines beeinflusst
     private float currentSpeed;
-    // wieviel ist schon gefallen
+    // wieviel ist der aktuelle Stein schon ungerundet gefallen
     private float distanceRemainder;
-    // Verzögerung bei gedrückter Taste
-    private float movingCountdown;
 
     private float freezeCountdown;
-
     private boolean isGameOver;
 
     //vom Input geschrieben
@@ -41,23 +45,14 @@ public class GameModel {
     private int isRotate;
     private int isMovingLeft; // 0: nein, 1: ja, 2: gerade begonnen
     private int isMovingRight;
+    // Verzögerung bei gedrückter Taste
+    private float movingCountdown;
 
     public GameModel(IGameModelListener listener) {
 
-        gameboard = new Gameboard();
         this.listener = listener;
-
-        score = 0;
         linesToRemove = new IntArray(Gameboard.GAMEBOARD_ROWS);
-        setClearedLines(0);
-
-        activeTetromino = null;
         isGameOver = false;
-
-        drawyer = new TetrominoDrawyer();
-        nextTetromino = drawyer.getNextTetromino();
-        activateNextTetromino();
-
 
     }
 
@@ -217,6 +212,10 @@ public class GameModel {
 
     }
 
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
     private void setClearedLines(int lines) {
         clearedLines = lines;
         level = 1 + clearedLines / 10;
@@ -253,5 +252,86 @@ public class GameModel {
         // wenn während der Pause ein Knopf für Rotation gedrückt wurde, ist das
         // nicht zu beachten
         isRotate = 0;
+    }
+
+    /**
+     * starts a new game
+     */
+    public void startNewGame() {
+        gameboard = new Gameboard();
+        score = 0;
+        setClearedLines(0);
+
+        activeTetromino = null;
+
+        drawyer = new TetrominoDrawyer();
+        nextTetromino = drawyer.getNextTetromino();
+        activateNextTetromino();
+    }
+
+    public void loadGameModel(String jsonString) {
+        score = 0;
+        setClearedLines(0);
+
+        Json json = new Json();
+        json.setSerializer(GameModel.class, new ModelSerializer());
+
+        json.fromJson(GameModel.class, jsonString);
+
+        // in das UI alle Blöcke einfügen
+        int[][] blockSquares = gameboard.getGameboardSquares();
+
+        for (int y = 0; y < blockSquares.length; y++)
+            for (int x = 0; x < blockSquares[y].length; x++)
+                if (blockSquares[y][x] != Gameboard.SQUARE_EMPTY)
+                    listener.insertNewBlock(x, y);
+
+        // und auch den aktiven Tetromino
+        for (Integer[] v : activeTetromino.getCurrentBlockPositions()) {
+            listener.insertNewBlock(v[0], v[1]);
+            listener.setBlockActivated(v[0], v[1], true);
+        }
+
+    }
+
+
+    public String saveGameModel() {
+        Json json = new Json();
+        json.setSerializer(GameModel.class, new ModelSerializer());
+        json.setOutputType(JsonWriter.OutputType.json);
+        return json.toJson(this);
+    }
+
+    private class ModelSerializer implements Json.Serializer<GameModel> {
+
+        @Override
+        public void write(Json json, GameModel object, Class knownType) {
+            json.writeObjectStart();
+            json.writeValue("gameModelVersion", GAMEMODEL_VERSION);
+            json.writeValue("board", gameboard);
+            json.writeValue("drawyer", drawyer);
+            json.writeValue("active", activeTetromino);
+            json.writeValue("next", nextTetromino.getIndex());
+            json.writeObjectEnd();
+        }
+
+        @Override
+        public GameModel read(Json json, JsonValue jsonData, Class type) {
+            gameboard = new Gameboard();
+            gameboard.read(json, jsonData.get("board"));
+            drawyer = new TetrominoDrawyer();
+            drawyer.read(json, jsonData.get("drawyer"));
+            nextTetromino = new Tetromino(jsonData.getInt("next"));
+
+            // den aktiven Tetromino hier einzeln herausfummeln wegen des
+            // parametrisierten Konstruktors
+            JsonValue tetromino = jsonData.get("active");
+            activeTetromino = new Tetromino(tetromino.getInt("tetrominoIndex"));
+            activeTetromino.setRotation(tetromino.getInt("currentRotation"));
+            Vector2 posFromJson = json.readValue(Vector2.class, tetromino.get("position"));
+            activeTetromino.getPosition().set(posFromJson);
+
+            return GameModel.this;
+        }
     }
 }

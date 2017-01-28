@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -34,16 +33,7 @@ public class MainMenuScreen extends AbstractScreen {
     private final CheckBox menuMusicButton;
     private final ButtonGroup inputChoseField;
     private int inputChosen;
-
-    class ValueCheckBox<T> extends CheckBox {
-        public T value;
-
-        public ValueCheckBox(String text, Skin skin, String styleName) {
-            super(text, skin, styleName);
-        }
-    }
-
-    private PlayScreen currentGame;
+    private TextButton resumeGameButton;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
@@ -81,33 +71,32 @@ public class MainMenuScreen extends AbstractScreen {
         // Play the game!
         TextButton button = new TextButton(app.TEXTS.get("menuPlayButton"), app.skin);
         button.addListener(new ChangeListener() {
-                               public void changed (ChangeEvent event, Actor actor) {
+                               public void changed(ChangeEvent event, Actor actor) {
                                    gotoPlayScreen(false);
-                               }}
-                               );
+                               }
+                           }
+        );
 
         mainTable.add(button).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2);
 
         mainTable.row();
 
         // Resume the game
-        button = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
-        button.addListener(new ChangeListener() {
-            public void changed (ChangeEvent event, Actor actor) {
-                gotoPlayScreen(true);
-            }}
+        resumeGameButton = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
+        resumeGameButton.addListener(new ChangeListener() {
+                                         public void changed(ChangeEvent event, Actor actor) {
+                                             gotoPlayScreen(true);
+                                         }
+                                     }
         );
 
-        mainTable.add(button).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2);
-
-        mainTable.row();
-        mainTable.add(new Label(app.TEXTS.get("menuPlayerNameField") + ":", app.skin));
-        mainTable.add(new TextField(null, app.skin));
+        mainTable.add(resumeGameButton).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2).spaceBottom
+                (LightBlocksGame.nativeGameWidth / 16);
 
         // die möglichen Inputs aufzählen
         inputChoseField = new ButtonGroup();
 
-        inputChosen = app.prefs.getInteger ("inputType", 0);
+        inputChosen = app.prefs.getInteger("inputType", 0);
         if (!PlayScreenInput.inputAvailable(inputChosen))
             inputChosen = 0;
 
@@ -115,7 +104,8 @@ public class MainMenuScreen extends AbstractScreen {
         while (true) {
             try {
                 Input.Peripheral ic = PlayScreenInput.peripheralFromInt(i);
-                ValueCheckBox<Integer> input = new ValueCheckBox<Integer>(app.TEXTS.get(PlayScreenInput.inputName(i)), app.skin, "radio");
+                ValueCheckBox<Integer> input = new ValueCheckBox<Integer>(app.TEXTS.get(PlayScreenInput.inputName(i))
+                        , app.skin, "radio");
                 input.setDisabled(!PlayScreenInput.inputAvailable(i));
                 input.value = i;
 
@@ -129,7 +119,7 @@ public class MainMenuScreen extends AbstractScreen {
                 inputChoseField.add(input);
 
                 mainTable.row();
-                if (i==0)
+                if (i == 0)
                     mainTable.add(new Label(app.TEXTS.get("menuInputControl") + ":", app.skin));
                 else
                     mainTable.add();
@@ -147,7 +137,7 @@ public class MainMenuScreen extends AbstractScreen {
         mainTable.add();
         menuMusicButton = new CheckBox(app.TEXTS.get("menuMusicButton"), app.skin);
         menuMusicButton.setChecked(app.prefs.getBoolean("musicPlayback", true));
-        mainTable.add(menuMusicButton).minHeight(30);
+        mainTable.add(menuMusicButton).minHeight(30).spaceTop(LightBlocksGame.nativeGameWidth / 16);
 
         stage.getRoot().setColor(Color.CLEAR);
 
@@ -155,16 +145,17 @@ public class MainMenuScreen extends AbstractScreen {
 
     }
 
-    private void gotoPlayScreen(boolean lastScreen) {
+    private void gotoPlayScreen(boolean resumeGame) {
         // falls die anfangsanimation noch läuft, unterbrechen
 //                                   for (Actor block : blockGroup.getChildren()) {
 //                                       block.clearActions();
 //                                   }
-        if (!lastScreen || currentGame == null) {
-            inputChosen = ((ValueCheckBox<Integer>) inputChoseField.getChecked()).value;
-            currentGame = new PlayScreen(app, PlayScreenInput.getPlayInput(inputChosen));
-        }
 
+        if (!resumeGame && app.savegame.hasSavedGame())
+            app.savegame.resetGame();
+
+        inputChosen = ((ValueCheckBox<Integer>) inputChoseField.getChecked()).value;
+        final PlayScreen currentGame = new PlayScreen(app, PlayScreenInput.getPlayInput(inputChosen));
         currentGame.setMusic(menuMusicButton.isChecked());
 
         Gdx.input.setInputProcessor(null);
@@ -182,15 +173,15 @@ public class MainMenuScreen extends AbstractScreen {
      * It is then played via Actions
      */
     private void constructBlockAnimation(final Group blockGroup) {
-        for (int i=0; i<4; i++) {
+        for (int i = 0; i < 4; i++) {
             BlockActor block = new BlockActor(app);
             blockGroup.addActor(block);
             block.setY(500);
             block.setEnlightened(true);
-            if (i!=3) block.setX(-BlockActor.blockWidth);
+            if (i != 3) block.setX(-BlockActor.blockWidth);
 
             block.addAction(Actions.sequence(Actions.delay(2 * i),
-                    Actions.moveTo(block.getX(), (i == 3 ? 0 : i * BlockActor.blockWidth ), 0.5f),
+                    Actions.moveTo(block.getX(), (i == 3 ? 0 : i * BlockActor.blockWidth), 0.5f),
                     run(new Runnable() {
                         @Override
                         public void run() {
@@ -221,9 +212,18 @@ public class MainMenuScreen extends AbstractScreen {
     public void show() {
         Gdx.input.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(false);
+        resumeGameButton.setVisible(app.savegame.hasSavedGame());
         stage.getRoot().addAction(Actions.fadeIn(2));
 
 
+    }
+
+    class ValueCheckBox<T> extends CheckBox {
+        public T value;
+
+        public ValueCheckBox(String text, Skin skin, String styleName) {
+            super(text, skin, styleName);
+        }
     }
 
 }

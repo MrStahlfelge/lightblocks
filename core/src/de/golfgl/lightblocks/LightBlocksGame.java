@@ -1,19 +1,13 @@
 package de.golfgl.lightblocks;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.FPSLogger;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 
@@ -22,14 +16,13 @@ import de.golfgl.lightblocks.screen.MainMenuScreen;
 import static com.badlogic.gdx.Gdx.app;
 
 public class LightBlocksGame extends Game {
-	public SpriteBatch batch;
-	Texture img;
+    public static final int nativeGameWidth = 480;
+    public static final int nativeGameHeight = 800;
     public Skin skin;
     public AssetManager assetManager;
     public I18NBundle TEXTS;
     public Preferences prefs;
-    private FPSLogger fpsLogger;
-
+    public SaveGameHandler savegame;
     // these resources are used in the whole game... so we are loading them here
     public TextureRegion trBlock;
     public TextureRegion trBlockEnlightened;
@@ -38,13 +31,10 @@ public class LightBlocksGame extends Game {
     public Sound removeSound;
 
     public MainMenuScreen mainMenuScreen;
-
-    public static final int nativeGameWidth = 480;
-    public static final int nativeGameHeight = 800;
+    private FPSLogger fpsLogger;
 
     @Override
-	public void create () {
-		batch = new SpriteBatch();
+    public void create() {
         fpsLogger = new FPSLogger();
         prefs = app.getPreferences("lightblocks");
 
@@ -68,20 +58,21 @@ public class LightBlocksGame extends Game {
         rotateSound = assetManager.get("sound/switchflip.ogg", Sound.class);
         removeSound = assetManager.get("sound/glow05.ogg", Sound.class);
 
+        savegame = new SaveGameHandler();
+
         mainMenuScreen = new MainMenuScreen(this);
         this.setScreen(mainMenuScreen);
-	}
+    }
 
-	@Override
-	public void render () {
-		super.render(); //important!
+    @Override
+    public void render() {
+        super.render(); //important!
         fpsLogger.log();
-	}
-	
-	@Override
-	public void dispose () {
+    }
+
+    @Override
+    public void dispose() {
         mainMenuScreen.dispose();
         skin.dispose();
-		batch.dispose();
-	}
+    }
 }

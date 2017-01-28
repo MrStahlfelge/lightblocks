@@ -10,50 +10,51 @@ import static de.golfgl.lightblocks.model.Gameboard.GAMEBOARD_ROWS;
  */
 public class Tetromino {
     // es gibt sieben verschiedene Tetrominos
-    public static final int COUNT = 7;
+    public static final int TETROMINO_NUMBER = 7;
+    // und jeder besteht aus vier Blöcken
+    public static final int TETROMINO_BLOCKS = 4;
 
     //Die 7 Tetrominos
     private static Vector2[][][] tetrominoTemplates = {
             // das I
             {{new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(3, 2)},
-             {new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)}},
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)}},
 
-             {{new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)},
-             {new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(1, 3)},
-             {new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)},
-             {new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)}},
+            {{new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)},
+                    {new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(1, 3)},
+                    {new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)},
+                    {new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)}},
 
-             {{new Vector2(0, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)},
-             {new Vector2(1, 1), new Vector2(1, 2), new Vector2(0, 3), new Vector2(1, 3)},
-             {new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(2, 3)},
-             {new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(1, 3)}},
+            {{new Vector2(0, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)},
+                    {new Vector2(1, 1), new Vector2(1, 2), new Vector2(0, 3), new Vector2(1, 3)},
+                    {new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(2, 3)},
+                    {new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(1, 3)}},
 
-             {{new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)},
-             {new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)},
-             {new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(0, 3)},
-             {new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3), new Vector2(2, 3)}},
+            {{new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)},
+                    {new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)},
+                    {new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(0, 3)},
+                    {new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3), new Vector2(2, 3)}},
 
-             // Z
-             {{new Vector2(1, 1), new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2)},
-             {new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(2, 3)}},
+            // Z
+            {{new Vector2(1, 1), new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2)},
+                    {new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(2, 3)}},
 
-             {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2)},
-             {new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)}},
+            {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2)},
+                    {new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)}},
 
-             // Der Würfel
-             {{new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)}}};
+            // Der Würfel
+            {{new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)}}};
 
     private final int tetrominoIndex;
-    private int currentRotation;
     private final Vector2 position;
-
     // wird immer wieder verwendet um Garbage Collection zu verhindern
     // also aufpassen und ggf. kopieren
-    private final Integer[][] blockPosition;
+    private transient final Integer[][] blockPosition;
+    private int currentRotation;
 
     Tetromino(int index) {
         this.tetrominoIndex = index;
-        this.blockPosition  = new Integer[4][2];
+        this.blockPosition = new Integer[TETROMINO_BLOCKS][2];
 
         // Die Startposition jedes Tetrominos
         this.position = new Vector2(GAMEBOARD_COLUMNS / 2 - 2, GAMEBOARD_ROWS - 5);

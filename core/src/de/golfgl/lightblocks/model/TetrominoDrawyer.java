@@ -2,6 +2,8 @@ package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * This is the Tetromino draywer
@@ -9,7 +11,7 @@ import com.badlogic.gdx.utils.IntArray;
  * Created by Benjamin Schulte on 27.01.2017.
  */
 
-public class TetrominoDrawyer {
+class TetrominoDrawyer implements Json.Serializable {
     private IntArray drawyer = new IntArray();
 
     // der Block der der erste im Array ist
@@ -24,8 +26,6 @@ public class TetrominoDrawyer {
 
     /**
      * returns the next tetromino for this player
-     *
-     * @return
      */
     public Tetromino getNextTetromino() {
         drawnTetrominos = drawnTetrominos + 1;
@@ -70,4 +70,26 @@ public class TetrominoDrawyer {
         }
     }
 
+    @Override
+    public void write(Json json) {
+        json.writeValue("drawn", drawnTetrominos);
+        json.writeValue("offset", currentMinIndex);
+        // da es nur von 0 bis 6 geht, einfach in einen String
+        String blocks = "";
+        for (int i = 0; i < drawyer.size; i++) {
+            blocks += (char) (65 + (drawyer.get(i)));
+        }
+        json.writeValue("onDrawyer", blocks);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        drawnTetrominos = jsonData.getInt("drawn");
+        currentMinIndex = jsonData.getInt(("offset"));
+        String onDraywerString = jsonData.getString("onDrawyer");
+        for (int i = 0; i < onDraywerString.length(); i++) {
+            drawyer.clear();
+            drawyer.add((int) (onDraywerString.charAt(i) - 65));
+        }
+    }
 }

@@ -27,7 +27,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         this.screenY = screenY;
 
         if (isPaused) {
-            playScreen.switchPause();
+            playScreen.switchPause(false);
             didSomething = true;
         } else
             didSomething = false;
@@ -63,7 +63,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         }
 
         if (screenY - this.screenY < -200 & !isPaused) {
-            playScreen.switchPause();
+            playScreen.switchPause(false);
         }
 
         // rotate vermeiden

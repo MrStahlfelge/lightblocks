@@ -2,19 +2,21 @@ package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 /**
  * Created by Benjamin Schulte on 23.01.2017.
  */
 
-public class Gameboard {
+public class Gameboard implements Json.Serializable {
     public static final int GAMEBOARD_ROWS = 22;
     public static final int GAMEBOARD_COLUMNS = 10;
-
-    // Der Tetromino-Index an dieser Position (wird bei Lightblocks derzeit nicht genutzt)
-    private final int[][] gameboardSquare;
     public static final int SQUARE_EMPTY = -1;
 
+    // Der Tetromino-Index an dieser Position (wird bei lightblocks derzeit nur  zur Unterscheidung
+    // leer/nicht leer genutzt)
+    private final int[][] gameboardSquare;
     Vector2 tempPos;
 
     Gameboard() {
@@ -29,11 +31,14 @@ public class Gameboard {
 
     }
 
+    public int[][] getGameboardSquares() {
+        return gameboardSquare;
+    }
+
     /**
      * Bewegt den Tetromino maximal die übergebene Distanz.
      *
-     * @return
-     *     Die tatsächliche Anzahl bewegte Einheiten
+     * @return Die tatsächliche Anzahl bewegte Einheiten
      */
     public int checkPossibleMoveDistance(boolean horizontal, int distance, Tetromino activeTetromino) {
 
@@ -43,7 +48,7 @@ public class Gameboard {
 
         for (i = 1; i <= Math.abs(distance); i++) {
             tempPos.set(activeTetromino.getPosition().x + i * (horizontal ? signum : 0),
-                        activeTetromino.getPosition().y + i * (!horizontal ? signum : 0));
+                    activeTetromino.getPosition().y + i * (!horizontal ? signum : 0));
             if (!isValidPosition(activeTetromino, tempPos, activeTetromino.getCurrentRotation())) {
                 canMove = false;
                 break;
@@ -114,5 +119,38 @@ public class Gameboard {
                 }
             }
         }
+    }
+
+    // JSON
+    // Die JSON für das Spielbrett sind einfach alle Blöcke hintereinander weg geschrieben
+    // Ist der Block leer, kommt ein Leerzeichen. Ansonsten der ASCII-Wert des Blocks + 65
+    // (so ist Blockwert 0 -> A, Blockwert 1 -> B usw.)
+    @Override
+    public void write(Json json) {
+        String jsonString = "";
+        for (int y = 0; y < GAMEBOARD_ROWS; y++) {
+            for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
+                if (gameboardSquare[y][x] == SQUARE_EMPTY)
+                    jsonString += ' ';
+                else
+                    jsonString += (char) (65 + (gameboardSquare[y][x]));
+            }
+        }
+        json.writeValue("fields", jsonString);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        String jsonString = jsonData.getString("fields");
+        for (int y = 0; y < GAMEBOARD_ROWS; y++) {
+            for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
+                char block = jsonString.charAt(y * GAMEBOARD_COLUMNS + x);
+                if (block == ' ')
+                    gameboardSquare[y][x] = SQUARE_EMPTY;
+                else
+                    gameboardSquare[y][x] = (int) ((gameboardSquare[y][x]) - 65);
+            }
+        }
+
     }
 }

@@ -1,9 +1,6 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
-
-import de.golfgl.lightblocks.LightBlocksGame;
 
 /**
  * Created by Benjamin Schulte on 17.01.2017.
@@ -20,7 +17,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
             case Input.Keys.ENTER:
             case Input.Keys.UP:
-                playScreen.switchPause();
+                playScreen.switchPause(false);
                 return true;
 
             case Input.Keys.DOWN:
