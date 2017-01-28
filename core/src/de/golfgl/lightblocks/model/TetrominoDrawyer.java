@@ -87,8 +87,8 @@ class TetrominoDrawyer implements Json.Serializable {
         drawnTetrominos = jsonData.getInt("drawn");
         currentMinIndex = jsonData.getInt(("offset"));
         String onDraywerString = jsonData.getString("onDrawyer");
+        drawyer.clear();
         for (int i = 0; i < onDraywerString.length(); i++) {
-            drawyer.clear();
             drawyer.add((int) (onDraywerString.charAt(i) - 65));
         }
     }
