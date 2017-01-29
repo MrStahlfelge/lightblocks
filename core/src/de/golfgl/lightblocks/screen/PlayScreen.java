@@ -262,7 +262,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     @Override
     public void clearLines(IntArray linesToRemove) {
 
-        final float removeDelayTime = .3f;
+        final float removeDelayTime = .15f;
         final float removeFadeOutTime = .2f;
         final float moveActorsTime = .1f;
 
@@ -390,6 +390,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void updateScoreLines(int clearedLines, int currentLevel) {
         linesNum.setScore(clearedLines);
         levelNum.setScore(currentLevel);
+    }
+
+    @Override
+    public void updateScore(int score) {
+        scoreNum.setScore(score);
     }
 
     public void setMusic(boolean playMusic) {

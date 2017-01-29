@@ -18,8 +18,11 @@ public class GameScore {
         return score;
     }
 
-    public void setScore(int score) {
-        this.score = score;
+    public void incScore(int score, IGameModelListener userInterface) {
+        this.score += score;
+
+        if (userInterface != null)
+            userInterface.updateScore(this.score);
     }
 
     public int getClearedLines() {
@@ -37,7 +40,7 @@ public class GameScore {
      * returns current level depending on starting level and cleared lines
      */
     public int getCurrentLevel() {
-        return startingLevel + clearedLines / 10;
+        return Math.max(startingLevel, clearedLines / 10);
     }
 
     public int getStartingLevel() {
