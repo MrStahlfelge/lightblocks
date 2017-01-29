@@ -33,12 +33,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
                 return true;
 
             case Input.Keys.CONTROL_LEFT:
-            case Input.Keys.SPACE:
+            case Input.Keys.ALT_LEFT:
                 playScreen.gameModel.setRotate(false);
                 return true;
 
-            case Input.Keys.SHIFT_LEFT:
-            case Input.Keys.ALT_LEFT:
+            case Input.Keys.SPACE:
                 playScreen.gameModel.setRotate(true);
                 return true;
 
