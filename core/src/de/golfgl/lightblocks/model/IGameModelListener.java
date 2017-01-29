@@ -23,4 +23,6 @@ public interface IGameModelListener {
     void activateNextTetro(Integer[][] boardBlockPositions);
 
     void pinTetromino(Integer[][] currentBlockPositions);
+
+    void updateScoreLines(int clearedLines, int currentLevel);
 }

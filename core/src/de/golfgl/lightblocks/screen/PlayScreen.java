@@ -19,6 +19,7 @@ import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
+import de.golfgl.lightblocks.scenes.ScoreLabel;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
@@ -35,9 +36,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final BlockGroup blockGroup;
     private final BlockActor[][] blockMatrix;
     private final BlockActor[] nextTetro;
-    private final Label scoreNum;
-    private final Label levelNum;
-    private final Label linesNum;
+    private final ScoreLabel scoreNum;
+    private final ScoreLabel levelNum;
+    private final ScoreLabel linesNum;
 
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
@@ -45,7 +46,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     float lastAccX = 0;
 
     private boolean isPaused = true;
-    private int shownScore = 0;
 
     public PlayScreen(LightBlocksGame app, PlayScreenInput inputAdapter) {
         super(app);
@@ -92,19 +92,19 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         final Table mainTable = new Table();
 
         mainTable.row();
-        Label scoreLabel = new Label(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
-        mainTable.add(scoreLabel).right().top();
-        scoreNum = new Label("0000000000", app.skin, "big");
-        mainTable.add(scoreNum).left().colspan(3);
-        mainTable.row();
         Label levelLabel = new Label(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
         mainTable.add(levelLabel).right().bottom();
-        levelNum = new Label("00", app.skin, "big");
+        levelNum = new ScoreLabel(2, 0, app.skin, "big");
         mainTable.add(levelNum).left();
         Label linesLabel = new Label(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
         mainTable.add(linesLabel).right().bottom().spaceLeft(5);
-        linesNum = new Label("000", app.skin, "big");
+        linesNum = new ScoreLabel(3, 0, app.skin, "big");
         mainTable.add(linesNum).left();
+        mainTable.row();
+        Label scoreLabel = new Label(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
+        mainTable.add(scoreLabel).right().bottom();
+        scoreNum = new ScoreLabel(9, 0, app.skin, "big");
+        mainTable.add(scoreNum).left().colspan(3);
 
         mainTable.setY(LightBlocksGame.nativeGameHeight - mainTable.getPrefHeight() / 2 - 5);
         mainTable.setX(mainTable.getPrefWidth() / 2 + 5);
@@ -119,8 +119,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (app.savegame.hasSavedGame())
             gameModel.loadGameModel(app.savegame.loadGame());
         else
-            gameModel.startNewGame();
-        setShownScore(10000); // nur zum Test TODO
+            gameModel.startNewGame(0);
     }
 
     @Override
@@ -387,6 +386,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             blockMatrix[vAfterMove[0]][vAfterMove[1]].setEnlightened(false);
     }
 
+    @Override
+    public void updateScoreLines(int clearedLines, int currentLevel) {
+        linesNum.setScore(clearedLines);
+        levelNum.setScore(currentLevel);
+    }
+
     public void setMusic(boolean playMusic) {
         if (playMusic) {
             music = Gdx.audio.newMusic(Gdx.files.internal("sound/dd.ogg"));
@@ -395,10 +400,5 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         } else if (music != null)
             music.dispose();
 
-    }
-
-    public void setShownScore(int newScore) {
-        scoreNum.setText(String.format("%010d", newScore));
-        this.shownScore = newScore;
     }
 }

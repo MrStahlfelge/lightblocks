@@ -17,6 +17,7 @@ public class GameModel {
     private static final float REPEAT_START_OFFSET = 0.4f;
     private static final float REPEAT_INTERVAL = 0.05f;
     private static final float SOFT_DROP_SPEED = 30.0f;
+    private static GameScore score;
     // Speicherhaltung
     private final IntArray linesToRemove;
     IGameModelListener userInterface;
@@ -24,22 +25,10 @@ public class GameModel {
     private Tetromino activeTetromino;
     private Tetromino nextTetromino;
     private Gameboard gameboard;
-
-    // der aktuelle Punktestand
-    private int score;
-    // die abgebauten Reihen
-    private int clearedLines;
-    // Level
-    private int level;
-
-    // Fallgeschwindigkeit - wird von clearedLines beeinflusst
-    private float currentSpeed;
     // wieviel ist der aktuelle Stein schon ungerundet gefallen
     private float distanceRemainder;
-
     private float freezeCountdown;
     private boolean isGameOver;
-
     //vom Input geschrieben
     private boolean isSoftDrop;
     private int isRotate;
@@ -95,7 +84,7 @@ public class GameModel {
             }
         }
 
-        float speed = isSoftDrop ? SOFT_DROP_SPEED : currentSpeed;
+        float speed = isSoftDrop ? SOFT_DROP_SPEED : getCurrentSpeed();
         distanceRemainder += delta * speed;
         if (distanceRemainder >= 1.0f)
             moveDown((int) distanceRemainder);
@@ -141,6 +130,7 @@ public class GameModel {
 
         gameboard.clearLines(linesToRemove);
         userInterface.clearLines(linesToRemove);
+        score.incClearedLines(lineCount, userInterface);
     }
 
     private void addDropScore() {
@@ -216,11 +206,8 @@ public class GameModel {
         return isGameOver;
     }
 
-    private void setClearedLines(int lines) {
-        clearedLines = lines;
-        level = 1 + clearedLines / 10;
-        currentSpeed = 1.5f + (level - 1) * 0.25f;
-        currentSpeed = Math.min(currentSpeed, SOFT_DROP_SPEED);
+    private float getCurrentSpeed() {
+        return Math.min(1.5f + score.getCurrentLevel() * 0.25f, SOFT_DROP_SPEED);
     }
 
     public void setSoftDrop(boolean newVal) {
@@ -257,22 +244,20 @@ public class GameModel {
     /**
      * starts a new game
      */
-    public void startNewGame() {
+    public void startNewGame(int beginningLevel) {
         gameboard = new Gameboard();
-        score = 0;
-        setClearedLines(0);
+        score = new GameScore();
+        score.setStartingLevel(beginningLevel);
 
         activeTetromino = null;
-
         drawyer = new TetrominoDrawyer();
         nextTetromino = drawyer.getNextTetromino();
         activateNextTetromino();
+
+        userInterface.updateScoreLines(score.getClearedLines(), score.getCurrentLevel());
     }
 
     public void loadGameModel(String jsonString) {
-        score = 0;
-        setClearedLines(0);
-
         Json json = new Json();
         json.setSerializer(GameModel.class, new ModelSerializer());
 
@@ -288,6 +273,9 @@ public class GameModel {
 
         // und auch die aktiven Tetrominos
         fireUserInterfaceTetrominoSwap();
+
+        // Score
+        userInterface.updateScoreLines(score.getClearedLines(), score.getCurrentLevel());
     }
 
 
@@ -308,6 +296,7 @@ public class GameModel {
             json.writeValue("drawyer", drawyer);
             json.writeValue("active", activeTetromino);
             json.writeValue("next", nextTetromino.getIndex());
+            json.writeValue("score", score);
             json.writeObjectEnd();
         }
 
@@ -317,6 +306,7 @@ public class GameModel {
             gameboard.read(json, jsonData.get("board"));
             drawyer = new TetrominoDrawyer();
             drawyer.read(json, jsonData.get("drawyer"));
+            score = json.readValue("score", GameScore.class, jsonData);
             nextTetromino = new Tetromino(jsonData.getInt("next"));
 
             // den aktiven Tetromino hier einzeln herausfummeln wegen des
