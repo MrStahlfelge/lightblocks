@@ -15,35 +15,40 @@ public class Tetromino {
     public static final int TETROMINO_BLOCKCOUNT = 4;
 
     //Die 7 Tetrominos
+    // wiki/Nintendo_Rotation_System
     private static Vector2[][][] tetrominoTemplates = {
             // das I
-            {{new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(3, 2)},
-                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)}},
+            {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(3, 1)},
+                    {new Vector2(2, 0), new Vector2(2, 1), new Vector2(2, 2), new Vector2(2, 3)}
+            },
 
-            {{new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)},
-                    {new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(1, 3)},
-                    {new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)},
-                    {new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)}},
+            {{new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1)},
+                    {new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2)},
+                    {new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2)},
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2)}
+            },
 
-            {{new Vector2(0, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)},
-                    {new Vector2(1, 1), new Vector2(1, 2), new Vector2(0, 3), new Vector2(1, 3)},
-                    {new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(2, 3)},
-                    {new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(1, 3)}},
+            {{new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1)},
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2)},
+                    {new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(2, 2)},
+                    {new Vector2(1, 0), new Vector2(2, 0), new Vector2(1, 1), new Vector2(1, 2)}
+            },
 
-            {{new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2)},
-                    {new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)},
-                    {new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(0, 3)},
-                    {new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3), new Vector2(2, 3)}},
+            {{new Vector2(2, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1)},
+                    {new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2)},
+                    {new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(0, 2)},
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2)}
+            },
 
             // Z
-            {{new Vector2(1, 1), new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2)},
-                    {new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(2, 3)}},
+            {{new Vector2(1, 0), new Vector2(2, 0), new Vector2(0, 1), new Vector2(1, 1)},
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(2, 1), new Vector2(2, 2)}},
 
-            {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2)},
-                    {new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2), new Vector2(1, 3)}},
+            {{new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(2, 1)},
+                    {new Vector2(2, 0), new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2)}},
 
             // Der Würfel
-            {{new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)}}};
+            {{new Vector2(1, 0), new Vector2(2, 0), new Vector2(1, 1), new Vector2(2, 1)}}};
 
     private final int tetrominoIndex;
     private final Vector2 position;
@@ -57,7 +62,7 @@ public class Tetromino {
         this.blockPosition = new Integer[TETROMINO_BLOCKCOUNT][2];
 
         // Die Startposition jedes Tetrominos
-        this.position = new Vector2(GAMEBOARD_COLUMNS / 2 - 2, GAMEBOARD_NORMALROWS - 3);
+        this.position = new Vector2(GAMEBOARD_COLUMNS / 2 - 2, GAMEBOARD_NORMALROWS - 2);
         currentRotation = 0;
     }
 
