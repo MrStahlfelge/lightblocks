@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -34,6 +35,7 @@ public class MainMenuScreen extends AbstractScreen {
     private final ButtonGroup inputChoseField;
     private int inputChosen;
     private TextButton resumeGameButton;
+    private Slider beginningLevel;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
@@ -75,6 +77,23 @@ public class MainMenuScreen extends AbstractScreen {
         );
 
         mainTable.add(button).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2);
+
+        mainTable.row();
+        beginningLevel = new Slider(0, 9, 1, false, app.skin);
+
+        final Label beginningLevelLabel = new Label("", app.skin);
+        final ChangeListener changeListener = new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                beginningLevelLabel.setText(app.TEXTS.get("labelLevel") + " " + Integer.toString((int) beginningLevel
+                        .getValue()));
+            }
+        };
+        beginningLevel.addListener(changeListener);
+        changeListener.changed(null, null);
+
+        mainTable.add(beginningLevelLabel).right().spaceRight(10);
+        mainTable.add(beginningLevel).minHeight(30).left();
 
         mainTable.row();
 
@@ -152,8 +171,14 @@ public class MainMenuScreen extends AbstractScreen {
             app.savegame.resetGame();
 
         inputChosen = ((ValueCheckBox<Integer>) inputChoseField.getChecked()).value;
-        final PlayScreen currentGame = new PlayScreen(app, PlayScreenInput.getPlayInput(inputChosen));
+        final PlayScreen currentGame = new PlayScreen(app, PlayScreenInput.getPlayInput(inputChosen), (int)
+                beginningLevel.getValue());
         currentGame.setMusic(menuMusicButton.isChecked());
+
+        // Einstellungen speichern
+        app.prefs.putInteger("inputType", inputChosen);
+        app.prefs.putBoolean("musicPlayback", menuMusicButton.isChecked());
+        app.prefs.flush();
 
         Gdx.input.setInputProcessor(null);
         stage.getRoot().clearActions();

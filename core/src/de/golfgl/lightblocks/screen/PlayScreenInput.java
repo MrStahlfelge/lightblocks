@@ -14,11 +14,20 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     @Override
     public boolean keyDown(int keycode) {
+        // der Android Back Button gilt für alle
         if (keycode == Input.Keys.BACK) {
             playScreen.goBackToMenu();
             return true;
         }
         return super.keyDown(keycode);
+    }
+
+    /**
+     * Subklassen können dies übersteuern, um durch Polling Events auszulösen
+     * @param delta
+     */
+    public void doPoll(float delta) {
+
     }
 
     public void setPlayScreen(PlayScreen playScreen) {
@@ -29,6 +38,8 @@ public abstract class PlayScreenInput extends InputAdapter {
         switch (key) {
             case 1:
                 return new PlayGesturesInput();
+            case 2:
+                return new PlayGravityInput();
             default:
                 return new PlayKeyboardInput();
         }
@@ -40,6 +51,8 @@ public abstract class PlayScreenInput extends InputAdapter {
                 return Input.Peripheral.HardwareKeyboard;
             case 1:
                 return Input.Peripheral.MultitouchScreen;
+            case 2:
+                return Input.Peripheral.Accelerometer;
             default:
                 throw new IllegalArgumentException("Not supported");
         }
@@ -63,6 +76,8 @@ public abstract class PlayScreenInput extends InputAdapter {
                 return "menuInputKeyboard";
             case MultitouchScreen:
                 return "menuInputGestures";
+            case Accelerometer:
+                return "menuInputAccelerometer";
             default:
                 return null;
         }

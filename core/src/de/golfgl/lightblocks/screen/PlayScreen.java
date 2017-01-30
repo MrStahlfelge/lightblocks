@@ -47,7 +47,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     private boolean isPaused = true;
 
-    public PlayScreen(LightBlocksGame app, PlayScreenInput inputAdapter) {
+    public PlayScreen(LightBlocksGame app, PlayScreenInput inputAdapter, int beginningLevel) {
         super(app);
 
         blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ALLROWS];
@@ -119,11 +119,15 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (app.savegame.hasSavedGame())
             gameModel.loadGameModel(app.savegame.loadGame());
         else
-            gameModel.startNewGame(0);
+            gameModel.startNewGame(beginningLevel);
     }
 
     @Override
     public void render(float delta) {
+
+        // Controller und Schwerkraft müssen gepollt werden
+        inputAdapter.doPoll(delta);
+
         delta = Math.min(delta, 1 / 30f);
 
         if (!isPaused)
@@ -140,7 +144,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     public void goBackToMenu() {
-        if (!gameModel.isGameOver())
+        if (!gameModel.isGameOver() && app.savegame.canSaveGame())
             app.savegame.saveGame(gameModel.saveGameModel());
 
         app.setScreen(app.mainMenuScreen);
@@ -190,7 +194,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 music.pause();
 
             // Spielstand speichern
-            app.savegame.saveGame(gameModel.saveGameModel());
+            if (app.savegame.canSaveGame())
+                app.savegame.saveGame(gameModel.saveGameModel());
         }
     }
 
@@ -337,7 +342,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         final float offsetX = LightBlocksGame.nativeGameWidth - blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT -
                 .3f) * BlockActor
                 .blockWidth;
-        final float offsetY = (Gameboard.GAMEBOARD_NORMALROWS - .7f) * BlockActor.blockWidth;
+        final float offsetY = (Gameboard.GAMEBOARD_NORMALROWS + .3f) * BlockActor.blockWidth;
 
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
             nextTetro[i] = new BlockActor(app);
