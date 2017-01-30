@@ -28,7 +28,7 @@ public class GameModel {
     // wieviel ist der aktuelle Stein schon ungerundet gefallen
     private float currentSpeed;
     private float distanceRemainder;
-    private int dropScore;
+    private float dropScore;
 
     //nach remove Lines oder drop kurze Zeit warten
     private float freezeCountdown;
@@ -39,7 +39,7 @@ public class GameModel {
     private boolean isGameOver;
 
     //vom Input geschrieben
-    private boolean isSoftDrop;
+    private float softDropFactor;
     private int isInputRotate;
     // 0: nein, 1: ja, 2: gerade begonnen
     private int isInputMovingLeft;
@@ -103,7 +103,7 @@ public class GameModel {
             }
         }
 
-        float speed = isSoftDrop ? Math.max(SOFT_DROP_SPEED, currentSpeed) : currentSpeed;
+        float speed = Math.max(SOFT_DROP_SPEED * softDropFactor, currentSpeed);
         distanceRemainder += delta * speed;
         if (distanceRemainder >= 1.0f)
             moveDown((int) distanceRemainder);
@@ -117,8 +117,8 @@ public class GameModel {
             activeTetromino.getPosition().y -= maxDistance;
         }
 
-        if (isSoftDrop)
-            dropScore += maxDistance;
+        if (SOFT_DROP_SPEED * softDropFactor > currentSpeed)
+            dropScore += maxDistance * softDropFactor;
 
         // wenn nicht bewegen konnte, dann festnageln und nächsten aktivieren
         if (maxDistance < distance) {
@@ -126,7 +126,7 @@ public class GameModel {
             gameboard.pinTetromino(activeTetromino);
             userInterface.pinTetromino(activeTetromino.getCurrentBlockPositions());
 
-            score.incScore(dropScore, userInterface);
+            score.incScore((int) dropScore, userInterface);
             dropScore = 0;
 
             removeFullLines();
@@ -244,7 +244,7 @@ public class GameModel {
     }
 
     private void activateNextTetromino() {
-        isSoftDrop = false;
+        softDropFactor = 0;
 
         endMoveHorizontal(true);
         endMoveHorizontal(false);
@@ -278,8 +278,8 @@ public class GameModel {
         return isGameOver;
     }
 
-    public void setSoftDrop(boolean newVal) {
-        isSoftDrop = newVal;
+    public void setSoftDropFactor(float newVal) {
+        softDropFactor = newVal;
     }
 
     public void setRotate(boolean clockwise) {

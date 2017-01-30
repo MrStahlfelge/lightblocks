@@ -56,11 +56,11 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (!beganHorizontalMove) {
             if (screenY - this.screenY > 50 && !beganSoftDrop) {
                 beganSoftDrop = true;
-                playScreen.gameModel.setSoftDrop(true);
+                playScreen.gameModel.setSoftDropFactor(1);
             }
             if (screenY - this.screenY < 50 && beganSoftDrop) {
                 beganSoftDrop = false;
-                playScreen.gameModel.setSoftDrop(false);
+                playScreen.gameModel.setSoftDropFactor(0);
             }
         }
 
@@ -87,7 +87,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             playScreen.gameModel.setRotate(screenX > LightBlocksGame.nativeGameWidth / 2);
 
         else
-            playScreen.gameModel.setSoftDrop(false);
+            playScreen.gameModel.setSoftDropFactor(0);
 
         if (beganHorizontalMove) {
             playScreen.gameModel.endMoveHorizontal(true);

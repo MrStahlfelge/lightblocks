@@ -5,12 +5,20 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
+import de.golfgl.lightblocks.LightBlocksGame;
+
 /**
  * Created by Benjamin Schulte on 25.01.2017.
  */
 
 public class PlayGravityInput extends PlayScreenInput {
 
+    // der Schwellwert wird von der Neigung abgezogen
+    public static final float GRADIENT_TRESHOLD = 1.5f;
+    // der Neigungswert 4 ist der "Normalwert", etwa die Geschwindigkeit die der entsprechende Tastendruck hat
+    public static final int GRADIENT_BASE = 4;
+
+    // öfter wird nicht ausgelesen
     private static final float UPDATE_INTERVAL = .05f;
 
     final Vector3 currentInputVector;
@@ -19,9 +27,8 @@ public class PlayGravityInput extends PlayScreenInput {
     private boolean hasCalibration;
     private Matrix4 calibrationMatrix;
 
-    private boolean isMoving;
-    private boolean didStartRight;
-
+    private float deltaSinceLastMove;
+    private boolean lastMoveWasToRight;
     private float deltaSum;
 
     public PlayGravityInput() {
@@ -41,7 +48,10 @@ public class PlayGravityInput extends PlayScreenInput {
         if (isPaused && !hasCalibration)
             return true;
 
-        playScreen.switchPause(!isPaused);
+        if (isPaused)
+            playScreen.switchPause(false);
+        else
+            playScreen.gameModel.setRotate(screenX > LightBlocksGame.nativeGameWidth / 2);
 
         return true;
     }
@@ -61,50 +71,66 @@ public class PlayGravityInput extends PlayScreenInput {
             System.out.println(hasCalibration);
             // Kallibrieren
             if (!hasCalibration || currentInputVector.len() > 2)
-                doCallibrate(deltaSum);
+                doCalibrate(deltaSum);
 
         } else {
             // Wert nur nehmen wenn nicht zu sehr am Handy gewackelt wird
-            if (Math.abs(currentInputVector.len() - 9.8) < .7) {
+            final double acceleration = Math.abs(currentInputVector.len() - 9.8);
+            if (acceleration < GRADIENT_TRESHOLD / 2) {
                 currentInputVector.mul(this.calibrationMatrix);
-
-                // Nun sind die Koordinaten so, dass das weiter wie bei der Kallibrierung gehaltene Gerät x=0, y=0,
-                // z=10 gibt.
-                playScreen.gameModel.setSoftDrop(currentInputVector.y >= 4);
-
-                if (Math.abs(currentInputVector.x) > 2) {
-                    // wenn der Nutzer zu schnell ist, dann muss erst die umgekehrte Bewegung beendet werden
-                    if (isMoving && didStartRight != (currentInputVector.x > 0)) {
-                        playScreen.gameModel.endMoveHorizontal(!didStartRight);
-                        isMoving = false;
-                    }
-
-                    if (!isMoving) {
-                        didStartRight = currentInputVector.x > 0;
-                        playScreen.gameModel.startMoveHorizontal(didStartRight);
-                        isMoving = true;
-                    }
-                }
-                else if (Math.abs(currentInputVector.x) <= 2 && isMoving) {
-                    playScreen.gameModel.endMoveHorizontal(false);
-                    playScreen.gameModel.endMoveHorizontal(true);
-                    isMoving = false;
-                }
-            }
+                doControl(deltaSum, currentInputVector);
+            } else if (acceleration > GRADIENT_TRESHOLD * 3)
+                playScreen.switchPause(false);
         }
 
         deltaSum -= UPDATE_INTERVAL;
 
     }
 
-    private void doCallibrate(float delta) {
-        if (currentInputVector.len() > 0.25) {
+    /**
+     * die eigentliche Steuerung
+     * Nun sind die Koordinaten so, dass das weiter wie bei der Kallibrierung gehaltene Gerät x=0, y=0,
+     * z=10 gibt.
+     */
+    private void doControl(float delta, Vector3 inputVector) {
+        playScreen.gameModel.setSoftDropFactor(inputVector.y >= 0 ? (inputVector.y - GRADIENT_TRESHOLD) /
+                GRADIENT_BASE : 0);
+
+        // die zuletzt gemachte Bewegung beenden
+        playScreen.gameModel.endMoveHorizontal(false);
+        playScreen.gameModel.endMoveHorizontal(true);
+
+        deltaSinceLastMove += delta;
+        if (Math.abs(inputVector.x) >= GRADIENT_TRESHOLD) {
+            // bei einem Richtungswechsel riesengroß!
+            if (lastMoveWasToRight && inputVector.x < 0 ||
+                    !lastMoveWasToRight && inputVector.x > 0)
+                deltaSinceLastMove = 100;
+
+            // okay, der Nutzer kippt das Handy. Wie sehr entscheidet über die Geschwindigkeit der Bewegung
+            // wenn keine Zeit mehr zum warten ist, denn bewegen wir
+            if (1 / ((Math.abs(inputVector.x) - GRADIENT_TRESHOLD) * GRADIENT_BASE) < deltaSinceLastMove) {
+                deltaSinceLastMove = 0;
+                lastMoveWasToRight = inputVector.x > 0;
+                playScreen.gameModel.startMoveHorizontal(lastMoveWasToRight);
+            }
+        }
+    }
+
+    /**
+     * Kalibierung. Der calibrierungsvector wurde bereits vom inputvector abgezogen
+     *
+     * @param delta
+     */
+
+    private void doCalibrate(float delta) {
+        if (currentInputVector.len() > 0.5) {
             calibrationSuitableTime = 0;
             updateFromSensor(calibrationVector);
         } else
             calibrationSuitableTime += delta;
 
-        if (!hasCalibration && calibrationSuitableTime > 1f) {
+        if (!hasCalibration && calibrationSuitableTime > .5f) {
             Vector3 tmp = new Vector3(0, 0, 1);
             Vector3 tmp2 = new Vector3().set(calibrationVector).nor();
             Quaternion rotateQuaternion = new Quaternion().setFromCross(tmp, tmp2);

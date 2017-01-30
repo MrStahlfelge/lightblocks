@@ -21,7 +21,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
                 return true;
 
             case Input.Keys.DOWN:
-                playScreen.gameModel.setSoftDrop(true);
+                playScreen.gameModel.setSoftDropFactor(1);
                 return true;
 
             case Input.Keys.LEFT:
@@ -50,7 +50,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.DOWN) {
-            playScreen.gameModel.setSoftDrop(false);
+            playScreen.gameModel.setSoftDropFactor(0);
             return true;
         }
 
