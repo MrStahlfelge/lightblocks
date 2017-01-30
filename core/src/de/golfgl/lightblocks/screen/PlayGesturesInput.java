@@ -29,8 +29,10 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (isPaused) {
             playScreen.switchPause(false);
             didSomething = true;
-        } else
+        } else {
+            playScreen.gameModel.setInputFreezeInterval(.1f);
             didSomething = false;
+        }
 
         return true;
     }
@@ -68,14 +70,18 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         // rotate vermeiden
         if (!didSomething && (Math.abs(screenX - this.screenX) > 50
-                || Math.abs(screenY - this.screenY) > 50))
+                || Math.abs(screenY - this.screenY) > 50)) {
+            playScreen.gameModel.setInputFreezeInterval(0);
             didSomething = true;
+        }
 
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+
+        playScreen.gameModel.setInputFreezeInterval(0);
 
         if (!didSomething)
             playScreen.gameModel.setRotate(screenX > LightBlocksGame.nativeGameWidth / 2);

@@ -32,6 +32,10 @@ public class GameModel {
 
     //nach remove Lines oder drop kurze Zeit warten
     private float freezeCountdown;
+    //Touchcontrol braucht etwas bis der Nutzer zeichnet... diese Zeit muss ihm gegeben werden. Damit sie nicht zu
+    // einem bestehenden Freeze addiert und problemlos wieder abgezogen werden kann wenn der Nutzer fertig gezeichnet
+    // hat, wird sie extra verwaltet
+    private float inputFreezeCountdown;
     private boolean isGameOver;
 
     //vom Input geschrieben
@@ -60,7 +64,10 @@ public class GameModel {
         if (freezeCountdown > 0)
             freezeCountdown -= delta;
 
-        if (freezeCountdown > 0)
+        if (inputFreezeCountdown > 0)
+            inputFreezeCountdown -= delta;
+
+        if (freezeCountdown > 0 || inputFreezeCountdown > 0)
             return;
 
         if (isInputRotate != 0) {
@@ -203,8 +210,18 @@ public class GameModel {
         }
     }
 
+    /**
+     * setzt die Freeze-Zeit auf den angegebenen Wert, wenn er höher als der aktuelle ist.
+     */
     public void setFreezeInterval(float time) {
         freezeCountdown = Math.max(time, freezeCountdown);
+    }
+
+    /**
+     * setzt die Input Freeze-Zeit auf den angegeben Wert. Kann auch wieder zurücksetzen
+     */
+    public void setInputFreezeInterval(float time) {
+        inputFreezeCountdown = time;
     }
 
     private void activateNextTetromino() {
