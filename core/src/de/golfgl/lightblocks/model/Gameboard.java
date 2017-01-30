@@ -69,8 +69,7 @@ public class Gameboard implements Json.Serializable {
      */
     public boolean isValidPosition(Tetromino tetromino, Vector2 testPosition, int testRotation) {
         for (Integer[] coord : tetromino.getBlockPositions(testPosition, testRotation)) {
-            if (!isValidCoordinate(
-                    coord[0], coord[1])) {
+            if (isValidCoordinate(coord[0], coord[1]) != 0) {
                 return false;
             }
         }
@@ -88,17 +87,21 @@ public class Gameboard implements Json.Serializable {
         return true;
     }
 
-
-    private boolean isValidCoordinate(int x, int y) {
+    /**
+     * Prüft ob die gegebene Koordinate einen Block aufnehmen kann
+     *
+     * @return 0, wenn das so ist. -1, wenn außerhalb des Spielfelds. 1, wenn belegt
+     */
+    public int isValidCoordinate(int x, int y) {
         if (x < 0 || x >= GAMEBOARD_COLUMNS) {
-            return false;
+            return -1;
         }
 
         if (y < 0 || y >= GAMEBOARD_ALLROWS) {
-            return false;
+            return -1;
         }
 
-        return gameboardSquare[y][x] == SQUARE_EMPTY;
+        return (gameboardSquare[y][x] == SQUARE_EMPTY ? 0 : 1);
     }
 
     public void pinTetromino(Tetromino activeTetromino) {
@@ -156,4 +159,5 @@ public class Gameboard implements Json.Serializable {
         }
 
     }
+
 }

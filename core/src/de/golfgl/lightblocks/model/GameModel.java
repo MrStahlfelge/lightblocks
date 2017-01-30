@@ -179,13 +179,32 @@ public class GameModel {
         setCurrentSpeed();
     }
 
+    /**
+     * horizontale Bewegung, falls möglich
+     *
+     * @param distance Anzahl Blöcke die bewegt werden soll
+     * @return true wenn eine Bewegung (auch kleiner als Distanz) möglich war, sonst false
+     */
     private boolean moveHorizontal(int distance) {
+        if (distance == 0)
+            return false;
+
         int maxDistance = gameboard.checkPossibleMoveDistance(true, distance, activeTetromino);
 
         if (maxDistance != 0) {
             userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), maxDistance, 0);
             activeTetromino.getPosition().x += maxDistance;
         }
+
+        if (maxDistance != distance) {
+            int signum = (distance > 0 ? 1 : -1);
+
+            for (Integer[] coord : activeTetromino.getCurrentBlockPositions()) {
+                if (gameboard.isValidCoordinate(coord[0] + signum, coord[1]) == 1)
+                    userInterface.markConflict(coord[0] + signum, coord[1]);
+            }
+        }
+
         return (maxDistance != 0);
     }
 

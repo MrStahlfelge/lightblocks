@@ -392,6 +392,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
+    public void markConflict(int x, int y) {
+        BlockActor block = blockMatrix[x][y];
+        block.showConflictTouch();
+    }
+
+    @Override
     public void updateScoreLines(int clearedLines, int currentLevel) {
         linesNum.setScore(clearedLines);
         levelNum.setScore(currentLevel);

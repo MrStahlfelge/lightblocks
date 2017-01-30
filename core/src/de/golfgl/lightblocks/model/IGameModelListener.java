@@ -27,4 +27,6 @@ public interface IGameModelListener {
     void updateScoreLines(int clearedLines, int currentLevel);
 
     void updateScore(int score);
+
+    void markConflict(int x, int y);
 }

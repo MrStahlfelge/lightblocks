@@ -28,6 +28,9 @@ public class BlockActor extends Actor {
      * Das dient dazu, sie ggf. wieder zu entfernen wenn eine andere Bewegung nötig wird.
      */
     private Action moveAction;
+
+    private final AlphaAction glowAction;
+
     /**
      * Damit der Glow immer auf den Steinen ist, ruft die BockGroup die draw-Methode aller
      * Steine zweimal auf. Das erste Mal wird der Stein gezeichnet, das zweite Mal der Glow-Effekt
@@ -36,10 +39,13 @@ public class BlockActor extends Actor {
      */
     private boolean drawGlow;
     private boolean isEnlightened = false;
+
     /**
      * constructor adds the Textures and Images
      */
     public BlockActor(LightBlocksGame app) {
+        glowAction = Actions.action(AlphaAction.class);
+
         imBlock = new Image(app.trBlock);
         //imBlockDeactivated = new Image(app.trBlockDeactivated);
         imBlockEnlightened = new Image(app.trBlockEnlightened);
@@ -64,19 +70,19 @@ public class BlockActor extends Actor {
 
     public void setEnlightened(boolean sollwert) {
         if (isEnlightened != sollwert) {
-            AlphaAction action = Actions.action(AlphaAction.class);
+            glowAction.reset();
 
             // solange auf dem Enlightenblock nur FadeActions laufen reicht das
             imBlockEnlightened.clearActions();
 
             if (sollwert) {
-                action.setDuration(timeToEnlighten);
-                action.setAlpha(1);
-                imBlockEnlightened.addAction(action);
+                glowAction.setDuration(timeToEnlighten);
+                glowAction.setAlpha(1);
+                imBlockEnlightened.addAction(glowAction);
             } else {
-                action.setDuration(timeToDislighten);
-                action.setAlpha(dislighentedAlpha);
-                imBlockEnlightened.addAction(action);
+                glowAction.setDuration(timeToDislighten);
+                glowAction.setAlpha(dislighentedAlpha);
+                imBlockEnlightened.addAction(glowAction);
             }
         }
 
@@ -141,6 +147,22 @@ public class BlockActor extends Actor {
         imBlock.setColor(r, g, b, a);
         //imBlockDeactivated.setColor(r, g, b, a);
         imBlockEnlightened.setColor(r, g, b, imBlockEnlightened.getColor().a);
+    }
+
+    /**
+     * wird aufgerufen wenn dieser Block einen anderen blockiert. Er glüht dann kurz auf
+     */
+    public void showConflictTouch() {
+
+        // wenn der Block eh schon angeknippst ist, dann lass den Kram
+        if (isEnlightened)
+            return;
+
+        imBlockEnlightened.getColor().a = 2 * dislighentedAlpha;
+
+        // kleiner Hack, damit setEnlightened(false) arbeitet
+        isEnlightened = true;
+        setEnlightened(false);
     }
 
     /**
