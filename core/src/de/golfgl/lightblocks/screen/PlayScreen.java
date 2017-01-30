@@ -279,6 +279,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             lineMove.add(i);
 
 
+        app.removeSound.play();
+
         for (int i = linesToRemove.size - 1; i >= 0; i--) {
             int y = linesToRemove.get(i);
 
@@ -294,7 +296,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     block.setMoveAction(sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -(i + 1) *
                             BlockActor.blockWidth, moveActorsTime)));
 
-                app.removeSound.play();
                 block.addAction(sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
                         Actions.removeActor()));
             }
@@ -330,6 +331,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void setGameOver(boolean b) {
         if (music != null)
             music.stop();
+        app.gameOverSound.play();
         app.savegame.resetGame();
     }
 
