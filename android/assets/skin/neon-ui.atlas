@@ -59,13 +59,6 @@ checkbox-pressed-over
   orig: 22, 22
   offset: 0, 0
   index: -1
-font-export
-  rotate: false
-  xy: 388, 394
-  size: 116, 117
-  orig: 116, 117
-  offset: 0, 0
-  index: -1
 font-over-export
   rotate: false
   xy: 1, 41
