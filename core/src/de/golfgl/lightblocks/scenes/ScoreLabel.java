@@ -19,6 +19,8 @@ public class ScoreLabel<T extends Number> extends Label {
     public ScoreLabel(int digits, T score, Skin skin, String styleName) {
         super("0", skin, styleName);
 
+        getBitmapFontCache().getFont().setFixedWidthGlyphs("0123456789");
+
         this.formatString = "%0" + digits + "d";
         setScore(score);
 

@@ -4,6 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 
@@ -30,6 +35,7 @@ public class PlayGravityInput extends PlayScreenInput {
     private float deltaSinceLastMove;
     private boolean lastMoveWasToRight;
     private float deltaSum;
+    private Label calibrationProgress;
 
     public PlayGravityInput() {
         currentInputVector = new Vector3();
@@ -68,7 +74,6 @@ public class PlayGravityInput extends PlayScreenInput {
 
         if (isPaused) {
             currentInputVector.sub(calibrationVector);
-            System.out.println(hasCalibration);
             // Kallibrieren
             if (!hasCalibration || currentInputVector.len() > 2)
                 doCalibrate(deltaSum);
@@ -138,9 +143,36 @@ public class PlayGravityInput extends PlayScreenInput {
             Matrix4 m = new Matrix4(Vector3.Zero, rotateQuaternion, new Vector3(1f, 1f, 1f));
             this.calibrationMatrix = m.inv();
 
+            if (calibrationProgress != null)
+                calibrationProgress.setText(playScreen.app.TEXTS.get("labelTapToPlay"));
             hasCalibration = true;
-        } else
+        } else if (hasCalibration) {
+            if (calibrationProgress != null)
+                calibrationProgress.setText(playScreen.app.TEXTS.get("labelCalibration"));
             hasCalibration = false;
+        }
 
     }
+
+    @Override
+    public Actor showHelp(Group drawGroup, boolean isBegin) {
+        Table table = (Table) super.showHelp(drawGroup, isBegin);
+
+        table.row();
+        calibrationProgress = new Label("", playScreen.app.skin, "big");
+
+        table.add(calibrationProgress).spaceTop(30);
+
+        table.row();
+
+        Label keyHelp = new Label(playScreen.app.TEXTS.get("inputGravityHelp") + "\n\n" + playScreen.app.TEXTS.get
+                ("labelGoBackToChoseInput"), playScreen.app.skin);
+        keyHelp.setWrap(true);
+        keyHelp.setAlignment(Align.center);
+        table.add(keyHelp).spaceTop(30).prefWidth(drawGroup.getWidth());
+
+        return table;
+
+    }
+
 }

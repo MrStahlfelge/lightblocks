@@ -1,6 +1,11 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 
 /**
  * Created by Benjamin Schulte on 17.01.2017.
@@ -44,6 +49,29 @@ public class PlayKeyboardInput extends PlayScreenInput {
             default:
                 return super.keyDown(keycode);
         }
+
+    }
+
+    @Override
+    public Actor showHelp(Group drawGroup, boolean isBegin) {
+
+        Table table = (Table) super.showHelp(drawGroup, isBegin);
+
+        table.row();
+        Label hintBegin = new Label(playScreen.app.TEXTS.get(isBegin ? "labelPressEnterToStart" :
+                "labelPressEnterToResume"), playScreen.app.skin, isBegin ? "big" : "default");
+
+        table.add(hintBegin).spaceTop(30);
+
+        table.row();
+
+        Label keyHelp = new Label(playScreen.app.TEXTS.get("inputKeyboardHelp") + "\n\n" + playScreen.app.TEXTS.get
+                ("labelGoBackToChoseInput"), playScreen.app.skin);
+        keyHelp.setWrap(true);
+        keyHelp.setAlignment(Align.center);
+        table.add(keyHelp).spaceTop(30).prefWidth(drawGroup.getWidth());
+
+        return table;
 
     }
 

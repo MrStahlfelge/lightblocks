@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -36,6 +37,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     private final BlockGroup blockGroup;
+    private final Group labelGroup;
     private final BlockActor[][] blockMatrix;
     private final BlockActor[] nextTetro;
     private final ScoreLabel scoreNum;
@@ -66,6 +68,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Die Blockgroup nimmt die Steinanimation auf
         blockGroup = new BlockGroup();
         blockGroup.setTransform(false);
+        blockGroup.getColor().a = .4f;
 
         // 10 Steine breit, 20 Steine hoch
         blockGroup.setX((LightBlocksGame.nativeGameWidth - Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth) / 2);
@@ -100,17 +103,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         mainTable.row();
         Label levelLabel = new Label(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
-        mainTable.add(levelLabel).right().bottom();
+        mainTable.add(levelLabel).right().bottom().padBottom(3).spaceRight(3);
         levelNum = new ScoreLabel(2, 0, app.skin, "big");
         mainTable.add(levelNum).left();
         Label linesLabel = new Label(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
-        mainTable.add(linesLabel).right().bottom().spaceLeft(5);
+        mainTable.add(linesLabel).right().bottom().padBottom(3).spaceLeft(10);
         linesNum = new ScoreLabel(3, 0, app.skin, "big");
         mainTable.add(linesNum).left();
         mainTable.row();
         Label scoreLabel = new Label(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
-        mainTable.add(scoreLabel).right().bottom();
-        scoreNum = new ScoreLabel(9, 0, app.skin, "big");
+        mainTable.add(scoreLabel).right().bottom().padBottom(3).spaceRight(3);
+        scoreNum = new ScoreLabel(8, 0, app.skin, "big");
         mainTable.add(scoreNum).left().colspan(3);
 
         mainTable.setY(LightBlocksGame.nativeGameHeight - mainTable.getPrefHeight() / 2 - 5);
@@ -119,6 +122,14 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         stage.addActor(mainTable);
 
         stage.addActor(weldEffect);
+
+        labelGroup = new Group();
+        labelGroup.setTransform(false);
+        labelGroup.setWidth(BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS);
+        labelGroup.setHeight(BlockActor.blockWidth * Gameboard.GAMEBOARD_NORMALROWS - 2);
+        labelGroup.setPosition(blockGroup.getX(), blockGroup.getY());
+        inputAdapter.showHelp(labelGroup, true);
+        stage.addActor(labelGroup);
 
         stage.getRoot().setColor(Color.CLEAR);
 
@@ -177,7 +188,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void switchPause(boolean immediately) {
 
         if (gameModel.isGameOver())
-            return;
+            goBackToMenu();
 
         isPaused = !isPaused;
 
@@ -198,6 +209,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 gameModel.setFreezeInterval(fadingInterval);
             }
 
+            labelGroup.clearChildren();
+
             //inform the game model that there was a pause
             gameModel.fromPause();
         } else {
@@ -208,6 +221,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             // Spielstand speichern
             if (app.savegame.canSaveGame())
                 app.savegame.saveGame(gameModel.saveGameModel());
+
+            inputAdapter.showHelp(labelGroup, false);
         }
     }
 
