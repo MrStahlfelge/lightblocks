@@ -14,7 +14,14 @@ public interface IGameModelListener {
 
     void rotateTetro(Integer[][] vOld, Integer[][] vNew);
 
-    void clearLines(IntArray linesToRemove);
+    /**
+     * entfernt die im Array angegebenen Zeilen mit Effekt
+     *
+     * @param linesToRemove Zeilen die zu entfernen sind, aufsteigend sortiert
+     * @param special       wenn ja, wird eine "Explosion" ausgelöst. Es wird angenommen, dass die abgebauten Zeilen
+     *                      zusammenhängend sind.
+     */
+    void clearLines(IntArray linesToRemove, boolean special);
 
     void setGameOver(boolean b);
 

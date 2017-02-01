@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -19,6 +20,7 @@ import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
+import de.golfgl.lightblocks.scenes.ParticleEffectActor;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
@@ -39,16 +41,21 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final ScoreLabel scoreNum;
     private final ScoreLabel levelNum;
     private final ScoreLabel linesNum;
+    private final ParticleEffectActor weldEffect;
 
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
     Music music;
     float lastAccX = 0;
-
     private boolean isPaused = true;
 
     public PlayScreen(LightBlocksGame app, PlayScreenInput inputAdapter, int beginningLevel) {
         super(app);
+
+        ParticleEffect pweldEffect = new ParticleEffect();
+        //TODO wenn Atlas da, dann hier ändern
+        pweldEffect.load(Gdx.files.internal("raw/explode.p"), Gdx.files.internal("raw"));
+        weldEffect = new ParticleEffectActor(pweldEffect);
 
         blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ALLROWS];
         nextTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
@@ -111,6 +118,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         stage.addActor(mainTable);
 
+        stage.addActor(weldEffect);
+
         stage.getRoot().setColor(Color.CLEAR);
 
         // Game Model erst hinzufügen, wenn die blockgroup schon steht
@@ -134,6 +143,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             gameModel.update(delta);
 
         super.render(delta);
+
     }
 
     @Override
@@ -150,6 +160,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         app.setScreen(app.mainMenuScreen);
         if (music != null)
             music.dispose();
+
+        weldEffect.dispose();
 
         stage.dispose();
     }
@@ -265,7 +277,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void clearLines(IntArray linesToRemove) {
+    public void clearLines(IntArray linesToRemove, boolean special) {
 
         final float removeDelayTime = .15f;
         final float removeFadeOutTime = .2f;
@@ -279,7 +291,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             lineMove.add(i);
 
 
-        app.removeSound.play();
+        app.removeSound.play(.4f + linesToRemove.size * .2f);
+        if (special)
+            app.cleanSpecialSound.play(.8f);
 
         for (int i = linesToRemove.size - 1; i >= 0; i--) {
             int y = linesToRemove.get(i);
@@ -291,8 +305,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 blockMatrix[x][y] = null;
                 block.setEnlightened(true);
 
-                // die untersten zusammenhängenden Zeilen rausschieben
-                if (y == i)
+
+                if (special)
+                    // Spezialeffekt: Verdichtung auf einen Block
+                    block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(0) - .5f +
+                            linesToRemove.size / 2) * BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
+                else if (linesToRemove.size >= 3)
+                    // ab 3 Zeilen alle zeilenweise zusammen schieben
+                    block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(i)) *
+                            BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
+                else if (y == i)
+                    // die untersten zusammenhängenden Zeilen rausschieben
                     block.setMoveAction(sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -(i + 1) *
                             BlockActor.blockWidth, moveActorsTime)));
 
@@ -307,6 +330,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 else
                     lineMove.set(higherY, -1);
 
+        }
+
+        // den Explosions-Effekt einfügen
+        if (special) {
+            weldEffect.setPosition(blockGroup.getX() + 5f * BlockActor.blockWidth, blockGroup.getY() +
+                    (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth);
+            weldEffect.start();
         }
 
         for (int i = 0; i < lineMove.size; i++) {
