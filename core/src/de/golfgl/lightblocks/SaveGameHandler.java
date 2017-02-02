@@ -16,7 +16,7 @@ public class SaveGameHandler {
     }
 
     public boolean hasSavedGame() {
-        return Gdx.files.local(FILENAME).exists();
+        return canSaveGame() && Gdx.files.local(FILENAME).exists();
     }
 
     public String loadGame() {
