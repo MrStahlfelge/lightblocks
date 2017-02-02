@@ -28,7 +28,6 @@ public class GameModel {
     // wieviel ist der aktuelle Stein schon ungerundet gefallen
     private float currentSpeed;
     private float distanceRemainder;
-    private float dropScore;
 
     //nach remove Lines oder drop kurze Zeit warten
     private float freezeCountdown;
@@ -118,27 +117,32 @@ public class GameModel {
         }
 
         if (SOFT_DROP_SPEED * softDropFactor > currentSpeed)
-            dropScore += maxDistance * softDropFactor;
+            score.addSoftDropScore(maxDistance * softDropFactor);
 
         // wenn nicht bewegen konnte, dann festnageln und nächsten aktivieren
-        if (maxDistance < distance) {
-
-            gameboard.pinTetromino(activeTetromino);
-            userInterface.pinTetromino(activeTetromino.getCurrentBlockPositions());
-
-            score.incScore((int) dropScore, userInterface);
-            dropScore = 0;
-
-            removeFullLines();
-
-            // dem Spieler ein bißchen ARE gönnen (wiki/ARE) - je weiter oben, je mehr
-            // evtl. wurde schon vom UI gefreezet um Animationen abzuspielen, die ARE kommt oben drauf
-            freezeCountdown = Math.max(0, freezeCountdown) + .015f * (10 + activeTetromino.getPosition().y / 2);
-            // hiernach keine Zugriffe mehr auf activeTetromino!
-            activateNextTetromino();
-        } else {
+        if (maxDistance < distance)
+            dropActiveTetromino();
+        else
             distanceRemainder -= distance;
-        }
+    }
+
+    private void dropActiveTetromino() {
+
+        gameboard.pinTetromino(activeTetromino);
+        userInterface.pinTetromino(activeTetromino.getCurrentBlockPositions());
+
+        removeFullLines();
+
+        int gainedScore = score.flushScore();
+        int gainedPositionX = (int) activeTetromino.getPosition().x;
+        int gainedPositionY = (int) activeTetromino.getPosition().y;
+        userInterface.updateScore(score, gainedScore);
+
+        // dem Spieler ein bißchen ARE gönnen (wiki/ARE) - je weiter oben, je mehr
+        // evtl. wurde schon vom UI gefreezet um Animationen abzuspielen, die ARE kommt oben drauf
+        freezeCountdown = Math.max(0, freezeCountdown) + .015f * (10 + activeTetromino.getPosition().y / 2);
+        // hiernach keine Zugriffe mehr auf activeTetromino!
+        activateNextTetromino();
     }
 
     private void removeFullLines() {
@@ -155,28 +159,10 @@ public class GameModel {
             return;
         }
 
-        // wiki/Scoring
-        int removeScore = 0;
-        switch (lineCount) {
-            case 1:
-                removeScore = 40;
-                break;
-            case 2:
-                removeScore = 100;
-                break;
-            case 3:
-                removeScore = 300;
-                break;
-            case 4:
-                removeScore = 1200;
-                break;
-        }
-        score.incScore((score.getCurrentLevel() + 1) * removeScore, userInterface);
-
         gameboard.clearLines(linesToRemove);
         //TODO: t-spin mit zwei zeilen auch rein!
+        score.incClearedLines(lineCount, (lineCount == 4));
         userInterface.clearLines(linesToRemove, (lineCount == 4));
-        score.incClearedLines(lineCount, userInterface);
         setCurrentSpeed();
     }
 
@@ -323,7 +309,7 @@ public class GameModel {
         nextTetromino = drawyer.getNextTetromino();
         activateNextTetromino();
 
-        userInterface.updateScoreLines(score.getClearedLines(), score.getCurrentLevel());
+        userInterface.updateScore(score, 0);
         setCurrentSpeed();
     }
 
@@ -346,8 +332,7 @@ public class GameModel {
         fireUserInterfaceTetrominoSwap();
 
         // Score
-        userInterface.updateScoreLines(score.getClearedLines(), score.getCurrentLevel());
-        userInterface.updateScore(score.getScore());
+        userInterface.updateScore(score, 0);
         setCurrentSpeed();
     }
 

@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.IntArray;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
+import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.Tetromino;
@@ -87,7 +88,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         imLine.setY(blockGroup.getY() - ninePatchBorderSize);
         imLine.addAction(Actions.sizeTo(imLine.getWidth(), (Gameboard.GAMEBOARD_NORMALROWS) * BlockActor.blockWidth +
                 2 * ninePatchBorderSize, 1f, Interpolation.circleOut));
-        imLine.setColor(.9f, .9f, .9f, 1);
+        imLine.setColor(.8f, .8f, .8f, 1);
         stage.addActor(imLine);
 
         imLine = new Image(line);
@@ -95,7 +96,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         imLine.setX(blockGroup.getX() - imLine.getWidth() - 2);
         imLine.addAction(Actions.sizeTo(imLine.getWidth(), (Gameboard.GAMEBOARD_NORMALROWS) * BlockActor.blockWidth +
                 2 * ninePatchBorderSize, 1f, Interpolation.circleOut));
-        imLine.setColor(.9f, .9f, .9f, 1);
+        imLine.setColor(.8f, .8f, .8f, 1);
         stage.addActor(imLine);
 
         // Labels
@@ -109,11 +110,14 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         Label linesLabel = new Label(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
         mainTable.add(linesLabel).right().bottom().padBottom(3).spaceLeft(10);
         linesNum = new ScoreLabel(3, 0, app.skin, "big");
+        linesNum.setCountingSpeed(100);
         mainTable.add(linesNum).left();
         mainTable.row();
         Label scoreLabel = new Label(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
         mainTable.add(scoreLabel).right().bottom().padBottom(3).spaceRight(3);
         scoreNum = new ScoreLabel(8, 0, app.skin, "big");
+        scoreNum.setCountingSpeed(2000);
+        scoreNum.setMaxCountingTime(1);
         mainTable.add(scoreNum).left().colspan(3);
 
         mainTable.setY(LightBlocksGame.nativeGameHeight - mainTable.getPrefHeight() / 2 - 5);
@@ -140,6 +144,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             gameModel.loadGameModel(app.savegame.loadGame());
         else
             gameModel.startNewGame(beginningLevel);
+
+        // erst nach dem Laden setzen, damit das noch ohne Animation läuft
+        levelNum.setEmphasizeTreshold(1, new Color(1, .3f, .3f, 1));
+        scoreNum.setEmphasizeTreshold(1000, new Color(1, .3f, .3f, 1));
     }
 
     @Override
@@ -445,14 +453,24 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void updateScoreLines(int clearedLines, int currentLevel) {
-        linesNum.setScore(clearedLines);
-        levelNum.setScore(currentLevel);
-    }
+    public void updateScore(GameScore score, int gainedScore) {
+        linesNum.setScore(score.getClearedLines());
+        levelNum.setScore(score.getCurrentLevel());
 
-    @Override
-    public void updateScore(int score) {
-        scoreNum.setScore(score);
+        scoreNum.setScore(score.getScore());
+
+//        // den gainedScore über dem gesetzten Stein anzeigen
+//        if (gainedScore >= 500) {
+//            ScoreLabel<Integer> gainedScoreLabel = new ScoreLabel<Integer>(0, gainedScore, app.skin, "big");
+//            gainedScoreLabel.setShowSignum(true);
+//
+//            gainedScoreLabel.setPosition(5 * BlockActor.blockWidth, gainedPositionY * BlockActor.blockWidth);
+//            gainedScoreLabel.setColor(.7f, .7f, .7f, 0);
+//            labelGroup.addActor(gainedScoreLabel);
+//            gainedScoreLabel.addAction(Actions.parallel(Actions.fadeIn(.1f, Interpolation.fade),
+//                    Actions.sequence(Actions.moveBy(0, BlockActor.blockWidth * 2, 2), Actions.delay(1),
+//                            Actions.fadeOut(.5f, Interpolation.fade), Actions.removeActor())));
+//        }
     }
 
     public void setMusic(boolean playMusic) {

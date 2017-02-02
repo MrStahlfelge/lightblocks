@@ -31,9 +31,7 @@ public interface IGameModelListener {
 
     void pinTetromino(Integer[][] currentBlockPositions);
 
-    void updateScoreLines(int clearedLines, int currentLevel);
-
-    void updateScore(int score);
+    void updateScore(GameScore score, int gainedScore);
 
     void markConflict(int x, int y);
 }
