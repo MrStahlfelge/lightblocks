@@ -161,7 +161,9 @@ public class GameModel {
 
         gameboard.clearLines(linesToRemove);
         //TODO: t-spin mit zwei zeilen auch rein!
-        score.incClearedLines(lineCount, (lineCount == 4));
+        boolean doubleSpecial = score.incClearedLines(lineCount, (lineCount == 4));
+        if (doubleSpecial)
+            userInterface.addMotivation("motivationDoubleSpecial");
         userInterface.clearLines(linesToRemove, (lineCount == 4));
         setCurrentSpeed();
     }

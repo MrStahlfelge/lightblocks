@@ -22,6 +22,7 @@ import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
+import de.golfgl.lightblocks.scenes.MotivationLabel;
 import de.golfgl.lightblocks.scenes.ParticleEffectActor;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
 
@@ -44,7 +45,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final ScoreLabel scoreNum;
     private final ScoreLabel levelNum;
     private final ScoreLabel linesNum;
+    private final MotivationLabel motivatorLabel;
     private final ParticleEffectActor weldEffect;
+    private boolean isLoading;
 
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
@@ -135,15 +138,20 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         inputAdapter.showHelp(labelGroup, true);
         stage.addActor(labelGroup);
 
+        motivatorLabel = new MotivationLabel(app.skin, "bigbigoutline", labelGroup);
+
         stage.getRoot().setColor(Color.CLEAR);
 
         // Game Model erst hinzufügen, wenn die blockgroup schon steht
         gameModel = new GameModel(this);
 
+        isLoading = true;
         if (app.savegame.hasSavedGame())
             gameModel.loadGameModel(app.savegame.loadGame());
         else
             gameModel.startNewGame(beginningLevel);
+
+        isLoading = false;
 
         // erst nach dem Laden setzen, damit das noch ohne Animation läuft
         levelNum.setEmphasizeTreshold(1, new Color(1, .3f, .3f, 1));
@@ -453,10 +461,20 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
+    public void addMotivation(String motivationText) {
+        app.unlockedSound.play();
+        motivatorLabel.addMotivationText(app.TEXTS.get(motivationText));
+    }
+
+    @Override
     public void updateScore(GameScore score, int gainedScore) {
         linesNum.setScore(score.getClearedLines());
-        levelNum.setScore(score.getCurrentLevel());
 
+        // Level hoch? Super!
+        if (score.getCurrentLevel() != levelNum.getScore() && !isLoading)
+            motivatorLabel.addMotivationText(app.TEXTS.get("labelLevel") + score.getCurrentLevel() + "!");
+
+        levelNum.setScore(score.getCurrentLevel());
         scoreNum.setScore(score.getScore());
 
 //        // den gainedScore über dem gesetzten Stein anzeigen

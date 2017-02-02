@@ -32,6 +32,7 @@ public class LightBlocksGame extends Game {
     public Sound removeSound;
     public Sound gameOverSound;
     public Sound cleanSpecialSound;
+    public Sound unlockedSound;
 
     public MainMenuScreen mainMenuScreen;
     private FPSLogger fpsLogger;
@@ -54,6 +55,7 @@ public class LightBlocksGame extends Game {
         assetManager.load("sound/glow05.ogg", Sound.class);
         assetManager.load("sound/gameover.ogg", Sound.class);
         assetManager.load("sound/cleanspecial.ogg", Sound.class);
+        assetManager.load("sound/unlocked.ogg", Sound.class);
         assetManager.finishLoading();
 
         TEXTS = assetManager.get("i18n/strings", I18NBundle.class);
@@ -65,6 +67,7 @@ public class LightBlocksGame extends Game {
         rotateSound = assetManager.get("sound/switchflip.ogg", Sound.class);
         removeSound = assetManager.get("sound/glow05.ogg", Sound.class);
         gameOverSound = assetManager.get("sound/gameover.ogg", Sound.class);
+        unlockedSound = assetManager.get("sound/unlocked.ogg", Sound.class);
         cleanSpecialSound = assetManager.get("sound/cleanspecial.ogg", Sound.class);
 
         savegame = new SaveGameHandler();

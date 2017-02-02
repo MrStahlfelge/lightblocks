@@ -34,4 +34,6 @@ public interface IGameModelListener {
     void updateScore(GameScore score, int gainedScore);
 
     void markConflict(int x, int y);
+
+    void addMotivation(String motivationText);
 }
