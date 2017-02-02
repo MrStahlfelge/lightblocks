@@ -7,14 +7,14 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.BlockActor;
@@ -32,8 +32,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  */
 public class MainMenuScreen extends AbstractScreen {
     private final CheckBox menuMusicButton;
-    private final ButtonGroup inputChoseField;
-    private int inputChosen;
+    private final SelectBox inputChoseField;
     private TextButton resumeGameButton;
     private Slider beginningLevel;
 
@@ -81,6 +80,8 @@ public class MainMenuScreen extends AbstractScreen {
         mainTable.row();
         beginningLevel = new Slider(0, 9, 1, false, app.skin);
 
+        beginningLevel.setValue(app.prefs.getInteger("beginningLevel", 0));
+
         final Label beginningLevelLabel = new Label("", app.skin);
         final ChangeListener changeListener = new ChangeListener() {
             @Override
@@ -110,37 +111,27 @@ public class MainMenuScreen extends AbstractScreen {
                 (LightBlocksGame.nativeGameWidth / 16);
 
         // die möglichen Inputs aufzählen
-        inputChoseField = new ButtonGroup();
+        inputChoseField = new SelectBox(app.skin);
 
-        inputChosen = app.prefs.getInteger("inputType", 0);
+        Array<KeyText<Integer>> inputTypes = new Array<KeyText<Integer>>();
+
+        int inputChosen = app.prefs.getInteger("inputType", 0);
         if (!PlayScreenInput.inputAvailable(inputChosen))
             inputChosen = 0;
+
+        int chosenIndex = -1;
 
         int i = 0;
         while (true) {
             try {
+
                 Input.Peripheral ic = PlayScreenInput.peripheralFromInt(i);
-                ValueCheckBox<Integer> input = new ValueCheckBox<Integer>(app.TEXTS.get(PlayScreenInput.inputName(i))
-                        , app.skin, "radio");
-                input.setDisabled(!PlayScreenInput.inputAvailable(i));
-                input.value = i;
-
-                if (inputChosen == i) {
-                    if (input.isDisabled())
-                        inputChosen++;
-                    else
-                        input.setChecked(true);
-                }
-
-                inputChoseField.add(input);
-
-                mainTable.row();
-                if (i == 0)
-                    mainTable.add(new Label(app.TEXTS.get("menuInputControl") + ":", app.skin));
-                else
-                    mainTable.add();
-
-                mainTable.add(input).minHeight(30).left();
+                if (PlayScreenInput.inputAvailable(i)) {
+                    if (inputChosen == i)
+                        chosenIndex = inputTypes.size;
+                    inputTypes.add(new KeyText<Integer>(i, app.TEXTS.get(PlayScreenInput.inputName(i))));
+                } else if (inputChosen == i)
+                    inputChosen++;
 
                 i++;
             } catch (Throwable t) {
@@ -148,6 +139,12 @@ public class MainMenuScreen extends AbstractScreen {
             }
         }
 
+        inputChoseField.setItems(inputTypes);
+        inputChoseField.setSelectedIndex(chosenIndex);
+
+        mainTable.row();
+        mainTable.add(new Label(app.TEXTS.get("menuInputControl") + ":", app.skin));
+        mainTable.add(inputChoseField).minHeight(30).left();
 
         mainTable.row();
         mainTable.add();
@@ -170,7 +167,7 @@ public class MainMenuScreen extends AbstractScreen {
         if (!resumeGame && app.savegame.hasSavedGame())
             app.savegame.resetGame();
 
-        inputChosen = ((ValueCheckBox<Integer>) inputChoseField.getChecked()).value;
+        int inputChosen = ((KeyText<Integer>) inputChoseField.getSelected()).value;
         final PlayScreen currentGame = new PlayScreen(app, PlayScreenInput.getPlayInput(inputChosen), (int)
                 beginningLevel.getValue());
         currentGame.setMusic(menuMusicButton.isChecked());
@@ -178,6 +175,7 @@ public class MainMenuScreen extends AbstractScreen {
         // Einstellungen speichern
         app.prefs.putInteger("inputType", inputChosen);
         app.prefs.putBoolean("musicPlayback", menuMusicButton.isChecked());
+        app.prefs.putInteger("beginningLevel", (int) beginningLevel.getValue());
         app.prefs.flush();
 
         Gdx.input.setInputProcessor(null);
@@ -240,11 +238,19 @@ public class MainMenuScreen extends AbstractScreen {
 
     }
 
-    class ValueCheckBox<T> extends CheckBox {
+    class KeyText<T> {
         public T value;
+        public String description;
 
-        public ValueCheckBox(String text, Skin skin, String styleName) {
-            super(text, skin, styleName);
+        KeyText(T value, String description) {
+            this.value = value;
+            this.description = description;
+
+        }
+
+        @Override
+        public String toString() {
+            return description;
         }
     }
 
