@@ -16,6 +16,7 @@ public class AndroidLauncher extends AndroidApplication {
 		config.useCompass = false;
 		config.useGyroscope = false;
 		config.useWakelock = true;
+		config.useImmersiveMode = true;
 		initialize(new LightBlocksGame(), config);
 	}
 }
