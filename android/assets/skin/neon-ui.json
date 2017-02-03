@@ -6,8 +6,8 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 	qs-25-bold: {
 		file: raw/qs-25-bold.fnt
 	}
-	qs-outline-40-bold: {
-		file: raw/qs-outline-40-bold.fnt
+	qs-40-bold: {
+		file: raw/qs-40-bold.fnt
 	}
 }
 com.badlogic.gdx.graphics.Color: {
@@ -290,7 +290,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 		fontColor: text
 	}
 	bigbigoutline: {
-		font: qs-outline-40-bold
+		font: qs-40-bold
 		fontColor: text
 	}
 }

@@ -7,9 +7,11 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
+import com.badlogic.gdx.utils.ObjectMap;
 
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 
@@ -43,6 +45,13 @@ public class LightBlocksGame extends Game {
         prefs = app.getPreferences("lightblocks");
 
         skin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
+
+        ObjectMap<String, BitmapFont> objectMap = skin.getAll(BitmapFont.class);
+
+        //Sicherstellen dass alle Fonts optimal gerendet werden
+        for (BitmapFont font : objectMap.values()) {
+            font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        }
 
         assetManager = new AssetManager();
         assetManager.load("i18n/strings", I18NBundle.class);
