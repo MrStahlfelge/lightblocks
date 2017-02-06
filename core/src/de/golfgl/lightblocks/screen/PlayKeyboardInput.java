@@ -65,8 +65,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
         table.row();
 
-        Label keyHelp = new Label(playScreen.app.TEXTS.get("inputKeyboardHelp") + "\n\n" + playScreen.app.TEXTS.get
-                ("labelGoBackToChoseInput"), playScreen.app.skin);
+        Label keyHelp = new Label(playScreen.app.TEXTS.get("inputKeyboardHelp"), playScreen.app.skin);
         keyHelp.setWrap(true);
         keyHelp.setAlignment(Align.center);
         table.add(keyHelp).spaceTop(30).prefWidth(drawGroup.getWidth());

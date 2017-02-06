@@ -54,7 +54,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private boolean isLoading;
     private boolean isPaused = true;
 
-    public PlayScreen(LightBlocksGame app, PlayScreenInput inputAdapter, int beginningLevel) {
+    public PlayScreen(LightBlocksGame app, int inputKey, int beginningLevel) throws InputNotAvailableException {
         super(app);
 
         ParticleEffect pweldEffect = new ParticleEffect();
@@ -64,9 +64,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ALLROWS];
         nextTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
-
-        inputAdapter.setPlayScreen(this);
-        this.inputAdapter = inputAdapter;
 
         // Die Blockgroup nimmt die Steinanimation auf
         blockGroup = new BlockGroup();
@@ -134,7 +131,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         labelGroup.setWidth(BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS);
         labelGroup.setHeight(BlockActor.blockWidth * Gameboard.GAMEBOARD_NORMALROWS - 2);
         labelGroup.setPosition(blockGroup.getX(), blockGroup.getY());
-        inputAdapter.showHelp(labelGroup, true);
         stage.addActor(labelGroup);
 
         motivatorLabel = new MotivationLabel(app.skin, "bigbigoutline", labelGroup);
@@ -149,6 +145,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             gameModel.loadGameModel(app.savegame.loadGame());
         else
             gameModel.startNewGame(beginningLevel);
+
+        // wenn im Savegame oder Mission nichts vorgegeben ist, dann vom Nutzer gewählten InputController nehmen
+        if (gameModel.inputTypeKey < 0)
+            gameModel.inputTypeKey = inputKey;
+        inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey);
+        inputAdapter.setPlayScreen(this);
+        inputAdapter.showHelp(labelGroup, true);
 
         isLoading = false;
 

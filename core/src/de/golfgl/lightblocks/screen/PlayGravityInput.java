@@ -165,8 +165,7 @@ public class PlayGravityInput extends PlayScreenInput {
 
         table.row();
 
-        Label keyHelp = new Label(playScreen.app.TEXTS.get("inputGravityHelp") + "\n\n" + playScreen.app.TEXTS.get
-                ("labelGoBackToChoseInput"), playScreen.app.skin);
+        Label keyHelp = new Label(playScreen.app.TEXTS.get("inputGravityHelp"), playScreen.app.skin);
         keyHelp.setWrap(true);
         keyHelp.setAlignment(Align.center);
         table.add(keyHelp).spaceTop(30).prefWidth(drawGroup.getWidth());

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
@@ -177,24 +178,34 @@ public class MainMenuScreen extends AbstractScreen {
             app.savegame.resetGame();
 
         int inputChosen = ((KeyText<Integer>) inputChoseField.getSelected()).value;
-        final PlayScreen currentGame = new PlayScreen(app, PlayScreenInput.getPlayInput(inputChosen), (int)
-                beginningLevel.getValue());
-        currentGame.setMusic(menuMusicButton.isChecked());
+        try {
+            final PlayScreen currentGame = new PlayScreen(app, inputChosen, (int)
+                    beginningLevel.getValue());
+            currentGame.setMusic(menuMusicButton.isChecked());
 
-        // Einstellungen speichern
-        app.prefs.putInteger("inputType", inputChosen);
-        app.prefs.putBoolean("musicPlayback", menuMusicButton.isChecked());
-        app.prefs.putInteger("beginningLevel", (int) beginningLevel.getValue());
-        app.prefs.flush();
+            // Einstellungen speichern
+            app.prefs.putInteger("inputType", inputChosen);
+            app.prefs.putBoolean("musicPlayback", menuMusicButton.isChecked());
+            app.prefs.putInteger("beginningLevel", (int) beginningLevel.getValue());
+            app.prefs.flush();
 
-        Gdx.input.setInputProcessor(null);
-        stage.getRoot().clearActions();
-        stage.getRoot().addAction(sequence(fadeOut(.5f), Actions.run(new Runnable() {
-            @Override
-            public void run() {
-                app.setScreen(currentGame);
-            }
-        })));
+            Gdx.input.setInputProcessor(null);
+            stage.getRoot().clearActions();
+            stage.getRoot().addAction(sequence(fadeOut(.5f), Actions.run(new Runnable() {
+                @Override
+                public void run() {
+                    app.setScreen(currentGame);
+                }
+            })));
+        } catch (InputNotAvailableException inp) {
+            Dialog dialog = new Dialog("", app.skin);
+            Label errorMsgLabel = new Label(app.TEXTS.get("errorInputNotAvail"), app.skin);
+            errorMsgLabel.setWrap(true);
+            dialog.getContentTable().add(errorMsgLabel).prefWidth
+                    (LightBlocksGame.nativeGameWidth * .75f).pad(10);
+            dialog.button("OK"); //sends "true" as the result
+            dialog.show(stage);
+        }
     }
 
     /**

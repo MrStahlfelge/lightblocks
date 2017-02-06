@@ -48,6 +48,11 @@ public class GameModel {
     // Verzögerung bei gedrückter Taste
     private float movingCountdown;
 
+    /**
+     * hier am GameModel verwaltet, da die Eingabemethode mit dem Modell ins Savegame kommt (und von dort geladen wird)
+     */
+    public int inputTypeKey = -1;
+
     public GameModel(IGameModelListener userInterface) {
 
         this.userInterface = userInterface;
@@ -414,6 +419,7 @@ public class GameModel {
             json.writeValue("active", activeTetromino);
             json.writeValue("next", nextTetromino.getIndex());
             json.writeValue("score", score);
+            json.writeValue("inputType", inputTypeKey);
             json.writeObjectEnd();
         }
 
@@ -424,6 +430,7 @@ public class GameModel {
             drawyer = new TetrominoDrawyer();
             drawyer.read(json, jsonData.get("drawyer"));
             score = json.readValue("score", GameScore.class, jsonData);
+            inputTypeKey = jsonData.getInt("inputType", -1);
             nextTetromino = new Tetromino(jsonData.getInt("next"));
 
             // den aktiven Tetromino hier einzeln herausfummeln wegen des

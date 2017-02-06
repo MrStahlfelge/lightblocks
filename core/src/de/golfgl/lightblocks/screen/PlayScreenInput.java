@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
+import java.util.InputMismatchException;
+
 /**
  * Created by Benjamin Schulte on 25.01.2017.
  */
@@ -17,7 +19,11 @@ public abstract class PlayScreenInput extends InputAdapter {
     public boolean isPaused = true;
     PlayScreen playScreen;
 
-    public static PlayScreenInput getPlayInput(int key) {
+    public static PlayScreenInput getPlayInput(int key) throws InputNotAvailableException {
+
+        if (!inputAvailable(key))
+            throw new InputNotAvailableException();
+
         switch (key) {
             case 1:
                 return new PlayGesturesInput();
