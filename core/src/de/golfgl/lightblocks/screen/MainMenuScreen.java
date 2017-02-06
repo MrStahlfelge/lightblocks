@@ -7,7 +7,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
@@ -31,7 +32,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 15.01.2017.
  */
 public class MainMenuScreen extends AbstractScreen {
-    private final CheckBox menuMusicButton;
+    private final Button menuMusicButton;
     private final SelectBox inputChoseField;
     private TextButton resumeGameButton;
     private Slider beginningLevel;
@@ -50,7 +51,7 @@ public class MainMenuScreen extends AbstractScreen {
         final BlockGroup blockGroup = new BlockGroup();
         blockGroup.setTransform(false);
 
-        mainTable.add(blockGroup).colspan(2).center();
+        mainTable.add(blockGroup).colspan(2).center().prefHeight(200);
 
         // Der Titel
         mainTable.row();
@@ -64,10 +65,24 @@ public class MainMenuScreen extends AbstractScreen {
 
 
         //nun die Buttons zum bedienen
+
+        // Resume the game
+        mainTable.row();
+        resumeGameButton = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
+        resumeGameButton.addListener(new ChangeListener() {
+                                         public void changed(ChangeEvent event, Actor actor) {
+                                             gotoPlayScreen(true);
+                                         }
+                                     }
+        );
+
+        mainTable.add(resumeGameButton).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2).spaceBottom
+                (LightBlocksGame.nativeGameWidth / 16).minHeight(resumeGameButton.getPrefHeight() * 1.2f);
+
+        // Play new game!
         mainTable.row();
 
-        // Play the game!
-        TextButton button = new TextButton(app.TEXTS.get("menuPlayButton"), app.skin);
+        TextButton button = new TextButton(app.TEXTS.get("menuPlayMarathonButton"), app.skin);
         button.addListener(new ChangeListener() {
                                public void changed(ChangeEvent event, Actor actor) {
                                    gotoPlayScreen(false);
@@ -75,7 +90,8 @@ public class MainMenuScreen extends AbstractScreen {
                            }
         );
 
-        mainTable.add(button).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2);
+        mainTable.add(button).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2).minHeight(resumeGameButton
+                .getPrefHeight() * 1.2f);
 
         mainTable.row();
         beginningLevel = new Slider(0, 9, 1, false, app.skin);
@@ -97,18 +113,6 @@ public class MainMenuScreen extends AbstractScreen {
         mainTable.add(beginningLevel).minHeight(30).left();
 
         mainTable.row();
-
-        // Resume the game
-        resumeGameButton = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
-        resumeGameButton.addListener(new ChangeListener() {
-                                         public void changed(ChangeEvent event, Actor actor) {
-                                             gotoPlayScreen(true);
-                                         }
-                                     }
-        );
-
-        mainTable.add(resumeGameButton).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2).spaceBottom
-                (LightBlocksGame.nativeGameWidth / 16);
 
         // die möglichen Inputs aufzählen
         inputChoseField = new SelectBox(app.skin);
@@ -142,15 +146,20 @@ public class MainMenuScreen extends AbstractScreen {
         inputChoseField.setItems(inputTypes);
         inputChoseField.setSelectedIndex(chosenIndex);
 
-        mainTable.row();
         mainTable.add(new Label(app.TEXTS.get("menuInputControl") + ":", app.skin));
         mainTable.add(inputChoseField).minHeight(30).left();
 
         mainTable.row();
-        mainTable.add();
-        menuMusicButton = new CheckBox(app.TEXTS.get("menuMusicButton"), app.skin);
+        menuMusicButton = new ImageTextButton(app.TEXTS.get("menuMusicButton"), app.skin, "checkbox");
         menuMusicButton.setChecked(app.prefs.getBoolean("musicPlayback", true));
-        mainTable.add(menuMusicButton).minHeight(30).spaceTop(LightBlocksGame.nativeGameWidth / 16);
+        mainTable.add(menuMusicButton).minHeight(30).spaceTop(LightBlocksGame.nativeGameWidth / 16).colspan(2)
+                .minWidth(LightBlocksGame.nativeGameWidth / 2);
+
+        mainTable.row().expandY();
+        Label gameVersion = new Label(app.TEXTS.get("gameVersion"), app.skin);
+        gameVersion.setColor(.5f, .5f, .5f, 1);
+        mainTable.add(gameVersion).bottom().right().colspan(2);
+
 
         stage.getRoot().setColor(Color.CLEAR);
 

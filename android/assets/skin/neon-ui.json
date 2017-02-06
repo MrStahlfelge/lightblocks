@@ -263,6 +263,9 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
 		imageOver: checkbox-over-c
 		imageChecked: checkbox-pressed-c
 		imageCheckedOver: checkbox-pressed-over-c
+		up: button-c
+		down: button-pressed-c
+		over: button-over-c
 		font: font
 		fontColor: text
 		downFontColor: text-selected
@@ -278,6 +281,9 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
 		fontColor: text
 		downFontColor: text-selected
 		checkedFontColor: text-selected
+		up: button-c
+		down: button-pressed-c
+		over: button-over-c
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
