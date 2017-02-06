@@ -17,11 +17,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
     public boolean keyDown(int keycode) {
         switch (keycode) {
             case Input.Keys.ESCAPE:
+            case Input.Keys.BACKSPACE:
                 playScreen.goBackToMenu();
                 return true;
 
             case Input.Keys.ENTER:
-            case Input.Keys.UP:
                 playScreen.switchPause(false);
                 return true;
 

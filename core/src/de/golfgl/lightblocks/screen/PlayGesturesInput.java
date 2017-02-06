@@ -14,6 +14,8 @@ import de.golfgl.lightblocks.LightBlocksGame;
  */
 public class PlayGesturesInput extends PlayScreenInput {
 
+    public static final int DRAG_TRESHOLD = 50;
+
     int screenX;
     int screenY;
     boolean beganHorizontalMove;
@@ -44,14 +46,14 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        // Bei mehr als 20 Pixeln erkennen wir eine Bewegung an...
+        // Bei mehr als DRAG_TRESHOLD Pixeln erkennen wir eine Bewegung an...
 
         if (!beganSoftDrop) {
-            if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > 50)) {
+            if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > DRAG_TRESHOLD)) {
                 beganHorizontalMove = true;
                 playScreen.gameModel.startMoveHorizontal(screenX - this.screenX < 0);
             }
-            if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < 50)) {
+            if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < DRAG_TRESHOLD)) {
                 playScreen.gameModel.endMoveHorizontal(true);
                 playScreen.gameModel.endMoveHorizontal(false);
                 beganHorizontalMove = false;
@@ -59,23 +61,23 @@ public class PlayGesturesInput extends PlayScreenInput {
         }
 
         if (!beganHorizontalMove) {
-            if (screenY - this.screenY > 50 && !beganSoftDrop) {
+            if (screenY - this.screenY > DRAG_TRESHOLD && !beganSoftDrop) {
                 beganSoftDrop = true;
                 playScreen.gameModel.setSoftDropFactor(1);
             }
-            if (screenY - this.screenY < 50 && beganSoftDrop) {
+            if (screenY - this.screenY < DRAG_TRESHOLD && beganSoftDrop) {
                 beganSoftDrop = false;
                 playScreen.gameModel.setSoftDropFactor(0);
             }
         }
 
-        if (screenY - this.screenY < -200 & !isPaused) {
+        if (screenY - this.screenY < -4 * DRAG_TRESHOLD & !isPaused) {
             playScreen.switchPause(false);
         }
 
         // rotate vermeiden
-        if (!didSomething && (Math.abs(screenX - this.screenX) > 50
-                || Math.abs(screenY - this.screenY) > 50)) {
+        if (!didSomething && (Math.abs(screenX - this.screenX) > DRAG_TRESHOLD
+                || Math.abs(screenY - this.screenY) > DRAG_TRESHOLD)) {
             playScreen.gameModel.setInputFreezeInterval(0);
             didSomething = true;
         }
