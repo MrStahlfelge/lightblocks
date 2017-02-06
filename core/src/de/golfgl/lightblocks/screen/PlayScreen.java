@@ -47,12 +47,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final ScoreLabel linesNum;
     private final MotivationLabel motivatorLabel;
     private final ParticleEffectActor weldEffect;
-    private boolean isLoading;
-
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
     Music music;
     float lastAccX = 0;
+    private boolean isLoading;
     private boolean isPaused = true;
 
     public PlayScreen(LightBlocksGame app, PlayScreenInput inputAdapter, int beginningLevel) {
@@ -181,8 +180,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     public void goBackToMenu() {
-        if (!gameModel.isGameOver() && app.savegame.canSaveGame())
-            app.savegame.saveGame(gameModel.saveGameModel());
+        app.savegame.saveGame(gameModel.saveGameModel());
 
         app.setScreen(app.mainMenuScreen);
         if (music != null)
@@ -206,39 +204,40 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (gameModel.isGameOver())
             goBackToMenu();
 
-        isPaused = !isPaused;
+        else {
+            isPaused = !isPaused;
 
-        final float fadingInterval = immediately ? 0 : .2f;
+            final float fadingInterval = immediately ? 0 : .2f;
 
-        //inform input adapter, too
-        inputAdapter.isPaused = isPaused;
+            //inform input adapter, too
+            inputAdapter.isPaused = isPaused;
 
-        blockGroup.clearActions();
+            blockGroup.clearActions();
 
-        if (!isPaused) {
+            if (!isPaused) {
 
-            if (music != null)
-                music.play();
+                if (music != null)
+                    music.play();
 
-            if (blockGroup.getColor().a < 1) {
-                blockGroup.addAction(Actions.fadeIn(fadingInterval));
-                gameModel.setFreezeInterval(fadingInterval);
-            }
+                if (blockGroup.getColor().a < 1) {
+                    blockGroup.addAction(Actions.fadeIn(fadingInterval));
+                    gameModel.setFreezeInterval(fadingInterval);
+                }
 
-            labelGroup.clearChildren();
+                labelGroup.clearChildren();
 
-            //inform the game model that there was a pause
-            gameModel.fromPause();
-        } else {
-            blockGroup.addAction(Actions.fadeOut(fadingInterval));
-            if (music != null)
-                music.pause();
+                //inform the game model that there was a pause
+                gameModel.fromPause();
+            } else {
+                blockGroup.addAction(Actions.fadeOut(fadingInterval));
+                if (music != null)
+                    music.pause();
 
-            // Spielstand speichern
-            if (app.savegame.canSaveGame())
+                // Spielstand speichern
                 app.savegame.saveGame(gameModel.saveGameModel());
 
-            inputAdapter.showHelp(labelGroup, false);
+                inputAdapter.showHelp(labelGroup, false);
+            }
         }
     }
 

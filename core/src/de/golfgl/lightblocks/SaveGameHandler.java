@@ -32,13 +32,17 @@ public class SaveGameHandler {
     }
 
     /**
-     * Saves the string to the savegamefile
+     * Saves the string to the savegamefile. If null, savegame is resetted
      *
      * @return true when successful
      */
     public boolean saveGame(String jsonString) {
         if (!canSaveGame())
             return false;
+
+
+        if (jsonString == null)
+            return resetGame();
 
         try {
             Gdx.files.local(FILENAME).writeString(jsonString, false);

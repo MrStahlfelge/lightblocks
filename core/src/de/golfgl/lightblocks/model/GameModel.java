@@ -340,10 +340,14 @@ public class GameModel {
 
 
     public String saveGameModel() {
-        Json json = new Json();
-        json.setSerializer(GameModel.class, new ModelSerializer());
-        json.setOutputType(JsonWriter.OutputType.json);
-        return json.toJson(this);
+        if (isGameOver)
+            return null;
+        else {
+            Json json = new Json();
+            json.setSerializer(GameModel.class, new ModelSerializer());
+            json.setOutputType(JsonWriter.OutputType.json);
+            return json.toJson(this);
+        }
     }
 
     public void setCurrentSpeed() {
