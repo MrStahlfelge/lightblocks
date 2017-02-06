@@ -67,19 +67,6 @@ public class MainMenuScreen extends AbstractScreen {
 
         //nun die Buttons zum bedienen
 
-        // Resume the game
-        mainTable.row();
-        resumeGameButton = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
-        resumeGameButton.addListener(new ChangeListener() {
-                                         public void changed(ChangeEvent event, Actor actor) {
-                                             gotoPlayScreen(true);
-                                         }
-                                     }
-        );
-
-        mainTable.add(resumeGameButton).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2).spaceBottom
-                (LightBlocksGame.nativeGameWidth / 16).minHeight(resumeGameButton.getPrefHeight() * 1.2f);
-
         // Play new game!
         mainTable.row();
 
@@ -91,7 +78,7 @@ public class MainMenuScreen extends AbstractScreen {
                            }
         );
 
-        mainTable.add(button).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2).minHeight(resumeGameButton
+        mainTable.add(button).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2).minHeight(button
                 .getPrefHeight() * 1.2f);
 
         mainTable.row();
@@ -149,6 +136,19 @@ public class MainMenuScreen extends AbstractScreen {
 
         mainTable.add(new Label(app.TEXTS.get("menuInputControl") + ":", app.skin));
         mainTable.add(inputChoseField).minHeight(30).left();
+
+        // Resume the game
+        mainTable.row();
+        resumeGameButton = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
+        resumeGameButton.addListener(new ChangeListener() {
+                                         public void changed(ChangeEvent event, Actor actor) {
+                                             gotoPlayScreen(true);
+                                         }
+                                     }
+        );
+
+        mainTable.add(resumeGameButton).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2).spaceTop
+                (LightBlocksGame.nativeGameWidth / 16).minHeight(resumeGameButton.getPrefHeight() * 1.2f);
 
         mainTable.row();
         menuMusicButton = new ImageTextButton(app.TEXTS.get("menuMusicButton"), app.skin, "checkbox");
