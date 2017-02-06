@@ -35,7 +35,7 @@ public class GameScore {
      * @param specialMove  Four Line oder T-Spin
      * @return true wenn specialmove und davor war auch special
      */
-    public boolean incClearedLines(int clearedLines, boolean specialMove) {
+    public boolean incClearedLines(int clearedLines, boolean specialMove, boolean isTSpin) {
         // wiki/Scoring
 
         float removeScore;
@@ -43,10 +43,10 @@ public class GameScore {
 
         switch (clearedLines) {
             case 1:
-                removeScore = 40;
+                removeScore = (isTSpin ? 300 : 40);
                 break;
             case 2:
-                removeScore = 100;
+                removeScore = (isTSpin ? 1200 : 100);
                 break;
             case 3:
                 removeScore = 300;
@@ -85,6 +85,10 @@ public class GameScore {
 
     public void setStartingLevel(int startingLevel) {
         this.startingLevel = startingLevel;
+    }
+
+    public void addTSpinBonus() {
+        this.dropScore += (getCurrentLevel() + 1) * 150;
     }
 
     public void addSoftDropScore(float softDropScore) {

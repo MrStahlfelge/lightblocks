@@ -20,6 +20,10 @@ public class GameModel {
     private static GameScore score;
     // Speicherhaltung
     private final IntArray linesToRemove;
+    /**
+     * hier am GameModel verwaltet, da die Eingabemethode mit dem Modell ins Savegame kommt (und von dort geladen wird)
+     */
+    public int inputTypeKey = -1;
     IGameModelListener userInterface;
     TetrominoDrawyer drawyer;
     private Tetromino activeTetromino;
@@ -28,7 +32,6 @@ public class GameModel {
     // wieviel ist der aktuelle Stein schon ungerundet gefallen
     private float currentSpeed;
     private float distanceRemainder;
-
     //nach remove Lines oder drop kurze Zeit warten
     private float freezeCountdown;
     //Touchcontrol braucht etwas bis der Nutzer zeichnet... diese Zeit muss ihm gegeben werden. Damit sie nicht zu
@@ -36,7 +39,6 @@ public class GameModel {
     // hat, wird sie extra verwaltet
     private float inputFreezeCountdown;
     private boolean isGameOver;
-
     //vom Input geschrieben
     private float softDropFactor;
     private int isInputRotate;
@@ -47,11 +49,6 @@ public class GameModel {
     private boolean isSomeMovementDone;
     // Verzögerung bei gedrückter Taste
     private float movingCountdown;
-
-    /**
-     * hier am GameModel verwaltet, da die Eingabemethode mit dem Modell ins Savegame kommt (und von dort geladen wird)
-     */
-    public int inputTypeKey = -1;
 
     public GameModel(IGameModelListener userInterface) {
 
@@ -119,6 +116,7 @@ public class GameModel {
         if (maxDistance > 0) {
             userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), 0, -maxDistance);
             activeTetromino.getPosition().y -= maxDistance;
+            activeTetromino.setLastMovementType(0);
         }
 
         if (SOFT_DROP_SPEED * softDropFactor > currentSpeed)
@@ -136,11 +134,28 @@ public class GameModel {
         gameboard.pinTetromino(activeTetromino);
         userInterface.pinTetromino(activeTetromino.getCurrentBlockPositions());
 
-        removeFullLines();
+        // T-Spin? 1. T, 2. letzte Bewegung ist Drehung, 3. drei Felder um Rotationszentrum sind belegt
+        boolean tSpin = (activeTetromino.isT() && activeTetromino.getLastMovementType() == 1);
+        // einfache Bedingungen erfüllt, also gucken ob drei Felder belegt sind
+        if (tSpin) {
+            int occupiedNeighbords = 0;
+            int rotationAxisX = (int) activeTetromino.getPosition().x + 1;
+            int rotationAxisY = (int) activeTetromino.getPosition().y + 1;
+
+            occupiedNeighbords += (gameboard.isValidCoordinate(rotationAxisX + 1, rotationAxisY + 1) != 0 ? 1 : 0);
+            occupiedNeighbords += (gameboard.isValidCoordinate(rotationAxisX - 1, rotationAxisY - 1) != 0 ? 1 : 0);
+            occupiedNeighbords += (gameboard.isValidCoordinate(rotationAxisX - 1, rotationAxisY + 1) != 0 ? 1 : 0);
+            occupiedNeighbords += (gameboard.isValidCoordinate(rotationAxisX + 1, rotationAxisY - 1) != 0 ? 1 : 0);
+
+            tSpin = occupiedNeighbords >= 3;
+        }
+
+        if (tSpin)
+            userInterface.addMotivation("motivationTSpin");
+
+        removeFullLines(tSpin);
 
         int gainedScore = score.flushScore();
-        int gainedPositionX = (int) activeTetromino.getPosition().x;
-        int gainedPositionY = (int) activeTetromino.getPosition().y;
         userInterface.updateScore(score, gainedScore);
 
         // dem Spieler ein bißchen ARE gönnen (wiki/ARE) - je weiter oben, je mehr
@@ -150,7 +165,7 @@ public class GameModel {
         activateNextTetromino();
     }
 
-    private void removeFullLines() {
+    private void removeFullLines(boolean isTSpin) {
         linesToRemove.clear();
 
         for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
@@ -160,17 +175,22 @@ public class GameModel {
         }
 
         int lineCount = linesToRemove.size;
-        if (lineCount == 0) {
-            return;
+
+        if (lineCount > 0) {
+
+            gameboard.clearLines(linesToRemove);
+            boolean isSpecial = (lineCount == 4) || (lineCount == 2 && isTSpin);
+            boolean doubleSpecial = score.incClearedLines(lineCount, isSpecial, isTSpin);
+            if (doubleSpecial)
+                userInterface.addMotivation("motivationDoubleSpecial");
+            userInterface.clearLines(linesToRemove, isSpecial);
+            setCurrentSpeed();
+        } else if (isTSpin) {
+            // T-Spin Bonus erteilen falls keine Reihen abgebaut wurden (sonst wurde Bonus schon in incClearedLines
+            // vergeben)
+            score.addTSpinBonus();
         }
 
-        gameboard.clearLines(linesToRemove);
-        //TODO: t-spin mit zwei zeilen auch rein!
-        boolean doubleSpecial = score.incClearedLines(lineCount, (lineCount == 4));
-        if (doubleSpecial)
-            userInterface.addMotivation("motivationDoubleSpecial");
-        userInterface.clearLines(linesToRemove, (lineCount == 4));
-        setCurrentSpeed();
     }
 
     /**
@@ -188,6 +208,7 @@ public class GameModel {
         if (maxDistance != 0) {
             userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), maxDistance, 0);
             activeTetromino.getPosition().x += maxDistance;
+            activeTetromino.setLastMovementType(0);
         }
 
         if (maxDistance != distance) {
@@ -439,6 +460,8 @@ public class GameModel {
             JsonValue tetromino = jsonData.get("active");
             activeTetromino = new Tetromino(tetromino.getInt("tetrominoIndex"));
             activeTetromino.setRotation(tetromino.getInt("currentRotation"));
+            // unbedingt nach setRotation!
+            activeTetromino.setLastMovementType(tetromino.getInt("lastMovementType"));
             Vector2 posFromJson = json.readValue(Vector2.class, tetromino.get("position"));
             activeTetromino.getPosition().set(posFromJson);
 

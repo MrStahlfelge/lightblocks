@@ -22,6 +22,7 @@ public class Tetromino {
                     {new Vector2(2, 0), new Vector2(2, 1), new Vector2(2, 2), new Vector2(2, 3)}
             },
 
+            // T
             {{new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1)},
                     {new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2)},
                     {new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2)},
@@ -44,10 +45,11 @@ public class Tetromino {
             {{new Vector2(1, 0), new Vector2(2, 0), new Vector2(0, 1), new Vector2(1, 1)},
                     {new Vector2(1, 0), new Vector2(1, 1), new Vector2(2, 1), new Vector2(2, 2)}},
 
+            // S
             {{new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(2, 1)},
                     {new Vector2(2, 0), new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2)}},
 
-            // Der Würfel
+            // O
             {{new Vector2(1, 0), new Vector2(2, 0), new Vector2(1, 1), new Vector2(2, 1)}}};
 
     private final int tetrominoIndex;
@@ -56,6 +58,8 @@ public class Tetromino {
     // also aufpassen und ggf. kopieren
     private transient final Integer[][] blockPosition;
     private int currentRotation;
+    // letzte Bewegung rotation (1) oder Positionsänderung (0)?
+    private int lastMovementType;
 
     Tetromino(int index) {
         this.tetrominoIndex = index;
@@ -115,8 +119,28 @@ public class Tetromino {
 
     public int setRotation(int newRotation) {
 
-        currentRotation = normalizeRotation(newRotation);
+        newRotation = normalizeRotation(newRotation);
+
+        if (currentRotation != newRotation) {
+            currentRotation = newRotation;
+            setLastMovementType(1);
+        }
 
         return currentRotation;
+    }
+
+    /**
+     * WICHTIG: das T rotiert um Position 1,1
+     */
+    public boolean isT() {
+        return tetrominoIndex == 1;
+    }
+
+    public int getLastMovementType() {
+        return lastMovementType;
+    }
+
+    public void setLastMovementType(int lastMovementType) {
+        this.lastMovementType = lastMovementType;
     }
 }
