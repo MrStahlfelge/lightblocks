@@ -15,6 +15,8 @@ public class GameScore {
     private int startingLevel;
     // der noch nicht dem Gesamtscore zugerechnete aufgelaufene Score
     private float dropScore;
+    // Anzahl gezogene Blöcke
+    private int drawnTetrominos;
 
     private boolean lastClearLinesWasSpecial = false;
 
@@ -101,4 +103,11 @@ public class GameScore {
         return flushedScore;
     }
 
+    public int getDrawnTetrominos() {
+        return drawnTetrominos;
+    }
+
+    public void incDrawnTetrominos() {
+        this.drawnTetrominos += 1;
+    }
 }

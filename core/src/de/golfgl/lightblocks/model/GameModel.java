@@ -245,6 +245,7 @@ public class GameModel {
 
         activeTetromino = nextTetromino;
         nextTetromino = drawyer.getNextTetromino();
+        score.incDrawnTetrominos();
 
         // ins Display mit beiden
         fireUserInterfaceTetrominoSwap();

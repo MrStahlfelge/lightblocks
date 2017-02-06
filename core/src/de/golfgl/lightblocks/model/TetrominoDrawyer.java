@@ -14,44 +14,18 @@ import com.badlogic.gdx.utils.JsonValue;
 class TetrominoDrawyer implements Json.Serializable {
     private IntArray drawyer = new IntArray();
 
-    // der Block der der erste im Array ist
-    private int currentMinIndex = 0;
-
-    //Anzahl gezogene Blöcke
-    private int drawnTetrominos = -1;
-
-    public int getDrawnTetrominos() {
-        return drawnTetrominos;
-    }
-
     /**
-     * returns the next tetromino for this player
+     * returns the next tetromino
      */
     public Tetromino getNextTetromino() {
-        drawnTetrominos = drawnTetrominos + 1;
-        return getTetromino(drawnTetrominos);
-    }
 
-    /**
-     * returns the tetromino at the given position in draywer
-     *
-     * @param count from the beginning of the current game
-     */
-    public Tetromino getTetromino(int count) {
-
-        int positionInArray = count - currentMinIndex;
-
-        if (drawyer.size - 1 < positionInArray)
+        if (drawyer.size < 1)
             determineNextTetrominos();
 
-        Tetromino retVal = new Tetromino(drawyer.get(positionInArray));
+        Tetromino retVal = new Tetromino(drawyer.get(0));
 
-        // minimale Position weiterschieben
-        // das muss dann mit mehreren Spielern anders werden
-        if (positionInArray > 9) {
-            currentMinIndex = currentMinIndex + positionInArray + 1;
-            drawyer.removeRange(0, positionInArray);
-        }
+        // Position weiterschieben
+        drawyer.removeIndex(0);
 
         return retVal;
     }
@@ -72,8 +46,6 @@ class TetrominoDrawyer implements Json.Serializable {
 
     @Override
     public void write(Json json) {
-        json.writeValue("drawn", drawnTetrominos);
-        json.writeValue("offset", currentMinIndex);
         // da es nur von 0 bis 6 geht, einfach in einen String
         String blocks = "";
         for (int i = 0; i < drawyer.size; i++) {
@@ -84,8 +56,6 @@ class TetrominoDrawyer implements Json.Serializable {
 
     @Override
     public void read(Json json, JsonValue jsonData) {
-        drawnTetrominos = jsonData.getInt("drawn");
-        currentMinIndex = jsonData.getInt(("offset"));
         String onDraywerString = jsonData.getString("onDrawyer");
         drawyer.clear();
         for (int i = 0; i < onDraywerString.length(); i++) {
