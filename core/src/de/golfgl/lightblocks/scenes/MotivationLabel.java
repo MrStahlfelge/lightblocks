@@ -8,8 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
-import de.golfgl.lightblocks.LightBlocksGame;
-
 /**
  * Created by Benjamin Schulte on 02.02.2017.
  */
@@ -41,14 +39,13 @@ public class MotivationLabel extends Label {
             isActive = true;
             setText(text);
 
-            setX(LightBlocksGame.nativeGameWidth);
-            setY(BlockActor.blockWidth * 1);
+            setY(-this.getHeight());
 
             groupBox.addActor(this);
 
             getColor().a = .8f;
-            this.addAction(Actions.sequence(Actions.moveTo(0, getY(), .2f, Interpolation.fade),
-                    Actions.moveBy(0, BlockActor.blockWidth * 2, 1f),
+            this.addAction(Actions.sequence(Actions.moveTo(0, BlockActor.blockWidth, .2f, Interpolation.circleOut),
+                    Actions.moveBy(0, BlockActor.blockWidth, 1f),
                     Actions.delay(1f),
                     Actions.fadeOut(.3f, Interpolation.fade),
                     Actions.run(new Runnable() {
