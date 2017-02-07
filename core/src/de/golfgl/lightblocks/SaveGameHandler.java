@@ -9,7 +9,7 @@ import com.badlogic.gdx.Gdx;
  */
 public class SaveGameHandler {
 
-    private static final String FILENAME = "savegames/lightblockssavegame.json";
+    private static final String FILENAME = "data/savegame.json";
 
     public boolean canSaveGame() {
         return Gdx.files.isLocalStorageAvailable();
