@@ -315,7 +315,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             int newx = vNew[i][0];
             int newy = vNew[i][1];
             block.setMoveAction(Actions.moveTo((newx) * BlockActor.blockWidth, (newy) * BlockActor.blockWidth, 1 /
-                    10f));
+                    20f));
             blockMatrix[newx][newy] = block;
         }
 
