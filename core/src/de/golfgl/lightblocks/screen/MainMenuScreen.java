@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -58,10 +59,7 @@ public class MainMenuScreen extends AbstractScreen {
         mainTable.row();
 
         final Label gameTitle = new Label(app.TEXTS.get("gameTitle").toUpperCase(), app.skin, "big");
-        mainTable.add(gameTitle).colspan(2).spaceTop(LightBlocksGame.nativeGameWidth / 12);
-        mainTable.row();
-        final Label gameAuthor = new Label(app.TEXTS.get("gameAuthor"), app.skin);
-        mainTable.add(gameAuthor).colspan(2).
+        mainTable.add(gameTitle).colspan(2).spaceTop(LightBlocksGame.nativeGameWidth / 12).
                 spaceBottom(LightBlocksGame.nativeGameWidth / 12).top();
 
 
@@ -157,9 +155,11 @@ public class MainMenuScreen extends AbstractScreen {
                 .minWidth(LightBlocksGame.nativeGameWidth / 2);
 
         mainTable.row().expandY();
-        Label gameVersion = new Label(app.TEXTS.get("gameVersion"), app.skin);
+        Label gameVersion = new Label(app.TEXTS.get("gameVersion") + "\n" + app.TEXTS.get("gameAuthor"), app.skin);
         gameVersion.setColor(.5f, .5f, .5f, 1);
-        mainTable.add(gameVersion).bottom().right().colspan(2);
+        gameVersion.setFontScale(.8f);
+        gameVersion.setAlignment(Align.center);
+        mainTable.add(gameVersion).bottom().colspan(2);
 
 
         stage.getRoot().setColor(Color.CLEAR);
