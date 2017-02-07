@@ -51,7 +51,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     PlayScreenInput inputAdapter;
     Music music;
     float lastAccX = 0;
-    private boolean isLoading;
     private boolean isPaused = true;
 
     public PlayScreen(LightBlocksGame app, int inputKey, int beginningLevel) throws InputNotAvailableException {
@@ -137,10 +136,15 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         stage.getRoot().setColor(Color.CLEAR);
 
+        initializeGameModel(inputKey, beginningLevel);
+
+
+    }
+
+    private void initializeGameModel(int inputKey, int beginningLevel) throws InputNotAvailableException {
         // Game Model erst hinzufügen, wenn die blockgroup schon steht
         gameModel = new GameModel(this);
 
-        isLoading = true;
         if (app.savegame.hasSavedGame())
             gameModel.loadGameModel(app.savegame.loadGame());
         else
@@ -153,11 +157,15 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         inputAdapter.setPlayScreen(this);
         inputAdapter.showHelp(labelGroup, true);
 
-        isLoading = false;
+        // Highscores
+        gameModel.totalScore = app.savegame.loadTotalScore();
+        //TODO das sollte ins GameModel
+        gameModel.bestScore = app.savegame.loadBestScore(gameModel.getIdentifier());
 
         // erst nach dem Laden setzen, damit das noch ohne Animation läuft
         levelNum.setEmphasizeTreshold(1, new Color(1, .3f, .3f, 1));
         scoreNum.setEmphasizeTreshold(1000, new Color(1, .3f, .3f, 1));
+
     }
 
     @Override
@@ -183,7 +191,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     public void goBackToMenu() {
-        app.savegame.saveGame(gameModel.saveGameModel());
+        saveGameState();
 
         app.setScreen(app.mainMenuScreen);
         if (music != null)
@@ -194,11 +202,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         stage.dispose();
     }
 
+    private void saveGameState() {
+        app.savegame.saveTotalScore(gameModel.totalScore);
+        app.savegame.saveBestScore(gameModel.bestScore, gameModel.getIdentifier());
+        app.savegame.saveGame(gameModel.saveGameModel());
+    }
+
     @Override
     public void pause() {
         super.pause();
 
-        if (!isPaused)
+        if (!isPaused && !gameModel.isGameOver())
             switchPause(true);
     }
 
@@ -237,7 +251,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     music.pause();
 
                 // Spielstand speichern
-                app.savegame.saveGame(gameModel.saveGameModel());
+                saveGameState();
 
                 inputAdapter.showHelp(labelGroup, false);
             }
@@ -264,7 +278,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             Array<BlockActor> blocks = removeBlockActorsFromMatrix(v);
 
             //... und dann neu ablegen
-            //TODO die geschwindigkeit muss genauso hoch sein wie beim SOFTDROP!
             for (int i = 0; i < v.length; i++) {
                 BlockActor block = blocks.get(i);
                 int x = v[i][0];
@@ -391,11 +404,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void setGameOver(boolean b) {
+    public void setGameOver() {
         if (music != null)
             music.stop();
         app.gameOverSound.play();
-        app.savegame.resetGame();
+        saveGameState();
     }
 
     @Override
@@ -480,6 +493,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 break;
             case tenLinesCleared:
                 text = extraMsg + " " + app.TEXTS.get("labelLines");
+                break;
+            case newHighscore:
+                text = app.TEXTS.get("motivationNewHighscore");
+                break;
         }
 
         if (playSound)

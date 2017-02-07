@@ -6,6 +6,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
+import de.golfgl.lightblocks.score.BestScore;
+import de.golfgl.lightblocks.score.TotalScore;
+
 /**
  * Created by Benjamin Schulte on 23.01.2017.
  */
@@ -17,15 +20,18 @@ public class GameModel {
     private static final float REPEAT_START_OFFSET = 0.3f;
     private static final float REPEAT_INTERVAL = 0.05f;
     private static final float SOFT_DROP_SPEED = 30.0f;
-    private static GameScore score;
     // Speicherhaltung
     private final IntArray linesToRemove;
+    public BestScore bestScore;
+    public TotalScore totalScore;
     /**
      * hier am GameModel verwaltet, da die Eingabemethode mit dem Modell ins Savegame kommt (und von dort geladen wird)
      */
     public int inputTypeKey = -1;
     IGameModelListener userInterface;
     TetrominoDrawyer drawyer;
+    private GameScore score;
+    private boolean isBestScore = false;
     private Tetromino activeTetromino;
     private Tetromino nextTetromino;
     private Gameboard gameboard;
@@ -174,6 +180,20 @@ public class GameModel {
             userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, Integer.toString((int)
                     Math.floor(score.getClearedLines() / 10) * 10));
 
+        // Highscores updaten
+        if (bestScore.setBestScores(score)) {
+            // nur einmal rausgeben - und auch nur wenn nicht trivial
+            if (!isBestScore && score.getScore() > 10000)
+                userInterface.showMotivation(IGameModelListener.MotivationTypes.newHighscore, null);
+            isBestScore = true;
+        }
+        totalScore.addScore(gainedScore);
+        totalScore.addClearedLines(removedLines);
+        totalScore.incDrawnTetrominos();
+        if (removedLines == 4)
+            totalScore.incFourLineCount();
+        if (tSpin)
+            totalScore.incTSpins();
 
         userInterface.updateScore(score, gainedScore);
 
@@ -182,6 +202,8 @@ public class GameModel {
         freezeCountdown = Math.max(0, freezeCountdown) + .015f * (10 + activeTetromino.getPosition().y / 2);
         // hiernach keine Zugriffe mehr auf activeTetromino!
         activateNextTetromino();
+
+        // Game Over kann hier erfolgt sein!
     }
 
     private int removeFullLines(boolean isTSpin) {
@@ -200,8 +222,10 @@ public class GameModel {
             gameboard.clearLines(linesToRemove);
             boolean isSpecial = (lineCount == 4) || (lineCount == 2 && isTSpin);
             boolean doubleSpecial = score.incClearedLines(lineCount, isSpecial, isTSpin);
-            if (doubleSpecial)
+            if (doubleSpecial) {
+                totalScore.incDoubles();
                 userInterface.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
+            }
             userInterface.clearLines(linesToRemove, isSpecial);
             setCurrentSpeed();
         } else if (isTSpin) {
@@ -298,7 +322,7 @@ public class GameModel {
         if (!gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
                 activeTetromino.getCurrentRotation())) {
             isGameOver = true;
-            userInterface.setGameOver(true);
+            userInterface.setGameOver();
         }
 
     }
@@ -451,6 +475,13 @@ public class GameModel {
         }
     }
 
+    /**
+     * returns identifier for this game model
+     */
+    public String getIdentifier() {
+        return "marathon" + inputTypeKey;
+    }
+
     private class ModelSerializer implements Json.Serializer<GameModel> {
 
         @Override
@@ -488,5 +519,6 @@ public class GameModel {
 
             return GameModel.this;
         }
+
     }
 }

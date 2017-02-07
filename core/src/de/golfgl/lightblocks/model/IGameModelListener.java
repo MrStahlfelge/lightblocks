@@ -23,7 +23,7 @@ public interface IGameModelListener {
      */
     void clearLines(IntArray linesToRemove, boolean special);
 
-    void setGameOver(boolean b);
+    void setGameOver();
 
     void showNextTetro(Integer[][] relativeBlockPositions);
 
@@ -35,7 +35,7 @@ public interface IGameModelListener {
 
     void markConflict(int x, int y);
 
-    enum MotivationTypes {newLevel, tSpin, doubleSpecial, tenLinesCleared};
-
     void showMotivation(MotivationTypes achievement, String extra);
+
+    enum MotivationTypes {newLevel, tSpin, doubleSpecial, tenLinesCleared, dropSpeedLevel, boardCleared, newHighscore}
 }

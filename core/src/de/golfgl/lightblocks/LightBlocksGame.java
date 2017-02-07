@@ -24,7 +24,7 @@ public class LightBlocksGame extends Game {
     public AssetManager assetManager;
     public I18NBundle TEXTS;
     public Preferences prefs;
-    public SaveGameHandler savegame;
+    public GameStateHandler savegame;
     // these resources are used in the whole game... so we are loading them here
     public TextureRegion trBlock;
     public TextureRegion trBlockEnlightened;
@@ -79,7 +79,7 @@ public class LightBlocksGame extends Game {
         unlockedSound = assetManager.get("sound/unlocked.ogg", Sound.class);
         cleanSpecialSound = assetManager.get("sound/cleanspecial.ogg", Sound.class);
 
-        savegame = new SaveGameHandler();
+        savegame = new GameStateHandler();
 
         mainMenuScreen = new MainMenuScreen(this);
         this.setScreen(mainMenuScreen);
