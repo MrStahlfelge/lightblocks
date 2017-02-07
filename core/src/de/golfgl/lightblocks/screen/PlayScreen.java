@@ -463,19 +463,35 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void addMotivation(String motivationText) {
-        app.unlockedSound.play();
-        motivatorLabel.addMotivationText(app.TEXTS.get(motivationText));
+    public void showMotivation(MotivationTypes achievement, String extraMsg) {
+
+        boolean playSound = true;
+        String text = "";
+
+        switch (achievement) {
+            case newLevel:
+                text = app.TEXTS.get("labelLevel") + " " + extraMsg;
+                break;
+            case tSpin:
+                text = app.TEXTS.get("motivationTSpin");
+                break;
+            case doubleSpecial:
+                text = app.TEXTS.get("motivationDoubleSpecial");
+                break;
+            case tenLinesCleared:
+                text = extraMsg + " " + app.TEXTS.get("labelLines");
+        }
+
+        if (playSound)
+            app.unlockedSound.play();
+
+        if (!text.isEmpty())
+            motivatorLabel.addMotivationText(text.toUpperCase());
     }
 
     @Override
     public void updateScore(GameScore score, int gainedScore) {
         linesNum.setScore(score.getClearedLines());
-
-        // Level hoch? Super!
-        if (score.getCurrentLevel() != levelNum.getScore() && !isLoading)
-            motivatorLabel.addMotivationText(app.TEXTS.get("labelLevel") + score.getCurrentLevel() + "!");
-
         levelNum.setScore(score.getCurrentLevel());
         scoreNum.setScore(score.getScore());
 

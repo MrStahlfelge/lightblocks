@@ -150,12 +150,31 @@ public class GameModel {
             tSpin = occupiedNeighbords >= 3;
         }
 
-        if (tSpin)
-            userInterface.addMotivation("motivationTSpin");
+        // für Achievement-Auswertung benötigt
+        int levelBeforeRemove = score.getCurrentLevel();
+        int removedLines;
 
-        removeFullLines(tSpin);
+        removedLines = removeFullLines(tSpin);
 
         int gainedScore = score.flushScore();
+
+        // Auswertung Achievements
+
+        if (tSpin && removedLines < 2)
+            // T-Spin nur zeigen, wenn nicht eh schon die Explosion erfolgt
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.tSpin, null);
+
+        // Level hoch? Super!
+        if (score.getCurrentLevel() != levelBeforeRemove)
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.newLevel, Integer.toString(score
+                    .getCurrentLevel()));
+
+            // Wenn kein Level hoch, dann 10 Reihen geschafft?
+        else if (Math.floor(score.getClearedLines() / 10) > Math.floor((score.getClearedLines() - removedLines) / 10))
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, Integer.toString((int)
+                    Math.floor(score.getClearedLines() / 10) * 10));
+
+
         userInterface.updateScore(score, gainedScore);
 
         // dem Spieler ein bißchen ARE gönnen (wiki/ARE) - je weiter oben, je mehr
@@ -165,7 +184,7 @@ public class GameModel {
         activateNextTetromino();
     }
 
-    private void removeFullLines(boolean isTSpin) {
+    private int removeFullLines(boolean isTSpin) {
         linesToRemove.clear();
 
         for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
@@ -182,7 +201,7 @@ public class GameModel {
             boolean isSpecial = (lineCount == 4) || (lineCount == 2 && isTSpin);
             boolean doubleSpecial = score.incClearedLines(lineCount, isSpecial, isTSpin);
             if (doubleSpecial)
-                userInterface.addMotivation("motivationDoubleSpecial");
+                userInterface.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
             userInterface.clearLines(linesToRemove, isSpecial);
             setCurrentSpeed();
         } else if (isTSpin) {
@@ -190,6 +209,8 @@ public class GameModel {
             // vergeben)
             score.addTSpinBonus();
         }
+
+        return lineCount;
 
     }
 

@@ -35,5 +35,7 @@ public interface IGameModelListener {
 
     void markConflict(int x, int y);
 
-    void addMotivation(String motivationText);
+    enum MotivationTypes {newLevel, tSpin, doubleSpecial, tenLinesCleared};
+
+    void showMotivation(MotivationTypes achievement, String extra);
 }
