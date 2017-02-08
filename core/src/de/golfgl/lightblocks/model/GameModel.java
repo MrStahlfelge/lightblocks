@@ -311,7 +311,6 @@ public class GameModel {
 
         activeTetromino = nextTetromino;
         nextTetromino = drawyer.getNextTetromino();
-        score.incDrawnTetrominos();
 
         // ins Display mit beiden
         fireUserInterfaceTetrominoSwap();
@@ -323,7 +322,8 @@ public class GameModel {
                 activeTetromino.getCurrentRotation())) {
             isGameOver = true;
             userInterface.setGameOver();
-        }
+        } else
+            score.incDrawnTetrominos();
 
     }
 
@@ -480,6 +480,10 @@ public class GameModel {
      */
     public String getIdentifier() {
         return "marathon" + inputTypeKey;
+    }
+
+    public GameScore getScore() {
+        return this.score;
     }
 
     private class ModelSerializer implements Json.Serializer<GameModel> {

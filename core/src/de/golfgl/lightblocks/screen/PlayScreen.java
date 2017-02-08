@@ -191,15 +191,22 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     public void goBackToMenu() {
-        saveGameState();
 
-        app.setScreen(app.mainMenuScreen);
-        if (music != null)
-            music.dispose();
+        if (gameModel.isGameOver())
+            goToHighscores();
 
+        else {
+            saveGameState();
+            app.setScreen(app.mainMenuScreen);
+            this.dispose();
+        }
+    }
+
+    @Override
+    public void dispose() {
+        setMusic(false);
         weldEffect.dispose();
-
-        stage.dispose();
+        super.dispose();
     }
 
     private void saveGameState() {
@@ -219,7 +226,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void switchPause(boolean immediately) {
 
         if (gameModel.isGameOver())
-            goBackToMenu();
+            goToHighscores();
 
         else {
             isPaused = !isPaused;
@@ -256,6 +263,19 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 inputAdapter.showHelp(labelGroup, false);
             }
         }
+    }
+
+    private void goToHighscores() {
+
+        ScoreScreen scoreScreen = new ScoreScreen(app);
+        //TODO hier MODEL_MARATHON_ID
+        scoreScreen.setGameModelId(gameModel.getIdentifier());
+        scoreScreen.setRound(gameModel.getScore());
+        scoreScreen.setBest(gameModel.bestScore);
+        scoreScreen.initializeUI(3);
+        app.setScreen(scoreScreen);
+
+        this.dispose();
     }
 
     @Override
@@ -408,6 +428,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (music != null)
             music.stop();
         app.gameOverSound.play();
+        inputAdapter.isPaused = true;
         saveGameState();
     }
 

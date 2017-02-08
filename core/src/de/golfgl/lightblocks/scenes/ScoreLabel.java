@@ -16,22 +16,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class ScoreLabel extends Label {
     private String formatString;
-    private int score;
+    private long score;
     private boolean showSignum;
     private int digits;
 
     // Anzahl der hochgezählten Ziffern pro Sekunde
-    private int countingSpeed;
+    private long countingSpeed;
     // maximale Anzahl in Sekunden die hochgezählt wird
-    private int countingSpeedNow;
+    private long countingSpeedNow;
     private float maxCountingTime;
-    private int scoreToAdd;
+    private long scoreToAdd;
 
     // Einfärben bei bestimmten Wertüberschreitungen
-    private int emphasizeTreshold;
+    private long emphasizeTreshold;
+    private long emphasizeScore;
     private Color emphasizeColor;
 
-    public ScoreLabel(int digits, int score, Skin skin, String styleName) {
+    public ScoreLabel(int digits, long score, Skin skin, String styleName) {
         super("0", skin, styleName);
 
         getBitmapFontCache().getFont().setFixedWidthGlyphs("0123456789");
@@ -47,9 +48,9 @@ public class ScoreLabel extends Label {
         super.act(delta);
 
         if (scoreToAdd != 0) {
-            int scoreToAddNow;
+            long scoreToAddNow;
             if (countingSpeedNow > 0) {
-                scoreToAddNow = (int) (countingSpeedNow * delta);
+                scoreToAddNow = (long) (countingSpeedNow * delta);
                 scoreToAddNow = Math.min(Math.abs(scoreToAdd), scoreToAddNow);
                 if (scoreToAdd < 0)
                     scoreToAddNow *= -1;
@@ -58,9 +59,12 @@ public class ScoreLabel extends Label {
 
             scoreToAdd -= scoreToAddNow;
 
+            if (emphasizeScore > 0 && score < emphasizeScore && score + scoreToAddNow >= emphasizeScore)
+            emphasizeLabel();
+
             score += scoreToAddNow;
 
-            String text = Integer.toString(this.score);
+            String text = Long.toString(this.score);
 
             while (text.length() < digits)
                 text = '0' + text;
@@ -71,26 +75,29 @@ public class ScoreLabel extends Label {
         }
     }
 
-    public int getScore() {
+    public long getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(long score) {
         final float newGainedScore = score - this.score - this.scoreToAdd;
 
-        if (emphasizeTreshold > 0 && Math.abs(newGainedScore) >= emphasizeTreshold) {
-            // bisherige Farbe kopieren
-            Color colorNow = new Color(getColor());
-
-            setColor(emphasizeColor);
-            this.addAction(Actions.color(colorNow, 1f));
-        }
+        if (emphasizeTreshold > 0 && Math.abs(newGainedScore) >= emphasizeTreshold)
+            emphasizeLabel();
 
         this.scoreToAdd = (score - this.score);
 
         if (maxCountingTime > 0)
-            countingSpeedNow = Math.max(countingSpeed, (int) (Math.abs(scoreToAdd) / maxCountingTime));
+            countingSpeedNow = Math.max(countingSpeed, (long) (Math.abs(scoreToAdd) / maxCountingTime));
 
+    }
+
+    public void emphasizeLabel() {
+        // bisherige Farbe kopieren
+        Color colorNow = new Color(getColor());
+
+        setColor(emphasizeColor);
+        this.addAction(Actions.color(colorNow, 1f));
     }
 
     public boolean isShowSignum() {
@@ -107,15 +114,15 @@ public class ScoreLabel extends Label {
         setScore(this.score);
     }
 
-    public int getCountingSpeed() {
+    public long getCountingSpeed() {
         return countingSpeed;
     }
 
-    public void setCountingSpeed(int countingSpeed) {
+    public void setCountingSpeed(long countingSpeed) {
         this.countingSpeed = countingSpeed;
     }
 
-    public void setEmphasizeTreshold(int emphasizeTreshold, Color emphasizeColor) {
+    public void setEmphasizeTreshold(long emphasizeTreshold, Color emphasizeColor) {
         this.emphasizeTreshold = emphasizeTreshold;
         this.emphasizeColor = emphasizeColor;
     }
@@ -127,5 +134,10 @@ public class ScoreLabel extends Label {
      */
     public void setMaxCountingTime(float maxCountingTime) {
         this.maxCountingTime = maxCountingTime;
+    }
+
+    public void setEmphasizeScore(long emphasizeScore, Color emphasizeColor) {
+        this.emphasizeScore = emphasizeScore;
+        this.emphasizeColor = emphasizeColor;
     }
 }

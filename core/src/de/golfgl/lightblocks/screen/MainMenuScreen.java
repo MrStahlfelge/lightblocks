@@ -135,6 +135,18 @@ public class MainMenuScreen extends AbstractScreen {
         mainTable.add(new Label(app.TEXTS.get("menuInputControl") + ":", app.skin));
         mainTable.add(inputChoseField).minHeight(30).left();
 
+        // High scores
+        mainTable.row();
+        TextButton scoreButton = new TextButton(app.TEXTS.get("menuHighscores"), app.skin);
+        scoreButton.addListener(new ChangeListener() {
+                                    public void changed(ChangeEvent event, Actor actor) {
+                                        gotoHighscoreScreen();
+                                    }
+                                }
+        );
+        mainTable.add(scoreButton).minWidth(LightBlocksGame.nativeGameWidth / 2).colspan(2);
+
+
         // Resume the game
         mainTable.row();
         resumeGameButton = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
@@ -168,6 +180,25 @@ public class MainMenuScreen extends AbstractScreen {
 
     }
 
+    private void gotoHighscoreScreen() {
+
+        if (!app.savegame.canSaveState()) {
+            showDialog("Sorry, highscores are only saved in the native Android version of Lightblocks. Download it to" +
+                    " your mobile!");
+            return;
+        }
+
+        int inputChosen = ((KeyText<Integer>) inputChoseField.getSelected()).value;
+
+        ScoreScreen scoreScreen = new ScoreScreen(app);
+        //TODO hier MODEL_MARATHON_ID
+        scoreScreen.setGameModelId("marathon" + inputChosen);
+        scoreScreen.setBest(app.savegame.loadBestScore("marathon" + inputChosen));
+        scoreScreen.setTotal(app.savegame.loadTotalScore());
+        scoreScreen.initializeUI(1);
+        app.setScreen(scoreScreen);
+    }
+
     private void gotoPlayScreen(boolean resumeGame) {
         // falls die anfangsanimation noch läuft, unterbrechen
 //                                   for (Actor block : blockGroup.getChildren()) {
@@ -198,14 +229,18 @@ public class MainMenuScreen extends AbstractScreen {
                 }
             })));
         } catch (InputNotAvailableException inp) {
-            Dialog dialog = new Dialog("", app.skin);
-            Label errorMsgLabel = new Label(app.TEXTS.get("errorInputNotAvail"), app.skin);
-            errorMsgLabel.setWrap(true);
-            dialog.getContentTable().add(errorMsgLabel).prefWidth
-                    (LightBlocksGame.nativeGameWidth * .75f).pad(10);
-            dialog.button("OK"); //sends "true" as the result
-            dialog.show(stage);
+            showDialog(app.TEXTS.get("errorInputNotAvail"));
         }
+    }
+
+    private void showDialog(String errorMsg) {
+        Dialog dialog = new Dialog("", app.skin);
+        Label errorMsgLabel = new Label(errorMsg, app.skin);
+        errorMsgLabel.setWrap(true);
+        dialog.getContentTable().add(errorMsgLabel).prefWidth
+                (LightBlocksGame.nativeGameWidth * .75f).pad(10);
+        dialog.button("OK"); //sends "true" as the result
+        dialog.show(stage);
     }
 
     /**

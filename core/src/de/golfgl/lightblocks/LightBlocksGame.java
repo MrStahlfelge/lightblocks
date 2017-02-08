@@ -35,6 +35,7 @@ public class LightBlocksGame extends Game {
     public Sound gameOverSound;
     public Sound cleanSpecialSound;
     public Sound unlockedSound;
+    public ShareHandler share;
 
     public MainMenuScreen mainMenuScreen;
     private FPSLogger fpsLogger;
@@ -43,6 +44,11 @@ public class LightBlocksGame extends Game {
     public void create() {
         fpsLogger = new FPSLogger();
         prefs = app.getPreferences("lightblocks");
+
+        if (share == null)
+            share = new ShareHandler();
+
+        I18NBundle.setSimpleFormatter(true);
 
         skin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
 
