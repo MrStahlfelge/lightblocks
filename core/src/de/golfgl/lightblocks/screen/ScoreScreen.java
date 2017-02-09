@@ -266,7 +266,8 @@ public class ScoreScreen extends AbstractScreen {
             Button share = new TextButton(app.TEXTS.get("menuShare"), app.skin);
             share.addListener(new ChangeListener() {
                 public void changed(ChangeEvent event, Actor actor) {
-                    app.share.shareText(app.TEXTS.format("shareText", round.getScore()), null);
+                    app.share.shareText(app.TEXTS.format("shareText", round.getScore(), LightBlocksGame
+                            .GAME_URL_SHORT), null);
                 }
             });
             mainTable.add(share).colspan(NUM_COLUMNS).center().minWidth(LightBlocksGame.nativeGameWidth / 2);

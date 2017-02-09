@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
 
+import java.util.Date;
+
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 
 import static com.badlogic.gdx.Gdx.app;
@@ -20,6 +22,11 @@ import static com.badlogic.gdx.Gdx.app;
 public class LightBlocksGame extends Game {
     public static final int nativeGameWidth = 480;
     public static final int nativeGameHeight = 800;
+    public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
+    public static final String GAME_URL = "http://www.golfgl.de/lightblocks";
+    public static final String GAME_VERSIONSTRING = "0.50.021beta";
+    public static final long GAME_EXPIRATION = 1501538400000L; // 1.8.17
+
     public Skin skin;
     public AssetManager assetManager;
     public I18NBundle TEXTS;

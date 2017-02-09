@@ -167,7 +167,8 @@ public class MainMenuScreen extends AbstractScreen {
                 .minWidth(LightBlocksGame.nativeGameWidth / 2);
 
         mainTable.row().expandY();
-        Label gameVersion = new Label(app.TEXTS.get("gameVersion") + "\n" + app.TEXTS.get("gameAuthor"), app.skin);
+        Label gameVersion = new Label(LightBlocksGame.GAME_VERSIONSTRING + "\n" + app.TEXTS.get("gameAuthor"), app
+                .skin);
         gameVersion.setColor(.5f, .5f, .5f, 1);
         gameVersion.setFontScale(.8f);
         gameVersion.setAlignment(Align.center);
@@ -204,6 +205,11 @@ public class MainMenuScreen extends AbstractScreen {
 //                                   for (Actor block : blockGroup.getChildren()) {
 //                                       block.clearActions();
 //                                   }
+
+        if (System.currentTimeMillis() > LightBlocksGame.GAME_EXPIRATION) {
+            showDialog("Sorry, this version of Lightblocks is outdated. Please download a newer version.");
+            return;
+        }
 
         if (!resumeGame && app.savegame.hasSavedGame())
             app.savegame.resetGame();
