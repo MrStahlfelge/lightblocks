@@ -210,9 +210,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     private void saveGameState() {
-        app.savegame.saveTotalScore(gameModel.totalScore);
-        app.savegame.saveBestScore(gameModel.bestScore, gameModel.getIdentifier());
-        app.savegame.saveGame(gameModel.saveGameModel());
+        if (app.savegame.canSaveState()) {
+            app.savegame.saveTotalScore(gameModel.totalScore);
+            app.savegame.saveBestScore(gameModel.bestScore, gameModel.getIdentifier());
+            app.savegame.saveGame(gameModel.saveGameModel());
+        }
     }
 
     @Override
@@ -271,7 +273,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         //TODO hier MODEL_MARATHON_ID
         scoreScreen.setGameModelId(gameModel.getIdentifier());
         scoreScreen.setRound(gameModel.getScore());
-        scoreScreen.setBest(gameModel.bestScore);
+        if (app.savegame.canSaveState())
+            scoreScreen.setBest(gameModel.bestScore);
         scoreScreen.initializeUI(3);
         app.setScreen(scoreScreen);
 
