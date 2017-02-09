@@ -137,7 +137,7 @@ public class MainMenuScreen extends AbstractScreen {
 
         // High scores
         mainTable.row();
-        TextButton scoreButton = new TextButton(app.TEXTS.get("menuHighscores"), app.skin);
+        TextButton scoreButton = new TextButton(app.TEXTS.get("labelScores"), app.skin);
         scoreButton.addListener(new ChangeListener() {
                                     public void changed(ChangeEvent event, Actor actor) {
                                         gotoHighscoreScreen();
