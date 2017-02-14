@@ -111,20 +111,23 @@ public class ScoreScreen extends AbstractScreen {
         mainTable.add(bestColumnTable).spaceBottom(5);
         ;
 
-        Label totalColumnTable = null;
-        if (total != null)
-            totalColumnTable = new Label(app.TEXTS.get("labelTotalScore").toUpperCase(), app.skin, "big");
-        mainTable.add(totalColumnTable).spaceBottom(5);
+        Label totalColumnLabel = null;
+        Label allGamesLabel = null;
+        if (total != null) {
+            totalColumnLabel = new Label(app.TEXTS.get("labelTotalScore").toUpperCase(), app.skin, "big");
+            allGamesLabel = new Label(app.TEXTS.get("labelAllGames"), app.skin);
+        }
+        mainTable.add(totalColumnLabel).spaceBottom(5);
         ;
 
         // Rundenbezeichnung
-        if (gameModelId != null) {
-            mainTable.row();
-            Label modelId = new Label(app.TEXTS.get(gameModelId), app.skin);
-            mainTable.add(modelId).colspan(NUM_COLUMNS - 1).spaceTop(0);
-            mainTable.add().spaceTop(0);
-            ;
-        }
+        Label modelId = null;
+        if (gameModelId != null)
+            modelId = new Label(app.TEXTS.get(gameModelId), app.skin);
+
+        mainTable.row();
+        mainTable.add(modelId).colspan(NUM_COLUMNS - 1).spaceTop(0);
+        mainTable.add(allGamesLabel).spaceTop(0);
 
         // SCORE
         mainTable.row();
