@@ -13,12 +13,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Json;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.IGameModelListener;
+import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
@@ -143,12 +145,15 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     private void initializeGameModel(int inputKey, int beginningLevel) throws InputNotAvailableException {
         // Game Model erst hinzufügen, wenn die blockgroup schon steht
-        gameModel = new GameModel(this);
-
-        if (app.savegame.hasSavedGame())
-            gameModel.loadGameModel(app.savegame.loadGame());
-        else
+        if (app.savegame.hasSavedGame()) {
+            Json json = new Json();
+            gameModel = json.fromJson(GameModel.class, app.savegame.loadGame());
+        } else {
+            gameModel = new MarathonModel();
             gameModel.startNewGame(beginningLevel);
+        }
+
+        gameModel.setUserInterface(this);
 
         // wenn im Savegame oder Mission nichts vorgegeben ist, dann vom Nutzer gewählten InputController nehmen
         if (gameModel.inputTypeKey < 0)
@@ -270,7 +275,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private void goToHighscores() {
 
         ScoreScreen scoreScreen = new ScoreScreen(app);
-        //TODO hier MODEL_MARATHON_ID
         scoreScreen.setGameModelId(gameModel.getIdentifier());
         scoreScreen.setRound(gameModel.getScore());
         if (app.savegame.canSaveState())

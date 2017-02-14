@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
 
@@ -193,7 +194,7 @@ public class MainMenuScreen extends AbstractScreen {
 
         ScoreScreen scoreScreen = new ScoreScreen(app);
         //TODO hier MODEL_MARATHON_ID
-        scoreScreen.setGameModelId("marathon" + inputChosen);
+        scoreScreen.setGameModelId(MarathonModel.MODEL_MARATHON_ID + inputChosen);
         scoreScreen.setBest(app.savegame.loadBestScore("marathon" + inputChosen));
         scoreScreen.setTotal(app.savegame.loadTotalScore());
         scoreScreen.initializeUI(1);

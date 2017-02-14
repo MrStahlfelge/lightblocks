@@ -13,7 +13,7 @@ import de.golfgl.lightblocks.score.TotalScore;
  * Created by Benjamin Schulte on 23.01.2017.
  */
 
-public class GameModel {
+public abstract class GameModel implements Json.Serializable {
     // das Spielgeschehen
     public static final String GAMEMODEL_VERSION = "1.0.0";
     // Für die Steuerung
@@ -56,9 +56,8 @@ public class GameModel {
     // Verzögerung bei gedrückter Taste
     private float movingCountdown;
 
-    public GameModel(IGameModelListener userInterface) {
+    public GameModel() {
 
-        this.userInterface = userInterface;
         linesToRemove = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
         isGameOver = false;
 
@@ -313,7 +312,8 @@ public class GameModel {
         nextTetromino = drawyer.getNextTetromino();
 
         // ins Display mit beiden
-        fireUserInterfaceTetrominoSwap();
+        if (userInterface != null)
+            fireUserInterfaceTetrominoSwap();
 
         distanceRemainder = 0.0f;
 
@@ -383,16 +383,13 @@ public class GameModel {
         nextTetromino = drawyer.getNextTetromino();
         activateNextTetromino();
 
-        userInterface.updateScore(score, 0);
         setCurrentSpeed();
     }
 
-    public void loadGameModel(String jsonString) {
-        Json json = new Json();
-        json.setSerializer(GameModel.class, new ModelSerializer());
+    public void setUserInterface(IGameModelListener userInterface) {
+        this.userInterface = userInterface;
 
-        json.fromJson(GameModel.class, jsonString);
-
+        // Und dann das UI mal aufbauen
 
         // in das UI alle inaktiven Blöcke einfügen
         int[][] blockSquares = gameboard.getGameboardSquares();
@@ -407,7 +404,6 @@ public class GameModel {
 
         // Score
         userInterface.updateScore(score, 0);
-        setCurrentSpeed();
     }
 
 
@@ -416,9 +412,8 @@ public class GameModel {
             return null;
         else {
             Json json = new Json();
-            json.setSerializer(GameModel.class, new ModelSerializer());
             json.setOutputType(JsonWriter.OutputType.json);
-            return json.toJson(this);
+            return json.toJson(this, GameModel.class);
         }
     }
 
@@ -478,51 +473,45 @@ public class GameModel {
     /**
      * returns identifier for this game model
      */
-    public String getIdentifier() {
-        return "marathon" + inputTypeKey;
-    }
+    public abstract String getIdentifier();
 
     public GameScore getScore() {
         return this.score;
     }
 
-    private class ModelSerializer implements Json.Serializer<GameModel> {
+    @Override
+    public void write(Json json) {
+        json.writeValue("gameModelVersion", GAMEMODEL_VERSION);
+        json.writeValue("board", gameboard);
+        json.writeValue("drawyer", drawyer);
+        json.writeValue("active", activeTetromino);
+        json.writeValue("next", nextTetromino.getIndex());
+        json.writeValue("score", score);
+        json.writeValue("inputType", inputTypeKey);
+    }
 
-        @Override
-        public void write(Json json, GameModel object, Class knownType) {
-            json.writeObjectStart();
-            json.writeValue("gameModelVersion", GAMEMODEL_VERSION);
-            json.writeValue("board", gameboard);
-            json.writeValue("drawyer", drawyer);
-            json.writeValue("active", activeTetromino);
-            json.writeValue("next", nextTetromino.getIndex());
-            json.writeValue("score", score);
-            json.writeValue("inputType", inputTypeKey);
-            json.writeObjectEnd();
-        }
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        this.gameboard = new Gameboard();
+        this.gameboard.read(json, jsonData.get("board"));
+        this.drawyer = new TetrominoDrawyer();
+        this.drawyer.read(json, jsonData.get("drawyer"));
+        this.score = json.readValue("score", GameScore.class, jsonData);
+        this.inputTypeKey = jsonData.getInt("inputType", -1);
+        this.nextTetromino = new Tetromino(jsonData.getInt("next"));
 
-        @Override
-        public GameModel read(Json json, JsonValue jsonData, Class type) {
-            gameboard = new Gameboard();
-            gameboard.read(json, jsonData.get("board"));
-            drawyer = new TetrominoDrawyer();
-            drawyer.read(json, jsonData.get("drawyer"));
-            score = json.readValue("score", GameScore.class, jsonData);
-            inputTypeKey = jsonData.getInt("inputType", -1);
-            nextTetromino = new Tetromino(jsonData.getInt("next"));
+        // den aktiven Tetromino hier einzeln herausfummeln wegen des
+        // parametrisierten Konstruktors
+        JsonValue tetromino = jsonData.get("active");
+        activeTetromino = new Tetromino(tetromino.getInt("tetrominoIndex"));
+        activeTetromino.setRotation(tetromino.getInt("currentRotation"));
+        // unbedingt nach setRotation!
+        activeTetromino.setLastMovementType(tetromino.getInt("lastMovementType"));
+        Vector2 posFromJson = json.readValue(Vector2.class, tetromino.get("position"));
+        activeTetromino.getPosition().set(posFromJson);
 
-            // den aktiven Tetromino hier einzeln herausfummeln wegen des
-            // parametrisierten Konstruktors
-            JsonValue tetromino = jsonData.get("active");
-            activeTetromino = new Tetromino(tetromino.getInt("tetrominoIndex"));
-            activeTetromino.setRotation(tetromino.getInt("currentRotation"));
-            // unbedingt nach setRotation!
-            activeTetromino.setLastMovementType(tetromino.getInt("lastMovementType"));
-            Vector2 posFromJson = json.readValue(Vector2.class, tetromino.get("position"));
-            activeTetromino.getPosition().set(posFromJson);
-
-            return GameModel.this;
-        }
+        setCurrentSpeed();
 
     }
+
 }
