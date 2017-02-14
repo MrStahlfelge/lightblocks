@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Falling LightBlocks</string>
+    <string name="app_name">Falling Lightblocks</string>
+    <string name="app_short_name">Lightblocks</string>
     <string name="crash_toast_text">Something went wrong - please send the crash report to help us improve the application!</string>
 
 </resources>
