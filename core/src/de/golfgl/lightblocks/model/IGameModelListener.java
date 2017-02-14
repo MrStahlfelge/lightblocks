@@ -37,5 +37,6 @@ public interface IGameModelListener {
 
     void showMotivation(MotivationTypes achievement, String extra);
 
-    enum MotivationTypes {newLevel, tSpin, doubleSpecial, tenLinesCleared, dropSpeedLevel, boardCleared, newHighscore}
+    enum MotivationTypes {newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
+        boardCleared, newHighscore}
 }

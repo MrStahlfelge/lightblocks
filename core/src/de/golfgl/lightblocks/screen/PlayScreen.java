@@ -538,6 +538,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             case newHighscore:
                 text = app.TEXTS.get("motivationNewHighscore");
                 break;
+            case hundredBlocksDropped:
+                text = app.TEXTS.format("motivationHundredBlocks", extraMsg);
+                break;
         }
 
         if (playSound)

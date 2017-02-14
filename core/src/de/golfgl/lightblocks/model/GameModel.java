@@ -179,6 +179,11 @@ public abstract class GameModel implements Json.Serializable {
             userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, Integer.toString((int)
                     Math.floor(score.getClearedLines() / 10) * 10));
 
+        // Oder vielleicht x100 Tetrominos?
+        if (Math.floor(score.getDrawnTetrominos() / 100) > Math.floor((score.getDrawnTetrominos() - 1) / 100))
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.hundredBlocksDropped, Integer.toString(
+                    score.getDrawnTetrominos()));
+
         // Highscores updaten
         if (bestScore.setBestScores(score)) {
             // nur einmal rausgeben - und auch nur wenn nicht trivial
