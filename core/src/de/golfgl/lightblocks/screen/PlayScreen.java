@@ -99,7 +99,19 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         imLine.setColor(.8f, .8f, .8f, 1);
         stage.addActor(imLine);
 
-        // Labels
+        // Anzeige des Levels - muss in Group, Rotation funktioniert direkt auf Label nicht
+        Group gameTypeLabels = new Group();
+        Label gameType = new Label("", app.skin, "big");
+        gameType.setColor(.7f, .7f, .7f, 1);
+        //gameType.setFontScale(.9f);
+        gameTypeLabels.setPosition(imLine.getX() - gameType.getPrefHeight() / 2 - 5, blockGroup.getY());
+        gameTypeLabels.addActor(gameType);
+        gameTypeLabels.setRotation(90);
+        //gameTypeLabels.addAction(Actions.rotateBy(90, 10f));
+
+        stage.addActor(gameTypeLabels);
+
+        // Score Labels
         final Table mainTable = new Table();
 
         mainTable.row();
@@ -140,6 +152,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         initializeGameModel(inputKey, beginningLevel);
 
+        gameType.setText(app.TEXTS.get(gameModel.getIdentifier()));
 
     }
 
