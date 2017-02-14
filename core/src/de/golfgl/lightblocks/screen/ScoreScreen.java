@@ -40,27 +40,14 @@ public class ScoreScreen extends AbstractScreen {
 
     public ScoreScreen(LightBlocksGame app) {
         super(app);
-
-        stage.addListener(new InputListener() {
-            @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-                // der Android Back Button gilt für alle
-                if (keycode == Input.Keys.BACK) {
-                    ScoreScreen.this.goBackToMenu(false);
-                    return true;
-                }
-                return super.keyDown(event, keycode);
-            }
-
-        });
     }
 
-    private void goBackToMenu(boolean dispose) {
+    private void goBackToMenu() {
+        Gdx.input.setInputProcessor(null);
+
         app.setScreen(app.mainMenuScreen);
 
-        //TODO Workaround sonst kommt ein Fehler bein Android Back Button
-        if (dispose)
-            this.dispose();
+        this.dispose();
     }
 
     @Override
@@ -277,11 +264,26 @@ public class ScoreScreen extends AbstractScreen {
         Button leave = new TextButton(app.TEXTS.get("menuBackToMenu"), app.skin);
         leave.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                goBackToMenu(true);
+                goBackToMenu();
             }
+        });
+
+        leave.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                // der Android Back Button gilt fÃ¼r alle
+                if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) {
+                    ScoreScreen.this.goBackToMenu();
+                    return true;
+                }
+                return super.keyDown(event, keycode);
+            }
+
         });
         mainTable.add(leave).colspan(NUM_COLUMNS).center().minHeight(leave.getPrefHeight() * 1.2f).minWidth
                 (LightBlocksGame.nativeGameWidth / 2);
+
+        stage.setKeyboardFocus(leave);
 
     }
 }
