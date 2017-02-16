@@ -6,6 +6,8 @@ package de.golfgl.lightblocks.screen;
 
 public class FontAwesome {
 
+    public static final String SKIN_FONT_FA = "fontawesome";
+
     public static String ROTATE_RIGHT = "\uF01E";
     public static String ROTATE_LEFT = "\uF0E2";
     public static String ROTATE_RELOAD = "\uF021";

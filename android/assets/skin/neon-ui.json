@@ -377,7 +377,23 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		fontColor: text
 		downFontColor: text-selected
 		up: button-c
-		down: button-pressed-c
+		down: button-over-c
+		over: button-over-c
+	}
+	fontawesome: {
+		font: fa-45
+		fontColor: text
+		downFontColor: text-selected
+		up: button-c
+		down: button-over-c
+		over: button-over-c
+	}
+	big: {
+		font: qs-25-bold
+		fontColor: text
+		downFontColor: text-selected
+		up: button-c
+		down: button-over-c
 		over: button-over-c
 	}
 }

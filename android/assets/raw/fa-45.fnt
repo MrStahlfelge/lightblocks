@@ -1,8 +1,8 @@
 info face="FontAwesome" size=45 bold=0 italic=0 charset="" unicode=0 stretchH=100 smooth=1 aa=1 padding=6,6,5,6 spacing=-5,-5
-common lineHeight=52 base=39 scaleW=512 scaleH=512 pages=1 packed=0
+common lineHeight=52 base=45 scaleW=512 scaleH=512 pages=1 packed=0
 page id=0 file="fa-45.png"
 chars count=93
-char id=0       x=48   y=454  width=30   height=50   xoffset=-4   yoffset=-6   xadvance=30   page=0    chnl=0 
+char id=0       x=48   y=454  width=30   height=50   xoffset=-4   yoffset=-6   xadvance=30   page=0    chnl=0
 char id=10      x=0    y=0    width=0    height=0    xoffset=-6   yoffset=0    xadvance=7    page=0    chnl=0 
 char id=32      x=0    y=0    width=0    height=0    xoffset=-6   yoffset=0    xadvance=18   page=0    chnl=0 
 char id=61441   x=294  y=0    width=51   height=54   xoffset=-6   yoffset=-3   xadvance=46   page=0    chnl=0 
@@ -33,8 +33,8 @@ char id=61523   x=93   y=57   width=39   height=52   xoffset=-3   yoffset=-5   x
 char id=61524   x=54   y=57   width=39   height=52   xoffset=-4   yoffset=-5   xadvance=39   page=0    chnl=0 
 char id=61527   x=357  y=161  width=51   height=51   xoffset=-6   yoffset=-3   xadvance=46   page=0    chnl=0 
 char id=61528   x=408  y=161  width=51   height=51   xoffset=-6   yoffset=-3   xadvance=46   page=0    chnl=0 
-char id=61536   x=415  y=110  width=50   height=51   xoffset=-5   yoffset=-1   xadvance=46   page=0    chnl=0 
-char id=61537   x=366  y=110  width=49   height=51   xoffset=-6   yoffset=-1   xadvance=46   page=0    chnl=0 
+char id=61536   x=415  y=110  width=50   height=51   xoffset=0    yoffset=-3   xadvance=50   page=0    chnl=0
+char id=61537   x=366  y=110  width=49   height=51   xoffset=0    yoffset=-3   xadvance=50   page=0    chnl=0
 char id=61538   x=408  y=263  width=52   height=49   xoffset=-5   yoffset=-1   xadvance=49   page=0    chnl=0 
 char id=61539   x=0    y=314  width=52   height=49   xoffset=-5   yoffset=-3   xadvance=49   page=0    chnl=0 
 char id=61540   x=132  y=57   width=57   height=52   xoffset=-6   yoffset=-4   xadvance=52   page=0    chnl=0 

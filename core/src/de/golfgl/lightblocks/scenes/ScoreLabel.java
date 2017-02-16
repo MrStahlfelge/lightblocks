@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.scenes;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -31,6 +32,7 @@ public class ScoreLabel extends Label {
     private long emphasizeTreshold;
     private long emphasizeScore;
     private Color emphasizeColor;
+    private Sound emphasizeSound;
 
     public ScoreLabel(int digits, long score, Skin skin, String styleName) {
         super("0", skin, styleName);
@@ -98,6 +100,9 @@ public class ScoreLabel extends Label {
 
         setColor(emphasizeColor);
         this.addAction(Actions.color(colorNow, 1f));
+
+        if (emphasizeSound != null)
+            emphasizeSound.play();
     }
 
     public boolean isShowSignum() {
@@ -139,5 +144,9 @@ public class ScoreLabel extends Label {
     public void setEmphasizeScore(long emphasizeScore, Color emphasizeColor) {
         this.emphasizeScore = emphasizeScore;
         this.emphasizeColor = emphasizeColor;
+    }
+
+    public void setEmphasizeSound(Sound emphasizeSound) {
+        this.emphasizeSound = emphasizeSound;
     }
 }

@@ -146,7 +146,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         labelGroup.setPosition(blockGroup.getX(), blockGroup.getY());
         stage.addActor(labelGroup);
 
-        motivatorLabel = new MotivationLabel(app.skin, "bigbigoutline", labelGroup);
+        motivatorLabel = new MotivationLabel(app.skin, LightBlocksGame.SKIN_FONT_TITLE, labelGroup);
 
         stage.getRoot().setColor(Color.CLEAR);
 
@@ -154,6 +154,34 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         gameType.setText(app.TEXTS.get(gameModel.getIdentifier()));
 
+    }
+
+    public static void gotoPlayScreen(AbstractScreen caller, boolean resumeGame, int inputChosen, int beginningLevel) {
+
+        if (System.currentTimeMillis() > LightBlocksGame.GAME_EXPIRATION) {
+            caller.showDialog("Sorry, this version of Lightblocks is outdated. Please download a newer version.");
+            return;
+        }
+
+        if (!resumeGame && caller.app.savegame.hasSavedGame())
+            caller.app.savegame.resetGame();
+
+        try {
+            final PlayScreen currentGame = new PlayScreen(caller.app, inputChosen, (int)
+                    beginningLevel);
+            currentGame.setMusic(caller.app.isPlayMusic());
+
+            // Einstellungen speichern
+            caller.app.prefs.putInteger("inputType", inputChosen);
+            caller.app.prefs.putInteger("beginningLevel", beginningLevel);
+            caller.app.prefs.flush();
+
+            Gdx.input.setInputProcessor(null);
+            caller.app.setScreen(currentGame);
+
+        } catch (InputNotAvailableException inp) {
+            caller.showDialog(caller.app.TEXTS.get("errorInputNotAvail"));
+        }
     }
 
     private void initializeGameModel(int inputKey, int beginningLevel) throws InputNotAvailableException {
@@ -579,4 +607,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             music.dispose();
 
     }
+
+
 }

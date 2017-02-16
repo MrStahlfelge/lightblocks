@@ -13,8 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
 
-import java.util.Date;
-
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 
 import static com.badlogic.gdx.Gdx.app;
@@ -26,6 +24,8 @@ public class LightBlocksGame extends Game {
     public static final String GAME_URL = "http://www.golfgl.de/lightblocks";
     public static final String GAME_VERSIONSTRING = "0.50.021beta";
     public static final long GAME_EXPIRATION = 1501538400000L; // 1.8.17
+
+    public static final String SKIN_FONT_TITLE = "bigbigoutline";
 
     public Skin skin;
     public AssetManager assetManager;
@@ -42,10 +42,13 @@ public class LightBlocksGame extends Game {
     public Sound gameOverSound;
     public Sound cleanSpecialSound;
     public Sound unlockedSound;
+    public Sound swoshSound;
     public ShareHandler share;
 
     public MainMenuScreen mainMenuScreen;
     private FPSLogger fpsLogger;
+
+    private Boolean playMusic;
 
     @Override
     public void create() {
@@ -78,6 +81,7 @@ public class LightBlocksGame extends Game {
         assetManager.load("sound/gameover.ogg", Sound.class);
         assetManager.load("sound/cleanspecial.ogg", Sound.class);
         assetManager.load("sound/unlocked.ogg", Sound.class);
+        assetManager.load("sound/swosh.ogg", Sound.class);
         assetManager.finishLoading();
 
         TEXTS = assetManager.get("i18n/strings", I18NBundle.class);
@@ -91,6 +95,7 @@ public class LightBlocksGame extends Game {
         gameOverSound = assetManager.get("sound/gameover.ogg", Sound.class);
         unlockedSound = assetManager.get("sound/unlocked.ogg", Sound.class);
         cleanSpecialSound = assetManager.get("sound/cleanspecial.ogg", Sound.class);
+        swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
 
         savegame = new GameStateHandler();
 
@@ -108,5 +113,20 @@ public class LightBlocksGame extends Game {
     public void dispose() {
         mainMenuScreen.dispose();
         skin.dispose();
+    }
+
+    public boolean isPlayMusic() {
+        if (playMusic == null)
+            playMusic = prefs.getBoolean("musicPlayback", true);
+
+        return playMusic;
+    }
+
+    public void setPlayMusic(boolean playMusic) {
+        if (this.playMusic != playMusic) {
+            this.playMusic = playMusic;
+            prefs.putBoolean("musicPlayback", playMusic);
+            prefs.flush();
+        }
     }
 }

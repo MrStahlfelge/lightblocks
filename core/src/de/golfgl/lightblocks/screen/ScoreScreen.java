@@ -3,9 +3,11 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -42,25 +44,13 @@ public class ScoreScreen extends AbstractScreen {
         super(app);
     }
 
-    private void goBackToMenu() {
-        Gdx.input.setInputProcessor(null);
-
-        app.setScreen(app.mainMenuScreen);
-
-        this.dispose();
-    }
-
     @Override
     public void show() {
         Gdx.input.setCatchBackKey(true);
         Gdx.input.setInputProcessor(stage);
-        stage.getRoot().addAction(Actions.fadeIn(1));
 
-        // Highscore?
-        if (newHighscore)
-            app.unlockedSound.play();
-        else if (round != null)
-            app.rotateSound.play();
+        swoshIn();
+
     }
 
     public void setRound(GameScore round) {
@@ -93,7 +83,7 @@ public class ScoreScreen extends AbstractScreen {
         //Titel
         mainTable.row();
         Label title = new Label(app.TEXTS.get(round != null ? "labelScore" : "labelScores").toUpperCase(), app
-                .skin, "bigbigoutline");
+                .skin, LightBlocksGame.SKIN_FONT_TITLE);
         mainTable.add(title).colspan(NUM_COLUMNS).center().spaceBottom(30);
 
         // Spaltentitel
@@ -145,6 +135,7 @@ public class ScoreScreen extends AbstractScreen {
 
             if (best != null) {
                 roundScore.setEmphasizeScore(best.getScore(), Color.RED);
+                roundScore.setEmphasizeSound(app.unlockedSound);
                 if (round.getScore() >= best.getScore() && best.getScore() > 1000)
                     newHighscore = true;
             }
@@ -187,6 +178,7 @@ public class ScoreScreen extends AbstractScreen {
             roundLines.setScore(round.getClearedLines());
             if (best != null) {
                 roundLines.setEmphasizeScore(best.getClearedLines(), Color.RED);
+                roundScore.setEmphasizeSound(app.unlockedSound);
                 if (round.getClearedLines() >= best.getClearedLines() && best.getClearedLines() > 10)
                     newHighscore = true;
             }
@@ -223,6 +215,7 @@ public class ScoreScreen extends AbstractScreen {
             roundBlocks.setScore(round.getDrawnTetrominos());
             if (best != null) {
                 roundBlocks.setEmphasizeScore(best.getDrawnTetrominos(), Color.RED);
+                roundScore.setEmphasizeSound(app.unlockedSound);
                 if (round.getDrawnTetrominos() >= best.getDrawnTetrominos() && best.getDrawnTetrominos() > 20)
                     newHighscore = true;
             }
