@@ -1,0 +1,27 @@
+font.name=FontAwesome
+font.size=45
+font.bold=false
+font.italic=false
+font.gamma=1.8
+font.mono=false
+
+font2.file=
+font2.use=false
+
+pad.top=6
+pad.right=6
+pad.bottom=5
+pad.left=6
+pad.advance.x=-5
+pad.advance.y=-4
+
+glyph.native.rendering=false
+glyph.page.width=512
+glyph.page.height=512
+glyph.text=\n \n\n\n \n\n\n\n
+
+render_type=0
+
+effect.class=com.badlogic.gdx.tools.hiero.unicodefont.effects.ColorEffect
+effect.Color=ffffff
+
