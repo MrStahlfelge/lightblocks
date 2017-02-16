@@ -1,14 +1,8 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -258,28 +252,10 @@ public class ScoreScreen extends AbstractScreen {
 
         mainTable.row();
         Button leave = new TextButton(app.TEXTS.get("menuBackToMenu"), app.skin);
-        leave.addListener(new ChangeListener() {
-            public void changed(ChangeEvent event, Actor actor) {
-                goBackToMenu();
-            }
-        });
+        setBackButton(leave);
 
-        leave.addListener(new InputListener() {
-            @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-                // der Android Back Button gilt fÃ¼r alle
-                if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) {
-                    ScoreScreen.this.goBackToMenu();
-                    return true;
-                }
-                return super.keyDown(event, keycode);
-            }
-
-        });
         mainTable.add(leave).colspan(NUM_COLUMNS).center().minHeight(leave.getPrefHeight() * 1.2f).minWidth
                 (LightBlocksGame.nativeGameWidth / 2);
-
-        stage.setKeyboardFocus(leave);
 
     }
 }

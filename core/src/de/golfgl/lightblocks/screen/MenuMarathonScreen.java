@@ -35,12 +35,7 @@ public class MenuMarathonScreen extends AbstractScreen {
         Label title = new Label(app.TEXTS.get("menuPlayMarathonButton"), app.skin, "big");
         TextButton backButton = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
         backButton.getLabel().setFontScale(.8f);
-        backButton.addListener(new ChangeListener() {
-                                   public void changed(ChangeEvent event, Actor actor) {
-                                       goBackToMenu();
-                                   }
-                               }
-        );
+        setBackButton(backButton);
 
         mainTable.add(backButton);
         mainTable.add(title).expandX();

@@ -1,13 +1,19 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -67,6 +73,29 @@ public abstract class AbstractScreen implements Screen {
     protected void goBackToMenu() {
         app.setScreen(app.mainMenuScreen);
         this.dispose();
+    }
+
+    protected void setBackButton(Button backButton) {
+        backButton.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                goBackToMenu();
+            }
+        });
+
+        backButton.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                // der Android Back Button gilt fÃ¼r alle
+                if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) {
+                    goBackToMenu();
+                    return true;
+                }
+                return super.keyDown(event, keycode);
+            }
+
+        });
+        stage.setKeyboardFocus(backButton);
+
     }
 
     protected void showDialog(String errorMsg) {
