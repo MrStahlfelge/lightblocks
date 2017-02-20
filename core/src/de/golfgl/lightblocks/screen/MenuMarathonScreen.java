@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.scenes.FATextButton;
 
 /**
@@ -28,29 +29,48 @@ public class MenuMarathonScreen extends AbstractScreen {
     public MenuMarathonScreen(final LightBlocksGame app) {
         super(app);
 
-        // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
-        final Table mainTable = new Table();
-        mainTable.setFillParent(true);
+        TextButton backButton = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
+        setBackButton(backButton);
+        TextButton playButton = new FATextButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
+        playButton.addListener(new ChangeListener() {
+                                   public void changed(ChangeEvent event, Actor actor) {
+                                       PlayScreen.gotoPlayScreen(MenuMarathonScreen.this, false, inputChosen, (int)
+                                               beginningLevel.getValue());
+                                   }
+                               }
+        );
+        TextButton highScoreButton = new FATextButton(FontAwesome.COMMENT_STAR_TROPHY, app.TEXTS.get("labelScores"),
+                app.skin);
+        highScoreButton.addListener(new ChangeListener() {
+                                        public void changed(ChangeEvent event, Actor actor) {
+                                            if (!app.savegame.canSaveState()) {
+                                                showDialog("Sorry, highscores are only saved in the native Android " +
+                                                        "version of Lightblocks. Download it to" +
+                                                        " your mobile!");
+                                                return;
+                                            }
 
-        stage.addActor(mainTable);
+                                            ScoreScreen scoreScreen = new ScoreScreen(app);
+                                            scoreScreen.setGameModelId(MarathonModel.MODEL_MARATHON_ID + inputChosen);
+                                            scoreScreen.addScoreToShow(app.savegame.loadBestScore("marathon" + inputChosen),
+                                                    app.TEXTS.get("labelBestScores"));
+                                            scoreScreen.setBackScreen(MenuMarathonScreen.this);
+                                            scoreScreen.initializeUI(1);
+                                            app.setScreen(scoreScreen);
+                                        }
+                                    }
+        );
 
-        mainTable.row();
-        mainTable.add(new Label(FontAwesome.NET_PERSON, app.skin, FontAwesome.SKIN_FONT_FA));
+        // Buttons
+        Table buttons = new Table();
+        buttons.defaults().fill();
+        buttons.add(backButton).fill(false).center();
+        buttons.add(highScoreButton);
+        buttons.add(playButton).prefWidth(backButton.getPrefWidth() * 1.5f);
 
-        mainTable.row();
-        Label title = new Label(app.TEXTS.get("labelMarathon").toUpperCase(), app.skin, LightBlocksGame
-                .SKIN_FONT_TITLE);
-        mainTable.add(title);
-
-        mainTable.row().padTop(50);
-        mainTable.add(new Label(app.TEXTS.get("labelBeginningLevel"), app.skin)).left();
-        mainTable.row();
-
+        // Startlevel
         Table settingsTable = new Table();
-        mainTable.add(settingsTable);
-
         beginningLevel = new Slider(0, 9, 1, false, app.skin);
-
         beginningLevel.setValue(app.prefs.getInteger("beginningLevel", 0));
 
         final Label beginningLevelLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
@@ -66,10 +86,6 @@ public class MenuMarathonScreen extends AbstractScreen {
 
         settingsTable.add(beginningLevel).minHeight(30).minWidth(200).right().fill();
         settingsTable.add(beginningLevelLabel).left().spaceLeft(10);
-
-        mainTable.row().padTop(20);
-
-        mainTable.add(new Label(app.TEXTS.get("menuInputControl"), app.skin)).left();
 
         // die möglichen Inputs aufzählen
         Table inputButtons = new Table();
@@ -125,33 +141,28 @@ public class MenuMarathonScreen extends AbstractScreen {
             }
         }
 
+
+        // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
+        final Table mainTable = new Table();
+        mainTable.setFillParent(true);
+        stage.addActor(mainTable);
+        mainTable.row();
+        mainTable.add(new Label(FontAwesome.NET_PERSON, app.skin, FontAwesome.SKIN_FONT_FA));
+        mainTable.row();
+        mainTable.add(new Label(app.TEXTS.get("labelMarathon").toUpperCase(), app.skin, LightBlocksGame
+                .SKIN_FONT_TITLE));
+        mainTable.row().padTop(50);
+        mainTable.add(new Label(app.TEXTS.get("labelBeginningLevel"), app.skin)).left();
+        mainTable.row();
+        mainTable.add(settingsTable);
+        mainTable.row().padTop(20);
+        mainTable.add(new Label(app.TEXTS.get("menuInputControl"), app.skin)).left();
         mainTable.row();
         mainTable.add(inputButtons);
         mainTable.row();
         mainTable.add(currentInputLabel).center();
-
-        // Buttons
         mainTable.row().padTop(50);
-
-        Table buttons = new Table();
-        buttons.defaults().fill();
         mainTable.add(buttons);
-
-        TextButton backButton = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
-        setBackButton(backButton);
-
-        buttons.add(backButton).fill(false).center();
-
-        TextButton playButton = new FATextButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
-        playButton.addListener(new ChangeListener() {
-                                   public void changed(ChangeEvent event, Actor actor) {
-                                       PlayScreen.gotoPlayScreen(MenuMarathonScreen.this, false, inputChosen, (int)
-                                               beginningLevel.getValue());
-                                   }
-                               }
-        );
-
-        buttons.add(playButton).prefWidth(backButton.getPrefWidth() * 1.5f);
 
     }
 

@@ -8,7 +8,7 @@ import de.golfgl.lightblocks.model.GameScore;
  * Created by Benjamin Schulte on 07.02.2017.
  */
 
-public class BestScore {
+public class BestScore implements IRoundScore {
     // der aktuelle Punktestand
     private int score;
     // die abgebauten Reihen
@@ -16,6 +16,7 @@ public class BestScore {
     // Anzahl gezogene Blöcke
     private int drawnTetrominos;
 
+    @Override
     public int getScore() {
         return score;
     }
@@ -25,6 +26,7 @@ public class BestScore {
         return (this.score == score);
     }
 
+    @Override
     public int getClearedLines() {
         return clearedLines;
     }
@@ -34,6 +36,7 @@ public class BestScore {
         return this.clearedLines == clearedLines;
     }
 
+    @Override
     public int getDrawnTetrominos() {
         return drawnTetrominos;
     }

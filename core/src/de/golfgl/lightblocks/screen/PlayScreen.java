@@ -317,10 +317,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         ScoreScreen scoreScreen = new ScoreScreen(app);
         scoreScreen.setGameModelId(gameModel.getIdentifier());
-        scoreScreen.setRound(gameModel.getScore());
-        if (app.savegame.canSaveState())
+        scoreScreen.addScoreToShow(gameModel.getScore(), app.TEXTS.get("labelRoundScore"));
+        if (app.savegame.canSaveState()) {
             scoreScreen.setBest(gameModel.bestScore);
-        scoreScreen.initializeUI(3);
+            scoreScreen.addScoreToShow(gameModel.bestScore, app.TEXTS.get("labelBestScore"));
+        }
+        scoreScreen.initializeUI(2);
         app.setScreen(scoreScreen);
 
         this.dispose();
@@ -549,6 +551,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         boolean playSound = true;
         String text = "";
+        float duration = 2;
 
         switch (achievement) {
             case newLevel:
@@ -568,6 +571,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 break;
             case hundredBlocksDropped:
                 text = app.TEXTS.format("motivationHundredBlocks", extraMsg);
+                playSound = false;
+                break;
+            case gameOver:
+                text = app.TEXTS.format("motivationGameOver");
+                duration = 10;
+                playSound = false;
                 break;
         }
 
@@ -575,7 +584,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             app.unlockedSound.play();
 
         if (!text.isEmpty())
-            motivatorLabel.addMotivationText(text.toUpperCase());
+            motivatorLabel.addMotivationText(text.toUpperCase(), duration);
     }
 
     @Override

@@ -166,10 +166,7 @@ public class MainMenuScreen extends AbstractScreen {
 
         //int inputChosen = ((KeyText<Integer>) inputChoseField.getSelected()).value;
 
-        ScoreScreen scoreScreen = new ScoreScreen(app);
-        //TODO hier MODEL_MARATHON_ID
-        //scoreScreen.setGameModelId(MarathonModel.MODEL_MARATHON_ID + inputChosen);
-        //scoreScreen.setBest(app.savegame.loadBestScore("marathon" + inputChosen));
+        TotalScoreScreen scoreScreen = new TotalScoreScreen(app);
         scoreScreen.setTotal(app.savegame.loadTotalScore());
         scoreScreen.initializeUI(1);
         app.setScreen(scoreScreen);

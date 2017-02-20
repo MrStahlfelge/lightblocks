@@ -326,6 +326,7 @@ public abstract class GameModel implements Json.Serializable {
         if (!gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
                 activeTetromino.getCurrentRotation())) {
             isGameOver = true;
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.gameOver, null);
             userInterface.setGameOver();
         } else
             score.incDrawnTetrominos();

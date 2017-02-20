@@ -1,40 +1,38 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.model.GameScore;
-import de.golfgl.lightblocks.scenes.ScoreLabel;
 import de.golfgl.lightblocks.score.BestScore;
-import de.golfgl.lightblocks.score.TotalScore;
+import de.golfgl.lightblocks.score.IRoundScore;
 
 /**
- * Anzeige von Highscores, Roundscores etc.
+ * Anzeige von Runden und Highscore
  * <p>
  * Created by Benjamin Schulte on 08.02.2017.
  */
 
-public class ScoreScreen extends AbstractScreen {
+public class ScoreScreen extends AbstractScoreScreen {
 
-    private static final int SCORE_COUNTING_SPEED = 2000;
-    private static final int NUM_COLUMNS = 4;
+    //TODO ab size 3 muss die Anzeige gedreht werden. Dann nur noch Spalten Score/Lines
+    // dh für MultiplayerScore braucht es eh einen anderen Bildschirm
 
-    private GameScore round;
+
+    private Array<IRoundScore> scoresToShow;
+    private Array<String> scoresToShowLabels;
     private BestScore best;
-    private TotalScore total;
     private String gameModelId;
 
     private boolean newHighscore;
 
     public ScoreScreen(LightBlocksGame app) {
         super(app);
+
+        scoresToShow = new Array<IRoundScore>();
+        scoresToShowLabels = new Array<String>();
     }
 
     @Override
@@ -46,232 +44,85 @@ public class ScoreScreen extends AbstractScreen {
 
     }
 
-    public void setRound(GameScore round) {
-        this.round = round;
+    public void addScoreToShow(IRoundScore score, String label) {
+        scoresToShow.add(score);
+        scoresToShowLabels.add(label);
     }
 
+    /**
+     * Nur für Highscore Erkennung zu füllen - ansonsten null lassen!
+     *
+     * @param best
+     */
     public void setBest(BestScore best) {
         this.best = best;
-    }
-
-    public void setTotal(TotalScore total) {
-        this.total = total;
     }
 
     public void setGameModelId(String gameModelId) {
         this.gameModelId = gameModelId;
     }
 
-    public void initializeUI(float maxCountingTime) {
+    @Override
+    protected String getSubtitle() {
+        return app.TEXTS.get(gameModelId);
+    }
 
-        // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
-        final Table mainTable = new Table();
-        mainTable.setFillParent(true);
+    @Override
+    protected String getTitle() {
+        if (newHighscore)
+            return app.TEXTS.get("motivationNewHighscore");
+        else if (scoresToShowLabels.size == 1)
+            return scoresToShowLabels.get(0);
+        else
+            return app.TEXTS.get("labelScores");
+    }
 
-        mainTable.defaults().right();
-        mainTable.defaults().space(15);
+    @Override
+    protected String getShareText() {
+        return app.TEXTS.format((newHighscore || isBestScore(0) ? "shareBestText" :
+                "shareText"), scoresToShow.get(0).getScore(), LightBlocksGame.GAME_URL_SHORT, getSubtitle());
+    }
 
-        stage.addActor(mainTable);
+    @Override
+    protected void fillScoreTable(Table scoreTable) {
 
-        //Titel
-        mainTable.row();
-        mainTable.add(new Label(FontAwesome.COMMENT_STAR_TROPHY, app.skin, FontAwesome.SKIN_FONT_FA)).colspan
-                (NUM_COLUMNS).center();
+        // Die Reihe mit den Labels
+        if (scoresToShowLabels.size > 1) {
+            scoreTable.add();
 
-        mainTable.row();
-        Label title = new Label(app.TEXTS.get(round != null ? "labelScore" : "labelScores").toUpperCase(), app
-                .skin, LightBlocksGame.SKIN_FONT_TITLE);
-        mainTable.add(title).colspan(NUM_COLUMNS).center().spaceBottom(30);
-
-        // Spaltentitel
-        mainTable.row();
-        mainTable.add();
-
-        Label roundColumLabel = null;
-        if (round != null)
-            roundColumLabel = new Label(app.TEXTS.get("labelRoundScore").toUpperCase(), app.skin, LightBlocksGame
-                    .SKIN_FONT_BIG);
-        mainTable.add(roundColumLabel).spaceBottom(5);
-
-        Label bestColumnTable = null;
-        if (best != null)
-            bestColumnTable = new Label(app.TEXTS.get("labelBestScore").toUpperCase(), app.skin, LightBlocksGame
-                    .SKIN_FONT_BIG);
-        mainTable.add(bestColumnTable).spaceBottom(5);
-        ;
-
-        Label totalColumnLabel = null;
-        Label allGamesLabel = null;
-        if (total != null) {
-            totalColumnLabel = new Label(app.TEXTS.get("labelTotalScore").toUpperCase(), app.skin, LightBlocksGame
-                    .SKIN_FONT_BIG);
-            allGamesLabel = new Label(app.TEXTS.get("labelAllGames"), app.skin);
+            for (int i = 0; i < scoresToShowLabels.size; i++)
+                scoreTable.add(new Label(scoresToShowLabels.get(i).toUpperCase(), app.skin, LightBlocksGame
+                        .SKIN_FONT_BIG));
         }
-        mainTable.add(totalColumnLabel).spaceBottom(5);
-        ;
-
-        // Rundenbezeichnung
-        Label modelId = null;
-        if (gameModelId != null)
-            modelId = new Label(app.TEXTS.get(gameModelId), app.skin);
-
-        mainTable.row();
-        mainTable.add(modelId).colspan(NUM_COLUMNS - 1).spaceTop(0);
-        mainTable.add(allGamesLabel).spaceTop(0);
 
         // SCORE
-        mainTable.row();
-        mainTable.add(new Label(app.TEXTS.get("labelScore").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_BIG))
-                .left();
+        Array<Long> scores = new Array<Long>(scoresToShow.size);
+        for (int i = 0; i < scoresToShow.size; i++) {
+            scores.add((long) scoresToShow.get(i).getScore());
 
-        float prefLabelWidth = 0;
-        ScoreLabel roundScore = null;
-        if (round != null) {
-            roundScore = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-            prefLabelWidth = roundScore.getPrefWidth() * 8;
-            roundScore.setAlignment(Align.right);
-            roundScore.setMaxCountingTime(maxCountingTime);
-            roundScore.setCountingSpeed(SCORE_COUNTING_SPEED);
-            roundScore.setScore(round.getScore());
-
-            if (best != null) {
-                roundScore.setEmphasizeScore(best.getScore(), Color.RED);
-                roundScore.setEmphasizeSound(app.unlockedSound);
-                if (round.getScore() >= best.getScore() && best.getScore() > 1000)
-                    newHighscore = true;
-            }
+            if (best != null && scoresToShow.get(i).getScore() >= best.getScore() && best.getScore() > 1000
+                    && !isBestScore(i))
+                newHighscore = true;
         }
-        mainTable.add(roundScore).minWidth(prefLabelWidth);
-
-        ScoreLabel bestScore = null;
-        prefLabelWidth = 0;
-        if (best != null) {
-            bestScore = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-            prefLabelWidth = bestScore.getPrefWidth() * 8;
-            bestScore.setAlignment(Align.right);
-            bestScore.setMaxCountingTime(maxCountingTime);
-            bestScore.setCountingSpeed(SCORE_COUNTING_SPEED);
-            bestScore.setScore(best.getScore());
-        }
-        mainTable.add(bestScore).minWidth(prefLabelWidth);
-
-        ScoreLabel totalScore = null;
-        prefLabelWidth = 0;
-        if (total != null) {
-            totalScore = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-            prefLabelWidth = totalScore.getPrefWidth() * 10;
-            totalScore.setAlignment(Align.right);
-            totalScore.setMaxCountingTime(maxCountingTime);
-            totalScore.setCountingSpeed(SCORE_COUNTING_SPEED);
-            totalScore.setScore(total.getScore());
-        }
-        mainTable.add(totalScore).minWidth(prefLabelWidth);
+        addScoresLine(scoreTable, "labelScore", 8, scores, (best != null ? best.getScore() : 0));
 
         // LINES
-        mainTable.row();
-        mainTable.add(new Label(app.TEXTS.get("labelLines").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_BIG))
-                .left();
+        scores.clear();
+        for (int i = 0; i < scoresToShow.size; i++)
+            scores.add((long) scoresToShow.get(i).getClearedLines());
 
-        ScoreLabel roundLines = null;
-        if (round != null) {
-            roundLines = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-            roundLines.setMaxCountingTime(maxCountingTime);
-            roundLines.setCountingSpeed(SCORE_COUNTING_SPEED / 10);
-            roundLines.setScore(round.getClearedLines());
-            if (best != null) {
-                roundLines.setEmphasizeScore(best.getClearedLines(), Color.RED);
-                roundScore.setEmphasizeSound(app.unlockedSound);
-                if (round.getClearedLines() >= best.getClearedLines() && best.getClearedLines() > 10)
-                    newHighscore = true;
-            }
-        }
-        mainTable.add(roundLines);
-
-        ScoreLabel bestLines = null;
-        if (best != null) {
-            bestLines = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-            bestLines.setMaxCountingTime(maxCountingTime);
-            bestLines.setCountingSpeed(SCORE_COUNTING_SPEED / 10);
-            bestLines.setScore(best.getClearedLines());
-        }
-        mainTable.add(bestLines);
-
-        ScoreLabel totalLines = null;
-        if (total != null) {
-            totalLines = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-            totalLines.setMaxCountingTime(maxCountingTime);
-            totalLines.setCountingSpeed(SCORE_COUNTING_SPEED / 10);
-            totalLines.setScore(total.getClearedLines());
-        }
-        mainTable.add(totalLines);
+        addScoresLine(scoreTable, "labelLines", 0, scores, (best != null ? best.getClearedLines() : 0));
 
         // BLOCKS
-        mainTable.row();
-        mainTable.add(new Label(app.TEXTS.get("labelBlocks").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_BIG))
-                .left();
+        scores.clear();
+        for (int i = 0; i < scoresToShow.size; i++)
+            scores.add((long) scoresToShow.get(i).getDrawnTetrominos());
 
-        ScoreLabel roundBlocks = null;
-        if (round != null) {
-            roundBlocks = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-            roundBlocks.setMaxCountingTime(maxCountingTime);
-            roundBlocks.setCountingSpeed(SCORE_COUNTING_SPEED / 10);
-            roundBlocks.setScore(round.getDrawnTetrominos());
-            if (best != null) {
-                roundBlocks.setEmphasizeScore(best.getDrawnTetrominos(), Color.RED);
-                roundScore.setEmphasizeSound(app.unlockedSound);
-                if (round.getDrawnTetrominos() >= best.getDrawnTetrominos() && best.getDrawnTetrominos() > 20)
-                    newHighscore = true;
-            }
-        }
-        mainTable.add(roundBlocks);
+        addScoresLine(scoreTable, "labelBlocks", 0, scores, (best != null ? best.getDrawnTetrominos() : 0));
+    }
 
-        ScoreLabel bestBlocks = null;
-        if (best != null) {
-            bestBlocks = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-            bestBlocks.setMaxCountingTime(maxCountingTime);
-            bestBlocks.setCountingSpeed(SCORE_COUNTING_SPEED / 10);
-            bestBlocks.setScore(best.getDrawnTetrominos());
-        }
-        mainTable.add(bestBlocks);
-
-        ScoreLabel totalBlocks = null;
-        if (total != null) {
-            totalBlocks = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-            totalBlocks.setMaxCountingTime(maxCountingTime);
-            totalBlocks.setCountingSpeed(SCORE_COUNTING_SPEED / 10);
-            totalBlocks.setScore(total.getDrawnTetrominos());
-        }
-        mainTable.add(totalBlocks);
-
-        if (newHighscore)
-            title.setText(app.TEXTS.get("motivationNewHighscore").toUpperCase());
-
-        // Buttons
-        Table buttons = new Table();
-        buttons.defaults().fill().uniform();
-
-        Button leave = new de.golfgl.lightblocks.scenes.FATextButton(FontAwesome.LEFT_ARROW, app.TEXTS.get
-                ("menuBackToMenu"), app.skin);
-        setBackButton(leave);
-        buttons.add(leave);
-
-        // Share Button
-        if (round != null) {
-            mainTable.row();
-            Button share = new de.golfgl.lightblocks.scenes.FATextButton(FontAwesome.NET_SHARE1, app.TEXTS.get
-                    ("menuShare"), app.skin);
-            share.addListener(new ChangeListener() {
-                public void changed(ChangeEvent event, Actor actor) {
-                    app.share.shareText(app.TEXTS.format("shareText", round.getScore(), LightBlocksGame
-                            .GAME_URL_SHORT), null);
-                }
-            });
-            buttons.add(share);
-        }
-
-        mainTable.row();
-        mainTable.add(buttons).colspan(NUM_COLUMNS).center().spaceTop(30);
-
-
+    @Override
+    protected boolean isBestScore(int i) {
+        return (scoresToShow.get(i) instanceof BestScore);
     }
 }

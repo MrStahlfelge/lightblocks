@@ -1,12 +1,14 @@
 package de.golfgl.lightblocks.model;
 
+import de.golfgl.lightblocks.score.IRoundScore;
+
 /**
  * Diese Klasse verwaltet alle Punktstände eines Spiels oder der Gesamtspiele
  * <p>
  * Created by Benjamin Schulte on 29.01.2017.
  */
 
-public class GameScore {
+public class GameScore implements IRoundScore {
     // der aktuelle Punktestand
     private int score;
     // die abgebauten Reihen
@@ -20,10 +22,12 @@ public class GameScore {
 
     private boolean lastClearLinesWasSpecial = false;
 
+    @Override
     public int getScore() {
         return score;
     }
 
+    @Override
     public int getClearedLines() {
         return clearedLines;
     }
@@ -107,6 +111,7 @@ public class GameScore {
         return flushedScore;
     }
 
+    @Override
     public int getDrawnTetrominos() {
         return drawnTetrominos;
     }

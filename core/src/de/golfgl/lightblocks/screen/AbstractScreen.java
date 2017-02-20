@@ -24,6 +24,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 public abstract class AbstractScreen implements Screen {
     protected final LightBlocksGame app;
     protected Stage stage;
+    private Screen backScreen;
 
     public AbstractScreen(LightBlocksGame app) {
         this.app = app;
@@ -71,7 +72,7 @@ public abstract class AbstractScreen implements Screen {
     }
 
     protected void goBackToMenu() {
-        app.setScreen(app.mainMenuScreen);
+        app.setScreen(backScreen != null ? backScreen : app.mainMenuScreen);
         this.dispose();
     }
 
@@ -108,4 +109,7 @@ public abstract class AbstractScreen implements Screen {
         dialog.show(stage);
     }
 
+    public void setBackScreen(Screen backScreen) {
+        this.backScreen = backScreen;
+    }
 }
