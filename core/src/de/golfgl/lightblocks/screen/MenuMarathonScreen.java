@@ -3,15 +3,16 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scenes.FATextButton;
 
 /**
  * Created by Benjamin Schulte on 16.02.2017.
@@ -19,8 +20,10 @@ import de.golfgl.lightblocks.LightBlocksGame;
 
 public class MenuMarathonScreen extends AbstractScreen {
 
-    private final SelectBox inputChoseField;
+    private final ButtonGroup<IntButton> inputButtonsGroup;
+    private final Label currentInputLabel;
     private Slider beginningLevel;
+    private int inputChosen;
 
     public MenuMarathonScreen(final LightBlocksGame app) {
         super(app);
@@ -32,25 +35,25 @@ public class MenuMarathonScreen extends AbstractScreen {
         stage.addActor(mainTable);
 
         mainTable.row();
-        Label title = new Label(app.TEXTS.get("menuPlayMarathonButton"), app.skin, "big");
-        TextButton backButton = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
-        backButton.getLabel().setFontScale(.8f);
-        setBackButton(backButton);
+        mainTable.add(new Label(FontAwesome.NET_PERSON, app.skin, FontAwesome.SKIN_FONT_FA));
 
-        mainTable.add(backButton);
-        mainTable.add(title).expandX();
+        mainTable.row();
+        Label title = new Label(app.TEXTS.get("labelMarathon").toUpperCase(), app.skin, LightBlocksGame
+                .SKIN_FONT_TITLE);
+        mainTable.add(title);
 
         mainTable.row().padTop(50);
+        mainTable.add(new Label(app.TEXTS.get("labelBeginningLevel"), app.skin)).left();
+        mainTable.row();
 
         Table settingsTable = new Table();
-        settingsTable.row();
-        mainTable.add(settingsTable).colspan(2);
+        mainTable.add(settingsTable);
 
         beginningLevel = new Slider(0, 9, 1, false, app.skin);
 
         beginningLevel.setValue(app.prefs.getInteger("beginningLevel", 0));
 
-        final Label beginningLevelLabel = new Label("", app.skin);
+        final Label beginningLevelLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
         final ChangeListener changeListener = new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -61,60 +64,94 @@ public class MenuMarathonScreen extends AbstractScreen {
         beginningLevel.addListener(changeListener);
         changeListener.changed(null, null);
 
-        settingsTable.add(beginningLevelLabel).right().spaceRight(10);
-        settingsTable.add(beginningLevel).minHeight(30).left();
+        settingsTable.add(beginningLevel).minHeight(30).minWidth(200).right().fill();
+        settingsTable.add(beginningLevelLabel).left().spaceLeft(10);
 
-        settingsTable.row();
+        mainTable.row().padTop(20);
+
+        mainTable.add(new Label(app.TEXTS.get("menuInputControl"), app.skin)).left();
 
         // die möglichen Inputs aufzählen
-        inputChoseField = new SelectBox(app.skin);
+        Table inputButtons = new Table();
+        inputButtonsGroup = new ButtonGroup<IntButton>();
+        currentInputLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        inputButtons.defaults().uniform().fill();
+        ChangeListener controllerChangeListener = new ChangeListener() {
 
-        Array<KeyText<Integer>> inputTypes = new Array<KeyText<Integer>>();
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (inputButtonsGroup.getChecked() != null) {
+                    inputChosen = inputButtonsGroup.getChecked().getValue();
+                    currentInputLabel.setText(app.TEXTS.get(PlayScreenInput.inputName(inputChosen)));
+                }
+            }
+        };
 
-        int inputChosen = app.prefs.getInteger("inputType", 0);
-        if (!PlayScreenInput.inputAvailable(inputChosen))
-            inputChosen = 0;
 
-        int chosenIndex = -1;
+        int lastInputChosen = app.prefs.getInteger("inputType", 0);
+        if (!PlayScreenInput.inputAvailable(lastInputChosen))
+            lastInputChosen = 0;
 
         int i = 0;
         while (true) {
             try {
 
                 Input.Peripheral ic = PlayScreenInput.peripheralFromInt(i);
-                if (PlayScreenInput.inputAvailable(i)) {
-                    if (inputChosen == i)
-                        chosenIndex = inputTypes.size;
-                    inputTypes.add(new KeyText<Integer>(i, app.TEXTS.get(PlayScreenInput.inputName(i))));
-                } else if (inputChosen == i)
-                    inputChosen++;
+
+                IntButton inputButton = new IntButton(PlayScreenInput.getInputFAIcon(i), app.skin, FontAwesome
+                        .SKIN_FONT_FA + "-checked");
+                inputButton.setValue(i);
+                inputButton.addListener(controllerChangeListener);
+                inputButton.setDisabled(!PlayScreenInput.inputAvailable(i));
+
+                // Tastatur nur anzeigen, wenn sie auch wirklich da ist
+                if (i > 0 || !inputButton.isDisabled()) {
+                    inputButtons.add(inputButton);
+                    inputButtonsGroup.add(inputButton);
+                }
+
+                if (lastInputChosen == i) {
+                    if (inputButton.isDisabled())
+                        lastInputChosen++;
+                    else
+                        inputButton.setChecked(true);
+
+                }
 
                 i++;
+
             } catch (Throwable t) {
                 break;
             }
         }
 
-        inputChoseField.setItems(inputTypes);
-        inputChoseField.setSelectedIndex(chosenIndex);
+        mainTable.row();
+        mainTable.add(inputButtons);
+        mainTable.row();
+        mainTable.add(currentInputLabel).center();
 
-        settingsTable.add(new Label(app.TEXTS.get("menuInputControl") + ":", app.skin));
-        settingsTable.add(inputChoseField).minHeight(30).left();
+        // Buttons
+        mainTable.row().padTop(50);
 
-        settingsTable.row().padTop(50);
+        Table buttons = new Table();
+        buttons.defaults().fill();
+        mainTable.add(buttons);
 
-        TextButton playButton = new TextButton(app.TEXTS.get("menuStart"), app.skin, "big");
+        TextButton backButton = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
+        setBackButton(backButton);
+
+        buttons.add(backButton).fill(false).center();
+
+        TextButton playButton = new FATextButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
         playButton.addListener(new ChangeListener() {
                                    public void changed(ChangeEvent event, Actor actor) {
-                                       PlayScreen.gotoPlayScreen(MenuMarathonScreen.this, false, (int) (
-                                               (KeyText<Integer>) inputChoseField.getSelected()).value, (int)
+                                       PlayScreen.gotoPlayScreen(MenuMarathonScreen.this, false, inputChosen, (int)
                                                beginningLevel.getValue());
                                    }
                                }
         );
-        playButton.getCell(playButton.getLabel()).pad(10);
 
-        settingsTable.add(playButton).colspan(2);
+        buttons.add(playButton).prefWidth(backButton.getPrefWidth() * 1.5f);
 
     }
 
@@ -142,5 +179,21 @@ public class MenuMarathonScreen extends AbstractScreen {
         }
     }
 
+    public class IntButton extends TextButton {
+
+        private int value;
+
+        public IntButton(String text, Skin skin, String styleName) {
+            super(text, skin, styleName);
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+    }
 
 }

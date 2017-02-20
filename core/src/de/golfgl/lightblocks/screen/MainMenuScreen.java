@@ -6,8 +6,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -17,6 +15,7 @@ import com.badlogic.gdx.utils.Align;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
+import de.golfgl.lightblocks.scenes.FATextButton;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.forever;
@@ -28,7 +27,6 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 15.01.2017.
  */
 public class MainMenuScreen extends AbstractScreen {
-    private final Button menuMusicButton;
     private TextButton resumeGameButton;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
@@ -45,47 +43,48 @@ public class MainMenuScreen extends AbstractScreen {
         final BlockGroup blockGroup = new BlockGroup();
         blockGroup.setTransform(false);
 
-        mainTable.add(blockGroup).center().prefHeight(200);
+        mainTable.add(blockGroup).center().prefHeight(180);
+        mainTable.defaults().minWidth(LightBlocksGame.nativeGameWidth / 2).fill();
 
         // Der Titel
         mainTable.row();
 
-        final Label gameTitle = new Label(app.TEXTS.get("gameTitle").toUpperCase(), app.skin, "big");
+        final Label gameTitle = new Label(app.TEXTS.get("gameTitle").toUpperCase(), app.skin, LightBlocksGame
+                .SKIN_FONT_TITLE);
+        gameTitle.setWrap(true);
+        gameTitle.setAlignment(Align.center);
         mainTable.add(gameTitle).spaceTop(LightBlocksGame.nativeGameWidth / 12).
-                spaceBottom(LightBlocksGame.nativeGameWidth / 12).top();
+                spaceBottom(LightBlocksGame.nativeGameWidth / 12).top().prefWidth(LightBlocksGame.nativeGameWidth *
+                .75f);
 
 
         //nun die Buttons zum bedienen
+        Table buttons = new Table();
+        buttons.defaults().fill().uniform();
+
 
         // Play new game!
-        mainTable.row();
+        TextButton missionButton = new FATextButton(FontAwesome.COMMENT_STAR_FLAG, app.TEXTS.get
+                ("menuPlayMissionButton"),
+                app.skin);
+        missionButton.setDisabled(true);
+        buttons.add(missionButton);
 
-        TextButton button = new TextButton(app.TEXTS.get("menuPlayMarathonButton"), app.skin);
-        button.addListener(new ChangeListener() {
-                               public void changed(ChangeEvent event, Actor actor) {
-                                   //gotoPlayScreen(false);
-                                   app.setScreen(new MenuMarathonScreen(app));
-                               }
-                           }
+        TextButton singleMarathonButton = new FATextButton(FontAwesome.NET_PERSON, app.TEXTS.get
+                ("menuPlayMarathonButton"),
+                app.skin);
+        singleMarathonButton.addListener(new ChangeListener() {
+                                             public void changed(ChangeEvent event, Actor actor) {
+                                                 //gotoPlayScreen(false);
+                                                 app.setScreen(new MenuMarathonScreen(app));
+                                             }
+                                         }
         );
 
-        mainTable.add(button).minWidth(LightBlocksGame.nativeGameWidth / 2).minHeight(button
-                .getPrefHeight() * 1.2f);
-
-        // High scores
-        mainTable.row();
-        TextButton scoreButton = new TextButton(app.TEXTS.get("labelScores"), app.skin);
-        scoreButton.addListener(new ChangeListener() {
-                                    public void changed(ChangeEvent event, Actor actor) {
-                                        gotoHighscoreScreen();
-                                    }
-                                }
-        );
-        mainTable.add(scoreButton).minWidth(LightBlocksGame.nativeGameWidth / 2);
-
+        buttons.add(singleMarathonButton);
 
         // Resume the game
-        mainTable.row();
+        buttons.row();
         resumeGameButton = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
         resumeGameButton.addListener(new ChangeListener() {
                                          public void changed(ChangeEvent event, Actor actor) {
@@ -94,29 +93,61 @@ public class MainMenuScreen extends AbstractScreen {
                                      }
         );
 
-        mainTable.add(resumeGameButton).minWidth(LightBlocksGame.nativeGameWidth / 2).spaceTop
-                (LightBlocksGame.nativeGameWidth / 16).minHeight(resumeGameButton.getPrefHeight() * 1.2f);
+        buttons.add(resumeGameButton).colspan(2).uniform(true, false).padBottom(10).minHeight(resumeGameButton
+                .getPrefHeight() * 1.2f);
+
+        buttons.row();
+        TextButton playMultiplayerButton = new FATextButton(FontAwesome.NET_PEOPLE, app.TEXTS.get
+                ("menuPlayMultiplayerButton"), app.skin);
+        playMultiplayerButton.setDisabled(true);
+        buttons.add(playMultiplayerButton).colspan(2).padBottom(20);
+
+        //TODO High scores -> hier kommt Google Plag Games Icon und "Account" rein
+        buttons.row();
+
+        TextButton scoreButton = new FATextButton(FontAwesome.COMMENT_STAR_TROPHY, app.TEXTS.get("labelScores"), app
+                .skin);
+        scoreButton.addListener(new ChangeListener() {
+                                    public void changed(ChangeEvent event, Actor actor) {
+                                        gotoHighscoreScreen();
+                                    }
+                                }
+        );
+        buttons.add(scoreButton);
+        // Settings
+        TextButton settingsButton = new FATextButton(FontAwesome.SETTINGS_GEARS, app.TEXTS.get("menuSettings"), app
+                .skin);
+        settingsButton.addListener(new ChangeListener() {
+                                       public void changed(ChangeEvent event, Actor actor) {
+                                           gotoHighscoreScreen();
+                                       }
+                                   }
+        );
+        buttons.add(settingsButton);
+
+        //TODO kommt in Settings
+//        buttons.row();
+//        menuMusicButton = new ImageTextButton(app.TEXTS.get("menuMusicButton"), app.skin, "checkbox");
+//        menuMusicButton.setChecked(app.isPlayMusic());
+//        menuMusicButton.addListener(new ChangeListener() {
+//                                        public void changed(ChangeEvent event, Actor actor) {
+//                                            app.setPlayMusic(menuMusicButton.isChecked());
+//                                        }
+//                                    }
+//        );
+//
+//        buttons.add(menuMusicButton).colspan(2).uniform(false, false);
 
         mainTable.row();
-        menuMusicButton = new ImageTextButton(app.TEXTS.get("menuMusicButton"), app.skin, "checkbox");
-        menuMusicButton.setChecked(app.isPlayMusic());
-        menuMusicButton.addListener(new ChangeListener() {
-                                        public void changed(ChangeEvent event, Actor actor) {
-                                            app.setPlayMusic(menuMusicButton.isChecked());
-                                        }
-                                    }
-        );
-
-        mainTable.add(menuMusicButton).minHeight(30).spaceTop(LightBlocksGame.nativeGameWidth / 16)
-                .minWidth(LightBlocksGame.nativeGameWidth / 2);
+        mainTable.add(buttons);
 
         mainTable.row().expandY();
         Label gameVersion = new Label(LightBlocksGame.GAME_VERSIONSTRING + "\n" + app.TEXTS.get("gameAuthor"), app
                 .skin);
         gameVersion.setColor(.5f, .5f, .5f, 1);
         gameVersion.setFontScale(.8f);
-        gameVersion.setAlignment(Align.center);
-        mainTable.add(gameVersion).bottom();
+        gameVersion.setAlignment(Align.bottom);
+        mainTable.add(gameVersion);
 
         constructBlockAnimation(blockGroup);
 
@@ -154,7 +185,7 @@ public class MainMenuScreen extends AbstractScreen {
             blockGroup.addActor(block);
             block.setY(500);
             block.setEnlightened(true);
-            if (i != 3) block.setX(-BlockActor.blockWidth);
+            if (i != 3) block.setX(blockGroup.getWidth() / 2 - BlockActor.blockWidth);
 
             block.addAction(Actions.sequence(Actions.delay(2 * i),
                     Actions.moveTo(block.getX(), (i == 3 ? 0 : i * BlockActor.blockWidth), 0.5f),
@@ -188,7 +219,7 @@ public class MainMenuScreen extends AbstractScreen {
     public void show() {
         Gdx.input.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(false);
-        resumeGameButton.setVisible(app.savegame.hasSavedGame());
+        resumeGameButton.setDisabled(!app.savegame.hasSavedGame());
 
         if (stage.getRoot().getActions().size == 0)
             swoshIn();

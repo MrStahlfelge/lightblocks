@@ -26,6 +26,7 @@ public class LightBlocksGame extends Game {
     public static final long GAME_EXPIRATION = 1501538400000L; // 1.8.17
 
     public static final String SKIN_FONT_TITLE = "bigbigoutline";
+    public static final String SKIN_FONT_BIG = "big";
 
     public Skin skin;
     public AssetManager assetManager;

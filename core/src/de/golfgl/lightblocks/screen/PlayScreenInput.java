@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
-import java.util.InputMismatchException;
+import de.golfgl.lightblocks.LightBlocksGame;
 
 /**
  * Created by Benjamin Schulte on 25.01.2017.
@@ -72,6 +72,19 @@ public abstract class PlayScreenInput extends InputAdapter {
         }
     }
 
+    public static String getInputFAIcon(int key) {
+        switch (peripheralFromInt(key)) {
+            case HardwareKeyboard:
+                return FontAwesome.DEVICE_KEYBOARD;
+            case MultitouchScreen:
+                return FontAwesome.DEVICE_GESTURE2;
+            case Accelerometer:
+                return FontAwesome.DEVICE_GRAVITY;
+            default:
+                return null;
+        }
+    }
+
     @Override
     public boolean keyDown(int keycode) {
         // der Android Back Button gilt für alle
@@ -105,7 +118,8 @@ public abstract class PlayScreenInput extends InputAdapter {
 
         if (!isBegin) {
             table.row();
-            Label title = new Label(playScreen.app.TEXTS.get("labelPause"), playScreen.app.skin, "big");
+            Label title = new Label(playScreen.app.TEXTS.get("labelPause"), playScreen.app.skin, LightBlocksGame
+                    .SKIN_FONT_BIG);
             table.add(title);
         }
 

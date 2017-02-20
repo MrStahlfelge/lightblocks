@@ -7,6 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 
+import de.golfgl.lightblocks.LightBlocksGame;
+
 /**
  * Created by Benjamin Schulte on 17.01.2017.
  */
@@ -59,7 +61,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
         table.row();
         Label hintBegin = new Label(playScreen.app.TEXTS.get(isBegin ? "labelPressEnterToStart" :
-                "labelPressEnterToResume"), playScreen.app.skin, isBegin ? "big" : "default");
+                "labelPressEnterToResume"), playScreen.app.skin, isBegin ? LightBlocksGame.SKIN_FONT_BIG : "default");
 
         table.add(hintBegin).spaceTop(30);
 

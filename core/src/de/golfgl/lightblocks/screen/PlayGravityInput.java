@@ -159,7 +159,7 @@ public class PlayGravityInput extends PlayScreenInput {
         Table table = (Table) super.showHelp(drawGroup, isBegin);
 
         table.row();
-        calibrationProgress = new Label("", playScreen.app.skin, "big");
+        calibrationProgress = new Label("", playScreen.app.skin, LightBlocksGame.SKIN_FONT_BIG);
 
         table.add(calibrationProgress).spaceTop(30);
 

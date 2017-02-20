@@ -101,7 +101,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         // Anzeige des Levels - muss in Group, Rotation funktioniert direkt auf Label nicht
         Group gameTypeLabels = new Group();
-        Label gameType = new Label("", app.skin, "big");
+        Label gameType = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
         gameType.setColor(.7f, .7f, .7f, 1);
         //gameType.setFontScale(.9f);
         gameTypeLabels.setPosition(imLine.getX() - gameType.getPrefHeight() / 2 - 5, blockGroup.getY());
@@ -117,17 +117,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         mainTable.row();
         Label levelLabel = new Label(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
         mainTable.add(levelLabel).right().bottom().padBottom(3).spaceRight(3);
-        levelNum = new ScoreLabel(2, 0, app.skin, "big");
+        levelNum = new ScoreLabel(2, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
         mainTable.add(levelNum).left();
         Label linesLabel = new Label(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
         mainTable.add(linesLabel).right().bottom().padBottom(3).spaceLeft(10);
-        linesNum = new ScoreLabel(3, 0, app.skin, "big");
+        linesNum = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
         linesNum.setCountingSpeed(100);
         mainTable.add(linesNum).left();
         mainTable.row();
         Label scoreLabel = new Label(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
         mainTable.add(scoreLabel).right().bottom().padBottom(3).spaceRight(3);
-        scoreNum = new ScoreLabel(8, 0, app.skin, "big");
+        scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
         scoreNum.setCountingSpeed(2000);
         scoreNum.setMaxCountingTime(1);
         mainTable.add(scoreNum).left().colspan(3);

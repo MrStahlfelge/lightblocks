@@ -72,7 +72,7 @@ char id=61720   x=51   y=263  width=51   height=51   xoffset=-6   yoffset=-3   x
 char id=61721   x=0    y=263  width=51   height=51   xoffset=-6   yoffset=-3   xadvance=46   page=0    chnl=0 
 char id=61722   x=102  y=263  width=51   height=51   xoffset=-6   yoffset=-3   xadvance=46   page=0    chnl=0 
 char id=61723   x=370  y=410  width=61   height=37   xoffset=-6   yoffset=7    xadvance=55   page=0    chnl=0 
-char id=61724   x=148  y=410  width=61   height=40   xoffset=-6   yoffset=4    xadvance=55   page=0    chnl=0 
+char id=61724   x=148  y=410  width=61   height=40   xoffset=-3   yoffset=4    xadvance=55   page=0    chnl=0
 char id=61725   x=436  y=212  width=56   height=51   xoffset=-5   yoffset=-3   xadvance=52   page=0    chnl=0 
 char id=61731   x=243  y=57   width=55   height=52   xoffset=-7   yoffset=-5   xadvance=49   page=0    chnl=0 
 char id=61742   x=271  y=212  width=54   height=51   xoffset=-6   yoffset=-6   xadvance=49   page=0    chnl=0 
@@ -91,8 +91,8 @@ char id=61920   x=172  y=212  width=51   height=51   xoffset=-6   yoffset=-3   x
 char id=61956   x=265  y=363  width=64   height=44   xoffset=-6   yoffset=0    xadvance=58   page=0    chnl=0 
 char id=61957   x=201  y=363  width=64   height=44   xoffset=-6   yoffset=0    xadvance=58   page=0    chnl=0 
 char id=62004   x=108  y=212  width=64   height=51   xoffset=-6   yoffset=-3   xadvance=58   page=0    chnl=0 
-char id=62030   x=166  y=0    width=67   height=57   xoffset=-6   yoffset=-6   xadvance=65   page=0    chnl=0 
-char id=62042   x=112  y=0    width=54   height=57   xoffset=-6   yoffset=-6   xadvance=52   page=0    chnl=0 
+char id=62030   x=166  y=0    width=67   height=57   xoffset=-1   yoffset=-6   xadvance=65   page=0    chnl=0
+char id=62042   x=112  y=0    width=54   height=57   xoffset=-2   yoffset=-6   xadvance=52   page=0    chnl=0
 char id=62091   x=204  y=161  width=51   height=51   xoffset=-6   yoffset=-3   xadvance=46   page=0    chnl=0 
 char id=62093   x=255  y=161  width=51   height=51   xoffset=-6   yoffset=-3   xadvance=46   page=0    chnl=0 
 kernings count=0

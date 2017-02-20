@@ -38,17 +38,31 @@ com.badlogic.gdx.graphics.Color: {
 		b: 1
 		a: 1
 	}
+	disabled: {
+		r: .4
+		g: .4
+		b: .4
+		a: 1
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 	button-c: {
 		name: button-pressed
 		color: color
 	}
+	button-checked: {
+		name: button
+		color: color
+	}
+	button-disabled-c: {
+		name: button-pressed
+		color: disabled
+	}
 	button-over-c: {
 		name: button-over
 		color: color
 	}
-	button-pressed-c: {
+	button-over-checked: {
 		name: button
 		color: color
 	}
@@ -220,8 +234,9 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 	default: {
 		up: button-c
-		down: button-pressed-c
+		down: button-over-c
 		over: button-over-c
+        disabled: button-disabled-c
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle: {
@@ -247,7 +262,7 @@ com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
 	default: {
 		imageUp: button-c
-		imageDown: button-pressed-c
+		imageDown: button-over-c
 		imageOver: button-over-c
 	}
 }
@@ -257,7 +272,7 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
 		fontColor: text
 		downFontColor: text-selected
 		up: button-c
-		down: button-pressed-c
+		down: button-over-c
 		over: button-over-c
 	}
 	checkbox: {
@@ -267,7 +282,7 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
 		imageChecked: checkbox-pressed-c
 		imageCheckedOver: checkbox-pressed-over-c
 		up: button-c
-		down: button-pressed-c
+		down: button-over-c
 		over: button-over-c
 		font: font
 		fontColor: text
@@ -285,7 +300,7 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
 		downFontColor: text-selected
 		checkedFontColor: text-selected
 		up: button-c
-		down: button-pressed-c
+		down: button-over-c
 		over: button-over-c
 	}
 }
@@ -376,9 +391,12 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		font: font
 		fontColor: text
 		downFontColor: text-selected
+		disabledFontColor: disabled
 		up: button-c
 		down: button-over-c
 		over: button-over-c
+		disabled: button-disabled-c
+		disabledFontColor: disabled
 	}
 	fontawesome: {
 		font: fa-45
@@ -387,14 +405,30 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		up: button-c
 		down: button-over-c
 		over: button-over-c
+		disabled: button-disabled-c
+		disabledFontColor: disabled
+	}
+	fontawesome-checked: {
+		font: fa-45
+		fontColor: text
+		checked: button-checked
+		checkedOver: button-over-checked
+		up: button-c
+		down: button-over-c
+		over: button-over-c
+		disabled: button-disabled-c
+		disabledFontColor: disabled
 	}
 	big: {
 		font: qs-25-bold
 		fontColor: text
 		downFontColor: text-selected
 		up: button-c
+		disabled: button-disabled-c
 		down: button-over-c
 		over: button-over-c
+		disabledFontColor: disabled
+		disabled: button-disabled-c
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
