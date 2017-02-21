@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.score.TotalScore;
+import de.golfgl.lightblocks.state.TotalScore;
 
 /**
  * Anzeige von Total Scores

@@ -1,13 +1,18 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.score.BestScore;
-import de.golfgl.lightblocks.score.IRoundScore;
+import de.golfgl.lightblocks.scenes.FATextButton;
+import de.golfgl.lightblocks.state.BestScore;
+import de.golfgl.lightblocks.state.IRoundScore;
+import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
  * Anzeige von Runden und Highscore
@@ -25,6 +30,7 @@ public class ScoreScreen extends AbstractScoreScreen {
     private Array<String> scoresToShowLabels;
     private BestScore best;
     private String gameModelId;
+    private InitGameParameters newGameParams;
 
     private boolean newHighscore;
 
@@ -122,7 +128,36 @@ public class ScoreScreen extends AbstractScoreScreen {
     }
 
     @Override
+    protected void fillButtonTable(Table buttons) {
+
+        // Retry button
+        if (newGameParams != null) {
+            Button retry = new FATextButton(FontAwesome.ROTATE_RIGHT, app.TEXTS.get("menuRetry"), app.skin);
+            retry.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    try {
+                        PlayScreen.gotoPlayScreen(ScoreScreen.this, newGameParams);
+                    } catch (VetoException e) {
+                        showDialog(e.getMessage());
+                    }
+                    dispose();
+                }
+            });
+
+            buttons.add(retry).prefWidth(retry.getPrefWidth() * 1.2f).uniform(false, false);
+        }
+
+        super.fillButtonTable(buttons);
+
+    }
+
+    @Override
     protected boolean isBestScore(int i) {
         return (scoresToShow.get(i) instanceof BestScore);
+    }
+
+    public void setNewGameParams(InitGameParameters newGameParams) {
+        this.newGameParams = newGameParams;
     }
 }

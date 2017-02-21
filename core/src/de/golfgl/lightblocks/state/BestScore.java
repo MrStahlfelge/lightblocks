@@ -1,4 +1,4 @@
-package de.golfgl.lightblocks.score;
+package de.golfgl.lightblocks.state;
 
 import de.golfgl.lightblocks.model.GameScore;
 

@@ -1,4 +1,4 @@
-package de.golfgl.lightblocks.score;
+package de.golfgl.lightblocks.state;
 
 /**
  * Der Total Score nimmt die gesamten Punktzahlen für den Spieler auf

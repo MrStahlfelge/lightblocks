@@ -1,11 +1,8 @@
-package de.golfgl.lightblocks;
+package de.golfgl.lightblocks.state;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
-
-import de.golfgl.lightblocks.score.BestScore;
-import de.golfgl.lightblocks.score.TotalScore;
 
 /**
  * Die Klasse lädt oder speichert einen Json-String der den Spielstand abbildet

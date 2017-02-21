@@ -88,7 +88,11 @@ public class MainMenuScreen extends AbstractScreen {
         resumeGameButton = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
         resumeGameButton.addListener(new ChangeListener() {
                                          public void changed(ChangeEvent event, Actor actor) {
-                                             PlayScreen.gotoPlayScreen(MainMenuScreen.this, true, 0, 0);
+                                             try {
+                                                 PlayScreen.gotoPlayScreen(MainMenuScreen.this, null);
+                                             } catch (VetoException e) {
+                                                 showDialog(e.getMessage());
+                                             }
                                          }
                                      }
         );

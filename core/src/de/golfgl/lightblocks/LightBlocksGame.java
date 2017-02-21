@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
 
 import de.golfgl.lightblocks.screen.MainMenuScreen;
+import de.golfgl.lightblocks.state.GameStateHandler;
 
 import static com.badlogic.gdx.Gdx.app;
 

@@ -27,6 +27,7 @@ import de.golfgl.lightblocks.scenes.BlockGroup;
 import de.golfgl.lightblocks.scenes.MotivationLabel;
 import de.golfgl.lightblocks.scenes.ParticleEffectActor;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
+import de.golfgl.lightblocks.state.InitGameParameters;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
@@ -55,7 +56,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     float lastAccX = 0;
     private boolean isPaused = true;
 
-    public PlayScreen(LightBlocksGame app, int inputKey, int beginningLevel) throws InputNotAvailableException {
+    public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
+            InputNotAvailableException, VetoException {
         super(app);
 
         ParticleEffect pweldEffect = new ParticleEffect();
@@ -148,57 +150,56 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         motivatorLabel = new MotivationLabel(app.skin, LightBlocksGame.SKIN_FONT_TITLE, labelGroup);
 
-        stage.getRoot().setColor(Color.CLEAR);
-
-        initializeGameModel(inputKey, beginningLevel);
+        initializeGameModel(initGameParametersParams);
 
         gameType.setText(app.TEXTS.get(gameModel.getIdentifier()));
 
     }
 
-    public static void gotoPlayScreen(AbstractScreen caller, boolean resumeGame, int inputChosen, int beginningLevel) {
+    /**
+     * Constructs a new game and sets the screen to it.
+     *
+     * @param caller        the AbstractScreen that is calling.
+     * @param newGameParams null if game should be resumed.
+     */
+    public static void gotoPlayScreen(AbstractScreen caller, InitGameParameters newGameParams) throws
+            VetoException {
 
-        if (System.currentTimeMillis() > LightBlocksGame.GAME_EXPIRATION) {
-            caller.showDialog("Sorry, this version of Lightblocks is outdated. Please download a newer version.");
-            return;
-        }
+        boolean resumeGame = (newGameParams == null);
+
+        if (System.currentTimeMillis() > LightBlocksGame.GAME_EXPIRATION)
+            throw new VetoException("Sorry, this version of Lightblocks is outdated. Please download a newer version.");
 
         if (!resumeGame && caller.app.savegame.hasSavedGame())
             caller.app.savegame.resetGame();
 
         try {
-            final PlayScreen currentGame = new PlayScreen(caller.app, inputChosen, (int)
-                    beginningLevel);
+            final PlayScreen currentGame = new PlayScreen(caller.app, newGameParams);
             currentGame.setMusic(caller.app.isPlayMusic());
-
-            // Einstellungen speichern
-            caller.app.prefs.putInteger("inputType", inputChosen);
-            caller.app.prefs.putInteger("beginningLevel", beginningLevel);
-            caller.app.prefs.flush();
 
             Gdx.input.setInputProcessor(null);
             caller.app.setScreen(currentGame);
 
         } catch (InputNotAvailableException inp) {
-            caller.showDialog(caller.app.TEXTS.get("errorInputNotAvail"));
+            throw new VetoException(caller.app.TEXTS.get("errorInputNotAvail"));
         }
     }
 
-    private void initializeGameModel(int inputKey, int beginningLevel) throws InputNotAvailableException {
+    private void initializeGameModel(InitGameParameters initGameParametersParams) throws InputNotAvailableException,
+            VetoException {
         // Game Model erst hinzufügen, wenn die blockgroup schon steht
-        if (app.savegame.hasSavedGame()) {
+        if (initGameParametersParams == null && !app.savegame.hasSavedGame()) {
+            throw new VetoException("No savegame available!");
+        } else if (initGameParametersParams == null) {
             Json json = new Json();
             gameModel = json.fromJson(GameModel.class, app.savegame.loadGame());
         } else {
             gameModel = new MarathonModel();
-            gameModel.startNewGame(beginningLevel);
+            gameModel.startNewGame(initGameParametersParams);
         }
 
         gameModel.setUserInterface(this);
 
-        // wenn im Savegame oder Mission nichts vorgegeben ist, dann vom Nutzer gewählten InputController nehmen
-        if (gameModel.inputTypeKey < 0)
-            gameModel.inputTypeKey = inputKey;
         inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey);
         inputAdapter.setPlayScreen(this);
         inputAdapter.showHelp(labelGroup, true);
@@ -233,9 +234,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void show() {
         Gdx.input.setCatchBackKey(true);
         Gdx.input.setInputProcessor(inputAdapter);
-        stage.getRoot().addAction(Actions.fadeIn(1));
+        swoshIn();
     }
 
+    @Override
     public void goBackToMenu() {
 
         if (gameModel.isGameOver())
@@ -243,8 +245,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         else {
             saveGameState();
-            app.setScreen(app.mainMenuScreen);
-            this.dispose();
+            super.goBackToMenu();
         }
     }
 
@@ -322,6 +323,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             scoreScreen.setBest(gameModel.bestScore);
             scoreScreen.addScoreToShow(gameModel.bestScore, app.TEXTS.get("labelBestScore"));
         }
+        scoreScreen.setNewGameParams(gameModel.getInitParameters());
         scoreScreen.initializeUI(2);
         app.setScreen(scoreScreen);
 

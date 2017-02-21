@@ -1,6 +1,6 @@
 package de.golfgl.lightblocks.model;
 
-import de.golfgl.lightblocks.score.IRoundScore;
+import de.golfgl.lightblocks.state.IRoundScore;
 
 /**
  * Diese Klasse verwaltet alle Punktstände eines Spiels oder der Gesamtspiele

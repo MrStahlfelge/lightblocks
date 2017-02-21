@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scenes.FATextButton;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
 
 /**
@@ -39,23 +40,14 @@ public abstract class AbstractScoreScreen extends AbstractScreen {
         Label title = new Label(getTitle().toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         Label subTitle = new Label(getSubtitle(), app.skin, LightBlocksGame.SKIN_FONT_BIG);
 
+        // Buttons
+        Table buttons = new Table();
+
         // Back button
         Button leave = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
         setBackButton(leave);
-        // Share Button
-        Button share = new de.golfgl.lightblocks.scenes.FATextButton(FontAwesome.NET_SHARE1, app.TEXTS.get
-                ("menuShare"), app.skin);
-        share.addListener(new ChangeListener() {
-            public void changed(ChangeEvent event, Actor actor) {
-                app.share.shareText(getShareText(), null);
-            }
-        });
-
-        // Buttons
-        Table buttons = new Table();
-        buttons.defaults().fill().uniform();
-        buttons.add(leave).fill(false);
-        buttons.add(share);
+        buttons.add(leave).uniform();
+        fillButtonTable(buttons);
 
         // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
         final Table mainTable = new Table();
@@ -73,6 +65,18 @@ public abstract class AbstractScoreScreen extends AbstractScreen {
 
         stage.addActor(mainTable);
 
+    }
+
+    protected void fillButtonTable(Table buttons) {
+        // Share Button
+        Button share = new FATextButton(FontAwesome.NET_SHARE1, app.TEXTS.get("menuShare"), app.skin);
+        share.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                app.share.shareText(getShareText(), null);
+            }
+        });
+
+        buttons.add(share).fill().uniform();
     }
 
     protected abstract String getSubtitle();

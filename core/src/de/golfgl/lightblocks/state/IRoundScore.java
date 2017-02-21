@@ -1,4 +1,4 @@
-package de.golfgl.lightblocks.score;
+package de.golfgl.lightblocks.state;
 
 /**
  * Created by Benjamin Schulte on 20.02.2017.

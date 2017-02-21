@@ -6,8 +6,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
-import de.golfgl.lightblocks.score.BestScore;
-import de.golfgl.lightblocks.score.TotalScore;
+import de.golfgl.lightblocks.state.BestScore;
+import de.golfgl.lightblocks.state.InitGameParameters;
+import de.golfgl.lightblocks.state.TotalScore;
 
 /**
  * Created by Benjamin Schulte on 23.01.2017.
@@ -379,10 +380,10 @@ public abstract class GameModel implements Json.Serializable {
     /**
      * starts a new game
      */
-    public void startNewGame(int beginningLevel) {
+    public void startNewGame(InitGameParameters newGameParams) {
         gameboard = new Gameboard();
         score = new GameScore();
-        score.setStartingLevel(beginningLevel);
+        score.setStartingLevel(newGameParams.getBeginningLevel());
 
         activeTetromino = null;
         drawyer = new TetrominoDrawyer();
@@ -390,6 +391,20 @@ public abstract class GameModel implements Json.Serializable {
         activateNextTetromino();
 
         setCurrentSpeed();
+
+        inputTypeKey = newGameParams.getInputKey();
+    }
+
+    /**
+     * returns the parameters to initialize a new game of same type for retrying
+     */
+    public InitGameParameters getInitParameters() {
+        InitGameParameters retVal = new InitGameParameters();
+
+        retVal.setBeginningLevel(getScore().getStartingLevel());
+        retVal.setInputKey(inputTypeKey);
+
+        return retVal;
     }
 
     public void setUserInterface(IGameModelListener userInterface) {
