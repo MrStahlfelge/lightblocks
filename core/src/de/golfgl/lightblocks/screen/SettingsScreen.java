@@ -133,8 +133,21 @@ public class SettingsScreen extends AbstractScreen {
 
     @Override
     protected void goBackToMenu() {
-        app.setTouchPanelSize((int) touchPanelSizeSlider.getValue());
+        flushChanges();
         super.goBackToMenu();
+    }
+
+    /**
+     * speichert die Einstellungen die nicht sofort gespeichert werden
+     */
+    private void flushChanges() {
+        app.setTouchPanelSize((int) touchPanelSizeSlider.getValue());
+    }
+
+    @Override
+    public void pause() {
+        flushChanges();
+        super.pause();
     }
 
     @Override

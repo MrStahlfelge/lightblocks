@@ -145,7 +145,7 @@ public class LightBlocksGame extends Game {
         if (this.showTouchPanel != showTouchPanel) {
             this.showTouchPanel = showTouchPanel;
 
-            prefs.putBoolean("musicPlayback", showTouchPanel);
+            prefs.putBoolean("showTouchPanel", showTouchPanel);
             prefs.flush();
         }
     }
