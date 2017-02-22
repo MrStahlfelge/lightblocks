@@ -51,7 +51,7 @@ public class PlayGravityInput extends PlayScreenInput {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (isPaused && !hasCalibration)
+        if (isPaused && !hasCalibration && !isGameOver)
             return true;
 
         if (isPaused)
@@ -64,6 +64,9 @@ public class PlayGravityInput extends PlayScreenInput {
 
     @Override
     public void doPoll(float delta) {
+
+        if (isGameOver)
+            return;
 
         deltaSum += delta;
 
@@ -159,7 +162,8 @@ public class PlayGravityInput extends PlayScreenInput {
         Table table = (Table) super.showHelp(drawGroup, isBegin);
 
         table.row();
-        calibrationProgress = new Label("", playScreen.app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        calibrationProgress = new Label(playScreen.app.TEXTS.get("labelCalibration"), playScreen.app.skin,
+                LightBlocksGame.SKIN_FONT_BIG);
 
         table.add(calibrationProgress).spaceTop(30);
 

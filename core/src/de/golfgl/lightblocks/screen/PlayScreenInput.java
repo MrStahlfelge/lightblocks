@@ -17,6 +17,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
  */
 public abstract class PlayScreenInput extends InputAdapter {
     public boolean isPaused = true;
+    protected boolean isGameOver;
     PlayScreen playScreen;
 
     public static PlayScreenInput getPlayInput(int key) throws InputNotAvailableException {
@@ -79,6 +80,11 @@ public abstract class PlayScreenInput extends InputAdapter {
             default:
                 throw new IllegalArgumentException("Not supported");
         }
+    }
+
+    public void setGameOver() {
+        this.isGameOver = true;
+        this.isPaused = true;
     }
 
     @Override

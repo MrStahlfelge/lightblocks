@@ -480,7 +480,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (music != null)
             music.stop();
         app.gameOverSound.play();
-        inputAdapter.isPaused = true;
+        inputAdapter.setGameOver();
         saveGameState();
     }
 
