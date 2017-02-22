@@ -74,7 +74,6 @@ public class LightBlocksGame extends Game {
 
         assetManager = new AssetManager();
         assetManager.load("i18n/strings", I18NBundle.class);
-        assetManager.load("raw/block.png", Texture.class);
         assetManager.load("raw/block-deactivated.png", Texture.class);
         assetManager.load("raw/block-light.png", Texture.class);
         assetManager.load("raw/lineglow.png", Texture.class);
@@ -88,10 +87,12 @@ public class LightBlocksGame extends Game {
         assetManager.finishLoading();
 
         TEXTS = assetManager.get("i18n/strings", I18NBundle.class);
-        //trBlock = new TextureRegion(assetManager.get("raw/block.png", Texture.class));
         trBlock = new TextureRegion(assetManager.get("raw/block-deactivated.png", Texture.class));
+        trBlock.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         trBlockEnlightened = new TextureRegion(assetManager.get("raw/block-light.png", Texture.class));
+        trBlockEnlightened.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         trGlowingLine = new TextureRegion(assetManager.get("raw/lineglow.png", Texture.class));
+        trGlowingLine.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         dropSound = assetManager.get("sound/switchon.ogg", Sound.class);
         rotateSound = assetManager.get("sound/switchflip.ogg", Sound.class);
         removeSound = assetManager.get("sound/glow05.ogg", Sound.class);
