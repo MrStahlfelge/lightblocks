@@ -17,14 +17,16 @@ import de.golfgl.lightblocks.LightBlocksGame;
  */
 public class PlayGesturesInput extends PlayScreenInput {
 
-    public static final int DRAG_TRESHOLD = 50;
+    public Color rotateRightColor = new Color(.1f, 1, .3f, .8f);
+    public Color rotateLeftColor = new Color(.2f, .8f, 1, .8f);
+
+    private int dragThreshold;
 
     int screenX;
     int screenY;
     boolean beganHorizontalMove;
     boolean beganSoftDrop;
     boolean didSomething;
-
     Group touchPanel;
     Vector2 touchCoordinates;
     private Label toTheRight;
@@ -36,7 +38,10 @@ public class PlayGesturesInput extends PlayScreenInput {
     public void setPlayScreen(PlayScreen playScreen) {
         super.setPlayScreen(playScreen);
 
-        initializeTouchPanel(playScreen);
+        dragThreshold = playScreen.app.getTouchPanelSize();
+
+        if (playScreen.app.getShowTouchPanel())
+            initializeTouchPanel(playScreen, dragThreshold);
     }
 
     @Override
@@ -62,11 +67,11 @@ public class PlayGesturesInput extends PlayScreenInput {
         return true;
     }
 
-    public void initializeTouchPanel(PlayScreen playScreen) {
+    public Group initializeTouchPanel(AbstractScreen playScreen, int dragTrashold) {
         touchPanel = new Group();
         touchPanel.setTransform(false);
         Vector2 touchCoordinates1 = new Vector2(0, 0);
-        touchCoordinates = new Vector2(DRAG_TRESHOLD, 0);
+        touchCoordinates = new Vector2(dragTrashold, 0);
 
         playScreen.stage.getViewport().unproject(touchCoordinates);
         playScreen.stage.getViewport().unproject(touchCoordinates1);
@@ -98,38 +103,50 @@ public class PlayGesturesInput extends PlayScreenInput {
         touchPanel.addActor(rotationLabel);
 
         playScreen.stage.addActor(touchPanel);
+
+        return touchPanel;
     }
 
     public void setTouchPanel(int screenX, int screenY) {
+
+        if (touchPanel == null)
+            return;
+
         touchCoordinates.set(screenX, screenY);
         playScreen.stage.getViewport().unproject(touchCoordinates);
         touchPanel.setPosition(touchCoordinates.x, touchCoordinates.y);
 
-        Color c = toTheRight.getColor();
         if (this.screenX >= Gdx.graphics.getWidth() / 2) {
-            c.set(.1f, 1, .3f, .8f);
+            setTouchPanelColor(rotateRightColor);
             rotationLabel.setText(FontAwesome.ROTATE_RIGHT);
         } else {
-            c.set(.2f, .8f, 1, .8f);
+            setTouchPanelColor(rotateLeftColor);
             rotationLabel.setText(FontAwesome.ROTATE_LEFT);
         }
 
+        touchPanel.setVisible(true);
+    }
+
+    public void setTouchPanelColor(Color c) {
+        if (touchPanel == null)
+            return;
+
+        toTheRight.setColor(c);
         toTheLeft.setColor(c);
         toDrop.setColor(c);
         rotationLabel.setColor(c);
-        touchPanel.setVisible(true);
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        // Bei mehr als DRAG_TRESHOLD Pixeln erkennen wir eine Bewegung an...
+        // Bei mehr als dragThreshold Pixeln erkennen wir eine Bewegung an...
 
         if (!beganSoftDrop) {
-            if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > DRAG_TRESHOLD)) {
+            if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > dragThreshold)) {
                 beganHorizontalMove = true;
                 playScreen.gameModel.startMoveHorizontal(screenX - this.screenX < 0);
             }
-            if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < DRAG_TRESHOLD)) {
+            if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < dragThreshold)) {
                 playScreen.gameModel.endMoveHorizontal(true);
                 playScreen.gameModel.endMoveHorizontal(false);
                 beganHorizontalMove = false;
@@ -137,23 +154,23 @@ public class PlayGesturesInput extends PlayScreenInput {
         }
 
         if (!beganHorizontalMove) {
-            if (screenY - this.screenY > DRAG_TRESHOLD && !beganSoftDrop) {
+            if (screenY - this.screenY > dragThreshold && !beganSoftDrop) {
                 beganSoftDrop = true;
                 playScreen.gameModel.setSoftDropFactor(1);
             }
-            if (screenY - this.screenY < DRAG_TRESHOLD && beganSoftDrop) {
+            if (screenY - this.screenY < dragThreshold && beganSoftDrop) {
                 beganSoftDrop = false;
                 playScreen.gameModel.setSoftDropFactor(0);
             }
         }
 
-        if (screenY - this.screenY < -4 * DRAG_TRESHOLD & !isPaused) {
+        if (screenY - this.screenY < -4 * dragThreshold & !isPaused) {
             playScreen.switchPause(false);
         }
 
         // rotate vermeiden
-        if (!didSomething && (Math.abs(screenX - this.screenX) > DRAG_TRESHOLD
-                || Math.abs(screenY - this.screenY) > DRAG_TRESHOLD)) {
+        if (!didSomething && (Math.abs(screenX - this.screenX) > dragThreshold
+                || Math.abs(screenY - this.screenY) > dragThreshold)) {
             playScreen.gameModel.setInputFreezeInterval(0);
             didSomething = true;
         }
@@ -165,7 +182,9 @@ public class PlayGesturesInput extends PlayScreenInput {
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 
         playScreen.gameModel.setInputFreezeInterval(0);
-        touchPanel.setVisible(false);
+
+        if (touchPanel != null)
+            touchPanel.setVisible(false);
 
         if (!didSomething)
             playScreen.gameModel.setRotate(screenX >= Gdx.graphics.getWidth() / 2);

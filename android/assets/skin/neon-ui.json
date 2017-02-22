@@ -391,7 +391,18 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		font: font
 		fontColor: text
 		downFontColor: text-selected
+		up: button-c
+		down: button-over-c
+		over: button-over-c
+		disabled: button-disabled-c
 		disabledFontColor: disabled
+	}
+	checked: {
+		font: font
+		fontColor: text
+		downFontColor: text-selected
+		checked: button-checked
+		checkedOver: button-over-checked
 		up: button-c
 		down: button-over-c
 		over: button-over-c

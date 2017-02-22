@@ -123,24 +123,11 @@ public class MainMenuScreen extends AbstractScreen {
                 .skin);
         settingsButton.addListener(new ChangeListener() {
                                        public void changed(ChangeEvent event, Actor actor) {
-                                           gotoHighscoreScreen();
+                                           app.setScreen(new SettingsScreen(app));
                                        }
                                    }
         );
         buttons.add(settingsButton);
-
-        //TODO kommt in Settings
-//        buttons.row();
-//        menuMusicButton = new ImageTextButton(app.TEXTS.get("menuMusicButton"), app.skin, "checkbox");
-//        menuMusicButton.setChecked(app.isPlayMusic());
-//        menuMusicButton.addListener(new ChangeListener() {
-//                                        public void changed(ChangeEvent event, Actor actor) {
-//                                            app.setPlayMusic(menuMusicButton.isChecked());
-//                                        }
-//                                    }
-//        );
-//
-//        buttons.add(menuMusicButton).colspan(2).uniform(false, false);
 
         mainTable.row();
         mainTable.add(buttons);

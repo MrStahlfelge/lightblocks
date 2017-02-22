@@ -51,6 +51,7 @@ public class LightBlocksGame extends Game {
     private FPSLogger fpsLogger;
 
     private Boolean playMusic;
+    private Boolean showTouchPanel;
 
     @Override
     public void create() {
@@ -130,5 +131,30 @@ public class LightBlocksGame extends Game {
             prefs.putBoolean("musicPlayback", playMusic);
             prefs.flush();
         }
+    }
+
+    public boolean getShowTouchPanel() {
+        if (showTouchPanel == null)
+            showTouchPanel = prefs.getBoolean("showTouchPanel", true);
+
+        return showTouchPanel;
+    }
+
+    public void setShowTouchPanel(boolean showTouchPanel) {
+        if (this.showTouchPanel != showTouchPanel) {
+            this.showTouchPanel = showTouchPanel;
+
+            prefs.putBoolean("musicPlayback", showTouchPanel);
+            prefs.flush();
+        }
+    }
+
+    public int getTouchPanelSize() {
+        return prefs.getInteger("touchPanelSize", 50);
+    }
+
+    public void setTouchPanelSize(int touchPanelSize) {
+        prefs.putInteger("touchPanelSize", touchPanelSize);
+        prefs.flush();
     }
 }
