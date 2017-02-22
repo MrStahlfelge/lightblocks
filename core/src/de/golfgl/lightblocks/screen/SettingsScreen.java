@@ -42,8 +42,8 @@ public class SettingsScreen extends AbstractScreen {
                                     }
         );
 
-        final Button touchPanelButton = new TextButton(FontAwesome.DEVICE_GESTURE2, app.skin, FontAwesome.SKIN_FONT_FA
-                + "-checked");
+        final Button touchPanelButton = new TextButton(PlayScreenInput.getInputFAIcon(1), app.skin, FontAwesome
+                .SKIN_FONT_FA + "-checked");
         touchPanelButton.setChecked(app.getShowTouchPanel());
         touchPanelButton.addListener(new ChangeListener() {
                                          public void changed(ChangeEvent event, Actor actor) {
@@ -60,6 +60,8 @@ public class SettingsScreen extends AbstractScreen {
             }
         });
 
+        Button gamePadButton = new TextButton(PlayScreenInput.getInputFAIcon(3), app.skin, FontAwesome.SKIN_FONT_FA);
+        gamePadButton.setDisabled(true);
 
         // Back button
         Button leave = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
@@ -69,20 +71,26 @@ public class SettingsScreen extends AbstractScreen {
         Table settingsTable = new Table();
         settingsTable.row();
         settingsTable.defaults().fill();
-        settingsTable.add(menuMusicButton);
-        settingsTable.add(new Label(app.TEXTS.get("menuMusicButton"), app.skin, app.SKIN_FONT_BIG));
+        settingsTable.add(menuMusicButton).uniform();
+        settingsTable.add(new Label(app.TEXTS.get("menuMusicButton"), app.skin, app.SKIN_FONT_BIG)).expandX();
+
         settingsTable.row().spaceTop(30);
-        settingsTable.add(new Label(app.TEXTS.get("menuInputGestures"), app.skin, app.SKIN_FONT_BIG)).colspan(2).fill
-                (false);
+        settingsTable.add(new Label(app.TEXTS.get("menuInputGestures"), app.skin, app.SKIN_FONT_BIG)).colspan(2);
         settingsTable.row();
-        settingsTable.add(new Label(app.TEXTS.get("menuSizeOfTouchPanel"), app.skin)).colspan(2).fill(false);
-        settingsTable.row();
-        settingsTable.add(touchPanelSizeSlider).colspan(2).minHeight(50);
-        settingsTable.row();
-        settingsTable.add(touchPanelButton);
+        settingsTable.add(touchPanelButton).uniform();
         Label tg = new Label(app.TEXTS.get("menuShowTouchPanel"), app.skin);
         tg.setWrap(true);
         settingsTable.add(tg).prefWidth(LightBlocksGame.nativeGameWidth * 0.5f);
+        settingsTable.row();
+        settingsTable.add();
+        settingsTable.add(new Label(app.TEXTS.get("menuSizeOfTouchPanel"), app.skin));
+        settingsTable.row();
+        settingsTable.add();
+        settingsTable.add(touchPanelSizeSlider).minHeight(40);
+
+        settingsTable.row().spaceTop(30);
+        settingsTable.add(gamePadButton).uniform();
+        settingsTable.add(new Label(app.TEXTS.get("menuInputGamepad"), app.skin, app.SKIN_FONT_BIG));
 
         // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
         final Table mainTable = new Table();

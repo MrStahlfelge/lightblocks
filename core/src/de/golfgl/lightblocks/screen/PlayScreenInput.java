@@ -21,7 +21,7 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     public static PlayScreenInput getPlayInput(int key) throws InputNotAvailableException {
 
-        if (!inputAvailable(key))
+        if (!isInputTypeAvailable(key))
             throw new InputNotAvailableException();
 
         switch (key) {
@@ -34,54 +34,50 @@ public abstract class PlayScreenInput extends InputAdapter {
         }
     }
 
-    public static Input.Peripheral peripheralFromInt(int key) {
+    public static boolean isInputTypeAvailable(int key) {
         switch (key) {
-            case 0:
-                return Input.Peripheral.HardwareKeyboard;
             case 1:
-                return Input.Peripheral.MultitouchScreen;
+                // Touchscreen wird simuliert
+                return true;
+            case 3:
+                // Controller noch nicht implementert
+                return false;
             case 2:
-                return Input.Peripheral.Accelerometer;
+                return Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
+            case 0:
+                return Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard);
             default:
                 throw new IllegalArgumentException("Not supported");
         }
     }
 
-    public static boolean inputAvailable(int key) {
-        try {
-            // Touchscreen wird simuliert
-            if (key == 1)
-                return true;
-            else
-                return Gdx.input.isPeripheralAvailable(peripheralFromInt(key));
-        } catch (Throwable t) {
-            return false;
-        }
-    }
-
-    public static String inputName(int key) {
-        switch (peripheralFromInt(key)) {
-            case HardwareKeyboard:
+    public static String getInputTypeName(int key) {
+        switch (key) {
+            case 0:
                 return "menuInputKeyboard";
-            case MultitouchScreen:
+            case 1:
                 return "menuInputGestures";
-            case Accelerometer:
+            case 2:
                 return "menuInputAccelerometer";
+            case 3:
+                return "menuInputGamepad";
             default:
-                return null;
+                throw new IllegalArgumentException("Not supported");
         }
     }
 
     public static String getInputFAIcon(int key) {
-        switch (peripheralFromInt(key)) {
-            case HardwareKeyboard:
+        switch (key) {
+            case 0:
                 return FontAwesome.DEVICE_KEYBOARD;
-            case MultitouchScreen:
+            case 1:
                 return FontAwesome.DEVICE_GESTURE2;
-            case Accelerometer:
+            case 2:
                 return FontAwesome.DEVICE_GRAVITY;
+            case 3:
+                return FontAwesome.DEVICE_GAMEPAD;
             default:
-                return null;
+                throw new IllegalArgumentException("Not supported");
         }
     }
 

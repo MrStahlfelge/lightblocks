@@ -1,7 +1,6 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -85,27 +84,25 @@ public class MenuMarathonScreen extends AbstractScreen {
             public void changed(ChangeEvent event, Actor actor) {
                 if (inputButtonsGroup.getChecked() != null) {
                     inputChosen = inputButtonsGroup.getChecked().getValue();
-                    currentInputLabel.setText(app.TEXTS.get(PlayScreenInput.inputName(inputChosen)));
+                    currentInputLabel.setText(app.TEXTS.get(PlayScreenInput.getInputTypeName(inputChosen)));
                 }
             }
         };
 
 
         int lastInputChosen = app.prefs.getInteger("inputType", 0);
-        if (!PlayScreenInput.inputAvailable(lastInputChosen))
+        if (!PlayScreenInput.isInputTypeAvailable(lastInputChosen))
             lastInputChosen = 0;
 
         int i = 0;
         while (true) {
             try {
 
-                Input.Peripheral ic = PlayScreenInput.peripheralFromInt(i);
-
                 IntButton inputButton = new IntButton(PlayScreenInput.getInputFAIcon(i), app.skin, FontAwesome
                         .SKIN_FONT_FA + "-checked");
                 inputButton.setValue(i);
                 inputButton.addListener(controllerChangeListener);
-                inputButton.setDisabled(!PlayScreenInput.inputAvailable(i));
+                inputButton.setDisabled(!PlayScreenInput.isInputTypeAvailable(i));
 
                 // Tastatur nur anzeigen, wenn sie auch wirklich da ist
                 if (i > 0 || !inputButton.isDisabled()) {
