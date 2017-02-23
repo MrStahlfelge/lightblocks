@@ -18,7 +18,7 @@ public class ShareHandler {
         String uri = LightBlocksGame.GAME_URL + "share.php?u=";
         try {
 
-            uri += URLEncoder.encode(message, "utf-8");
+            uri += URLEncoder.encode(message, "UTF-8");
 
             if (title != null)
                 uri += "&subject=" + URLEncoder.encode(title);
