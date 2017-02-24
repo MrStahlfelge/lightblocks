@@ -159,7 +159,8 @@ public class MainMenuScreen extends AbstractScreen {
 
         TotalScoreScreen scoreScreen = new TotalScoreScreen(app);
         scoreScreen.setTotal(app.savegame.loadTotalScore());
-        scoreScreen.initializeUI(1);
+        scoreScreen.setMaxCountingTime(1);
+        scoreScreen.initializeUI();
         app.setScreen(scoreScreen);
     }
 

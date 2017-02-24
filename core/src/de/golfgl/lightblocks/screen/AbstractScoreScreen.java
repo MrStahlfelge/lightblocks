@@ -5,7 +5,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -17,7 +16,7 @@ import de.golfgl.lightblocks.scenes.ScoreLabel;
 /**
  * Created by Benjamin Schulte on 20.02.2017.
  */
-public abstract class AbstractScoreScreen extends AbstractScreen {
+public abstract class AbstractScoreScreen extends AbstractMenuScreen {
     protected static final int SCORE_COUNTING_SPEED = 2000;
     protected float maxCountingTime;
 
@@ -25,48 +24,16 @@ public abstract class AbstractScoreScreen extends AbstractScreen {
         super(app);
     }
 
-    public void initializeUI(float maxCountingTime) {
-
+    public void setMaxCountingTime(float maxCountingTime) {
         this.maxCountingTime = maxCountingTime;
-
-        // SCORES
-        Table scoreTable = new Table();
-        scoreTable.defaults().right();
-        scoreTable.defaults().space(15);
-        fillScoreTable(scoreTable);
-
-        //Titel
-        // Der Titel wird nach den Scores gefüllt, denn dort wird eventuell Highscore gesetzt
-        Label title = new Label(getTitle().toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        Label subTitle = new Label(getSubtitle(), app.skin, LightBlocksGame.SKIN_FONT_BIG);
-
-        // Buttons
-        Table buttons = new Table();
-
-        // Back button
-        Button leave = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
-        setBackButton(leave);
-        buttons.add(leave).uniform();
-        fillButtonTable(buttons);
-
-        // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
-        final Table mainTable = new Table();
-        mainTable.setFillParent(true);
-        mainTable.row();
-        mainTable.add(new Label(FontAwesome.COMMENT_STAR_TROPHY, app.skin, FontAwesome.SKIN_FONT_FA));
-        mainTable.row();
-        mainTable.add(title);
-        mainTable.row();
-        mainTable.add(subTitle).spaceBottom(50);
-        mainTable.row();
-        mainTable.add(scoreTable);
-        mainTable.row();
-        mainTable.add(buttons).spaceTop(50);
-
-        stage.addActor(mainTable);
-
     }
 
+    @Override
+    protected String getTitleIcon() {
+        return FontAwesome.COMMENT_STAR_TROPHY;
+    }
+
+    @Override
     protected void fillButtonTable(Table buttons) {
         // Share Button
         Button share = new FATextButton(FontAwesome.NET_SHARE1, app.TEXTS.get("menuShare"), app.skin);
@@ -79,13 +46,16 @@ public abstract class AbstractScoreScreen extends AbstractScreen {
         buttons.add(share).fill().uniform();
     }
 
-    protected abstract String getSubtitle();
-
-    protected abstract String getTitle();
-
     protected abstract String getShareText();
 
-    protected abstract void fillScoreTable(Table scoreTable);
+    @Override
+    protected void fillMenuTable(Table menuTable) {
+        // must be subclassed
+        menuTable.defaults().right();
+        menuTable.defaults().space(15);
+    }
+
+    ;
 
 
     protected void addScoresLine(Table scoreTable, String label, int digits, long score) {

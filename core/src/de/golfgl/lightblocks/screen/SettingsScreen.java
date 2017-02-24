@@ -23,15 +23,21 @@ import de.golfgl.lightblocks.LightBlocksGame;
  * Created by Benjamin Schulte on 21.02.2017.
  */
 
-public class SettingsScreen extends AbstractScreen {
+public class SettingsScreen extends AbstractMenuScreen {
 
-    private final Slider touchPanelSizeSlider;
     PlayGesturesInput pgi;
     Group touchPanel;
+    private Slider touchPanelSizeSlider;
 
     public SettingsScreen(final LightBlocksGame app) {
         super(app);
 
+        initializeUI();
+
+    }
+
+    @Override
+    protected void fillMenuTable(Table settingsTable) {
         final Button menuMusicButton = new TextButton(FontAwesome.SETTINGS_MUSIC, app.skin, FontAwesome.SKIN_FONT_FA
                 + "-checked");
         menuMusicButton.setChecked(app.isPlayMusic());
@@ -68,7 +74,6 @@ public class SettingsScreen extends AbstractScreen {
         setBackButton(leave);
 
         //Settings Table
-        Table settingsTable = new Table();
         settingsTable.row();
         settingsTable.defaults().fill();
         settingsTable.add(menuMusicButton).uniform();
@@ -92,21 +97,22 @@ public class SettingsScreen extends AbstractScreen {
         settingsTable.add(gamePadButton).uniform();
         settingsTable.add(new Label(app.TEXTS.get("menuInputGamepad"), app.skin, app.SKIN_FONT_BIG));
 
-        // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
-        final Table mainTable = new Table();
-        mainTable.setFillParent(true);
-        mainTable.row();
-        mainTable.add(new Label(FontAwesome.SETTINGS_GEARS, app.skin, FontAwesome.SKIN_FONT_FA));
-        mainTable.row();
-        mainTable.add(new Label(app.TEXTS.get("menuSettings").toUpperCase(), app.skin, LightBlocksGame
-                .SKIN_FONT_TITLE)).spaceBottom(50);
-        mainTable.row();
-        mainTable.add(settingsTable);
-        mainTable.row();
-        mainTable.add(leave).spaceTop(50);
+    }
 
-        stage.addActor(mainTable);
 
+    @Override
+    protected String getTitleIcon() {
+        return FontAwesome.SETTINGS_GEARS;
+    }
+
+    @Override
+    protected String getSubtitle() {
+        return null;
+    }
+
+    @Override
+    protected String getTitle() {
+        return app.TEXTS.get("menuSettings");
     }
 
     protected void touchPanelSizeChanged() {
@@ -150,11 +156,4 @@ public class SettingsScreen extends AbstractScreen {
         super.pause();
     }
 
-    @Override
-    public void show() {
-        Gdx.input.setCatchBackKey(true);
-        Gdx.input.setInputProcessor(stage);
-
-        swoshIn();
-    }
 }

@@ -1,6 +1,5 @@
 package de.golfgl.lightblocks.screen;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -18,15 +17,6 @@ public class TotalScoreScreen extends AbstractScoreScreen {
 
     public TotalScoreScreen(LightBlocksGame app) {
         super(app);
-    }
-
-    @Override
-    public void show() {
-        Gdx.input.setCatchBackKey(true);
-        Gdx.input.setInputProcessor(stage);
-
-        swoshIn();
-
     }
 
     public void setTotal(TotalScore total) {
@@ -50,7 +40,9 @@ public class TotalScoreScreen extends AbstractScoreScreen {
     }
 
     @Override
-    protected void fillScoreTable(Table scoreTable) {
+    protected void fillMenuTable(Table scoreTable) {
+        super.fillMenuTable(scoreTable);
+
         addScoresLine(scoreTable, "labelScore", 10, total.getScore());
         addScoresLine(scoreTable, "labelLines", 0, total.getClearedLines());
         addScoresLine(scoreTable, "labelBlocks", 0, total.getDrawnTetrominos());

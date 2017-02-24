@@ -324,7 +324,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             scoreScreen.addScoreToShow(gameModel.bestScore, app.TEXTS.get("labelBestScore"));
         }
         scoreScreen.setNewGameParams(gameModel.getInitParameters());
-        scoreScreen.initializeUI(2);
+        scoreScreen.setMaxCountingTime(2);
+        scoreScreen.initializeUI();
         app.setScreen(scoreScreen);
 
         this.dispose();

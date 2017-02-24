@@ -1,6 +1,5 @@
 package de.golfgl.lightblocks.screen;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -39,15 +38,6 @@ public class ScoreScreen extends AbstractScoreScreen {
 
         scoresToShow = new Array<IRoundScore>();
         scoresToShowLabels = new Array<String>();
-    }
-
-    @Override
-    public void show() {
-        Gdx.input.setCatchBackKey(true);
-        Gdx.input.setInputProcessor(stage);
-
-        swoshIn();
-
     }
 
     public void addScoreToShow(IRoundScore score, String label) {
@@ -90,7 +80,9 @@ public class ScoreScreen extends AbstractScoreScreen {
     }
 
     @Override
-    protected void fillScoreTable(Table scoreTable) {
+    protected void fillMenuTable(Table scoreTable) {
+
+        super.fillMenuTable(scoreTable);
 
         // Die Reihe mit den Labels
         if (scoresToShowLabels.size > 1) {
