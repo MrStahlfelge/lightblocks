@@ -34,6 +34,17 @@ public class MotivationLabel extends Label {
         motivationDuration = new Array<Float>();
     }
 
+    @Override
+    protected void setParent(Group parent) {
+        super.setParent(parent);
+
+        // Label was deleted from stage -> clear texts
+        motivationTexts.clear();
+        motivationDuration.clear();
+        isActive = false;
+
+    }
+
     public void addMotivationText(String text, float duration) {
 
         //erstmal einfach loslegen
