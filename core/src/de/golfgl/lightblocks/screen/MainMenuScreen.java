@@ -103,7 +103,12 @@ public class MainMenuScreen extends AbstractScreen {
         buttons.row();
         TextButton playMultiplayerButton = new FATextButton(FontAwesome.NET_PEOPLE, app.TEXTS.get
                 ("menuPlayMultiplayerButton"), app.skin);
-        playMultiplayerButton.setDisabled(true);
+        playMultiplayerButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                app.setScreen(new MultiplayerMenuScreen(app));
+            }
+        });
         buttons.add(playMultiplayerButton).colspan(2).padBottom(20);
 
         //TODO High scores -> hier kommt Google Plag Games Icon und "Account" rein
@@ -154,8 +159,6 @@ public class MainMenuScreen extends AbstractScreen {
                     " your mobile!");
             return;
         }
-
-        //int inputChosen = ((KeyText<Integer>) inputChoseField.getSelected()).value;
 
         TotalScoreScreen scoreScreen = new TotalScoreScreen(app);
         scoreScreen.setTotal(app.savegame.loadTotalScore());

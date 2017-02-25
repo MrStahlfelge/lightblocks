@@ -8,7 +8,7 @@ package de.golfgl.lightblocks.screen;
 
 public class VetoException extends Exception {
 
-    VetoException(String message) {
+    public VetoException(String message) {
         super(message);
     }
 }

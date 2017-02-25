@@ -13,7 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
 
+import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
+import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
 
 import static com.badlogic.gdx.Gdx.app;
@@ -47,6 +49,7 @@ public class LightBlocksGame extends Game {
     public Sound unlockedSound;
     public Sound swoshSound;
     public ShareHandler share;
+    public AbstractMultiplayerRoom multiRoom;
 
     public MainMenuScreen mainMenuScreen;
     private FPSLogger fpsLogger;
@@ -116,6 +119,13 @@ public class LightBlocksGame extends Game {
 
     @Override
     public void dispose() {
+        if (multiRoom != null)
+            try {
+                multiRoom.leaveRoom(true);
+            } catch (VetoException e) {
+                e.printStackTrace();
+            }
+
         mainMenuScreen.dispose();
         skin.dispose();
     }
