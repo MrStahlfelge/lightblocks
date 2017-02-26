@@ -30,16 +30,15 @@ public abstract class AbstractMultiplayerRoom {
      */
     public abstract void closeRoom(boolean force) throws VetoException;
 
-    public abstract void joinRoom(RoomLocation roomLoc) throws VetoException;
+    public abstract void joinRoom(IRoomLocation roomLoc) throws VetoException;
 
     public abstract void leaveRoom(boolean force) throws VetoException;
 
-    public abstract List<RoomLocation> searchRooms() throws VetoException;
+    public abstract void startRoomDiscovery() throws VetoException;
 
-    /**
-     * Where to go to reach the room?
-     */
-    public abstract static class RoomLocation {
+    public abstract void stopRoomDiscovery() throws VetoException;
 
-    }
+    public abstract List<IRoomLocation> getDiscoveredRooms();
+
+
 }

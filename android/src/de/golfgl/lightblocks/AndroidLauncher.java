@@ -5,8 +5,14 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.rafakob.nsdhelper.NsdHelper;
+
+import de.golfgl.lightblocks.multiplayer.NsdAdapter;
 
 public class AndroidLauncher extends AndroidApplication {
+
+    NsdAdapter nsdAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,7 +26,27 @@ public class AndroidLauncher extends AndroidApplication {
         LightBlocksGame game = new LightBlocksGame();
         game.share = new AndroidShareHandler();
 
+        this.nsdAdapter = new NsdAdapter(this);
+        game.nsdHelper = nsdAdapter;
+
         initialize(game, config);
+    }
+
+    @Override
+    protected void onPause() {
+        if (nsdAdapter != null)
+            nsdAdapter.stopDiscovery();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (nsdAdapter != null) {
+            nsdAdapter.unregisterService();
+            nsdAdapter.stopDiscovery();
+        }
+
+        super.onDestroy();
     }
 
     public class AndroidShareHandler extends ShareHandler {
@@ -35,4 +61,5 @@ public class AndroidLauncher extends AndroidApplication {
             startActivity(chooser);
         }
     }
+
 }

@@ -24,6 +24,8 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
     public static final int UDP_PORT = 54777;
     private Server server;
     private Client client;
+    private INsdHelper nsdHelper;
+    private List<IRoomLocation> udpPollReply;
 
     private int numberOfPlayers;
 
@@ -42,6 +44,9 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
     protected void startServer() throws VetoException {
 
         checkIfAlreadyConnected();
+
+        if (nsdHelper != null)
+            stopRoomDiscovery();
 
         server = new Server();
         server.start();
@@ -63,7 +68,8 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             }
         });
 
-
+        if (nsdHelper != null)
+            nsdHelper.registerService();
     }
 
     private void checkIfAlreadyConnected() throws VetoException {
@@ -85,12 +91,18 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         if (server == null)
             throw new VetoException("Only the multiplayer host can close the room");
 
+        if (nsdHelper != null)
+            nsdHelper.unregisterService();
+
         server.close();
     }
 
     @Override
-    public void joinRoom(RoomLocation roomLoc) throws VetoException {
+    public void joinRoom(IRoomLocation roomLoc) throws VetoException {
         checkIfAlreadyConnected();
+
+        if (nsdHelper != null)
+            stopRoomDiscovery();
 
         Client client = new Client();
         client.start();
@@ -127,29 +139,46 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
     }
 
     @Override
-    public List<RoomLocation> searchRooms() throws VetoException {
-
+    public void startRoomDiscovery() throws VetoException {
         checkIfAlreadyConnected();
 
-        Client client = new Client();
-        client.start();
-        List<InetAddress> addressList = client.discoverHosts(UDP_PORT, 500);
-        client.stop();
+        if (nsdHelper != null)
+            nsdHelper.startDiscovery();
+        else {
 
-        List<RoomLocation> roomLocs = new ArrayList<RoomLocation>(addressList.size());
+            udpPollReply = new ArrayList<IRoomLocation>(1);
 
-        for (InetAddress a : addressList)
-            roomLocs.add(new KryonetRoomLocation(a));
+            Client client = new Client();
+            client.start();
+            InetAddress address = client.discoverHost(UDP_PORT, 150);
+            client.stop();
 
+            if (address != null)
+                udpPollReply.add(new KryonetRoomLocation(address.getHostName(), address));
+        }
 
-        return roomLocs;
     }
 
-    public static class KryonetRoomLocation extends RoomLocation {
-        public InetAddress address;
+    @Override
+    public void stopRoomDiscovery() throws VetoException {
+        if (nsdHelper != null)
+            nsdHelper.stopDiscovery();
+    }
 
-        KryonetRoomLocation(InetAddress address) {
-            this.address = address;
+    @Override
+    public List<IRoomLocation> getDiscoveredRooms() {
+
+        if (nsdHelper == null) {
+            return udpPollReply;
+        } else {
+            return nsdHelper.getDiscoveredServices();
         }
     }
+
+    public void setNsdHelper(INsdHelper nsdHelper) {
+        this.nsdHelper = nsdHelper;
+    }
+
+
 }
+
