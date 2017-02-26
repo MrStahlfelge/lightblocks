@@ -32,7 +32,7 @@ public class NsdAdapter implements INsdHelper, NsdListener {
 
         nsdHelper.setLogEnabled(true);
         //nsdHelper.setAutoResolveEnabled(true);
-        nsdHelper.setDiscoveryTimeout(60);
+        nsdHelper.setDiscoveryTimeout(300);
 
         currentServices = new ConcurrentHashMap<String, InetAddress>();
     }
@@ -70,7 +70,7 @@ public class NsdAdapter implements INsdHelper, NsdListener {
     @Override
     public void onNsdServiceLost(NsdService nsdService) {
         if (nsdService.getName().startsWith(SERVICE_NAME)) {
-            currentServices.remove(nsdService.getName());
+            currentServices.remove(nsdService.getName().substring(SERVICE_NAME.length() + 1));
         }
     }
 

@@ -18,6 +18,7 @@ import de.golfgl.lightblocks.multiplayer.INsdHelper;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
+import de.golfgl.lightblocks.state.Player;
 
 import static com.badlogic.gdx.Gdx.app;
 
@@ -51,6 +52,7 @@ public class LightBlocksGame extends Game {
     public Sound swoshSound;
     public ShareHandler share;
     public AbstractMultiplayerRoom multiRoom;
+    public Player player;
 
     public MainMenuScreen mainMenuScreen;
     public INsdHelper nsdHelper;
@@ -107,6 +109,7 @@ public class LightBlocksGame extends Game {
         swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
 
         savegame = new GameStateHandler();
+        player = new Player();
 
         mainMenuScreen = new MainMenuScreen(this);
         this.setScreen(mainMenuScreen);

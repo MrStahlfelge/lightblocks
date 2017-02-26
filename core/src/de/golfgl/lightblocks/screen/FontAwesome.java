@@ -84,7 +84,7 @@ public class FontAwesome {
     public static String NET_FACEBOOK = "\uF09A";
     public static String NET_TWITTER = "\uF099";
     public static String NET_CLOUDSAVE = "\uF0EE";
-    public static String NET_LINK = "\uF08E";
+    public static String NET_SQUARELINK = "\uF08E";
     public static String NET_PEOPLE = "\uF0C0";
     public static String NET_PERSON = "\uF007";
     public static String NET_ADDPERSON = "\uF234";

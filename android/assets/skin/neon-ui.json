@@ -325,8 +325,15 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
 	default: {
 		font: font
-		fontColorSelected: selected
-		fontColorUnselected: text
+		fontColorSelected: text-selected
+		fontColorUnselected: disabled
+		selection: color
+		background: list-c
+	}
+	big: {
+		font: qs-25-bold
+		fontColorSelected: text-selected
+		fontColorUnselected: disabled
 		selection: color
 		background: list-c
 	}
