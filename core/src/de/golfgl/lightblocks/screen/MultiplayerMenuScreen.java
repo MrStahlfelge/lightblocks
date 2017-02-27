@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
@@ -15,7 +16,7 @@ import de.golfgl.lightblocks.scenes.FATextButton;
 
 /**
  * Multiplayer Screen where players fill rooms to play
- *
+ * <p>
  * Created by Benjamin Schulte on 24.02.2017.
  */
 
@@ -98,7 +99,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 app.multiRoom = null;
             } else {
                 initializeKryonetRoom();
-                app.multiRoom.createRoom(app.player);
+                app.multiRoom.openRoom(app.player);
             }
 
         } catch (VetoException e) {
@@ -153,37 +154,22 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
 
     @Override
-    public void multiPlayerRoomStateChanged(final boolean joined) {
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                setOpenJoinRoomButtons();
-            }
-        });
+    public void multiPlayerRoomStateChanged(AbstractMultiplayerRoom.RoomState roomState) {
+        setOpenJoinRoomButtons();
 
         // wenn raus, dann playerlist neu machen
-        if (!joined)
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    refreshPlayerList();
-                }
-            });
-
-
+        if (roomState == AbstractMultiplayerRoom.RoomState.closed)
+            refreshPlayerList();
     }
 
     @Override
-    public void multiPlayerRoomInhabitantsChanged(final MultiPlayerObjects.PlayersChanged mpo) {
+    public void multiPlayerRoomInhabitantsChanged(final MultiPlayerObjects.PlayerChanged mpo) {
+        refreshPlayerList();
+    }
 
-        // die Änderung im GUI-Thread durchführen damit wir keinen Stress kriegen
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                refreshPlayerList();
-            }
-        });
-
+    @Override
+    public void multiPlayerGotErrorMessage(Object o) {
+        // Got an error message from networking
     }
 
     protected void refreshPlayerList() {
@@ -193,9 +179,9 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         else {
             Table playersTable = new Table();
 
-            for (MultiPlayerObjects.Player player : app.multiRoom.getPlayers()) {
+            for (String player : app.multiRoom.getPlayers()) {
                 playersTable.row();
-                playersTable.add(new Label(player.name, app.skin, LightBlocksGame.SKIN_FONT_BIG)).minWidth
+                playersTable.add(new Label(player, app.skin, LightBlocksGame.SKIN_FONT_BIG)).minWidth
                         (LightBlocksGame.nativeGameWidth * .5f);
             }
 

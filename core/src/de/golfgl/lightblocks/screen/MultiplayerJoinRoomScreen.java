@@ -6,9 +6,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
+import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
+import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.FATextButton;
 
 /**
@@ -17,7 +21,7 @@ import de.golfgl.lightblocks.scenes.FATextButton;
  * Created by Benjamin Schulte on 26.02.2017.
  */
 
-public class MultiplayerJoinRoomScreen extends AbstractMenuScreen {
+public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRoomListener {
     private List<IRoomLocation> hostList;
     private float timeSinceHostListRefresh;
     private IRoomLocation lastSelectedRoom;
@@ -61,8 +65,10 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen {
                 } catch (VetoException e) {
                     showDialog(e.getMessage());
                 }
-                if (app.multiRoom.isConnected())
-                    goBackToMenu();
+
+                // wenn bis hierher gekommen, dann ist die Connection aufgebaut und der Handshake gesendet.
+                // die Antwort kommt per roomStateChange
+
             }
         });
         joinRoomButton.setDisabled(true);
@@ -107,6 +113,7 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen {
     @Override
     public void dispose() {
         app.multiRoom.stopRoomDiscovery();
+        app.multiRoom.removeListener(this);
 
         super.dispose();
     }
@@ -116,6 +123,7 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen {
         super.show();
 
         try {
+            app.multiRoom.addListener(this);
             app.multiRoom.startRoomDiscovery();
         } catch (VetoException e) {
             showDialog(e.getMessage());
@@ -143,5 +151,23 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen {
 
         }
 
+    }
+
+    @Override
+    public void multiPlayerRoomStateChanged(AbstractMultiplayerRoom.RoomState roomState) {
+        // join -> gut
+        if (roomState.equals(AbstractMultiplayerRoom.RoomState.join))
+            goBackToMenu();
+    }
+
+    @Override
+    public void multiPlayerRoomInhabitantsChanged(MultiPlayerObjects.PlayerChanged mpo) {
+        // interessiert mich nicht
+    }
+
+    @Override
+    public void multiPlayerGotErrorMessage(Object o) {
+        if (o instanceof MultiPlayerObjects.Handshake)
+            showDialog(o.toString());
     }
 }

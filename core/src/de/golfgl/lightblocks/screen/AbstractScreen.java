@@ -24,7 +24,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 public abstract class AbstractScreen implements Screen {
     protected final LightBlocksGame app;
     protected Stage stage;
-    private Screen backScreen;
+    protected Screen backScreen;
 
     public AbstractScreen(LightBlocksGame app) {
         this.app = app;

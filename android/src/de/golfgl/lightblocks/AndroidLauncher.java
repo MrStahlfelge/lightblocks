@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.rafakob.nsdhelper.NsdHelper;
 
 import de.golfgl.lightblocks.multiplayer.NsdAdapter;
+import de.golfgl.lightblocks.state.Player;
 
 public class AndroidLauncher extends AndroidApplication {
 
@@ -24,8 +26,15 @@ public class AndroidLauncher extends AndroidApplication {
         config.useWakelock = true;
 
         LightBlocksGame game = new LightBlocksGame();
+
+        // Sharing is caring - daher mit diesem Handler den nativen Android-Dialog aufrufen
         game.share = new AndroidShareHandler();
 
+        // den Playernamen legen wir auf das Gerätemodell
+        game.player = new Player();
+        game.player.setGamerId(Build.MODEL);
+
+        // Network Serice Discovery
         this.nsdAdapter = new NsdAdapter(this);
         game.nsdHelper = nsdAdapter;
 

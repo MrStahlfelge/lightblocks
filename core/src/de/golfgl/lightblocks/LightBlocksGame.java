@@ -109,7 +109,9 @@ public class LightBlocksGame extends Game {
         swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
 
         savegame = new GameStateHandler();
-        player = new Player();
+
+        if (player == null)
+            player = new Player();
 
         mainMenuScreen = new MainMenuScreen(this);
         this.setScreen(mainMenuScreen);

@@ -10,7 +10,7 @@ import com.rafakob.nsdhelper.NsdType;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,8 +58,10 @@ public class NsdAdapter implements INsdHelper, NsdListener {
     public void onNsdServiceResolved(NsdService nsdService) {
         if (nsdService.getName().startsWith(SERVICE_NAME)) {
             try {
-                currentServices.put(nsdService.getName().substring(SERVICE_NAME.length() + 1), InetAddress.getByName
-                        (nsdService.getHost().getHostName()));
+                synchronized (currentServices) {
+                    currentServices.put(nsdService.getName().substring(SERVICE_NAME.length() + 1), InetAddress.getByName
+                            (nsdService.getHost().getHostName()));
+                }
             } catch (UnknownHostException e) {
                 // eat
             }
@@ -69,9 +71,11 @@ public class NsdAdapter implements INsdHelper, NsdListener {
 
     @Override
     public void onNsdServiceLost(NsdService nsdService) {
-        if (nsdService.getName().startsWith(SERVICE_NAME)) {
-            currentServices.remove(nsdService.getName().substring(SERVICE_NAME.length() + 1));
-        }
+        if (nsdService.getName().startsWith(SERVICE_NAME))
+            synchronized (currentServices) {
+                currentServices.remove(nsdService.getName().substring(SERVICE_NAME.length() + 1));
+            }
+
     }
 
     @Override
@@ -107,10 +111,12 @@ public class NsdAdapter implements INsdHelper, NsdListener {
     @Override
     public List<IRoomLocation> getDiscoveredServices() {
 
-        List<IRoomLocation> retVal = new ArrayList<>();
+        List<IRoomLocation> retVal = new LinkedList<>();
 
-        for (Map.Entry<String, InetAddress> entry : currentServices.entrySet()) {
-            retVal.add(new KryonetRoomLocation(entry.getKey(), entry.getValue()));
+        synchronized (currentServices) {
+            for (Map.Entry<String, InetAddress> entry : currentServices.entrySet()) {
+                retVal.add(new KryonetRoomLocation(entry.getKey(), entry.getValue()));
+            }
         }
 
         return retVal;

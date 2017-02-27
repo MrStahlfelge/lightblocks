@@ -6,14 +6,27 @@ import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 
 /**
  * This class represents the player
- *
+ * <p>
  * Created by Benjamin Schulte on 26.02.2017.
  */
 
 public class Player {
 
+    private String gamerId;
+
     public String getName() {
-        return Integer.toString(MathUtils.random(100, 999));
+        if (gamerId == null)
+            return Integer.toString(MathUtils.random(100, 999));
+        else
+            return gamerId;
+    }
+
+    public String getGamerId() {
+        return gamerId;
+    }
+
+    public void setGamerId(String gamerId) {
+        this.gamerId = gamerId;
     }
 
     public MultiPlayerObjects.Player toKryoPlayer() {
@@ -22,4 +35,5 @@ public class Player {
 
         return kp;
     }
+
 }

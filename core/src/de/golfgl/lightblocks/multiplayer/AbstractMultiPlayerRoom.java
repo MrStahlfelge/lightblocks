@@ -2,8 +2,8 @@ package de.golfgl.lightblocks.multiplayer;
 
 import com.badlogic.gdx.utils.Array;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.Player;
@@ -17,6 +17,25 @@ import de.golfgl.lightblocks.state.Player;
 public abstract class AbstractMultiplayerRoom {
 
     protected Array<IRoomListener> listeners = new Array<IRoomListener>(0);
+    private RoomState roomState = RoomState.closed;
+
+    /**
+     * returns current state of this room
+     */
+    public RoomState getRoomState() {
+        return roomState;
+    }
+
+    protected void setRoomState(final RoomState roomState) {
+
+        if (!this.roomState.equals(roomState)) {
+            this.roomState = roomState;
+
+            for (IRoomListener l : listeners) {
+                l.multiPlayerRoomStateChanged(roomState);
+            }
+        }
+    }
 
     public abstract boolean isOwner();
 
@@ -31,7 +50,7 @@ public abstract class AbstractMultiplayerRoom {
      *
      * @param player
      */
-    public abstract void createRoom(Player player) throws VetoException;
+    public abstract void openRoom(Player player) throws VetoException;
 
     /**
      * closes a multiplayer room
@@ -62,6 +81,20 @@ public abstract class AbstractMultiplayerRoom {
         listeners.clear();
     }
 
-    public abstract Collection<MultiPlayerObjects.Player> getPlayers();
+    public abstract Set<String> getPlayers();
+
+    protected void informRoomInhabitantsChanged(final MultiPlayerObjects.PlayerChanged pc) {
+        for (IRoomListener l : listeners) {
+            l.multiPlayerRoomInhabitantsChanged(pc);
+        }
+    }
+
+    protected void informGotErrorMessage(final Object o) {
+        for (IRoomListener l : listeners) {
+            l.multiPlayerGotErrorMessage(o);
+        }
+    }
+
+    public enum RoomState {closed, join, inGame}
 
 }
