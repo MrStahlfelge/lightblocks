@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.multiplayer;
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
@@ -33,8 +34,9 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
     final private KryonetListener thisListener;
     final private PlayersInRoom players;
 
-    // connection id -> gamerId - nur für Server
-    private Map<Integer, String> playerConnections;
+    // connection id -> playerId - nur für Server
+    private Map<Integer, String> connectionToPlayer;
+    private Map<String, Integer> playerToConnection;
 
     private Server server;
     private Client client;
@@ -46,7 +48,8 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
     public KryonetMultiplayerRoom() {
         players = new PlayersInRoom();
         thisListener = new KryonetListener();
-        playerConnections = new HashMap<Integer, String>();
+        connectionToPlayer = new HashMap<Integer, String>();
+        playerToConnection = new HashMap<String, Integer>();
     }
 
     public boolean isOwner() {
@@ -59,8 +62,6 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
     }
 
     public int getNumberOfPlayers() {
-        // Diese synchronized könnten alle wieder raus seitdem der QueueListener aktiv ist.
-        // Es bleibt aber erstmal drin falls das Ausführen aller Codes nur auf dem Renderthread nicht geht.
         synchronized (players) {
             return players.size();
         }
@@ -97,11 +98,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         }
         MultiPlayerObjects.register(server.getKryo());
 
-        server.addListener(new Listener.QueuedListener(thisListener) {
-            protected void queue (Runnable runnable) {
-                Gdx.app.postRunnable(runnable);
-            }
-        });
+        server.addListener(thisListener);
 
         if (nsdHelper != null)
             nsdHelper.registerService();
@@ -111,7 +108,9 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
 
         synchronized (players) {
             final MultiPlayerObjects.Player kp = player.toKryoPlayer();
-            playerConnections.put(0, kp.name);
+            connectionToPlayer.put(0, kp.name);
+            playerToConnection.put(kp.name, 0);
+            myPlayerId = kp.name;
             players.put(kp.name, kp);
         }
 
@@ -139,7 +138,8 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             server = null;
 
             players.clear();
-            playerConnections.clear();
+            connectionToPlayer.clear();
+            playerToConnection.clear();
         }
 
         setRoomState(RoomState.closed);
@@ -158,21 +158,60 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         }
 
         try {
-            client.connect(500, ((KryonetRoomLocation) roomLoc).address, TCP_PORT, UDP_PORT);
+            client.connect(2000, ((KryonetRoomLocation) roomLoc).address, TCP_PORT, UDP_PORT);
         } catch (IOException e) {
             e.printStackTrace();
             throw new VetoException(e.getLocalizedMessage());
         }
         MultiPlayerObjects.register(client.getKryo());
-        client.addListener(new Listener.QueuedListener(thisListener) {
-            protected void queue (Runnable runnable) {
-                Gdx.app.postRunnable(runnable);
-            }
-        });
+        client.addListener(thisListener);
 
         MultiPlayerObjects.Handshake handshake = new MultiPlayerObjects.Handshake();
-        handshake.gamerId = player.getName();
+        handshake.playerId = player.getName();
         client.sendTCP(handshake);
+    }
+
+    @Override
+    public void sendToPlayer(String playerId, Object message) {
+
+        if (playerId.equals(myPlayerId))
+            Log.warn("Multiplayer", "Message to myself - ignored");
+
+        // SERVER
+        if (isOwner()) {
+            // ok, ich bin der Server... also die Connection raussuchen und ab
+            Integer connectionId = playerToConnection.get(playerId);
+
+            if (connectionId == null)
+                Log.error("Multiplayer", "Should send to player with no connection: " + playerId);
+            else
+                server.sendToTCP(connectionId, message);
+        }
+
+        // CLIENT
+        else {
+            MultiPlayerObjects.RelayToPlayer fwd = new MultiPlayerObjects.RelayToPlayer();
+            fwd.recipient = playerId;
+            fwd.message = message;
+            client.sendTCP(fwd);
+        }
+    }
+
+    @Override
+    public void sendToAllPlayers(Object message) {
+        if (isOwner())
+            server.sendToAllTCP(message);
+
+        else
+            sendToPlayer(MultiPlayerObjects.PLAYERS_ALL, message);
+    }
+
+    @Override
+    public void sendToAllPlayersExcept(String playerId, Object message) {
+        for (String player : getPlayers()) {
+            if (!player.equals(myPlayerId) && !player.equals(playerId))
+                sendToPlayer(player, message);
+        }
     }
 
     @Override
@@ -194,15 +233,23 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             nsdHelper.startDiscovery();
         else {
 
+            // nur unter Windows...
             udpPollReply = new ArrayList<IRoomLocation>(1);
 
-            Client client = new Client();
-            client.start();
-            InetAddress address = client.discoverHost(UDP_PORT, 50);
-            client.stop();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Client client = new Client();
+                    client.start();
+                    InetAddress address = client.discoverHost(UDP_PORT, 200);
+                    client.stop();
 
-            if (address != null)
-                udpPollReply.add(new KryonetRoomLocation(address.getHostName(), address));
+                    if (address != null)
+                        synchronized (udpPollReply) {
+                            udpPollReply.add(new KryonetRoomLocation(address.getHostName(), address));
+                        }
+                }
+            }).start();
         }
 
     }
@@ -217,7 +264,9 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
     public List<IRoomLocation> getDiscoveredRooms() {
 
         if (nsdHelper == null) {
-            return udpPollReply;
+            synchronized (udpPollReply) {
+                return udpPollReply;
+            }
         } else {
             return nsdHelper.getDiscoveredServices();
         }
@@ -239,24 +288,28 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
 
             //hier kann jetzt die Version geprüft werden
 
-            if(handshake.interfaceVersion != MultiPlayerObjects.INTERFACE_VERSION) {
+            if (handshake.interfaceVersion != MultiPlayerObjects.INTERFACE_VERSION) {
                 handshake.success = false;
                 handshake.message = "Interface versions differ. Use same Lightblocks version.";
             } else if (!getRoomState().equals(RoomState.join)) {
                 handshake.success = false;
                 handshake.message = "Room cannot be joined at the moment.";
+//            } else if (getNumberOfPlayers() >= 2) {
+//                handshake.success = false;
+//                handshake.message = "Room is full.";
             } else
                 synchronized (players) {
                     // Spielername eindeutig?
-                    while (players.containsKey(handshake.gamerId))
-                        handshake.gamerId += "!";
+                    while (players.containsKey(handshake.playerId))
+                        handshake.playerId += "!";
 
                     MultiPlayerObjects.Player newPlayer = new MultiPlayerObjects.Player();
-                    newPlayer.name = handshake.gamerId;
+                    newPlayer.name = handshake.playerId;
                     newPlayer.lightblocksVersion = handshake.lightblocksVersion;
 
-                    players.put(handshake.gamerId, newPlayer);
-                    playerConnections.put(connection.getID(), handshake.gamerId);
+                    players.put(handshake.playerId, newPlayer);
+                    connectionToPlayer.put(connection.getID(), handshake.playerId);
+                    playerToConnection.put(handshake.playerId, connection.getID());
                 }
 
             handshake.lightblocksVersion = LightBlocksGame.GAME_VERSIONSTRING;
@@ -267,6 +320,8 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             if (!handshake.success)
                 connection.close();
             else {
+                // Begrüßung
+                connection.sendTCP(getRoomState());
                 synchronized (players) {
                     for (MultiPlayerObjects.Player player : players.values()) {
                         MultiPlayerObjects.PlayerChanged pc = new MultiPlayerObjects.PlayerChanged();
@@ -280,6 +335,10 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             // wenn Client, dann bin ich hiermit drin! - Name kann aber geändert worden sein
             if (handshake.success) {
                 Log.info("Multiplayer", handshake.toString());
+                myPlayerId = handshake.playerId;
+
+                // der Server sendet den Roomstate gleich noch einmal. Aber er muss hier schonmal auf Join
+                // geändert werden damit diese Message akzeptiert wird.
                 setRoomState(RoomState.join);
             } else {
                 Log.warn("Multiplayer", handshake.toString());
@@ -313,6 +372,23 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         }
     }
 
+    private void handleRelayObject(Connection connection, MultiPlayerObjects.RelayToPlayer fwd) {
+        if (!isOwner()) {
+            Log.error("Multiplayer", "Should relay message but I am a client.");
+            return;
+        }
+
+        if (fwd.recipient.equals(myPlayerId))
+            thisListener.received(connection, fwd.message);
+
+        else if (fwd.recipient.equals(MultiPlayerObjects.PLAYERS_ALL)) {
+            // soll an alle gehen. Außer natürlich an den Absender
+            sendToAllPlayersExcept(connectionToPlayer.get(connection.getID()), fwd.message);
+            thisListener.received(connection, fwd.message);
+        } else
+            sendToPlayer(fwd.recipient, fwd.message);
+    }
+
     private class KryonetListener extends Listener {
         @Override
         public void disconnected(Connection connection) {
@@ -325,25 +401,45 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                 setRoomState(RoomState.closed);
 
             } else {
-                String gamerId = playerConnections.get(connection.getID());
-                Log.info("Multiplayer", gamerId + " disconnected");
+                String playerId = connectionToPlayer.get(connection.getID());
+                Log.info("Multiplayer", playerId + " disconnected");
 
                 synchronized (players) {
-                    MultiPlayerObjects.Player removedPlayer = players.remove(gamerId);
-                    playerConnections.remove(connection.getID());
+                    players.remove(playerId);
                 }
             }
         }
 
         @Override
         public void received(Connection connection, Object object) {
-            if (object instanceof MultiPlayerObjects.Handshake)
+            if (object instanceof MultiPlayerObjects.Handshake) {
                 //HANDSHAKE ist gekommen
                 handleHandshake(connection, (MultiPlayerObjects.Handshake) object);
+                return;
+            }
+
+            if (getRoomState() == RoomState.closed) {
+                Log.warn("Multiplayer", "Got information before handshake - ignored");
+                return;
+            }
 
             if (object instanceof MultiPlayerObjects.PlayerChanged) {
                 handlePlayersChanged((MultiPlayerObjects.PlayerChanged) object);
+                return;
             }
+
+            if (!isOwner() && object instanceof RoomState) {
+                setRoomState((RoomState) object);
+                return;
+            }
+
+            if (object instanceof MultiPlayerObjects.RelayToPlayer) {
+                handleRelayObject(connection, (MultiPlayerObjects.RelayToPlayer) object);
+                return;
+            }
+
+            if (!(object instanceof FrameworkMessage))
+                Log.warn("Multiplayer", "Got object without knowing what it is: " + object.toString());
         }
     }
 
@@ -360,8 +456,13 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             pc.changeType = (retVal == null ? MultiPlayerObjects.CHANGE_ADD : MultiPlayerObjects.CHANGE_UPDATE);
             pc.changedPlayer = player;
 
-            if (isOwner())
-                server.sendToAllTCP(pc);
+            if (isOwner()) {
+                // wenn gerade neu hinzugekommen den Spieler noch nicht benachrichtigen
+                if (pc.changeType == MultiPlayerObjects.CHANGE_ADD)
+                    sendToAllPlayersExcept(key, pc);
+                else
+                    sendToAllPlayers(pc);
+            }
 
             informRoomInhabitantsChanged(pc);
 
@@ -377,8 +478,10 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                 pc.changedPlayer = removedPlayer;
                 pc.changeType = MultiPlayerObjects.CHANGE_REMOVE;
 
-                if (isOwner())
-                    server.sendToAllTCP(pc);
+                if (isOwner()) {
+                    connectionToPlayer.remove(playerToConnection.remove(removedPlayer.name));
+                    sendToAllPlayers(pc);
+                }
 
                 informRoomInhabitantsChanged(pc);
             }

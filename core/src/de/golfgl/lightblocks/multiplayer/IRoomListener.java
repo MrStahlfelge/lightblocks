@@ -3,8 +3,7 @@ package de.golfgl.lightblocks.multiplayer;
 /**
  * To this listener multiplayer rooms send their messages
  * <p>
- * IMPORTANT: All methods are called on the render thread. The caller is reponsible, not the listener implementing
- * class!
+ * IMPORTANT: Methods are most likely not be called on render thread!
  * <p>
  * <p>
  * Created by Benjamin Schulte on 26.02.2017.

@@ -1,12 +1,12 @@
 package de.golfgl.lightblocks.screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -62,6 +62,7 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
 
                 try {
                     app.multiRoom.joinRoom(lastSelectedRoom, app.player);
+                    joinRoomButton.setDisabled(true);
                 } catch (VetoException e) {
                     showDialog(e.getMessage());
                 }
@@ -115,6 +116,14 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
         app.multiRoom.stopRoomDiscovery();
         app.multiRoom.removeListener(this);
 
+        // Verbindungsanfrage hängt oder es wurde keine gestellt
+        if (app.multiRoom.getRoomState() == AbstractMultiplayerRoom.RoomState.closed)
+            try {
+                app.multiRoom.leaveRoom(true);
+            } catch (VetoException e) {
+                // kann nichts kommen
+            }
+
         super.dispose();
     }
 
@@ -157,7 +166,13 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
     public void multiPlayerRoomStateChanged(AbstractMultiplayerRoom.RoomState roomState) {
         // join -> gut
         if (roomState.equals(AbstractMultiplayerRoom.RoomState.join))
-            goBackToMenu();
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    goBackToMenu();
+
+                }
+            });
     }
 
     @Override
@@ -166,8 +181,14 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
     }
 
     @Override
-    public void multiPlayerGotErrorMessage(Object o) {
+    public void multiPlayerGotErrorMessage(final Object o) {
         if (o instanceof MultiPlayerObjects.Handshake)
-            showDialog(o.toString());
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    showDialog(o.toString());
+                    joinRoomButton.setDisabled(false);
+                }
+            });
     }
 }

@@ -17,22 +17,31 @@ import de.golfgl.lightblocks.state.Player;
 public abstract class AbstractMultiplayerRoom {
 
     protected Array<IRoomListener> listeners = new Array<IRoomListener>(0);
+    protected String myPlayerId;
     private RoomState roomState = RoomState.closed;
+
+    public String getMyPlayerId() {
+        return myPlayerId;
+    }
 
     /**
      * returns current state of this room
      */
     public RoomState getRoomState() {
-        return roomState;
+        synchronized (roomState) {
+            return roomState;
+        }
     }
 
     protected void setRoomState(final RoomState roomState) {
 
-        if (!this.roomState.equals(roomState)) {
-            this.roomState = roomState;
+        synchronized (roomState) {
+            if (!this.roomState.equals(roomState)) {
+                this.roomState = roomState;
 
-            for (IRoomListener l : listeners) {
-                l.multiPlayerRoomStateChanged(roomState);
+                for (IRoomListener l : listeners) {
+                    l.multiPlayerRoomStateChanged(roomState);
+                }
             }
         }
     }
@@ -60,6 +69,12 @@ public abstract class AbstractMultiplayerRoom {
     public abstract void closeRoom(boolean force) throws VetoException;
 
     public abstract void joinRoom(IRoomLocation roomLoc, Player player) throws VetoException;
+
+    public abstract void sendToPlayer(String playerId, Object message);
+
+    public abstract void sendToAllPlayers(Object message);
+
+    public abstract void sendToAllPlayersExcept(String playerId, Object message);
 
     public abstract void leaveRoom(boolean force) throws VetoException;
 

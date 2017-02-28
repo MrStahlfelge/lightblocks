@@ -154,17 +154,29 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
 
     @Override
-    public void multiPlayerRoomStateChanged(AbstractMultiplayerRoom.RoomState roomState) {
-        setOpenJoinRoomButtons();
+    public void multiPlayerRoomStateChanged(final AbstractMultiplayerRoom.RoomState roomState) {
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                setOpenJoinRoomButtons();
 
-        // wenn raus, dann playerlist neu machen
-        if (roomState == AbstractMultiplayerRoom.RoomState.closed)
-            refreshPlayerList();
+                // wenn raus, dann playerlist neu machen
+                if (roomState == AbstractMultiplayerRoom.RoomState.closed)
+                    refreshPlayerList();
+
+            }
+        });
+
     }
 
     @Override
     public void multiPlayerRoomInhabitantsChanged(final MultiPlayerObjects.PlayerChanged mpo) {
-        refreshPlayerList();
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                refreshPlayerList();
+            }
+        });
     }
 
     @Override
@@ -181,7 +193,11 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
             for (String player : app.multiRoom.getPlayers()) {
                 playersTable.row();
-                playersTable.add(new Label(player, app.skin, LightBlocksGame.SKIN_FONT_BIG)).minWidth
+                String playerLabel = player;
+                if (player.equals(app.multiRoom.getMyPlayerId()))
+                    playerLabel = "* " + playerLabel;
+
+                playersTable.add(new Label(playerLabel, app.skin, LightBlocksGame.SKIN_FONT_BIG)).minWidth
                         (LightBlocksGame.nativeGameWidth * .5f);
             }
 
