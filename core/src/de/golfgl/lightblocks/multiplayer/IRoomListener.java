@@ -24,4 +24,11 @@ public interface IRoomListener {
     public void multiPlayerRoomInhabitantsChanged(MultiPlayerObjects.PlayerChanged mpo);
 
     public void multiPlayerGotErrorMessage(Object o);
+
+    /**
+     * called for every message that is not managed by the room. Probably it is a message for the game model
+     *
+     * @param o the message
+     */
+    public void multiPlayerGotModelMessage(Object o);
 }

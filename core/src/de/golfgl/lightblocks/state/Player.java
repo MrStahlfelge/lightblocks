@@ -16,7 +16,7 @@ public class Player {
 
     public String getName() {
         if (gamerId == null)
-            return Integer.toString(MathUtils.random(100, 999));
+            return "SUPERDEV";
         else
             return gamerId;
     }

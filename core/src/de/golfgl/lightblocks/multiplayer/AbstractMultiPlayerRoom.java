@@ -35,13 +35,29 @@ public abstract class AbstractMultiplayerRoom {
 
     protected void setRoomState(final RoomState roomState) {
 
+        // keep sync block small
+        boolean changed = false;
+
         synchronized (roomState) {
             if (!this.roomState.equals(roomState)) {
                 this.roomState = roomState;
+                changed = true;
+            }
+        }
 
-                for (IRoomListener l : listeners) {
-                    l.multiPlayerRoomStateChanged(roomState);
-                }
+        if (changed) {
+
+            if (isOwner()) {
+                MultiPlayerObjects.RoomStateChanged rsc = new MultiPlayerObjects.RoomStateChanged();
+                rsc.roomState = roomState;
+                rsc.refereePlayerId = myPlayerId;
+                //TODO Stellvertreter
+                sendToAllPlayers(rsc);
+            }
+
+            // auch mich selbst benachrichtigen
+            for (IRoomListener l : listeners) {
+                l.multiPlayerRoomStateChanged(roomState);
             }
         }
     }
@@ -60,6 +76,22 @@ public abstract class AbstractMultiplayerRoom {
      * @param player
      */
     public abstract void openRoom(Player player) throws VetoException;
+
+    /**
+     * starts a new game if allowed to
+     *
+     * @throws VetoException if not allowed to start the game
+     */
+    public void startGame() throws VetoException {
+        if (!getRoomState().equals(RoomState.join))
+            throw new VetoException("Cannot start a game, room is closed or game already running.");
+        if (getNumberOfPlayers() < 2)
+            throw new VetoException("You need at least two players.");
+        if (!isOwner())
+            throw new VetoException("Only game owner can start a game.");
+
+        setRoomState(RoomState.inGame);
+    }
 
     /**
      * closes a multiplayer room
@@ -87,7 +119,8 @@ public abstract class AbstractMultiplayerRoom {
     public abstract List<IRoomLocation> getDiscoveredRooms();
 
     public void addListener(IRoomListener listener) {
-        listeners.add(listener);
+        if (!listeners.contains(listener, true))
+            listeners.add(listener);
     }
 
     public void removeListener(IRoomListener listener) {
@@ -109,6 +142,12 @@ public abstract class AbstractMultiplayerRoom {
     protected void informGotErrorMessage(final Object o) {
         for (IRoomListener l : listeners) {
             l.multiPlayerGotErrorMessage(o);
+        }
+    }
+
+    protected void informGotGameModelMessage(final Object o) {
+        for (IRoomListener l : listeners) {
+            l.multiPlayerGotModelMessage(o);
         }
     }
 

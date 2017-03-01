@@ -60,7 +60,7 @@ public class ScoreScreen extends AbstractScoreScreen {
 
     @Override
     protected String getSubtitle() {
-        return app.TEXTS.get(gameModelId);
+        return app.TEXTS.get("labelModel_" + gameModelId);
     }
 
     @Override

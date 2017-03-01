@@ -129,19 +129,22 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         synchronized (players) {
             if (!force && players.size() > 1)
                 throw new VetoException("Players must leave your room before you can close it.");
+        }
 
-            if (nsdHelper != null)
-                nsdHelper.unregisterService();
+        setRoomState(RoomState.closed);
 
-            server.close();
-            server = null;
+        if (nsdHelper != null)
+            nsdHelper.unregisterService();
 
+        server.close();
+        server = null;
+
+        synchronized (players) {
             players.clear();
             connectionToPlayer.clear();
             playerToConnection.clear();
         }
 
-        setRoomState(RoomState.closed);
     }
 
     @Override
@@ -418,6 +421,9 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                 synchronized (players) {
                     players.remove(playerId);
                 }
+
+                if (getNumberOfPlayers() < 2 && getRoomState().equals(RoomState.inGame))
+                    setRoomState(RoomState.join);
             }
         }
 
@@ -442,6 +448,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             }
 
             if (!isOwner() && object instanceof MultiPlayerObjects.RoomStateChanged) {
+                Log.info("Multiplayer", "Received change of " + object.toString());
                 setRoomState(((MultiPlayerObjects.RoomStateChanged) object).roomState);
                 // die anderen Felder referee und deputy sind für Kryonet-Connections egal
                 return;
@@ -452,8 +459,10 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                 return;
             }
 
-            if (!(object instanceof FrameworkMessage))
-                Log.warn("Multiplayer", "Got object without knowing what it is: " + object.toString());
+            if (!(object instanceof FrameworkMessage)) {
+                Log.info("Multiplayer", "Got game object: " + object.toString());
+                informGotGameModelMessage(object);
+            }
         }
     }
 

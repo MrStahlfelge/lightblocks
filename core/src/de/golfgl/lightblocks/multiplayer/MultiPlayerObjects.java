@@ -14,7 +14,8 @@ import de.golfgl.lightblocks.LightBlocksGame;
 
 public class MultiPlayerObjects {
 
-    public static final int INTERFACE_VERSION = 1;
+    // *** BEI JEDER ÄNDERUNG HOCHZÄHLEN!!! ***
+    public static final int INTERFACE_VERSION = 2;
 
     public static final int CHANGE_ADD = 1;
     public static final int CHANGE_UPDATE = 2;
@@ -24,16 +25,24 @@ public class MultiPlayerObjects {
 
     // This registers objects that are going to be sent over the network.
     public static void register(Kryo kryo) {
+        // *** HANDSHAKE MUSS DIE ERSTE REGISTRIERTE KLASSE SEIN!!! ***
         kryo.register(Handshake.class);
+        // und nun die weiteren Klassen registrieren =>
         kryo.register(AbstractMultiplayerRoom.RoomState.class);
         kryo.register(RoomStateChanged.class);
         kryo.register(Player.class);
         kryo.register(PlayerChanged.class);
         kryo.register(ArrayList.class);
         kryo.register(RelayToPlayer.class);
+
+        // GameModel
+        kryo.register(SwitchedPause.class);
+        kryo.register(PlayerIsOver.class);
+        kryo.register(GameIsOver.class);
     }
 
     public static class Handshake {
+        // *** AN DIESER KLASSE DÜRFEN KEINERLEI VERÄNDERUNGEN GEMACHT WERDEN!!! ***
         public byte interfaceVersion = INTERFACE_VERSION;
         public String lightblocksVersion = LightBlocksGame.GAME_VERSIONSTRING;
         public boolean success;
@@ -53,6 +62,11 @@ public class MultiPlayerObjects {
         public AbstractMultiplayerRoom.RoomState roomState;
         public String refereePlayerId;
         public String debutyPlayerId;
+
+        @Override
+        public String toString() {
+            return "Room state: " + roomState + ", Host: " + refereePlayerId;
+        }
     }
 
     public static class Player {
@@ -70,4 +84,21 @@ public class MultiPlayerObjects {
         public Object message;
     }
 
+    public static class SwitchedPause {
+        public boolean nowPaused;
+
+        public SwitchedPause withPaused(boolean paused) {
+            nowPaused = paused;
+            return this;
+        }
+    }
+
+    public static class PlayerIsOver {
+        public int finalScore;
+        public String playerId;
+    }
+
+    public static class GameIsOver {
+        public String winnerPlayerId;
+    }
 }

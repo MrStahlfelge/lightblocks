@@ -9,7 +9,9 @@ package de.golfgl.lightblocks.model;
 public class MultiplayerModel extends GameModel {
 
     public static final String MODEL_ID = "multiplayer";
-    private byte numberOfPlayers;
+
+    //TODO!
+    private byte numberOfPlayers = 2;
 
     @Override
     public String getIdentifier() {
@@ -20,5 +22,11 @@ public class MultiplayerModel extends GameModel {
     public String saveGameModel() {
         // Saving multiplayer gamestate is unfortunately impossible
         return null;
+    }
+
+    public void allOtherPlayersHaveGone() {
+        if (!isGameOver())
+            //TODO Glückwunsch - Du bist der Gewinner
+            setGameOverBoardFull();
     }
 }

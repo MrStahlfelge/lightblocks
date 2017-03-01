@@ -326,12 +326,16 @@ public abstract class GameModel implements Json.Serializable {
         // Wenn der neu eingefügte Tetromino keinen Platz mehr hat, ist das Spiel zu Ende
         if (!gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
                 activeTetromino.getCurrentRotation())) {
-            isGameOver = true;
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.gameOver, null);
-            userInterface.setGameOver();
+            setGameOverBoardFull();
         } else
             score.incDrawnTetrominos();
 
+    }
+
+    protected void setGameOverBoardFull() {
+        isGameOver = true;
+        userInterface.showMotivation(IGameModelListener.MotivationTypes.gameOver, null);
+        userInterface.setGameOver();
     }
 
     /**

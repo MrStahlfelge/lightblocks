@@ -8,11 +8,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.FATextButton;
+import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
  * Multiplayer Screen where players fill rooms to play
@@ -24,6 +26,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
     private FATextButton openRoomButton;
     private FATextButton joinRoomButton;
+    private FATextButton startGameButton;
     private Label lanHelp;
     private Cell mainCell;
 
@@ -43,6 +46,14 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     }
 
     @Override
+    public void dispose() {
+        // und weg mit dem Zeug
+        app.multiRoom = null;
+
+        super.dispose();
+    }
+
+    @Override
     protected void fillButtonTable(Table buttons) {
         openRoomButton = new FATextButton("", "", app.skin);
         openRoomButton.addListener(new ChangeListener() {
@@ -58,6 +69,20 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 joinButtonPressed();
             }
         });
+        startGameButton = new FATextButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
+        startGameButton.addListener(new ChangeListener() {
+                                        public void changed(ChangeEvent event, Actor actor) {
+                                            try {
+                                                //TODO Es ist wichtig, das erst zu machen wenn alle Spieler wieder
+                                                //bereit sind - es könnten noch welche den Highscore bewundern
+                                                app.multiRoom.startGame();
+                                            } catch (VetoException e) {
+                                                showDialog(e.getMessage());
+                                            }
+                                        }
+                                    }
+        );
+
 
         setOpenJoinRoomButtons();
 
@@ -155,17 +180,49 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
     @Override
     public void multiPlayerRoomStateChanged(final AbstractMultiplayerRoom.RoomState roomState) {
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                setOpenJoinRoomButtons();
+        // Raum ist ins Spiel gewechselt
+        if (roomState.equals(AbstractMultiplayerRoom.RoomState.inGame))
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    beginNewMultiplayerGame();
+                }
+            });
 
-                // wenn raus, dann playerlist neu machen
-                if (roomState == AbstractMultiplayerRoom.RoomState.closed)
-                    refreshPlayerList();
+            // ansonsten entweder in Join gewechselt oder in Spiel
+        else
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    setOpenJoinRoomButtons();
 
-            }
-        });
+                    // wenn raus, dann playerlist neu machen
+                    if (roomState == AbstractMultiplayerRoom.RoomState.closed)
+                        refreshPlayerList();
+
+                }
+            });
+
+    }
+
+    private void beginNewMultiplayerGame() {
+        InitGameParameters initGameParametersParams = new InitGameParameters();
+        initGameParametersParams.setGameModelClass(MultiplayerModel.class);
+
+        //TODO - erstmal einfach letzten Input und Level 0
+        initGameParametersParams.setBeginningLevel(0);
+        initGameParametersParams.setInputKey(app.prefs.getInteger("inputType", 0));
+
+        try {
+            MultiplayerPlayScreen mps = (MultiplayerPlayScreen) PlayScreen.gotoPlayScreen(this,
+                    initGameParametersParams);
+            mps.setBackScreen(this);
+
+            app.multiRoom.addListener(mps);
+
+        } catch (VetoException e) {
+            showDialog(e.getMessage());
+        }
 
     }
 
@@ -184,6 +241,11 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         // Got an error message from networking
     }
 
+    @Override
+    public void multiPlayerGotModelMessage(Object o) {
+        // interessiert mich nicht
+    }
+
     protected void refreshPlayerList() {
         final Actor newActor;
         if (app.multiRoom == null || app.multiRoom.getNumberOfPlayers() == 0)
@@ -200,6 +262,17 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 playersTable.add(new Label(playerLabel, app.skin, LightBlocksGame.SKIN_FONT_BIG)).minWidth
                         (LightBlocksGame.nativeGameWidth * .5f);
             }
+
+            playersTable.row().padTop(30);
+
+            if (app.multiRoom.getNumberOfPlayers() < 2) {
+                Label intoCell = new Label(app.TEXTS.get("multiplayerJoinNotEnoughPlayers"), app.skin);
+                intoCell.setWrap(true);
+                playersTable.add(intoCell).fill();
+            } else if (app.multiRoom.isOwner())
+                playersTable.add(startGameButton);
+            else
+                playersTable.add(new Label("Please wait for the host to start the game.", app.skin));
 
             newActor = playersTable;
         }

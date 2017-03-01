@@ -227,4 +227,9 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
                 }
             });
     }
+
+    @Override
+    public void multiPlayerGotModelMessage(Object o) {
+        // interessiert mich nicht
+    }
 }

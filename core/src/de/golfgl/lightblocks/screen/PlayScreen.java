@@ -20,7 +20,6 @@ import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.IGameModelListener;
-import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
@@ -162,7 +161,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
      * @param caller        the AbstractScreen that is calling.
      * @param newGameParams null if game should be resumed.
      */
-    public static void gotoPlayScreen(AbstractScreen caller, InitGameParameters newGameParams) throws
+    public static PlayScreen gotoPlayScreen(AbstractScreen caller, InitGameParameters newGameParams) throws
             VetoException {
 
         boolean resumeGame = (newGameParams == null);
@@ -174,15 +173,31 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             caller.app.savegame.resetGame();
 
         try {
-            final PlayScreen currentGame = new PlayScreen(caller.app, newGameParams);
+            final PlayScreen currentGame;
+            if (newGameParams.isMultiplayer())
+                currentGame = new MultiplayerPlayScreen(caller.app, newGameParams);
+            else
+                currentGame = new PlayScreen(caller.app, newGameParams);
+
             currentGame.setMusic(caller.app.isPlayMusic());
 
             Gdx.input.setInputProcessor(null);
             caller.app.setScreen(currentGame);
 
+            return currentGame;
+
         } catch (InputNotAvailableException inp) {
             throw new VetoException(caller.app.TEXTS.get("errorInputNotAvail"));
         }
+    }
+
+    /**
+     * returns if the game state is currently paused
+     *
+     * @return true if is paused, false if not
+     */
+    public boolean isPaused() {
+        return isPaused;
     }
 
     private void initializeGameModel(InitGameParameters initGameParametersParams) throws InputNotAvailableException,
@@ -329,6 +344,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         }
         scoreScreen.setNewGameParams(gameModel.getInitParameters());
         scoreScreen.setMaxCountingTime(2);
+        scoreScreen.setBackScreen(this.backScreen);
         scoreScreen.initializeUI();
         app.setScreen(scoreScreen);
 
