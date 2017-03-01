@@ -213,6 +213,16 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
     }
 
     @Override
+    public void sendToReferee(Object message) {
+        // bei Kryonet ist der Referee immer der Host.
+        if (isOwner())
+            thisListener.received(null, message);
+
+        else
+            client.sendTCP(message);
+    }
+
+    @Override
     public void leaveRoom(boolean force) throws VetoException {
         if (isOwner())
             closeRoom(force);
@@ -318,8 +328,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             if (!handshake.success)
                 connection.close();
             else {
-                // Begrüßung
-                connection.sendTCP(getRoomState());
+                // Begrüßung: 1. Spieler; 2. RoomState;
                 synchronized (players) {
                     for (MultiPlayerObjects.Player player : players.values()) {
                         MultiPlayerObjects.PlayerChanged pc = new MultiPlayerObjects.PlayerChanged();
@@ -327,6 +336,10 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                         connection.sendTCP(pc);
                     }
                 }
+                MultiPlayerObjects.RoomStateChanged rsc = new MultiPlayerObjects.RoomStateChanged();
+                rsc.refereePlayerId = myPlayerId;
+                rsc.roomState = getRoomState();
+                connection.sendTCP(rsc);
             }
         } else {
             // Client: Antwort
@@ -370,19 +383,19 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         }
     }
 
-    private void handleRelayObject(Connection connection, MultiPlayerObjects.RelayToPlayer fwd) {
+    private void handleRelayObject(Connection senderConnection, MultiPlayerObjects.RelayToPlayer fwd) {
         if (!isOwner()) {
             Log.error("Multiplayer", "Should relay message but I am a client.");
             return;
         }
 
         if (fwd.recipient.equals(myPlayerId))
-            thisListener.received(connection, fwd.message);
+            thisListener.received(senderConnection, fwd.message);
 
         else if (fwd.recipient.equals(MultiPlayerObjects.PLAYERS_ALL)) {
             // soll an alle gehen. Außer natürlich an den Absender
-            sendToAllPlayersExcept(connectionToPlayer.get(connection.getID()), fwd.message);
-            thisListener.received(connection, fwd.message);
+            sendToAllPlayersExcept(connectionToPlayer.get(senderConnection.getID()), fwd.message);
+            thisListener.received(senderConnection, fwd.message);
         } else
             sendToPlayer(fwd.recipient, fwd.message);
     }
@@ -410,6 +423,8 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
 
         @Override
         public void received(Connection connection, Object object) {
+            // ACHTUNG: connection kann null sein, zum Beispiel durch sendToReferee
+
             if (object instanceof MultiPlayerObjects.Handshake) {
                 //HANDSHAKE ist gekommen
                 handleHandshake(connection, (MultiPlayerObjects.Handshake) object);
@@ -426,8 +441,9 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                 return;
             }
 
-            if (!isOwner() && object instanceof RoomState) {
-                setRoomState((RoomState) object);
+            if (!isOwner() && object instanceof MultiPlayerObjects.RoomStateChanged) {
+                setRoomState(((MultiPlayerObjects.RoomStateChanged) object).roomState);
+                // die anderen Felder referee und deputy sind für Kryonet-Connections egal
                 return;
             }
 

@@ -26,6 +26,7 @@ public class MultiPlayerObjects {
     public static void register(Kryo kryo) {
         kryo.register(Handshake.class);
         kryo.register(AbstractMultiplayerRoom.RoomState.class);
+        kryo.register(RoomStateChanged.class);
         kryo.register(Player.class);
         kryo.register(PlayerChanged.class);
         kryo.register(ArrayList.class);
@@ -46,6 +47,12 @@ public class MultiPlayerObjects {
             else
                 return "Joined room with player name " + playerId;
         }
+    }
+
+    public static class RoomStateChanged {
+        public AbstractMultiplayerRoom.RoomState roomState;
+        public String refereePlayerId;
+        public String debutyPlayerId;
     }
 
     public static class Player {

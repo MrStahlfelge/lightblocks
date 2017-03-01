@@ -76,6 +76,8 @@ public abstract class AbstractMultiplayerRoom {
 
     public abstract void sendToAllPlayersExcept(String playerId, Object message);
 
+    public abstract void sendToReferee(Object message);
+
     public abstract void leaveRoom(boolean force) throws VetoException;
 
     public abstract void startRoomDiscovery() throws VetoException;
