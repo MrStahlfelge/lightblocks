@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
@@ -8,10 +9,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
+import de.golfgl.lightblocks.multiplayer.KryonetRoomLocation;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.FATextButton;
 
@@ -81,27 +86,58 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
     protected void fillMenuTable(Table menuTable) {
         hostList = new List<IRoomLocation>(app.skin, LightBlocksGame.SKIN_FONT_BIG);
         selectedRoomLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+        final TextButton enterManually = new TextButton(app.TEXTS.get("multiplayerJoinManually"), app.skin);
 
         hostList.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 final IRoomLocation selectedRoom = hostList.getSelected();
                 if (selectedRoom != null) {
-                    lastSelectedRoom = selectedRoom;
-                    joinRoomButton.setDisabled(false);
-                    selectedRoomLabel.setText(selectedRoom.getRoomName());
+                    roomSelect(selectedRoom);
                 }
+            }
+        });
+
+        enterManually.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.input.getTextInput(new Input.TextInputListener() {
+                    @Override
+                    public void input(String text) {
+                        try {
+                            KryonetRoomLocation newRoom = new KryonetRoomLocation(text, InetAddress.getByName(text));
+                            roomSelect(newRoom);
+                        } catch (UnknownHostException e) {
+                            showDialog("Not valid - " + e.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void canceled() {
+                        //nix
+                    }
+                }, app.TEXTS.get("gameTitle"), "", app.TEXTS.get("multiplayerJoinManually"));
             }
         });
 
         menuTable.add(new Label(app.TEXTS.get("multiplayerJoinRoomHelp1"), app.skin)).fill();
         menuTable.row();
         menuTable.add(hostList).minWidth(LightBlocksGame.nativeGameWidth * .75f).minHeight(LightBlocksGame
-                .nativeGameHeight * .25f).pad(10);
+                .nativeGameHeight * .15f).pad(10);
         menuTable.row();
         menuTable.add(selectedRoomLabel);
         menuTable.row();
-        menuTable.add(new Label(app.TEXTS.get("multiplayerJoinRoomHelp2"), app.skin)).fill();
+        final Label multiplayerJoinRoomHelp2 = new Label(app.TEXTS.get("multiplayerJoinRoomHelp2"), app.skin);
+        multiplayerJoinRoomHelp2.setWrap(true);
+        menuTable.add(multiplayerJoinRoomHelp2).fill();
+        menuTable.row();
+        menuTable.add(enterManually);
+    }
+
+    protected void roomSelect(IRoomLocation selectedRoom) {
+        lastSelectedRoom = selectedRoom;
+        joinRoomButton.setDisabled(false);
+        selectedRoomLabel.setText(selectedRoom.getRoomName());
     }
 
     @Override

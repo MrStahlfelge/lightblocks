@@ -91,7 +91,6 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         try {
             server.bind(TCP_PORT, UDP_PORT);
         } catch (IOException e) {
-            e.printStackTrace();
             // wieder aufräumen wenn das nicht ging
             closeRoom(true);
             throw new VetoException(e.getLocalizedMessage());
@@ -160,7 +159,6 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         try {
             client.connect(2000, ((KryonetRoomLocation) roomLoc).address, TCP_PORT, UDP_PORT);
         } catch (IOException e) {
-            e.printStackTrace();
             throw new VetoException(e.getLocalizedMessage());
         }
         MultiPlayerObjects.register(client.getKryo());
