@@ -427,7 +427,12 @@ public abstract class GameModel implements Json.Serializable {
         userInterface.updateScore(score, 0);
     }
 
-
+    /**
+     * Called to return game model to save
+     *
+     * @return
+     *  json string or null if saving the state is not allowed or supported
+     */
     public String saveGameModel() {
         if (isGameOver)
             return null;

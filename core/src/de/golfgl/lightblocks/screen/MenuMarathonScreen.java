@@ -176,6 +176,7 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
 
     protected void beginNewGame() {
         InitGameParameters initGameParametersParams = new InitGameParameters();
+        initGameParametersParams.setGameModelClass(MarathonModel.class);
         initGameParametersParams.setBeginningLevel((int) beginningLevel.getValue());
         initGameParametersParams.setInputKey(inputChosen);
 

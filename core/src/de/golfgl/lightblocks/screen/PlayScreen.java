@@ -152,7 +152,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         initializeGameModel(initGameParametersParams);
 
-        gameType.setText(app.TEXTS.get(gameModel.getIdentifier()));
+        gameType.setText(app.TEXTS.get("labelModel_" + gameModel.getIdentifier()));
 
     }
 
@@ -194,7 +194,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             Json json = new Json();
             gameModel = json.fromJson(GameModel.class, app.savegame.loadGame());
         } else {
-            gameModel = new MarathonModel();
+            try {
+                gameModel = initGameParametersParams.getGameModelClass().newInstance();
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Given game model class is not appropriate.", e);
+            }
             gameModel.startNewGame(initGameParametersParams);
         }
 
