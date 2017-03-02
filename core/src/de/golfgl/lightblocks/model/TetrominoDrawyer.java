@@ -12,35 +12,47 @@ import com.badlogic.gdx.utils.JsonValue;
  */
 
 class TetrominoDrawyer implements Json.Serializable {
-    private IntArray drawyer = new IntArray();
+    protected IntArray drawyer = new IntArray();
 
     /**
      * returns the next tetromino
      */
     public Tetromino getNextTetromino() {
 
-        if (drawyer.size < 1)
-            determineNextTetrominos();
+        Tetromino retVal;
 
-        Tetromino retVal = new Tetromino(drawyer.get(0));
+        synchronized (drawyer) {
+            if (drawyer.size < 1)
+                determineNextTetrominos();
 
-        // Position weiterschieben
-        drawyer.removeIndex(0);
+            retVal = new Tetromino(drawyer.get(0));
+
+            // Position weiterschieben
+            drawyer.removeIndex(0);
+        }
 
         return retVal;
     }
 
-    private void determineNextTetrominos() {
+    protected void determineNextTetrominos() {
         // die sieben nächsten Steine bestimmen
-        int sizeBeforeAdding = drawyer.size;
+        synchronized (drawyer) {
+            int sizeBeforeAdding = drawyer.size;
 
-        for (int i = 0; i < 7; i++)
-            drawyer.add(i);
+            for (int i = 0; i < 7; i++)
+                drawyer.add(i);
 
-        for (int i = sizeBeforeAdding; i < drawyer.size - 2; i++) {
-            int swapWith = MathUtils.random(i, drawyer.size - 1);
-            drawyer.swap(i, swapWith);
+            for (int i = sizeBeforeAdding; i < drawyer.size - 2; i++) {
+                int swapWith = MathUtils.random(i, drawyer.size - 1);
+                drawyer.swap(i, swapWith);
+            }
+        }
+    }
 
+    protected void queueNextTetrominos(int[] newTetros) {
+        synchronized (drawyer) {
+            for (int i = 0; i < newTetros.length; i++)
+                drawyer.add(newTetros[i]);
         }
     }
 

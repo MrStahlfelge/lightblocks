@@ -234,6 +234,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
             mps.setBackScreen(this);
 
             app.multiRoom.addListener(mps);
+            app.multiRoom.gameModelStarted();
 
         } catch (VetoException e) {
             showDialog(e.getMessage());

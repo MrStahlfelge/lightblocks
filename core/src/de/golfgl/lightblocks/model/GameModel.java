@@ -215,9 +215,8 @@ public abstract class GameModel implements Json.Serializable {
 
     /**
      * Auswertung ob Levelziel geschafft oder ähnliches ist hier möglich
-     *
+     * <p>
      * Zustand: Reihen wurden abgebaut, aber der nächste Tetromino noch nicht aktiviert
-     *
      */
     protected void activeTetrominoDropped() {
     }
@@ -358,7 +357,7 @@ public abstract class GameModel implements Json.Serializable {
     /**
      * die Methode aktiviert den bisherigen "Next" Tetromino im UI und zeichnet den nächsten next-Tetromino
      */
-    private void fireUserInterfaceTetrominoSwap() {
+    protected void fireUserInterfaceTetrominoSwap() {
         userInterface.activateNextTetro(activeTetromino.getCurrentBlockPositions());
         userInterface.showNextTetro(nextTetromino.getBlockPositions(new Vector2(0, 0), 0));
     }
@@ -408,13 +407,14 @@ public abstract class GameModel implements Json.Serializable {
         setCurrentSpeed();
         inputTypeKey = newGameParams.getInputKey();
 
+        activeTetromino = null;
+        drawyer = new TetrominoDrawyer();
+
         initializeActiveAndNextTetromino();
 
     }
 
     protected void initializeActiveAndNextTetromino() {
-        activeTetromino = null;
-        drawyer = new TetrominoDrawyer();
         nextTetromino = drawyer.getNextTetromino();
         activateNextTetromino();
     }
@@ -454,8 +454,7 @@ public abstract class GameModel implements Json.Serializable {
     /**
      * Called to return game model to save
      *
-     * @return
-     *  json string or null if saving the state is not allowed or supported
+     * @return json string or null if saving the state is not allowed or supported
      */
     public String saveGameModel() {
         if (isGameOver)

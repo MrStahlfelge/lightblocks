@@ -5,7 +5,6 @@ import com.esotericsoftware.kryo.Kryo;
 import java.util.ArrayList;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.model.MultiplayerModel;
 
 /**
  * The objects that are transferred via kryo
@@ -42,6 +41,9 @@ public class MultiPlayerObjects {
         kryo.register(GameIsOver.class);
         kryo.register(BonusScore.class);
         kryo.register(PlayerInGame.class);
+        kryo.register(InitGame.class);
+        kryo.register(int[].class);
+        kryo.register(NextTetrosDrawn.class);
     }
 
     public static class Handshake {
@@ -103,6 +105,15 @@ public class MultiPlayerObjects {
             this.playerId = playerId;
             return this;
         }
+    }
+
+    public static class InitGame {
+        public int[] firstTetrominos;
+        public int[] holePosition;
+    }
+
+    public static class NextTetrosDrawn {
+        public int[] nextTetrominos;
     }
 
     public static class BonusScore {

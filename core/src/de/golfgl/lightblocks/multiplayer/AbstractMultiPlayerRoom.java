@@ -1,7 +1,9 @@
 package de.golfgl.lightblocks.multiplayer;
 
 import com.badlogic.gdx.utils.Array;
+import com.esotericsoftware.minlog.Log;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +21,9 @@ public abstract class AbstractMultiplayerRoom {
     protected Array<IRoomListener> listeners = new Array<IRoomListener>(0);
     protected String myPlayerId;
     private RoomState roomState = RoomState.closed;
+
+    private boolean gameModelStarted;
+    private LinkedList<Object> queuedMessages;
 
     public String getMyPlayerId() {
         return myPlayerId;
@@ -46,6 +51,11 @@ public abstract class AbstractMultiplayerRoom {
         }
 
         if (changed) {
+
+            if (roomState.equals(RoomState.inGame)) {
+                gameModelStarted = false;
+                queuedMessages = new LinkedList<Object>();
+            }
 
             if (isOwner()) {
                 MultiPlayerObjects.RoomStateChanged rsc = new MultiPlayerObjects.RoomStateChanged();
@@ -96,6 +106,22 @@ public abstract class AbstractMultiplayerRoom {
 
 
         setRoomState(RoomState.inGame);
+    }
+
+    public void gameModelStarted() {
+        // die gequeuten abarbeiten
+        synchronized (queuedMessages) {
+            if (queuedMessages.size() > 0)
+                Log.info("Multiplayer", "Delivering queued messages: " + queuedMessages.size());
+
+            for (Object o : queuedMessages)
+                for (IRoomListener l : listeners)
+                    l.multiPlayerGotModelMessage(o);
+
+            queuedMessages.clear();
+
+            gameModelStarted = true;
+        }
     }
 
     /**
@@ -164,9 +190,23 @@ public abstract class AbstractMultiplayerRoom {
     }
 
     protected void informGotGameModelMessage(final Object o) {
-        for (IRoomListener l : listeners) {
-            l.multiPlayerGotModelMessage(o);
+        if (!roomState.equals(RoomState.inGame)) {
+            // Game Model message werden verworfen wenn nicht im Spiel
+            Log.warn("Multiplayer", "Ignored game model message - room not in game mode.");
+            return;
         }
+
+        synchronized (queuedMessages) {
+            if (gameModelStarted)
+                for (IRoomListener l : listeners)
+                    l.multiPlayerGotModelMessage(o);
+
+            else {
+                Log.info("Multiplayer", "Queued incoming game model message.");
+                queuedMessages.add(o);
+            }
+        }
+
     }
 
     public enum RoomState {closed, join, inGame}

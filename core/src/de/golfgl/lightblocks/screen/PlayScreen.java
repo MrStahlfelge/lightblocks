@@ -174,7 +174,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         try {
             final PlayScreen currentGame;
-            if (newGameParams.isMultiplayer())
+            if (!resumeGame && newGameParams.isMultiplayer())
                 currentGame = new MultiplayerPlayScreen(caller.app, newGameParams);
             else
                 currentGame = new PlayScreen(caller.app, newGameParams);

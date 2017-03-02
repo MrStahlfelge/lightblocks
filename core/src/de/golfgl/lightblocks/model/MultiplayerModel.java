@@ -26,6 +26,9 @@ public class MultiplayerModel extends GameModel {
     private AbstractMultiplayerRoom playerRoom;
 
     private HashMap<String, MultiPlayerObjects.PlayerInGame> playerInGame;
+    private int tetrominosSent;
+    private int maxPlayerDrawn;
+    private boolean isInitialized = false;
 
     @Override
     public String getIdentifier() {
@@ -49,6 +52,37 @@ public class MultiplayerModel extends GameModel {
         }
 
         super.startNewGame(newGameParams);
+    }
+
+    @Override
+    protected void initializeActiveAndNextTetromino() {
+
+        // der Meister würfelt die Tetrominos aus
+        if (playerRoom.isOwner()) {
+
+            // 21 steine bestimmen
+            for (int i = 0; i < 3; i++)
+                drawyer.determineNextTetrominos();
+
+            // und dann an alle anderen senden
+            //TODO auch auswürfeln wo das Loch ist
+
+            MultiPlayerObjects.InitGame initGame = new MultiPlayerObjects.InitGame();
+            initGame.firstTetrominos = drawyer.drawyer.toArray();
+            playerRoom.sendToAllPlayers(initGame);
+            tetrominosSent = initGame.firstTetrominos.length;
+
+            // das erst nach der Kopie in initGame... sonst sind zwei Steine bereits entnommen
+            super.initializeActiveAndNextTetromino();
+            isInitialized = true;
+        }
+    }
+
+    @Override
+    protected void fireUserInterfaceTetrominoSwap() {
+        //darf noch nicht, wenn noch nicht initialisiert ist
+        if (isInitialized)
+            super.fireUserInterfaceTetrominoSwap();
     }
 
     @Override
@@ -93,8 +127,27 @@ public class MultiplayerModel extends GameModel {
             });
         }
 
-        if (o instanceof MultiPlayerObjects.PlayerInGame) {
+        if (o instanceof MultiPlayerObjects.PlayerInGame)
             handlePlayerInGameChanged((MultiPlayerObjects.PlayerInGame) o);
+
+
+        if (o instanceof MultiPlayerObjects.NextTetrosDrawn)
+            drawyer.queueNextTetrominos(((MultiPlayerObjects.NextTetrosDrawn) o).nextTetrominos);
+
+        if (o instanceof MultiPlayerObjects.InitGame) {
+            drawyer.queueNextTetrominos(((MultiPlayerObjects.InitGame) o).firstTetrominos);
+
+            // ok, das war das init...
+            isInitialized = true;
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    MultiplayerModel.super.initializeActiveAndNextTetromino();
+
+                }
+            });
+
+            //TODO zurückmelden dass dieser Spieler nun soweit ist
         }
 
     }
@@ -102,18 +155,45 @@ public class MultiplayerModel extends GameModel {
     private void handlePlayerInGameChanged(MultiPlayerObjects.PlayerInGame pig) {
 
         boolean changedIt = false;
+        boolean needNewTetros = false;
 
         synchronized (playerInGame) {
             // wenn wirklich noch im rennen, dann updaten
             if (playerInGame.containsKey(pig.playerId)) {
                 playerInGame.put(pig.playerId, pig);
                 changedIt = true;
+                maxPlayerDrawn = Math.max(maxPlayerDrawn, pig.drawnBlocks);
+                needNewTetros = tetrominosSent - maxPlayerDrawn <= 10;
             }
         }
 
         if (changedIt) {
-            if (playerRoom.isOwner())
+            if (playerRoom.isOwner()) {
                 playerRoom.sendToAllPlayers(pig);
+
+                if (needNewTetros)
+                    synchronized (playerInGame) {
+                        // es wird zeit die nächsten Tetrominos zu ziehen
+                        int offset = drawyer.drawyer.size;
+                        for (int i = 0; i < 3; i++)
+                            drawyer.determineNextTetrominos();
+                        int drawnTetros = drawyer.drawyer.size - offset;
+
+                        // auf synchronized drawyer wird verzichtet. es kann nur noch der eigene Thread zugreifen,
+                        // und dieser wird nur lesen da ja genug Tetros da sind
+                        MultiPlayerObjects.NextTetrosDrawn nt = new MultiPlayerObjects.NextTetrosDrawn();
+
+                        nt.nextTetrominos = new int[drawnTetros];
+
+                        for (int i = 0; i < drawnTetros; i++) {
+                            nt.nextTetrominos[i] = drawyer.drawyer.get(i + offset);
+                        }
+                        playerRoom.sendToAllPlayers(nt);
+
+                        tetrominosSent += drawnTetros;
+
+                    }
+            }
 
             Gdx.app.postRunnable(new Runnable() {
                 @Override
