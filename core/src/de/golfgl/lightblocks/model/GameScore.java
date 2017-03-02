@@ -95,6 +95,10 @@ public class GameScore implements IRoundScore {
         this.dropScore += (getCurrentLevel() + 1) * 150;
     }
 
+    public void addBonusScore(int bonusScore) {
+        this.score += bonusScore;
+    }
+
     public void addSoftDropScore(float softDropScore) {
         this.dropScore += softDropScore;
     }

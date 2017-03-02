@@ -200,7 +200,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         return isPaused;
     }
 
-    private void initializeGameModel(InitGameParameters initGameParametersParams) throws InputNotAvailableException,
+    protected void initializeGameModel(InitGameParameters initGameParametersParams) throws InputNotAvailableException,
             VetoException {
         // Game Model erst hinzufügen, wenn die blockgroup schon steht
         if (initGameParametersParams == null && !app.savegame.hasSavedGame()) {
@@ -596,8 +596,16 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 text = app.TEXTS.format("motivationHundredBlocks", extraMsg);
                 playSound = false;
                 break;
+            case playerOver:
+                text = app.TEXTS.format("motivationPlayerOver", extraMsg);
+                break;
             case gameOver:
                 text = app.TEXTS.format("motivationGameOver");
+                duration = 10;
+                playSound = false;
+                break;
+            case gameWon:
+                text = app.TEXTS.format("motivationGameWon");
                 duration = 10;
                 playSound = false;
                 break;
@@ -628,6 +636,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 //                    Actions.sequence(Actions.moveBy(0, BlockActor.blockWidth * 2, 2), Actions.delay(1),
 //                            Actions.fadeOut(.5f, Interpolation.fade), Actions.removeActor())));
 //        }
+    }
+
+    @Override
+    public void playersInGameChanged() {
+        // Das passiert nur beim Multiplayer daher hier nichts
     }
 
     public void setMusic(boolean playMusic) {

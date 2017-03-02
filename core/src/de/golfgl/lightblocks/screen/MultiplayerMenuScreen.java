@@ -54,6 +54,18 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     }
 
     @Override
+    public void show() {
+        super.show();
+
+        if (app.multiRoom != null && app.multiRoom.getRoomState().equals(AbstractMultiplayerRoom.RoomState.inGame))
+            try {
+                app.multiRoom.gameStopped();
+            } catch (VetoException e) {
+                // eat
+            }
+    }
+
+    @Override
     protected void fillButtonTable(Table buttons) {
         openRoomButton = new FATextButton("", "", app.skin);
         openRoomButton.addListener(new ChangeListener() {
@@ -73,9 +85,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         startGameButton.addListener(new ChangeListener() {
                                         public void changed(ChangeEvent event, Actor actor) {
                                             try {
-                                                //TODO Es ist wichtig, das erst zu machen wenn alle Spieler wieder
-                                                //bereit sind - es könnten noch welche den Highscore bewundern
-                                                app.multiRoom.startGame();
+                                                app.multiRoom.startGame(false);
                                             } catch (VetoException e) {
                                                 showDialog(e.getMessage());
                                             }
@@ -180,6 +190,10 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
     @Override
     public void multiPlayerRoomStateChanged(final AbstractMultiplayerRoom.RoomState roomState) {
+
+        //TODO dies kann auch in einem Client aufgerufen werden wenn er sich noch den Highscore anguckt. Es wird
+        // dann korrekt gewechselt, aber der ScoreScreen wird nicht korrekt beendet
+
         // Raum ist ins Spiel gewechselt
         if (roomState.equals(AbstractMultiplayerRoom.RoomState.inGame))
             Gdx.app.postRunnable(new Runnable() {
@@ -212,6 +226,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         //TODO - erstmal einfach letzten Input und Level 0
         initGameParametersParams.setBeginningLevel(0);
         initGameParametersParams.setInputKey(app.prefs.getInteger("inputType", 0));
+        initGameParametersParams.setMultiplayerRoom(app.multiRoom);
 
         try {
             MultiplayerPlayScreen mps = (MultiplayerPlayScreen) PlayScreen.gotoPlayScreen(this,

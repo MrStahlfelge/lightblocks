@@ -41,23 +41,16 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     }
 
     @Override
+    public void playersInGameChanged() {
+        // TODO Liste ändern
+    }
+
+    @Override
     public void switchPause(boolean immediately) {
         super.switchPause(immediately);
 
         // Pause gedrückt oder App in den Hintergrund gelegt... die anderen informieren
         app.multiRoom.sendToAllPlayers(new MultiPlayerObjects.SwitchedPause().withPaused(isPaused()));
-    }
-
-    @Override
-    public void setGameOver() {
-
-        final MultiPlayerObjects.PlayerIsOver playerOverMsg = new MultiPlayerObjects.PlayerIsOver();
-        playerOverMsg.finalScore = gameModel.getScore().getScore();
-        playerOverMsg.playerId = app.multiRoom.getMyPlayerId();
-        app.multiRoom.sendToReferee(playerOverMsg);
-
-        super.setGameOver();
-        // dispose wird aufgerufen, hier ist also schon alles gelaufen
     }
 
     @Override
@@ -76,9 +69,8 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     public void multiPlayerRoomInhabitantsChanged(MultiPlayerObjects.PlayerChanged mpo) {
         //TODO anzeigen
 
-        if (app.multiRoom.isOwner()) {
-            //TODO bei Abgängen abbilden auf multiPlayerGotModelMessage(PlayerIsOver)
-        }
+        if (app.multiRoom.isOwner())
+            ((MultiplayerModel) gameModel).handleMessagesFromOthers(mpo);
     }
 
     @Override
@@ -97,29 +89,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
                 }
             });
 
-        if (o instanceof MultiPlayerObjects.PlayerIsOver) {
-            // okay, einer ist alle...
-
-            if (app.multiRoom.isOwner()) {
-                //TODO der Meister teilt das Geld dann auf und informiert alle über den Abgang
-
-
-                //TODO Bei zwei Spielern ist nur noch einer über - das muss aber anders werden
-                final MultiPlayerObjects.GameIsOver gameOverMsg = new MultiPlayerObjects.GameIsOver();
-                app.multiRoom.sendToAllPlayers(gameOverMsg);
-                multiPlayerGotModelMessage(gameOverMsg);
-            }
-        }
-
-        if (o instanceof MultiPlayerObjects.GameIsOver) {
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    if (!gameModel.isGameOver())
-                        ((MultiplayerModel) gameModel).allOtherPlayersHaveGone();
-                }
-            });
-
-        }
+        //ansonsten weiter an das Spiel
+        ((MultiplayerModel) gameModel).handleMessagesFromOthers(o);
     }
 }

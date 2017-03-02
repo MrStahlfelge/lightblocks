@@ -39,6 +39,7 @@ public class MultiPlayerObjects {
         kryo.register(SwitchedPause.class);
         kryo.register(PlayerIsOver.class);
         kryo.register(GameIsOver.class);
+        kryo.register(BonusScore.class);
     }
 
     public static class Handshake {
@@ -94,8 +95,16 @@ public class MultiPlayerObjects {
     }
 
     public static class PlayerIsOver {
-        public int finalScore;
         public String playerId;
+
+        public PlayerIsOver withPlayerId(String playerId) {
+            this.playerId = playerId;
+            return this;
+        }
+    }
+
+    public static class BonusScore {
+        public int score;
     }
 
     public static class GameIsOver {

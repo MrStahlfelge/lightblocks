@@ -80,9 +80,10 @@ public abstract class AbstractMultiplayerRoom {
     /**
      * starts a new game if allowed to
      *
+     * @param force starts the game even if not all players are ready
      * @throws VetoException if not allowed to start the game
      */
-    public void startGame() throws VetoException {
+    public void startGame(boolean force) throws VetoException {
         if (!getRoomState().equals(RoomState.join))
             throw new VetoException("Cannot start a game, room is closed or game already running.");
         if (getNumberOfPlayers() < 2)
@@ -90,7 +91,24 @@ public abstract class AbstractMultiplayerRoom {
         if (!isOwner())
             throw new VetoException("Only game owner can start a game.");
 
+        //TODO Es ist wichtig, das erst zu machen wenn alle Spieler wieder
+        //bereit sind - es könnten noch welche den Highscore bewundern
+
+
         setRoomState(RoomState.inGame);
+    }
+
+    /**
+     * sets room state back
+     */
+    public void gameStopped() throws VetoException {
+        if (!isOwner())
+            throw new VetoException("Only room owner can end of the game");
+        if (!getRoomState().equals(RoomState.inGame))
+            throw new VetoException("No game active.");
+
+        setRoomState(RoomState.join);
+
     }
 
     /**

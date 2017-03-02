@@ -33,10 +33,12 @@ public interface IGameModelListener {
 
     void updateScore(GameScore score, int gainedScore);
 
+    void playersInGameChanged();
+
     void markConflict(int x, int y);
 
     void showMotivation(MotivationTypes achievement, String extra);
 
     enum MotivationTypes {newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
-        boardCleared, newHighscore, gameOver}
+        boardCleared, newHighscore, gameOver, gameWon, playerOver}
 }

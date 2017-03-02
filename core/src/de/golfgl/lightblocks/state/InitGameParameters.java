@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.state;
 
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.MultiplayerModel;
+import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
 /**
  * This class defines new games.
@@ -13,7 +14,11 @@ public class InitGameParameters {
 
     private int inputKey;
     private int beginningLevel;
+
     private Class<? extends GameModel> gameModelClass;
+
+    private AbstractMultiplayerRoom multiplayerRoom;
+
 
     public int getInputKey() {
         return inputKey;
@@ -41,5 +46,13 @@ public class InitGameParameters {
 
     public void setGameModelClass(Class<? extends GameModel> gameModelClass) {
         this.gameModelClass = gameModelClass;
+    }
+
+    public AbstractMultiplayerRoom getMultiplayerRoom() {
+        return multiplayerRoom;
+    }
+
+    public void setMultiplayerRoom(AbstractMultiplayerRoom multiplayerRoom) {
+        this.multiplayerRoom = multiplayerRoom;
     }
 }

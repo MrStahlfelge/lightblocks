@@ -338,6 +338,12 @@ public abstract class GameModel implements Json.Serializable {
         userInterface.setGameOver();
     }
 
+    protected void setGameOverWon() {
+        isGameOver = true;
+        userInterface.showMotivation(IGameModelListener.MotivationTypes.gameWon, null);
+        userInterface.setGameOver();
+    }
+
     /**
      * die Methode aktiviert den bisherigen "Next" Tetromino im UI und zeichnet den nächsten next-Tetromino
      */
@@ -388,15 +394,18 @@ public abstract class GameModel implements Json.Serializable {
         gameboard = new Gameboard();
         score = new GameScore();
         score.setStartingLevel(newGameParams.getBeginningLevel());
+        setCurrentSpeed();
+        inputTypeKey = newGameParams.getInputKey();
 
+        initializeActiveAndNextTetromino();
+
+    }
+
+    protected void initializeActiveAndNextTetromino() {
         activeTetromino = null;
         drawyer = new TetrominoDrawyer();
         nextTetromino = drawyer.getNextTetromino();
         activateNextTetromino();
-
-        setCurrentSpeed();
-
-        inputTypeKey = newGameParams.getInputKey();
     }
 
     /**
