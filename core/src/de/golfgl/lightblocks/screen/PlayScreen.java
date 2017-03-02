@@ -623,19 +623,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         linesNum.setScore(score.getClearedLines());
         levelNum.setScore(score.getCurrentLevel());
         scoreNum.setScore(score.getScore());
-
-//        // den gainedScore über dem gesetzten Stein anzeigen
-//        if (gainedScore >= 500) {
-//            ScoreLabel<Integer> gainedScoreLabel = new ScoreLabel<Integer>(0, gainedScore, app.skin, "big");
-//            gainedScoreLabel.setShowSignum(true);
-//
-//            gainedScoreLabel.setPosition(5 * BlockActor.blockWidth, gainedPositionY * BlockActor.blockWidth);
-//            gainedScoreLabel.setColor(.7f, .7f, .7f, 0);
-//            labelGroup.addActor(gainedScoreLabel);
-//            gainedScoreLabel.addAction(Actions.parallel(Actions.fadeIn(.1f, Interpolation.fade),
-//                    Actions.sequence(Actions.moveBy(0, BlockActor.blockWidth * 2, 2), Actions.delay(1),
-//                            Actions.fadeOut(.5f, Interpolation.fade), Actions.removeActor())));
-//        }
     }
 
     @Override
