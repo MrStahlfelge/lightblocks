@@ -5,6 +5,7 @@ import com.esotericsoftware.kryo.Kryo;
 import java.util.ArrayList;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.MultiplayerModel;
 
 /**
  * The objects that are transferred via kryo
@@ -40,6 +41,7 @@ public class MultiPlayerObjects {
         kryo.register(PlayerIsOver.class);
         kryo.register(GameIsOver.class);
         kryo.register(BonusScore.class);
+        kryo.register(PlayerInGame.class);
     }
 
     public static class Handshake {
@@ -109,5 +111,12 @@ public class MultiPlayerObjects {
 
     public static class GameIsOver {
         public String winnerPlayerId;
+    }
+
+    public static class PlayerInGame {
+        public String playerId;
+        public int filledBlocks;
+        public int drawnBlocks;
+        public int score;
     }
 }

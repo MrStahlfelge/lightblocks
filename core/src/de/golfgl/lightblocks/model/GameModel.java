@@ -202,6 +202,8 @@ public abstract class GameModel implements Json.Serializable {
 
         userInterface.updateScore(score, gainedScore);
 
+        activeTetrominoDropped();
+
         // dem Spieler ein bißchen ARE gönnen (wiki/ARE) - je weiter oben, je mehr
         // evtl. wurde schon vom UI gefreezet um Animationen abzuspielen, die ARE kommt oben drauf
         freezeCountdown = Math.max(0, freezeCountdown) + .015f * (10 + activeTetromino.getPosition().y / 2);
@@ -209,6 +211,15 @@ public abstract class GameModel implements Json.Serializable {
         activateNextTetromino();
 
         // Game Over kann hier erfolgt sein!
+    }
+
+    /**
+     * Auswertung ob Levelziel geschafft oder ähnliches ist hier möglich
+     *
+     * Zustand: Reihen wurden abgebaut, aber der nächste Tetromino noch nicht aktiviert
+     *
+     */
+    protected void activeTetrominoDropped() {
     }
 
     private int removeFullLines(boolean isTSpin) {

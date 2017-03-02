@@ -25,7 +25,7 @@ public class MultiplayerModel extends GameModel {
     private byte numberOfPlayers = 2;
     private AbstractMultiplayerRoom playerRoom;
 
-    private HashMap<String, PlayerInGame> playerInGame;
+    private HashMap<String, MultiPlayerObjects.PlayerInGame> playerInGame;
 
     @Override
     public String getIdentifier() {
@@ -43,12 +43,24 @@ public class MultiplayerModel extends GameModel {
         playerRoom = newGameParams.getMultiplayerRoom();
 
         Set<String> playersInRoom = playerRoom.getPlayers();
-        playerInGame = new HashMap<String, PlayerInGame>(playersInRoom.size());
+        playerInGame = new HashMap<String, MultiPlayerObjects.PlayerInGame>(playersInRoom.size());
         for (String player : playersInRoom) {
-            playerInGame.put(player, new PlayerInGame());
+            playerInGame.put(player, new MultiPlayerObjects.PlayerInGame());
         }
 
         super.startNewGame(newGameParams);
+    }
+
+    @Override
+    protected void activeTetrominoDropped() {
+        // den Meister über den Stand der Dinge informieren
+        MultiPlayerObjects.PlayerInGame meInGame = new MultiPlayerObjects.PlayerInGame();
+        meInGame.playerId = playerRoom.getMyPlayerId();
+        meInGame.filledBlocks = 0; // TODO AUswertung muss noch
+        final GameScore myScore = getScore();
+        meInGame.drawnBlocks = myScore.getDrawnTetrominos();
+        meInGame.score = myScore.getScore();
+        playerRoom.sendToReferee(meInGame);
     }
 
     @Override
@@ -81,6 +93,37 @@ public class MultiplayerModel extends GameModel {
             });
         }
 
+        if (o instanceof MultiPlayerObjects.PlayerInGame) {
+            handlePlayerInGameChanged((MultiPlayerObjects.PlayerInGame) o);
+        }
+
+    }
+
+    private void handlePlayerInGameChanged(MultiPlayerObjects.PlayerInGame pig) {
+
+        boolean changedIt = false;
+
+        synchronized (playerInGame) {
+            // wenn wirklich noch im rennen, dann updaten
+            if (playerInGame.containsKey(pig.playerId)) {
+                playerInGame.put(pig.playerId, pig);
+                changedIt = true;
+            }
+        }
+
+        if (changedIt) {
+            if (playerRoom.isOwner())
+                playerRoom.sendToAllPlayers(pig);
+
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    userInterface.playersInGameChanged();
+                }
+            });
+
+        }
+
     }
 
     private void handleBonusScore(final int score) {
@@ -97,7 +140,7 @@ public class MultiplayerModel extends GameModel {
     }
 
     protected void handlePlayerIsOver(final String playerId) {
-        PlayerInGame deadPlayer = null;
+        MultiPlayerObjects.PlayerInGame deadPlayer = null;
         Set<String> playersLeft = null;
 
         synchronized (playerInGame) {
@@ -123,7 +166,6 @@ public class MultiplayerModel extends GameModel {
                 if (playersLeft.size() >= 1) {
                     MultiPlayerObjects.BonusScore bonus = new MultiPlayerObjects.BonusScore();
                     bonus.score = (int) ((deadPlayer.score * .3f) / playersLeft.size());
-                    bonus.score = 50;
                     for (String leftPlayerId : playersLeft) {
                         if (leftPlayerId.equals(playerRoom.getMyPlayerId()))
                             handleMessagesFromOthers(bonus);
@@ -160,11 +202,5 @@ public class MultiplayerModel extends GameModel {
     @Override
     public void read(Json json, JsonValue jsonData) {
         throw new UnsupportedOperationException("Not allowed in multiplayer");
-    }
-
-    public static class PlayerInGame {
-        public int filledBlocks;
-        public int drawnBlocks;
-        public int score;
     }
 }
