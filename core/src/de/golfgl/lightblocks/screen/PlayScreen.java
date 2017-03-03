@@ -597,6 +597,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 playSound = false;
                 break;
             case playerOver:
+                if (extraMsg.length() >= 10)
+                    extraMsg = extraMsg.substring(1, 8) + "...";
                 text = app.TEXTS.format("motivationPlayerOver", extraMsg);
                 break;
             case gameOver:
@@ -608,6 +610,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 text = app.TEXTS.format("motivationGameWon");
                 duration = 10;
                 playSound = false;
+                break;
+            case watchOutGarbage:
+                text = app.TEXTS.format("motivationGarbage");
+                playSound = false;
+                duration = 3;
                 break;
         }
 

@@ -241,6 +241,7 @@ public abstract class GameModel implements Json.Serializable {
                 totalScore.incDoubles();
                 userInterface.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
             }
+            linesRemoved(lineCount, isSpecial, doubleSpecial);
             userInterface.clearLines(linesToRemove, isSpecial);
             setCurrentSpeed();
         } else if (isTSpin) {
@@ -251,6 +252,12 @@ public abstract class GameModel implements Json.Serializable {
 
         return lineCount;
 
+    }
+
+    /**
+     * for overriding purpose
+     */
+    protected void linesRemoved(int lineCount, boolean isSpecial, boolean doubleSpecial) {
     }
 
     /**

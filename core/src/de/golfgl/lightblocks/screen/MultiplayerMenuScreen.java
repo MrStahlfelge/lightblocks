@@ -224,8 +224,8 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         InitGameParameters initGameParametersParams = new InitGameParameters();
         initGameParametersParams.setGameModelClass(MultiplayerModel.class);
 
-        //TODO - erstmal einfach letzten Input und Level 0
-        initGameParametersParams.setBeginningLevel(0);
+        //TODO - erstmal einfach letzten Input und Level
+        initGameParametersParams.setBeginningLevel(app.prefs.getInteger("beginningLevel", 0));
         initGameParametersParams.setInputKey(app.prefs.getInteger("inputType", 0));
         initGameParametersParams.setMultiplayerRoom(app.multiRoom);
 

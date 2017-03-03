@@ -44,6 +44,8 @@ public class MultiPlayerObjects {
         kryo.register(InitGame.class);
         kryo.register(int[].class);
         kryo.register(NextTetrosDrawn.class);
+        kryo.register(LinesRemoved.class);
+        kryo.register(GarbageForYou.class);
     }
 
     public static class Handshake {
@@ -129,5 +131,16 @@ public class MultiPlayerObjects {
         public int filledBlocks;
         public int drawnBlocks;
         public int score;
+    }
+
+    public static class LinesRemoved {
+        public String playerId;
+        public int linesRemoved;
+        public boolean isSpecial;
+        public boolean isDouble;
+    }
+
+    public static class GarbageForYou {
+        public int garbageLines;
     }
 }

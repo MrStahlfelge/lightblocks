@@ -3,13 +3,17 @@ package de.golfgl.lightblocks.model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.esotericsoftware.minlog.Log;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.state.InitGameParameters;
+
+import static de.golfgl.lightblocks.model.IGameModelListener.MotivationTypes.watchOutGarbage;
 
 /**
  * Das Multiplayer-Modell
@@ -22,12 +26,11 @@ public class MultiplayerModel extends GameModel {
     public static final String MODEL_ID = "multiplayer";
     // Referee
     private static final byte DRAWYER_PACKAGESIZE = 3;
-    //TODO!
-    private byte numberOfPlayers = 2;
     private AbstractMultiplayerRoom playerRoom;
     private HashMap<String, MultiPlayerObjects.PlayerInGame> playerInGame;
     private int tetrominosSent;
     private int maxTetrosAPlayerDrawn;
+    private Integer waitingGarbageLines = new Integer(0);
     private boolean isInitialized = false;
 
     @Override
@@ -90,11 +93,25 @@ public class MultiplayerModel extends GameModel {
         // den Meister über den Stand der Dinge informieren
         MultiPlayerObjects.PlayerInGame meInGame = new MultiPlayerObjects.PlayerInGame();
         meInGame.playerId = playerRoom.getMyPlayerId();
-        meInGame.filledBlocks = 0; // TODO AUswertung muss noch
+        meInGame.filledBlocks = 0; // TODO AUswertung muss noch - angesammelte Garbage reinrechnen!
         final GameScore myScore = getScore();
         meInGame.drawnBlocks = myScore.getDrawnTetrominos();
         meInGame.score = myScore.getScore();
         playerRoom.sendToReferee(meInGame);
+    }
+
+    @Override
+    protected void linesRemoved(int linesRemoved, boolean isSpecial, boolean isDouble) {
+
+        if (linesRemoved > 1) {
+            MultiPlayerObjects.LinesRemoved lr = new MultiPlayerObjects.LinesRemoved();
+            lr.playerId = playerRoom.getMyPlayerId();
+            lr.isDouble = isDouble;
+            lr.isSpecial = isSpecial;
+            lr.linesRemoved = linesRemoved;
+
+            playerRoom.sendToReferee(lr);
+        }
     }
 
     @Override
@@ -147,7 +164,64 @@ public class MultiplayerModel extends GameModel {
                 }
             });
 
-            //TODO zurückmelden dass dieser Spieler nun soweit ist
+            //TODO zurückmelden dass dieser Spieler nun soweit ist - mit PlayerInGame
+        }
+
+        if (o instanceof MultiPlayerObjects.LinesRemoved)
+            handleLinesRemoved((MultiPlayerObjects.LinesRemoved) o);
+
+        if (o instanceof MultiPlayerObjects.GarbageForYou) {
+            boolean warningTreshold = false;
+            synchronized (waitingGarbageLines) {
+                int oldWaitingLines = waitingGarbageLines;
+                waitingGarbageLines = waitingGarbageLines + ((MultiPlayerObjects.GarbageForYou) o).garbageLines;
+
+                if (waitingGarbageLines >= 4 && oldWaitingLines < 4)
+                    warningTreshold = true;
+            }
+
+            if (warningTreshold)
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        userInterface.showMotivation(watchOutGarbage, null);
+                    }
+                });
+        }
+    }
+
+    private void handleLinesRemoved(MultiPlayerObjects.LinesRemoved lr) {
+        if (!playerRoom.isOwner()) {
+            Log.error("Multiplayer", "Got LinesRemoved message, but I am not the referee.");
+            return;
+        }
+
+        int garbageToSend = lr.isSpecial ? 4 : lr.linesRemoved - 1;
+
+        if (garbageToSend >= 1) {
+            String playerWithLowestFill = null;
+
+            synchronized (playerInGame) {
+                int lowestFill = Integer.MAX_VALUE;
+                for (Map.Entry<String, MultiPlayerObjects.PlayerInGame> player : playerInGame.entrySet()) {
+                    String playerId = player.getKey();
+                    int playerFill = player.getValue().filledBlocks;
+                    if (!playerId.equals(lr.playerId) && playerFill < lowestFill) {
+                        playerWithLowestFill = playerId;
+                        lowestFill = playerFill;
+                    }
+                }
+            }
+
+            if (playerWithLowestFill != null) {
+                MultiPlayerObjects.GarbageForYou gfu = new MultiPlayerObjects.GarbageForYou();
+                gfu.garbageLines = garbageToSend;
+
+                if (playerWithLowestFill.equals(playerRoom.getMyPlayerId()))
+                    handleMessagesFromOthers(gfu);
+                else
+                    playerRoom.sendToPlayer(playerWithLowestFill, gfu);
+            }
         }
 
     }
@@ -171,7 +245,8 @@ public class MultiplayerModel extends GameModel {
                             drawyer.determineNextTetrominos();
                         int drawnTetros = drawyer.drawyer.size - offset;
 
-                        // auf synchronized drawyer wird verzichtet. es kann nur noch der eigene Render-Thread zugreifen,
+                        // auf synchronized drawyer wird verzichtet. es kann nur noch der eigene Render-Thread
+                        // zugreifen,
                         // und dieser wird nur lesen da ja genug Tetros da sind
                         MultiPlayerObjects.NextTetrosDrawn nt = new MultiPlayerObjects.NextTetrosDrawn();
 
