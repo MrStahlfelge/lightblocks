@@ -20,19 +20,19 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 public class MultiplayerModel extends GameModel {
 
     public static final String MODEL_ID = "multiplayer";
-
+    // Referee
+    private static final byte DRAWYER_PACKAGESIZE = 3;
     //TODO!
     private byte numberOfPlayers = 2;
     private AbstractMultiplayerRoom playerRoom;
-
     private HashMap<String, MultiPlayerObjects.PlayerInGame> playerInGame;
     private int tetrominosSent;
-    private int maxPlayerDrawn;
+    private int maxTetrosAPlayerDrawn;
     private boolean isInitialized = false;
 
     @Override
     public String getIdentifier() {
-        return MODEL_ID + numberOfPlayers;
+        return MODEL_ID;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class MultiplayerModel extends GameModel {
         if (playerRoom.isOwner()) {
 
             // 21 steine bestimmen
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < DRAWYER_PACKAGESIZE; i++)
                 drawyer.determineNextTetrominos();
 
             // und dann an alle anderen senden
@@ -154,32 +154,24 @@ public class MultiplayerModel extends GameModel {
 
     private void handlePlayerInGameChanged(MultiPlayerObjects.PlayerInGame pig) {
 
-        boolean changedIt = false;
-        boolean needNewTetros = false;
-
         synchronized (playerInGame) {
             // wenn wirklich noch im rennen, dann updaten
             if (playerInGame.containsKey(pig.playerId)) {
                 playerInGame.put(pig.playerId, pig);
-                changedIt = true;
-                maxPlayerDrawn = Math.max(maxPlayerDrawn, pig.drawnBlocks);
-                needNewTetros = tetrominosSent - maxPlayerDrawn <= 10;
-            }
-        }
 
-        if (changedIt) {
-            if (playerRoom.isOwner()) {
-                playerRoom.sendToAllPlayers(pig);
+                maxTetrosAPlayerDrawn = Math.max(maxTetrosAPlayerDrawn, pig.drawnBlocks);
 
-                if (needNewTetros)
-                    synchronized (playerInGame) {
+                if (playerRoom.isOwner()) {
+                    playerRoom.sendToAllPlayers(pig);
+
+                    if (tetrominosSent - maxTetrosAPlayerDrawn <= 10) {
                         // es wird zeit die nächsten Tetrominos zu ziehen
                         int offset = drawyer.drawyer.size;
-                        for (int i = 0; i < 3; i++)
+                        for (int i = 0; i < DRAWYER_PACKAGESIZE; i++)
                             drawyer.determineNextTetrominos();
                         int drawnTetros = drawyer.drawyer.size - offset;
 
-                        // auf synchronized drawyer wird verzichtet. es kann nur noch der eigene Thread zugreifen,
+                        // auf synchronized drawyer wird verzichtet. es kann nur noch der eigene Render-Thread zugreifen,
                         // und dieser wird nur lesen da ja genug Tetros da sind
                         MultiPlayerObjects.NextTetrosDrawn nt = new MultiPlayerObjects.NextTetrosDrawn();
 
@@ -193,16 +185,18 @@ public class MultiplayerModel extends GameModel {
                         tetrominosSent += drawnTetros;
 
                     }
-            }
-
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    userInterface.playersInGameChanged();
                 }
-            });
 
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        userInterface.playersInGameChanged();
+                    }
+                });
+
+            }
         }
+
 
     }
 

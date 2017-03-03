@@ -59,6 +59,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
         if (app.multiRoom != null && app.multiRoom.getRoomState().equals(AbstractMultiplayerRoom.RoomState.inGame))
             try {
+                //TODO: Das darf nicht ausgelöst werden wenn 3 Spieler aktiv sind und die anderen beiden noch spielen
                 app.multiRoom.gameStopped();
             } catch (VetoException e) {
                 // eat
