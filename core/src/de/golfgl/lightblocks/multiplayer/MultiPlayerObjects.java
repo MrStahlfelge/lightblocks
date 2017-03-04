@@ -15,7 +15,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 public class MultiPlayerObjects {
 
     // *** BEI JEDER ÄNDERUNG HOCHZÄHLEN!!! ***
-    public static final int INTERFACE_VERSION = 2;
+    public static final int INTERFACE_VERSION = 1;
 
     public static final int CHANGE_ADD = 1;
     public static final int CHANGE_UPDATE = 2;
@@ -34,6 +34,8 @@ public class MultiPlayerObjects {
         kryo.register(PlayerChanged.class);
         kryo.register(ArrayList.class);
         kryo.register(RelayToPlayer.class);
+        kryo.register(ChatMessage.class);
+        kryo.register(GeneralKryoMessage.class);
 
         // GameModel
         kryo.register(SwitchedPause.class);
@@ -91,6 +93,20 @@ public class MultiPlayerObjects {
         public Object message;
     }
 
+    public static class ChatMessage {
+        public String playerId;
+        public String message;
+    }
+
+    /**
+     * for future use only, to keep interface the same
+     */
+    public static class GeneralKryoMessage {
+        public int messageType;
+        public String identifier;
+        public String message;
+    }
+
     public static class SwitchedPause {
         public boolean nowPaused;
 
@@ -143,4 +159,5 @@ public class MultiPlayerObjects {
     public static class GarbageForYou {
         public int garbageLines;
     }
+
 }
