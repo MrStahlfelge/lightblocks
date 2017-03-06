@@ -249,7 +249,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
             @Override
             public void run() {
                 if (mpo.changeType == MultiPlayerObjects.CHANGE_ADD)
-                    app.playerChangeSound.play();
+                    app.rotateSound.play();
                 refreshPlayerList();
             }
         });
