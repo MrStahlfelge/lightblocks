@@ -1,10 +1,13 @@
 package de.golfgl.lightblocks.multiplayer;
 
+import com.badlogic.gdx.utils.IntArray;
 import com.esotericsoftware.kryo.Kryo;
 
 import java.util.ArrayList;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.GameScore;
+import de.golfgl.lightblocks.model.IGameModelListener;
 
 /**
  * The objects that are transferred via kryo
@@ -48,6 +51,16 @@ public class MultiPlayerObjects {
         kryo.register(NextTetrosDrawn.class);
         kryo.register(LinesRemoved.class);
         kryo.register(GarbageForYou.class);
+
+        // Watch play
+        kryo.register(WatchPlayInsertNewBlock.class);
+        kryo.register(WatchPlayMoveTetro.class);
+        kryo.register(WatchPlayRotateTetro.class);
+        kryo.register(WatchPlayClearAndInsertLines.class);
+        kryo.register(WatchPlayShowNextTetro.class);
+        kryo.register(WatchPlayActivateNextTetro.class);
+        kryo.register(WatchPlayPinTetromino.class);
+        kryo.register(WatchPlayMarkConflict.class);
     }
 
     public static class Handshake {
@@ -80,6 +93,7 @@ public class MultiPlayerObjects {
 
     public static class Player {
         public String name;
+        public String tag;
         public String lightblocksVersion = LightBlocksGame.GAME_VERSIONSTRING;
     }
 
@@ -160,4 +174,43 @@ public class MultiPlayerObjects {
         public int garbageLines;
     }
 
+    // Zum Zugucken
+    public static class WatchPlayInsertNewBlock {
+        public int x;
+        public int y;
+    }
+
+    public static class WatchPlayMoveTetro {
+        public Integer[][] v;
+        public int dx;
+        public int dy;
+    }
+
+    public static class WatchPlayRotateTetro {
+        public Integer[][] vOld;
+        public Integer[][] vNew;
+    }
+
+    public static class WatchPlayClearAndInsertLines {
+        public int[] linesToRemove;
+        public boolean special;
+        public int[] garbageGapPos;
+    }
+
+    public static class WatchPlayShowNextTetro {
+        public Integer[][] blockPositions;
+    }
+
+    public static class WatchPlayActivateNextTetro {
+        public Integer[][] boardBlockPositions;
+    }
+
+    public static class WatchPlayPinTetromino {
+        public Integer[][] blockPos;
+    }
+
+    public static class WatchPlayMarkConflict {
+        public int x;
+        public int y;
+    }
 }
