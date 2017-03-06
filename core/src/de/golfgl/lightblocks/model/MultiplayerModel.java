@@ -93,7 +93,9 @@ public class MultiplayerModel extends GameModel {
         Set<String> playersInRoom = playerRoom.getPlayers();
         playerInGame = new HashMap<String, MultiPlayerObjects.PlayerInGame>(playersInRoom.size());
         for (String player : playersInRoom) {
-            playerInGame.put(player, new MultiPlayerObjects.PlayerInGame());
+            final MultiPlayerObjects.PlayerInGame pig = new MultiPlayerObjects.PlayerInGame();
+            pig.playerId = player;
+            playerInGame.put(player, pig);
         }
 
         garbageHolePosition = new int[10];
@@ -287,7 +289,7 @@ public class MultiplayerModel extends GameModel {
 
     }
 
-    private void handlePlayerInGameChanged(MultiPlayerObjects.PlayerInGame pig) {
+    private void handlePlayerInGameChanged(final MultiPlayerObjects.PlayerInGame pig) {
 
         synchronized (playerInGame) {
             // wenn wirklich noch im rennen, dann updaten
@@ -326,7 +328,7 @@ public class MultiplayerModel extends GameModel {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        userInterface.playersInGameChanged();
+                        userInterface.playersInGameChanged(pig);
                     }
                 });
 
@@ -359,10 +361,14 @@ public class MultiplayerModel extends GameModel {
         }
 
         if (deadPlayer != null) {
+            final MultiPlayerObjects.PlayerInGame pig = deadPlayer;
+            // um anzuzeigen dass er Game Over ist Gameboard voll
+            pig.filledBlocks = Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_ALLROWS;
+
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    userInterface.playersInGameChanged();
+                    userInterface.playersInGameChanged(pig);
 
                     if (!isGameOver())
                         userInterface.showMotivation(IGameModelListener.MotivationTypes.playerOver, playerId);
@@ -402,6 +408,17 @@ public class MultiplayerModel extends GameModel {
         playerRoom.sendToReferee(playerOverMsg);
 
         super.setGameOverBoardFull();
+    }
+
+    @Override
+    public void setUserInterface(IGameModelListener userInterface) {
+        super.setUserInterface(userInterface);
+
+        synchronized (playerInGame) {
+            for (MultiPlayerObjects.PlayerInGame pig : playerInGame.values())
+                userInterface.playersInGameChanged(pig);
+        }
+
     }
 
     @Override

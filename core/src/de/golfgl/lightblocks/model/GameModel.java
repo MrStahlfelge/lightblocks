@@ -161,7 +161,7 @@ public abstract class GameModel implements Json.Serializable {
         int levelBeforeRemove = score.getCurrentLevel();
         int removedLines;
 
-        removedLines = removeFullLines(tSpin);
+        removedLines = removeFullAndInsertLines(tSpin);
 
         int gainedScore = score.flushScore();
 
@@ -227,7 +227,7 @@ public abstract class GameModel implements Json.Serializable {
      *
      * @return Anzahl entfernte Zeilen. Wird im Aufrufer für Achievement-Auswertung genutzt (Garbage egal)
      */
-    private int removeFullLines(boolean isTSpin) {
+    private int removeFullAndInsertLines(boolean isTSpin) {
         linesToRemove.clear();
 
         for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {

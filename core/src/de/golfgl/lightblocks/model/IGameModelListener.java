@@ -2,6 +2,8 @@ package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.utils.IntArray;
 
+import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
+
 /**
  * Created by Benjamin Schulte on 23.01.2017.
  */
@@ -35,7 +37,7 @@ public interface IGameModelListener {
 
     void updateScore(GameScore score, int gainedScore);
 
-    void playersInGameChanged();
+    void playersInGameChanged(MultiPlayerObjects.PlayerInGame pig);
 
     void markConflict(int x, int y);
 

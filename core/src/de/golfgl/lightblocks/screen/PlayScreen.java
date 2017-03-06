@@ -22,6 +22,7 @@ import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.Tetromino;
+import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
 import de.golfgl.lightblocks.scenes.MotivationLabel;
@@ -42,19 +43,20 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
+    protected static final Color EMPHASIZE_COLOR = new Color(1, .3f, .3f, 1);
     private final BlockGroup blockGroup;
     private final Group labelGroup;
     private final BlockActor[][] blockMatrix;
     private final BlockActor[] nextTetro;
-    private final ScoreLabel scoreNum;
-    private final ScoreLabel levelNum;
-    private final ScoreLabel linesNum;
     private final MotivationLabel motivatorLabel;
     private final ParticleEffectActor weldEffect;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
     Music music;
     float lastAccX = 0;
+    private ScoreLabel scoreNum;
+    private ScoreLabel levelNum;
+    private ScoreLabel linesNum;
     private boolean isPaused = true;
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
@@ -116,28 +118,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         // Score Labels
         final Table mainTable = new Table();
-
-        mainTable.row();
-        Label levelLabel = new Label(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
-        mainTable.add(levelLabel).right().bottom().padBottom(3).spaceRight(3);
-        levelNum = new ScoreLabel(2, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        mainTable.add(levelNum).left();
-        Label linesLabel = new Label(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
-        mainTable.add(linesLabel).right().bottom().padBottom(3).spaceLeft(10);
-        linesNum = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        linesNum.setCountingSpeed(100);
-        mainTable.add(linesNum).left();
-        mainTable.row();
-        Label scoreLabel = new Label(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
-        mainTable.add(scoreLabel).right().bottom().padBottom(3).spaceRight(3);
-        scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        scoreNum.setCountingSpeed(2000);
-        scoreNum.setMaxCountingTime(1);
-        mainTable.add(scoreNum).left().colspan(3);
-
+        populateScoreTable(mainTable);
         mainTable.setY(LightBlocksGame.nativeGameHeight - mainTable.getPrefHeight() / 2 - 5);
         mainTable.setX(mainTable.getPrefWidth() / 2 + 5);
-
         stage.addActor(mainTable);
 
         stage.addActor(weldEffect);
@@ -193,6 +176,26 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         }
     }
 
+    protected void populateScoreTable(Table scoreTable) {
+        scoreTable.row();
+        Label levelLabel = new Label(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
+        scoreTable.add(levelLabel).right().bottom().padBottom(3).spaceRight(3);
+        levelNum = new ScoreLabel(2, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        scoreTable.add(levelNum).left();
+        Label linesLabel = new Label(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
+        scoreTable.add(linesLabel).right().bottom().padBottom(3).spaceLeft(10);
+        linesNum = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        linesNum.setCountingSpeed(100);
+        scoreTable.add(linesNum).left();
+        scoreTable.row();
+        Label scoreLabel = new Label(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
+        scoreTable.add(scoreLabel).right().bottom().padBottom(3).spaceRight(3);
+        scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        scoreNum.setCountingSpeed(2000);
+        scoreNum.setMaxCountingTime(1);
+        scoreTable.add(scoreNum).left().colspan(3);
+    }
+
     /**
      * returns if the game state is currently paused
      *
@@ -231,8 +234,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameModel.bestScore = app.savegame.loadBestScore(gameModel.getIdentifier());
 
         // erst nach dem Laden setzen, damit das noch ohne Animation läuft
-        levelNum.setEmphasizeTreshold(1, new Color(1, .3f, .3f, 1));
-        scoreNum.setEmphasizeTreshold(1000, new Color(1, .3f, .3f, 1));
+        levelNum.setEmphasizeTreshold(1, EMPHASIZE_COLOR);
+        scoreNum.setEmphasizeTreshold(1000, EMPHASIZE_COLOR);
 
     }
 
@@ -690,7 +693,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void playersInGameChanged() {
+    public void playersInGameChanged(MultiPlayerObjects.PlayerInGame pig) {
         // Das passiert nur beim Multiplayer daher hier nichts
     }
 

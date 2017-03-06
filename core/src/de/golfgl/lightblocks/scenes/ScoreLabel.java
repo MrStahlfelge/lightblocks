@@ -34,10 +34,13 @@ public class ScoreLabel extends Label {
     private Color emphasizeColor;
     private Sound emphasizeSound;
 
+    private String suffix;
+    private Character exceedChar = null;
+
     public ScoreLabel(int digits, long score, Skin skin, String styleName) {
         super("0", skin, styleName);
 
-        getBitmapFontCache().getFont().setFixedWidthGlyphs("0123456789");
+        getBitmapFontCache().getFont().setFixedWidthGlyphs("0123456789-");
 
         this.digits = digits;
         this.score = score - 1;
@@ -62,17 +65,30 @@ public class ScoreLabel extends Label {
             scoreToAdd -= scoreToAddNow;
 
             if (emphasizeScore > 0 && score < emphasizeScore && score + scoreToAddNow >= emphasizeScore)
-            emphasizeLabel();
+                emphasizeLabel();
 
             score += scoreToAddNow;
 
-            String text = Long.toString(this.score);
+            String text = Long.toString(Math.abs(this.score));
 
             while (text.length() < digits)
                 text = '0' + text;
 
-            if (showSignum && this.score >= 0)
-                text = '+' + text;
+            if (text.length() > digits && exceedChar != null) {
+                text = "";
+                while (text.length() < digits)
+                    text += exceedChar.toString();
+            } else {
+
+                if (showSignum && this.score >= 0)
+                    text = '+' + text;
+                else if (this.score < 0)
+                    text = '-' + text;
+            }
+
+            if (suffix != null)
+                text += suffix;
+
             setText(text);
         }
     }
@@ -148,5 +164,21 @@ public class ScoreLabel extends Label {
 
     public void setEmphasizeSound(Sound emphasizeSound) {
         this.emphasizeSound = emphasizeSound;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+
+    public Character getExceedChar() {
+        return exceedChar;
+    }
+
+    public void setExceedChar(Character exceedChar) {
+        this.exceedChar = exceedChar;
     }
 }

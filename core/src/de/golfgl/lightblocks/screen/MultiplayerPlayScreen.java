@@ -1,12 +1,18 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+
+import java.util.HashMap;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
+import de.golfgl.lightblocks.scenes.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
@@ -17,9 +23,37 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
+    private HashMap<String, ScoreLabel> playerLabels;
+
     public MultiplayerPlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
         super(app, initGameParametersParams);
+    }
+
+    @Override
+    protected void populateScoreTable(Table scoreTable) {
+        super.populateScoreTable(scoreTable);
+
+        // Für die verschiedenen Spieler eine Zelle vorsehen. Noch nicht füllen, Infos stehen noch nicht zur Verfügung
+        // das eingefügte ScoreLabel dient nur dazu den Platzbedarf festzulegen
+        scoreTable.row();
+        Label fillLabel = new Label(app.TEXTS.get("labelFill").toUpperCase(), app.skin);
+        scoreTable.add(fillLabel).right().bottom().padBottom(3).spaceRight(3);
+
+        // noch eine Tabelle für die Spieler
+        Table fillingTable = new Table();
+        playerLabels = new HashMap<String, ScoreLabel>(app.multiRoom.getNumberOfPlayers());
+
+        for (String playerId : app.multiRoom.getPlayers()) {
+            ScoreLabel lblFilling = new ScoreLabel(2, 100, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+            lblFilling.setCountingSpeed(20);
+            lblFilling.setExceedChar('-');
+            fillingTable.add(lblFilling);
+            playerLabels.put(playerId, lblFilling);
+            fillingTable.add(new Label("%", app.skin)).padRight(10).bottom().padBottom(3);
+        }
+
+        scoreTable.add(fillingTable).colspan(3);
     }
 
     @Override
@@ -41,8 +75,15 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     }
 
     @Override
-    public void playersInGameChanged() {
-        // TODO Liste ändern
+    public void playersInGameChanged(MultiPlayerObjects.PlayerInGame pig) {
+        ScoreLabel lblPlayerFill = playerLabels.get(pig.playerId);
+
+        if (lblPlayerFill != null) {
+            lblPlayerFill.setScore(pig.filledBlocks * 100 / (Gameboard.GAMEBOARD_COLUMNS * Gameboard
+                    .GAMEBOARD_NORMALROWS));
+            // geht nicht beim Init, da dieser mit 100 erfolgt und dann auf 0 zurückgesetzt wird
+            lblPlayerFill.setEmphasizeTreshold(15, EMPHASIZE_COLOR);
+        }
     }
 
     @Override
