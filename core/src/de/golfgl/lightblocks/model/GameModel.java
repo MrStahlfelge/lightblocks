@@ -35,6 +35,7 @@ public abstract class GameModel implements Json.Serializable {
     private boolean isBestScore = false;
     private Tetromino activeTetromino;
     private Tetromino nextTetromino;
+
     private Gameboard gameboard;
     // wieviel ist der aktuelle Stein schon ungerundet gefallen
     private float currentSpeed;
@@ -221,6 +222,11 @@ public abstract class GameModel implements Json.Serializable {
     protected void activeTetrominoDropped() {
     }
 
+    /**
+     * Zeilen aktualisieren: Volle entfernen, Garbage einfügen
+     *
+     * @return Anzahl entfernte Zeilen. Wird im Aufrufer für Achievement-Auswertung genutzt (Garbage egal)
+     */
     private int removeFullLines(boolean isTSpin) {
         linesToRemove.clear();
 
@@ -230,19 +236,22 @@ public abstract class GameModel implements Json.Serializable {
             }
         }
 
-        int lineCount = linesToRemove.size;
+        int[] garbageLines = drawGarbageLines();
 
-        if (lineCount > 0) {
+        int removeLinesCount = linesToRemove.size;
+        int insertLinesCount = (garbageLines == null ? 0 : garbageLines.length);
+        boolean isSpecial = (removeLinesCount == 4) || (removeLinesCount == 2 && isTSpin);
+
+        if (removeLinesCount > 0) {
 
             gameboard.clearLines(linesToRemove);
-            boolean isSpecial = (lineCount == 4) || (lineCount == 2 && isTSpin);
-            boolean doubleSpecial = score.incClearedLines(lineCount, isSpecial, isTSpin);
+            boolean doubleSpecial = score.incClearedLines(removeLinesCount, isSpecial, isTSpin);
             if (doubleSpecial) {
                 totalScore.incDoubles();
                 userInterface.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
             }
-            linesRemoved(lineCount, isSpecial, doubleSpecial);
-            userInterface.clearLines(linesToRemove, isSpecial);
+            linesRemoved(removeLinesCount, isSpecial, doubleSpecial);
+
             setCurrentSpeed();
         } else if (isTSpin) {
             // T-Spin Bonus erteilen falls keine Reihen abgebaut wurden (sonst wurde Bonus schon in incClearedLines
@@ -250,12 +259,26 @@ public abstract class GameModel implements Json.Serializable {
             score.addTSpinBonus();
         }
 
-        return lineCount;
+        if (insertLinesCount > 0)
+            gameboard.insertLines(garbageLines);
+
+        if (removeLinesCount > 0 || insertLinesCount > 0)
+            userInterface.clearAndInsertLines(linesToRemove, isSpecial, garbageLines);
+
+
+        return removeLinesCount;
 
     }
 
     /**
-     * for overriding purpose
+     * Ermittelt für die Garbage wo das Loch sein muss und gibt ein Array für jede Zeile zurück.
+     */
+    protected int[] drawGarbageLines() {
+        return null;
+    }
+
+    /**
+     * for overriding purpose. Lines are removed but garbage not yet inserted
      */
     protected void linesRemoved(int lineCount, boolean isSpecial, boolean doubleSpecial) {
     }
@@ -429,14 +452,7 @@ public abstract class GameModel implements Json.Serializable {
     /**
      * returns the parameters to initialize a new game of same type for retrying
      */
-    public InitGameParameters getInitParameters() {
-        InitGameParameters retVal = new InitGameParameters();
-
-        retVal.setBeginningLevel(getScore().getStartingLevel());
-        retVal.setInputKey(inputTypeKey);
-
-        return retVal;
-    }
+    public abstract InitGameParameters getInitParameters();
 
     public void setUserInterface(IGameModelListener userInterface) {
         this.userInterface = userInterface;
@@ -533,6 +549,10 @@ public abstract class GameModel implements Json.Serializable {
 
     public GameScore getScore() {
         return this.score;
+    }
+
+    protected Gameboard getGameboard() {
+        return gameboard;
     }
 
     @Override

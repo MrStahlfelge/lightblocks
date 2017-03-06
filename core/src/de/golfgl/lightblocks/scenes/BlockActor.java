@@ -69,6 +69,10 @@ public class BlockActor extends Actor {
     }
 
     public void setEnlightened(boolean sollwert) {
+        setEnlightened(sollwert, false);
+    }
+
+    public void setEnlightened(boolean sollwert, boolean immediately) {
         if (isEnlightened != sollwert) {
             glowAction.reset();
 
@@ -76,11 +80,11 @@ public class BlockActor extends Actor {
             imBlockEnlightened.clearActions();
 
             if (sollwert) {
-                glowAction.setDuration(timeToEnlighten);
+                glowAction.setDuration(immediately ? 0 : timeToEnlighten);
                 glowAction.setAlpha(1);
                 imBlockEnlightened.addAction(glowAction);
             } else {
-                glowAction.setDuration(timeToDislighten);
+                glowAction.setDuration(immediately ? 0 : timeToDislighten);
                 glowAction.setAlpha(dislighentedAlpha);
                 imBlockEnlightened.addAction(glowAction);
             }

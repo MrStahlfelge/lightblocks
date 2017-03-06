@@ -56,7 +56,8 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     @Override
     public void multiPlayerRoomStateChanged(AbstractMultiplayerRoom.RoomState roomState) {
         if (!roomState.equals(AbstractMultiplayerRoom.RoomState.inGame))
-            //TODO hier sollten dann noch zum Score gewechselt werden bevor man am Ende ist
+            //TODO hier sollten dann noch Game Over gezeigt werden bevor man am Ende ist
+            // Auch die letzen Ergebnisse müssen dann im Raum noch angezeigt werden
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
@@ -67,7 +68,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
     @Override
     public void multiPlayerRoomInhabitantsChanged(MultiPlayerObjects.PlayerChanged mpo) {
-        //TODO anzeigen
+        //TODO anzeigen - deckt sich aber teilweise mit playersInGameChanged
 
         if (app.multiRoom.isOwner())
             ((MultiplayerModel) gameModel).handleMessagesFromOthers(mpo);

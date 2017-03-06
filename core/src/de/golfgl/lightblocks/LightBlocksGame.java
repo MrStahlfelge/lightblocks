@@ -50,6 +50,8 @@ public class LightBlocksGame extends Game {
     public Sound cleanSpecialSound;
     public Sound unlockedSound;
     public Sound swoshSound;
+    public Sound garbageSound;
+    public Sound playerChangeSound;
     public ShareHandler share;
     public AbstractMultiplayerRoom multiRoom;
     public Player player;
@@ -91,6 +93,8 @@ public class LightBlocksGame extends Game {
         assetManager.load("sound/cleanspecial.ogg", Sound.class);
         assetManager.load("sound/unlocked.ogg", Sound.class);
         assetManager.load("sound/swosh.ogg", Sound.class);
+        assetManager.load("sound/garbage.ogg", Sound.class);
+        assetManager.load("sound/playerchange.ogg", Sound.class);
         assetManager.finishLoading();
 
         TEXTS = assetManager.get("i18n/strings", I18NBundle.class);
@@ -105,7 +109,9 @@ public class LightBlocksGame extends Game {
         removeSound = assetManager.get("sound/glow05.ogg", Sound.class);
         gameOverSound = assetManager.get("sound/gameover.ogg", Sound.class);
         unlockedSound = assetManager.get("sound/unlocked.ogg", Sound.class);
+        garbageSound = assetManager.get("sound/garbage.ogg", Sound.class);
         cleanSpecialSound = assetManager.get("sound/cleanspecial.ogg", Sound.class);
+        playerChangeSound = assetManager.get("sound/playerchange.ogg", Sound.class);
         swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
 
         savegame = new GameStateHandler();

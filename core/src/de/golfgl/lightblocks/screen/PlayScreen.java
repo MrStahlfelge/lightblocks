@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -28,6 +29,7 @@ import de.golfgl.lightblocks.scenes.ParticleEffectActor;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 /**
@@ -416,11 +418,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void clearLines(IntArray linesToRemove, boolean special) {
+    public void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition) {
 
         final float removeDelayTime = .15f;
         final float removeFadeOutTime = .2f;
         final float moveActorsTime = .1f;
+
+        int linesToInsert = (garbageHolePosition == null ? 0 : garbageHolePosition.length);
 
         gameModel.setFreezeInterval(removeDelayTime);
 
@@ -430,70 +434,124 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             lineMove.add(i);
 
 
-        app.removeSound.play(.4f + linesToRemove.size * .2f);
-        if (special)
-            app.cleanSpecialSound.play(.8f);
+        if (linesToRemove.size > 0) {
+            app.removeSound.play(.4f + linesToRemove.size * .2f);
+            if (special)
+                app.cleanSpecialSound.play(.8f);
 
-        for (int i = linesToRemove.size - 1; i >= 0; i--) {
-            int y = linesToRemove.get(i);
+            for (int i = linesToRemove.size - 1; i >= 0; i--) {
+                int y = linesToRemove.get(i);
 
-            // die zu entfernende Zeile durchgehen und alle Blöcke erleuchten
-            // und entfernen
-            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                BlockActor block = blockMatrix[x][y];
-                blockMatrix[x][y] = null;
-                block.setEnlightened(true);
+                // die zu entfernende Zeile durchgehen und alle Blöcke erleuchten
+                // und entfernen
+                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                    BlockActor block = blockMatrix[x][y];
+                    blockMatrix[x][y] = null;
+                    block.setEnlightened(true);
 
 
-                if (special)
-                    // Spezialeffekt: Verdichtung auf einen Block
-                    block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(0) - .5f +
-                            linesToRemove.size / 2) * BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
-                else if (linesToRemove.size >= 3)
-                    // ab 3 Zeilen alle zeilenweise zusammen schieben
-                    block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(i)) *
-                            BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
-                else if (y == i)
-                    // die untersten zusammenhängenden Zeilen rausschieben
-                    block.setMoveAction(sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -(i + 1) *
-                            BlockActor.blockWidth, moveActorsTime)));
+                    if (special)
+                        // Spezialeffekt: Verdichtung auf einen Block
+                        block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(0) - .5f +
+                                linesToRemove.size / 2) * BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
+                    else if (linesToRemove.size >= 3)
+                        // ab 3 Zeilen alle zeilenweise zusammen schieben
+                        block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(i)) *
+                                BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
+                    else if (y == i && linesToInsert == 0)
+                        // die untersten zusammenhängenden Zeilen rausschieben
+                        block.setMoveAction(sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -2 *
+                                BlockActor.blockWidth, moveActorsTime)));
 
-                block.addAction(sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
-                        Actions.removeActor()));
+                    block.addAction(sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
+                            Actions.removeActor()));
+                }
+
+                // heraussuchen durch welche Zeile diese hier ersetzt wird (linesToInsert hier noch nicht beachtet)
+                for (int higherY = y; higherY < Gameboard.GAMEBOARD_ALLROWS; higherY++)
+                    if (higherY < Gameboard.GAMEBOARD_ALLROWS - 1)
+                        lineMove.set(higherY, lineMove.get(higherY + 1));
+                    else
+                        lineMove.set(higherY, -1);
             }
 
-            // heraussuchen durch weile Zeile diese hier ersetzt wird
-            for (int higherY = y; higherY < Gameboard.GAMEBOARD_ALLROWS; higherY++)
-                if (higherY < Gameboard.GAMEBOARD_ALLROWS - 1)
-                    lineMove.set(higherY, lineMove.get(higherY + 1));
-                else
-                    lineMove.set(higherY, -1);
-
+            // den Explosions-Effekt einfügen
+            if (special) {
+                weldEffect.setPosition(blockGroup.getX() + 5f * BlockActor.blockWidth, blockGroup.getY() +
+                        (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth);
+                weldEffect.start();
+            }
         }
 
-        // den Explosions-Effekt einfügen
-        if (special) {
-            weldEffect.setPosition(blockGroup.getX() + 5f * BlockActor.blockWidth, blockGroup.getY() +
-                    (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth);
-            weldEffect.start();
-        }
-
+        // his hier gilt: i = Zeile; lineMove.get(i): Zeile durch die i ersetzt wird ohne Garbage (oder -1 für keine)
         for (int i = 0; i < lineMove.size; i++) {
-            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-
-                if (lineMove.get(i) >= 0) {
-                    BlockActor block = blockMatrix[x][lineMove.get(i)];
-                    blockMatrix[x][lineMove.get(i)] = null;
+            int replaceLineIwith = lineMove.get(i);
+            int destinationY = i + linesToInsert;
+            if (replaceLineIwith >= 0) {
+                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                    // hier die Garbage ebenfalls noch nicht einrechnen... in der Matrix erst im nächsten Schritt
+                    // hochziehen
+                    BlockActor block = blockMatrix[x][replaceLineIwith];
+                    blockMatrix[x][replaceLineIwith] = null;
                     blockMatrix[x][i] = block;
-                    if (block != null)
-                        block.setMoveAction(sequence(Actions.delay(removeDelayTime), (Actions.moveTo((x) *
-                                BlockActor.blockWidth, (i) * BlockActor.blockWidth, moveActorsTime))));
+
+                    // verschieben des Actors... hier wird aber die Garbage schon beachtet!
+                    // falls gar keine Bewegung da, dann auch nix machen
+                    if (block != null && destinationY != replaceLineIwith) {
+
+                        // jetzt eine grundsätzliche Unterscheidung: wird die Zeile hochgeschoben oder runterbewegt?
+                        // wenn hoch, dann kein delay
+                        SequenceAction moveSequence = Actions.action(SequenceAction.class);
+
+                        if (destinationY <= replaceLineIwith)
+                            moveSequence.addAction(Actions.delay(removeDelayTime));
+
+                        moveSequence.addAction(Actions.moveTo((x) * BlockActor.blockWidth, (destinationY) *
+                                BlockActor.blockWidth, moveActorsTime));
+
+                        // wenn Block durch insert rausgeschoben wird, dann weg
+                        if (destinationY >= Gameboard.GAMEBOARD_ALLROWS) {
+                            moveSequence.addAction(Actions.fadeOut(removeFadeOutTime));
+                            moveSequence.addAction(removeActor());
+                        }
+
+                        block.setMoveAction(moveSequence);
+                    }
+
                 }
 
             }
         }
 
+        if (linesToInsert > 0) {
+            app.garbageSound.play(.4f + linesToInsert * .2f);
+            // nun die Referenz hochziehen
+            for (int i = Gameboard.GAMEBOARD_ALLROWS - 1; i >= linesToInsert; i--)
+                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                    BlockActor block = blockMatrix[x][i - linesToInsert];
+                    blockMatrix[x][i - linesToInsert] = null;
+                    blockMatrix[x][i] = block;
+                }
 
+            // und zu guter letzt die neuen Blöcke einfügen
+            for (int y = linesToInsert - 1; y >= 0; y--) {
+                int holePos = garbageHolePosition[linesToInsert - 1 - y];
+
+                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                    if (x != holePos) {
+                        BlockActor block = new BlockActor(app);
+                        block.setX(x * BlockActor.blockWidth);
+                        block.setY((y - linesToInsert) * BlockActor.blockWidth);
+                        block.setEnlightened(true, true);
+                        block.setMoveAction(Actions.sequence(Actions.moveTo((x) * BlockActor.blockWidth, y *
+                                BlockActor.blockWidth, moveActorsTime), Actions.run(block.getDislightenAction())));
+                        blockGroup.addActor(block);
+                        blockMatrix[x][y] = block;
+                    }
+                }
+            }
+
+        }
     }
 
     @Override
@@ -512,8 +570,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Spielfeld überlagert
 
         final float offsetX = LightBlocksGame.nativeGameWidth - blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT -
-                .3f) * BlockActor
-                .blockWidth;
+                .3f) * BlockActor.blockWidth;
         final float offsetY = (Gameboard.GAMEBOARD_NORMALROWS + .3f) * BlockActor.blockWidth;
 
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {

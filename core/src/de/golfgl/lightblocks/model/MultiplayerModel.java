@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.esotericsoftware.minlog.Log;
@@ -24,13 +25,22 @@ import static de.golfgl.lightblocks.model.IGameModelListener.MotivationTypes.wat
 public class MultiplayerModel extends GameModel {
 
     public static final String MODEL_ID = "multiplayer";
-    // Referee
+    public static final float SCORE_BONUS_PLAYEROVER = .33f;
+    public static final int GARBAGEGAP_CHANGECOUNT = 9;
+
+    // Referee - aber auch die anderen pflegen die Werte, falls Übergabe erfolgt
     private static final byte DRAWYER_PACKAGESIZE = 3;
     private AbstractMultiplayerRoom playerRoom;
     private HashMap<String, MultiPlayerObjects.PlayerInGame> playerInGame;
-    private int tetrominosSent;
+    private int tetrominosSent = 0;
     private int maxTetrosAPlayerDrawn;
     private Integer waitingGarbageLines = new Integer(0);
+
+    // siehe drawGarbageLines
+    private int[] garbageHolePosition;
+    private int currentGarbageHolePosIndex = 0;
+    private int currentGarbageHolePosUsed = 0;
+
     private boolean isInitialized = false;
 
     @Override
@@ -45,6 +55,38 @@ public class MultiplayerModel extends GameModel {
     }
 
     @Override
+    protected int[] drawGarbageLines() {
+        // Das Loch in der Garbage wird über das Array definiert. Es ist mit Zufallszahlen gefüllt.
+        // Immer 9 Reihen werden mit dem definierten Loch gefüllt. Dann wird currentGarbageHolePosIndex
+        // weiter gesetzt. currentGarbageHolePosUsed ist der Merker wieviele Reihen schon für den
+        // aktiven Index gefüllt wurden.
+
+        int numOfLines = 0;
+        synchronized (waitingGarbageLines) {
+            numOfLines = waitingGarbageLines;
+            waitingGarbageLines = 0;
+        }
+
+        int[] retVal = new int[numOfLines];
+
+        for (int garbageLine = 0; garbageLine < numOfLines; garbageLine++) {
+            System.out.println(currentGarbageHolePosIndex + ";" + currentGarbageHolePosUsed);
+            retVal[garbageLine] = garbageHolePosition[currentGarbageHolePosIndex];
+            currentGarbageHolePosUsed++;
+
+            if (currentGarbageHolePosUsed >= GARBAGEGAP_CHANGECOUNT) {
+                currentGarbageHolePosUsed = 0;
+                currentGarbageHolePosIndex++;
+
+                if (currentGarbageHolePosIndex >= garbageHolePosition.length)
+                    currentGarbageHolePosIndex = 0;
+            }
+        }
+
+        return retVal;
+    }
+
+    @Override
     public void startNewGame(InitGameParameters newGameParams) {
         playerRoom = newGameParams.getMultiplayerRoom();
 
@@ -53,6 +95,10 @@ public class MultiplayerModel extends GameModel {
         for (String player : playersInRoom) {
             playerInGame.put(player, new MultiPlayerObjects.PlayerInGame());
         }
+
+        garbageHolePosition = new int[10];
+        for (byte i = 0; i < garbageHolePosition.length; i++)
+            garbageHolePosition[i] = MathUtils.random(0, Gameboard.GAMEBOARD_COLUMNS - 1);
 
         super.startNewGame(newGameParams);
     }
@@ -68,10 +114,9 @@ public class MultiplayerModel extends GameModel {
                 drawyer.determineNextTetrominos();
 
             // und dann an alle anderen senden
-            //TODO auch auswürfeln wo das Loch ist
-
             MultiPlayerObjects.InitGame initGame = new MultiPlayerObjects.InitGame();
             initGame.firstTetrominos = drawyer.drawyer.toArray();
+            initGame.garbageHolePosition = this.garbageHolePosition;
             playerRoom.sendToAllPlayers(initGame);
             tetrominosSent = initGame.firstTetrominos.length;
 
@@ -93,7 +138,7 @@ public class MultiplayerModel extends GameModel {
         // den Meister über den Stand der Dinge informieren
         MultiPlayerObjects.PlayerInGame meInGame = new MultiPlayerObjects.PlayerInGame();
         meInGame.playerId = playerRoom.getMyPlayerId();
-        meInGame.filledBlocks = 0; // TODO AUswertung muss noch - angesammelte Garbage reinrechnen!
+        meInGame.filledBlocks = getGameboard().calcGameboardFill();
         final GameScore myScore = getScore();
         meInGame.drawnBlocks = myScore.getDrawnTetrominos();
         meInGame.score = myScore.getScore();
@@ -148,23 +193,35 @@ public class MultiplayerModel extends GameModel {
             handlePlayerInGameChanged((MultiPlayerObjects.PlayerInGame) o);
 
 
-        if (o instanceof MultiPlayerObjects.NextTetrosDrawn)
-            drawyer.queueNextTetrominos(((MultiPlayerObjects.NextTetrosDrawn) o).nextTetrominos);
+        if (o instanceof MultiPlayerObjects.NextTetrosDrawn) {
+            if (playerRoom.isOwner())
+                Log.error("Multiplayer", "Drawn tetros received but I am the referee.");
+            else {
+                final int[] receivedTetros = ((MultiPlayerObjects.NextTetrosDrawn) o).nextTetrominos;
+                drawyer.queueNextTetrominos(receivedTetros);
+                tetrominosSent += receivedTetros.length;
+            }
+        }
 
         if (o instanceof MultiPlayerObjects.InitGame) {
-            drawyer.queueNextTetrominos(((MultiPlayerObjects.InitGame) o).firstTetrominos);
+            if (isInitialized)
+                Log.error("Multiplayer", "InitGame message received but already initialized");
+            else {
+                drawyer.queueNextTetrominos(((MultiPlayerObjects.InitGame) o).firstTetrominos);
+                this.garbageHolePosition = ((MultiPlayerObjects.InitGame) o).garbageHolePosition;
 
-            // ok, das war das init...
-            isInitialized = true;
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    MultiplayerModel.super.initializeActiveAndNextTetromino();
+                // ok, das war das init...
+                isInitialized = true;
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        MultiplayerModel.super.initializeActiveAndNextTetromino();
 
-                }
-            });
+                    }
+                });
 
-            //TODO zurückmelden dass dieser Spieler nun soweit ist - mit PlayerInGame
+                //TODO zurückmelden dass dieser Spieler nun soweit ist - mit PlayerInGame
+            }
         }
 
         if (o instanceof MultiPlayerObjects.LinesRemoved)
@@ -211,6 +268,10 @@ public class MultiplayerModel extends GameModel {
                         lowestFill = playerFill;
                     }
                 }
+
+                // die Garbage sofort intern vermerken, denn der Spieler selbst sendet erst beim nächsten Drop
+                if ((playerWithLowestFill != null))
+                    playerInGame.get(playerWithLowestFill).filledBlocks += garbageToSend * Gameboard.GAMEBOARD_COLUMNS;
             }
 
             if (playerWithLowestFill != null) {
@@ -314,7 +375,7 @@ public class MultiplayerModel extends GameModel {
 
                 if (playersLeft.size() >= 1) {
                     MultiPlayerObjects.BonusScore bonus = new MultiPlayerObjects.BonusScore();
-                    bonus.score = (int) ((deadPlayer.score * .3f) / playersLeft.size());
+                    bonus.score = (int) ((deadPlayer.score * SCORE_BONUS_PLAYEROVER) / playersLeft.size());
                     for (String leftPlayerId : playersLeft) {
                         if (leftPlayerId.equals(playerRoom.getMyPlayerId()))
                             handleMessagesFromOthers(bonus);

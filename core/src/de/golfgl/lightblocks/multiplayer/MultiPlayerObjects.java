@@ -127,7 +127,7 @@ public class MultiPlayerObjects {
 
     public static class InitGame {
         public int[] firstTetrominos;
-        public int[] holePosition;
+        public int[] garbageHolePosition;
     }
 
     public static class NextTetrosDrawn {

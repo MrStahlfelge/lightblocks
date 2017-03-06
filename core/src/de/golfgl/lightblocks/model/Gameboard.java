@@ -16,6 +16,7 @@ public class Gameboard implements Json.Serializable {
     public static final int GAMEBOARD_NORMALROWS = GAMEBOARD_ALLROWS - 2;
     public static final int GAMEBOARD_COLUMNS = 10;
     public static final int SQUARE_EMPTY = -1;
+    public static final int SQUARE_GARBAGE = 9;
 
     // Der Tetromino-Index an dieser Position (wird bei lightblocks derzeit nur  zur Unterscheidung
     // leer/nicht leer genutzt)
@@ -125,6 +126,46 @@ public class Gameboard implements Json.Serializable {
                 }
             }
         }
+    }
+
+    /**
+     * Garbage einfügen. Das übergebene Array definiert dabei sowohl die Anzahl der Zeilen (über seine Größe),
+     * als auch an welcher Stelle die Leerstelle ist.
+     */
+    public void insertLines(int[] holePosition) {
+        final int numberOfLines = holePosition.length;
+
+        // die Zeilen weiter oben hochziehen
+        for (int y = GAMEBOARD_ALLROWS - 1; y >= numberOfLines; y--) {
+            for (int x = 0; x < GAMEBOARD_COLUMNS; x++)
+                gameboardSquare[y][x] = gameboardSquare[y - numberOfLines][x];
+        }
+
+        // und unten nun die neuen rein
+        for (int y = numberOfLines - 1; y >= 0; y--) {
+            int lineIndex = numberOfLines - 1 - y;
+            for (int x = 0; x < GAMEBOARD_COLUMNS; x++)
+                gameboardSquare[y][x] = (holePosition[lineIndex] == x ? SQUARE_EMPTY : SQUARE_GARBAGE);
+        }
+    }
+
+    /**
+     * gibt den Füllstand des Bretts zurück.
+     * Dabei gilt: Es sind nicht alle leeren Felder leer, sondern nur die, die direkt von oben sichtbar sind
+     */
+    public int calcGameboardFill() {
+        int retVal = GAMEBOARD_COLUMNS * GAMEBOARD_NORMALROWS;
+
+        for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
+            int y = GAMEBOARD_NORMALROWS - 1;
+
+            while (y >= 0 && gameboardSquare[y][x] == SQUARE_EMPTY) {
+                y--;
+                retVal--;
+            }
+        }
+
+        return retVal;
     }
 
     // JSON
