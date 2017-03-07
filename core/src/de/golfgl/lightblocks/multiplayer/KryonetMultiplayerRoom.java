@@ -229,6 +229,8 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
     public void leaveRoom(boolean force) throws VetoException {
         if (isOwner())
             closeRoom(force);
+        else
+            setRoomState(RoomState.closed);
 
         if (client != null) {
             client.stop();
@@ -459,10 +461,8 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                 return;
             }
 
-            if (!(object instanceof FrameworkMessage)) {
-                Log.info("Multiplayer", "Got game object: " + object.toString());
-                informGotGameModelMessage(object);
-            }
+            if (!(object instanceof FrameworkMessage))
+                informGotRoomMessage(object);
         }
     }
 

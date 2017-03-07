@@ -1,13 +1,10 @@
 package de.golfgl.lightblocks.multiplayer;
 
-import com.badlogic.gdx.utils.IntArray;
 import com.esotericsoftware.kryo.Kryo;
 
 import java.util.ArrayList;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.model.GameScore;
-import de.golfgl.lightblocks.model.IGameModelListener;
 
 /**
  * The objects that are transferred via kryo
@@ -39,6 +36,8 @@ public class MultiPlayerObjects {
         kryo.register(RelayToPlayer.class);
         kryo.register(ChatMessage.class);
         kryo.register(GeneralKryoMessage.class);
+        kryo.register(PlayerInMatch.class);
+        kryo.register(PlayerInRoom.class);
 
         // GameModel
         kryo.register(SwitchedPause.class);
@@ -86,7 +85,6 @@ public class MultiPlayerObjects {
     public static class Player {
         public String name;
         public String tag;
-        public boolean isPaused;
         public String lightblocksVersion = LightBlocksGame.GAME_VERSIONSTRING;
     }
 
@@ -114,8 +112,23 @@ public class MultiPlayerObjects {
         public String message;
     }
 
+    // PlayerInMatch und PlayerInRoom sind beides Spielarten von MultiplayerMatch
+    // Während PlayerInMatch aber vom Owner verwaltet ist, ist PlayerInRoom vom Spieler selbst gesetzt
+    public static class PlayerInMatch {
+        public String playerId;
+        public int numOutplayed;
+        public int totalScore;
+    }
+
+    public static class PlayerInRoom {
+        public String playerId;
+        public boolean isReady;
+        public int inputType;
+        public boolean[] supportedInputTypes;
+    }
+
     public static class SwitchedPause {
-        public String  playerId;
+        public String playerId;
         public boolean nowPaused;
 
         public SwitchedPause withPaused(boolean paused) {
@@ -155,6 +168,7 @@ public class MultiPlayerObjects {
         public int filledBlocks;
         public int drawnBlocks;
         public int score;
+        public boolean isPaused;
     }
 
     public static class LinesRemoved {

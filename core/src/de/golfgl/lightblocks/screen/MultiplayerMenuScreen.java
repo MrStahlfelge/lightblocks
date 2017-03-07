@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -14,7 +15,9 @@ import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.FATextButton;
+import de.golfgl.lightblocks.scenes.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
+import de.golfgl.lightblocks.state.MultiplayerMatch;
 
 /**
  * Multiplayer Screen where players fill rooms to play
@@ -29,6 +32,8 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     private FATextButton startGameButton;
     private Label lanHelp;
     private Cell mainCell;
+    private MultiplayerMatch matchStats = new MultiplayerMatch();
+    private boolean hasToRefresh = false;
 
     public MultiplayerMenuScreen(LightBlocksGame app) {
         super(app);
@@ -55,7 +60,11 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
     @Override
     public void show() {
+
         super.show();
+
+        if (hasToRefresh)
+            refreshPlayerList();
 
         if (app.multiRoom != null && app.multiRoom.getRoomState().equals(AbstractMultiplayerRoom.RoomState.inGame))
             try {
@@ -144,6 +153,9 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     }
 
     private void initializeKryonetRoom() {
+        // falls schon matches gelaufen, dann zurücksetzen
+        matchStats.clearStats();
+
         final KryonetMultiplayerRoom kryonetRoom = new KryonetMultiplayerRoom();
         kryonetRoom.setNsdHelper(app.nsdHelper);
         kryonetRoom.addListener(this);
@@ -212,8 +224,15 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                     setOpenJoinRoomButtons();
 
                     // wenn raus, dann playerlist neu machen
-                    if (roomState == AbstractMultiplayerRoom.RoomState.closed)
-                        refreshPlayerList();
+                    if (roomState == AbstractMultiplayerRoom.RoomState.closed) {
+                        if (matchStats.getNumberOfPlayers() == 1)
+                            matchStats.clearStats();
+                        else
+                            for (String playerId : matchStats.getPlayers())
+                                matchStats.getPlayerStat(playerId).setPresent(false);
+                    }
+
+                    refreshPlayerList();
 
                 }
             });
@@ -233,6 +252,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
             MultiplayerPlayScreen mps = (MultiplayerPlayScreen) PlayScreen.gotoPlayScreen(this,
                     initGameParametersParams);
             mps.setBackScreen(this);
+            ((MultiplayerModel) mps.gameModel).setMatchStats(matchStats);
 
             app.multiRoom.addListener(mps);
             app.multiRoom.gameModelStarted();
@@ -245,11 +265,30 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
     @Override
     public void multiPlayerRoomInhabitantsChanged(final MultiPlayerObjects.PlayerChanged mpo) {
+
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
-                if (mpo.changeType == MultiPlayerObjects.CHANGE_ADD)
+                if (mpo.changeType == MultiPlayerObjects.CHANGE_ADD) {
                     app.rotateSound.play();
+
+                    // Neuankömmling und ich bin der Host? Dann matchStats schicken
+                    // Das ginge theoretisch auch ohne postrunnable. Aber dann ist das Problem dass bei LAN-Spiel der
+                    // Handshake noch nicht durch ist
+                    if (app.multiRoom.isOwner()) {
+                        synchronized (matchStats) {
+                            for (String player : matchStats.getPlayers())
+                                app.multiRoom.sendToPlayer(mpo.changedPlayer.name, matchStats.getPlayerStat(player)
+                                        .toPlayerInMatch());
+                        }
+                    }
+                }
+
+                synchronized (matchStats) {
+                    MultiplayerMatch.PlayerStat playerStat = matchStats.getPlayerStat(mpo.changedPlayer.name);
+                    playerStat.setPresent(!(mpo.changeType == MultiPlayerObjects.CHANGE_REMOVE));
+                }
+
                 refreshPlayerList();
             }
         });
@@ -265,37 +304,91 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         // interessiert mich nicht
     }
 
+    @Override
+    public void multiPlayerGotRoomMessage(Object o) {
+        if (o instanceof MultiPlayerObjects.PlayerInMatch) {
+            synchronized (matchStats) {
+                matchStats.getPlayerStat(((MultiPlayerObjects.PlayerInMatch) o).playerId).setFromPlayerInMatch(
+                        (MultiPlayerObjects.PlayerInMatch) o);
+            }
+
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    refreshPlayerList();
+                }
+            });
+        }
+    }
+
     protected void refreshPlayerList() {
         final Actor newActor;
-        if (app.multiRoom == null || app.multiRoom.getNumberOfPlayers() == 0)
+
+        if (app.getScreen() != this)
+            hasToRefresh = true;
+
+        if (matchStats.getNumberOfPlayers() == 0)
             newActor = lanHelp;
         else {
             Table playersTable = new Table();
 
-            for (String player : app.multiRoom.getPlayers()) {
-                playersTable.row();
-                String playerLabel = player;
-                if (player.equals(app.multiRoom.getMyPlayerId()))
-                    playerLabel = "* " + playerLabel;
+            playersTable.defaults().pad(5);
 
-                playersTable.add(new Label(playerLabel, app.skin, LightBlocksGame.SKIN_FONT_BIG)).minWidth
-                        (LightBlocksGame.nativeGameWidth * .5f);
+            playersTable.add();
+            playersTable.add(new Label("#OP", app.skin)).right();
+            playersTable.add(new Label(app.TEXTS.get("labelTotalScores"), app.skin)).right();
+
+            for (String playerId : matchStats.getPlayers()) {
+                playersTable.row();
+                final MultiplayerMatch.PlayerStat playerStat = matchStats.getPlayerStat(playerId);
+
+                Color lineColor;
+
+                if (!playerStat.isPresent())
+                    lineColor = new Color(.2f, .2f, .2f, 1);
+                else if (app.multiRoom == null || !playerId.equals(app.multiRoom.getMyPlayerId()))
+                    lineColor = new Color(.5f, .5f, .5f, 1);
+                else
+                    lineColor = new Color(1, 1, 1, 1);
+
+
+                final Label playerIdLabel = new Label(playerId, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                Label playerOutplaysLabel = new ScoreLabel(1, playerStat.getNumberOutplays(), app.skin,
+                        LightBlocksGame.SKIN_FONT_BIG);
+                Label playerScoreLabel = new ScoreLabel(1, playerStat.getTotalScore(), app.skin, LightBlocksGame
+                        .SKIN_FONT_BIG);
+
+                playerIdLabel.setColor(lineColor);
+                playerOutplaysLabel.setColor(lineColor);
+                playerScoreLabel.setColor(lineColor);
+
+                playersTable.add(playerIdLabel).minWidth(LightBlocksGame.nativeGameWidth * .33f);
+                playersTable.add(playerOutplaysLabel).right();
+                playersTable.add(playerScoreLabel).right();
+
             }
 
-            playersTable.row().padTop(30);
+            Actor toAdd;
 
-            if (app.multiRoom.getNumberOfPlayers() < 2) {
-                Label intoCell = new Label(app.TEXTS.get("multiplayerJoinNotEnoughPlayers"), app.skin);
-                intoCell.setWrap(true);
-                playersTable.add(intoCell).fill();
-            } else if (app.multiRoom.isOwner())
-                playersTable.add(startGameButton);
-            else
-                playersTable.add(new Label("Please wait for the host to start the game.", app.skin));
+            if (app.multiRoom != null && !app.multiRoom.getRoomState().equals(AbstractMultiplayerRoom.RoomState
+                    .closed)) {
+                if (app.multiRoom.getNumberOfPlayers() < 2) {
+                    toAdd = new Label(app.TEXTS.get("multiplayerJoinNotEnoughPlayers"), app.skin);
+                } else if (app.multiRoom.isOwner())
+                    toAdd = startGameButton;
+                else
+                    toAdd = new Label(app.TEXTS.get("multiplayerJoinWaitForStart"), app.skin);
+            } else
+                toAdd = new Label(app.TEXTS.get("multiplayerLanDisconnected"), app.skin);
+
+            playersTable.row().padTop(30);
+            playersTable.add(toAdd).colspan(3);
 
             newActor = playersTable;
         }
 
         mainCell.setActor(newActor);
+
+        hasToRefresh = false;
     }
 }

@@ -264,13 +264,20 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     @Override
     public void goBackToMenu() {
 
-        if (gameModel.isGameOver())
+        if (gameModel.isGameOver() && goToScoresWhenOver())
             goToHighscores();
 
         else {
             saveGameState();
             super.goBackToMenu();
         }
+    }
+
+    /**
+     * for overriding. Defines if scores should be shown after a round.
+     */
+    protected boolean goToScoresWhenOver() {
+        return true;
     }
 
     @Override
@@ -299,7 +306,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void switchPause(boolean immediately) {
 
         if (gameModel.isGameOver())
-            goToHighscores();
+            goBackToMenu();
 
         else {
             isPaused = !isPaused;

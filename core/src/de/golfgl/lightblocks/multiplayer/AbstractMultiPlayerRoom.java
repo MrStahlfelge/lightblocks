@@ -189,12 +189,24 @@ public abstract class AbstractMultiplayerRoom {
         }
     }
 
+    protected void informGotRoomMessage(final Object o) {
+
+        if (o instanceof MultiPlayerObjects.PlayerInMatch)
+            for (IRoomListener l : listeners)
+                l.multiPlayerGotRoomMessage(o);
+
+        else
+            informGotGameModelMessage(o);
+    }
+
     protected void informGotGameModelMessage(final Object o) {
         if (!roomState.equals(RoomState.inGame)) {
             // Game Model message werden verworfen wenn nicht im Spiel
             Log.warn("Multiplayer", "Ignored game model message - room not in game mode.");
             return;
         }
+
+        Log.info("Multiplayer", "Got game object: " + o.toString());
 
         synchronized (queuedMessages) {
             if (gameModelStarted)

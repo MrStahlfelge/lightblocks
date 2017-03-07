@@ -31,4 +31,6 @@ public interface IRoomListener {
      * @param o the message
      */
     public void multiPlayerGotModelMessage(Object o);
+
+    public void multiPlayerGotRoomMessage(Object o);
 }

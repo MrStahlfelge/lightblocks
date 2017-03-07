@@ -13,6 +13,7 @@ import java.util.Set;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.state.InitGameParameters;
+import de.golfgl.lightblocks.state.MultiplayerMatch;
 
 import static de.golfgl.lightblocks.model.IGameModelListener.MotivationTypes.watchOutGarbage;
 
@@ -41,7 +42,10 @@ public class MultiplayerModel extends GameModel {
     private int currentGarbageHolePosIndex = 0;
     private int currentGarbageHolePosUsed = 0;
 
+    private MultiplayerMatch matchStats;
+
     private boolean isInitialized = false;
+    private boolean isCompletelyOver = false;
 
     @Override
     public String getIdentifier() {
@@ -182,6 +186,7 @@ public class MultiplayerModel extends GameModel {
 
         // Meldung dass das Spiel zu Ende ist
         if (o instanceof MultiPlayerObjects.GameIsOver) {
+            isCompletelyOver = true;
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
@@ -205,47 +210,54 @@ public class MultiplayerModel extends GameModel {
             }
         }
 
-        if (o instanceof MultiPlayerObjects.InitGame) {
-            if (isInitialized)
-                Log.error("Multiplayer", "InitGame message received but already initialized");
-            else {
-                drawyer.queueNextTetrominos(((MultiPlayerObjects.InitGame) o).firstTetrominos);
-                this.garbageHolePosition = ((MultiPlayerObjects.InitGame) o).garbageHolePosition;
-
-                // ok, das war das init...
-                isInitialized = true;
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        MultiplayerModel.super.initializeActiveAndNextTetromino();
-
-                    }
-                });
-
-                //TODO zurückmelden dass dieser Spieler nun soweit ist - mit PlayerInGame
-            }
-        }
+        if (o instanceof MultiPlayerObjects.InitGame)
+            handleInitGame((MultiPlayerObjects.InitGame) o);
 
         if (o instanceof MultiPlayerObjects.LinesRemoved)
             handleLinesRemoved((MultiPlayerObjects.LinesRemoved) o);
 
-        if (o instanceof MultiPlayerObjects.GarbageForYou) {
-            boolean warningTreshold = false;
-            synchronized (waitingGarbageLines) {
-                int oldWaitingLines = waitingGarbageLines;
-                waitingGarbageLines = waitingGarbageLines + ((MultiPlayerObjects.GarbageForYou) o).garbageLines;
+        if (o instanceof MultiPlayerObjects.GarbageForYou)
+            handleGarbageForYou((MultiPlayerObjects.GarbageForYou) o);
 
-                if (waitingGarbageLines >= 4 && oldWaitingLines < 4)
-                    warningTreshold = true;
-            }
+    }
 
-            if (warningTreshold)
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        userInterface.showMotivation(watchOutGarbage, null);
-                    }
-                });
+    protected void handleGarbageForYou(MultiPlayerObjects.GarbageForYou o) {
+        boolean warningTreshold = false;
+        synchronized (waitingGarbageLines) {
+            int oldWaitingLines = waitingGarbageLines;
+            waitingGarbageLines = waitingGarbageLines + o.garbageLines;
+
+            if (waitingGarbageLines >= 4 && oldWaitingLines < 4)
+                warningTreshold = true;
+        }
+
+        if (warningTreshold)
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    userInterface.showMotivation(watchOutGarbage, null);
+                }
+            });
+    }
+
+    protected void handleInitGame(MultiPlayerObjects.InitGame o) {
+        if (isInitialized)
+            Log.error("Multiplayer", "InitGame message received but already initialized");
+        else {
+            drawyer.queueNextTetrominos(o.firstTetrominos);
+            this.garbageHolePosition = o.garbageHolePosition;
+
+            // ok, das war das init...
+            isInitialized = true;
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    MultiplayerModel.super.initializeActiveAndNextTetromino();
+
+                }
+            });
+
+            //TODO zurückmelden dass dieser Spieler nun soweit ist - mit PlayerInGame
         }
     }
 
@@ -387,9 +399,25 @@ public class MultiplayerModel extends GameModel {
                             handleMessagesFromOthers(bonus);
                         else
                             playerRoom.sendToPlayer(leftPlayerId, bonus);
+
+                        // beim letzten übrigen kommt kein playerisOver mehr, daher Score + Bonus in
+                        // dieser Ausnahme schon hier auf die Match-Stats rechnen
+                        if (playersLeft.size() == 1)
+                            matchStats.getPlayerStat(leftPlayerId).addTotalScore(playerInGame.get(leftPlayerId).score
+                                    + bonus.score);
                     }
                 }
 
+                // Stats aktualisieren & an die Clients senden
+                for (String playerLeftId : playersLeft) {
+                    MultiplayerMatch.PlayerStat playerLeftStat = matchStats.getPlayerStat(playerLeftId);
+                    playerLeftStat.incNumberOutplays();
+                    playerRoom.sendToAllPlayers(playerLeftStat.toPlayerInMatch());
+                }
+                matchStats.getPlayerStat(deadPlayer.playerId).addTotalScore(deadPlayer.score);
+                playerRoom.sendToAllPlayers(matchStats.getPlayerStat(deadPlayer.playerId).toPlayerInMatch());
+
+                // und nun Spiel beenden wenn niemand mehr da ist
                 if (playersLeft.size() <= 1) {
                     final MultiPlayerObjects.GameIsOver gameOverMsg = new MultiPlayerObjects.GameIsOver();
                     playerRoom.sendToAllPlayers(gameOverMsg);
@@ -419,6 +447,14 @@ public class MultiplayerModel extends GameModel {
                 userInterface.playersInGameChanged(pig);
         }
 
+    }
+
+    public void setMatchStats(MultiplayerMatch matchStats) {
+        this.matchStats = matchStats;
+    }
+
+    public boolean isCompletelyOver() {
+        return isCompletelyOver;
     }
 
     @Override

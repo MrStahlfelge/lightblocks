@@ -57,13 +57,19 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
     @Override
     public void goBackToMenu() {
-        if (!gameModel.isGameOver()) {
+        if (!((MultiplayerModel) gameModel).isCompletelyOver()) {
             //TODO hier vor dem Verlust der Ehre warnen und ob man wirklich möchte Ja/Nein
 
+        } else {
+            // ist eventuell doppelt, aber der unten im dispose kommt u.U. zu spät
+            app.multiRoom.removeListener(this);
+            super.goBackToMenu();
         }
+    }
 
-        //wird nicht benötigt, macht der Listener unten
-        // super.goBackToMenu();
+    @Override
+    protected boolean goToScoresWhenOver() {
+        return false;
     }
 
     @Override
@@ -138,5 +144,10 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
         //ansonsten weiter an das Spiel
         ((MultiplayerModel) gameModel).handleMessagesFromOthers(o);
+    }
+
+    @Override
+    public void multiPlayerGotRoomMessage(Object o) {
+        // bisher keine die hier zu verarbeiten sind.
     }
 }
