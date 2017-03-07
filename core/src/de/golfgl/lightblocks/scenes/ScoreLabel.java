@@ -23,10 +23,11 @@ public class ScoreLabel extends Label {
 
     // Anzahl der hochgezählten Ziffern pro Sekunde
     private long countingSpeed;
-    // maximale Anzahl in Sekunden die hochgezählt wird
     private long countingSpeedNow;
+    // maximale Anzahl in Sekunden die hochgezählt wird
     private float maxCountingTime;
     private long scoreToAdd;
+    private float deltaSinceLastChange;
 
     // Einfärben bei bestimmten Wertüberschreitungen
     private long emphasizeTreshold;
@@ -40,7 +41,7 @@ public class ScoreLabel extends Label {
     public ScoreLabel(int digits, long score, Skin skin, String styleName) {
         super("0", skin, styleName);
 
-        getBitmapFontCache().getFont().setFixedWidthGlyphs("0123456789-");
+        getBitmapFontCache().getFont().setFixedWidthGlyphs("0123456789-+X");
 
         this.digits = digits;
         this.score = score - 1;
@@ -55,7 +56,7 @@ public class ScoreLabel extends Label {
         if (scoreToAdd != 0) {
             long scoreToAddNow;
             if (countingSpeedNow > 0) {
-                scoreToAddNow = (long) (countingSpeedNow * delta);
+                scoreToAddNow = (long) (countingSpeedNow * (delta + deltaSinceLastChange));
                 scoreToAddNow = Math.min(Math.abs(scoreToAdd), scoreToAddNow);
                 if (scoreToAdd < 0)
                     scoreToAddNow *= -1;
@@ -63,6 +64,11 @@ public class ScoreLabel extends Label {
                 scoreToAddNow = scoreToAdd;
 
             scoreToAdd -= scoreToAddNow;
+
+            if (scoreToAddNow != 0)
+                deltaSinceLastChange = 0;
+            else
+                deltaSinceLastChange = deltaSinceLastChange + delta;
 
             if (emphasizeScore > 0 && score < emphasizeScore && score + scoreToAddNow >= emphasizeScore)
                 emphasizeLabel();
@@ -107,6 +113,10 @@ public class ScoreLabel extends Label {
 
         if (maxCountingTime > 0)
             countingSpeedNow = Math.max(countingSpeed, (long) (Math.abs(scoreToAdd) / maxCountingTime));
+        else
+            countingSpeedNow = countingSpeed;
+
+        deltaSinceLastChange = 0;
 
     }
 

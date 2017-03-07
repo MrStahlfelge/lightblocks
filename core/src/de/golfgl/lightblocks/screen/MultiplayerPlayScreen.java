@@ -46,8 +46,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
         for (String playerId : app.multiRoom.getPlayers()) {
             ScoreLabel lblFilling = new ScoreLabel(2, 100, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-            lblFilling.setCountingSpeed(20);
-            lblFilling.setExceedChar('-');
+            lblFilling.setExceedChar('X');
             fillingTable.add(lblFilling);
             playerLabels.put(playerId, lblFilling);
             fillingTable.add(new Label("%", app.skin)).padRight(10).bottom().padBottom(3);
@@ -79,10 +78,16 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
         ScoreLabel lblPlayerFill = playerLabels.get(pig.playerId);
 
         if (lblPlayerFill != null) {
+            boolean notInitialized = (lblPlayerFill.getScore() == 100);
             lblPlayerFill.setScore(pig.filledBlocks * 100 / (Gameboard.GAMEBOARD_COLUMNS * Gameboard
                     .GAMEBOARD_NORMALROWS));
-            // geht nicht beim Init, da dieser mit 100 erfolgt und dann auf 0 zurückgesetzt wird
-            lblPlayerFill.setEmphasizeTreshold(15, EMPHASIZE_COLOR);
+
+            if (notInitialized) {
+                // geht nicht beim Init, da dieser mit 100 erfolgt und dann auf 0 zurückgesetzt wird
+                lblPlayerFill.setEmphasizeTreshold(15, EMPHASIZE_COLOR);
+                lblPlayerFill.setCountingSpeed(30);
+                lblPlayerFill.setMaxCountingTime(.3f);
+            }
         }
     }
 
