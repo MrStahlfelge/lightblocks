@@ -70,14 +70,6 @@ public class MultiPlayerObjects {
         public boolean success;
         public String message;
         public String playerId;
-
-        @Override
-        public String toString() {
-            if (!success)
-                return "Room refused join, reason: " + message;
-            else
-                return "Joined room with player name " + playerId;
-        }
     }
 
     public static class RoomStateChanged {
@@ -94,6 +86,7 @@ public class MultiPlayerObjects {
     public static class Player {
         public String name;
         public String tag;
+        public boolean isPaused;
         public String lightblocksVersion = LightBlocksGame.GAME_VERSIONSTRING;
     }
 
@@ -122,6 +115,7 @@ public class MultiPlayerObjects {
     }
 
     public static class SwitchedPause {
+        public String  playerId;
         public boolean nowPaused;
 
         public SwitchedPause withPaused(boolean paused) {
