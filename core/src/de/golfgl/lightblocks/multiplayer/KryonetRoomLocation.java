@@ -25,7 +25,7 @@ public class KryonetRoomLocation implements IRoomLocation {
 
     @Override
     public String toString() {
-        return getRoomName() + " (" + address.getHostName() + ")";
+        return getRoomName();
     }
 
     @Override

@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 
 import java.util.HashMap;
 
@@ -34,6 +35,9 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     protected void populateScoreTable(Table scoreTable) {
         super.populateScoreTable(scoreTable);
 
+        //TODO (eventuell) Bei disconnect haben die Clients keinen Zugriff mehr auf ihre Punkte die erreicht wurden
+        // könnte man bei dem Event eventuell sonderbehandeln
+
         // Für die verschiedenen Spieler eine Zelle vorsehen. Noch nicht füllen, Infos stehen noch nicht zur Verfügung
         // das eingefügte ScoreLabel dient nur dazu den Platzbedarf festzulegen
         scoreTable.row();
@@ -52,7 +56,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
             fillingTable.add(new Label("%", app.skin)).padRight(10).bottom().padBottom(3);
         }
 
-        scoreTable.add(fillingTable).colspan(3);
+        scoreTable.add(fillingTable).colspan(3).align(Align.left);
     }
 
     @Override
@@ -108,12 +112,11 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     @Override
     public void multiPlayerRoomStateChanged(AbstractMultiplayerRoom.RoomState roomState) {
         if (!roomState.equals(AbstractMultiplayerRoom.RoomState.inGame))
-            //TODO hier sollten dann noch Game Over gezeigt werden bevor man am Ende ist
-            // Auch die letzen Ergebnisse müssen dann im Raum noch angezeigt werden
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    MultiplayerPlayScreen.super.goBackToMenu();
+                    if (app.getScreen() == MultiplayerPlayScreen.this)
+                        MultiplayerPlayScreen.super.goBackToMenu();
                 }
             });
     }

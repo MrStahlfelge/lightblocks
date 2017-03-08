@@ -48,6 +48,7 @@ public class TotalScoreScreen extends AbstractScoreScreen {
         addScoresLine(scoreTable, "labelBlocks", 0, total.getDrawnTetrominos());
         addScoresLine(scoreTable, "labelFourLines", 0, total.getFourLineCount());
         addScoresLine(scoreTable, "labelTSpin", 0, total.getTSpins());
+        addScoresLine(scoreTable, "labelMultiPlayerWon", 0, total.getMultiPlayerMatchesWon());
     }
 
 }

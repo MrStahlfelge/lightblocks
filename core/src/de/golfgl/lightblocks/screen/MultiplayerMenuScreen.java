@@ -204,9 +204,6 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     @Override
     public void multiPlayerRoomStateChanged(final AbstractMultiplayerRoom.RoomState roomState) {
 
-        //TODO dies kann auch in einem Client aufgerufen werden wenn er sich noch den Highscore anguckt. Es wird
-        // dann korrekt gewechselt, aber der ScoreScreen wird nicht korrekt beendet
-
         // Raum ist ins Spiel gewechselt
         if (roomState.equals(AbstractMultiplayerRoom.RoomState.inGame))
             Gdx.app.postRunnable(new Runnable() {

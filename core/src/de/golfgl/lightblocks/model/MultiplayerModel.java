@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.Timer;
 import com.esotericsoftware.minlog.Log;
 
 import java.util.HashMap;
@@ -186,12 +187,22 @@ public class MultiplayerModel extends GameModel {
 
         // Meldung dass das Spiel zu Ende ist
         if (o instanceof MultiPlayerObjects.GameIsOver) {
-            isCompletelyOver = true;
+            // isCompletelyOver erst nach kurzer Zeit setzen, damit Spieler kurz zu sich finden können
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    isCompletelyOver = true;
+                }
+            }, 2);
+
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    if (!isGameOver())
+                    if (!isGameOver()) {
+                        totalScore.incMultiPlayerMatchesWon();
+                        totalScore.incMultiPlayerMatchesStarted();
                         setGameOverWon();
+                    }
                 }
             });
         }
@@ -434,6 +445,7 @@ public class MultiplayerModel extends GameModel {
         final MultiPlayerObjects.PlayerIsOver playerOverMsg = new MultiPlayerObjects.PlayerIsOver();
         playerOverMsg.playerId = playerRoom.getMyPlayerId();
         playerRoom.sendToReferee(playerOverMsg);
+        totalScore.incMultiPlayerMatchesStarted();
 
         super.setGameOverBoardFull();
     }
