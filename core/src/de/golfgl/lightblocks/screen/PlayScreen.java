@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.Timer;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
@@ -470,6 +471,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                                 BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
                     else if (y == i && linesToInsert == 0)
                         // die untersten zusammenhängenden Zeilen rausschieben
+                        // TODO delay ggf. ebenfalls über Timer falls es Grafikprobleme beim Rausschieben gibt
                         block.setMoveAction(sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -2 *
                                 BlockActor.blockWidth, moveActorsTime)));
 
@@ -508,24 +510,38 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     // verschieben des Actors... hier wird aber die Garbage schon beachtet!
                     // falls gar keine Bewegung da, dann auch nix machen
                     if (block != null && destinationY != replaceLineIwith) {
+                        float delay = 0;
 
                         // jetzt eine grundsätzliche Unterscheidung: wird die Zeile hochgeschoben oder runterbewegt?
                         // wenn hoch, dann kein delay
-                        SequenceAction moveSequence = Actions.action(SequenceAction.class);
+                        final SequenceAction moveSequence = Actions.action(SequenceAction.class);
 
                         if (destinationY <= replaceLineIwith)
-                            moveSequence.addAction(Actions.delay(removeDelayTime));
+                            delay = removeDelayTime;
 
                         moveSequence.addAction(Actions.moveTo((x) * BlockActor.blockWidth, (destinationY) *
                                 BlockActor.blockWidth, moveActorsTime));
 
                         // wenn Block durch insert rausgeschoben wird, dann weg
+                        // in der moveAction eigentlich nicht ganz korrekt, aber der Fall tritt sehr selten auf
+                        // und der Block wird sowieso nicht nochmal angefasst werden
                         if (destinationY >= Gameboard.GAMEBOARD_ALLROWS) {
                             moveSequence.addAction(Actions.fadeOut(removeFadeOutTime));
                             moveSequence.addAction(removeActor());
                         }
 
-                        block.setMoveAction(moveSequence);
+                        if (delay > 0) {
+                            final BlockActor timedBlock = block;
+
+                            Timer.schedule(new Timer.Task() {
+                                @Override
+                                public void run() {
+                                    timedBlock.setMoveAction(moveSequence);
+                                }
+                            }, delay);
+
+                        } else
+                            block.setMoveAction(moveSequence);
                     }
 
                 }
@@ -664,8 +680,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 playSound = false;
                 break;
             case playerOver:
-                if (extraMsg.length() >= 10)
-                    extraMsg = extraMsg.substring(1, 8) + "...";
+                if (extraMsg.length() >= 12)
+                    extraMsg = extraMsg.substring(0, 10) + "...";
                 text = app.TEXTS.format("motivationPlayerOver", extraMsg);
                 break;
             case gameOver:

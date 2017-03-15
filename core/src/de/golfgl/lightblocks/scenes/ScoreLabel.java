@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.scenes;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
@@ -34,6 +35,7 @@ public class ScoreLabel extends Label {
     private long emphasizeScore;
     private Color emphasizeColor;
     private Sound emphasizeSound;
+    private TemporalAction emphAction;
 
     private String suffix;
     private Character exceedChar = null;
@@ -121,11 +123,19 @@ public class ScoreLabel extends Label {
     }
 
     public void emphasizeLabel() {
-        // bisherige Farbe kopieren
-        Color colorNow = new Color(getColor());
+        //wenn die Action noch am laufen ist, dann einfach neu starten
+        if (emphAction != null && emphAction.getTarget() != null) {
+            setColor(emphasizeColor);
+            emphAction.restart();
 
-        setColor(emphasizeColor);
-        this.addAction(Actions.color(colorNow, 1f));
+        } else {
+            // bisherige Farbe kopieren
+            Color colorNow = new Color(getColor());
+
+            setColor(emphasizeColor);
+            emphAction = Actions.color(colorNow, 1f);
+            this.addAction(emphAction);
+        }
 
         if (emphasizeSound != null)
             emphasizeSound.play();
