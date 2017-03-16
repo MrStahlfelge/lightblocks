@@ -28,7 +28,7 @@ public class LightBlocksGame extends Game {
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
     public static final String GAME_URL = "http://www.golfgl.de/lightblocks/";
     // An den gleichen Eintrag im AndroidManifest denken!!!
-    public static final String GAME_VERSIONSTRING = "0.55.032";
+    public static final String GAME_VERSIONSTRING = "0.55.033";
     public static final long GAME_EXPIRATION = 1501538400000L; // 1.8.17
 
     public static final String SKIN_FONT_TITLE = "bigbigoutline";

@@ -123,12 +123,8 @@ public class ScoreLabel extends Label {
     }
 
     public void emphasizeLabel() {
-        //wenn die Action noch am laufen ist, dann einfach neu starten
-        if (emphAction != null && emphAction.getTarget() != null) {
-            setColor(emphasizeColor);
-            emphAction.restart();
-
-        } else {
+        // nur färben wenn die vorherige Action nicht mehr am Laufen ist
+        if (emphAction == null || emphAction.getTarget() == null) {
             // bisherige Farbe kopieren
             Color colorNow = new Color(getColor());
 
@@ -136,7 +132,6 @@ public class ScoreLabel extends Label {
             emphAction = Actions.color(colorNow, 1f);
             this.addAction(emphAction);
         }
-
         if (emphasizeSound != null)
             emphasizeSound.play();
     }
