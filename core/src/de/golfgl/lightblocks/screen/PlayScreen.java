@@ -184,7 +184,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         levelNum = new ScoreLabel(2, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
         scoreTable.add(levelNum).left();
         Label linesLabel = new Label(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
-        scoreTable.add(linesLabel).right().bottom().padBottom(3).spaceLeft(10);
+        scoreTable.add(linesLabel).right().bottom().padBottom(3).spaceLeft(10).spaceRight(3);
         linesNum = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
         linesNum.setCountingSpeed(100);
         scoreTable.add(linesNum).left();
