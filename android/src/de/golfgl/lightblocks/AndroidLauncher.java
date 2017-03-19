@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.rafakob.nsdhelper.NsdHelper;
 
 import de.golfgl.lightblocks.multiplayer.NsdAdapter;
 import de.golfgl.lightblocks.state.Player;
@@ -18,6 +17,14 @@ public class AndroidLauncher extends AndroidApplication {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // auch hiermit lassen sich Fehler vermeiden wenn über anderen Launcher gestartet
+        // launchMode: singleTask im Manifest tut aber das gleiche, ist nur evtl. zu viel
+//        if (!isTaskRoot()) {
+//            finish();
+//            return;
+//        }
+
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.hideStatusBar = true;
         config.useAccelerometer = true;
