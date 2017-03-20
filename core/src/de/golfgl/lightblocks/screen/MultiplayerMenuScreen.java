@@ -263,32 +263,51 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     @Override
     public void multiPlayerRoomInhabitantsChanged(final MultiPlayerObjects.PlayerChanged mpo) {
 
+        // Liste aktualisieren
+        synchronized (matchStats) {
+            MultiplayerMatch.PlayerStat playerStat = matchStats.getPlayerStat(mpo.changedPlayer.name);
+            playerStat.setPresent(!(mpo.changeType == MultiPlayerObjects.CHANGE_REMOVE));
+        }
+
+        // Refresh des UI lostreten
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
-                if (mpo.changeType == MultiPlayerObjects.CHANGE_ADD) {
+                if (mpo.changeType == MultiPlayerObjects.CHANGE_ADD
+                        || mpo.changeType == MultiPlayerObjects.CHANGE_REMOVE)
                     app.rotateSound.play();
-
-                    // Neuankömmling und ich bin der Host? Dann matchStats schicken
-                    // Das ginge theoretisch auch ohne postrunnable. Aber dann ist das Problem dass bei LAN-Spiel der
-                    // Handshake noch nicht durch ist
-                    if (app.multiRoom.isOwner()) {
-                        synchronized (matchStats) {
-                            for (String player : matchStats.getPlayers())
-                                app.multiRoom.sendToPlayer(mpo.changedPlayer.name, matchStats.getPlayerStat(player)
-                                        .toPlayerInMatch());
-                        }
-                    }
-                }
-
-                synchronized (matchStats) {
-                    MultiplayerMatch.PlayerStat playerStat = matchStats.getPlayerStat(mpo.changedPlayer.name);
-                    playerStat.setPresent(!(mpo.changeType == MultiPlayerObjects.CHANGE_REMOVE));
-                }
 
                 refreshPlayerList();
             }
         });
+
+        // Neuankömmling und ich bin der Host? Dann matchStats schicken
+        if (mpo.changeType == MultiPlayerObjects.CHANGE_ADD && app.multiRoom.isOwner()) {
+            // Das ginge theoretisch auch ohne neuen Thread. Aber dann ist das Problem dass bei LAN-Spiel der
+            // Handshake noch nicht durch ist (wird erst nach Ausführen dieser Methode gemacht) und der Client
+            // die Daten daher ablehnt
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        // kurze Verzögerung, der Handshake soll zuerst kommen
+                        Thread.sleep(30);
+                    } catch (InterruptedException e) {
+                        // eat
+                    }
+
+                    synchronized (matchStats) {
+                        for (String player : matchStats.getPlayers())
+                            app.multiRoom.sendToPlayer(mpo.changedPlayer.name, matchStats.getPlayerStat(player)
+                                    .toPlayerInMatch());
+                    }
+
+                }
+            }).start();
+
+        }
+
     }
 
     @Override
