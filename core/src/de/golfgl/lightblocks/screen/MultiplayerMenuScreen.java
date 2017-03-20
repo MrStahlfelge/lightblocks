@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -140,8 +142,13 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     protected void buttonOpenRoomPressed() {
         try {
             if (app.multiRoom != null && app.multiRoom.isConnected()) {
-                app.multiRoom.closeRoom(false);
-                app.multiRoom = null;
+                if (app.multiRoom.getNumberOfPlayers() > 1)
+                    confirmForcedRoomClose();
+
+                else {
+                    app.multiRoom.closeRoom(false);
+                    app.multiRoom = null;
+                }
             } else {
                 initializeKryonetRoom();
                 app.multiRoom.openRoom(app.player);
@@ -150,6 +157,31 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         } catch (VetoException e) {
             showDialog(e.getMessage());
         }
+    }
+
+    private void confirmForcedRoomClose() {
+        // mehr als ein Spieler - dann nachfragen ob wirklich geschlossen werden soll
+        Dialog dialog = new Dialog("", app.skin) {
+            @Override
+            protected void result(Object object) {
+                if (object != null) {
+                    try {
+                        app.multiRoom.closeRoom(true);
+                        app.multiRoom = null;
+                    } catch (VetoException e) {
+                        showDialog(e.getMessage());
+                    }
+                }
+            }
+        };
+        Label errorMsgLabel = new Label(app.TEXTS.get("multiplayerDisconnectClients"), app.skin);
+        errorMsgLabel.setWrap(true);
+        dialog.getContentTable().add(errorMsgLabel).prefWidth
+                (LightBlocksGame.nativeGameWidth * .75f).pad(10);
+        final TextButton.TextButtonStyle buttonStyle = app.skin.get("big", TextButton.TextButtonStyle.class);
+        dialog.button(app.TEXTS.get("menuYes"), true, buttonStyle);
+        dialog.button(app.TEXTS.get("menuNo"), null, buttonStyle);
+        dialog.show(stage);
     }
 
     private void initializeKryonetRoom() {

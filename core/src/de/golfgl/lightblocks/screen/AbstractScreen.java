@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -105,7 +106,7 @@ public abstract class AbstractScreen implements Screen {
         errorMsgLabel.setWrap(true);
         dialog.getContentTable().add(errorMsgLabel).prefWidth
                 (LightBlocksGame.nativeGameWidth * .75f).pad(10);
-        dialog.button("OK"); //sends "true" as the result
+        dialog.button("OK", null, app.skin.get("big", TextButton.TextButtonStyle.class));
         dialog.show(stage);
     }
 
