@@ -1,9 +1,7 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -12,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.scenes.FATextButton;
+import de.golfgl.lightblocks.scenes.InputButtonTable;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
@@ -20,10 +19,8 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class MenuMarathonScreen extends AbstractMenuScreen {
 
-    private ButtonGroup<IntButton> inputButtonsGroup;
-    private Label currentInputLabel;
-    private Slider beginningLevel;
-    private int inputChosen;
+    private Slider beginningLevelSlider;
+    private InputButtonTable inputButtons;
 
     public MenuMarathonScreen(final LightBlocksGame app) {
         super(app);
@@ -57,87 +54,28 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
     @Override
     protected void fillMenuTable(Table menuTable) {
 
-        // Startlevel
-        beginningLevel = new Slider(0, 9, 1, false, app.skin);
-        beginningLevel.setValue(app.prefs.getInteger("beginningLevel", 0));
-
         final Label beginningLevelLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        final ChangeListener changeListener = new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                beginningLevelLabel.setText(app.TEXTS.get("labelLevel") + " " + Integer.toString((int) beginningLevel
-                        .getValue()));
-            }
-        };
-        beginningLevel.addListener(changeListener);
-        changeListener.changed(null, null);
+        beginningLevelSlider = constructBeginningLevelSlider(beginningLevelLabel, app.prefs.getInteger
+                ("beginningLevel", 0), 9);
 
-        Table beginningLevel = new Table();
-        beginningLevel.add(this.beginningLevel).minHeight(30).minWidth(200).right().fill();
-        beginningLevel.add(beginningLevelLabel).left().spaceLeft(10);
+
+        Table beginningLevelTable = new Table();
+        beginningLevelTable.add(beginningLevelSlider).minHeight(30).minWidth(200).right().fill();
+        beginningLevelTable.add(beginningLevelLabel).left().spaceLeft(10);
 
         // die möglichen Inputs aufzählen
-        Table inputButtons = new Table();
-        inputButtonsGroup = new ButtonGroup<IntButton>();
-        currentInputLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        inputButtons.defaults().uniform().fill();
-        ChangeListener controllerChangeListener = new ChangeListener() {
-
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                if (inputButtonsGroup.getChecked() != null) {
-                    inputChosen = inputButtonsGroup.getChecked().getValue();
-                    currentInputLabel.setText(app.TEXTS.get(PlayScreenInput.getInputTypeName(inputChosen)));
-                }
-            }
-        };
-
-
-        int lastInputChosen = app.prefs.getInteger("inputType", 0);
-        if (!PlayScreenInput.isInputTypeAvailable(lastInputChosen))
-            lastInputChosen = 0;
-
-        int i = 0;
-        while (true) {
-            try {
-
-                IntButton inputButton = new IntButton(PlayScreenInput.getInputFAIcon(i), app.skin, FontAwesome
-                        .SKIN_FONT_FA + "-checked");
-                inputButton.setValue(i);
-                inputButton.addListener(controllerChangeListener);
-                inputButton.setDisabled(!PlayScreenInput.isInputTypeAvailable(i));
-
-                // Tastatur nur anzeigen, wenn sie auch wirklich da ist
-                if (i > 0 || !inputButton.isDisabled()) {
-                    inputButtons.add(inputButton);
-                    inputButtonsGroup.add(inputButton);
-                }
-
-                if (lastInputChosen == i) {
-                    if (inputButton.isDisabled())
-                        lastInputChosen++;
-                    else
-                        inputButton.setChecked(true);
-
-                }
-
-                i++;
-
-            } catch (Throwable t) {
-                break;
-            }
-        }
+        inputButtons = new InputButtonTable(app, app.prefs.getInteger("inputType", 0));
 
         menuTable.row();
         menuTable.add(new Label(app.TEXTS.get("labelBeginningLevel"), app.skin)).left();
         menuTable.row();
-        menuTable.add(beginningLevel);
+        menuTable.add(beginningLevelTable);
         menuTable.row().padTop(20);
         menuTable.add(new Label(app.TEXTS.get("menuInputControl"), app.skin)).left();
         menuTable.row();
         menuTable.add(inputButtons);
         menuTable.row();
-        menuTable.add(currentInputLabel).center();
+        menuTable.add(inputButtons.getInputLabel()).center();
     }
 
     @Override
@@ -164,9 +102,9 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
         }
 
         ScoreScreen scoreScreen = new ScoreScreen(app);
-        scoreScreen.setGameModelId(MarathonModel.MODEL_MARATHON_ID + inputChosen);
+        scoreScreen.setGameModelId(MarathonModel.MODEL_MARATHON_ID + inputButtons.getSelectedInput());
         scoreScreen.addScoreToShow(app.savegame.loadBestScore("marathon" +
-                        inputChosen),
+                        inputButtons.getSelectedInput()),
                 app.TEXTS.get("labelBestScores"));
         scoreScreen.setBackScreen(MenuMarathonScreen.this);
         scoreScreen.setMaxCountingTime(1);
@@ -177,11 +115,11 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
     protected void beginNewGame() {
         InitGameParameters initGameParametersParams = new InitGameParameters();
         initGameParametersParams.setGameModelClass(MarathonModel.class);
-        initGameParametersParams.setBeginningLevel((int) beginningLevel.getValue());
-        initGameParametersParams.setInputKey(inputChosen);
+        initGameParametersParams.setBeginningLevel((int) beginningLevelSlider.getValue());
+        initGameParametersParams.setInputKey(inputButtons.getSelectedInput());
 
         // Einstellungen speichern
-        app.prefs.putInteger("inputType", inputChosen);
+        app.prefs.putInteger("inputType", inputButtons.getSelectedInput());
         app.prefs.putInteger("beginningLevel", initGameParametersParams
                 .getBeginningLevel());
         app.prefs.flush();
@@ -191,39 +129,6 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
             dispose();
         } catch (VetoException e) {
             showDialog(e.getMessage());
-        }
-    }
-
-    class KeyText<T> {
-        public T value;
-        public String description;
-
-        KeyText(T value, String description) {
-            this.value = value;
-            this.description = description;
-
-        }
-
-        @Override
-        public String toString() {
-            return description;
-        }
-    }
-
-    public class IntButton extends TextButton {
-
-        private int value;
-
-        public IntButton(String text, Skin skin, String styleName) {
-            super(text, skin, styleName);
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public void setValue(int value) {
-            this.value = value;
         }
     }
 

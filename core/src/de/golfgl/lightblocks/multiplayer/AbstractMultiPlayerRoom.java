@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.Player;
 
@@ -63,6 +64,15 @@ public abstract class AbstractMultiplayerRoom {
                 rsc.refereePlayerId = myPlayerId;
                 //TODO Stellvertreter
                 sendToAllPlayers(rsc);
+            }
+
+            if (!isOwner() && roomState.equals(RoomState.join)) {
+                //Handshake wurde durchgeführt, jetzt dem Owner senden was für Inputs ich kann
+                MultiPlayerObjects.PlayerInRoom pir = new MultiPlayerObjects.PlayerInRoom();
+                pir.playerId = myPlayerId;
+                pir.supportedInputTypes = PlayScreenInput.getInputAvailableBitset();
+
+                sendToReferee(pir);
             }
 
             // auch mich selbst benachrichtigen
@@ -191,7 +201,9 @@ public abstract class AbstractMultiplayerRoom {
 
     protected void informGotRoomMessage(final Object o) {
 
-        if (o instanceof MultiPlayerObjects.PlayerInMatch)
+        if (o instanceof MultiPlayerObjects.PlayerInMatch ||
+                o instanceof MultiPlayerObjects.PlayerInRoom
+                || o instanceof MultiPlayerObjects.GameParameters)
             for (IRoomListener l : listeners)
                 l.multiPlayerGotRoomMessage(o);
 

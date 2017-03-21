@@ -20,6 +20,9 @@ public abstract class PlayScreenInput extends InputAdapter {
     protected boolean isGameOver;
     PlayScreen playScreen;
 
+    public static final int KEY_INPUTTYPE_MAX = 3;
+    public static final int KEY_INPUTTYPE_ALLAVAIL = 1;
+
     public static PlayScreenInput getPlayInput(int key) throws InputNotAvailableException {
 
         if (!isInputTypeAvailable(key))
@@ -50,6 +53,15 @@ public abstract class PlayScreenInput extends InputAdapter {
             default:
                 throw new IllegalArgumentException("Not supported");
         }
+    }
+
+    public static boolean[] getInputAvailableBitset() {
+        boolean[] retVal = new boolean[KEY_INPUTTYPE_MAX + 1];
+
+        for (int i = 0; i <=KEY_INPUTTYPE_MAX; i++)
+            retVal[i] = isInputTypeAvailable(i);
+
+        return retVal;
     }
 
     public static String getInputTypeName(int key) {

@@ -6,9 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+
+import java.util.HashMap;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MultiplayerModel;
@@ -17,6 +20,7 @@ import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.FATextButton;
+import de.golfgl.lightblocks.scenes.InputButtonTable;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.MultiplayerMatch;
@@ -32,10 +36,15 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     private FATextButton openRoomButton;
     private FATextButton joinRoomButton;
     private FATextButton startGameButton;
+    private Slider beginningLevelSlider;
+    private Table beginningLevelTable;
+    private InputButtonTable inputButtonTable;
     private Label lanHelp;
     private Cell mainCell;
     private MultiplayerMatch matchStats = new MultiplayerMatch();
+    private HashMap<String, boolean[]> availablePlayerInputs = new HashMap<String, boolean[]>();
     private boolean hasToRefresh = false;
+    private ChangeListener gameParameterListener;
 
     public MultiplayerMenuScreen(LightBlocksGame app) {
         super(app);
@@ -93,6 +102,9 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 joinButtonPressed();
             }
         });
+
+        // Die folgenden Elemente sind nicht in der Buttontable, aber die Initialisierung hier macht Sinn
+
         startGameButton = new FATextButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
         startGameButton.addListener(new ChangeListener() {
                                         public void changed(ChangeEvent event, Actor actor) {
@@ -105,6 +117,30 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                                     }
         );
 
+        final Label beginningLevelLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        beginningLevelSlider = constructBeginningLevelSlider(beginningLevelLabel, 0, 5);
+
+        gameParameterListener = new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (app.multiRoom != null && app.multiRoom.isOwner()) {
+                    MultiPlayerObjects.GameParameters gp = new MultiPlayerObjects.GameParameters();
+                    gp.beginningLevel = (int) beginningLevelSlider.getValue();
+                    gp.chosenInput = inputButtonTable.getSelectedInput();
+
+                    app.multiRoom.sendToAllPlayers(gp);
+                }
+            }
+        };
+
+        beginningLevelTable = new Table();
+        beginningLevelTable.add(beginningLevelSlider).minHeight(30).minWidth(200).right().fill();
+        beginningLevelTable.add(beginningLevelLabel).left().spaceLeft(10);
+
+        inputButtonTable = new InputButtonTable(app, 0);
+
+        beginningLevelSlider.addListener(gameParameterListener);
+        inputButtonTable.setExternalChangeListener(gameParameterListener);
 
         setOpenJoinRoomButtons();
 
@@ -272,9 +308,8 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         InitGameParameters initGameParametersParams = new InitGameParameters();
         initGameParametersParams.setGameModelClass(MultiplayerModel.class);
 
-        //TODO - erstmal einfach letzten Input und Level
-        initGameParametersParams.setBeginningLevel(app.prefs.getInteger("beginningLevel", 0));
-        initGameParametersParams.setInputKey(app.prefs.getInteger("inputType", 0));
+        initGameParametersParams.setBeginningLevel((int) beginningLevelSlider.getValue());
+        initGameParametersParams.setInputKey(inputButtonTable.getSelectedInput());
         initGameParametersParams.setMultiplayerRoom(app.multiRoom);
 
         try {
@@ -310,10 +345,12 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                     app.rotateSound.play();
 
                 refreshPlayerList();
+                if (app.multiRoom != null && app.multiRoom.isOwner())
+                    refreshAvailableInputs();
             }
         });
 
-        // Neuankömmling und ich bin der Host? Dann matchStats schicken
+        // Neuankömmling und ich bin der Host? Dann matchStats und gameParameters schicken
         if (mpo.changeType == MultiPlayerObjects.CHANGE_ADD && app.multiRoom.isOwner()) {
             // Das ginge theoretisch auch ohne neuen Thread. Aber dann ist das Problem dass bei LAN-Spiel der
             // Handshake noch nicht durch ist (wird erst nach Ausführen dieser Methode gemacht) und der Client
@@ -335,6 +372,9 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                                     .toPlayerInMatch());
                     }
 
+                    // Spielparameter schicken
+                    gameParameterListener.changed(null, null);
+
                 }
             }).start();
 
@@ -353,7 +393,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     }
 
     @Override
-    public void multiPlayerGotRoomMessage(Object o) {
+    public void multiPlayerGotRoomMessage(final Object o) {
         if (o instanceof MultiPlayerObjects.PlayerInMatch) {
             synchronized (matchStats) {
                 matchStats.getPlayerStat(((MultiPlayerObjects.PlayerInMatch) o).playerId).setFromPlayerInMatch(
@@ -367,6 +407,53 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 }
             });
         }
+
+        if (o instanceof MultiPlayerObjects.PlayerInRoom) {
+            synchronized (availablePlayerInputs) {
+                availablePlayerInputs.put(((MultiPlayerObjects.PlayerInRoom) o).playerId,
+                        ((MultiPlayerObjects.PlayerInRoom) o).supportedInputTypes);
+
+                if (app.multiRoom.isOwner())
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshAvailableInputs();
+                        }
+                    });
+            }
+        }
+
+        if (o instanceof MultiPlayerObjects.GameParameters && !app.multiRoom.isOwner()) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    beginningLevelSlider.setValue(((MultiPlayerObjects.GameParameters) o).beginningLevel);
+                    inputButtonTable.setInputChecked(((MultiPlayerObjects.GameParameters) o).chosenInput);
+                    inputButtonTable.setAllDisabledButSelected();
+                }
+            });
+
+        }
+    }
+
+    private void refreshAvailableInputs() {
+        // nur relevant für Owner => raus
+        if (app.multiRoom == null || !app.multiRoom.isOwner())
+            return;
+
+        boolean[] allSupportedInputs = PlayScreenInput.getInputAvailableBitset();
+
+        for (String playerId : app.multiRoom.getPlayers()) {
+
+            boolean[] playerInputAvail = availablePlayerInputs.get(playerId);
+
+            if (playerInputAvail != null)
+                for (int i = 0; i < Math.min(allSupportedInputs.length, playerInputAvail.length); i++)
+                    allSupportedInputs[i] = allSupportedInputs[i] && playerInputAvail[i];
+        }
+
+        for (int i = 0; i < allSupportedInputs.length; i++)
+            inputButtonTable.setInputDisabled(i, !allSupportedInputs[i]);
     }
 
     protected void refreshPlayerList() {
@@ -431,6 +518,20 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
             playersTable.row().padTop(30);
             playersTable.add(toAdd).colspan(3);
+
+            if (app.multiRoom != null && !app.multiRoom.getRoomState().equals(AbstractMultiplayerRoom.RoomState
+                    .closed)) {
+                playersTable.row().padTop(25);
+                playersTable.add(new Label(app.TEXTS.get("multiplayerRoundSettings"), app.skin, LightBlocksGame
+                        .SKIN_FONT_BIG)).colspan(3);
+                playersTable.row();
+                playersTable.add(beginningLevelTable).colspan(3);
+                playersTable.row().padTop(5);
+                playersTable.add(inputButtonTable).colspan(3);
+
+                beginningLevelSlider.setDisabled(!app.multiRoom.isOwner());
+                inputButtonTable.setAllDisabledButSelected();
+            }
 
             newActor = playersTable;
         }

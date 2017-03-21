@@ -15,7 +15,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 public class MultiPlayerObjects {
 
     // *** BEI JEDER ÄNDERUNG HOCHZÄHLEN!!! ***
-    public static final int INTERFACE_VERSION = 1;
+    public static final int INTERFACE_VERSION = 2;
 
     public static final int CHANGE_ADD = 1;
     public static final int CHANGE_UPDATE = 2;
@@ -32,11 +32,13 @@ public class MultiPlayerObjects {
         kryo.register(RoomStateChanged.class);
         kryo.register(Player.class);
         kryo.register(PlayerChanged.class);
+        kryo.register(GameParameters.class);
         kryo.register(ArrayList.class);
         kryo.register(RelayToPlayer.class);
         kryo.register(ChatMessage.class);
         kryo.register(GeneralKryoMessage.class);
         kryo.register(PlayerInMatch.class);
+        kryo.register(boolean[].class);
         kryo.register(PlayerInRoom.class);
 
         // GameModel
@@ -74,7 +76,7 @@ public class MultiPlayerObjects {
     public static class RoomStateChanged {
         public AbstractMultiplayerRoom.RoomState roomState;
         public String refereePlayerId;
-        public String debutyPlayerId;
+        public String deputyPlayerId;
 
         @Override
         public String toString() {
@@ -91,6 +93,12 @@ public class MultiPlayerObjects {
     public static class PlayerChanged {
         public Player changedPlayer;
         public int changeType;
+    }
+
+    public static class GameParameters {
+        public int chosenInput;
+        public int beginningLevel;
+        public String futureUse;
     }
 
     public static class RelayToPlayer {
@@ -122,8 +130,6 @@ public class MultiPlayerObjects {
 
     public static class PlayerInRoom {
         public String playerId;
-        public boolean isReady;
-        public int inputType;
         public boolean[] supportedInputTypes;
     }
 
