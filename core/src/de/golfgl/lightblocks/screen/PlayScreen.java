@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -18,7 +19,10 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Timer;
 
+import java.util.HashSet;
+
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Gameboard;
@@ -61,7 +65,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private ScoreLabel levelNum;
     private ScoreLabel linesNum;
     private PauseDialog pauseDialog;
+    private Dialog pauseMsgDialog;
     private boolean isPaused = true;
+    private HashSet<GameBlocker> gameBlockers = new HashSet<GameBlocker>();
+    private boolean pausedByBlocker;
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
@@ -323,7 +330,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (gameModel.isGameOver())
             goBackToMenu();
 
-        else {
+        else if (!isPaused || gameBlockers.isEmpty()) {
             isPaused = !isPaused;
 
             final float fadingInterval = immediately ? 0 : .2f;
@@ -345,6 +352,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 }
 
                 pauseDialog.hide(null);
+                if (pauseMsgDialog != null && pauseMsgDialog.hasParent())
+                    pauseMsgDialog.hide();
 
                 //inform the game model that there was a pause
                 gameModel.fromPause();
@@ -748,6 +757,24 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
 
     public void showInputHelp() {
-        showDialog(inputAdapter.getInputHelpText());
+        pauseMsgDialog = showDialog(inputAdapter.getInputHelpText());
+    }
+
+    public void addGameBlocker(GameBlocker e) {
+        gameBlockers.add(e);
+
+        // Pause auslösen
+        if (!isPaused && !gameBlockers.isEmpty()) {
+            pausedByBlocker = true;
+            switchPause(false);
+        }
+    }
+
+    public void removeGameBlocker(GameBlocker e) {
+        gameBlockers.remove(e);
+
+        //TODO hier sollte noch 3 Sekunden reingehen
+        if (isPaused && pausedByBlocker && gameBlockers.isEmpty())
+            switchPause(true);
     }
 }

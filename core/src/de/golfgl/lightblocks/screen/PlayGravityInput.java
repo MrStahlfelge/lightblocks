@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.GameBlocker;
 
 /**
  * Created by Benjamin Schulte on 25.01.2017.
@@ -35,6 +36,7 @@ public class PlayGravityInput extends PlayScreenInput {
     private float deltaSinceLastMove;
     private boolean lastMoveWasToRight;
     private float deltaSum;
+    private GameBlocker.InputGameBlocker gravityInputBlocker = new GameBlocker.InputGameBlocker();
 
     public PlayGravityInput() {
         currentInputVector = new Vector3();
@@ -154,10 +156,12 @@ public class PlayGravityInput extends PlayScreenInput {
             if (calibrationProgress != null)
                 calibrationProgress.setText(playScreen.app.TEXTS.get("labelTapToPlay"));
             hasCalibration = true;
+            playScreen.removeGameBlocker(gravityInputBlocker);
         } else if (hasCalibration) {
             if (calibrationProgress != null)
                 calibrationProgress.setText(playScreen.app.TEXTS.get("labelCalibration"));
             hasCalibration = false;
+            playScreen.addGameBlocker(gravityInputBlocker);
         }
 
     }

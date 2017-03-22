@@ -100,7 +100,7 @@ public abstract class AbstractScreen implements Screen {
 
     }
 
-    protected void showDialog(String errorMsg) {
+    protected Dialog showDialog(String errorMsg) {
         Dialog dialog = new Dialog("", app.skin);
         Label errorMsgLabel = new Label(errorMsg, app.skin);
         errorMsgLabel.setWrap(true);
@@ -108,6 +108,8 @@ public abstract class AbstractScreen implements Screen {
                 (LightBlocksGame.nativeGameWidth * .75f).pad(10);
         dialog.button("OK", null, app.skin.get("big", TextButton.TextButtonStyle.class));
         dialog.show(stage);
+
+        return dialog;
     }
 
     public void setBackScreen(Screen backScreen) {
