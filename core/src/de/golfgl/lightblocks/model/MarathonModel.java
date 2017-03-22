@@ -18,6 +18,11 @@ public class MarathonModel extends GameModel {
     }
 
     @Override
+    public String getGoalDescription() {
+        return "goalModelMarathon";
+    }
+
+    @Override
     public InitGameParameters getInitParameters() {
         InitGameParameters retVal = new InitGameParameters();
 

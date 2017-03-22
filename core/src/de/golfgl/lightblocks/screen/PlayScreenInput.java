@@ -3,25 +3,18 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-
-import de.golfgl.lightblocks.LightBlocksGame;
 
 /**
  * Created by Benjamin Schulte on 25.01.2017.
  */
 public abstract class PlayScreenInput extends InputAdapter {
+    public static final int KEY_INPUTTYPE_MAX = 3;
+    public static final int KEY_INPUTTYPE_ALLAVAIL = 1;
     public boolean isPaused = true;
     protected boolean isGameOver;
     PlayScreen playScreen;
-
-    public static final int KEY_INPUTTYPE_MAX = 3;
-    public static final int KEY_INPUTTYPE_ALLAVAIL = 1;
+    private Label pauseInputMsgLabel;
 
     public static PlayScreenInput getPlayInput(int key) throws InputNotAvailableException {
 
@@ -58,7 +51,7 @@ public abstract class PlayScreenInput extends InputAdapter {
     public static boolean[] getInputAvailableBitset() {
         boolean[] retVal = new boolean[KEY_INPUTTYPE_MAX + 1];
 
-        for (int i = 0; i <=KEY_INPUTTYPE_MAX; i++)
+        for (int i = 0; i <= KEY_INPUTTYPE_MAX; i++)
             retVal[i] = isInputTypeAvailable(i);
 
         return retVal;
@@ -94,6 +87,16 @@ public abstract class PlayScreenInput extends InputAdapter {
         }
     }
 
+    public Label getPauseInputMsgLabel() {
+        return pauseInputMsgLabel;
+    }
+
+    public void setPauseInputMsgLabel(Label pauseInputMsgLabel) {
+        this.pauseInputMsgLabel = pauseInputMsgLabel;
+    }
+
+    public abstract String getInputHelpText();
+
     public void setGameOver() {
         this.isGameOver = true;
         this.isPaused = true;
@@ -120,26 +123,6 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     public void setPlayScreen(PlayScreen playScreen) {
         this.playScreen = playScreen;
-    }
-
-    public Actor showHelp(Group drawGroup, boolean isBegin) {
-        drawGroup.clearChildren();
-
-        Table table = new Table();
-        table.setFillParent(true);
-        table.setColor(1, 1, 1, 0);
-        table.addAction(Actions.fadeIn(.2f, Interpolation.fade));
-
-        if (!isBegin) {
-            table.row();
-            Label title = new Label(playScreen.app.TEXTS.get("labelPause"), playScreen.app.skin, LightBlocksGame
-                    .SKIN_FONT_BIG);
-            table.add(title);
-        }
-
-        drawGroup.addActor(table);
-
-        return table;
     }
 
 }

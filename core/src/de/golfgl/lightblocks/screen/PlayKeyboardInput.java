@@ -16,6 +16,11 @@ import de.golfgl.lightblocks.LightBlocksGame;
 public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
+    public String getInputHelpText() {
+        return playScreen.app.TEXTS.get("inputKeyboardHelp");
+    }
+
+    @Override
     public boolean keyDown(int keycode) {
         switch (keycode) {
             case Input.Keys.ESCAPE:
@@ -55,28 +60,6 @@ public class PlayKeyboardInput extends PlayScreenInput {
     }
 
     @Override
-    public Actor showHelp(Group drawGroup, boolean isBegin) {
-
-        Table table = (Table) super.showHelp(drawGroup, isBegin);
-
-        table.row();
-        Label hintBegin = new Label(playScreen.app.TEXTS.get(isBegin ? "labelPressEnterToStart" :
-                "labelPressEnterToResume"), playScreen.app.skin, isBegin ? LightBlocksGame.SKIN_FONT_BIG : "default");
-
-        table.add(hintBegin).spaceTop(30);
-
-        table.row();
-
-        Label keyHelp = new Label(playScreen.app.TEXTS.get("inputKeyboardHelp"), playScreen.app.skin);
-        keyHelp.setWrap(true);
-        keyHelp.setAlignment(Align.center);
-        table.add(keyHelp).spaceTop(30).prefWidth(drawGroup.getWidth());
-
-        return table;
-
-    }
-
-    @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.DOWN) {
             playScreen.gameModel.setSoftDropFactor(0);
@@ -96,5 +79,10 @@ public class PlayKeyboardInput extends PlayScreenInput {
         return super.keyUp(keycode);
     }
 
+    @Override
+    public void setPauseInputMsgLabel(Label pauseInputMsgLabel) {
+        super.setPauseInputMsgLabel(pauseInputMsgLabel);
+        pauseInputMsgLabel.setText(playScreen.app.TEXTS.get("labelPressEnterToPlay"));
+    }
 
 }

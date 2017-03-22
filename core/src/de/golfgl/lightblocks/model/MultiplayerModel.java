@@ -54,6 +54,11 @@ public class MultiplayerModel extends GameModel {
     }
 
     @Override
+    public String getGoalDescription() {
+        return "goalModelMultiplayer";
+    }
+
+    @Override
     public String saveGameModel() {
         // Saving multiplayer gamestate is unfortunately impossible
         return null;

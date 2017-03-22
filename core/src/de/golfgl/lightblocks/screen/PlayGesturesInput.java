@@ -35,6 +35,11 @@ public class PlayGesturesInput extends PlayScreenInput {
     private Label rotationLabel;
 
     @Override
+    public String getInputHelpText() {
+        return playScreen.app.TEXTS.get("inputGesturesHelp");
+    }
+
+    @Override
     public void setPlayScreen(PlayScreen playScreen) {
         super.setPlayScreen(playScreen);
 
@@ -202,23 +207,8 @@ public class PlayGesturesInput extends PlayScreenInput {
     }
 
     @Override
-    public Actor showHelp(Group drawGroup, boolean isBegin) {
-        Table table = (Table) super.showHelp(drawGroup, isBegin);
-
-        table.row();
-        Label hintBegin = new Label(playScreen.app.TEXTS.get(isBegin ? "labelTapToStart" :
-                "labelTapToResume"), playScreen.app.skin, isBegin ? LightBlocksGame.SKIN_FONT_BIG : "default");
-
-        table.add(hintBegin).spaceTop(30);
-
-        table.row();
-
-        Label keyHelp = new Label(playScreen.app.TEXTS.get("inputGesturesHelp"), playScreen.app.skin);
-        keyHelp.setWrap(true);
-        keyHelp.setAlignment(Align.center);
-        table.add(keyHelp).spaceTop(30).prefWidth(drawGroup.getWidth());
-
-        return table;
-
+    public void setPauseInputMsgLabel(Label pauseInputMsgLabel) {
+        super.setPauseInputMsgLabel(pauseInputMsgLabel);
+        pauseInputMsgLabel.setText(playScreen.app.TEXTS.get("labelTapToPlay"));
     }
 }

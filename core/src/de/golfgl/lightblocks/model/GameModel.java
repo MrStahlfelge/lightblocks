@@ -547,6 +547,8 @@ public abstract class GameModel implements Json.Serializable {
      */
     public abstract String getIdentifier();
 
+    public abstract String getGoalDescription();
+
     public GameScore getScore() {
         return this.score;
     }

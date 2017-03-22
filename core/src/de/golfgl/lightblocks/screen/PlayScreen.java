@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
@@ -28,6 +29,7 @@ import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
 import de.golfgl.lightblocks.scenes.MotivationLabel;
 import de.golfgl.lightblocks.scenes.ParticleEffectActor;
+import de.golfgl.lightblocks.scenes.PauseDialog;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -58,6 +60,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private ScoreLabel scoreNum;
     private ScoreLabel levelNum;
     private ScoreLabel linesNum;
+    private PauseDialog pauseDialog;
     private boolean isPaused = true;
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
@@ -133,11 +136,18 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         labelGroup.setPosition(blockGroup.getX(), blockGroup.getY());
         stage.addActor(labelGroup);
 
+        pauseDialog = new PauseDialog(app, this);
+
         motivatorLabel = new MotivationLabel(app.skin, LightBlocksGame.SKIN_FONT_TITLE, labelGroup);
 
         initializeGameModel(initGameParametersParams);
 
-        gameType.setText(app.TEXTS.get("labelModel_" + gameModel.getIdentifier()));
+        final String modelIdLabel = app.TEXTS.get("labelModel_" + gameModel.getIdentifier());
+        gameType.setText(modelIdLabel);
+        pauseDialog.setTitle(modelIdLabel);
+        pauseDialog.setText(app.TEXTS.get(gameModel.getGoalDescription()));
+
+        pauseDialog.show(stage);
 
     }
 
@@ -164,8 +174,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 currentGame = new MultiplayerPlayScreen(caller.app, newGameParams);
             else
                 currentGame = new PlayScreen(caller.app, newGameParams);
-
-            currentGame.setMusic(caller.app.isPlayMusic());
 
             Gdx.input.setInputProcessor(null);
             caller.app.setScreen(currentGame);
@@ -225,9 +233,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         gameModel.setUserInterface(this);
 
+        // input initialisieren
         inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey);
         inputAdapter.setPlayScreen(this);
-        inputAdapter.showHelp(labelGroup, true);
+        inputAdapter.setPauseInputMsgLabel(pauseDialog.getInputMsgLabel());
 
         // Highscores
         gameModel.totalScore = app.savegame.loadTotalScore();
@@ -258,7 +267,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     @Override
     public void show() {
         Gdx.input.setCatchBackKey(true);
-        Gdx.input.setInputProcessor(inputAdapter);
+
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(stage);
+        multiplexer.addProcessor(inputAdapter);
+        Gdx.input.setInputProcessor(multiplexer);
         swoshIn();
     }
 
@@ -268,10 +281,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (gameModel.isGameOver() && goToScoresWhenOver())
             goToHighscores();
 
-        else {
+        else if (isPaused()) {
             saveGameState();
             super.goBackToMenu();
-        }
+        } else
+            switchPause(true);
     }
 
     /**
@@ -321,6 +335,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
             if (!isPaused) {
 
+                setMusic(app.isPlayMusic());
                 if (music != null)
                     music.play();
 
@@ -329,7 +344,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     gameModel.setFreezeInterval(fadingInterval);
                 }
 
-                labelGroup.clearChildren();
+                pauseDialog.hide(null);
 
                 //inform the game model that there was a pause
                 gameModel.fromPause();
@@ -341,7 +356,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 // Spielstand speichern
                 saveGameState();
 
-                inputAdapter.showHelp(labelGroup, false);
+                pauseDialog.show(stage);
             }
         }
     }
@@ -721,14 +736,18 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     public void setMusic(boolean playMusic) {
-        if (playMusic) {
+        if (playMusic && music == null) {
             music = Gdx.audio.newMusic(Gdx.files.internal("sound/dd.ogg"));
             music.setVolume(1f);                 // sets the volume to half the maximum volume
             music.setLooping(true);
-        } else if (music != null)
+        } else if (!playMusic && music != null) {
             music.dispose();
-
+            music = null;
+        }
     }
 
 
+    public void showInputHelp() {
+        showDialog(inputAdapter.getInputHelpText());
+    }
 }

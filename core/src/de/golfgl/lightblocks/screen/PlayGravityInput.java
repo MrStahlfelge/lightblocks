@@ -35,7 +35,6 @@ public class PlayGravityInput extends PlayScreenInput {
     private float deltaSinceLastMove;
     private boolean lastMoveWasToRight;
     private float deltaSum;
-    private Label calibrationProgress;
 
     public PlayGravityInput() {
         currentInputVector = new Vector3();
@@ -60,6 +59,11 @@ public class PlayGravityInput extends PlayScreenInput {
             playScreen.gameModel.setRotate(screenX > LightBlocksGame.nativeGameWidth / 2);
 
         return true;
+    }
+
+    @Override
+    public String getInputHelpText() {
+        return playScreen.app.TEXTS.get("inputGravityHelp");
     }
 
     @Override
@@ -138,6 +142,7 @@ public class PlayGravityInput extends PlayScreenInput {
         } else
             calibrationSuitableTime += delta;
 
+        Label calibrationProgress = getPauseInputMsgLabel();
         if (!hasCalibration && calibrationSuitableTime > .5f) {
             Vector3 tmp = new Vector3(0, 0, 1);
             Vector3 tmp2 = new Vector3().set(calibrationVector).nor();
@@ -154,27 +159,6 @@ public class PlayGravityInput extends PlayScreenInput {
                 calibrationProgress.setText(playScreen.app.TEXTS.get("labelCalibration"));
             hasCalibration = false;
         }
-
-    }
-
-    @Override
-    public Actor showHelp(Group drawGroup, boolean isBegin) {
-        Table table = (Table) super.showHelp(drawGroup, isBegin);
-
-        table.row();
-        calibrationProgress = new Label(playScreen.app.TEXTS.get("labelCalibration"), playScreen.app.skin,
-                LightBlocksGame.SKIN_FONT_BIG);
-
-        table.add(calibrationProgress).spaceTop(30);
-
-        table.row();
-
-        Label keyHelp = new Label(playScreen.app.TEXTS.get("inputGravityHelp"), playScreen.app.skin);
-        keyHelp.setWrap(true);
-        keyHelp.setAlignment(Align.center);
-        table.add(keyHelp).spaceTop(30).prefWidth(drawGroup.getWidth());
-
-        return table;
 
     }
 
