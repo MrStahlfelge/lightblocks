@@ -8,11 +8,13 @@ import com.badlogic.gdx.utils.Timer;
 import com.esotericsoftware.minlog.Log;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
+import de.golfgl.lightblocks.screen.MultiplayerPlayScreen;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.MultiplayerMatch;
 
@@ -34,6 +36,7 @@ public class MultiplayerModel extends GameModel {
     private static final byte DRAWYER_PACKAGESIZE = 3;
     private AbstractMultiplayerRoom playerRoom;
     private HashMap<String, MultiPlayerObjects.PlayerInGame> playerInGame;
+    private HashSet<String> uninitializedPlayers;
     private int tetrominosSent = 0;
     private int maxTetrosAPlayerDrawn;
     private Integer waitingGarbageLines = new Integer(0);
@@ -125,7 +128,10 @@ public class MultiplayerModel extends GameModel {
             for (int i = 0; i < DRAWYER_PACKAGESIZE; i++)
                 drawyer.determineNextTetrominos();
 
-            // und dann an alle anderen senden
+            // und dann an alle anderen senden und merken, wer geantwortet hat
+            uninitializedPlayers = new HashSet<String>(playerRoom.getPlayers());
+            uninitializedPlayers.remove(playerRoom.getMyPlayerId());
+
             MultiPlayerObjects.InitGame initGame = new MultiPlayerObjects.InitGame();
             initGame.firstTetrominos = drawyer.drawyer.toArray();
             initGame.garbageHolePosition = this.garbageHolePosition;
@@ -148,6 +154,10 @@ public class MultiplayerModel extends GameModel {
     @Override
     protected void activeTetrominoDropped() {
         // den Meister über den Stand der Dinge informieren
+        sendPlayerInGameStats();
+    }
+
+    private void sendPlayerInGameStats() {
         MultiPlayerObjects.PlayerInGame meInGame = new MultiPlayerObjects.PlayerInGame();
         meInGame.playerId = playerRoom.getMyPlayerId();
         meInGame.filledBlocks = getGameboard().calcGameboardFill();
@@ -273,7 +283,8 @@ public class MultiplayerModel extends GameModel {
                 }
             });
 
-            //TODO zurückmelden dass dieser Spieler nun soweit ist - mit PlayerInGame
+            // zurückmelden dass fertig initialisiert ist
+            sendPlayerInGameStats();
         }
     }
 
@@ -327,6 +338,21 @@ public class MultiplayerModel extends GameModel {
                 maxTetrosAPlayerDrawn = Math.max(maxTetrosAPlayerDrawn, pig.drawnBlocks);
 
                 if (playerRoom.isOwner()) {
+                    // pig wird auch für initialize benutzt
+                    if (!uninitializedPlayers.isEmpty()) {
+                        uninitializedPlayers.remove(pig.playerId);
+                        if (uninitializedPlayers.isEmpty()) {
+                            // alle sind fertig, dann Nachricht schicken
+                            // gibt keine extra Init nachricht, es wird einfach ein SwitchPause mit PlayerId null
+                            // geschickt
+                            MultiPlayerObjects.SwitchedPause sp = new MultiPlayerObjects.SwitchedPause();
+                            sp.playerId = null;
+                            sp.nowPaused = false;
+                            playerRoom.sendToAllPlayers(sp);
+                            ((MultiplayerPlayScreen) userInterface).multiPlayerGotModelMessage(sp);
+                        }
+                    }
+
                     playerRoom.sendToAllPlayers(pig);
 
                     if (tetrominosSent - maxTetrosAPlayerDrawn <= 10) {

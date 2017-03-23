@@ -27,4 +27,11 @@ public abstract class GameBlocker {
             return bundle.format("labelMultiplayerOtherPaused", playerId);
         }
     }
+
+    public static class WaitForOthersInitializedBlocker extends GameBlocker {
+        @Override
+        public String getDescription(I18NBundle bundle) {
+            return bundle.get("labelMultiplayerInitializing");
+        }
+    }
 }

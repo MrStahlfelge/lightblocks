@@ -158,6 +158,11 @@ public abstract class AbstractMultiplayerRoom {
 
     public abstract void sendToPlayer(String playerId, Object message);
 
+    /**
+     * sends a message to all other players
+     *
+     * @param message
+     */
     public abstract void sendToAllPlayers(Object message);
 
     public abstract void sendToAllPlayersExcept(String playerId, Object message);

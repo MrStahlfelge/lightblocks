@@ -28,14 +28,15 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     private HashMap<String, ScoreLabel> playerLabels;
     private HashMap<String, GameBlocker.OtherPlayerPausedGameBlocker> playerBlockers = new HashMap<String,
             GameBlocker.OtherPlayerPausedGameBlocker>();
-    private boolean isHandlingPauseMessage = false;
+    private GameBlocker initializeBlocker = new GameBlocker.WaitForOthersInitializedBlocker();
+    private boolean isHandlingBlockerSet = false;
 
     public MultiplayerPlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
         super(app, initGameParametersParams);
 
-        // die Pause soll Anfangs nicht fest sein
-
+        // Blocker bis alle initialisiert sind
+        addGameBlocker(initializeBlocker);
     }
 
     @Override
@@ -128,7 +129,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
         super.switchPause(immediately);
 
         // Pause gedrückt oder App in den Hintergrund gelegt... die anderen informieren
-        if (!isHandlingPauseMessage && oldIsPaused != isPaused())
+        if (!isHandlingBlockerSet && oldIsPaused != isPaused())
             sendPauseMessage(isPaused());
         else if (oldIsPaused)
             // Falls Pause gelöst werden sollte auch wenn nicht gelöst wurde senden, um Deadlock zu verhindern
@@ -152,16 +153,31 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     }
 
     @Override
+    public void addGameBlocker(GameBlocker e) {
+        try {
+            isHandlingBlockerSet = true;
+            super.addGameBlocker(e);
+        } finally {
+            isHandlingBlockerSet = false;
+        }
+    }
+
+    @Override
     public void removeGameBlocker(GameBlocker e) {
-        // Abfrage vor remove, denn nach remove ja gerade nicht mehr
-        boolean pausedByBlocker = !isGameBlockersEmpty();
+        try {
+            isHandlingBlockerSet = true;
 
-        super.removeGameBlocker(e);
+            // Abfrage vor remove, denn nach remove ja gerade nicht mehr
+            boolean pausedByBlocker = !isGameBlockersEmpty();
 
-        //TODO hier sollte noch 3 Sekunden reingehen
-        if (pausedByBlocker && isGameBlockersEmpty())
-            switchPause(true);
+            super.removeGameBlocker(e);
 
+            //TODO hier sollte noch 3 Sekunden reingehen
+            if (pausedByBlocker && isGameBlockersEmpty())
+                switchPause(true);
+        } finally {
+            isHandlingBlockerSet = false;
+        }
     }
 
     @Override
@@ -216,21 +232,23 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     }
 
     private void handleOtherPlayerSwitchedPause(MultiPlayerObjects.SwitchedPause sp) {
-        GameBlocker.OtherPlayerPausedGameBlocker pb = playerBlockers.get(sp.playerId);
-        if (pb == null) {
-            pb = new GameBlocker.OtherPlayerPausedGameBlocker();
-            pb.playerId = sp.playerId;
-            playerBlockers.put(sp.playerId, pb);
-        }
 
-        try {
-            isHandlingPauseMessage = true;
+        if (sp.playerId == null) {
+            // das ist eigentlich die Initnachricht
+            removeGameBlocker(initializeBlocker);
+        } else {
+
+            GameBlocker.OtherPlayerPausedGameBlocker pb = playerBlockers.get(sp.playerId);
+            if (pb == null) {
+                pb = new GameBlocker.OtherPlayerPausedGameBlocker();
+                pb.playerId = sp.playerId;
+                playerBlockers.put(sp.playerId, pb);
+            }
+
             if (sp.nowPaused)
                 addGameBlocker(pb);
             else
                 removeGameBlocker(pb);
-        } finally {
-            isHandlingPauseMessage = false;
         }
     }
 

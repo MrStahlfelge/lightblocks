@@ -169,7 +169,6 @@ public class MultiPlayerObjects {
         public int filledBlocks;
         public int drawnBlocks;
         public int score;
-        public boolean isPaused;
     }
 
     public static class LinesRemoved {
