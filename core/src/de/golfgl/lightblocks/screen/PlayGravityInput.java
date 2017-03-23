@@ -64,6 +64,11 @@ public class PlayGravityInput extends PlayScreenInput {
     }
 
     @Override
+    public String getResumeMessage() {
+        return playScreen.app.TEXTS.get("labelTapToPlay");
+    }
+
+    @Override
     public String getInputHelpText() {
         return playScreen.app.TEXTS.get("inputGravityHelp");
     }
@@ -144,7 +149,6 @@ public class PlayGravityInput extends PlayScreenInput {
         } else
             calibrationSuitableTime += delta;
 
-        Label calibrationProgress = getPauseInputMsgLabel();
         if (!hasCalibration && calibrationSuitableTime > .5f) {
             Vector3 tmp = new Vector3(0, 0, 1);
             Vector3 tmp2 = new Vector3().set(calibrationVector).nor();
@@ -153,13 +157,9 @@ public class PlayGravityInput extends PlayScreenInput {
             Matrix4 m = new Matrix4(Vector3.Zero, rotateQuaternion, new Vector3(1f, 1f, 1f));
             this.calibrationMatrix = m.inv();
 
-            if (calibrationProgress != null)
-                calibrationProgress.setText(playScreen.app.TEXTS.get("labelTapToPlay"));
             hasCalibration = true;
             playScreen.removeGameBlocker(gravityInputBlocker);
         } else if (hasCalibration) {
-            if (calibrationProgress != null)
-                calibrationProgress.setText(playScreen.app.TEXTS.get("labelCalibration"));
             hasCalibration = false;
             playScreen.addGameBlocker(gravityInputBlocker);
         }

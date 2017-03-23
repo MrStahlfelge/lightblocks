@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Align;
 import java.util.HashMap;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -25,10 +26,16 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
     private HashMap<String, ScoreLabel> playerLabels;
+    private HashMap<String, GameBlocker.OtherPlayerPausedGameBlocker> playerBlockers = new HashMap<String,
+            GameBlocker.OtherPlayerPausedGameBlocker>();
+    private boolean isHandlingPauseMessage = false;
 
     public MultiplayerPlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
         super(app, initGameParametersParams);
+
+        // die Pause soll Anfangs nicht fest sein
+
     }
 
     @Override
@@ -61,7 +68,10 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
     @Override
     public void goBackToMenu() {
-        if (!((MultiplayerModel) gameModel).isCompletelyOver()) {
+        if (!isPaused() && !gameModel.isGameOver())
+            switchPause(false);
+
+        else if (!((MultiplayerModel) gameModel).isCompletelyOver()) {
             //TODO hier vor dem Verlust der Ehre warnen und ob man wirklich möchte Ja/Nein
 
         } else {
@@ -103,10 +113,44 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
     @Override
     public void switchPause(boolean immediately) {
+        boolean oldIsPaused = isPaused();
         super.switchPause(immediately);
 
         // Pause gedrückt oder App in den Hintergrund gelegt... die anderen informieren
-        app.multiRoom.sendToAllPlayers(new MultiPlayerObjects.SwitchedPause().withPaused(isPaused()));
+        if (!isHandlingPauseMessage && oldIsPaused != isPaused())
+            sendPauseMessage(isPaused());
+        else if (oldIsPaused)
+            // Falls Pause gelöst werden sollte auch wenn nicht gelöst wurde senden, um Deadlock zu verhindern
+            sendPauseMessage(false);
+    }
+
+    protected void sendPauseMessage(boolean nowPaused) {
+        MultiPlayerObjects.SwitchedPause sp = new MultiPlayerObjects.SwitchedPause();
+        sp.playerId = app.multiRoom.getMyPlayerId();
+        sp.nowPaused = nowPaused;
+        app.multiRoom.sendToAllPlayers(sp);
+    }
+
+    @Override
+    public void pause() {
+        super.pause();
+
+        // Auf jeden Fall eine PauseMessage schicken!
+        if (!gameModel.isGameOver())
+            sendPauseMessage(true);
+    }
+
+    @Override
+    public void removeGameBlocker(GameBlocker e) {
+        // Abfrage vor remove, denn nach remove ja gerade nicht mehr
+        boolean pausedByBlocker = !isGameBlockersEmpty();
+
+        super.removeGameBlocker(e);
+
+        //TODO hier sollte noch 3 Sekunden reingehen
+        if (pausedByBlocker && isGameBlockersEmpty())
+            switchPause(true);
+
     }
 
     @Override
@@ -140,13 +184,31 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    if (isPaused() != ((MultiPlayerObjects.SwitchedPause) o).nowPaused)
-                        MultiplayerPlayScreen.super.switchPause(false);
+                    handleOtherPlayerSwitchedPause((MultiPlayerObjects.SwitchedPause) o);
                 }
             });
 
         //ansonsten weiter an das Spiel
         ((MultiplayerModel) gameModel).handleMessagesFromOthers(o);
+    }
+
+    private void handleOtherPlayerSwitchedPause(MultiPlayerObjects.SwitchedPause sp) {
+        GameBlocker.OtherPlayerPausedGameBlocker pb = playerBlockers.get(sp.playerId);
+        if (pb == null) {
+            pb = new GameBlocker.OtherPlayerPausedGameBlocker();
+            pb.playerId = sp.playerId;
+            playerBlockers.put(sp.playerId, pb);
+        }
+
+        try {
+            isHandlingPauseMessage = true;
+            if (sp.nowPaused)
+                addGameBlocker(pb);
+            else
+                removeGameBlocker(pb);
+        } finally {
+            isHandlingPauseMessage = false;
+        }
     }
 
     @Override

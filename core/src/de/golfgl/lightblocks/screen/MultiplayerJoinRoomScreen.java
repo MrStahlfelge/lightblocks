@@ -222,7 +222,7 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    showDialog(o.toString());
+                    showDialog(((MultiPlayerObjects.Handshake) o).message);
                     joinRoomButton.setDisabled(false);
                 }
             });

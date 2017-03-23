@@ -466,6 +466,11 @@ public class MultiplayerModel extends GameModel {
 
     }
 
+    @Override
+    public boolean beginPaused() {
+        return false;
+    }
+
     public void setMatchStats(MultiplayerMatch matchStats) {
         this.matchStats = matchStats;
     }

@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Timer;
 
 import java.util.HashSet;
+import java.util.Iterator;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameBlocker;
@@ -68,7 +69,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private Dialog pauseMsgDialog;
     private boolean isPaused = true;
     private HashSet<GameBlocker> gameBlockers = new HashSet<GameBlocker>();
-    private boolean pausedByBlocker;
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
@@ -153,8 +153,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameType.setText(modelIdLabel);
         pauseDialog.setTitle(modelIdLabel);
         pauseDialog.setText(app.TEXTS.get(gameModel.getGoalDescription()));
+        refreshResumeFromPauseText();
 
-        pauseDialog.show(stage);
+        if (!gameModel.beginPaused())
+            switchPause(true);
+        else
+            pauseDialog.show(stage);
 
     }
 
@@ -243,7 +247,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // input initialisieren
         inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey);
         inputAdapter.setPlayScreen(this);
-        inputAdapter.setPauseInputMsgLabel(pauseDialog.getInputMsgLabel());
 
         // Highscores
         gameModel.totalScore = app.savegame.loadTotalScore();
@@ -288,7 +291,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (gameModel.isGameOver() && goToScoresWhenOver())
             goToHighscores();
 
-        else if (isPaused()) {
+        else if (isPaused() || gameModel.isGameOver()) {
             saveGameState();
             super.goBackToMenu();
         } else
@@ -762,19 +765,34 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     public void addGameBlocker(GameBlocker e) {
         gameBlockers.add(e);
+        refreshResumeFromPauseText();
 
         // Pause auslösen
-        if (!isPaused && !gameBlockers.isEmpty()) {
-            pausedByBlocker = true;
+        if (!isPaused && !gameBlockers.isEmpty())
             switchPause(false);
-        }
     }
 
     public void removeGameBlocker(GameBlocker e) {
         gameBlockers.remove(e);
+        refreshResumeFromPauseText();
+    }
 
-        //TODO hier sollte noch 3 Sekunden reingehen
-        if (isPaused && pausedByBlocker && gameBlockers.isEmpty())
-            switchPause(true);
+    public boolean isGameBlockersEmpty() {
+        return gameBlockers.isEmpty();
+    }
+
+    private void refreshResumeFromPauseText() {
+        String blockText = "";
+        if (gameBlockers.isEmpty())
+            blockText = inputAdapter.getResumeMessage();
+        else {
+            Iterator<GameBlocker> gbi = gameBlockers.iterator();
+            while (gbi.hasNext()) {
+                GameBlocker gb = gbi.next();
+                blockText += "\n" + gb.getDescription(app.TEXTS);
+            }
+            blockText = blockText.substring(1);
+        }
+        pauseDialog.getInputMsgLabel().setText(blockText);
     }
 }

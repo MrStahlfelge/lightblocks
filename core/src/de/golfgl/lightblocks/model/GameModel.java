@@ -592,4 +592,7 @@ public abstract class GameModel implements Json.Serializable {
 
     }
 
+    public boolean beginPaused() {
+        return true;
+    }
 }

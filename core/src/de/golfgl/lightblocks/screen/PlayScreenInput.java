@@ -3,7 +3,6 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 /**
  * Created by Benjamin Schulte on 25.01.2017.
@@ -14,7 +13,6 @@ public abstract class PlayScreenInput extends InputAdapter {
     public boolean isPaused = true;
     protected boolean isGameOver;
     PlayScreen playScreen;
-    private Label pauseInputMsgLabel;
 
     public static PlayScreenInput getPlayInput(int key) throws InputNotAvailableException {
 
@@ -87,13 +85,7 @@ public abstract class PlayScreenInput extends InputAdapter {
         }
     }
 
-    public Label getPauseInputMsgLabel() {
-        return pauseInputMsgLabel;
-    }
-
-    public void setPauseInputMsgLabel(Label pauseInputMsgLabel) {
-        this.pauseInputMsgLabel = pauseInputMsgLabel;
-    }
+    public abstract String getResumeMessage();
 
     public abstract String getInputHelpText();
 

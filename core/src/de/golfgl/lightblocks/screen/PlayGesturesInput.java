@@ -4,13 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.Align;
-
-import de.golfgl.lightblocks.LightBlocksGame;
 
 /**
  * Created by Benjamin Schulte on 25.01.2017.
@@ -19,9 +14,6 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     public Color rotateRightColor = new Color(.1f, 1, .3f, .8f);
     public Color rotateLeftColor = new Color(.2f, .8f, 1, .8f);
-
-    private int dragThreshold;
-
     int screenX;
     int screenY;
     boolean beganHorizontalMove;
@@ -29,10 +21,16 @@ public class PlayGesturesInput extends PlayScreenInput {
     boolean didSomething;
     Group touchPanel;
     Vector2 touchCoordinates;
+    private int dragThreshold;
     private Label toTheRight;
     private Label toTheLeft;
     private Label toDrop;
     private Label rotationLabel;
+
+    @Override
+    public String getResumeMessage() {
+        return playScreen.app.TEXTS.get("labelTapToPlay");
+    }
 
     @Override
     public String getInputHelpText() {
@@ -204,11 +202,5 @@ public class PlayGesturesInput extends PlayScreenInput {
         }
 
         return true;
-    }
-
-    @Override
-    public void setPauseInputMsgLabel(Label pauseInputMsgLabel) {
-        super.setPauseInputMsgLabel(pauseInputMsgLabel);
-        pauseInputMsgLabel.setText(playScreen.app.TEXTS.get("labelTapToPlay"));
     }
 }

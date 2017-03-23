@@ -136,11 +136,6 @@ public class MultiPlayerObjects {
     public static class SwitchedPause {
         public String playerId;
         public boolean nowPaused;
-
-        public SwitchedPause withPaused(boolean paused) {
-            nowPaused = paused;
-            return this;
-        }
     }
 
     public static class PlayerIsOver {
