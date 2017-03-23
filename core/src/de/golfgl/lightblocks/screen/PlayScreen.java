@@ -9,11 +9,13 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
@@ -761,6 +763,16 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     public void showInputHelp() {
         pauseMsgDialog = showDialog(inputAdapter.getInputHelpText());
+    }
+
+    @Override
+    public Dialog showConfirmationDialog(String text, Runnable doWhenYes) {
+        Dialog dialog = super.showConfirmationDialog(text, doWhenYes);
+
+        if (isPaused)
+            pauseMsgDialog = dialog;
+
+        return dialog;
     }
 
     public void addGameBlocker(GameBlocker e) {

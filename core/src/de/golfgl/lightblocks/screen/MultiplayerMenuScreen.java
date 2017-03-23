@@ -197,27 +197,17 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
     private void confirmForcedRoomClose() {
         // mehr als ein Spieler - dann nachfragen ob wirklich geschlossen werden soll
-        Dialog dialog = new Dialog("", app.skin) {
+        showConfirmationDialog(app.TEXTS.get("multiplayerDisconnectClients"), new Runnable() {
             @Override
-            protected void result(Object object) {
-                if (object != null) {
-                    try {
-                        app.multiRoom.closeRoom(true);
-                        app.multiRoom = null;
-                    } catch (VetoException e) {
-                        showDialog(e.getMessage());
-                    }
+            public void run() {
+                try {
+                    app.multiRoom.closeRoom(true);
+                    app.multiRoom = null;
+                } catch (VetoException e) {
+                    showDialog(e.getMessage());
                 }
             }
-        };
-        Label errorMsgLabel = new Label(app.TEXTS.get("multiplayerDisconnectClients"), app.skin);
-        errorMsgLabel.setWrap(true);
-        dialog.getContentTable().add(errorMsgLabel).prefWidth
-                (LightBlocksGame.nativeGameWidth * .75f).pad(10);
-        final TextButton.TextButtonStyle buttonStyle = app.skin.get("big", TextButton.TextButtonStyle.class);
-        dialog.button(app.TEXTS.get("menuYes"), true, buttonStyle);
-        dialog.button(app.TEXTS.get("menuNo"), null, buttonStyle);
-        dialog.show(stage);
+        });
     }
 
     private void initializeKryonetRoom() {

@@ -112,6 +112,25 @@ public abstract class AbstractScreen implements Screen {
         return dialog;
     }
 
+    public Dialog showConfirmationDialog(String text, Runnable doWhenYes) {
+        Dialog dialog = new Dialog("", app.skin) {
+            @Override
+            protected void result(Object object) {
+                if (object instanceof Runnable)
+                    ((Runnable) object).run();
+            }
+        };
+        Label errorMsgLabel = new Label(text, app.skin);
+        errorMsgLabel.setWrap(true);
+        dialog.getContentTable().add(errorMsgLabel).prefWidth
+                (LightBlocksGame.nativeGameWidth * .75f).pad(10);
+        final TextButton.TextButtonStyle buttonStyle = app.skin.get("big", TextButton.TextButtonStyle.class);
+        dialog.button(app.TEXTS.get("menuYes"), doWhenYes, buttonStyle);
+        dialog.button(app.TEXTS.get("menuNo"), null, buttonStyle);
+        dialog.show(stage);
+        return dialog;
+    }
+
     public void setBackScreen(Screen backScreen) {
         this.backScreen = backScreen;
     }

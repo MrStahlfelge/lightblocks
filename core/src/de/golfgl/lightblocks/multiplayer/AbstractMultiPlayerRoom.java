@@ -164,6 +164,12 @@ public abstract class AbstractMultiplayerRoom {
 
     public abstract void sendToReferee(Object message);
 
+    /**
+     * leaves the room. If the room is owned, it will be closed and all guests leave
+     *
+     * @param force if true, all guests are forced to leave
+     * @throws VetoException error message when room is not empty and force is not true
+     */
     public abstract void leaveRoom(boolean force) throws VetoException;
 
     public abstract void startRoomDiscovery() throws VetoException;

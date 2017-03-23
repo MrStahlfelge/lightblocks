@@ -72,7 +72,18 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
             switchPause(false);
 
         else if (!((MultiplayerModel) gameModel).isCompletelyOver()) {
-            //TODO hier vor dem Verlust der Ehre warnen und ob man wirklich möchte Ja/Nein
+
+            showConfirmationDialog(app.TEXTS.get("multiplayerLeaveWhilePlaying"),
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                app.multiRoom.leaveRoom(true);
+                            } catch (VetoException e) {
+                                showDialog(e.getMessage());
+                            }
+                        }
+                    });
 
         } else {
             // ist eventuell doppelt, aber der unten im dispose kommt u.U. zu spät
@@ -166,8 +177,20 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     }
 
     @Override
-    public void multiPlayerRoomInhabitantsChanged(MultiPlayerObjects.PlayerChanged mpo) {
+    public void multiPlayerRoomInhabitantsChanged(final MultiPlayerObjects.PlayerChanged mpo) {
         //TODO anzeigen - deckt sich aber teilweise mit playersInGameChanged
+
+        // eine ggf. vorhandene Blockade durch den Spieler muss gelöst werden
+        if (mpo.changeType == MultiPlayerObjects.CHANGE_REMOVE)
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    MultiPlayerObjects.SwitchedPause sp = new MultiPlayerObjects.SwitchedPause();
+                    sp.nowPaused = false;
+                    sp.playerId = mpo.changedPlayer.name;
+                    handleOtherPlayerSwitchedPause((MultiPlayerObjects.SwitchedPause) sp);
+                }
+            });
 
         if (app.multiRoom.isOwner())
             ((MultiplayerModel) gameModel).handleMessagesFromOthers(mpo);
