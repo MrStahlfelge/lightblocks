@@ -125,15 +125,23 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
     @Override
     public void switchPause(boolean immediately) {
-        boolean oldIsPaused = isPaused();
-        super.switchPause(immediately);
 
-        // Pause gedrückt oder App in den Hintergrund gelegt... die anderen informieren
-        if (!isHandlingBlockerSet && oldIsPaused != isPaused())
-            sendPauseMessage(isPaused());
-        else if (oldIsPaused)
-            // Falls Pause gelöst werden sollte auch wenn nicht gelöst wurde senden, um Deadlock zu verhindern
-            sendPauseMessage(false);
+        if (gameModel.isGameOver() && ((MultiplayerModel) gameModel).isCompletelyOver())
+            goBackToMenu();
+
+        else {
+            boolean oldIsPaused = isPaused();
+
+            if (!gameModel.isGameOver())
+                super.switchPause(immediately);
+
+            // Pause gedrückt oder App in den Hintergrund gelegt... die anderen informieren
+            if (!isHandlingBlockerSet && oldIsPaused != isPaused())
+                sendPauseMessage(isPaused());
+            else if (oldIsPaused)
+                // Falls Pause gelöst werden sollte auch wenn nicht gelöst wurde senden, um Deadlock zu verhindern
+                sendPauseMessage(false);
+        }
     }
 
     protected void sendPauseMessage(boolean nowPaused) {
