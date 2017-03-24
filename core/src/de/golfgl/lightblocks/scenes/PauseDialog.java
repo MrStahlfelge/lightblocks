@@ -1,6 +1,8 @@
 package de.golfgl.lightblocks.scenes;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -16,12 +18,16 @@ import de.golfgl.lightblocks.screen.PlayScreen;
  */
 
 public class PauseDialog extends Dialog {
+    protected final Color EMPHASIZE_COLOR = new Color(1, .3f, .3f, 1);
+    protected final Color NORMAL_COLOR = new Color(1, 1, 1, 1);
     private final Label titleLabel;
     private final Label textLabel;
     private final Label inputMsgLabel;
+    private boolean emphasizeInputMsg;
 
     public PauseDialog(LightBlocksGame app, final PlayScreen playScreen) {
         super("", app.skin);
+
 
         Table table = getContentTable();
 
@@ -72,6 +78,23 @@ public class PauseDialog extends Dialog {
 
         // Modal wird ausgeschaltet, da sonst alle InputEvents weggeklaut werden
         setModal(false);
+    }
+
+    public boolean isEmphasizeInputMsg() {
+        return emphasizeInputMsg;
+    }
+
+    public void setEmphasizeInputMsg(boolean emphasizeInputMsg) {
+        if (this.emphasizeInputMsg != emphasizeInputMsg) {
+            this.emphasizeInputMsg = emphasizeInputMsg;
+
+            if (!emphasizeInputMsg) {
+                inputMsgLabel.clearActions();
+                inputMsgLabel.setColor(NORMAL_COLOR);
+            } else
+                inputMsgLabel.addAction(Actions.forever(Actions.sequence(Actions.color(EMPHASIZE_COLOR, 1.5f),
+                        Actions.color(NORMAL_COLOR, 1.5f))));
+        }
     }
 
     public Label getInputMsgLabel() {

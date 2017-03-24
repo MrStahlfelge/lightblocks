@@ -53,7 +53,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
-    protected static final Color EMPHASIZE_COLOR = new Color(1, .3f, .3f, 1);
+    protected final Color EMPHASIZE_COLOR = new Color(1, .3f, .3f, 1);
     private final BlockGroup blockGroup;
     private final Group labelGroup;
     private final BlockActor[][] blockMatrix;
@@ -806,5 +806,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             blockText = blockText.substring(1);
         }
         pauseDialog.getInputMsgLabel().setText(blockText);
+        pauseDialog.setEmphasizeInputMsg(!gameBlockers.isEmpty());
     }
 }

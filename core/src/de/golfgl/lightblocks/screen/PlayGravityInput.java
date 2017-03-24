@@ -166,4 +166,11 @@ public class PlayGravityInput extends PlayScreenInput {
 
     }
 
+    @Override
+    public void setPlayScreen(PlayScreen playScreen) {
+        super.setPlayScreen(playScreen);
+
+        if (!hasCalibration)
+            playScreen.addGameBlocker(gravityInputBlocker);
+    }
 }
