@@ -138,8 +138,9 @@ public class MainMenuScreen extends AbstractScreen {
         mainTable.add(buttons);
 
         mainTable.row().expandY();
-        Label gameVersion = new Label(LightBlocksGame.GAME_VERSIONSTRING + "\n" + app.TEXTS.get("gameAuthor"), app
-                .skin);
+        Label gameVersion = new Label(LightBlocksGame.GAME_VERSIONSTRING +
+                (LightBlocksGame.GAME_DEVMODE ? "-DEV\n" : "\n")
+                + app.TEXTS.get("gameAuthor"), app.skin);
         gameVersion.setColor(.5f, .5f, .5f, 1);
         gameVersion.setFontScale(.8f);
         gameVersion.setAlignment(Align.bottom);

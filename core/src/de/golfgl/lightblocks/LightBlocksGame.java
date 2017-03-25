@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
@@ -30,6 +32,8 @@ public class LightBlocksGame extends Game {
     // An den gleichen Eintrag im AndroidManifest denken!!!
     public static final String GAME_VERSIONSTRING = "0.56.034";
     public static final long GAME_EXPIRATION = 1501538400000L; // 1.8.17
+    // Abstand für Git
+    public static final boolean GAME_DEVMODE = true;
 
     public static final String SKIN_FONT_TITLE = "bigbigoutline";
     public static final String SKIN_FONT_BIG = "big";
@@ -63,7 +67,13 @@ public class LightBlocksGame extends Game {
 
     @Override
     public void create() {
-        fpsLogger = new FPSLogger();
+        if (GAME_DEVMODE)
+            fpsLogger = new FPSLogger();
+        else {
+            Log.set(Log.LEVEL_WARN);
+            Gdx.app.setLogLevel(Application.LOG_ERROR);
+        }
+
         prefs = app.getPreferences("lightblocks");
 
         if (share == null)
@@ -123,7 +133,8 @@ public class LightBlocksGame extends Game {
     @Override
     public void render() {
         super.render(); //important!
-        fpsLogger.log();
+        if (GAME_DEVMODE && fpsLogger != null)
+            fpsLogger.log();
     }
 
     @Override
