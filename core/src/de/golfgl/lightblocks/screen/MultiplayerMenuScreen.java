@@ -4,18 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import java.util.HashMap;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MultiplayerModel;
-import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
@@ -77,7 +74,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         if (hasToRefresh)
             refreshPlayerList();
 
-        if (app.multiRoom != null && app.multiRoom.getRoomState().equals(AbstractMultiplayerRoom.RoomState.inGame))
+        if (app.multiRoom != null && app.multiRoom.getRoomState().equals(MultiPlayerObjects.RoomState.inGame))
             try {
                 //TODO: Das darf nicht ausgelöst werden wenn 3 Spieler aktiv sind und die anderen beiden noch spielen
                 app.multiRoom.gameStopped();
@@ -260,10 +257,10 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
 
     @Override
-    public void multiPlayerRoomStateChanged(final AbstractMultiplayerRoom.RoomState roomState) {
+    public void multiPlayerRoomStateChanged(final MultiPlayerObjects.RoomState roomState) {
 
         // Raum ist ins Spiel gewechselt
-        if (roomState.equals(AbstractMultiplayerRoom.RoomState.inGame))
+        if (roomState.equals(MultiPlayerObjects.RoomState.inGame))
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
@@ -279,7 +276,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                     setOpenJoinRoomButtons();
 
                     // wenn raus, dann playerlist neu machen
-                    if (roomState == AbstractMultiplayerRoom.RoomState.closed) {
+                    if (roomState == MultiPlayerObjects.RoomState.closed) {
                         if (matchStats.getNumberOfPlayers() == 1)
                             matchStats.clearStats();
                         else
@@ -495,7 +492,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
             Actor toAdd;
 
-            if (app.multiRoom != null && !app.multiRoom.getRoomState().equals(AbstractMultiplayerRoom.RoomState
+            if (app.multiRoom != null && !app.multiRoom.getRoomState().equals(MultiPlayerObjects.RoomState
                     .closed)) {
                 if (app.multiRoom.getNumberOfPlayers() < 2) {
                     toAdd = new Label(app.TEXTS.get("multiplayerJoinNotEnoughPlayers"), app.skin);
@@ -509,7 +506,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
             playersTable.row().padTop(30);
             playersTable.add(toAdd).colspan(3);
 
-            if (app.multiRoom != null && !app.multiRoom.getRoomState().equals(AbstractMultiplayerRoom.RoomState
+            if (app.multiRoom != null && !app.multiRoom.getRoomState().equals(MultiPlayerObjects.RoomState
                     .closed)) {
                 playersTable.row().padTop(25);
                 playersTable.add(new Label(app.TEXTS.get("multiplayerRoundSettings"), app.skin, LightBlocksGame

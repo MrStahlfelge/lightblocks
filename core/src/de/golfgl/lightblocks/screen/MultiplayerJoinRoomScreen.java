@@ -13,7 +13,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
 import de.golfgl.lightblocks.multiplayer.KryonetRoomLocation;
@@ -153,7 +152,7 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
         app.multiRoom.removeListener(this);
 
         // Verbindungsanfrage hängt oder es wurde keine gestellt
-        if (app.multiRoom.getRoomState() == AbstractMultiplayerRoom.RoomState.closed)
+        if (app.multiRoom.getRoomState() == MultiPlayerObjects.RoomState.closed)
             try {
                 app.multiRoom.leaveRoom(true);
             } catch (VetoException e) {
@@ -199,9 +198,9 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
     }
 
     @Override
-    public void multiPlayerRoomStateChanged(AbstractMultiplayerRoom.RoomState roomState) {
+    public void multiPlayerRoomStateChanged(MultiPlayerObjects.RoomState roomState) {
         // join -> gut
-        if (roomState.equals(AbstractMultiplayerRoom.RoomState.join))
+        if (roomState.equals(MultiPlayerObjects.RoomState.join))
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {

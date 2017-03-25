@@ -28,7 +28,7 @@ public class MultiPlayerObjects {
         // *** HANDSHAKE MUSS DIE ERSTE REGISTRIERTE KLASSE SEIN!!! ***
         kryo.register(Handshake.class);
         // und nun die weiteren Klassen registrieren =>
-        kryo.register(AbstractMultiplayerRoom.RoomState.class);
+        kryo.register(RoomState.class);
         kryo.register(RoomStateChanged.class);
         kryo.register(Player.class);
         kryo.register(PlayerChanged.class);
@@ -64,6 +64,8 @@ public class MultiPlayerObjects {
         kryo.register(WatchPlayMarkConflict.class);
     }
 
+    public enum RoomState {closed, join, inGame}
+
     public static class Handshake {
         // *** AN DIESER KLASSE DÜRFEN KEINERLEI VERÄNDERUNGEN GEMACHT WERDEN!!! ***
         public byte interfaceVersion = INTERFACE_VERSION;
@@ -74,7 +76,7 @@ public class MultiPlayerObjects {
     }
 
     public static class RoomStateChanged {
-        public AbstractMultiplayerRoom.RoomState roomState;
+        public RoomState roomState;
         public String refereePlayerId;
         public String deputyPlayerId;
 

@@ -11,7 +11,6 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.MultiplayerModel;
-import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
@@ -189,8 +188,8 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     }
 
     @Override
-    public void multiPlayerRoomStateChanged(AbstractMultiplayerRoom.RoomState roomState) {
-        if (!roomState.equals(AbstractMultiplayerRoom.RoomState.inGame))
+    public void multiPlayerRoomStateChanged(MultiPlayerObjects.RoomState roomState) {
+        if (!roomState.equals(MultiPlayerObjects.RoomState.inGame))
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {

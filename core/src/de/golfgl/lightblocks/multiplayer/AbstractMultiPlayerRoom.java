@@ -21,7 +21,7 @@ public abstract class AbstractMultiplayerRoom {
 
     protected Array<IRoomListener> listeners = new Array<IRoomListener>(0);
     protected String myPlayerId;
-    private RoomState roomState = RoomState.closed;
+    private MultiPlayerObjects.RoomState roomState = MultiPlayerObjects.RoomState.closed;
 
     private boolean gameModelStarted;
     private LinkedList<Object> queuedMessages;
@@ -33,13 +33,13 @@ public abstract class AbstractMultiplayerRoom {
     /**
      * returns current state of this room
      */
-    public RoomState getRoomState() {
+    public MultiPlayerObjects.RoomState getRoomState() {
         synchronized (roomState) {
             return roomState;
         }
     }
 
-    protected void setRoomState(final RoomState roomState) {
+    protected void setRoomState(final MultiPlayerObjects.RoomState roomState) {
 
         // keep sync block small
         boolean changed = false;
@@ -53,7 +53,7 @@ public abstract class AbstractMultiplayerRoom {
 
         if (changed) {
 
-            if (roomState.equals(RoomState.inGame)) {
+            if (roomState.equals(MultiPlayerObjects.RoomState.inGame)) {
                 gameModelStarted = false;
                 queuedMessages = new LinkedList<Object>();
             }
@@ -66,7 +66,7 @@ public abstract class AbstractMultiplayerRoom {
                 sendToAllPlayers(rsc);
             }
 
-            if (!isOwner() && roomState.equals(RoomState.join)) {
+            if (!isOwner() && roomState.equals(MultiPlayerObjects.RoomState.join)) {
                 //Handshake wurde durchgeführt, jetzt dem Owner senden was für Inputs ich kann
                 MultiPlayerObjects.PlayerInRoom pir = new MultiPlayerObjects.PlayerInRoom();
                 pir.playerId = myPlayerId;
@@ -104,7 +104,7 @@ public abstract class AbstractMultiplayerRoom {
      * @throws VetoException if not allowed to start the game
      */
     public void startGame(boolean force) throws VetoException {
-        if (!getRoomState().equals(RoomState.join))
+        if (!getRoomState().equals(MultiPlayerObjects.RoomState.join))
             throw new VetoException("Cannot start a game, room is closed or game already running.");
         if (getNumberOfPlayers() < 2)
             throw new VetoException("You need at least two players.");
@@ -115,7 +115,7 @@ public abstract class AbstractMultiplayerRoom {
         //bereit sind - es könnten noch welche den Highscore bewundern
 
 
-        setRoomState(RoomState.inGame);
+        setRoomState(MultiPlayerObjects.RoomState.inGame);
     }
 
     public void gameModelStarted() {
@@ -140,10 +140,10 @@ public abstract class AbstractMultiplayerRoom {
     public void gameStopped() throws VetoException {
         if (!isOwner())
             throw new VetoException("Only room owner can end of the game");
-        if (!getRoomState().equals(RoomState.inGame))
+        if (!getRoomState().equals(MultiPlayerObjects.RoomState.inGame))
             throw new VetoException("No game active.");
 
-        setRoomState(RoomState.join);
+        setRoomState(MultiPlayerObjects.RoomState.join);
 
     }
 
@@ -223,7 +223,7 @@ public abstract class AbstractMultiplayerRoom {
     }
 
     protected void informGotGameModelMessage(final Object o) {
-        if (!roomState.equals(RoomState.inGame)) {
+        if (!roomState.equals(MultiPlayerObjects.RoomState.inGame)) {
             // Game Model message werden verworfen wenn nicht im Spiel
             Log.warn("Multiplayer", "Ignored game model message - room not in game mode.");
             return;
@@ -243,7 +243,5 @@ public abstract class AbstractMultiplayerRoom {
         }
 
     }
-
-    public enum RoomState {closed, join, inGame}
 
 }

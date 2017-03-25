@@ -14,7 +14,7 @@ public interface IRoomListener {
     /**
      * called when a room was joined or left
      */
-    public void multiPlayerRoomStateChanged(AbstractMultiplayerRoom.RoomState roomState);
+    public void multiPlayerRoomStateChanged(MultiPlayerObjects.RoomState roomState);
 
     /**
      * called when inhabitants of the room changed.

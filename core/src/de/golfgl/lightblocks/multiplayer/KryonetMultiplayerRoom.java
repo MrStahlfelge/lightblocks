@@ -103,7 +103,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             nsdHelper.registerService();
 
         // man selbst ist automatisch Mitglied
-        setRoomState(RoomState.join);
+        setRoomState(MultiPlayerObjects.RoomState.join);
 
         synchronized (players) {
             final MultiPlayerObjects.Player kp = player.toKryoPlayer();
@@ -131,7 +131,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                 throw new VetoException("Players must leave your room before you can close it.");
         }
 
-        setRoomState(RoomState.closed);
+        setRoomState(MultiPlayerObjects.RoomState.closed);
 
         if (nsdHelper != null)
             nsdHelper.unregisterService();
@@ -230,7 +230,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         if (isOwner())
             closeRoom(force);
         else
-            setRoomState(RoomState.closed);
+            setRoomState(MultiPlayerObjects.RoomState.closed);
 
         if (client != null) {
             client.stop();
@@ -304,7 +304,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             if (handshake.interfaceVersion != MultiPlayerObjects.INTERFACE_VERSION) {
                 handshake.success = false;
                 handshake.message = "Interface versions differ. Use same Lightblocks version.";
-            } else if (!getRoomState().equals(RoomState.join)) {
+            } else if (!getRoomState().equals(MultiPlayerObjects.RoomState.join)) {
                 handshake.success = false;
                 handshake.message = "Room cannot be joined at the moment.";
             } else if (getNumberOfPlayers() >= 4) {
@@ -355,11 +355,11 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
 
                 // der Server sendet den Roomstate gleich noch einmal. Aber er muss hier schonmal auf Join
                 // geändert werden damit diese Message akzeptiert wird.
-                setRoomState(RoomState.join);
+                setRoomState(MultiPlayerObjects.RoomState.join);
             } else {
                 Log.warn("Multiplayer", handshake.toString());
                 informGotErrorMessage(handshake);
-                setRoomState(RoomState.closed);
+                setRoomState(MultiPlayerObjects.RoomState.closed);
 
             }
         }
@@ -414,7 +414,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                     players.clear();
                 }
 
-                setRoomState(RoomState.closed);
+                setRoomState(MultiPlayerObjects.RoomState.closed);
 
             } else {
                 String playerId = connectionToPlayer.get(connection.getID());
@@ -424,8 +424,8 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                     players.remove(playerId);
                 }
 
-                if (getNumberOfPlayers() < 2 && getRoomState().equals(RoomState.inGame))
-                    setRoomState(RoomState.join);
+                if (getNumberOfPlayers() < 2 && getRoomState().equals(MultiPlayerObjects.RoomState.inGame))
+                    setRoomState(MultiPlayerObjects.RoomState.join);
             }
         }
 
@@ -439,7 +439,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                 return;
             }
 
-            if (getRoomState() == RoomState.closed) {
+            if (getRoomState() == MultiPlayerObjects.RoomState.closed) {
                 Log.warn("Multiplayer", "Got information before handshake - ignored");
                 return;
             }
