@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.minlog.Log;
 
+import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
@@ -58,6 +59,9 @@ public class LightBlocksGame extends Game {
     public ShareHandler share;
     public AbstractMultiplayerRoom multiRoom;
     public Player player;
+    public IGpgsClient gpgsClient;
+    // Android Modellname des Geräts
+    public String modelNameRunningOn;
 
     public MainMenuScreen mainMenuScreen;
     public INsdHelper nsdHelper;
@@ -78,6 +82,10 @@ public class LightBlocksGame extends Game {
 
         if (share == null)
             share = new ShareHandler();
+
+        // Wenn beim letzten Mal angemeldet, dann wieder anmelden
+        if (prefs.getBoolean("gpgsAutoLogin", true))
+            gpgsClient.connect(true);
 
         I18NBundle.setSimpleFormatter(true);
 
@@ -123,8 +131,10 @@ public class LightBlocksGame extends Game {
 
         savegame = new GameStateHandler();
 
-        if (player == null)
+        if (player == null) {
             player = new Player();
+            player.setGamerId(modelNameRunningOn);
+        }
 
         mainMenuScreen = new MainMenuScreen(this);
         this.setScreen(mainMenuScreen);

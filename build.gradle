@@ -51,6 +51,7 @@ project(":android") {
     configurations { natives }
 
     dependencies {
+        compile project(":BaseGameUtils")
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         compile 'ch.acra:acra:4.9.0'

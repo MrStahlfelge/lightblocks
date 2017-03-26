@@ -19,6 +19,5 @@ public class MyApplication extends Application {
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(newBase);
         ACRA.init(this);
-        System.out.println("ACRA initialisiert");
     }
 }
