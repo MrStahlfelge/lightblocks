@@ -10,6 +10,7 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
 import de.golfgl.lightblocks.AndroidLauncher;
@@ -132,10 +133,20 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             // string in your strings.xml file that tells the user they
             // could not be signed in, such as "Unable to sign in."
 
-            //TODO: UI bescheid geben
+            String errorMsg;
+            switch (resultCode) {
+                case GamesActivityResultCodes.RESULT_APP_MISCONFIGURED:
+                    errorMsg = myContext.getString(com.google.example.games.basegameutils.R.string.app_misconfigured);
+                    break;
+                case GamesActivityResultCodes.RESULT_SIGN_IN_FAILED:
+                    errorMsg = myContext.getString(com.google.example.games.basegameutils.R.string.sign_in_failed);
+                    break;
+                default:
+                    errorMsg ="Unable to sign in.";
+            }
 
-            //BaseGameUtils.showActivityResultError(this,
-            //        AndroidLauncher.RC_GPGS_SIGNIN, resultCode, "Unable to sign in.");
+            gameListener.gpgsErrorMsg(errorMsg);
+
         }
     }
 

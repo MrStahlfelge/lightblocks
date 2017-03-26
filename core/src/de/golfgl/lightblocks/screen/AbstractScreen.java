@@ -100,7 +100,7 @@ public abstract class AbstractScreen implements Screen {
 
     }
 
-    protected Dialog showDialog(String errorMsg) {
+    public Dialog showDialog(String errorMsg) {
         Dialog dialog = new Dialog("", app.skin);
         Label errorMsgLabel = new Label(errorMsg, app.skin);
         errorMsgLabel.setWrap(true);

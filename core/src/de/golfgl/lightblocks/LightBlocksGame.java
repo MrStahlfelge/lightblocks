@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.FPSLogger;
@@ -19,6 +20,7 @@ import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.gpgs.IGpgsListener;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -231,5 +233,18 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     public void gpgsDisconnected() {
         player.setGamerId(modelNameRunningOn);
         handleAccountChanged();
+    }
+
+    @Override
+    public void gpgsErrorMsg(final String msg) {
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                Screen currentScreen = getScreen();
+                if (currentScreen instanceof AbstractScreen)
+                    ((AbstractScreen) currentScreen).showDialog(msg);
+
+            }
+        });
     }
 }

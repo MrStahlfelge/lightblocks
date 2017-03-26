@@ -14,4 +14,6 @@ public interface IGpgsListener {
     public void gpgsConnected();
 
     public void gpgsDisconnected();
+
+    public void gpgsErrorMsg(String msg);
 }
