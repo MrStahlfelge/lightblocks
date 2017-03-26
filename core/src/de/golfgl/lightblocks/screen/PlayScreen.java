@@ -20,11 +20,13 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Timer;
+import com.esotericsoftware.minlog.Log;
 
 import java.util.HashSet;
 import java.util.Iterator;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
@@ -190,6 +192,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
             Gdx.input.setInputProcessor(null);
             caller.app.setScreen(currentGame);
+
+            // GPGS Event
+            if (caller.app.gpgsClient != null && caller.app.gpgsClient.isConnected()) {
+                String eventId = GpgsHelper.getNewGameEventByModelId(currentGame.gameModel.getIdentifier());
+                Log.info("GPGS", "Submitting newly started game " + currentGame.gameModel.getIdentifier());
+                caller.app.gpgsClient.submitEvent(eventId, 1);
+            }
 
             return currentGame;
 

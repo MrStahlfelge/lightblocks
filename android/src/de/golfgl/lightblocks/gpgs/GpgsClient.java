@@ -182,6 +182,15 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             throw new GpgsException();
     }
 
+    @Override
+    public void submitEvent(String eventId, int increment) {
+        // No exception, if not online events are dismissed
+        if (!isConnected())
+            return;
+
+        Games.Events.increment(mGoogleApiClient, eventId, increment);
+    }
+
     public void setGameListener(IGpgsListener gameListener) {
         this.gameListener = gameListener;
     }

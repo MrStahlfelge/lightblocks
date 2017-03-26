@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.screen.MultiplayerPlayScreen;
@@ -217,6 +218,8 @@ public class MultiplayerModel extends GameModel {
                         totalScore.incMultiPlayerMatchesWon();
                         totalScore.incMultiPlayerMatchesStarted();
                         setGameOverWon();
+
+                        gpgsSubmitEvent(GpgsHelper.EVENT_MULTIPLAYER_MATCH_WON, 1);
                     }
                 }
             });

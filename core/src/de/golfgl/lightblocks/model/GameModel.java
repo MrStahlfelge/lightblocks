@@ -188,9 +188,14 @@ public abstract class GameModel implements Json.Serializable {
                     Math.floor(score.getClearedLines() / 10) * 10));
 
         // Oder vielleicht x100 Tetrominos?
-        if (Math.floor(score.getDrawnTetrominos() / 100) > Math.floor((score.getDrawnTetrominos() - 1) / 100))
+        final int drawnTetrominos = score.getDrawnTetrominos();
+        if (Math.floor(drawnTetrominos / 100) > Math.floor((drawnTetrominos - 1) / 100))
             userInterface.showMotivation(IGameModelListener.MotivationTypes.hundredBlocksDropped, Integer.toString(
-                    score.getDrawnTetrominos()));
+                    drawnTetrominos));
+
+        // Alle 10 Tetros auch an GPGS melden
+        if (gpgsClient != null && Math.floor(drawnTetrominos / 10) > Math.floor((drawnTetrominos - 1) / 10))
+            gpgsSubmitEvent(GpgsHelper.EVENT_BLOCK_DROP, 10);
 
         // Highscores updaten
         if (bestScore.setBestScores(score)) {
@@ -256,6 +261,7 @@ public abstract class GameModel implements Json.Serializable {
                 totalScore.incDoubles();
                 userInterface.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
             }
+            gpgsSubmitEvent(GpgsHelper.EVENT_LINES_CLEARED, removeLinesCount);
             linesRemoved(removeLinesCount, isSpecial, doubleSpecial);
 
             setCurrentSpeed();
@@ -562,6 +568,14 @@ public abstract class GameModel implements Json.Serializable {
             default:
                 currentSpeed = score.getCurrentLevel() >= 29 ? 60f : SOFT_DROP_SPEED;
         }
+    }
+
+    /**
+     * GPGS sumbit event convencience - Check auf null und isConnected
+     */
+    protected void gpgsSubmitEvent(String eventId, int inc) {
+        if (gpgsClient != null && gpgsClient.isConnected())
+            gpgsClient.submitEvent(eventId, inc);
     }
 
     /**

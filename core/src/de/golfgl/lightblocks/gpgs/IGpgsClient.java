@@ -31,4 +31,6 @@ public interface IGpgsClient {
     public void showAchievements() throws GpgsException;
 
     public void submitToLeaderboard(String leaderboardId, long score, String tag) throws GpgsException;
+
+    public void submitEvent(String eventId, int increment);
 }

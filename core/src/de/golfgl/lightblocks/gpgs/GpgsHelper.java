@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.gpgs;
 
 import de.golfgl.lightblocks.model.MarathonModel;
+import de.golfgl.lightblocks.model.MultiplayerModel;
 
 /**
  * Helper class
@@ -56,7 +57,21 @@ public class GpgsHelper {
             return LEAD_MARATHON_GAMEPAD;
 
         return null;
+    }
 
+    public static String getNewGameEventByModelId(String gameModelId) {
+        String retVal;
+
+        if (gameModelId.equalsIgnoreCase (MarathonModel.MODEL_MARATHON_ID + "1"))
+            return EVENT_GESTURE_MARATHON_STARTED;
+        if (gameModelId.equalsIgnoreCase (MarathonModel.MODEL_MARATHON_ID + "2"))
+            return EVENT_GRAVITY_MARATHON_STARTED;
+        if (gameModelId.equalsIgnoreCase (MarathonModel.MODEL_MARATHON_ID + "3"))
+            return EVENT_GAMEPAD_MARATHON_STARTED;
+        if (gameModelId.equalsIgnoreCase(MultiplayerModel.MODEL_ID))
+            return EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED;
+
+        return null;
     }
 
 }
