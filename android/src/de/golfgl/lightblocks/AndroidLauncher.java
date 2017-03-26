@@ -79,12 +79,6 @@ public class AndroidLauncher extends AndroidApplication {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        gpgsClient.disconnect(true);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RC_GPGS_SIGNIN)
             gpgsClient.activityResult(resultCode, data);

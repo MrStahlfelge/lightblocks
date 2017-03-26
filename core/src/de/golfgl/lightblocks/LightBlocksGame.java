@@ -73,6 +73,22 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     private FPSLogger fpsLogger;
     private Boolean playMusic;
     private Boolean showTouchPanel;
+    private Boolean gpgsAutoLogin;
+
+    public Boolean getGpgsAutoLogin() {
+        if (gpgsAutoLogin == null)
+            gpgsAutoLogin = prefs.getBoolean("gpgsAutoLogin", true);
+
+        return gpgsAutoLogin;
+    }
+
+    public void setGpgsAutoLogin(Boolean gpgsAutoLogin) {
+        if (gpgsAutoLogin != this.gpgsAutoLogin) {
+            prefs.putBoolean("gpgsAutoLogin", gpgsAutoLogin);
+            prefs.flush();
+        }
+        this.gpgsAutoLogin = gpgsAutoLogin;
+    }
 
     public void setAccountScreen(PlayerAccountMenuScreen accountScreen) {
         this.accountScreen = accountScreen;
@@ -98,7 +114,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
             player.setGamerId(modelNameRunningOn);
         }
 
-        if (prefs.getBoolean("gpgsAutoLogin", true) && gpgsClient != null)
+        if (getGpgsAutoLogin() && gpgsClient != null)
             gpgsClient.connect(true);
 
         I18NBundle.setSimpleFormatter(true);
@@ -157,6 +173,22 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     }
 
     @Override
+    public void pause() {
+        super.pause();
+
+        if (gpgsClient != null)
+            gpgsClient.disconnect(true);
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+
+        if (getGpgsAutoLogin() && gpgsClient != null)
+            gpgsClient.connect(true);
+    }
+
+    @Override
     public void dispose() {
         if (multiRoom != null)
             try {
@@ -212,10 +244,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     @Override
     public void gpgsConnected() {
         player.setGamerId(gpgsClient.getPlayerDisplayName());
-
-        prefs.putBoolean("gpgsAutoLogin", true);
-        prefs.flush();
-
+        setGpgsAutoLogin(true);
         handleAccountChanged();
     }
 

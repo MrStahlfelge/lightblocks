@@ -61,12 +61,12 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
 
     private void performGpgsLoginout() {
         if (app.gpgsClient.isConnected()) {
-            app.prefs.putBoolean("gpgsAutoLogin", true);
-            app.prefs.flush();
-
+            app.setGpgsAutoLogin(false);
             app.gpgsClient.disconnect(false);
         } else
             app.gpgsClient.connect(false);
+
+        // Die AutoLogin Einstellung wird bei erfolgtem Connect wieder zurück gesetzt
 
     }
 

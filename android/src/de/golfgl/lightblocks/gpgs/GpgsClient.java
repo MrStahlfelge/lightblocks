@@ -45,6 +45,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void connect(boolean autoStart) {
+        Log.i("GPGS", "Trying to connect with autostart " + autoStart);
         mAutoStartSignInflow = autoStart;
         mSignInClicked = !autoStart;
         mGoogleApiClient.connect();
@@ -54,6 +55,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     @Override
     public void disconnect(boolean autoEnd) {
         if (isConnected()) {
+            Log.i("GPGS", "Disconnecting with autoEnd " + autoEnd);
             if (!autoEnd)
                 try {
                     Games.signOut(mGoogleApiClient);
