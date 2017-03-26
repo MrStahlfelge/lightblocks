@@ -25,4 +25,8 @@ public interface IGpgsClient {
     public String getPlayerDisplayName();
 
     boolean isConnected();
+
+    public void showLeaderboards(String leaderBoardId) throws GpgsException;
+
+    public void showAchievements() throws GpgsException;
 }

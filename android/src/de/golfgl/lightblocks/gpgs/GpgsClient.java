@@ -52,9 +52,13 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void disconnect(boolean autoEnd) {
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+        if (isConnected()) {
             if (!autoEnd)
-                Games.signOut(mGoogleApiClient);
+                try {
+                    Games.signOut(mGoogleApiClient);
+                } catch (Throwable t) {
+                    // eat security exceptions when already signed out via gpgs ui
+                }
             mGoogleApiClient.disconnect();
             gameListener.gpgsDisconnected();
         }
@@ -76,7 +80,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public boolean isConnected() {
-        return mGoogleApiClient.isConnected();
+        return mGoogleApiClient != null && mGoogleApiClient.isConnected();
     }
 
     @Override
@@ -133,6 +137,26 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             //BaseGameUtils.showActivityResultError(this,
             //        AndroidLauncher.RC_GPGS_SIGNIN, resultCode, "Unable to sign in.");
         }
+    }
+
+    @Override
+    public void showLeaderboards(String leaderBoardId) throws GpgsException {
+        if (isConnected())
+            myContext.startActivityForResult(leaderBoardId != null ?
+                    Games.Leaderboards.getLeaderboardIntent(mGoogleApiClient, leaderBoardId) :
+                    Games.Leaderboards.getAllLeaderboardsIntent(mGoogleApiClient), AndroidLauncher.RC_LEADERBOARD);
+        else
+            throw new GpgsException();
+    }
+
+    @Override
+    public void showAchievements() throws GpgsException {
+        if (isConnected())
+            myContext.startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient),
+                    AndroidLauncher.RC_ACHIEVEMENTS);
+        else
+            throw new GpgsException();
+
     }
 
 

@@ -14,6 +14,8 @@ import de.golfgl.lightblocks.multiplayer.NsdAdapter;
 public class AndroidLauncher extends AndroidApplication {
 
     public static final int RC_GPGS_SIGNIN = 9001;
+    public static final int RC_LEADERBOARD = 9002;
+    public static final int RC_ACHIEVEMENTS = 9003;
 
     // Network Service detection
     NsdAdapter nsdAdapter;
@@ -88,9 +90,8 @@ public class AndroidLauncher extends AndroidApplication {
             gpgsClient.activityResult(resultCode, data);
 
             // check for "inconsistent state"
-        else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
-            //TODO
-            //&& requestCode == <your_request_code_here> )  {
+        else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED &&
+                (requestCode == RC_LEADERBOARD || requestCode == RC_ACHIEVEMENTS)) {
             // force a disconnect to sync up state, ensuring that mClient reports "not connected"
             gpgsClient.disconnect(false);
         }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.GpgsException;
 import de.golfgl.lightblocks.scenes.FATextButton;
 
 /**
@@ -55,7 +56,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
                                 }
         );
 
-        buttons.add(logInOutButton);
+        buttons.add(logInOutButton).padLeft(50).minWidth(220);
     }
 
     private void performGpgsLoginout() {
@@ -84,7 +85,28 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
                                 }
         );
         leaderboardButton = new TextButton(FontAwesome.GPGS_LEADERBOARD, app.skin, FontAwesome.SKIN_FONT_FA);
+        leaderboardButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                try {
+                    app.gpgsClient.showLeaderboards(null);
+                } catch (GpgsException e) {
+                    showDialog("Error showing leaderboards.");
+                }
+            }
+        });
+
         achievementsButton = new TextButton(FontAwesome.GPGS_ACHIEVEMENT, app.skin, FontAwesome.SKIN_FONT_FA);
+        achievementsButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                try {
+                    app.gpgsClient.showAchievements();
+                } catch (GpgsException e) {
+                    showDialog("Error showing achievements.");
+                }
+            }
+        });
 
         menuTable.defaults().fill();
 
