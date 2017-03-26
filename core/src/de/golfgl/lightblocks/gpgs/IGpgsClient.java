@@ -29,4 +29,6 @@ public interface IGpgsClient {
     public void showLeaderboards(String leaderBoardId) throws GpgsException;
 
     public void showAchievements() throws GpgsException;
+
+    public void submitToLeaderboard(String leaderboardId, long score, String tag) throws GpgsException;
 }

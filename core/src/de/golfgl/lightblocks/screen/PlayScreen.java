@@ -254,6 +254,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameModel.totalScore = app.savegame.loadTotalScore();
         //TODO das sollte ins GameModel
         gameModel.bestScore = app.savegame.loadBestScore(gameModel.getIdentifier());
+        gameModel.gpgsClient = app.gpgsClient;
 
         // erst nach dem Laden setzen, damit das noch ohne Animation läuft
         levelNum.setEmphasizeTreshold(1, EMPHASIZE_COLOR);

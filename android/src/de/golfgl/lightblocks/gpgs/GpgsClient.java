@@ -142,10 +142,11 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
                     errorMsg = myContext.getString(com.google.example.games.basegameutils.R.string.sign_in_failed);
                     break;
                 default:
-                    errorMsg ="Unable to sign in.";
+                    errorMsg = null;
             }
 
-            gameListener.gpgsErrorMsg(errorMsg);
+            if (errorMsg != null)
+                gameListener.gpgsErrorMsg("Google Play Games: " + errorMsg);
 
         }
     }
@@ -170,6 +171,16 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     }
 
+    @Override
+    public void submitToLeaderboard(String leaderboardId, long score, String tag) throws GpgsException {
+        if (isConnected())
+            if (tag != null)
+                Games.Leaderboards.submitScore(mGoogleApiClient, leaderboardId, score, tag);
+            else
+                Games.Leaderboards.submitScore(mGoogleApiClient, leaderboardId, score);
+        else
+            throw new GpgsException();
+    }
 
     public void setGameListener(IGpgsListener gameListener) {
         this.gameListener = gameListener;

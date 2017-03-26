@@ -5,7 +5,12 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
+import com.esotericsoftware.minlog.Log;
 
+import de.golfgl.lightblocks.gpgs.GpgsException;
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.gpgs.IGpgsClient;
+import de.golfgl.lightblocks.gpgs.IGpgsListener;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.TotalScore;
@@ -25,6 +30,7 @@ public abstract class GameModel implements Json.Serializable {
     private final IntArray linesToRemove;
     public BestScore bestScore;
     public TotalScore totalScore;
+    public IGpgsClient gpgsClient;
     /**
      * hier am GameModel verwaltet, da die Eingabemethode mit dem Modell ins Savegame kommt (und von dort geladen wird)
      */
@@ -376,12 +382,28 @@ public abstract class GameModel implements Json.Serializable {
         isGameOver = true;
         userInterface.showMotivation(IGameModelListener.MotivationTypes.gameOver, null);
         userInterface.setGameOver();
+
+        submitToLeaderboard();
+
     }
 
     protected void setGameOverWon() {
         isGameOver = true;
         userInterface.showMotivation(IGameModelListener.MotivationTypes.gameWon, null);
         userInterface.setGameOver();
+
+        submitToLeaderboard();
+    }
+
+    protected void submitToLeaderboard() {
+        String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(getIdentifier());
+
+        if (leaderboardId != null && gpgsClient != null && gpgsClient.isConnected())
+            try {
+                gpgsClient.submitToLeaderboard(leaderboardId, score.getScore(), Integer.toString(score.getClearedLines()));
+            } catch (GpgsException e) {
+                Log.error("GPGS", "Error submitting leaderboard score.");
+            }
     }
 
     /**

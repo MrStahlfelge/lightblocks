@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.GpgsException;
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.scenes.FATextButton;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.IRoundScore;
@@ -141,6 +143,25 @@ public class ScoreScreen extends AbstractScoreScreen {
         }
 
         super.fillButtonTable(buttons);
+
+        // Leader Board
+        final String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(gameModelId);
+        if (leaderboardId != null) {
+            Button leaderboard = new FATextButton(FontAwesome.GPGS_LEADERBOARD, app.TEXTS.get("menuLeaderboard"), app.skin);
+            leaderboard.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    try {
+                        app.gpgsClient.showLeaderboards(leaderboardId);
+                    } catch (GpgsException e) {
+                        showDialog("Error showing leaderboard.");
+                    }
+                }
+            });
+            leaderboard.setDisabled(app.gpgsClient == null || !app.gpgsClient.isConnected());
+            buttons.add(leaderboard);
+
+        }
 
     }
 
