@@ -111,18 +111,15 @@ public class MainMenuScreen extends AbstractScreen {
         });
         buttons.add(playMultiplayerButton).colspan(2).padBottom(20);
 
-        //TODO High scores -> hier kommt Google Plag Games Icon und "Account" rein
         buttons.row();
-
-        TextButton scoreButton = new FATextButton(FontAwesome.COMMENT_STAR_TROPHY, app.TEXTS.get("labelScores"), app
-                .skin);
-        scoreButton.addListener(new ChangeListener() {
+        TextButton accountButton = new FATextButton(FontAwesome.GPGS_LOGO, app.TEXTS.get("menuAccount"), app.skin);
+        accountButton.addListener(new ChangeListener() {
                                     public void changed(ChangeEvent event, Actor actor) {
-                                        gotoHighscoreScreen();
+                                        app.setScreen(new PlayerAccountMenuScreen(app));
                                     }
                                 }
         );
-        buttons.add(scoreButton);
+        buttons.add(accountButton);
         // Settings
         TextButton settingsButton = new FATextButton(FontAwesome.SETTINGS_GEARS, app.TEXTS.get("menuSettings"), app
                 .skin);
@@ -151,21 +148,6 @@ public class MainMenuScreen extends AbstractScreen {
         stage.getRoot().setColor(Color.CLEAR);
         stage.getRoot().addAction(Actions.fadeIn(1));
 
-    }
-
-    private void gotoHighscoreScreen() {
-
-        if (!app.savegame.canSaveState()) {
-            showDialog("Sorry, highscores are only saved in the native Android version of Lightblocks. Download it to" +
-                    " your mobile!");
-            return;
-        }
-
-        TotalScoreScreen scoreScreen = new TotalScoreScreen(app);
-        scoreScreen.setTotal(app.savegame.loadTotalScore());
-        scoreScreen.setMaxCountingTime(1);
-        scoreScreen.initializeUI();
-        app.setScreen(scoreScreen);
     }
 
     /**

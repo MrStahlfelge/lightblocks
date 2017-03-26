@@ -62,10 +62,6 @@ public class SettingsScreen extends AbstractMenuScreen {
         Button gamePadButton = new TextButton(PlayScreenInput.getInputFAIcon(3), app.skin, FontAwesome.SKIN_FONT_FA);
         gamePadButton.setDisabled(true);
 
-        // Back button
-        Button leave = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
-        setBackButton(leave);
-
         //Settings Table
         settingsTable.row();
         settingsTable.defaults().fill();

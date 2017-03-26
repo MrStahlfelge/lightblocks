@@ -21,4 +21,8 @@ public interface IGpgsClient {
      * @param autoEnd if false, an expiclit signOut is performed
      */
     void disconnect(boolean autoEnd);
+
+    public String getPlayerDisplayName();
+
+    boolean isConnected();
 }

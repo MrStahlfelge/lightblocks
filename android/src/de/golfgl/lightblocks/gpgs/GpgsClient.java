@@ -13,7 +13,6 @@ import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
 import de.golfgl.lightblocks.AndroidLauncher;
-import de.golfgl.lightblocks.gpgs.IGpgsClient;
 
 /**
  * Client für Google Play Games
@@ -21,12 +20,11 @@ import de.golfgl.lightblocks.gpgs.IGpgsClient;
  * Created by Benjamin Schulte on 26.03.2017.
  */
 
-public class GpgsClient
-        implements
-        GoogleApiClient.ConnectionCallbacks,
+public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, IGpgsClient {
 
     private Activity myContext;
+    private IGpgsListener gameListener;
 
     // Play Games
     private GoogleApiClient mGoogleApiClient;
@@ -58,6 +56,7 @@ public class GpgsClient
             if (!autoEnd)
                 Games.signOut(mGoogleApiClient);
             mGoogleApiClient.disconnect();
+            gameListener.gpgsDisconnected();
         }
     }
 
@@ -65,8 +64,19 @@ public class GpgsClient
     public void onConnected(@Nullable Bundle bundle) {
         // The player is signed in. Hide the sign-in button and allow the
         // player to proceed.
-        Log.i("GPGS", "Successfully signed in with player id " + Games.Players.getCurrentPlayer(mGoogleApiClient)
-                .getDisplayName());
+        Log.i("GPGS", "Successfully signed in with player id " + getPlayerDisplayName());
+        gameListener.gpgsConnected();
+    }
+
+    @Override
+    public String getPlayerDisplayName() {
+        return Games.Players.getCurrentPlayer(mGoogleApiClient)
+                .getDisplayName();
+    }
+
+    @Override
+    public boolean isConnected() {
+        return mGoogleApiClient.isConnected();
     }
 
     @Override
@@ -106,7 +116,7 @@ public class GpgsClient
 
     }
 
-    public void activityResult (int resultCode, Intent data) {
+    public void activityResult(int resultCode, Intent data) {
         mSignInClicked = false;
         mResolvingConnectionFailure = false;
         if (resultCode == Activity.RESULT_OK) {
@@ -126,4 +136,7 @@ public class GpgsClient
     }
 
 
+    public void setGameListener(IGpgsListener gameListener) {
+        this.gameListener = gameListener;
+    }
 }

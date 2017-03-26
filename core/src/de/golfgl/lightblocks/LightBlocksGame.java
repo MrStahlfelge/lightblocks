@@ -16,16 +16,18 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.lightblocks.gpgs.IGpgsClient;
+import de.golfgl.lightblocks.gpgs.IGpgsListener;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
+import de.golfgl.lightblocks.screen.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
 import de.golfgl.lightblocks.state.Player;
 
 import static com.badlogic.gdx.Gdx.app;
 
-public class LightBlocksGame extends Game {
+public class LightBlocksGame extends Game implements IGpgsListener {
     public static final int nativeGameWidth = 480;
     public static final int nativeGameHeight = 800;
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
@@ -62,12 +64,17 @@ public class LightBlocksGame extends Game {
     public IGpgsClient gpgsClient;
     // Android Modellname des Geräts
     public String modelNameRunningOn;
-
     public MainMenuScreen mainMenuScreen;
     public INsdHelper nsdHelper;
+    // der AccountScreen um An-/Abmeldung dort anzuzeien
+    PlayerAccountMenuScreen accountScreen;
     private FPSLogger fpsLogger;
     private Boolean playMusic;
     private Boolean showTouchPanel;
+
+    public void setAccountScreen(PlayerAccountMenuScreen accountScreen) {
+        this.accountScreen = accountScreen;
+    }
 
     @Override
     public void create() {
@@ -83,8 +90,13 @@ public class LightBlocksGame extends Game {
         if (share == null)
             share = new ShareHandler();
 
-        // Wenn beim letzten Mal angemeldet, dann wieder anmelden
-        if (prefs.getBoolean("gpgsAutoLogin", true))
+        // GPGS: Wenn beim letzten Mal angemeldet, dann wieder anmelden
+        if (player == null) {
+            player = new Player();
+            player.setGamerId(modelNameRunningOn);
+        }
+
+        if (prefs.getBoolean("gpgsAutoLogin", true) && gpgsClient != null)
             gpgsClient.connect(true);
 
         I18NBundle.setSimpleFormatter(true);
@@ -130,11 +142,6 @@ public class LightBlocksGame extends Game {
         swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
 
         savegame = new GameStateHandler();
-
-        if (player == null) {
-            player = new Player();
-            player.setGamerId(modelNameRunningOn);
-        }
 
         mainMenuScreen = new MainMenuScreen(this);
         this.setScreen(mainMenuScreen);
@@ -198,5 +205,31 @@ public class LightBlocksGame extends Game {
     public void setTouchPanelSize(int touchPanelSize) {
         prefs.putInteger("touchPanelSize", touchPanelSize);
         prefs.flush();
+    }
+
+    @Override
+    public void gpgsConnected() {
+        player.setGamerId(gpgsClient.getPlayerDisplayName());
+
+        prefs.putBoolean("gpgsAutoLogin", true);
+        prefs.flush();
+
+        handleAccountChanged();
+    }
+
+    private void handleAccountChanged() {
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                if (accountScreen != null)
+                    accountScreen.refreshAccountChanged();
+            }
+        });
+    }
+
+    @Override
+    public void gpgsDisconnected() {
+        player.setGamerId(modelNameRunningOn);
+        handleAccountChanged();
     }
 }
