@@ -27,6 +27,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 15.01.2017.
  */
 public class MainMenuScreen extends AbstractScreen {
+    private final TextButton accountButton;
     private TextButton resumeGameButton;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
@@ -112,14 +113,16 @@ public class MainMenuScreen extends AbstractScreen {
         buttons.add(playMultiplayerButton).colspan(2).padBottom(20);
 
         buttons.row();
-        TextButton accountButton = new FATextButton(FontAwesome.GPGS_LOGO, app.TEXTS.get("menuAccount"), app.skin);
+        accountButton = new FATextButton(FontAwesome.GPGS_LOGO, "", app.skin);
         accountButton.addListener(new ChangeListener() {
-                                    public void changed(ChangeEvent event, Actor actor) {
-                                        app.setScreen(new PlayerAccountMenuScreen(app));
-                                    }
-                                }
+                                      public void changed(ChangeEvent event, Actor actor) {
+                                          app.setScreen(new PlayerAccountMenuScreen(app));
+                                      }
+                                  }
         );
         buttons.add(accountButton);
+        refreshAccountInfo();
+
         // Settings
         TextButton settingsButton = new FATextButton(FontAwesome.SETTINGS_GEARS, app.TEXTS.get("menuSettings"), app
                 .skin);
@@ -148,6 +151,18 @@ public class MainMenuScreen extends AbstractScreen {
         stage.getRoot().setColor(Color.CLEAR);
         stage.getRoot().addAction(Actions.fadeIn(1));
 
+    }
+
+    public void refreshAccountInfo() {
+        if (app.gpgsClient != null && app.gpgsClient.isConnected()) {
+            String gamerId = app.player.getGamerId();
+
+            if (gamerId.length() >= 12)
+                gamerId = gamerId.substring(0, 10) + "...";
+
+            accountButton.setText(gamerId);
+        } else
+            accountButton.setText(app.TEXTS.get("menuAccount"));
     }
 
     /**

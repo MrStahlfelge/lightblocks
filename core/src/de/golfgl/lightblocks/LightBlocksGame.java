@@ -252,6 +252,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
+                mainMenuScreen.refreshAccountInfo();
                 if (accountScreen != null)
                     accountScreen.refreshAccountChanged();
             }
