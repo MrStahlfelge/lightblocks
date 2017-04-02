@@ -473,8 +473,8 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 else
                     lineColor = new Color(1, 1, 1, 1);
 
-
                 final Label playerIdLabel = new Label(playerId, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                playerIdLabel.setEllipsis(true);
                 Label playerOutplaysLabel = new ScoreLabel(1, playerStat.getNumberOutplays(), app.skin,
                         LightBlocksGame.SKIN_FONT_BIG);
                 Label playerScoreLabel = new ScoreLabel(1, playerStat.getTotalScore(), app.skin, LightBlocksGame
@@ -484,7 +484,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 playerOutplaysLabel.setColor(lineColor);
                 playerScoreLabel.setColor(lineColor);
 
-                playersTable.add(playerIdLabel).minWidth(LightBlocksGame.nativeGameWidth * .33f);
+                playersTable.add(playerIdLabel).width(LightBlocksGame.nativeGameWidth * .33f).left();
                 playersTable.add(playerOutplaysLabel).right();
                 playersTable.add(playerScoreLabel).right();
 

@@ -56,6 +56,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
         playerLabels = new HashMap<String, ScoreLabel>(app.multiRoom.getNumberOfPlayers());
 
         for (String playerId : app.multiRoom.getPlayers()) {
+            fillingTable.add(new Label(playerId.substring(0, 1), app.skin)).top();
             ScoreLabel lblFilling = new ScoreLabel(2, 100, app.skin, LightBlocksGame.SKIN_FONT_BIG);
             lblFilling.setExceedChar('X');
             fillingTable.add(lblFilling);
