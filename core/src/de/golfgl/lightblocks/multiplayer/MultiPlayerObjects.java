@@ -15,7 +15,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 public class MultiPlayerObjects {
 
     // *** BEI JEDER ÄNDERUNG HOCHZÄHLEN!!! ***
-    public static final int INTERFACE_VERSION = 2;
+    public static final int INTERFACE_VERSION = 3;
 
     public static final int CHANGE_ADD = 1;
     public static final int CHANGE_UPDATE = 2;
@@ -182,6 +182,7 @@ public class MultiPlayerObjects {
 
     public static class GarbageForYou {
         public int garbageLines;
+        public String fromPlayerId;
     }
 
     // Zum Zugucken

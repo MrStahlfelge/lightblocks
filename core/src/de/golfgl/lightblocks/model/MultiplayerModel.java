@@ -40,7 +40,8 @@ public class MultiplayerModel extends GameModel {
     private HashSet<String> uninitializedPlayers;
     private int tetrominosSent = 0;
     private int maxTetrosAPlayerDrawn;
-    private Integer waitingGarbageLines = new Integer(0);
+    private Integer waitingGarbageLinesNum = new Integer(0);
+    private String waitingGarbageLinesFrom;
 
     // siehe drawGarbageLines
     private int[] garbageHolePosition;
@@ -76,9 +77,12 @@ public class MultiplayerModel extends GameModel {
         // aktiven Index gefüllt wurden.
 
         int numOfLines = 0;
-        synchronized (waitingGarbageLines) {
-            numOfLines = waitingGarbageLines;
-            waitingGarbageLines = 0;
+        synchronized (waitingGarbageLinesNum) {
+            numOfLines = waitingGarbageLinesNum;
+            waitingGarbageLinesNum = 0;
+
+            //TODO hier dann einblenden von wem die Zeilen kamen
+            waitingGarbageLinesFrom = null;
         }
 
         int[] retVal = new int[numOfLines];
@@ -252,11 +256,17 @@ public class MultiplayerModel extends GameModel {
 
     protected void handleGarbageForYou(MultiPlayerObjects.GarbageForYou o) {
         boolean warningTreshold = false;
-        synchronized (waitingGarbageLines) {
-            int oldWaitingLines = waitingGarbageLines;
-            waitingGarbageLines = waitingGarbageLines + o.garbageLines;
+        synchronized (waitingGarbageLinesNum) {
+            int oldWaitingLines = waitingGarbageLinesNum;
+            waitingGarbageLinesNum = waitingGarbageLinesNum + o.garbageLines;
 
-            if (waitingGarbageLines >= 4 && oldWaitingLines < 4)
+            // falls Garbage von verschiedenen Spielern kam dann from auf null
+            if (oldWaitingLines <= 0)
+                waitingGarbageLinesFrom = o.fromPlayerId;
+            else if (waitingGarbageLinesFrom != null && !waitingGarbageLinesFrom.equalsIgnoreCase(o.fromPlayerId))
+                waitingGarbageLinesFrom = null;
+
+            if (waitingGarbageLinesNum >= 4 && oldWaitingLines < 4)
                 warningTreshold = true;
         }
 
@@ -321,6 +331,7 @@ public class MultiplayerModel extends GameModel {
             if (playerWithLowestFill != null) {
                 MultiPlayerObjects.GarbageForYou gfu = new MultiPlayerObjects.GarbageForYou();
                 gfu.garbageLines = garbageToSend;
+                gfu.fromPlayerId = lr.playerId;
 
                 if (playerWithLowestFill.equals(playerRoom.getMyPlayerId()))
                     handleMessagesFromOthers(gfu);
