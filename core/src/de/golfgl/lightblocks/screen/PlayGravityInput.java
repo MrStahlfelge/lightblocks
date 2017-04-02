@@ -98,7 +98,7 @@ public class PlayGravityInput extends PlayScreenInput {
             if (acceleration < GRADIENT_TRESHOLD / 2) {
                 currentInputVector.mul(this.calibrationMatrix);
                 doControl(deltaSum, currentInputVector);
-            } else if (acceleration > GRADIENT_TRESHOLD * 3)
+            } else if (acceleration > GRADIENT_TRESHOLD * 5)
                 playScreen.switchPause(false);
         }
 
