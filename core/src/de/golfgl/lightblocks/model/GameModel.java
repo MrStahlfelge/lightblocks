@@ -62,6 +62,8 @@ public abstract class GameModel implements Json.Serializable {
     private boolean isSomeMovementDone;
     // Verzögerung bei gedrückter Taste
     private float movingCountdown;
+    // Wieviele Specials (Four Lines und T-Spin) hintereinander?
+    private int specialRowChainNum;
 
     public GameModel() {
 
@@ -245,6 +247,13 @@ public abstract class GameModel implements Json.Serializable {
 
         if (clearedLines >= 100 && clearedLines - removedLines < 100)
             gpgsUpdateAchievement(GpgsHelper.ACH_LONGCLEANER);
+
+        if (gameboard.calcGameboardFill() == 0 && score.getDrawnTetrominos() > 10)
+            gpgsUpdateAchievement(GpgsHelper.ACH_CLEAN_COMPLETE);
+
+        gpgsUpdateAchievement(GpgsHelper.ACH_ADDICTION_LEVEL_1, removedLines);
+        gpgsUpdateAchievement(GpgsHelper.ACH_ADDICTION_LEVEL_2, removedLines);
+        gpgsUpdateAchievement(GpgsHelper.ACH_HIGH_LEVEL_ADDICTION, removedLines);
     }
 
     protected void achievementTSpin() {
@@ -291,8 +300,7 @@ public abstract class GameModel implements Json.Serializable {
 
             gameboard.clearLines(linesToRemove);
             boolean doubleSpecial = score.incClearedLines(removeLinesCount, isSpecial, isTSpin);
-            if (doubleSpecial)
-                achievementDoubleSpecial();
+            achievementDoubleSpecial(doubleSpecial);
 
             gpgsSubmitEvent(GpgsHelper.EVENT_LINES_CLEARED, removeLinesCount);
             linesRemoved(removeLinesCount, isSpecial, doubleSpecial);
@@ -315,10 +323,19 @@ public abstract class GameModel implements Json.Serializable {
 
     }
 
-    protected void achievementDoubleSpecial() {
-        totalScore.incDoubles();
-        userInterface.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
-        gpgsUpdateAchievement(GpgsHelper.ACH_DOUBLE_SPECIAL);
+    protected void achievementDoubleSpecial(boolean doubleSpecial) {
+        if (doubleSpecial) {
+            specialRowChainNum++;
+            totalScore.incDoubles();
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
+
+            if (specialRowChainNum == 5)
+                gpgsUpdateAchievement(GpgsHelper.ACH_SPECIAL_CHAIN);
+            else
+                gpgsUpdateAchievement(GpgsHelper.ACH_DOUBLE_SPECIAL);
+        } else
+            // auf 1 initialisieren, weil bei Double das erste Mal erhöht wird!
+            specialRowChainNum = 1;
     }
 
     /**
