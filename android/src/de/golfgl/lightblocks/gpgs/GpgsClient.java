@@ -193,6 +193,18 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         Games.Events.increment(mGoogleApiClient, eventId, increment);
     }
 
+    @Override
+    public void unlockAchievement(String achievementId) {
+        if (isConnected())
+            Games.Achievements.unlock(mGoogleApiClient, achievementId);
+    }
+
+    @Override
+    public void incrementAchievement(String achievementId, int incNum) {
+        if (isConnected())
+            Games.Achievements.increment(mGoogleApiClient, achievementId, incNum);
+    }
+
     public void setGameListener(IGpgsListener gameListener) {
         this.gameListener = gameListener;
     }

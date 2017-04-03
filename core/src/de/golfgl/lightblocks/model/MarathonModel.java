@@ -1,5 +1,7 @@
 package de.golfgl.lightblocks.model;
 
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
@@ -31,5 +33,30 @@ public class MarathonModel extends GameModel {
         retVal.setGameModelClass(MarathonModel.class);
 
         return retVal;
+    }
+
+    @Override
+    protected void achievementsScore(int gainedScore) {
+        super.achievementsScore(gainedScore);
+
+        final int currentScore = getScore().getScore();
+        final int oldScore = currentScore - gainedScore;
+
+        if (inputTypeKey == PlayScreenInput.KEY_ACCELEROMETER && currentScore >= 50000
+                && oldScore < 50000)
+            gpgsUpdateAchievement(GpgsHelper.ACH_GRAVITY_KING);
+
+        if (currentScore >= 75000 && oldScore < 75000)
+            gpgsUpdateAchievement(GpgsHelper.ACH_MARATHON_SCORE_75000);
+        else if (currentScore >= 100000 && oldScore < 100000)
+            gpgsUpdateAchievement(GpgsHelper.ACH_MARATHON_SCORE_100000);
+        else if (currentScore >= 150000 && oldScore < 150000)
+            gpgsUpdateAchievement(GpgsHelper.ACH_MARATHON_SCORE_150000);
+        else if (currentScore >= 200000 && oldScore < 200000)
+            gpgsUpdateAchievement(GpgsHelper.ACH_MARATHON_SCORE_200000);
+        else if (currentScore >= 250000 && oldScore < 250000)
+            gpgsUpdateAchievement(GpgsHelper.ACH_MARATHON_SCORE_250000);
+        else if (currentScore >= 300000 && oldScore < 300000)
+            gpgsUpdateAchievement(GpgsHelper.ACH_MARATHON_SUPER_CHECKER);
     }
 }

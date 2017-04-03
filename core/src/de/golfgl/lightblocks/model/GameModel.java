@@ -10,7 +10,6 @@ import com.esotericsoftware.minlog.Log;
 import de.golfgl.lightblocks.gpgs.GpgsException;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.gpgs.IGpgsClient;
-import de.golfgl.lightblocks.gpgs.IGpgsListener;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.TotalScore;
@@ -171,21 +170,14 @@ public abstract class GameModel implements Json.Serializable {
 
         int gainedScore = score.flushScore();
 
-        // Auswertung Achievements
+        // Auswertung Achievements für GPGS und UI
 
         if (tSpin && removedLines < 2)
             // T-Spin nur zeigen, wenn nicht eh schon die Explosion erfolgt
             userInterface.showMotivation(IGameModelListener.MotivationTypes.tSpin, null);
 
-        // Level hoch? Super!
-        if (score.getCurrentLevel() != levelBeforeRemove)
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.newLevel, Integer.toString(score
-                    .getCurrentLevel()));
-
-            // Wenn kein Level hoch, dann 10 Reihen geschafft?
-        else if (Math.floor(score.getClearedLines() / 10) > Math.floor((score.getClearedLines() - removedLines) / 10))
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, Integer.toString((int)
-                    Math.floor(score.getClearedLines() / 10) * 10));
+        if (removedLines > 0)
+            achievementsClearedLines(levelBeforeRemove, removedLines);
 
         // Oder vielleicht x100 Tetrominos?
         final int drawnTetrominos = score.getDrawnTetrominos();
@@ -193,7 +185,7 @@ public abstract class GameModel implements Json.Serializable {
             userInterface.showMotivation(IGameModelListener.MotivationTypes.hundredBlocksDropped, Integer.toString(
                     drawnTetrominos));
 
-        // Alle 10 Tetros auch an GPGS melden
+        // Alle 10 Tetros auch Ereignis an GPGS melden
         if (gpgsClient != null && Math.floor(drawnTetrominos / 10) > Math.floor((drawnTetrominos - 1) / 10))
             gpgsSubmitEvent(GpgsHelper.EVENT_BLOCK_DROP, 10);
 
@@ -208,11 +200,13 @@ public abstract class GameModel implements Json.Serializable {
         totalScore.addClearedLines(removedLines);
         totalScore.incDrawnTetrominos();
         if (removedLines == 4)
-            totalScore.incFourLineCount();
+            achievementFourLines();
         if (tSpin)
-            totalScore.incTSpins();
+            achievementTSpin();
 
         userInterface.updateScore(score, gainedScore);
+        if (gainedScore > 0)
+            achievementsScore(gainedScore);
 
         activeTetrominoDropped();
 
@@ -223,6 +217,46 @@ public abstract class GameModel implements Json.Serializable {
         activateNextTetromino();
 
         // Game Over kann hier erfolgt sein!
+    }
+
+    protected void achievementsScore(int gainedScore) {
+        // Momentan nichts hier, das kann sich aber ändern
+        // wird aber in Unterklassen übersteuert
+    }
+
+    /**
+     * Wertet aus, welche Achievements bezüglich abgebauter Zeilen zutreffen und löst diese aus
+     *
+     * @param levelBeforeRemove das Level das vor dem aktuellen Zeilenabbau galt
+     * @param removedLines      die gerade abgebauten Reihen
+     */
+    protected void achievementsClearedLines(int levelBeforeRemove, int removedLines) {
+        final int clearedLines = score.getClearedLines();
+
+        // Level hoch? Super!
+        if (score.getCurrentLevel() != levelBeforeRemove)
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.newLevel, Integer.toString(score
+                    .getCurrentLevel()));
+
+            // Wenn kein Level hoch, dann 10 Reihen geschafft?
+        else if (Math.floor(clearedLines / 10) > Math.floor((clearedLines - removedLines) / 10))
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, Integer.toString((int)
+                    Math.floor(clearedLines / 10) * 10));
+
+        if (clearedLines >= 100 && clearedLines - removedLines < 100)
+            gpgsUpdateAchievement(GpgsHelper.ACH_LONGCLEANER);
+    }
+
+    protected void achievementTSpin() {
+        totalScore.incTSpins();
+        gpgsUpdateAchievement(GpgsHelper.ACH_TSPIN);
+        gpgsUpdateAchievement(GpgsHelper.ACH_10_TSPINS, 1);
+    }
+
+    protected void achievementFourLines() {
+        totalScore.incFourLineCount();
+        gpgsUpdateAchievement(GpgsHelper.ACH_FOUR_LINES);
+        gpgsUpdateAchievement(GpgsHelper.ACH_100_FOUR_LINES, 1);
     }
 
     /**
@@ -257,10 +291,9 @@ public abstract class GameModel implements Json.Serializable {
 
             gameboard.clearLines(linesToRemove);
             boolean doubleSpecial = score.incClearedLines(removeLinesCount, isSpecial, isTSpin);
-            if (doubleSpecial) {
-                totalScore.incDoubles();
-                userInterface.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
-            }
+            if (doubleSpecial)
+                achievementDoubleSpecial();
+
             gpgsSubmitEvent(GpgsHelper.EVENT_LINES_CLEARED, removeLinesCount);
             linesRemoved(removeLinesCount, isSpecial, doubleSpecial);
 
@@ -280,6 +313,12 @@ public abstract class GameModel implements Json.Serializable {
 
         return removeLinesCount;
 
+    }
+
+    protected void achievementDoubleSpecial() {
+        totalScore.incDoubles();
+        userInterface.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
+        gpgsUpdateAchievement(GpgsHelper.ACH_DOUBLE_SPECIAL);
     }
 
     /**
@@ -406,7 +445,8 @@ public abstract class GameModel implements Json.Serializable {
 
         if (leaderboardId != null && gpgsClient != null && gpgsClient.isConnected())
             try {
-                gpgsClient.submitToLeaderboard(leaderboardId, score.getScore(), Integer.toString(score.getClearedLines()));
+                gpgsClient.submitToLeaderboard(leaderboardId, score.getScore(), Integer.toString(score
+                        .getClearedLines()));
             } catch (GpgsException e) {
                 Log.error("GPGS", "Error submitting leaderboard score.");
             }
@@ -576,6 +616,18 @@ public abstract class GameModel implements Json.Serializable {
     protected void gpgsSubmitEvent(String eventId, int inc) {
         if (gpgsClient != null && gpgsClient.isConnected())
             gpgsClient.submitEvent(eventId, inc);
+    }
+
+    protected void gpgsUpdateAchievement(String achievementId) {
+        if (gpgsClient != null && gpgsClient.isConnected()) {
+            gpgsClient.unlockAchievement(achievementId);
+        }
+    }
+
+    protected void gpgsUpdateAchievement(String achievementId, int incNum) {
+        if (gpgsClient != null && gpgsClient.isConnected()) {
+            gpgsClient.incrementAchievement(achievementId, incNum);
+        }
     }
 
     /**
