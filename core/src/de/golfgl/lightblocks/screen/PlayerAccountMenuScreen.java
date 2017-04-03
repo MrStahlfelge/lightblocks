@@ -111,7 +111,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
         menuTable.defaults().fill();
 
         menuTable.row();
-        menuTable.add(signInState).colspan(2);
+        menuTable.add(signInState).colspan(2).minHeight(120);
 
         menuTable.row().padTop(30);
         menuTable.add(leaderboardButton).uniform();
@@ -122,7 +122,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
 
         menuTable.row().padTop(30);
         menuTable.add(scoreButton).uniform();
-        menuTable.add(new Label(app.TEXTS.get("labelScores"), app.skin, app.SKIN_FONT_BIG));
+        menuTable.add(new Label(app.TEXTS.get("labelTotalScores"), app.skin, app.SKIN_FONT_BIG));
 
     }
 
