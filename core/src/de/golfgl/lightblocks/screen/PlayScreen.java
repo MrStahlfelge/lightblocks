@@ -196,8 +196,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             // GPGS Event
             if (caller.app.gpgsClient != null && caller.app.gpgsClient.isConnected()) {
                 String eventId = GpgsHelper.getNewGameEventByModelId(currentGame.gameModel.getIdentifier());
-                Log.info("GPGS", "Submitting newly started game " + currentGame.gameModel.getIdentifier());
-                caller.app.gpgsClient.submitEvent(eventId, 1);
+                if (eventId != null) {
+                    Log.info("GPGS", "Submitting newly started game " + currentGame.gameModel.getIdentifier());
+                    caller.app.gpgsClient.submitEvent(eventId, 1);
+                }
             }
 
             return currentGame;
@@ -319,6 +321,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     @Override
     public void dispose() {
+        if (inputAdapter != null)
+            inputAdapter.dispose();
         setMusic(false);
         weldEffect.dispose();
         super.dispose();

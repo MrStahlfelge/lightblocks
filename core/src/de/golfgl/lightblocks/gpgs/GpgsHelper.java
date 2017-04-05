@@ -35,6 +35,7 @@ public class GpgsHelper {
     public static final String ACH_10_TSPINS = "CgkI4vHs17ETEAIQHw";
     public static final String ACH_FRIENDLY_MULTIPLAYER = "CgkI4vHs17ETEAIQIA";
     public static final String ACH_COMPLETE_TURNAROUND = "CgkI4vHs17ETEAIQIQ";
+    public static final String ACH_PLUMBOUS_TETROMINOS = "CgkI4vHs17ETEAIQJA";
     public static final String LEAD_MARATHON_GESTURES = "CgkI4vHs17ETEAIQAA";
     public static final String LEAD_MARATHON_GRAVITY = "CgkI4vHs17ETEAIQCA";
     public static final String LEAD_MARATHON_GAMEPAD = "CgkI4vHs17ETEAIQCQ";

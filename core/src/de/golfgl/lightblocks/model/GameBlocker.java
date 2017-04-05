@@ -12,10 +12,17 @@ public abstract class GameBlocker {
 
     public abstract String getDescription(I18NBundle bundle);
 
-    public static class InputGameBlocker extends GameBlocker {
+    public static class CallibrationGameBlocker extends GameBlocker {
         @Override
         public String getDescription(I18NBundle bundle) {
             return bundle.get("labelCalibration");
+        }
+    }
+
+    public static class NoGamepadGameBlocker extends GameBlocker {
+        @Override
+        public String getDescription(I18NBundle bundle) {
+            return bundle.get("labelNoGamepad");
         }
     }
 

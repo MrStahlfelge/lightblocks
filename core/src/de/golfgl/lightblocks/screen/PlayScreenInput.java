@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.controllers.Controllers;
 
 /**
  * Created by Benjamin Schulte on 25.01.2017.
@@ -29,6 +30,8 @@ public abstract class PlayScreenInput extends InputAdapter {
                 return new PlayGesturesInput();
             case KEY_ACCELEROMETER:
                 return new PlayGravityInput();
+            case KEY_GAMEPAD:
+                return new PlayGamepadInput();
             default:
                 return new PlayKeyboardInput();
         }
@@ -40,8 +43,7 @@ public abstract class PlayScreenInput extends InputAdapter {
                 // Touchscreen wird simuliert
                 return true;
             case KEY_GAMEPAD:
-                // Controller noch nicht implementert
-                return false;
+                return Controllers.getControllers().size > 0;
             case KEY_ACCELEROMETER:
                 return Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
             case KEY_KEYBOARD:
@@ -122,4 +124,9 @@ public abstract class PlayScreenInput extends InputAdapter {
         this.playScreen = playScreen;
     }
 
+    /**
+     * clean up if necessary
+     */
+    public void dispose() {
+    }
 }

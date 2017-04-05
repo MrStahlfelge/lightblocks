@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.model;
 
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -13,6 +14,7 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 public class MarathonModel extends GameModel {
 
     public static final String MODEL_MARATHON_ID = "marathon";
+    private boolean gamepadMarathonAchievementPosted = false;
 
     @Override
     public String getIdentifier() {
@@ -58,5 +60,18 @@ public class MarathonModel extends GameModel {
             gpgsUpdateAchievement(GpgsHelper.ACH_MARATHON_SCORE_250000);
         else if (currentScore >= 300000 && oldScore < 300000)
             gpgsUpdateAchievement(GpgsHelper.ACH_MARATHON_SUPER_CHECKER);
+    }
+
+    @Override
+    protected void achievementsClearedLines(int levelBeforeRemove, int removedLines) {
+        super.achievementsClearedLines(levelBeforeRemove, removedLines);
+
+        if (inputTypeKey == PlayScreenInput.KEY_GAMEPAD && !gamepadMarathonAchievementPosted) {
+            gpgsUpdateAchievement(GpgsHelper.ACH_GAMEPAD_OWNER);
+            gamepadMarathonAchievementPosted = true;
+        }
+
+        if (levelBeforeRemove < 16 && getScore().getCurrentLevel() >= 16)
+            gpgsUpdateAchievement(GpgsHelper.ACH_PLUMBOUS_TETROMINOS);
     }
 }

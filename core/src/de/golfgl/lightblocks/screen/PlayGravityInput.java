@@ -4,11 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameBlocker;
@@ -36,7 +31,7 @@ public class PlayGravityInput extends PlayScreenInput {
     private float deltaSinceLastMove;
     private boolean lastMoveWasToRight;
     private float deltaSum;
-    private GameBlocker.InputGameBlocker gravityInputBlocker = new GameBlocker.InputGameBlocker();
+    private GameBlocker.CallibrationGameBlocker gravityInputBlocker = new GameBlocker.CallibrationGameBlocker();
 
     public PlayGravityInput() {
         currentInputVector = new Vector3();
