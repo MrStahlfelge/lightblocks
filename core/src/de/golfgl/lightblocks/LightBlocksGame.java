@@ -25,6 +25,7 @@ import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
+import de.golfgl.lightblocks.state.GamepadConfig;
 import de.golfgl.lightblocks.state.Player;
 
 import static com.badlogic.gdx.Gdx.app;
@@ -74,6 +75,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     private Boolean playMusic;
     private Boolean showTouchPanel;
     private Boolean gpgsAutoLogin;
+    private GamepadConfig gamepadConfig;
 
     public Boolean getGpgsAutoLogin() {
         if (gpgsAutoLogin == null)
@@ -276,5 +278,27 @@ public class LightBlocksGame extends Game implements IGpgsListener {
 
             }
         });
+    }
+
+    public GamepadConfig getGamepadConfig() {
+        if (gamepadConfig == null) {
+            gamepadConfig = new GamepadConfig();
+
+            gamepadConfig.pauseButton = prefs.getInteger("gpButtonPause", GamepadConfig.GC_BUTTON_START);
+            gamepadConfig.verticalAxis = prefs.getInteger("gpAxisVertical", GamepadConfig.GC_AXIS_VERTICAL_ANDROID);
+            gamepadConfig.rotateClockwiseButton = prefs.getInteger("gpButtonClockwise", GamepadConfig.GC_BUTTON_START);
+        }
+
+        return gamepadConfig;
+    }
+
+    public void setGamepadConfig(GamepadConfig gamepadConfig) {
+        this.gamepadConfig = gamepadConfig;
+
+        prefs.putInteger("gpButtonPause", gamepadConfig.pauseButton);
+        prefs.putInteger("gpAxisVertical", gamepadConfig.verticalAxis);
+        prefs.putInteger("gpButtonClockwise", gamepadConfig.rotateClockwiseButton);
+
+        prefs.flush();
     }
 }

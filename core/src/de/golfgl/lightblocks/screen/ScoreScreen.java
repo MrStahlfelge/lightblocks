@@ -132,10 +132,10 @@ public class ScoreScreen extends AbstractScoreScreen {
                 public void changed(ChangeEvent event, Actor actor) {
                     try {
                         PlayScreen.gotoPlayScreen(ScoreScreen.this, newGameParams);
+                        dispose();
                     } catch (VetoException e) {
                         showDialog(e.getMessage());
                     }
-                    dispose();
                 }
             });
 

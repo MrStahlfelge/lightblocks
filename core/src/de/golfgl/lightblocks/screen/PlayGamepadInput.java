@@ -4,9 +4,9 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
-import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.lightblocks.model.GameBlocker;
+import de.golfgl.lightblocks.state.GamepadConfig;
 
 /**
  * Gamepad Controller
@@ -15,11 +15,9 @@ import de.golfgl.lightblocks.model.GameBlocker;
  */
 
 class PlayGamepadInput extends PlayScreenInput {
-    public static final int GC_AXIS_VERTICAL_ANDROID = 1;
-    public static final int GC_BUTTON_CLOCKWISE = 1;
-    public static final int GC_BUTTON_START = 7;
     protected GameBlocker.NoGamepadGameBlocker gamepadInputBlocker = new GameBlocker.NoGamepadGameBlocker();
     private ControllerAdapter controllerAdapter = new MyControllerAdapter();
+    private GamepadConfig gpc;
 
     @Override
     public String getResumeMessage() {
@@ -34,6 +32,7 @@ class PlayGamepadInput extends PlayScreenInput {
     @Override
     public void setPlayScreen(PlayScreen playScreen) {
         super.setPlayScreen(playScreen);
+        gpc = playScreen.app.getGamepadConfig();
         Controllers.addListener(controllerAdapter);
 
         // Blocker falls kein Gamepad vorhanden sofort setzen
@@ -48,15 +47,15 @@ class PlayGamepadInput extends PlayScreenInput {
     }
 
     protected boolean isVerticalAxis(int axisIndex) {
-        return axisIndex % 2 == GC_AXIS_VERTICAL_ANDROID;
+        return axisIndex % 2 == gpc.verticalAxis;
     }
 
     protected boolean isRotateClockwiseButton(int buttonIndex) {
-        return buttonIndex % 2 == GC_BUTTON_CLOCKWISE;
+        return buttonIndex % 2 == gpc.rotateClockwiseButton;
     }
 
     protected boolean isPauseButton(int buttonIndex) {
-        return buttonIndex == GC_BUTTON_START;
+        return buttonIndex == gpc.pauseButton;
     }
 
     private class MyControllerAdapter extends ControllerAdapter {
@@ -75,9 +74,6 @@ class PlayGamepadInput extends PlayScreenInput {
 
         @Override
         public boolean buttonDown(Controller controller, int buttonIndex) {
-            Log.info("Controllers", controller.getName() + " button down: " + buttonIndex);
-
-            //TODO pausiert sollten dann eigentlich die Buttons in der Pause wirken
             if (playScreen.isPaused() || isGameOver || isPauseButton(buttonIndex))
                 playScreen.switchPause(false);
             else
@@ -88,8 +84,6 @@ class PlayGamepadInput extends PlayScreenInput {
 
         @Override
         public boolean axisMoved(Controller controller, int axisIndex, float value) {
-            Log.info("Controllers", controller.getName() + " axis " + axisIndex + " moved: " + value);
-
             if (isVerticalAxis(axisIndex) && value >= 0 && value <= 1)
                 playScreen.gameModel.setSoftDropFactor(value);
             else if (!isVerticalAxis(axisIndex)) {
@@ -102,18 +96,15 @@ class PlayGamepadInput extends PlayScreenInput {
                 if (Math.abs(value) >= .8f && Math.abs(lastAxisValue) < .8f)
                     playScreen.gameModel.startMoveHorizontal(value < 0);
 
-
+                lastAxisValue = value;
             }
 
-            lastAxisValue = value;
 
             return false;
         }
 
         @Override
         public boolean povMoved(Controller controller, int povIndex, PovDirection value) {
-            Log.info("Controllers", controller.getName() + " pov " + povIndex + " moved: " + value);
-
             // die zuletzt gemachte Bewegung beenden
             playScreen.gameModel.endMoveHorizontal(false);
             playScreen.gameModel.endMoveHorizontal(true);
