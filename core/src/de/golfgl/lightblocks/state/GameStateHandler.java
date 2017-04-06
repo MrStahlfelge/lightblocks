@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.state;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 
@@ -14,8 +15,25 @@ public class GameStateHandler {
     private static final String FILENAME_SAVEGAME = "data/savegame.json";
     private static final String FILENAME_TOTALSCORE = "data/score_total.json";
     private static final String FILENAMEPREFIX_BESTSCORE = "data/score_";
+    private static final String SAVEGAMEKEY = "***REMOVED***";
 
     private TotalScore cachedTotalScore;
+
+    public static String encode(String s, String key) {
+        return new String(Base64Coder.encode(xorWithKey(s.getBytes(), key.getBytes())));
+    }
+
+    public static String decode(String s, String key) {
+        return new String(xorWithKey(Base64Coder.decode(s), key.getBytes()));
+    }
+
+    private static byte[] xorWithKey(byte[] a, byte[] key) {
+        byte[] out = new byte[a.length];
+        for (int i = 0; i < a.length; i++) {
+            out[i] = (byte) (a[i] ^ key[i % key.length]);
+        }
+        return out;
+    }
 
     public boolean canSaveState() {
         return Gdx.files.isLocalStorageAvailable();
@@ -30,7 +48,7 @@ public class GameStateHandler {
             throw new IndexOutOfBoundsException("cannot load game");
 
         try {
-            return Gdx.files.local(FILENAME_SAVEGAME).readString();
+            return decode(Gdx.files.local(FILENAME_SAVEGAME).readString(), SAVEGAMEKEY);
         } catch (Throwable t) {
             return null;
         }
@@ -51,7 +69,7 @@ public class GameStateHandler {
             return resetGame();
 
         try {
-            Gdx.files.local(FILENAME_SAVEGAME).writeString(jsonString, false);
+            Gdx.files.local(FILENAME_SAVEGAME).writeString(encode(jsonString, SAVEGAMEKEY), false);
             return true;
         } catch (Throwable t) {
             return false;
@@ -116,4 +134,5 @@ public class GameStateHandler {
 
         }
     }
+
 }

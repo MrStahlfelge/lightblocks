@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.BlockActor;
@@ -93,6 +94,9 @@ public class MainMenuScreen extends AbstractScreen {
                                                  PlayScreen.gotoPlayScreen(MainMenuScreen.this, null);
                                              } catch (VetoException e) {
                                                  showDialog(e.getMessage());
+                                             } catch (Throwable t) {
+                                                 Log.error("Error loading game", t);
+                                                 showDialog("Error loading game.");
                                              }
                                          }
                                      }
