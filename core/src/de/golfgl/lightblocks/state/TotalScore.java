@@ -2,7 +2,7 @@ package de.golfgl.lightblocks.state;
 
 /**
  * Der Total Score nimmt die gesamten Punktzahlen für den Spieler auf
- *
+ * <p>
  * Created by Benjamin Schulte on 07.02.2017.
  */
 
@@ -84,5 +84,32 @@ public class TotalScore {
 
     public void incMultiPlayerMatchesStarted() {
         this.multiPlayerMatchesStarted += 1;
+    }
+
+    protected void mergeWithOther(TotalScore totalScore) {
+        if (totalScore.getScore() > score)
+            score = totalScore.getScore();
+
+        if (totalScore.getClearedLines() > clearedLines)
+            clearedLines = totalScore.getClearedLines();
+
+        if (totalScore.drawnTetrominos > drawnTetrominos)
+            drawnTetrominos = totalScore.drawnTetrominos;
+
+        if (totalScore.getFourLineCount() > fourLineCount)
+            fourLineCount = totalScore.getFourLineCount();
+
+        if (totalScore.getTSpins() > tSpins)
+            tSpins = totalScore.getTSpins();
+
+        if (totalScore.getDoubles() > doubles)
+            doubles = totalScore.getDoubles();
+
+        if (totalScore.getMultiPlayerMatchesStarted() > multiPlayerMatchesStarted)
+            multiPlayerMatchesStarted = totalScore.getMultiPlayerMatchesStarted();
+
+        if (multiPlayerMatchesWon < totalScore.getMultiPlayerMatchesWon())
+            multiPlayerMatchesWon = totalScore.getMultiPlayerMatchesWon();
+
     }
 }

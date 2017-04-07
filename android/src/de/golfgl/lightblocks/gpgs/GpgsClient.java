@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.gpgs;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,9 +10,16 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
+import com.google.android.gms.games.GamesStatusCodes;
+import com.google.android.gms.games.snapshot.Snapshot;
+import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
+import com.google.android.gms.games.snapshot.Snapshots;
 import com.google.example.games.basegameutils.BaseGameUtils;
+
+import java.io.IOException;
 
 import de.golfgl.lightblocks.AndroidLauncher;
 
@@ -24,9 +32,9 @@ import de.golfgl.lightblocks.AndroidLauncher;
 public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, IGpgsClient {
 
+    private static final int MAX_SNAPSHOT_RESOLVE_RETRIES = 3;
     private Activity myContext;
     private IGpgsListener gameListener;
-
     // Play Games
     private GoogleApiClient mGoogleApiClient;
     private boolean mResolvingConnectionFailure = false;
@@ -39,6 +47,8 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+                // für Savegames
+                .addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER)
                 // add other APIs and scopes here as needed
                 .build();
     }
@@ -50,7 +60,6 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         mSignInClicked = !autoStart;
         mGoogleApiClient.connect();
     }
-
 
     @Override
     public void disconnect(boolean autoEnd) {
@@ -207,5 +216,163 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     public void setGameListener(IGpgsListener gameListener) {
         this.gameListener = gameListener;
+    }
+
+    @Override
+    public boolean saveGameState(boolean sync, final byte[] gameState, final long progressValue) {
+
+        if (!isConnected())
+            return false;
+
+        if (!sync) {
+            AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
+                @Override
+                protected Boolean doInBackground(Void... params) {
+                    return saveGameStateSync(progressValue, gameState);
+                }
+            };
+
+            task.execute();
+
+            return true;
+        } else
+            return saveGameStateSync(progressValue, gameState);
+    }
+
+    @NonNull
+    private Boolean saveGameStateSync(long progressValue, byte[] gameState) {
+        // Open the snapshot, creating if necessary
+        Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
+                mGoogleApiClient, "gamestate.sav", true).await();
+
+        Snapshot snapshot = processSnapshotOpenResult(open, 0);
+
+        if (snapshot == null) {
+            Log.w("GPGS", "Could not open Snapshot.");
+            return false;
+        }
+
+        if (progressValue < snapshot.getMetadata().getProgressValue()) {
+            Log.e("GPGS", "Progress of saved game state higher than current one. Did not save.");
+            return false;
+        }
+
+        // Write the new data to the snapshot
+        snapshot.getSnapshotContents().writeBytes(gameState);
+
+        // Change metadata
+        SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder()
+                .fromMetadata(snapshot.getMetadata())
+                .setDescription("Game state")
+                .setProgressValue(progressValue)
+                .build();
+
+        Snapshots.CommitSnapshotResult commit = Games.Snapshots.commitAndClose(
+                mGoogleApiClient, snapshot, metadataChange).await();
+
+        if (!commit.getStatus().isSuccess()) {
+            Log.w("GPGS", "Failed to commit Snapshot:" + commit.getStatus().getStatusMessage());
+
+            return false;
+        }
+
+        // No failures
+        Log.i("GPGS", "Successfully saved gamestate with " + gameState.length + "B");
+        return true;
+    }
+
+    @Override
+    public boolean loadGameState(boolean sync) {
+
+        if (!isConnected()) {
+            gameListener.gpgsGameStateLoaded(null);
+            return false;
+        }
+
+        if (!sync) {
+            AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
+                @Override
+                protected Boolean doInBackground(Void... params) {
+                    return loadGameStateSync();
+                }
+            };
+
+            task.execute();
+
+            return true;
+        } else
+            return loadGameStateSync();
+    }
+
+    @NonNull
+    private Boolean loadGameStateSync() {
+        // Open the snapshot, creating if necessary
+        Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
+                mGoogleApiClient, "gamestate.sav", true).await();
+
+        Snapshot snapshot = processSnapshotOpenResult(open, 0);
+
+        if (snapshot == null) {
+            Log.w("GPGS", "Could not open Snapshot.");
+            gameListener.gpgsGameStateLoaded(null);
+            return false;
+        }
+
+        // Read
+        try {
+            byte[] mSaveGameData = null;
+            mSaveGameData = snapshot.getSnapshotContents().readFully();
+            gameListener.gpgsGameStateLoaded(mSaveGameData);
+            return true;
+        } catch (IOException e) {
+            Log.e("GPGS", "Error while reading Snapshot.", e);
+            gameListener.gpgsGameStateLoaded(null);
+            return false;
+        }
+
+    }
+
+    /**
+     * Conflict resolution for when Snapshots are opened.  Must be run in an AsyncTask or in a
+     * background thread,
+     */
+    public Snapshot processSnapshotOpenResult(Snapshots.OpenSnapshotResult result, int retryCount) {
+        Snapshot mResolvedSnapshot = null;
+        retryCount++;
+
+        int status = result.getStatus().getStatusCode();
+        Log.i("GPGS", "Open Snapshot Result status: " + result.getStatus().getStatusMessage());
+
+        if (status == GamesStatusCodes.STATUS_OK) {
+            return result.getSnapshot();
+        } else if (status == GamesStatusCodes.STATUS_SNAPSHOT_CONTENTS_UNAVAILABLE) {
+            return result.getSnapshot();
+        } else if (status == GamesStatusCodes.STATUS_SNAPSHOT_CONFLICT) {
+            Snapshot snapshot = result.getSnapshot();
+            Snapshot conflictSnapshot = result.getConflictingSnapshot();
+
+            // Resolve between conflicts by selecting the highest progress or, if equal, newest of the conflicting
+            // snapshots.
+            mResolvedSnapshot = snapshot;
+
+            if (snapshot.getMetadata().getProgressValue() < conflictSnapshot.getMetadata().getProgressValue()
+                    || snapshot.getMetadata().getProgressValue() == conflictSnapshot.getMetadata().getProgressValue()
+                    && snapshot.getMetadata().getLastModifiedTimestamp() <
+                    conflictSnapshot.getMetadata().getLastModifiedTimestamp()) {
+                mResolvedSnapshot = conflictSnapshot;
+            }
+
+            Snapshots.OpenSnapshotResult resolveResult = Games.Snapshots.resolveConflict(
+                    mGoogleApiClient, result.getConflictId(), mResolvedSnapshot).await();
+
+            if (retryCount < MAX_SNAPSHOT_RESOLVE_RETRIES) {
+                // Recursively attempt again
+                return processSnapshotOpenResult(resolveResult, retryCount);
+            }
+
+        }
+
+        // Fail, return null.
+        return null;
     }
 }

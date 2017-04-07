@@ -37,4 +37,8 @@ public interface IGpgsClient {
     void unlockAchievement(String achievementId);
 
     void incrementAchievement(String achievementId, int incNum);
+
+    public boolean saveGameState(boolean sync, byte[] gameState, long progressValue);
+
+    public boolean loadGameState(boolean sync);
 }

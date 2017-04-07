@@ -61,8 +61,10 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
 
     private void performGpgsLoginout() {
         if (app.gpgsClient.isConnected()) {
+            app.savegame.gpgsSaveGameState(true);
             app.setGpgsAutoLogin(false);
             app.gpgsClient.disconnect(false);
+            app.savegame.resetLoadedFromCloud();
         } else
             app.gpgsClient.connect(false);
 
@@ -159,7 +161,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
         }
 
         TotalScoreScreen scoreScreen = new TotalScoreScreen(app);
-        scoreScreen.setTotal(app.savegame.loadTotalScore());
+        scoreScreen.setTotal(app.savegame.getTotalScore());
         scoreScreen.setMaxCountingTime(1);
         scoreScreen.setBackScreen(this);
         scoreScreen.initializeUI();

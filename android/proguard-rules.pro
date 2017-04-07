@@ -40,6 +40,10 @@
    **[] $VALUES;
     *;
 }
+-keep class  de.golfgl.lightblocks.state.CloudGameState {
+   **[] $VALUES;
+    *;
+}
 
 # Multiplayer communication
 -keep class  de.golfgl.lightblocks.multiplayer.MultiPlayerObjects* {

@@ -9,13 +9,11 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
@@ -262,7 +260,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         inputAdapter.setPlayScreen(this);
 
         // Highscores
-        gameModel.totalScore = app.savegame.loadTotalScore();
+        gameModel.totalScore = app.savegame.getTotalScore();
         //TODO das sollte ins GameModel
         gameModel.bestScore = app.savegame.loadBestScore(gameModel.getIdentifier());
         gameModel.gpgsClient = app.gpgsClient;
@@ -330,7 +328,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     private void saveGameState() {
         if (app.savegame.canSaveState()) {
-            app.savegame.saveTotalScore(gameModel.totalScore);
+            app.savegame.saveTotalScore();
             app.savegame.saveBestScore(gameModel.bestScore, gameModel.getIdentifier());
             app.savegame.saveGame(gameModel.saveGameModel());
         }
@@ -630,6 +628,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         app.gameOverSound.play();
         inputAdapter.setGameOver();
         saveGameState();
+        app.savegame.gpgsSaveGameState(false);
     }
 
     @Override

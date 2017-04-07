@@ -116,6 +116,8 @@ public class LightBlocksGame extends Game implements IGpgsListener {
             player.setGamerId(modelNameRunningOn);
         }
 
+        savegame = new GameStateHandler(this);
+
         if (getGpgsAutoLogin() && gpgsClient != null)
             gpgsClient.connect(true);
 
@@ -160,8 +162,6 @@ public class LightBlocksGame extends Game implements IGpgsListener {
         garbageSound = assetManager.get("sound/garbage.ogg", Sound.class);
         cleanSpecialSound = assetManager.get("sound/cleanspecial.ogg", Sound.class);
         swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
-
-        savegame = new GameStateHandler();
 
         mainMenuScreen = new MainMenuScreen(this);
         this.setScreen(mainMenuScreen);
@@ -248,6 +248,11 @@ public class LightBlocksGame extends Game implements IGpgsListener {
         player.setGamerId(gpgsClient.getPlayerDisplayName());
         setGpgsAutoLogin(true);
         handleAccountChanged();
+
+        //beim ersten Connect Spielstand laden (wenn vorhanden)
+        if (!savegame.isAlreadyLoadedFromCloud())
+            gpgsClient.loadGameState(false);
+        // auch testen was ist wenn Spielstand nicht vorhanden!
     }
 
     private void handleAccountChanged() {
@@ -278,6 +283,11 @@ public class LightBlocksGame extends Game implements IGpgsListener {
 
             }
         });
+    }
+
+    @Override
+    public void gpgsGameStateLoaded(byte[] gameState) {
+        savegame.gpgsLoadGameState(gameState);
     }
 
     public GamepadConfig getGamepadConfig() {

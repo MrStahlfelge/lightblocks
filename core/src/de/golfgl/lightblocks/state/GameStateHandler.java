@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
+import com.esotericsoftware.minlog.Log;
+
+import de.golfgl.lightblocks.LightBlocksGame;
 
 /**
  * Die Klasse lädt oder speichert einen Json-String der den Spielstand abbildet
@@ -17,7 +20,17 @@ public class GameStateHandler {
     private static final String FILENAMEPREFIX_BESTSCORE = "data/score_";
     private static final String SAVEGAMEKEY = "***REMOVED***";
 
-    private TotalScore cachedTotalScore;
+    private final LightBlocksGame app;
+    private TotalScore totalScore;
+    private Object gameStateMonitor = new Object();
+    // wurde bereits ein Cloud-Spielstand geladen?
+    private boolean alreadyLoadedFromCloud;
+    // store future use String - damit er nicht verloren geht!
+    private String futureUseFromCloudSaveGame;
+
+    public GameStateHandler(LightBlocksGame app) {
+        this.app = app;
+    }
 
     public static String encode(String s, String key) {
         return new String(Base64Coder.encode(xorWithKey(s.getBytes(), key.getBytes())));
@@ -85,29 +98,95 @@ public class GameStateHandler {
         }
     }
 
-    public TotalScore loadTotalScore() {
-        if (!canSaveState() || !Gdx.files.local(FILENAME_TOTALSCORE).exists()) {
-            if (cachedTotalScore == null)
-                cachedTotalScore = new TotalScore();
-        } else {
-            Json json = new Json();
-            try {
-                cachedTotalScore = json.fromJson(TotalScore.class, Gdx.files.local(FILENAME_TOTALSCORE));
-            } catch (Throwable t) {
-                cachedTotalScore = new TotalScore();
-            }
+    public TotalScore getTotalScore() {
+        synchronized (gameStateMonitor) {
+            if (totalScore == null)
+                loadTotalScore();
+
+            return totalScore;
         }
-        return cachedTotalScore;
     }
 
-    public void saveTotalScore(TotalScore score) {
-        cachedTotalScore = score;
-
-        if (canSaveState()) {
-            Json json = new Json();
-            json.setOutputType(JsonWriter.OutputType.json);
-            json.toJson(score, Gdx.files.local(FILENAME_TOTALSCORE));
+    protected void loadTotalScore() {
+        synchronized (gameStateMonitor) {
+            if (!canSaveState() || !Gdx.files.local(FILENAME_TOTALSCORE).exists()) {
+                totalScore = new TotalScore();
+            } else {
+                Json json = new Json();
+                try {
+                    totalScore = json.fromJson(TotalScore.class, Gdx.files.local(FILENAME_TOTALSCORE));
+                } catch (Throwable t) {
+                    totalScore = new TotalScore();
+                }
+            }
         }
+    }
+
+    /**
+     * saves the total score to file. Does not save it to cloud storage.
+     */
+    public void saveTotalScore() {
+        if (canSaveState()) {
+            synchronized (gameStateMonitor) {
+                Json json = new Json();
+                json.setOutputType(JsonWriter.OutputType.json);
+                json.toJson(totalScore, Gdx.files.local(FILENAME_TOTALSCORE));
+            }
+        }
+    }
+
+    /**
+     * saves total score und progression to cloud. Does not save it to files.
+     */
+    public void gpgsSaveGameState(boolean sync) {
+        if (app.gpgsClient != null && app.gpgsClient.isConnected()) {
+            synchronized (gameStateMonitor) {
+                getTotalScore(); // sicherstellen dass er geladen ist
+
+                CloudGameState cgs = new CloudGameState();
+                cgs.version = LightBlocksGame.GAME_VERSIONSTRING;
+                cgs.totalScore = totalScore;
+                cgs.futureUse = futureUseFromCloudSaveGame;
+
+                Json json = new Json();
+                json.setOutputType(JsonWriter.OutputType.minimal);
+
+                String jsonString = json.toJson(cgs);
+
+                if (LightBlocksGame.GAME_DEVMODE)
+                    Log.info("GameState", jsonString);
+
+                app.gpgsClient.saveGameState(sync, xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
+                        totalScore.getScore());
+            }
+        }
+    }
+
+    public void gpgsLoadGameState(byte[] gameState) {
+        alreadyLoadedFromCloud = true;
+
+        synchronized (gameStateMonitor) {
+            Json json = new Json();
+
+            try {
+
+                final String jsonString = new String(xorWithKey(gameState, SAVEGAMEKEY.getBytes()));
+
+                if (LightBlocksGame.GAME_DEVMODE)
+                    Log.info("GameState", jsonString);
+
+                CloudGameState cgs = json.fromJson(CloudGameState.class, jsonString);
+                getTotalScore(); // sicherstellen dass er geladen ist
+                futureUseFromCloudSaveGame = cgs.futureUse;
+
+                // Stand zusammenmergen
+                totalScore.mergeWithOther(cgs.totalScore);
+
+            } catch (Throwable t) {
+                Log.error("GameState", "Error reading saved gamestate. Ignored.");
+            }
+        }
+
     }
 
     public BestScore loadBestScore(String identifier) {
@@ -135,4 +214,11 @@ public class GameStateHandler {
         }
     }
 
+    public boolean isAlreadyLoadedFromCloud() {
+        return alreadyLoadedFromCloud;
+    }
+
+    public void resetLoadedFromCloud() {
+        alreadyLoadedFromCloud = false;
+    }
 }
