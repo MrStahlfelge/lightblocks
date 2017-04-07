@@ -33,6 +33,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, IGpgsClient {
 
     private static final int MAX_SNAPSHOT_RESOLVE_RETRIES = 3;
+    public static final String NAME_SAVE_GAMESTATE = "gamestate.sav";
     private Activity myContext;
     private IGpgsListener gameListener;
     // Play Games
@@ -243,7 +244,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     private Boolean saveGameStateSync(long progressValue, byte[] gameState) {
         // Open the snapshot, creating if necessary
         Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
-                mGoogleApiClient, "gamestate.sav", true).await();
+                mGoogleApiClient, NAME_SAVE_GAMESTATE, true).await();
 
         Snapshot snapshot = processSnapshotOpenResult(open, 0);
 
@@ -308,7 +309,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     private Boolean loadGameStateSync() {
         // Open the snapshot, creating if necessary
         Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
-                mGoogleApiClient, "gamestate.sav", true).await();
+                mGoogleApiClient, NAME_SAVE_GAMESTATE, true).await();
 
         Snapshot snapshot = processSnapshotOpenResult(open, 0);
 

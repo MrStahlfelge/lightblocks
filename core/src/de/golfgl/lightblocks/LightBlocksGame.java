@@ -248,11 +248,6 @@ public class LightBlocksGame extends Game implements IGpgsListener {
         player.setGamerId(gpgsClient.getPlayerDisplayName());
         setGpgsAutoLogin(true);
         handleAccountChanged();
-
-        //beim ersten Connect Spielstand laden (wenn vorhanden)
-        if (!savegame.isAlreadyLoadedFromCloud())
-            gpgsClient.loadGameState(false);
-        // auch testen was ist wenn Spielstand nicht vorhanden!
     }
 
     private void handleAccountChanged() {
@@ -262,6 +257,13 @@ public class LightBlocksGame extends Game implements IGpgsListener {
                 mainMenuScreen.refreshAccountInfo();
                 if (accountScreen != null)
                     accountScreen.refreshAccountChanged();
+                //beim ersten Connect Spielstand laden (wenn vorhanden)
+                // War zuerst in GpgsConnect, es wurde aber der allerste Login nicht mehr automatisch gesetzt.
+                // (obwohl das Willkommen... Schild kam)
+                // Nun in UI Thread verlagert
+                if (!savegame.isAlreadyLoadedFromCloud() && gpgsClient.isConnected())
+                    gpgsClient.loadGameState(false);
+
             }
         });
     }

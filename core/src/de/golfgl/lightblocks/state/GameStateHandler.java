@@ -163,6 +163,11 @@ public class GameStateHandler {
     }
 
     public void gpgsLoadGameState(byte[] gameState) {
+
+        // Übergabe von null: beim Laden ist ein Fehler aufgetreten
+        if (gameState == null)
+            return;
+
         alreadyLoadedFromCloud = true;
 
         synchronized (gameStateMonitor) {
