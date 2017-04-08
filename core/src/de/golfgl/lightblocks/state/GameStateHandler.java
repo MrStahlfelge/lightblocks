@@ -142,6 +142,8 @@ public class GameStateHandler {
         if (app.gpgsClient != null && app.gpgsClient.isConnected()) {
             synchronized (gameStateMonitor) {
                 getTotalScore(); // sicherstellen dass er geladen ist
+                // Wenn eh schon gesynct wird, auch Achievements auffrischen
+                totalScore.checkAchievements(app.gpgsClient);
 
                 CloudGameState cgs = new CloudGameState();
                 cgs.version = LightBlocksGame.GAME_VERSIONSTRING;
@@ -171,17 +173,17 @@ public class GameStateHandler {
         alreadyLoadedFromCloud = true;
 
         synchronized (gameStateMonitor) {
+            getTotalScore(); // sicherstellen dass er geladen ist
+
             Json json = new Json();
 
             try {
-
                 final String jsonString = new String(xorWithKey(gameState, SAVEGAMEKEY.getBytes()));
 
                 if (LightBlocksGame.GAME_DEVMODE)
                     Log.info("GameState", jsonString);
 
                 CloudGameState cgs = json.fromJson(CloudGameState.class, jsonString);
-                getTotalScore(); // sicherstellen dass er geladen ist
                 futureUseFromCloudSaveGame = cgs.futureUse;
 
                 // Stand zusammenmergen
@@ -190,6 +192,8 @@ public class GameStateHandler {
             } catch (Throwable t) {
                 Log.error("GameState", "Error reading saved gamestate. Ignored.");
             }
+
+            totalScore.checkAchievements(app.gpgsClient);
         }
 
     }

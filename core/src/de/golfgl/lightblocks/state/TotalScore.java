@@ -1,5 +1,8 @@
 package de.golfgl.lightblocks.state;
 
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.gpgs.IGpgsClient;
+
 /**
  * Der Total Score nimmt die gesamten Punktzahlen für den Spieler auf
  * <p>
@@ -110,6 +113,17 @@ public class TotalScore {
 
         if (multiPlayerMatchesWon < totalScore.getMultiPlayerMatchesWon())
             multiPlayerMatchesWon = totalScore.getMultiPlayerMatchesWon();
+    }
 
+    public void checkAchievements(IGpgsClient gpgsClient) {
+        // Warum werden die Achievements nicht immer kontrolliert? Ganz einfach: Falls dieses Objekt
+        // gar nicht der tatsächliche Spielstand ist, sondern nur ein geladener o.ä.
+        // reduziert außerdem die Anzahl der Meldungen an GPGS
+
+        if (gpgsClient == null || !gpgsClient.isConnected())
+            return;
+
+        if (score >= 1000000)
+            gpgsClient.unlockAchievement(GpgsHelper.ACH_SCORE_MILLIONAIRE);
     }
 }

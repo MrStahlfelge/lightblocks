@@ -53,6 +53,10 @@ public class MultiplayerModel extends GameModel {
     private boolean isInitialized = false;
     private boolean isCompletelyOver = false;
 
+    // Merker für Achievements
+    private boolean filledOver85Perc = false;
+    private boolean achTurnaroundSent = false;
+
     @Override
     public String getIdentifier() {
         return MODEL_ID;
@@ -169,6 +173,22 @@ public class MultiplayerModel extends GameModel {
         final GameScore myScore = getScore();
         meInGame.drawnBlocks = myScore.getDrawnTetrominos();
         meInGame.score = myScore.getScore();
+
+        // an dieser Stelle kann der Achievement-Test ohne Overhead durchgeführt werden
+        // da die Füllung bereits berechnet wurde
+        if (!achTurnaroundSent) {
+            if (!filledOver85Perc && meInGame.filledBlocks *
+                    100 / (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS) >= 85)
+                filledOver85Perc = true;
+
+            if (filledOver85Perc && meInGame.filledBlocks *
+                    100 / (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS) <= 15) {
+                gpgsUpdateAchievement(GpgsHelper.ACH_COMPLETE_TURNAROUND);
+                achTurnaroundSent = true;
+            }
+        }
+
+
         playerRoom.sendToReferee(meInGame);
     }
 
@@ -224,6 +244,7 @@ public class MultiplayerModel extends GameModel {
                         setGameOverWon();
 
                         gpgsSubmitEvent(GpgsHelper.EVENT_MULTIPLAYER_MATCH_WON, 1);
+                        gpgsUpdateAchievement(GpgsHelper.ACH_MATCHMAKER, 1);
                     }
                 }
             });
