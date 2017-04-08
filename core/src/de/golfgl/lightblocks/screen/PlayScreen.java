@@ -175,9 +175,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         boolean resumeGame = (newGameParams == null);
 
-        if (System.currentTimeMillis() > LightBlocksGame.GAME_EXPIRATION)
-            throw new VetoException("Sorry, this version of Lightblocks is outdated. Please download a newer version.");
-
         if (!resumeGame && caller.app.savegame.hasSavedGame())
             caller.app.savegame.resetGame();
 
