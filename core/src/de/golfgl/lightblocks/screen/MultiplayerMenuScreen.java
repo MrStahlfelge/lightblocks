@@ -513,7 +513,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 toAdd = new Label(app.TEXTS.get("multiplayerLanDisconnected"), app.skin);
 
             playersTable.row().padTop(30);
-            playersTable.add(toAdd).colspan(3);
+            playersTable.add(toAdd).colspan(3).minWidth(150);
 
             if (app.multiRoom != null && !app.multiRoom.getRoomState().equals(MultiPlayerObjects.RoomState
                     .closed)) {
