@@ -32,8 +32,8 @@ import de.golfgl.lightblocks.AndroidLauncher;
 public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, IGpgsClient {
 
-    private static final int MAX_SNAPSHOT_RESOLVE_RETRIES = 3;
     public static final String NAME_SAVE_GAMESTATE = "gamestate.sav";
+    private static final int MAX_SNAPSHOT_RESOLVE_RETRIES = 3;
     private Activity myContext;
     private IGpgsListener gameListener;
     // Play Games
@@ -41,6 +41,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     private boolean mResolvingConnectionFailure = false;
     private boolean mAutoStartSignInflow = true;
     private boolean mSignInClicked = false;
+    private boolean firstConnectAttempt = true;
 
     public GpgsClient(Activity context) {
         myContext = context;
@@ -82,6 +83,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         // The player is signed in. Hide the sign-in button and allow the
         // player to proceed.
         Log.i("GPGS", "Successfully signed in with player id " + getPlayerDisplayName());
+        firstConnectAttempt = false;
         gameListener.gpgsConnected();
     }
 
@@ -109,7 +111,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             // already resolving
             return;
         }
-        Log.w("GPGS", "onConnectFailed");
+        Log.w("GPGS", "onConnectFailed: " + connectionResult.getErrorCode());
 
         // if the sign-in button was clicked
         // launch the sign-in flow
@@ -128,9 +130,11 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
                 mResolvingConnectionFailure = false;
             }
         }
-
-        // Put code here to display the sign-in button
-
+        // Error code 4 tritt seit Zunahme Drive-API beim ersten Start auf. Dann einfach nochmal probieren?
+        else if (firstConnectAttempt && connectionResult.getErrorCode() == 4) {
+            firstConnectAttempt = false;
+            mGoogleApiClient.connect();
+        }
     }
 
     public void activityResult(int resultCode, Intent data) {
