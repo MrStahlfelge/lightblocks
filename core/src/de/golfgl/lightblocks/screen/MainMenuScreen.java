@@ -136,7 +136,7 @@ public class MainMenuScreen extends AbstractScreen {
                                        }
                                    }
         );
-        buttons.add(settingsButton);
+        buttons.add(settingsButton).minWidth(160);
 
         mainTable.row();
         mainTable.add(buttons);
