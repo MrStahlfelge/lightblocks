@@ -127,6 +127,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             rotationLabel.setText(FontAwesome.ROTATE_LEFT);
         }
 
+        touchPanel.setZIndex(Integer.MAX_VALUE);
         touchPanel.setVisible(true);
     }
 

@@ -18,10 +18,12 @@ import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.gpgs.IGpgsListener;
+import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
+import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
@@ -163,7 +165,20 @@ public class LightBlocksGame extends Game implements IGpgsListener {
         swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
 
         mainMenuScreen = new MainMenuScreen(this);
-        this.setScreen(mainMenuScreen);
+
+        if (savegame.hasGameState())
+            this.setScreen(mainMenuScreen);
+        else {
+            // beim ersten Mal ins Tutorial!
+            try {
+                PlayScreen ps = PlayScreen.gotoPlayScreen(mainMenuScreen, TutorialModel.getTutorialInitParams());
+                ps.setShowScoresWhenGameOver(false);
+                ps.setBackScreen(mainMenuScreen);
+            } catch (VetoException e) {
+                this.setScreen(mainMenuScreen);
+            }
+
+        }
     }
 
     @Override

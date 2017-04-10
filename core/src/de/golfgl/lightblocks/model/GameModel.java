@@ -34,16 +34,15 @@ public abstract class GameModel implements Json.Serializable {
      * hier am GameModel verwaltet, da die Eingabemethode mit dem Modell ins Savegame kommt (und von dort geladen wird)
      */
     public int inputTypeKey = -1;
+    // wieviel ist der aktuelle Stein schon ungerundet gefallen
+    protected float currentSpeed;
     IGameModelListener userInterface;
     TetrominoDrawyer drawyer;
     private GameScore score;
     private boolean isBestScore = false;
     private Tetromino activeTetromino;
     private Tetromino nextTetromino;
-
     private Gameboard gameboard;
-    // wieviel ist der aktuelle Stein schon ungerundet gefallen
-    private float currentSpeed;
     private float distanceRemainder;
     //nach remove Lines oder drop kurze Zeit warten
     private float freezeCountdown;
@@ -64,12 +63,15 @@ public abstract class GameModel implements Json.Serializable {
     private float movingCountdown;
     // Wieviele Specials (Four Lines und T-Spin) hintereinander?
     private int specialRowChainNum;
-
     public GameModel() {
 
         linesToRemove = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
         isGameOver = false;
 
+    }
+
+    protected Tetromino getActiveTetromino() {
+        return activeTetromino;
     }
 
     public void update(float delta) {

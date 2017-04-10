@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Align;
 import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
 import de.golfgl.lightblocks.scenes.FATextButton;
@@ -69,7 +70,21 @@ public class MainMenuScreen extends AbstractScreen {
         TextButton missionButton = new FATextButton(FontAwesome.COMMENT_STAR_FLAG, app.TEXTS.get
                 ("menuPlayMissionButton"),
                 app.skin);
-        missionButton.setDisabled(true);
+        missionButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                try {
+                    PlayScreen ps = PlayScreen.gotoPlayScreen(MainMenuScreen.this, TutorialModel.getTutorialInitParams());
+                    ps.setShowScoresWhenGameOver(false);
+                    ps.setBackScreen(MainMenuScreen.this);
+                } catch (VetoException e) {
+                    showDialog(e.getMessage());
+                }
+
+                //TODO app.setScreen(new MenuMissionsScreen(app));
+            }
+        });
+
         buttons.add(missionButton);
 
         TextButton singleMarathonButton = new FATextButton(FontAwesome.NET_PERSON, app.TEXTS.get

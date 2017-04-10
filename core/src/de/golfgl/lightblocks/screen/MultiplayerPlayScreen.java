@@ -94,7 +94,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     }
 
     @Override
-    protected boolean goToScoresWhenOver() {
+    protected boolean getShowScoresWhenGameOver() {
         return false;
     }
 

@@ -35,6 +35,7 @@ import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
 import de.golfgl.lightblocks.scenes.MotivationLabel;
+import de.golfgl.lightblocks.scenes.OverlayMessage;
 import de.golfgl.lightblocks.scenes.ParticleEffectActor;
 import de.golfgl.lightblocks.scenes.PauseDialog;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
@@ -71,6 +72,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private Dialog pauseMsgDialog;
     private boolean isPaused = true;
     private HashSet<GameBlocker> gameBlockers = new HashSet<GameBlocker>();
+    private OverlayMessage overlayWindow;
+    private boolean showScoresWhenGameOver = true;
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
@@ -154,7 +157,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         final String modelIdLabel = app.TEXTS.get("labelModel_" + gameModel.getIdentifier());
         gameType.setText(modelIdLabel);
         pauseDialog.setTitle(modelIdLabel);
-        pauseDialog.setText(app.TEXTS.get(gameModel.getGoalDescription()));
+        final String goalDescription = gameModel.getGoalDescription();
+        if (goalDescription != null && !goalDescription.isEmpty())
+            pauseDialog.setText(app.TEXTS.get(goalDescription));
         refreshResumeFromPauseText();
 
         if (!gameModel.beginPaused() && gameBlockers.isEmpty())
@@ -297,7 +302,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     @Override
     public void goBackToMenu() {
 
-        if (gameModel.isGameOver() && goToScoresWhenOver())
+        if (gameModel.isGameOver() && getShowScoresWhenGameOver())
             goToHighscores();
 
         else if (isPaused() || gameModel.isGameOver()) {
@@ -310,8 +315,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     /**
      * for overriding. Defines if scores should be shown after a round.
      */
-    protected boolean goToScoresWhenOver() {
-        return true;
+    protected boolean getShowScoresWhenGameOver() {
+        return showScoresWhenGameOver;
+    }
+
+    public void setShowScoresWhenGameOver(boolean showScoresWhenGameOver) {
+        this.showScoresWhenGameOver = showScoresWhenGameOver;
     }
 
     @Override
@@ -817,5 +826,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         }
         pauseDialog.getInputMsgLabel().setText(blockText);
         pauseDialog.setEmphasizeInputMsg(!gameBlockers.isEmpty());
+    }
+
+    @Override
+    public void showOverlayMessage(String message, float autoHide, String... params) {
+        if (overlayWindow == null)
+            overlayWindow = new OverlayMessage(app.skin, labelGroup.getWidth());
+
+        if (message == null)
+            overlayWindow.hide();
+        else {
+            overlayWindow.showText(stage, app.TEXTS.format(message, params));
+        }
     }
 }

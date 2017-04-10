@@ -107,6 +107,15 @@ public class GameStateHandler {
         }
     }
 
+    /**
+     * determines if there is a game state, if the game has already been played
+     *
+     * @return true if there already was played
+     */
+    public boolean hasGameState() {
+        return Gdx.files.local(FILENAME_TOTALSCORE).exists();
+    }
+
     protected void loadTotalScore() {
         synchronized (gameStateMonitor) {
             if (!canSaveState() || !Gdx.files.local(FILENAME_TOTALSCORE).exists()) {
