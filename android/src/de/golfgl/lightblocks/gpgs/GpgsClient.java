@@ -246,6 +246,9 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     @NonNull
     private Boolean saveGameStateSync(long progressValue, byte[] gameState) {
+        if (!isConnected())
+            return false;
+
         // Open the snapshot, creating if necessary
         Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
                 mGoogleApiClient, NAME_SAVE_GAMESTATE, true).await();
@@ -311,6 +314,9 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     @NonNull
     private Boolean loadGameStateSync() {
+        if (!isConnected())
+            return false;
+
         // Open the snapshot, creating if necessary
         Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
                 mGoogleApiClient, NAME_SAVE_GAMESTATE, true).await();
