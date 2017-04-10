@@ -41,7 +41,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     private boolean mResolvingConnectionFailure = false;
     private boolean mAutoStartSignInflow = true;
     private boolean mSignInClicked = false;
-    private boolean firstConnectAttempt = true;
+    private int firstConnectAttempt = 4;
 
     public GpgsClient(Activity context) {
         myContext = context;
@@ -83,7 +83,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         // The player is signed in. Hide the sign-in button and allow the
         // player to proceed.
         Log.i("GPGS", "Successfully signed in with player id " + getPlayerDisplayName());
-        firstConnectAttempt = false;
+        firstConnectAttempt = 0;
         gameListener.gpgsConnected();
     }
 
@@ -131,9 +131,27 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             }
         }
         // Error code 4 tritt seit Zunahme Drive-API beim ersten Start auf. Dann einfach nochmal probieren?
-        else if (firstConnectAttempt && connectionResult.getErrorCode() == 4) {
-            firstConnectAttempt = false;
-            mGoogleApiClient.connect();
+        else if (firstConnectAttempt > 0 && connectionResult.getErrorCode() == 4) {
+            firstConnectAttempt -= 1;
+            Log.w("GPGS", "Retrying to connect...");
+
+            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    try {
+                        // darf auch nicht zu schnell sein
+                        Thread.sleep(200);
+                        if (!mGoogleApiClient.isConnected())
+                            mGoogleApiClient.connect();
+                    } catch (InterruptedException e) {
+                        //eat
+                    }
+                    return null;
+                }
+            };
+
+            task.execute();
+
         }
     }
 
