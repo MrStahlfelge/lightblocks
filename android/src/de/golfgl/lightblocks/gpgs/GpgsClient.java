@@ -34,6 +34,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     public static final String NAME_SAVE_GAMESTATE = "gamestate.sav";
     private static final int MAX_SNAPSHOT_RESOLVE_RETRIES = 3;
+    private static final int MAX_CONNECTFAIL_RETRIES = 4;
     private Activity myContext;
     private IGpgsListener gameListener;
     // Play Games
@@ -41,10 +42,11 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     private boolean mResolvingConnectionFailure = false;
     private boolean mAutoStartSignInflow = true;
     private boolean mSignInClicked = false;
-    private int firstConnectAttempt = 4;
+    private int firstConnectAttempt;
 
     public GpgsClient(Activity context) {
         myContext = context;
+        firstConnectAttempt = MAX_CONNECTFAIL_RETRIES; // dreimal probieren in Play Games einzuloggen
         mGoogleApiClient = new GoogleApiClient.Builder(myContext)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -83,7 +85,10 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         // The player is signed in. Hide the sign-in button and allow the
         // player to proceed.
         Log.i("GPGS", "Successfully signed in with player id " + getPlayerDisplayName());
-        firstConnectAttempt = 0;
+        // den Zähler für maximale Versuche wieder zurück setzen. Wenn die App nämlich nicht
+        // beendet, aber länger nicht benutzt wird, kommt es wieder zu dem Problem dass
+        // GPGS erst fälschlicherweise errCode 4 zurückgibt
+        firstConnectAttempt = MAX_CONNECTFAIL_RETRIES;
         gameListener.gpgsConnected();
     }
 
