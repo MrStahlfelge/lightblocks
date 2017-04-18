@@ -836,7 +836,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (message == null)
             overlayWindow.hide();
         else {
-            overlayWindow.showText(stage, app.TEXTS.format(message, params));
+            overlayWindow.showText(stage, app.TEXTS.format(message, (Object) params));
         }
     }
 }
