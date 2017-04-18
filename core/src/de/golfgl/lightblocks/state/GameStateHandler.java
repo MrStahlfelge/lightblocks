@@ -3,8 +3,11 @@ package de.golfgl.lightblocks.state;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.esotericsoftware.minlog.Log;
+
+import java.util.HashMap;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 
@@ -17,7 +20,7 @@ public class GameStateHandler {
 
     private static final String FILENAME_SAVEGAME = "data/savegame.json";
     private static final String FILENAME_TOTALSCORE = "data/score_total.json";
-    private static final String FILENAMEPREFIX_BESTSCORE = "data/score_";
+    private static final String FILENAME_BESTSCORES = "data/score_best.json";
     private static final String SAVEGAMEKEY = "***REMOVED***";
 
     private final LightBlocksGame app;
@@ -27,6 +30,7 @@ public class GameStateHandler {
     private boolean alreadyLoadedFromCloud;
     // store future use String - damit er nicht verloren geht!
     private String futureUseFromCloudSaveGame;
+    private BestScores bestScores;
 
     public GameStateHandler(LightBlocksGame app) {
         this.app = app;
@@ -45,6 +49,7 @@ public class GameStateHandler {
         for (int i = 0; i < a.length; i++) {
             out[i] = (byte) (a[i] ^ key[i % key.length]);
         }
+
         return out;
     }
 
@@ -207,28 +212,37 @@ public class GameStateHandler {
 
     }
 
-    public BestScore loadBestScore(String identifier) {
-        String filename = FILENAMEPREFIX_BESTSCORE + identifier;
-        if (!canSaveState() || !Gdx.files.local(filename).exists())
-            return new BestScore();
-        else {
+    public BestScore getBestScore(String identifier) {
+        if (bestScores == null)
+            loadBestScores();
+
+        if (!bestScores.containsKey(identifier))
+            bestScores.put(identifier, new BestScore());
+
+        return bestScores.get(identifier);
+    }
+
+    protected void loadBestScores() {
+        if (!canSaveState() || !Gdx.files.local(FILENAME_BESTSCORES).exists()) {
+            Log.info("Gamestate", "No scores found.");
+            bestScores = new BestScores();
+        } else {
             Json json = new Json();
             try {
-                return json.fromJson(BestScore.class, Gdx.files.local(filename));
+                bestScores = json.fromJson(BestScores.class, decode(Gdx.files.local(FILENAME_BESTSCORES).readString()
+                        , SAVEGAMEKEY));
             } catch (Throwable t) {
-                return new BestScore();
+                Log.error("Gamestate", "Error loading best scores - resetting.", t);
+                bestScores = new BestScores();
             }
         }
     }
 
-    public void saveBestScore(BestScore score, String identifier) {
-        String filename = FILENAMEPREFIX_BESTSCORE + identifier;
-
+    public void saveBestScores() {
         if (canSaveState()) {
             Json json = new Json();
-            json.setOutputType(JsonWriter.OutputType.json);
-            json.toJson(score, Gdx.files.local(filename));
-
+            json.setOutputType(JsonWriter.OutputType.minimal);
+            Gdx.files.local(FILENAME_BESTSCORES).writeString(encode(json.toJson(bestScores), SAVEGAMEKEY), false);
         }
     }
 
@@ -238,5 +252,20 @@ public class GameStateHandler {
 
     public void resetLoadedFromCloud() {
         alreadyLoadedFromCloud = false;
+    }
+
+    protected static class BestScores extends HashMap<String, BestScore> implements Json.Serializable {
+
+        @Override
+        public void write(Json json) {
+            for (String key : this.keySet())
+                json.writeValue(key, this.get(key), BestScore.class);
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData) {
+            for (JsonValue entry = jsonData.child; entry != null; entry = entry.next)
+                this.put(entry.name, json.readValue(BestScore.class, entry));
+        }
     }
 }

@@ -264,7 +264,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Highscores
         gameModel.totalScore = app.savegame.getTotalScore();
         //TODO das sollte ins GameModel
-        gameModel.bestScore = app.savegame.loadBestScore(gameModel.getIdentifier());
+        gameModel.bestScore = app.savegame.getBestScore(gameModel.getIdentifier());
         gameModel.gpgsClient = app.gpgsClient;
 
         // erst nach dem Laden setzen, damit das noch ohne Animation läuft
@@ -335,7 +335,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private void saveGameState() {
         if (app.savegame.canSaveState()) {
             app.savegame.saveTotalScore();
-            app.savegame.saveBestScore(gameModel.bestScore, gameModel.getIdentifier());
+            app.savegame.saveBestScores();
             app.savegame.saveGame(gameModel.saveGameModel());
         }
     }

@@ -103,7 +103,7 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
 
         ScoreScreen scoreScreen = new ScoreScreen(app);
         scoreScreen.setGameModelId(MarathonModel.MODEL_MARATHON_ID + inputButtons.getSelectedInput());
-        scoreScreen.addScoreToShow(app.savegame.loadBestScore("marathon" +
+        scoreScreen.addScoreToShow(app.savegame.getBestScore("marathon" +
                         inputButtons.getSelectedInput()),
                 app.TEXTS.get("labelBestScores"));
         scoreScreen.setBackScreen(MenuMarathonScreen.this);
