@@ -9,5 +9,6 @@ package de.golfgl.lightblocks.state;
 public class CloudGameState {
     public String version;
     public TotalScore totalScore;
+    public BestScore.BestScoreMap bestScores;
     public String futureUse;
 }

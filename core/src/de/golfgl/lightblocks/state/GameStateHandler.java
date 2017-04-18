@@ -3,11 +3,8 @@ package de.golfgl.lightblocks.state;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.esotericsoftware.minlog.Log;
-
-import java.util.HashMap;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 
@@ -30,7 +27,7 @@ public class GameStateHandler {
     private boolean alreadyLoadedFromCloud;
     // store future use String - damit er nicht verloren geht!
     private String futureUseFromCloudSaveGame;
-    private BestScores bestScores;
+    private BestScore.BestScoreMap bestScores;
 
     public GameStateHandler(LightBlocksGame app) {
         this.app = app;
@@ -162,6 +159,7 @@ public class GameStateHandler {
                 CloudGameState cgs = new CloudGameState();
                 cgs.version = LightBlocksGame.GAME_VERSIONSTRING;
                 cgs.totalScore = totalScore;
+                cgs.bestScores = bestScores;
                 cgs.futureUse = futureUseFromCloudSaveGame;
 
                 Json json = new Json();
@@ -188,6 +186,7 @@ public class GameStateHandler {
 
         synchronized (gameStateMonitor) {
             getTotalScore(); // sicherstellen dass er geladen ist
+            loadBestScores(); // hier ebenso
 
             Json json = new Json();
 
@@ -202,9 +201,10 @@ public class GameStateHandler {
 
                 // Stand zusammenmergen
                 totalScore.mergeWithOther(cgs.totalScore);
+                bestScores.mergeWithOther(cgs.bestScores);
 
             } catch (Throwable t) {
-                Log.error("GameState", "Error reading saved gamestate. Ignored.");
+                Log.error("GameState", "Error reading saved gamestate. Ignored.", t);
             }
 
             totalScore.checkAchievements(app.gpgsClient);
@@ -223,26 +223,34 @@ public class GameStateHandler {
     }
 
     protected void loadBestScores() {
-        if (!canSaveState() || !Gdx.files.local(FILENAME_BESTSCORES).exists()) {
-            Log.info("Gamestate", "No scores found.");
-            bestScores = new BestScores();
-        } else {
-            Json json = new Json();
-            try {
-                bestScores = json.fromJson(BestScores.class, decode(Gdx.files.local(FILENAME_BESTSCORES).readString()
-                        , SAVEGAMEKEY));
-            } catch (Throwable t) {
-                Log.error("Gamestate", "Error loading best scores - resetting.", t);
-                bestScores = new BestScores();
+        if (bestScores != null)
+            return;
+
+        synchronized (gameStateMonitor) {
+            if (!canSaveState() || !Gdx.files.local(FILENAME_BESTSCORES).exists()) {
+                Log.info("Gamestate", "No scores found.");
+                bestScores = new BestScore.BestScoreMap();
+            } else {
+                Json json = new Json();
+                try {
+                    bestScores = json.fromJson(BestScore.BestScoreMap.class, decode(Gdx.files.local
+                                    (FILENAME_BESTSCORES).readString()
+                            , SAVEGAMEKEY));
+                } catch (Throwable t) {
+                    Log.error("Gamestate", "Error loading best scores - resetting.", t);
+                    bestScores = new BestScore.BestScoreMap();
+                }
             }
         }
     }
 
     public void saveBestScores() {
         if (canSaveState()) {
-            Json json = new Json();
-            json.setOutputType(JsonWriter.OutputType.minimal);
-            Gdx.files.local(FILENAME_BESTSCORES).writeString(encode(json.toJson(bestScores), SAVEGAMEKEY), false);
+            synchronized (gameStateMonitor) {
+                Json json = new Json();
+                json.setOutputType(JsonWriter.OutputType.minimal);
+                Gdx.files.local(FILENAME_BESTSCORES).writeString(encode(json.toJson(bestScores), SAVEGAMEKEY), false);
+            }
         }
     }
 
@@ -254,18 +262,4 @@ public class GameStateHandler {
         alreadyLoadedFromCloud = false;
     }
 
-    protected static class BestScores extends HashMap<String, BestScore> implements Json.Serializable {
-
-        @Override
-        public void write(Json json) {
-            for (String key : this.keySet())
-                json.writeValue(key, this.get(key), BestScore.class);
-        }
-
-        @Override
-        public void read(Json json, JsonValue jsonData) {
-            for (JsonValue entry = jsonData.child; entry != null; entry = entry.next)
-                this.put(entry.name, json.readValue(BestScore.class, entry));
-        }
-    }
 }
