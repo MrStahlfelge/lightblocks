@@ -64,7 +64,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
     }
 
     private void mergeWithOther(BestScore bs) {
-        if (bs.score > this.score) {
+        if (bs.score > this.score || bs.score == this.score && bs.clearedLines > this.clearedLines) {
             this.score = bs.score;
             this.clearedLines = bs.clearedLines;
             this.drawnTetrominos = bs.drawnTetrominos;
