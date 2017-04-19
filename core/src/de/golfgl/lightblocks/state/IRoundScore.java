@@ -9,4 +9,6 @@ public interface IRoundScore {
     int getClearedLines();
 
     int getDrawnTetrominos();
+
+    int getRating();
 }

@@ -73,15 +73,7 @@ public class MainMenuScreen extends AbstractScreen {
         missionButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                try {
-                    PlayScreen ps = PlayScreen.gotoPlayScreen(MainMenuScreen.this, TutorialModel.getTutorialInitParams());
-                    ps.setShowScoresWhenGameOver(false);
-                    ps.setBackScreen(MainMenuScreen.this);
-                } catch (VetoException e) {
-                    showDialog(e.getMessage());
-                }
-
-                //TODO app.setScreen(new MenuMissionsScreen(app));
+                app.setScreen(new MenuMissionsScreen(app));
             }
         });
 

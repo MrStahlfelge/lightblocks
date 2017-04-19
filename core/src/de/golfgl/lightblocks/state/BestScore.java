@@ -20,6 +20,8 @@ public class BestScore implements IRoundScore, Json.Serializable {
     private int clearedLines;
     // Anzahl gezogene Blöcke
     private int drawnTetrominos;
+    // ein (wie auch immer geartetes) Rating 1-8 (0 nicht gesetzt)
+    private int rating;
 
     @Override
     public int getScore() {
@@ -64,10 +66,13 @@ public class BestScore implements IRoundScore, Json.Serializable {
     }
 
     private void mergeWithOther(BestScore bs) {
-        if (bs.score > this.score || bs.score == this.score && bs.clearedLines > this.clearedLines) {
+        if (this.rating > 0 && bs.rating > 0 && bs.rating > this.rating
+                || ((this.rating == 0 || bs.rating == 0) &&
+                (bs.score > this.score || bs.score == this.score && bs.clearedLines > this.clearedLines))) {
             this.score = bs.score;
             this.clearedLines = bs.clearedLines;
             this.drawnTetrominos = bs.drawnTetrominos;
+            this.rating = bs.rating;
         }
     }
 
@@ -77,6 +82,9 @@ public class BestScore implements IRoundScore, Json.Serializable {
         json.writeValue("s", this.score);
         json.writeValue("c", this.clearedLines);
         json.writeValue("d", this.drawnTetrominos);
+
+        if (this.rating > 0)
+            json.writeValue("r", this.rating);
     }
 
     @Override
@@ -85,6 +93,18 @@ public class BestScore implements IRoundScore, Json.Serializable {
         this.score = json.readValue(int.class, jsonData.get("s"));
         this.clearedLines = json.readValue(int.class, jsonData.get("c"));
         this.drawnTetrominos = json.readValue(int.class, jsonData.get("d"));
+
+        // Rating optional
+        final JsonValue jsRating = jsonData.get("r");
+        this.rating = (jsRating != null ? json.readValue(int.class, jsRating) : 0);
+    }
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
     protected static class BestScoreMap extends HashMap<String, BestScore> implements Json.Serializable {

@@ -39,8 +39,28 @@ public class TutorialModel extends GameModel {
 
     @Override
     protected void activeTetrominoDropped() {
-        if (getScore().getClearedLines() > 0)
+        final GameScore score = getScore();
+
+        if (score.getClearedLines() > 0) {
+
+            int currentRating;
+
+            if (score.getScore() >= 1000)
+                currentRating = 8;
+            else if (score.getScore() >= 300)
+                currentRating = 6;
+            else if (score.getScore() >= 100)
+                currentRating = 4;
+            else
+                currentRating = 2;
+
+            score.setRating(currentRating);
+
+            if (bestScore.getRating() < currentRating)
+                bestScore.setRating(currentRating);
+
             setGameOverWon();
+        }
     }
 
     @Override

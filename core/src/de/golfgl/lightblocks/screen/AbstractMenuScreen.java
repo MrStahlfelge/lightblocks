@@ -1,9 +1,11 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -15,6 +17,9 @@ import de.golfgl.lightblocks.LightBlocksGame;
  * Created by Benjamin Schulte on 24.02.2017.
  */
 public abstract class AbstractMenuScreen extends AbstractScreen {
+    protected static final Color COLOR_TABLE_DEACTIVATED = new Color(.2f, .2f, .2f, 1);
+    protected static final Color COLOR_TABLE_NORMAL = new Color(.5f, .5f, .5f, 1);
+    protected static final Color COLOR_TABLE_HIGHLIGHTED = new Color(1, 1, 1, 1);
     private Button leaveButton;
 
     public AbstractMenuScreen(LightBlocksGame app) {
@@ -27,9 +32,12 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
 
     public void initializeUI() {
 
-        // SCORES
         Table menuTable = new Table();
         fillMenuTable(menuTable);
+        // setFillParent verursacht Probleme mit ScrollPane
+        menuTable.setFillParent(false);
+        ScrollPane sp = new ScrollPane(menuTable, app.skin);
+        sp.setSize(LightBlocksGame.nativeGameWidth, 150);
 
         //Titel
         // Der Titel wird nach der Menütabelle gefüllt, eventuell wird dort etwas gesetzt (=> Scores)
@@ -48,7 +56,7 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
         final Table mainTable = new Table();
         mainTable.setFillParent(true);
-        mainTable.row();
+        mainTable.row().padTop(15);
         mainTable.add(new Label(getTitleIcon(), app.skin, FontAwesome.SKIN_FONT_FA));
         mainTable.row();
         mainTable.add(title);
@@ -56,7 +64,7 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         if (subtitle != null)
             mainTable.add(new Label(subtitle, app.skin, LightBlocksGame.SKIN_FONT_BIG));
         mainTable.row().spaceTop(50);
-        mainTable.add(menuTable);
+        mainTable.add(sp);
         mainTable.row();
         mainTable.add(buttons).spaceTop(50);
 

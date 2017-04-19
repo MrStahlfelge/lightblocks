@@ -19,8 +19,17 @@ public class GameScore implements IRoundScore {
     private float dropScore;
     // Anzahl gezogene Blöcke
     private int drawnTetrominos;
-
+    private int rating;
     private boolean lastClearLinesWasSpecial = false;
+
+    @Override
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
 
     @Override
     public int getScore() {
