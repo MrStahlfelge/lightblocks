@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsException;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.scenes.FATextButton;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.IRoundScore;
@@ -32,6 +33,7 @@ public class ScoreScreen extends AbstractScoreScreen {
     private BestScore best;
     private String gameModelId;
     private InitGameParameters newGameParams;
+    private int missionIdx = -1;
 
     private boolean newHighscore;
 
@@ -40,6 +42,32 @@ public class ScoreScreen extends AbstractScoreScreen {
 
         scoresToShow = new Array<IRoundScore>();
         scoresToShowLabels = new Array<String>();
+    }
+
+    protected static String getFARatingString(int rating) {
+        String scoreLabelString;
+        scoreLabelString = "";
+        rating--;
+
+        for (int i = 0; i < 3; i++) {
+            if (rating >= 2)
+                scoreLabelString = scoreLabelString + FontAwesome.COMMENT_STAR_FULL;
+            else if (rating >= 1)
+                scoreLabelString = scoreLabelString + FontAwesome.COMMENT_STAR_HALF;
+            else
+                scoreLabelString = scoreLabelString + FontAwesome.COMMENT_STAR_EMPTY;
+
+            rating = rating - 2;
+        }
+        return scoreLabelString;
+    }
+
+    @Override
+    protected String getTitleIcon() {
+        if (scoresToShow.size >= 1 && scoresToShow.get(0).getRating() > 0)
+            return getFARatingString(scoresToShow.get(0).getRating());
+        else
+            return super.getTitleIcon();
     }
 
     public void addScoreToShow(IRoundScore score, String label) {
@@ -56,13 +84,22 @@ public class ScoreScreen extends AbstractScoreScreen {
         this.best = best;
     }
 
-    public void setGameModelId(String gameModelId) {
+    public void setGameModelId(String gameModelId, int missionIdx) {
         this.gameModelId = gameModelId;
+        this.missionIdx = missionIdx;
+    }
+
+    public void setGameModelId(String gameModelId) {
+        setGameModelId(gameModelId, -1);
     }
 
     @Override
     protected String getSubtitle() {
-        return app.TEXTS.get("labelModel_" + gameModelId);
+        String title = (missionIdx > 0 ?
+                app.TEXTS.format("labelMission", missionIdx)
+                : app.TEXTS.get(Mission.getLabelUid(gameModelId)));
+
+        return title;
     }
 
     @Override
@@ -147,7 +184,8 @@ public class ScoreScreen extends AbstractScoreScreen {
         // Leader Board
         final String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(gameModelId);
         if (leaderboardId != null) {
-            Button leaderboard = new FATextButton(FontAwesome.GPGS_LEADERBOARD, app.TEXTS.get("menuLeaderboard"), app.skin);
+            Button leaderboard = new FATextButton(FontAwesome.GPGS_LEADERBOARD,
+                    app.TEXTS.get("menuLeaderboard"), app.skin);
             leaderboard.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {

@@ -1,13 +1,17 @@
 package de.golfgl.lightblocks.screen;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
-import java.util.HashMap;
 import java.util.List;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -23,7 +27,11 @@ import de.golfgl.lightblocks.scenes.FATextButton;
 
 public class MenuMissionsScreen extends AbstractMenuScreen {
 
-    private HashMap<String, Label> scoreLabels;
+    private Label[] idxLabel;
+    private Label[] titleLabel;
+    private Label[] ratingLabel;
+    private List<Mission> missions;
+    private int selectedIndex = -1;
 
     public MenuMissionsScreen(LightBlocksGame app) {
         super(app);
@@ -48,53 +56,87 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
 
     @Override
     protected void fillMenuTable(Table menuTable) {
-        List<Mission> missions = Mission.getMissionList();
+        missions = Mission.getMissionList();
 
-        scoreLabels = new HashMap<String, Label>(missions.size());
+        idxLabel = new Label[missions.size()];
+        titleLabel = new Label[missions.size()];
+        ratingLabel = new Label[missions.size()];
 
-        int index = 0;
         menuTable.defaults().space(7, 15, 7, 15);
 
         for (Mission mission : missions) {
             final String uid = mission.getUniqueId();
-            final int usIdx = uid.indexOf("_");
+            int idx = mission.getIndex();
+            String lblUid = Mission.getLabelUid(uid);
 
-            String lblUid = (usIdx >= 0 ? uid.substring(0, usIdx) : uid);
+            idxLabel[idx] = new Label(Integer.toString(idx), app.skin, LightBlocksGame.SKIN_FONT_BIG);
+            titleLabel[idx] = new Label(app.TEXTS.get(lblUid), app.skin, LightBlocksGame
+                    .SKIN_FONT_BIG);
+            ratingLabel[idx] = new Label("", app.skin, FontAwesome.SKIN_FONT_FA);
+            ratingLabel[idx].setFontScale(.5f);
+            ratingLabel[idx].setAlignment(Align.center);
+
+            EventListener idxEvent = getEventListener(idx);
+
+            idxLabel[idx].addListener(idxEvent);
+            ratingLabel[idx].addListener(idxEvent);
+            titleLabel[idx].addListener(idxEvent);
 
             menuTable.row();
-            menuTable.add(new Label(Integer.toString(index), app.skin, LightBlocksGame.SKIN_FONT_BIG)).align(Align
-                    .right);
-
-            menuTable.add(new Label(app.TEXTS.get("labelModel_" + lblUid), app.skin, LightBlocksGame
-                    .SKIN_FONT_BIG)).align(Align.left).expandX();
-
-            String scoreLabelString = "";
-            int rating = app.savegame.getBestScore(uid).getRating();
-
-            if (rating >= 1) {
-                rating--;
-
-                for (int i = 0; i < 3; i++) {
-                    if (rating >= 2)
-                        scoreLabelString = scoreLabelString + FontAwesome.COMMENT_STAR_FULL;
-                    else if (rating >= 1)
-                        scoreLabelString = scoreLabelString + FontAwesome.COMMENT_STAR_HALF;
-                    else
-                        scoreLabelString = scoreLabelString + FontAwesome.COMMENT_STAR_EMPTY;
-
-                    rating = rating - 2;
-                }
-            } else
-                scoreLabelString = FontAwesome.CIRCLE_CROSS;
-
-            final Label scoreLabel = new Label(scoreLabelString, app.skin, FontAwesome.SKIN_FONT_FA);
-            scoreLabel.setFontScale(.5f);
-            scoreLabels.put(uid, scoreLabel);
-            menuTable.add(scoreLabel).padRight(30);
-
-            index++;
+            menuTable.add(idxLabel[idx]).align(Align.right);
+            menuTable.add(titleLabel[idx]).fill().expandX();
+            menuTable.add(ratingLabel[idx]).fill().padRight(30);
         }
 
+    }
+
+    public void refreshMenuTable(boolean selectLastPossible) {
+        boolean isAncestorDone = true;
+        int lastPossible = 0;
+
+        for (int idx = 0; idx < idxLabel.length; idx++) {
+
+            final String uid = missions.get(idx).getUniqueId();
+            int rating = app.savegame.getBestScore(uid).getRating();
+            boolean selectable = isAncestorDone || rating > 0;
+            if (selectable)
+                lastPossible = idx;
+            Touchable touchable = (selectable ? Touchable.enabled : Touchable.disabled);
+            Color rowColor = (selectedIndex == idx ? AbstractMenuScreen.COLOR_TABLE_HIGHLIGHTED :
+                    (selectable ? AbstractMenuScreen.COLOR_TABLE_NORMAL : AbstractMenuScreen.COLOR_TABLE_DEACTIVATED));
+
+            isAncestorDone = (rating > 0);
+
+            String scoreLabelString;
+            if (rating >= 1) {
+                scoreLabelString = ScoreScreen.getFARatingString(rating);
+            } else
+                scoreLabelString = (selectable ? FontAwesome.CIRCLE_PLAY : FontAwesome.CIRCLE_CROSS);
+
+            ratingLabel[idx].setText(scoreLabelString);
+            setRowColor(idx, rowColor);
+            ratingLabel[idx].setTouchable(touchable);
+            titleLabel[idx].setTouchable(touchable);
+            idxLabel[idx].setTouchable(touchable);
+        }
+
+        if (selectLastPossible)
+            setSelectedIndex(lastPossible);
+    }
+
+    protected void setRowColor(int idx, Color rowColor) {
+        ratingLabel[idx].setColor(rowColor);
+        titleLabel[idx].setColor(rowColor);
+        idxLabel[idx].setColor(rowColor);
+    }
+
+    public void setSelectedIndex(int idx) {
+        if (idx != selectedIndex) {
+            if (selectedIndex >= 0 && selectedIndex < idxLabel.length)
+                setRowColor(selectedIndex, AbstractMenuScreen.COLOR_TABLE_NORMAL);
+            selectedIndex = idx;
+            setRowColor(selectedIndex, AbstractMenuScreen.COLOR_TABLE_HIGHLIGHTED);
+        }
     }
 
     @Override
@@ -109,9 +151,31 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
                                }
         );
 
+        TextButton highScoreButton = new FATextButton(FontAwesome.COMMENT_STAR_TROPHY, app.TEXTS.get("labelScores"),
+                app.skin);
+        highScoreButton.addListener(new ChangeListener() {
+                                        public void changed(ChangeEvent event, Actor actor) {
+                                            showHighscores();
+                                        }
+                                    }
+        );
+
         buttons.defaults().fill();
+        buttons.add(highScoreButton).uniform();
         buttons.add(playButton).prefWidth(playButton.getPrefWidth() * 1.2f);
 
+    }
+
+    private void showHighscores() {
+        ScoreScreen scoreScreen = new ScoreScreen(app);
+        final String uniqueId = missions.get(selectedIndex).getUniqueId();
+        scoreScreen.setGameModelId(uniqueId, selectedIndex);
+        scoreScreen.addScoreToShow(app.savegame.getBestScore(uniqueId),
+                app.TEXTS.get("labelBestScores"));
+        scoreScreen.setBackScreen(this);
+        scoreScreen.setMaxCountingTime(1);
+        scoreScreen.initializeUI();
+        app.setScreen(scoreScreen);
     }
 
     private void beginNewGame() {
@@ -123,5 +187,32 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
             showDialog(e.getMessage());
         }
 
+    }
+
+    @Override
+    public void show() {
+        super.show();
+        refreshMenuTable(selectedIndex < 0);
+    }
+
+    private EventListener getEventListener(final int idx) {
+        return new EventListener() {
+            @Override
+            public boolean handle(Event event) {
+                if (event instanceof InputEvent) {
+                    switch (((InputEvent) event).getType()) {
+                        case touchUp:
+                            setSelectedIndex(idx);
+                        case touchDown:
+                            // damit touchUp gesendet wird auch touchDown annehmen
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+
+                return false;
+            }
+        };
     }
 }
