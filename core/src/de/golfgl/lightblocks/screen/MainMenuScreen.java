@@ -14,7 +14,6 @@ import com.badlogic.gdx.utils.Align;
 import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
 import de.golfgl.lightblocks.scenes.FATextButton;
@@ -31,6 +30,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 public class MainMenuScreen extends AbstractScreen {
     private final TextButton accountButton;
     private TextButton resumeGameButton;
+    private MenuMissionsScreen missionsScreen;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
@@ -73,7 +73,9 @@ public class MainMenuScreen extends AbstractScreen {
         missionButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                app.setScreen(new MenuMissionsScreen(app));
+                if (missionsScreen == null)
+                    missionsScreen = new MenuMissionsScreen(app);
+                app.setScreen(missionsScreen);
             }
         });
 

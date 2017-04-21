@@ -30,6 +30,7 @@ import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.IGameModelListener;
+import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.BlockActor;
@@ -154,12 +155,18 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         initializeGameModel(initGameParametersParams);
 
-        final String modelIdLabel = app.TEXTS.get("labelModel_" + gameModel.getIdentifier());
+        Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
+        String modelIdLabel = (mission != null ? app.TEXTS.format("labelMission", mission.getIndex())
+                : app.TEXTS.get(Mission.getLabelUid(gameModel.getIdentifier())));
+
         gameType.setText(modelIdLabel);
         pauseDialog.setTitle(modelIdLabel);
         final String goalDescription = gameModel.getGoalDescription();
-        if (goalDescription != null && !goalDescription.isEmpty())
-            pauseDialog.setText(app.TEXTS.get(goalDescription));
+        if (goalDescription != null && !goalDescription.isEmpty()) {
+            String[] goalParams = gameModel.getGoalParams();
+            pauseDialog.setText(goalParams == null ? app.TEXTS.get(goalDescription)
+                    : app.TEXTS.format(goalDescription, goalParams));
+        }
         refreshResumeFromPauseText();
 
         if (!gameModel.beginPaused() && gameBlockers.isEmpty())
@@ -246,6 +253,14 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         } else if (initGameParametersParams == null) {
             Json json = new Json();
             gameModel = json.fromJson(GameModel.class, app.savegame.loadGame());
+        } else if (initGameParametersParams.getMissionId() != null) {
+            Json json = new Json();
+            gameModel = json.fromJson(GameModel.class,
+                    app.savegame.loadMission(initGameParametersParams.getMissionId()));
+
+            // sicher ist sicher
+            if (!gameModel.getIdentifier().equals(initGameParametersParams.getMissionId()))
+                throw new IllegalStateException("Mission corrupted: " + initGameParametersParams.getMissionId());
         } else {
             try {
                 gameModel = initGameParametersParams.getGameModelClass().newInstance();

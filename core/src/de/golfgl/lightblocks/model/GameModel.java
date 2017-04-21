@@ -63,6 +63,7 @@ public abstract class GameModel implements Json.Serializable {
     private float movingCountdown;
     // Wieviele Specials (Four Lines und T-Spin) hintereinander?
     private int specialRowChainNum;
+
     public GameModel() {
 
         linesToRemove = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
@@ -442,6 +443,9 @@ public abstract class GameModel implements Json.Serializable {
 
     }
 
+    /**
+     * Game over not one. Normally when board full, but can be another reason
+     */
     protected void setGameOverBoardFull() {
         isGameOver = true;
         userInterface.showMotivation(IGameModelListener.MotivationTypes.gameOver, null);
@@ -677,29 +681,52 @@ public abstract class GameModel implements Json.Serializable {
 
     @Override
     public void read(Json json, JsonValue jsonData) {
+        // Gameboard (if set)
         this.gameboard = new Gameboard();
-        this.gameboard.read(json, jsonData.get("board"));
+        final JsonValue board = jsonData.get("board");
+        if (board != null)
+            this.gameboard.read(json, board);
+
+        // Drawyer (if set)
         this.drawyer = new TetrominoDrawyer();
-        this.drawyer.read(json, jsonData.get("drawyer"));
+        final JsonValue drawyer = jsonData.get("drawyer");
+        if (drawyer != null)
+            this.drawyer.read(json, drawyer);
+
+        // Score (if set)
         this.score = json.readValue("score", GameScore.class, jsonData);
+        if (this.score == null) {
+            score = new GameScore();
+            score.setStartingLevel(jsonData.getInt("beginningLevel", 0));
+        }
+
+        // Input Type (if set)
         this.inputTypeKey = jsonData.getInt("inputType", -1);
-        this.nextTetromino = new Tetromino(jsonData.getInt("next"));
 
         // den aktiven Tetromino hier einzeln herausfummeln wegen des
-        // parametrisierten Konstruktors
+        // parametrisierten Konstruktors (when set)
         JsonValue tetromino = jsonData.get("active");
-        activeTetromino = new Tetromino(tetromino.getInt("tetrominoIndex"));
-        activeTetromino.setRotation(tetromino.getInt("currentRotation"));
-        // unbedingt nach setRotation!
-        activeTetromino.setLastMovementType(tetromino.getInt("lastMovementType"));
-        Vector2 posFromJson = json.readValue(Vector2.class, tetromino.get("position"));
-        activeTetromino.getPosition().set(posFromJson);
+        if (tetromino != null) {
+            this.nextTetromino = new Tetromino(jsonData.getInt("next"));
+            activeTetromino = new Tetromino(tetromino.getInt("tetrominoIndex"));
+            activeTetromino.setRotation(tetromino.getInt("currentRotation"));
+            // unbedingt nach setRotation!
+            activeTetromino.setLastMovementType(tetromino.getInt("lastMovementType"));
+            Vector2 posFromJson = json.readValue(Vector2.class, tetromino.get("position"));
+            activeTetromino.getPosition().set(posFromJson);
+        } else {
+            activeTetromino = null;
+            initializeActiveAndNextTetromino();
+        }
 
         setCurrentSpeed();
-
     }
 
     public boolean beginPaused() {
         return true;
+    }
+
+    public String[] getGoalParams() {
+        return null;
     }
 }

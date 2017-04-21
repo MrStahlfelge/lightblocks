@@ -14,11 +14,17 @@ public class InitGameParameters {
 
     private int inputKey;
     private int beginningLevel;
-
+    private String missionId;
     private Class<? extends GameModel> gameModelClass;
-
     private AbstractMultiplayerRoom multiplayerRoom;
 
+    public String getMissionId() {
+        return missionId;
+    }
+
+    public void setMissionId(String missionId) {
+        this.missionId = missionId;
+    }
 
     public int getInputKey() {
         return inputKey;
@@ -29,7 +35,7 @@ public class InitGameParameters {
     }
 
     public boolean isMultiplayer() {
-        return MultiplayerModel.class.isAssignableFrom(gameModelClass);
+        return gameModelClass != null && MultiplayerModel.class.isAssignableFrom(gameModelClass);
     }
 
     public int getBeginningLevel() {

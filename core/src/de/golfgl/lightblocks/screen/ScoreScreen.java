@@ -33,7 +33,6 @@ public class ScoreScreen extends AbstractScoreScreen {
     private BestScore best;
     private String gameModelId;
     private InitGameParameters newGameParams;
-    private int missionIdx = -1;
 
     private boolean newHighscore;
 
@@ -84,19 +83,14 @@ public class ScoreScreen extends AbstractScoreScreen {
         this.best = best;
     }
 
-    public void setGameModelId(String gameModelId, int missionIdx) {
-        this.gameModelId = gameModelId;
-        this.missionIdx = missionIdx;
-    }
-
     public void setGameModelId(String gameModelId) {
-        setGameModelId(gameModelId, -1);
+        this.gameModelId = gameModelId;
     }
 
     @Override
     protected String getSubtitle() {
-        String title = (missionIdx > 0 ?
-                app.TEXTS.format("labelMission", missionIdx)
+        Mission mission = app.getMissionFromUid(gameModelId);
+        String title = (mission != null ? app.TEXTS.format("labelMission", mission.getIndex())
                 : app.TEXTS.get(Mission.getLabelUid(gameModelId)));
 
         return title;

@@ -34,10 +34,6 @@ public class Mission {
         return missionsList;
     }
 
-    public static boolean isMission(String modelId) {
-        return Arrays.asList(missions).contains(modelId);
-    }
-
     /**
      * returns the label used in i18n
      *

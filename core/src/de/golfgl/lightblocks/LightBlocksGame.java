@@ -16,8 +16,12 @@ import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.minlog.Log;
 
+import java.util.HashMap;
+import java.util.List;
+
 import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.gpgs.IGpgsListener;
+import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
@@ -77,6 +81,8 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     private Boolean showTouchPanel;
     private Boolean gpgsAutoLogin;
     private GamepadConfig gamepadConfig;
+    private List<Mission> missionList;
+    private HashMap<String, Mission> missionMap;
 
     public Boolean getGpgsAutoLogin() {
         if (gpgsAutoLogin == null)
@@ -326,5 +332,25 @@ public class LightBlocksGame extends Game implements IGpgsListener {
         prefs.putInteger("gpButtonClockwise", gamepadConfig.rotateClockwiseButton);
 
         prefs.flush();
+    }
+
+    public List<Mission> getMissionList() {
+        if (missionList == null) {
+            missionList = Mission.getMissionList();
+
+            // Hashmap aufbauen
+            missionMap = new HashMap<String, Mission>(missionList.size());
+            for (Mission mission : missionList)
+                missionMap.put(mission.getUniqueId(), mission);
+        }
+
+        return missionList;
+    }
+
+    public Mission getMissionFromUid(String uid) {
+        if (missionMap == null)
+            getMissionList();
+
+        return missionMap.get(uid);
     }
 }

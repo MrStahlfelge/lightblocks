@@ -18,6 +18,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.scenes.FATextButton;
+import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
  * Menu for missions
@@ -56,7 +57,7 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
 
     @Override
     protected void fillMenuTable(Table menuTable) {
-        missions = Mission.getMissionList();
+        missions = app.getMissionList();
 
         idxLabel = new Label[missions.size()];
         titleLabel = new Label[missions.size()];
@@ -169,7 +170,7 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
     private void showHighscores() {
         ScoreScreen scoreScreen = new ScoreScreen(app);
         final String uniqueId = missions.get(selectedIndex).getUniqueId();
-        scoreScreen.setGameModelId(uniqueId, selectedIndex);
+        scoreScreen.setGameModelId(uniqueId);
         scoreScreen.addScoreToShow(app.savegame.getBestScore(uniqueId),
                 app.TEXTS.get("labelBestScores"));
         scoreScreen.setBackScreen(this);
@@ -180,8 +181,18 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
 
     private void beginNewGame() {
         try {
-            PlayScreen ps = PlayScreen.gotoPlayScreen(this, TutorialModel.getTutorialInitParams());
-            ps.setShowScoresWhenGameOver(false);
+            String modelId = missions.get(selectedIndex).getUniqueId();
+
+            PlayScreen ps;
+            if (modelId.equals(TutorialModel.MODEL_ID)) {
+                ps = PlayScreen.gotoPlayScreen(this, TutorialModel.getTutorialInitParams());
+                ps.setShowScoresWhenGameOver(false);
+            } else {
+                InitGameParameters igp = new InitGameParameters();
+                igp.setMissionId(modelId);
+                ps = PlayScreen.gotoPlayScreen(this, igp);
+            }
+
             ps.setBackScreen(this);
         } catch (VetoException e) {
             showDialog(e.getMessage());
@@ -214,5 +225,10 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
                 return false;
             }
         };
+    }
+
+    @Override
+    public void dispose() {
+        // kein dispose wie super, da dieser Screen wieder verwendet wird.
     }
 }

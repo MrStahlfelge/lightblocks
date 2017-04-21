@@ -18,6 +18,7 @@ public class GameStateHandler {
     private static final String FILENAME_SAVEGAME = "data/savegame.json";
     private static final String FILENAME_TOTALSCORE = "data/score_total.json";
     private static final String FILENAME_BESTSCORES = "data/score_best.json";
+    private static final String FILENAME_PREFIX_MISSIONS = "missions/";
     private static final String SAVEGAMEKEY = "***REMOVED***";
 
     private final LightBlocksGame app;
@@ -79,9 +80,11 @@ public class GameStateHandler {
         if (!canSaveState())
             return false;
 
-
         if (jsonString == null)
             return resetGame();
+
+        if (LightBlocksGame.GAME_DEVMODE)
+            System.out.println(jsonString);
 
         try {
             Gdx.files.local(FILENAME_SAVEGAME).writeString(encode(jsonString, SAVEGAMEKEY), false);
@@ -262,4 +265,11 @@ public class GameStateHandler {
         alreadyLoadedFromCloud = false;
     }
 
+    public String loadMission(String missionId) {
+        try {
+            return Gdx.files.internal(FILENAME_PREFIX_MISSIONS + missionId).readString();
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 }
