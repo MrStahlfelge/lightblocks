@@ -46,13 +46,13 @@ public class TutorialModel extends GameModel {
             int currentRating;
 
             if (score.getScore() >= 1000)
-                currentRating = 8;
+                currentRating = 7;
             else if (score.getScore() >= 300)
-                currentRating = 6;
+                currentRating = 5;
             else if (score.getScore() >= 100)
-                currentRating = 4;
+                currentRating = 3;
             else
-                currentRating = 2;
+                currentRating = 1;
 
             score.setRating(currentRating);
 

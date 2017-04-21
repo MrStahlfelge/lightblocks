@@ -36,8 +36,8 @@ abstract class MissionModel extends GameModel {
         int newRating = getRating();
         if (newRating < 1)
             newRating = 1;
-        else if (newRating > 8)
-            newRating = 8;
+        else if (newRating > 7)
+            newRating = 7;
 
         getScore().setRating(newRating);
         if (bestScore.getRating() < newRating)

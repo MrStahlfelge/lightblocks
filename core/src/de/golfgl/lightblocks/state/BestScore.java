@@ -20,7 +20,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
     private int clearedLines;
     // Anzahl gezogene Blöcke
     private int drawnTetrominos;
-    // ein (wie auch immer geartetes) Rating 1-8 (0 nicht gesetzt)
+    // ein (wie auch immer geartetes) Rating 1-7 (0 nicht gesetzt)
     private int rating;
 
     @Override

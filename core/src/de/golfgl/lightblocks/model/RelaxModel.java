@@ -27,7 +27,7 @@ public class RelaxModel extends MissionModel {
     public int getRating() {
         float rating = ((float) getScore().getScore()) / ((float) topRatingScore);
 
-        return 1 + ((int) (rating * 7));
+        return 1 + ((int) (rating * 6));
     }
 
     @Override
