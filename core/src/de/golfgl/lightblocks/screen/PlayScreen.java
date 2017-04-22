@@ -69,6 +69,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private ScoreLabel scoreNum;
     private ScoreLabel levelNum;
     private ScoreLabel linesNum;
+    private ScoreLabel blocksLeft;
     private PauseDialog pauseDialog;
     private Dialog pauseMsgDialog;
     private boolean isPaused = true;
@@ -134,11 +135,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         stage.addActor(gameTypeLabels);
 
         // Score Labels
-        final Table mainTable = new Table();
-        populateScoreTable(mainTable);
-        mainTable.setY(LightBlocksGame.nativeGameHeight - mainTable.getPrefHeight() / 2 - 5);
-        mainTable.setX(mainTable.getPrefWidth() / 2 + 5);
-        stage.addActor(mainTable);
+        final Table scoreTable = new Table();
+        populateScoreTable(scoreTable);
+        // hinzufügen erst weiter unten (weil eventuell noch etwas dazu kommt)
 
         stage.addActor(weldEffect);
 
@@ -155,6 +154,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         initializeGameModel(initGameParametersParams);
 
+        // Score Table vervollständigen
+        if (gameModel.getMaxBlocksToUse() > 0) {
+            scoreTable.row();
+            final Label labelBlocks = new Label(app.TEXTS.get("labelBlocksScore").toUpperCase(), app.skin);
+            scoreTable.add(labelBlocks).right().bottom().padBottom(3).spaceRight(3);
+            scoreTable.add(blocksLeft).left().colspan(3);
+        }
+        scoreTable.setY(LightBlocksGame.nativeGameHeight - scoreTable.getPrefHeight() / 2 - 5);
+        scoreTable.setX(scoreTable.getPrefWidth() / 2 + 5);
+        stage.addActor(scoreTable);
+
         Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
         String modelIdLabel = (mission != null ? app.TEXTS.format("labelMission", mission.getIndex())
                 : app.TEXTS.get(Mission.getLabelUid(gameModel.getIdentifier())));
@@ -165,7 +175,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (goalDescription != null && !goalDescription.isEmpty()) {
             String[] goalParams = gameModel.getGoalParams();
             pauseDialog.setText(goalParams == null ? app.TEXTS.get(goalDescription)
-                    : app.TEXTS.format(goalDescription, goalParams));
+                    : app.TEXTS.format(goalDescription, (Object[]) goalParams));
         }
         refreshResumeFromPauseText();
 
@@ -234,6 +244,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         scoreNum.setCountingSpeed(2000);
         scoreNum.setMaxCountingTime(1);
         scoreTable.add(scoreNum).left().colspan(3);
+
+        // in jedem Fall initialisieren, damit der beim ersten updateScore gefüllt wird
+        blocksLeft = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
     }
 
     /**
@@ -284,7 +297,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Highscores
         gameModel.totalScore = app.savegame.getTotalScore();
         //TODO das sollte ins GameModel
-        gameModel.bestScore = app.savegame.getBestScore(gameModel.getIdentifier());
+        gameModel.setBestScore(app.savegame.getBestScore(gameModel.getIdentifier()));
         gameModel.gpgsClient = app.gpgsClient;
 
         // erst nach dem Laden setzen, damit das noch ohne Animation läuft
@@ -419,8 +432,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         scoreScreen.setGameModelId(gameModel.getIdentifier());
         scoreScreen.addScoreToShow(gameModel.getScore(), app.TEXTS.get("labelRoundScore"));
         if (app.savegame.canSaveState()) {
-            scoreScreen.setBest(gameModel.bestScore);
-            scoreScreen.addScoreToShow(gameModel.bestScore, app.TEXTS.get("labelBestScore"));
+            scoreScreen.setBest(gameModel.getBestScore());
+            scoreScreen.addScoreToShow(gameModel.getBestScore(), app.TEXTS.get("labelBestScore"));
         }
         scoreScreen.setNewGameParams(gameModel.getInitParameters());
         scoreScreen.setMaxCountingTime(2);
@@ -791,6 +804,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         linesNum.setScore(score.getClearedLines());
         levelNum.setScore(score.getCurrentLevel());
         scoreNum.setScore(score.getScore());
+
+        if (gameModel.getMaxBlocksToUse() > 0)
+            blocksLeft.setScore(gameModel.getMaxBlocksToUse() - score.getDrawnTetrominos());
     }
 
     @Override

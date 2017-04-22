@@ -27,13 +27,13 @@ public abstract class GameModel implements Json.Serializable {
     private static final float SOFT_DROP_SPEED = 30.0f;
     // Speicherhaltung
     private final IntArray linesToRemove;
-    public BestScore bestScore;
     public TotalScore totalScore;
     public IGpgsClient gpgsClient;
     /**
      * hier am GameModel verwaltet, da die Eingabemethode mit dem Modell ins Savegame kommt (und von dort geladen wird)
      */
     public int inputTypeKey = -1;
+    protected BestScore bestScore;
     // wieviel ist der aktuelle Stein schon ungerundet gefallen
     protected float currentSpeed;
     IGameModelListener userInterface;
@@ -422,8 +422,10 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     private void activateNextTetromino() {
-        if (maxBlocksToUse > 0 && maxBlocksToUse == score.getDrawnTetrominos())
+        if (maxBlocksToUse > 0 && maxBlocksToUse == score.getDrawnTetrominos()) {
             setGameOverBoardFull();
+            return;
+        }
 
         softDropFactor = 0;
 
@@ -443,9 +445,11 @@ public abstract class GameModel implements Json.Serializable {
         if (!gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
                 activeTetromino.getCurrentRotation())) {
             setGameOverBoardFull();
-        } else
+        } else {
             score.incDrawnTetrominos();
-
+            if (userInterface != null)
+                userInterface.updateScore(score, 0);
+        }
     }
 
     /**
@@ -745,6 +749,14 @@ public abstract class GameModel implements Json.Serializable {
 
     protected void setMaxBlocksToUse(int maxBlocksToUse) {
         this.maxBlocksToUse = maxBlocksToUse;
+    }
+
+    public BestScore getBestScore() {
+        return bestScore;
+    }
+
+    public void setBestScore(BestScore bestScore) {
+        this.bestScore = bestScore;
     }
 
 }

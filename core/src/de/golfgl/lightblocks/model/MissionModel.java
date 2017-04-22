@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.model;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
+import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
@@ -114,4 +115,9 @@ abstract class MissionModel extends GameModel {
         return welcomeMsgNum == 0;
     }
 
+    @Override
+    public void setBestScore(BestScore bestScore) {
+        super.setBestScore(bestScore);
+        bestScore.setCompareByRating(true);
+    }
 }

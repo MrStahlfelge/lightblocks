@@ -22,6 +22,15 @@ public class BestScore implements IRoundScore, Json.Serializable {
     private int drawnTetrominos;
     // ein (wie auch immer geartetes) Rating 1-7 (0 nicht gesetzt)
     private int rating;
+    private boolean compareByRating = false;
+
+    public boolean isCompareByRating() {
+        return compareByRating;
+    }
+
+    public void setCompareByRating(boolean compareByRating) {
+        this.compareByRating = compareByRating;
+    }
 
     @Override
     public int getScore() {
@@ -54,16 +63,29 @@ public class BestScore implements IRoundScore, Json.Serializable {
     }
 
     /**
-     * Setzt alle Scores
+     * Setzt alle Scores. Dabei wird bei jedem einzeln verglichen, ob er höher ist als vorher.
+     * Abhängig von compareByBestRating werden alle Scores gemeinsam, wenn das Rating verbessert oder das Rating
+     * gleich und der Score höher ist
      *
      * @param score
      * @return true genau dann wenn PUNKTESTAND erhöht wurde
      */
     public boolean setBestScores(GameScore score) {
-        setClearedLines(score.getClearedLines());
-        setDrawnTetrominos(score.getDrawnTetrominos());
-        setRating(score.getRating());
-        return setScore(score.getScore());
+        if (compareByRating) {
+            if (this.rating < score.getRating() || this.rating == score.getRating() && this.score < score.getScore()) {
+                this.clearedLines = score.getClearedLines();
+                this.rating = score.getRating();
+                this.score = score.getScore();
+                this.drawnTetrominos = score.getDrawnTetrominos();
+                return true;
+            }
+            return false;
+        } else {
+            setClearedLines(score.getClearedLines());
+            setDrawnTetrominos(score.getDrawnTetrominos());
+            setRating(score.getRating());
+            return setScore(score.getScore());
+        }
     }
 
     private void mergeWithOther(BestScore bs) {
@@ -104,8 +126,10 @@ public class BestScore implements IRoundScore, Json.Serializable {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public boolean setRating(int rating) {
         this.rating = Math.max(rating, this.rating);
+
+        return (this.rating == rating);
     }
 
     protected static class BestScoreMap extends HashMap<String, BestScore> implements Json.Serializable {
