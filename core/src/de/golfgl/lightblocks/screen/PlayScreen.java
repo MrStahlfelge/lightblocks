@@ -255,8 +255,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             gameModel = json.fromJson(GameModel.class, app.savegame.loadGame());
         } else if (initGameParametersParams.getMissionId() != null) {
             Json json = new Json();
-            gameModel = json.fromJson(GameModel.class,
-                    app.savegame.loadMission(initGameParametersParams.getMissionId()));
+            try {
+                gameModel = json.fromJson(GameModel.class,
+                        app.savegame.loadMission(initGameParametersParams.getMissionId()));
+            } catch (Throwable t) {
+                Log.error("Gamestate", "Error loading mission", t);
+                throw new IllegalStateException("Mission corrupted.", t);
+            }
 
             // sicher ist sicher
             if (!gameModel.getIdentifier().equals(initGameParametersParams.getMissionId()))
@@ -765,6 +770,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             case watchOutGarbage:
                 text = app.TEXTS.format("motivationGarbage");
                 playSound = false;
+                duration = 3;
+                break;
+            case bonusScore:
+                text = app.TEXTS.format("motivationBonusScore", extraMsg);
+                playSound = true;
                 duration = 3;
                 break;
         }

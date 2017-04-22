@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public class RelaxModel extends MissionModel {
     private int linesToClear;
-    private int topRatingScore;
 
     @Override
     public String getGoalDescription() {
@@ -20,14 +19,8 @@ public class RelaxModel extends MissionModel {
 
     @Override
     public String[] getGoalParams() {
-        return new String[]{String.valueOf(linesToClear), String.valueOf(0)};
-    }
-
-    @Override
-    public int getRating() {
-        float rating = ((float) getScore().getScore()) / ((float) topRatingScore);
-
-        return 1 + ((int) (rating * 6));
+        return new String[]{String.valueOf(linesToClear), String.valueOf(0),
+                (getMaxBlocksToUse() > 0 ? String.valueOf(getMaxBlocksToUse()) : "-")};
     }
 
     @Override
@@ -44,13 +37,11 @@ public class RelaxModel extends MissionModel {
     public void read(Json json, JsonValue jsonData) {
         super.read(json, jsonData);
         this.linesToClear = jsonData.getInt("linesToClear", 0);
-        this.topRatingScore = jsonData.getInt("topRatingScore", 0);
     }
 
     @Override
     public void write(Json json) {
         super.write(json);
         json.writeValue("linesToClear", linesToClear);
-        json.writeValue("topRatingScore", topRatingScore);
     }
 }

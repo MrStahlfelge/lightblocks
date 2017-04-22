@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
@@ -195,10 +196,43 @@ public class Gameboard implements Json.Serializable {
                 if (block == ' ')
                     gameboardSquare[y][x] = SQUARE_EMPTY;
                 else
-                    gameboardSquare[y][x] = (int) ((gameboardSquare[y][x]) - 65);
+                    gameboardSquare[y][x] = ((int) block) - 65;
             }
         }
 
     }
 
+    /**
+     * Inserts n lines of garbage
+     *
+     * @param insertGarbage number of lines to fill with garbage
+     */
+    public void initGarbage(int insertGarbage) {
+        for (int y = 0; y < insertGarbage; y++) {
+            // im groben soll die Zeile halb gefüllt werden. Es ist also einfach ein Zufallsgenerator 50/50 am laufen
+            // aber sicherstellen dass die zeile nicht schon von Anfang an voll ist!
+            boolean hasGap = false;
+            for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
+                if (MathUtils.randomBoolean() && (hasGap || x < GAMEBOARD_COLUMNS - 1))
+                    gameboardSquare[y][x] = SQUARE_GARBAGE;
+                else
+                    hasGap = true;
+            }
+        }
+    }
+
+    /**
+     * checks if there is garbage on gameboard
+     *
+     * @return true if there is at least one garbage field
+     */
+    public boolean hasGarbage() {
+        for (int y = 0; y < GAMEBOARD_NORMALROWS; y++)
+            for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
+                if (gameboardSquare[y][x] == SQUARE_GARBAGE)
+                    return true;
+            }
+
+        return false;
+    }
 }

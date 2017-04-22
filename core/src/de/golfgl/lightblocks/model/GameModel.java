@@ -63,6 +63,8 @@ public abstract class GameModel implements Json.Serializable {
     private float movingCountdown;
     // Wieviele Specials (Four Lines und T-Spin) hintereinander?
     private int specialRowChainNum;
+    // Blocklimit?
+    private int maxBlocksToUse;
 
     public GameModel() {
 
@@ -420,6 +422,9 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     private void activateNextTetromino() {
+        if (maxBlocksToUse > 0 && maxBlocksToUse == score.getDrawnTetrominos())
+            setGameOverBoardFull();
+
         softDropFactor = 0;
 
         endMoveHorizontal(true);
@@ -733,4 +738,13 @@ public abstract class GameModel implements Json.Serializable {
     public String[] getGoalParams() {
         return null;
     }
+
+    public int getMaxBlocksToUse() {
+        return maxBlocksToUse;
+    }
+
+    protected void setMaxBlocksToUse(int maxBlocksToUse) {
+        this.maxBlocksToUse = maxBlocksToUse;
+    }
+
 }

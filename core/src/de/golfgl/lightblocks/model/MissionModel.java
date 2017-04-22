@@ -16,6 +16,7 @@ abstract class MissionModel extends GameModel {
     private String welcomeMsg;
     private int welcomeMsgNum;
     private int curMsgIdx;
+    private int topRatingScore;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -29,7 +30,11 @@ abstract class MissionModel extends GameModel {
      *
      * @return
      */
-    public abstract int getRating();
+    public int getRating() {
+        float rating = ((float) getScore().getScore()) / ((float) topRatingScore);
+
+        return 1 + ((int) (rating * 6));
+    }
 
     @Override
     protected void setGameOverWon(IGameModelListener.MotivationTypes type) {
@@ -40,8 +45,7 @@ abstract class MissionModel extends GameModel {
             newRating = 7;
 
         getScore().setRating(newRating);
-        if (bestScore.getRating() < newRating)
-            bestScore.setRating(newRating);
+        bestScore.setBestScores(getScore());
 
         super.setGameOverWon(type);
     }
@@ -92,12 +96,17 @@ abstract class MissionModel extends GameModel {
             this.welcomeMsg = jsonData.getString("welcomeMsgPref");
             currentSpeed = 0;
         }
+        setMaxBlocksToUse(jsonData.getInt("maxBlocksToUse", 0));
+        this.topRatingScore = jsonData.getInt("topRatingScore", 0);
     }
 
     @Override
     public void write(Json json) {
         super.write(json);
         json.writeValue("modelId", modelId);
+        if (getMaxBlocksToUse() > 0)
+            json.writeValue("maxBlocksToUse", getMaxBlocksToUse());
+        json.writeValue("topRatingScore", topRatingScore);
     }
 
     @Override

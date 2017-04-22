@@ -166,7 +166,7 @@ public class ScoreScreen extends AbstractScoreScreen {
                 int idxMissionDone = app.getMissionFromUid(newGameParams.getMissionId()).getIndex();
 
                 // wenn wir bei der letzten Mission sind, kann man auch nix mehr machen
-                if (app.getMissionList().size() > idxMissionDone) {
+                if (app.getMissionList().size() > idxMissionDone + 1) {
                     newGameParams = new InitGameParameters();
                     newGameParams.setMissionId(app.getMissionList().get(idxMissionDone + 1).getUniqueId());
                     retryOrNextIcon = FontAwesome.BIG_PLAY;

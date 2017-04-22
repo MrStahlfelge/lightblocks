@@ -62,6 +62,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
     public boolean setBestScores(GameScore score) {
         setClearedLines(score.getClearedLines());
         setDrawnTetrominos(score.getDrawnTetrominos());
+        setRating(score.getRating());
         return setScore(score.getScore());
     }
 
@@ -104,7 +105,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
     }
 
     public void setRating(int rating) {
-        this.rating = rating;
+        this.rating = Math.max(rating, this.rating);
     }
 
     protected static class BestScoreMap extends HashMap<String, BestScore> implements Json.Serializable {
