@@ -12,18 +12,7 @@ import com.badlogic.gdx.utils.JsonValue;
 public class CleanModel extends MissionModel {
     @Override
     public int getRating() {
-        // gewonnen, daher wird der nächste Stein nicht mehr gezogen. Nochmal erhöhen!
-        getScore().incDrawnTetrominos();
-
-        int bonusScore = (getMaxBlocksToUse() - getScore().getDrawnTetrominos()) * 100;
-
-        if (bonusScore > 0) {
-            getScore().addBonusScore(bonusScore);
-            totalScore.addScore(bonusScore);
-            userInterface.updateScore(getScore(), bonusScore);
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.bonusScore, String.valueOf(bonusScore));
-        }
-
+        addBonusScore((getMaxBlocksToUse() - getScore().getDrawnTetrominos()) * 100);
         return super.getRating();
     }
 

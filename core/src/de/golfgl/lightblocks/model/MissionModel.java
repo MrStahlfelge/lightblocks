@@ -37,6 +37,21 @@ abstract class MissionModel extends GameModel {
         return 1 + ((int) (rating * 6));
     }
 
+    /**
+     * adds the bonus score to game score and total score, updates user interface and shows motivation message
+     * For usage in getRating() when game is won
+     *
+     * @param bonusScore
+     */
+    protected void addBonusScore(int bonusScore) {
+        if (bonusScore > 0) {
+            getScore().addBonusScore(bonusScore);
+            totalScore.addScore(bonusScore);
+            userInterface.updateScore(getScore(), bonusScore);
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.bonusScore, String.valueOf(bonusScore));
+        }
+    }
+
     @Override
     protected void setGameOverWon(IGameModelListener.MotivationTypes type) {
         int newRating = getRating();
