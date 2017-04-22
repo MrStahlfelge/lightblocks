@@ -216,14 +216,16 @@ public abstract class GameModel implements Json.Serializable {
             achievementsScore(gainedScore);
 
         activeTetrominoDropped();
+        // nicht mehr weiter machen wenn bereits geschafft
+        if (!isGameOver()) {
+            // dem Spieler ein bißchen ARE gönnen (wiki/ARE) - je weiter oben, je mehr
+            // evtl. wurde schon vom UI gefreezet um Animationen abzuspielen, die ARE kommt oben drauf
+            freezeCountdown = Math.max(0, freezeCountdown) + .015f * (10 + activeTetromino.getPosition().y / 2);
+            // hiernach keine Zugriffe mehr auf activeTetromino!
+            activateNextTetromino();
 
-        // dem Spieler ein bißchen ARE gönnen (wiki/ARE) - je weiter oben, je mehr
-        // evtl. wurde schon vom UI gefreezet um Animationen abzuspielen, die ARE kommt oben drauf
-        freezeCountdown = Math.max(0, freezeCountdown) + .015f * (10 + activeTetromino.getPosition().y / 2);
-        // hiernach keine Zugriffe mehr auf activeTetromino!
-        activateNextTetromino();
-
-        // Game Over kann hier erfolgt sein!
+            // Game Over kann hier erfolgt sein!
+        }
     }
 
     protected void achievementsScore(int gainedScore) {
