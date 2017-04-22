@@ -59,7 +59,7 @@ public class TutorialModel extends GameModel {
             if (bestScore.getRating() < currentRating)
                 bestScore.setRating(currentRating);
 
-            setGameOverWon();
+            setGameOverWon(IGameModelListener.MotivationTypes.gameSuccess);
         }
     }
 

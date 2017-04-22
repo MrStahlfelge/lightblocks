@@ -757,6 +757,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 duration = 10;
                 playSound = false;
                 break;
+            case gameSuccess:
+                text = app.TEXTS.format("motivationGameSuccess");
+                duration = 10;
+                playSound = false;
+                break;
             case watchOutGarbage:
                 text = app.TEXTS.format("motivationGarbage");
                 playSound = false;

@@ -456,8 +456,12 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     protected void setGameOverWon() {
+        setGameOverWon(IGameModelListener.MotivationTypes.gameWon);
+    }
+
+    protected void setGameOverWon(IGameModelListener.MotivationTypes type) {
         isGameOver = true;
-        userInterface.showMotivation(IGameModelListener.MotivationTypes.gameWon, null);
+        userInterface.showMotivation(type, null);
         userInterface.setGameOver();
 
         submitToLeaderboard();

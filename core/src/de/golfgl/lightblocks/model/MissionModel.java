@@ -32,7 +32,7 @@ abstract class MissionModel extends GameModel {
     public abstract int getRating();
 
     @Override
-    protected void setGameOverWon() {
+    protected void setGameOverWon(IGameModelListener.MotivationTypes type) {
         int newRating = getRating();
         if (newRating < 1)
             newRating = 1;
@@ -43,7 +43,7 @@ abstract class MissionModel extends GameModel {
         if (bestScore.getRating() < newRating)
             bestScore.setRating(newRating);
 
-        super.setGameOverWon();
+        super.setGameOverWon(type);
     }
 
     @Override

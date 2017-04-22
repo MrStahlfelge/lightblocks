@@ -34,7 +34,7 @@ public class RelaxModel extends MissionModel {
     protected void activeTetrominoDropped() {
         if (linesToClear > 0) {
             if (getScore().getClearedLines() >= linesToClear) {
-                setGameOverWon();
+                setGameOverWon(IGameModelListener.MotivationTypes.gameSuccess);
             }
         }
     }
