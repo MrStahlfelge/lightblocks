@@ -36,6 +36,7 @@ public class GpgsHelper {
     public static final String ACH_FRIENDLY_MULTIPLAYER = "CgkI4vHs17ETEAIQIA";
     public static final String ACH_COMPLETE_TURNAROUND = "CgkI4vHs17ETEAIQIQ";
     public static final String ACH_PLUMBOUS_TETROMINOS = "CgkI4vHs17ETEAIQJA";
+    public static final String ACH_MISSION_10_ACCOMPLISHED = "CgkI4vHs17ETEAIQKw";
     public static final String LEAD_MARATHON_GESTURES = "CgkI4vHs17ETEAIQAA";
     public static final String LEAD_MARATHON_GRAVITY = "CgkI4vHs17ETEAIQCA";
     public static final String LEAD_MARATHON_GAMEPAD = "CgkI4vHs17ETEAIQCQ";
@@ -45,7 +46,12 @@ public class GpgsHelper {
     public static final String EVENT_BLOCK_DROP = "CgkI4vHs17ETEAIQBA";
     public static final String EVENT_LINES_CLEARED = "CgkI4vHs17ETEAIQBQ";
     public static final String EVENT_GRAVITY_MARATHON_STARTED = "CgkI4vHs17ETEAIQBg";
-    public static final String EVENT_GAMEPAD_MARATHON_STARTED = "CgkI4vHs17ETEAIQBw";    
+    public static final String EVENT_GAMEPAD_MARATHON_STARTED = "CgkI4vHs17ETEAIQBw";
+    public static final String EVENT_MISSION_1_TYPEA_1A = "CgkI4vHs17ETEAIQJg'";
+    public static final String EVENT_MISSION_2_TYPEB_1A = "CgkI4vHs17ETEAIQJw";
+    public static final String EVENT_MISSION_3_TYPEA_1B = "CgkI4vHs17ETEAIQKA";
+    public static final String EVENT_MISSION_4_SPECIAL_1A = "CgkI4vHs17ETEAIQKQ";
+    public static final String EVENT_MISSION_5_TYPEA_1C = "CgkI4vHs17ETEAIQKg";
 
     public static String getLeaderBoardIdByModelId(String gameModelId) {
         String retVal;
@@ -71,6 +77,18 @@ public class GpgsHelper {
             return EVENT_GAMEPAD_MARATHON_STARTED;
         if (gameModelId.equalsIgnoreCase(MultiplayerModel.MODEL_ID))
             return EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED;
+
+        // Die Missionen
+        if (gameModelId.equalsIgnoreCase("typeA_1A"))
+            return EVENT_MISSION_1_TYPEA_1A;
+        if (gameModelId.equalsIgnoreCase("typeB_1A"))
+            return EVENT_MISSION_2_TYPEB_1A;
+        if (gameModelId.equalsIgnoreCase("typeA_1B"))
+            return EVENT_MISSION_3_TYPEA_1B;
+        if (gameModelId.equalsIgnoreCase("special_1A"))
+            return EVENT_MISSION_4_SPECIAL_1A;
+        if (gameModelId.equalsIgnoreCase("typeA_1C"))
+            return EVENT_MISSION_5_TYPEA_1C;
 
         return null;
     }
