@@ -157,8 +157,25 @@ public class ScoreScreen extends AbstractScoreScreen {
 
         // Retry button
         if (newGameParams != null) {
-            Button retry = new FATextButton(FontAwesome.ROTATE_RIGHT, app.TEXTS.get("menuRetry"), app.skin);
-            retry.addListener(new ChangeListener() {
+            String retryOrNextIcon = FontAwesome.ROTATE_RIGHT;
+            String retryOrNextLabel = "menuRetry";
+
+            // Unterschied: Wenn Marathon oder Mission nicht geschafft, dann Retry
+            // wenn aber Mission und Mission geschafft, dann nächste Mission anbieten!
+            if (newGameParams.getMissionId() != null && scoresToShow.get(0).getRating() > 0) {
+                int idxMissionDone = app.getMissionFromUid(newGameParams.getMissionId()).getIndex();
+
+                // wenn wir bei der letzten Mission sind, kann man auch nix mehr machen
+                if (app.getMissionList().size() > idxMissionDone) {
+                    newGameParams = new InitGameParameters();
+                    newGameParams.setMissionId(app.getMissionList().get(idxMissionDone + 1).getUniqueId());
+                    retryOrNextIcon = FontAwesome.BIG_PLAY;
+                    retryOrNextLabel = "menuNextMission";
+                }
+            }
+
+            Button retryOrNext = new FATextButton(retryOrNextIcon, app.TEXTS.get(retryOrNextLabel), app.skin);
+            retryOrNext.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     try {
@@ -170,7 +187,7 @@ public class ScoreScreen extends AbstractScoreScreen {
                 }
             });
 
-            buttons.add(retry).prefWidth(retry.getPrefWidth() * 1.2f).uniform(false, false);
+            buttons.add(retryOrNext).prefWidth(retryOrNext.getPrefWidth() * 1.2f).uniform(false, false);
         }
 
         super.fillButtonTable(buttons);
