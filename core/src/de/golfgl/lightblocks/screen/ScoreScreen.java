@@ -132,7 +132,7 @@ public class ScoreScreen extends AbstractScoreScreen {
             scores.add((long) scoresToShow.get(i).getScore());
 
             if (best != null && scoresToShow.get(i).getScore() >= best.getScore() && best.getScore() > 1000
-                    && !isBestScore(i))
+                    && scoresToShow.get(i).getRating() >= best.getRating() && !isBestScore(i))
                 newHighscore = true;
         }
         addScoresLine(scoreTable, "labelScore", 8, scores, (best != null ? best.getScore() : 0));
