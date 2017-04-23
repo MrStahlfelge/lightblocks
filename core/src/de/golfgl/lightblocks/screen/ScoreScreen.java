@@ -179,7 +179,8 @@ public class ScoreScreen extends AbstractScoreScreen {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     try {
-                        PlayScreen.gotoPlayScreen(ScoreScreen.this, newGameParams);
+                        PlayScreen ps = PlayScreen.gotoPlayScreen(ScoreScreen.this, newGameParams);
+                        ps.setBackScreen(ScoreScreen.this.backScreen);
                         dispose();
                     } catch (VetoException e) {
                         showDialog(e.getMessage());
