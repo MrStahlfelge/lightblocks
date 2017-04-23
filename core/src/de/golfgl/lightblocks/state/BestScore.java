@@ -5,7 +5,10 @@ import com.badlogic.gdx.utils.JsonValue;
 
 import java.util.HashMap;
 
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.model.GameScore;
+import de.golfgl.lightblocks.model.Mission;
 
 /**
  * Der best Score nimmt die besten erreichten Werte eines Spielers auf
@@ -155,6 +158,17 @@ public class BestScore implements IRoundScore, Json.Serializable {
                 else
                     this.get(key).mergeWithOther(bs);
             }
+        }
+
+        public void checkAchievements(IGpgsClient gpgsClient) {
+            if (gpgsClient == null || !gpgsClient.isConnected())
+                return;
+
+            // Mission 10 geschafft?
+            BestScore mission10Score = this.get(Mission.MISSION10ACHIEVEMENT);
+            if (mission10Score != null && mission10Score.getRating() > 0)
+                gpgsClient.unlockAchievement(GpgsHelper.ACH_MISSION_10_ACCOMPLISHED);
+
         }
     }
 }

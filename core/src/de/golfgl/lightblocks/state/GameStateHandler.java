@@ -156,8 +156,10 @@ public class GameStateHandler {
         if (app.gpgsClient != null && app.gpgsClient.isConnected()) {
             synchronized (gameStateMonitor) {
                 getTotalScore(); // sicherstellen dass er geladen ist
+                loadBestScores(); // hier ebenso
                 // Wenn eh schon gesynct wird, auch Achievements auffrischen
                 totalScore.checkAchievements(app.gpgsClient);
+                bestScores.checkAchievements(app.gpgsClient);
 
                 CloudGameState cgs = new CloudGameState();
                 cgs.version = LightBlocksGame.GAME_VERSIONSTRING;
@@ -211,6 +213,7 @@ public class GameStateHandler {
             }
 
             totalScore.checkAchievements(app.gpgsClient);
+            bestScores.checkAchievements(app.gpgsClient);
         }
 
     }

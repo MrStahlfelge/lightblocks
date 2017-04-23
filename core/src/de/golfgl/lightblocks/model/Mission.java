@@ -1,7 +1,6 @@
 package de.golfgl.lightblocks.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -11,6 +10,9 @@ import java.util.List;
  */
 
 public class Mission {
+
+    // GPGS Achievement "Mission 10 geschafft"
+    public static final String MISSION10ACHIEVEMENT = "typeB_1C";
 
     private static final String[] missions = {"tutorial", "typeA_1A", "typeB_1A", "typeA_1B", "special_1A", "typeA_1C",
             "special_1B", "typeB_1B", "special_1C", "garbage_1A", "typeB_1C"}; //
