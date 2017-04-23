@@ -53,10 +53,10 @@ public class GpgsHelper {
     public static final String EVENT_MISSION_4_SPECIAL_1A = "CgkI4vHs17ETEAIQKQ";
     public static final String EVENT_MISSION_5_TYPEA_1C = "CgkI4vHs17ETEAIQKg";
     public static final String EVENT_MISSION_6_SPECIAL_1B = "CgkI4vHs17ETEAIQLA";
-    public static final String EVENT_MISSION_7_TYPEA_1D = "CgkI4vHs17ETEAIQLQ";
     public static final String EVENT_MISSION_8_SPECIAL_1C = "CgkI4vHs17ETEAIQLg";
-    public static final String EVENT_MISSION_9_TYPEA_1E = "CgkI4vHs17ETEAIQLw";
-    public static final String EVENT_MISSION_10_MINTETROSET_1A = "CgkI4vHs17ETEAIQMA";
+    public static final String EVENT_MISSION_9_GARBAGE_1A = "CgkI4vHs17ETEAIQMQ";
+    public static final String EVENT_MISSION_10_TYPEB_1C = "CgkI4vHs17ETEAIQMg";
+    public static final String EVENT_MISSION_7_TYPEB_1B = "CgkI4vHs17ETEAIQMw";
 
     public static String getLeaderBoardIdByModelId(String gameModelId) {
         String retVal;
@@ -97,15 +97,16 @@ public class GpgsHelper {
             return EVENT_MISSION_5_TYPEA_1C;
 
         if (gameModelId.equalsIgnoreCase("special_1B"))
-            return EVENT_MISSION_5_TYPEA_1C;
-        if (gameModelId.equalsIgnoreCase("typeA_1D"))
-            return EVENT_MISSION_5_TYPEA_1C;
+            return EVENT_MISSION_6_SPECIAL_1B;
         if (gameModelId.equalsIgnoreCase("special_1C"))
-            return EVENT_MISSION_5_TYPEA_1C;
-        if (gameModelId.equalsIgnoreCase("typeA_1E"))
-            return EVENT_MISSION_5_TYPEA_1C;
-        if (gameModelId.equalsIgnoreCase("minTetroSet_1A"))
-            return EVENT_MISSION_5_TYPEA_1C;
+            return EVENT_MISSION_8_SPECIAL_1C;
+        if (gameModelId.equalsIgnoreCase("typeB_1B"))
+            return EVENT_MISSION_7_TYPEB_1B;
+        if (gameModelId.equalsIgnoreCase("garbage_1A"))
+            return EVENT_MISSION_9_GARBAGE_1A;
+        if (gameModelId.equalsIgnoreCase("typeB_1C"))
+            return EVENT_MISSION_10_TYPEB_1C;
+
 
         return null;
     }

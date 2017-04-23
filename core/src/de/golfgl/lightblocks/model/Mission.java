@@ -12,10 +12,8 @@ import java.util.List;
 
 public class Mission {
 
-    private static final String[] missions = {"tutorial", "typeA_1A", "typeB_1A", "typeA_1B", "special_1A", "typeA_1C"}; //,
-            //"special_1B", "typeA_1D", "special_1C", "typeA_1E", "minTetroSet_1A",
-            //"garbage_1A", "typeB_1B", "blocks_1A", "typeA_2A", "typeB_2A",
-            //"typeA_2B", "special_2A", "typeA_1F", "garbage_1B", "typeB_2B"};
+    private static final String[] missions = {"tutorial", "typeA_1A", "typeB_1A", "typeA_1B", "special_1A", "typeA_1C",
+            "special_1B", "typeB_1B", "special_1C", "garbage_1A", "typeB_1C"}; //
 
     private String uniqueId;
     private int index;
