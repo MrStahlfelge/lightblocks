@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.gpgs;
 
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.MultiplayerModel;
+import de.golfgl.lightblocks.model.TutorialModel;
 
 /**
  * Helper class
@@ -47,7 +48,8 @@ public class GpgsHelper {
     public static final String EVENT_LINES_CLEARED = "CgkI4vHs17ETEAIQBQ";
     public static final String EVENT_GRAVITY_MARATHON_STARTED = "CgkI4vHs17ETEAIQBg";
     public static final String EVENT_GAMEPAD_MARATHON_STARTED = "CgkI4vHs17ETEAIQBw";
-    public static final String EVENT_MISSION_1_TYPEA_1A = "CgkI4vHs17ETEAIQJg'";
+    public static final String EVENT_TUTORIAL_STARTED = "CgkI4vHs17ETEAIQJQ";
+    public static final String EVENT_MISSION_1_TYPEA_1A = "CgkI4vHs17ETEAIQJg";
     public static final String EVENT_MISSION_2_TYPEB_1A = "CgkI4vHs17ETEAIQJw";
     public static final String EVENT_MISSION_3_TYPEA_1B = "CgkI4vHs17ETEAIQKA";
     public static final String EVENT_MISSION_4_SPECIAL_1A = "CgkI4vHs17ETEAIQKQ";
@@ -82,6 +84,9 @@ public class GpgsHelper {
             return EVENT_GAMEPAD_MARATHON_STARTED;
         if (gameModelId.equalsIgnoreCase(MultiplayerModel.MODEL_ID))
             return EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED;
+
+        if (gameModelId.equalsIgnoreCase(TutorialModel.MODEL_ID))
+            return EVENT_TUTORIAL_STARTED;
 
         // Die Missionen
         // kein Switch wegen Java 6!
