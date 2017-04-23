@@ -330,6 +330,12 @@ public abstract class GameModel implements Json.Serializable {
 
     }
 
+    /**
+     * die Methode wird aufgerufen, um Achievements zu prüfen. Ein Double lag aber nur vor,
+     * wenn der übergebene Parameter wahr ist. Ansonsten ist ein "normaler" Reihenabbau gewesen
+     *
+     * @param doubleSpecial
+     */
     protected void achievementDoubleSpecial(boolean doubleSpecial) {
         if (doubleSpecial) {
             specialRowChainNum++;

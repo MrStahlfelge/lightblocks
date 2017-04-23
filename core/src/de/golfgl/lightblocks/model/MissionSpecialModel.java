@@ -13,6 +13,7 @@ public class MissionSpecialModel extends MissionModel {
 
     private int numFourLines;
     private int numTSpins;
+    private int numDoubleSpecials;
 
     @Override
     public String getGoalDescription() {
@@ -22,7 +23,7 @@ public class MissionSpecialModel extends MissionModel {
     @Override
     public String[] getGoalParams() {
         return new String[]{String.valueOf(numFourLines), String.valueOf(numTSpins),
-                String.valueOf(getMaxBlocksToUse())};
+                String.valueOf(getMaxBlocksToUse()), String.valueOf(numDoubleSpecials)};
     }
 
     @Override
@@ -38,8 +39,16 @@ public class MissionSpecialModel extends MissionModel {
     }
 
     @Override
+    protected void achievementDoubleSpecial(boolean doubleSpecial) {
+        if (doubleSpecial)
+            numDoubleSpecials--;
+
+        super.achievementDoubleSpecial(doubleSpecial);
+    }
+
+    @Override
     protected void activeTetrominoDropped() {
-        if (numFourLines <= 0 && numTSpins <= 0)
+        if (numFourLines <= 0 && numTSpins <= 0 && numDoubleSpecials <= 0)
             setGameOverWon(IGameModelListener.MotivationTypes.gameSuccess);
     }
 
@@ -55,6 +64,7 @@ public class MissionSpecialModel extends MissionModel {
         super.read(json, jsonData);
         this.numFourLines = jsonData.getInt("numFourLines", 0);
         this.numTSpins = jsonData.getInt("numTSpins", 0);
+        this.numDoubleSpecials = jsonData.getInt("numDoubleSpecials", 0);
     }
 
     @Override
@@ -62,5 +72,6 @@ public class MissionSpecialModel extends MissionModel {
         super.write(json);
         json.writeValue("numTSpins", numTSpins);
         json.writeValue("numFourLines", numFourLines);
+        json.writeValue("numDoubleSpecials", numDoubleSpecials);
     }
 }
