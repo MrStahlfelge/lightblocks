@@ -5,7 +5,7 @@ import de.golfgl.lightblocks.model.MultiplayerModel;
 
 /**
  * Helper class
- *
+ * <p>
  * Created by Benjamin Schulte on 26.03.2017.
  */
 
@@ -52,15 +52,20 @@ public class GpgsHelper {
     public static final String EVENT_MISSION_3_TYPEA_1B = "CgkI4vHs17ETEAIQKA";
     public static final String EVENT_MISSION_4_SPECIAL_1A = "CgkI4vHs17ETEAIQKQ";
     public static final String EVENT_MISSION_5_TYPEA_1C = "CgkI4vHs17ETEAIQKg";
+    public static final String EVENT_MISSION_6_SPECIAL_1B = "CgkI4vHs17ETEAIQLA";
+    public static final String EVENT_MISSION_7_TYPEA_1D = "CgkI4vHs17ETEAIQLQ";
+    public static final String EVENT_MISSION_8_SPECIAL_1C = "CgkI4vHs17ETEAIQLg";
+    public static final String EVENT_MISSION_9_TYPEA_1E = "CgkI4vHs17ETEAIQLw";
+    public static final String EVENT_MISSION_10_MINTETROSET_1A = "CgkI4vHs17ETEAIQMA";
 
     public static String getLeaderBoardIdByModelId(String gameModelId) {
         String retVal;
 
-        if (gameModelId.equalsIgnoreCase (MarathonModel.MODEL_MARATHON_ID + "1"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "1"))
             return LEAD_MARATHON_GESTURES;
-        if (gameModelId.equalsIgnoreCase (MarathonModel.MODEL_MARATHON_ID + "2"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "2"))
             return LEAD_MARATHON_GRAVITY;
-        if (gameModelId.equalsIgnoreCase (MarathonModel.MODEL_MARATHON_ID + "3"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "3"))
             return LEAD_MARATHON_GAMEPAD;
 
         return null;
@@ -69,16 +74,17 @@ public class GpgsHelper {
     public static String getNewGameEventByModelId(String gameModelId) {
         String retVal;
 
-        if (gameModelId.equalsIgnoreCase (MarathonModel.MODEL_MARATHON_ID + "1"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "1"))
             return EVENT_GESTURE_MARATHON_STARTED;
-        if (gameModelId.equalsIgnoreCase (MarathonModel.MODEL_MARATHON_ID + "2"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "2"))
             return EVENT_GRAVITY_MARATHON_STARTED;
-        if (gameModelId.equalsIgnoreCase (MarathonModel.MODEL_MARATHON_ID + "3"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "3"))
             return EVENT_GAMEPAD_MARATHON_STARTED;
         if (gameModelId.equalsIgnoreCase(MultiplayerModel.MODEL_ID))
             return EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED;
 
         // Die Missionen
+        // kein Switch wegen Java 6!
         if (gameModelId.equalsIgnoreCase("typeA_1A"))
             return EVENT_MISSION_1_TYPEA_1A;
         if (gameModelId.equalsIgnoreCase("typeB_1A"))
@@ -88,6 +94,17 @@ public class GpgsHelper {
         if (gameModelId.equalsIgnoreCase("special_1A"))
             return EVENT_MISSION_4_SPECIAL_1A;
         if (gameModelId.equalsIgnoreCase("typeA_1C"))
+            return EVENT_MISSION_5_TYPEA_1C;
+
+        if (gameModelId.equalsIgnoreCase("special_1B"))
+            return EVENT_MISSION_5_TYPEA_1C;
+        if (gameModelId.equalsIgnoreCase("typeA_1D"))
+            return EVENT_MISSION_5_TYPEA_1C;
+        if (gameModelId.equalsIgnoreCase("special_1C"))
+            return EVENT_MISSION_5_TYPEA_1C;
+        if (gameModelId.equalsIgnoreCase("typeA_1E"))
+            return EVENT_MISSION_5_TYPEA_1C;
+        if (gameModelId.equalsIgnoreCase("minTetroSet_1A"))
             return EVENT_MISSION_5_TYPEA_1C;
 
         return null;
