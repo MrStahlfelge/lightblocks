@@ -18,6 +18,17 @@ abstract class MissionModel extends GameModel {
     private int welcomeMsgNum;
     private int curMsgIdx;
     private int topRatingScore;
+    private String pauseMsg;
+
+    @Override
+    public String getGoalDescription() {
+        if (pauseMsg != null)
+            return pauseMsg;
+        else
+            return getMissionModelGoalDescription();
+    }
+
+    protected abstract String getMissionModelGoalDescription();
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -114,6 +125,7 @@ abstract class MissionModel extends GameModel {
         }
         setMaxBlocksToUse(jsonData.getInt("maxBlocksToUse", 0));
         this.topRatingScore = jsonData.getInt("topRatingScore", 0);
+        this.pauseMsg = jsonData.getString("pauseMsg", null);
     }
 
     @Override
@@ -123,6 +135,8 @@ abstract class MissionModel extends GameModel {
         if (getMaxBlocksToUse() > 0)
             json.writeValue("maxBlocksToUse", getMaxBlocksToUse());
         json.writeValue("topRatingScore", topRatingScore);
+        if (pauseMsg != null)
+            json.writeValue("pauseMsg", pauseMsg);
     }
 
     @Override

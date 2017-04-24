@@ -14,7 +14,7 @@ public class GarbageModel extends MissionModel {
     private float garbageChance;
 
     @Override
-    public String getGoalDescription() {
+    public String getMissionModelGoalDescription() {
         return "goalGarbage";
     }
 

@@ -13,7 +13,7 @@ public class RelaxModel extends MissionModel {
     private int linesToClear;
 
     @Override
-    public String getGoalDescription() {
+    public String getMissionModelGoalDescription() {
         return "goalRelax";
     }
 

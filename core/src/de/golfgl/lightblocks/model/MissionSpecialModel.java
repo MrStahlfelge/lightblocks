@@ -16,7 +16,7 @@ public class MissionSpecialModel extends MissionModel {
     private int numDoubleSpecials;
 
     @Override
-    public String getGoalDescription() {
+    public String getMissionModelGoalDescription() {
         return "goalSpecialMove";
     }
 

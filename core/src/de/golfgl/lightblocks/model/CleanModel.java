@@ -17,7 +17,7 @@ public class CleanModel extends MissionModel {
     }
 
     @Override
-    public String getGoalDescription() {
+    public String getMissionModelGoalDescription() {
         return "goalClean";
     }
 
