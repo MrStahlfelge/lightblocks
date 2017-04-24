@@ -67,14 +67,14 @@ public class PauseDialog extends Dialog {
                     }
                 });
         button(new MusicButton(app));
-        button(new TextButton(FontAwesome.BIG_FORWARD, app.skin, FontAwesome.SKIN_FONT_FA),
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if (playScreen.isPaused())
-                            playScreen.switchPause(false);
-                    }
-                });
+//        button(new TextButton(FontAwesome.BIG_FORWARD, app.skin, FontAwesome.SKIN_FONT_FA),
+//                new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if (playScreen.isPaused())
+//                            playScreen.switchPause(false);
+//                    }
+//                });
 
         // Modal wird ausgeschaltet, da sonst alle InputEvents weggeklaut werden
         setModal(false);
