@@ -59,6 +59,7 @@ public class GpgsHelper {
     public static final String EVENT_MISSION_9_GARBAGE_1A = "CgkI4vHs17ETEAIQMQ";
     public static final String EVENT_MISSION_10_TYPEB_1C = "CgkI4vHs17ETEAIQMg";
     public static final String EVENT_MISSION_7_TYPEB_1B = "CgkI4vHs17ETEAIQMw";
+    public static final String EVENT_MISSION_11_GRAVITYA_2A = "CgkI4vHs17ETEAIQNA";
 
     public static String getLeaderBoardIdByModelId(String gameModelId) {
         String retVal;
@@ -111,7 +112,8 @@ public class GpgsHelper {
             return EVENT_MISSION_9_GARBAGE_1A;
         if (gameModelId.equalsIgnoreCase("typeB_1C"))
             return EVENT_MISSION_10_TYPEB_1C;
-
+        if (gameModelId.equalsIgnoreCase("gravityA_2A"))
+            return EVENT_MISSION_11_GRAVITYA_2A;
 
         return null;
     }
