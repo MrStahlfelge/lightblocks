@@ -48,7 +48,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
 
     @Override
     protected void fillButtonTable(Table buttons) {
-        logInOutButton = new FATextButton("", "Google Play Games", app.skin);
+        logInOutButton = new FATextButton("", "", app.skin);
         logInOutButton.addListener(new ChangeListener() {
                                     public void changed(ChangeEvent event, Actor actor) {
                                         performGpgsLoginout();

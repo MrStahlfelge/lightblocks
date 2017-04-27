@@ -1,5 +1,7 @@
 package de.golfgl.lightblocks.gpgs;
 
+import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
+
 /**
  * Core Interface for GpgsClient
  * <p>
@@ -41,4 +43,6 @@ public interface IGpgsClient {
     public boolean saveGameState(boolean sync, byte[] gameState, long progressValue);
 
     public boolean loadGameState(boolean sync);
+
+    public AbstractMultiplayerRoom getMultiPlayerRoom();
 }

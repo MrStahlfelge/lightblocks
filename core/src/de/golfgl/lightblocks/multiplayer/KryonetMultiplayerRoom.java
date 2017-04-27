@@ -307,7 +307,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             } else if (!getRoomState().equals(MultiPlayerObjects.RoomState.join)) {
                 handshake.success = false;
                 handshake.message = "Room cannot be joined at the moment.";
-            } else if (getNumberOfPlayers() >= 4) {
+            } else if (getNumberOfPlayers() >= MAX_PLAYERS) {
                 handshake.success = false;
                 handshake.message = "Room is full.";
             } else

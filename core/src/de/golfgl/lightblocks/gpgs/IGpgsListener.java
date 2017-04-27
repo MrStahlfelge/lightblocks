@@ -23,4 +23,5 @@ public interface IGpgsListener {
      * @param gameState null if loading failed
      */
     public void gpgsGameStateLoaded(byte[] gameState);
+
 }

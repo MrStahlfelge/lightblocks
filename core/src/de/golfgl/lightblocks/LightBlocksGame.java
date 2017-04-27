@@ -206,7 +206,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     public void resume() {
         super.resume();
 
-        if (getGpgsAutoLogin() && gpgsClient != null)
+        if (getGpgsAutoLogin() && gpgsClient != null && !gpgsClient.isConnected())
             gpgsClient.connect(true);
     }
 

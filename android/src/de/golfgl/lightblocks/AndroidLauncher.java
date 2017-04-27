@@ -9,6 +9,7 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.android.gms.games.GamesActivityResultCodes;
 
 import de.golfgl.lightblocks.gpgs.GpgsClient;
+import de.golfgl.lightblocks.gpgs.GpgsMultiPlayerRoom;
 import de.golfgl.lightblocks.multiplayer.NsdAdapter;
 
 public class AndroidLauncher extends AndroidApplication {
@@ -16,6 +17,9 @@ public class AndroidLauncher extends AndroidApplication {
     public static final int RC_GPGS_SIGNIN = 9001;
     public static final int RC_LEADERBOARD = 9002;
     public static final int RC_ACHIEVEMENTS = 9003;
+    public static final int RC_SELECT_PLAYERS = 10000;
+    public final static int RC_INVITATION_INBOX = 10001;
+
 
     // Network Service detection
     NsdAdapter nsdAdapter;
@@ -81,7 +85,13 @@ public class AndroidLauncher extends AndroidApplication {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RC_GPGS_SIGNIN)
-            gpgsClient.activityResult(resultCode, data);
+            gpgsClient.signInResult(resultCode, data);
+
+        else if (requestCode == RC_SELECT_PLAYERS)
+            ((GpgsMultiPlayerRoom) gpgsClient.getMultiPlayerRoom()).selectPlayersResult(resultCode, data);
+
+        else if (requestCode == RC_INVITATION_INBOX)
+            ((GpgsMultiPlayerRoom) gpgsClient.getMultiPlayerRoom()).selectInvitationResult(resultCode, data);
 
             // check for "inconsistent state"
         else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED &&

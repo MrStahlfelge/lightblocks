@@ -37,12 +37,19 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     private Slider beginningLevelSlider;
     private Table beginningLevelTable;
     private InputButtonTable inputButtonTable;
-    private Label lanHelp;
+    private Table initGameScreen;
     private Cell mainCell;
     private MultiplayerMatch matchStats = new MultiplayerMatch();
     private HashMap<String, boolean[]> availablePlayerInputs = new HashMap<String, boolean[]>();
     private boolean hasToRefresh = false;
     private ChangeListener gameParameterListener;
+    private Cell buttonTableCell;
+    private Cell initScreenLanButtonCell;
+    private Cell initScreenGpgButtonCell;
+    private Table lanButtons;
+    private Table gpgButtons;
+    private FATextButton gpgShowInvitationsButton;
+    private FATextButton gpgInviteButton;
 
     public MultiplayerMenuScreen(LightBlocksGame app) {
         super(app);
@@ -86,20 +93,8 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
     @Override
     protected void fillButtonTable(Table buttons) {
-        openRoomButton = new FATextButton("", "", app.skin);
-        openRoomButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                buttonOpenRoomPressed();
-            }
-        });
-        joinRoomButton = new FATextButton("", "", app.skin);
-        joinRoomButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                joinButtonPressed();
-            }
-        });
+
+        buttonTableCell = buttons.add();
 
         // Die folgenden Elemente sind nicht in der Buttontable, aber die Initialisierung hier macht Sinn
 
@@ -142,8 +137,6 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
         setOpenJoinRoomButtons();
 
-        buttons.add(openRoomButton).uniform();
-        buttons.add(joinRoomButton).uniform();
     }
 
     @Override
@@ -153,7 +146,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
     @Override
     protected String getSubtitle() {
-        return app.TEXTS.get("labelMultiplayerLan");
+        return null;
     }
 
     @Override
@@ -164,16 +157,82 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     @Override
     protected void fillMenuTable(Table menuTable) {
 
-        lanHelp = new Label(app.TEXTS.get("multiplayerLanHelp"), app.skin);
+        Label lanHelp = new Label(app.TEXTS.get("multiplayerLanHelp"), app.skin);
         lanHelp.setWrap(true);
 
+        Label gpgHelp = new Label(app.TEXTS.get("multiplayerGpgHelp"), app.skin);
+        gpgHelp.setWrap(true);
 
-        mainCell = menuTable.add(lanHelp).fill().minWidth(LightBlocksGame.nativeGameWidth * .75f)
-                .minHeight(LightBlocksGame.nativeGameHeight * .5f);
+        gpgButtons = new Table();
+        gpgInviteButton = new FATextButton(FontAwesome.GPGS_LOGO, app.TEXTS.get
+                ("menuInvitePlayers"), app.skin);
+        gpgInviteButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (app.multiRoom != null && app.multiRoom.isConnected())
+                    try {
+                        app.multiRoom.leaveRoom(true);
+                    } catch (VetoException e) {
+                        // eat
+                    }
+                else
+                    initializeGpgsRoom();
+            }
+        });
+        gpgButtons.add(gpgInviteButton);
+
+        gpgShowInvitationsButton = new FATextButton(FontAwesome.NET_LOGIN, app.TEXTS.get
+                ("menuShowInvitations"), app.skin);
+        gpgShowInvitationsButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (checkNewGpgsConnPreConditions()) return;
+
+                joinGpgsButtonPressed();
+            }
+        });
+        gpgButtons.add(gpgShowInvitationsButton);
+
+        lanButtons = new Table();
+        openRoomButton = new FATextButton(FontAwesome.NET_SQUARELINK, app.TEXTS.get("labelMultiplayerOpenRoom"), app
+                .skin);
+        openRoomButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                buttonOpenLocalRoomPressed();
+            }
+        });
+        joinRoomButton = new FATextButton(FontAwesome.NET_LOGIN, app.TEXTS.get("labelMultiplayerJoinRoom"), app.skin);
+        joinRoomButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                joinLocalButtonPressed();
+            }
+        });
+        lanButtons.row();
+        lanButtons.add(openRoomButton).uniform().fill();
+        lanButtons.add(joinRoomButton).uniform().fill();
+
+        initGameScreen = new Table();
+        initGameScreen.row();
+        initGameScreen.add(new Label(app.TEXTS.get("menuSignInGPGS"), app.skin, LightBlocksGame.SKIN_FONT_BIG));
+        initGameScreen.row();
+        initScreenGpgButtonCell = initGameScreen.add(gpgButtons);
+        initGameScreen.row();
+        initGameScreen.add(gpgHelp).fill().minWidth(LightBlocksGame.nativeGameWidth * .9f);
+
+        initGameScreen.row().padTop(30);
+        initGameScreen.add(new Label(app.TEXTS.get("labelMultiplayerLan"), app.skin, LightBlocksGame.SKIN_FONT_BIG));
+        initGameScreen.row();
+        initScreenLanButtonCell = initGameScreen.add(lanButtons);
+        initGameScreen.row();
+        initGameScreen.add(lanHelp).fill().minWidth(LightBlocksGame.nativeGameWidth * .9f);
+
+        mainCell = menuTable.add(initGameScreen);
 
     }
 
-    protected void buttonOpenRoomPressed() {
+    protected void buttonOpenLocalRoomPressed() {
         try {
             if (app.multiRoom != null && app.multiRoom.isConnected()) {
                 if (app.multiRoom.getNumberOfPlayers() > 1)
@@ -191,6 +250,21 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         } catch (VetoException e) {
             showDialog(e.getMessage());
         }
+    }
+
+    private void setLocalMode() {
+        initScreenGpgButtonCell.setActor(gpgButtons);
+        buttonTableCell.setActor(lanButtons);
+    }
+
+    private void setInitMode() {
+        initScreenGpgButtonCell.setActor(gpgButtons);
+        initScreenLanButtonCell.setActor(lanButtons);
+    }
+
+    private void setGpgsMode() {
+        initScreenLanButtonCell.setActor(lanButtons);
+        buttonTableCell.setActor(gpgButtons);
     }
 
     private void confirmForcedRoomClose() {
@@ -218,6 +292,34 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         app.multiRoom = kryonetRoom;
     }
 
+    protected void initializeGpgsRoom() {
+        if (checkNewGpgsConnPreConditions()) return;
+
+        // falls schon matches gelaufen, dann zurücksetzen
+        matchStats.clearStats();
+
+        try {
+            app.multiRoom = app.gpgsClient.getMultiPlayerRoom();
+            app.multiRoom.addListener(this);
+            app.multiRoom.openRoom(app.player);
+        } catch (VetoException e) {
+            showDialog(e.getMessage());
+        }
+    }
+
+    private boolean checkNewGpgsConnPreConditions() {
+        if (app.gpgsClient == null || !app.gpgsClient.isConnected()) {
+            showDialog("Please sign in to Google Play Games first.");
+            return true;
+        }
+
+        if (app.multiRoom != null && app.multiRoom.isConnected()) {
+            showDialog("You are already in a multiplayer room. Please leave first.");
+            return true;
+        }
+        return false;
+    }
+
     private void setOpenJoinRoomButtons() {
         if (app.multiRoom == null || !app.multiRoom.isConnected()) {
             openRoomButton.setText(app.TEXTS.get("labelMultiplayerOpenRoom"));
@@ -227,6 +329,10 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
             joinRoomButton.setDisabled(false);
             openRoomButton.setDisabled(false);
+
+            gpgInviteButton.setText(app.TEXTS.get("menuInvitePlayers"));
+            gpgShowInvitationsButton.setDisabled(false);
+
         } else {
             openRoomButton.setText(app.TEXTS.get("labelMultiplayerCloseRoom"));
             openRoomButton.getFaLabel().setText(FontAwesome.MISC_CROSS);
@@ -235,10 +341,30 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
             openRoomButton.setDisabled(!app.multiRoom.isOwner());
             joinRoomButton.setDisabled(app.multiRoom.isOwner());
+
+            gpgInviteButton.setText(app.TEXTS.get("labelMultiplayerLeaveRoom"));
+            gpgShowInvitationsButton.setDisabled(true);
+
+            if (app.multiRoom.getRoomState() == MultiPlayerObjects.RoomState.join) {
+                if (app.multiRoom instanceof KryonetMultiplayerRoom)
+                    setLocalMode();
+                else
+                    setGpgsMode();
+            }
         }
     }
 
-    protected void joinButtonPressed() {
+    protected void joinGpgsButtonPressed() {
+        try {
+            app.multiRoom = app.gpgsClient.getMultiPlayerRoom();
+            app.multiRoom.addListener(this);
+            app.multiRoom.startRoomDiscovery();
+        } catch (VetoException e) {
+            showDialog(e.getMessage());
+        }
+    }
+
+    protected void joinLocalButtonPressed() {
         try {
             if (app.multiRoom != null && app.multiRoom.isConnected()) {
                 app.multiRoom.leaveRoom(true);
@@ -310,7 +436,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
             app.multiRoom.gameModelStarted();
 
             // Achievements
-            if (app.multiRoom.isOwner() && app.gpgsClient != null && app.gpgsClient.isConnected()) {
+            if (app.gpgsClient != null && app.gpgsClient.isConnected()) {
                 if (app.multiRoom.getNumberOfPlayers() >= 3)
                     app.gpgsClient.unlockAchievement(GpgsHelper.ACH_MEGA_MULTI_PLAYER);
 
@@ -458,9 +584,11 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         if (app.getScreen() != this)
             hasToRefresh = true;
 
-        if (matchStats.getNumberOfPlayers() == 0)
-            newActor = lanHelp;
-        else {
+        if (matchStats.getNumberOfPlayers() == 0) {
+            newActor = initGameScreen;
+
+            setInitMode();
+        } else {
             Table playersTable = new Table();
 
             playersTable.defaults().pad(5);

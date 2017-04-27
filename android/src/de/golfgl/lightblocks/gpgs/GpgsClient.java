@@ -14,14 +14,20 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesStatusCodes;
+import com.google.android.gms.games.multiplayer.Invitation;
+import com.google.android.gms.games.multiplayer.Multiplayer;
+import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.snapshot.Snapshot;
 import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
 import com.google.android.gms.games.snapshot.Snapshots;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
 import java.io.IOException;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.golfgl.lightblocks.AndroidLauncher;
+import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
 /**
  * Client für Google Play Games
@@ -43,6 +49,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     private boolean mAutoStartSignInflow = true;
     private boolean mSignInClicked = false;
     private int firstConnectAttempt;
+    private GpgsMultiPlayerRoom gpgsMPRoom;
 
     public GpgsClient(Activity context) {
         myContext = context;
@@ -57,8 +64,15 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
                 .build();
     }
 
+    public GoogleApiClient getGoogleApiClient() {
+        return mGoogleApiClient;
+    }
+
     @Override
     public void connect(boolean autoStart) {
+        if (isConnected())
+            return;
+
         Log.i("GPGS", "Trying to connect with autostart " + autoStart);
         mAutoStartSignInflow = autoStart;
         mSignInClicked = !autoStart;
@@ -67,6 +81,11 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void disconnect(boolean autoEnd) {
+
+        // kein disconnect wenn Multiplayer-Aktionen laufen
+        if (autoEnd && gpgsMPRoom != null && gpgsMPRoom.isConnected())
+            return;
+
         if (isConnected()) {
             Log.i("GPGS", "Disconnecting with autoEnd " + autoEnd);
             if (!autoEnd)
@@ -90,6 +109,16 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         // GPGS erst fälschlicherweise errCode 4 zurückgibt
         firstConnectAttempt = MAX_CONNECTFAIL_RETRIES;
         gameListener.gpgsConnected();
+
+        // TODO Erhaltene Einladungen... gleich in Multiplayer gehen
+        if (bundle != null) {
+            Invitation inv =
+                    bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
+
+            Log.i("GPGS", "Multiplayer Invitation: " +  inv.getInvitationId() + " from "
+                    + inv.getInviter().getParticipantId());
+        }
+
     }
 
     @Override
@@ -160,13 +189,13 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    public void activityResult(int resultCode, Intent data) {
+    public void signInResult(int resultCode, Intent data) {
         mSignInClicked = false;
         mResolvingConnectionFailure = false;
         if (resultCode == Activity.RESULT_OK) {
             mGoogleApiClient.connect();
         } else {
-            Log.w("GPGS", "ActivityResult - Unable to sign in");
+            Log.w("GPGS", "SignInResult - Unable to sign in");
             // Bring up an error dialog to alert the user that sign-in
             // failed. The R.string.signin_failure should reference an error
             // string in your strings.xml file that tells the user they
@@ -333,6 +362,16 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             return true;
         } else
             return loadGameStateSync();
+    }
+
+    @Override
+    public AbstractMultiplayerRoom getMultiPlayerRoom() {
+        if (gpgsMPRoom == null) {
+            gpgsMPRoom = new GpgsMultiPlayerRoom();
+            gpgsMPRoom.setContext(myContext);
+            gpgsMPRoom.setGpgsClient(this);
+        }
+        return gpgsMPRoom;
     }
 
     @NonNull

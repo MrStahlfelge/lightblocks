@@ -19,6 +19,7 @@ import de.golfgl.lightblocks.state.Player;
 
 public abstract class AbstractMultiplayerRoom {
 
+    public static final int MAX_PLAYERS = 4;
     protected Array<IRoomListener> listeners = new Array<IRoomListener>(0);
     protected String myPlayerId;
     private MultiPlayerObjects.RoomState roomState = MultiPlayerObjects.RoomState.closed;
