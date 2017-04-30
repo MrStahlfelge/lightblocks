@@ -31,6 +31,7 @@ import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.Mission;
+import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.BlockActor;
@@ -212,9 +213,18 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
             // GPGS Event
             if (caller.app.gpgsClient != null && caller.app.gpgsClient.isConnected()) {
-                String eventId = GpgsHelper.getNewGameEventByModelId(currentGame.gameModel.getIdentifier());
+                // Unterschied machen wenn Multiplayer
+                String modelId = currentGame.gameModel.getIdentifier();
+                String eventId = null;
+                if (!modelId.equals(MultiplayerModel.MODEL_ID))
+                    eventId = GpgsHelper.getNewGameEventByModelId(modelId);
+                else if (caller.app.multiRoom != null && caller.app.multiRoom.isLocalGame())
+                    eventId = GpgsHelper.EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED;
+                else if (caller.app.multiRoom != null && !caller.app.multiRoom.isLocalGame())
+                    eventId = GpgsHelper.EVENT_INET_MULTIPLAYER_MATCH_STARTED;
+
                 if (eventId != null) {
-                    Log.info("GPGS", "Submitting newly started game " + currentGame.gameModel.getIdentifier());
+                    Log.info("GPGS", "Submitting newly started game " + modelId);
                     caller.app.gpgsClient.submitEvent(eventId, 1);
                 }
             }

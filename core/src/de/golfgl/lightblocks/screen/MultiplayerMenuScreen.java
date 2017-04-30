@@ -346,7 +346,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
             gpgShowInvitationsButton.setDisabled(true);
 
             if (app.multiRoom.getRoomState() == MultiPlayerObjects.RoomState.join) {
-                if (app.multiRoom instanceof KryonetMultiplayerRoom)
+                if (app.multiRoom.isLocalGame())
                     setLocalMode();
                 else
                     setGpgsMode();

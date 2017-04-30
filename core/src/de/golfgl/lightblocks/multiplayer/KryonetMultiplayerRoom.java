@@ -75,6 +75,11 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         }
     }
 
+    @Override
+    public boolean isLocalGame() {
+        return true;
+    }
+
     public String getRoomName() {
         return "LAN";
     }

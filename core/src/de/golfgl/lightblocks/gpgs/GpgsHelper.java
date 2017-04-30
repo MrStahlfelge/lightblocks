@@ -60,6 +60,7 @@ public class GpgsHelper {
     public static final String EVENT_MISSION_10_TYPEB_1C = "CgkI4vHs17ETEAIQMg";
     public static final String EVENT_MISSION_7_TYPEB_1B = "CgkI4vHs17ETEAIQMw";
     public static final String EVENT_MISSION_11_GRAVITYA_2A = "CgkI4vHs17ETEAIQNA";
+    public static final String EVENT_INET_MULTIPLAYER_MATCH_STARTED = "CgkI4vHs17ETEAIQNQ";
 
     public static String getLeaderBoardIdByModelId(String gameModelId) {
         String retVal;
@@ -83,8 +84,6 @@ public class GpgsHelper {
             return EVENT_GRAVITY_MARATHON_STARTED;
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "3"))
             return EVENT_GAMEPAD_MARATHON_STARTED;
-        if (gameModelId.equalsIgnoreCase(MultiplayerModel.MODEL_ID))
-            return EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED;
 
         if (gameModelId.equalsIgnoreCase(TutorialModel.MODEL_ID))
             return EVENT_TUTORIAL_STARTED;

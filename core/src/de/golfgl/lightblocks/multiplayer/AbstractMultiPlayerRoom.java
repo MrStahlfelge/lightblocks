@@ -245,4 +245,11 @@ public abstract class AbstractMultiplayerRoom {
 
     }
 
+    /**
+     * returns if this is a local game or via a games service
+     *
+     * @return true if local game
+     */
+    public abstract boolean isLocalGame();
+
 }

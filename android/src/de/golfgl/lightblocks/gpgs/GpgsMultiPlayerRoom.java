@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.gpgs;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.golfgl.lightblocks.AndroidLauncher;
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
@@ -37,6 +39,17 @@ import de.golfgl.lightblocks.state.Player;
 
 public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements RoomUpdateListener,
         RealTimeMessageReceivedListener, RoomStatusUpdateListener {
+
+    private static final boolean AUTOMATCHING_ENABLED = LightBlocksGame.GAME_DEVMODE;
+    // über GPGS nur zwei Spieler zulassen
+    // dies ist vor allem so, weil ansonsten das Spiel nicht vorzeitig schon mit zwei Teilnehmern gestartet werden
+    // kann. Ein nachträglich dazukommender Eingeladener kann nicht abgelehnt werden und tritt in den Raum ein.
+    // Damit schon zwei Spieler vorher starten könnten, müsste ein Beobachtungsmodus implementiert werden.
+    // Zweiter Grund: Ein Host/Owner ist für die Spiellogik nötig. Ab drei Spielern müsste dafür ein übergabemechanismus
+    // implementiert werden.
+    // Beides zusammen lohnt zunächst mal den Aufwand nicht, zu Dritt spielen ist auch nicht sooo toll gewesen.
+    private static final int MAX_PLAYERS_GPGS = 2;
+
     private Activity context;
     private GpgsClient gpgsClient;
     private boolean roomCreationPending = false;
@@ -44,9 +57,9 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
     private Kryo kryo = new Kryo();
 
     // Participant ist anders als der Spielername... daher hier HashMaps
-    private Map<String, String> connectionToPlayer = new HashMap<>(MAX_PLAYERS);
-    private Map<String, String> playerToConnection = new HashMap<>(MAX_PLAYERS);
-    private HashSet<String> allPlayers = new HashSet<>(MAX_PLAYERS);
+    private Map<String, String> connectionToPlayer = new HashMap<>(MAX_PLAYERS_GPGS);
+    private Map<String, String> playerToConnection = new HashMap<>(MAX_PLAYERS_GPGS);
+    private HashSet<String> allPlayers = new HashSet<>(MAX_PLAYERS_GPGS);
 
 
     public void setGpgsClient(GpgsClient gpgsClient) {
@@ -98,7 +111,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         myPlayerId = player.getName();
 
         Intent intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(
-                gpgsClient.getGoogleApiClient(), 1, MAX_PLAYERS - 1);
+                gpgsClient.getGoogleApiClient(), 1, MAX_PLAYERS_GPGS - 1, AUTOMATCHING_ENABLED);
         context.startActivityForResult(intent, AndroidLauncher.RC_SELECT_PLAYERS);
 
     }
@@ -134,6 +147,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
             // create the room and specify a variant if appropriate
             RoomConfig.Builder roomConfigBuilder = makeBasicRoomConfigBuilder();
             roomConfigBuilder.addPlayersToInvite(invitees);
+            roomConfigBuilder.setVariant(MultiPlayerObjects.INTERFACE_VERSION * 10);
             if (autoMatchCriteria != null)
                 roomConfigBuilder.setAutoMatchCriteria(autoMatchCriteria);
 
@@ -247,6 +261,11 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         return allPlayers;
     }
 
+    @Override
+    public boolean isLocalGame() {
+        return false;
+    }
+
     // RealtimeMessageReceivedListener
 
     @Override
@@ -330,8 +349,9 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         // first, add the new arrived guys
         for (Participant p : room.getParticipants()) {
             String pid = p.getParticipantId();
-            System.out.println(pid + ": " + p.isConnectedToRoom());
-            Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null, "Test".getBytes(),
+            System.out.println(pid + ": " + p.getDisplayName() + " " + p.isConnectedToRoom());
+            Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null, (Build.MODEL +
+                            myPlayerId).getBytes(),
                     room.getRoomId(), p.getParticipantId());
 
         }
