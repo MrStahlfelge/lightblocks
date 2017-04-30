@@ -129,7 +129,7 @@ public class TutorialModel extends GameModel {
 
     @Override
     public String getGoalDescription() {
-        return "labelPause";
+        return "goalTutorial";
     }
 
     @Override
