@@ -207,6 +207,11 @@ public class MultiplayerModel extends GameModel {
     }
 
     @Override
+    public boolean isGameOver() {
+        return super.isGameOver() || (playerRoom.getRoomState() != MultiPlayerObjects.RoomState.inGame);
+    }
+
+    @Override
     public InitGameParameters getInitParameters() {
         return null;
     }

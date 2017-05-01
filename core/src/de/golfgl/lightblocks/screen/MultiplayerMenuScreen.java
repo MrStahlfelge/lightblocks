@@ -505,8 +505,18 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     }
 
     @Override
-    public void multiPlayerGotErrorMessage(Object o) {
+    public void multiPlayerGotErrorMessage(final Object o) {
         // Got an error message from networking
+        if (o instanceof MultiPlayerObjects.Handshake)
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    if (app.getScreen() == MultiplayerMenuScreen.this)
+                        showDialog("Error connecting with " + ((MultiPlayerObjects.Handshake) o).playerId + ": " +
+                                ((MultiPlayerObjects.Handshake) o).message);
+                }
+            });
+
     }
 
     @Override
