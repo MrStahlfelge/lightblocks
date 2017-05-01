@@ -562,11 +562,10 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
                     Log.i("GPGS", "Participant " + p.getParticipantId() + "/" + p.getDisplayName());
 
                 final String myParticipantId = getMyParticipantId();
-                addPlayer(myPlayerId, myParticipantId);
-                if (!roomWithAutoMatch) {
+                if (!roomWithAutoMatch)
                     setOwnerParticipantId(myParticipantId);
-                }
 
+                addPlayer(myPlayerId, myParticipantId);
                 setRoomState(MultiPlayerObjects.RoomState.join);
             }
         }
@@ -611,9 +610,9 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
             this.room = room;
             resetRoomMembers();
             if (room != null) {
+                setOwnerParticipantId(room.getCreatorId());
                 addPlayer(myPlayerId, getMyParticipantId());
                 roomCreationPending = false;
-                setOwnerParticipantId(room.getCreatorId());
                 setRoomState(MultiPlayerObjects.RoomState.join);
             }
         }
