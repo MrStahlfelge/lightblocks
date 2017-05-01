@@ -42,7 +42,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
     public static final String GAME_URL = "http://www.golfgl.de/lightblocks/";
     // An den gleichen Eintrag im AndroidManifest denken!!!
-    public static final String GAME_VERSIONSTRING = "0.62.049";
+    public static final String GAME_VERSIONSTRING = "0.70.051";
     // Abstand für Git
     public static final boolean GAME_DEVMODE = true;
 
