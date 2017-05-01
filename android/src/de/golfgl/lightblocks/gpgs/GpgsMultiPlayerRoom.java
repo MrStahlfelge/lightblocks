@@ -2,11 +2,12 @@ package de.golfgl.lightblocks.gpgs;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
@@ -48,13 +49,20 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
     // Zweiter Grund: Ein Host/Owner ist für die Spiellogik nötig. Ab drei Spielern müsste dafür ein übergabemechanismus
     // implementiert werden.
     // Beides zusammen lohnt zunächst mal den Aufwand nicht, zu Dritt spielen ist auch nicht sooo toll gewesen.
+    // Weiterhin drauf achten: AutoMatch und Invite darf auch zukünftig nicht gemischt werden, da Host bestimmen
+    // dann bei den Eingeladenen schief laufen kann (in onJoinedRoom wird creatorId als Owner gesetzt)
     private static final int MAX_PLAYERS_GPGS = 2;
 
     private Activity context;
     private GpgsClient gpgsClient;
+
     private boolean roomCreationPending = false;
     private Room room;
     private Kryo kryo = new Kryo();
+    private boolean roomWithAutoMatch;
+    private String ownerParticipantId;
+    private boolean iAmTheOwner;
+    private boolean allPlayersConnected;
 
     // Participant ist anders als der Spielername... daher hier HashMaps
     private Map<String, String> connectionToPlayer = new HashMap<>(MAX_PLAYERS_GPGS);
@@ -80,7 +88,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
 
     @Override
     public boolean isOwner() {
-        return false;
+        return iAmTheOwner;
     }
 
     @Override
@@ -138,9 +146,11 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
                     data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0);
             Log.i("GPGS", "AutoMatchPlayers: " + minAutoMatchPlayers + " to " + maxAutoMatchPlayers);
             if (minAutoMatchPlayers > 0) {
+                roomWithAutoMatch = true;
                 autoMatchCriteria = RoomConfig.createAutoMatchCriteria(
                         minAutoMatchPlayers, maxAutoMatchPlayers, 0);
             } else {
+                roomWithAutoMatch = false;
                 autoMatchCriteria = null;
             }
 
@@ -171,6 +181,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
             throw new IllegalArgumentException("GPGS room must be joined with GPGS invitation");
 
         roomCreationPending = true;
+        roomWithAutoMatch = false;
         RoomConfig roomConfig = makeBasicRoomConfigBuilder()
                 .setInvitationIdToAccept(((GpgsRoomLocation) roomLoc).getInvitationId())
                 .build();
@@ -180,22 +191,69 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
 
     @Override
     public void sendToPlayer(String playerId, Object message) {
+        if (playerId.equals(myPlayerId))
+            Log.w("GPGS", "Message to myself - ignored.");
+        else {
+            String participantId = playerToConnection.get(playerId);
 
+            if (participantId != null)
+                Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null,
+                        serializeObject(message),
+                        room.getRoomId(), participantId);
+            else
+                Log.e("GPGS", "sendToPlayer with unknown participant id for player " + playerId);
+        }
     }
 
     @Override
     public void sendToAllPlayers(Object message) {
-
+        sendToAllPlayersExcept(myPlayerId, message);
     }
 
     @Override
     public void sendToAllPlayersExcept(String playerId, Object message) {
+        if (getRoomState() == MultiPlayerObjects.RoomState.closed) {
+            Log.w("GPGS", "Room already closed - message not delivered");
+            return;
+        }
+
+        if (room == null)
+            throw new IllegalStateException("Room not initialized");
+
+        String exceptParticipant = null;
+        if (playerId != null)
+            exceptParticipant = playerToConnection.get(playerId);
+
+        final byte[] serializedMessage = serializeObject(message);
+
+        for (Participant p : room.getParticipants())
+            if (p.isConnectedToRoom() && (exceptParticipant == null || !exceptParticipant.equals(p.getParticipantId()
+            ))) {
+                Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null,
+                        serializedMessage,
+                        room.getRoomId(), p.getParticipantId());
+            }
+
 
     }
 
     @Override
     public void sendToReferee(Object message) {
+        if (ownerParticipantId == null)
+            Log.w("GPGS", "Message not sent to referee - not yet set." + message.getClass().getName());
+        else if (iAmTheOwner)
+            informGotRoomMessage(message);
+        else
+            Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null,
+                    serializeObject(message),
+                    room.getRoomId(), ownerParticipantId);
+    }
 
+    public byte[] serializeObject(Object message) {
+        Output output = new Output(128, 1025);
+        kryo.writeClassAndObject(output, message);
+        output.close();
+        return output.getBuffer();
     }
 
     @Override
@@ -226,7 +284,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
             roomCreationPending = false;
 
         else {
-// get the selected invitation
+            // get the selected invitation
             Bundle extras = data.getExtras();
             Invitation invitation =
                     extras.getParcelable(Multiplayer.EXTRA_INVITATION);
@@ -266,12 +324,120 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         return false;
     }
 
+    @Override
+    public void startGame(boolean force) throws VetoException {
+        if (room == null)
+            throw new VetoException("No room opened.");
+
+        // Abbruch wenn noch nicht alle verbunden sind
+        if (!allPlayersConnected)
+            throw new VetoException("There are still players invited but neither connected nor declined their " +
+                    "invitation.");
+
+        super.startGame(force);
+    }
+
     // RealtimeMessageReceivedListener
 
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
-        Log.i("GPGS", "onRealTimeMessageReceived");
-        System.out.println(new String(realTimeMessage.getMessageData()));
+        try {
+            Input input = new Input(realTimeMessage.getMessageData());
+            Object object = kryo.readClassAndObject(input);
+
+            // ACHTUNG: connection kann null sein, zum Beispiel durch sendToReferee
+
+            if (object instanceof MultiPlayerObjects.Handshake) {
+                //HANDSHAKE ist gekommen
+                handleHandshake(realTimeMessage.getSenderParticipantId(), (MultiPlayerObjects.Handshake) object);
+                return;
+            }
+
+            if (object instanceof MultiPlayerObjects.PlayerChanged) {
+                handlePlayersChanged((MultiPlayerObjects.PlayerChanged) object);
+                return;
+            }
+
+            if (!isOwner() && object instanceof MultiPlayerObjects.RoomStateChanged) {
+                com.esotericsoftware.minlog.Log.info("Multiplayer", "Received change of " + object.toString());
+                setRoomState(((MultiPlayerObjects.RoomStateChanged) object).roomState);
+                // die anderen Felder referee und deputy sind ungenutzt
+                return;
+            }
+
+            informGotRoomMessage(object);
+        } catch (Throwable t) {
+            Log.e("GPGS", "Error deserializing message!");
+        }
+    }
+
+    private void handlePlayersChanged(MultiPlayerObjects.PlayerChanged mpc) {
+        // kann nur auf dem Client kommen - trotzdem, sicher ist sicher.
+        if (isOwner()) {
+            Log.w("GPGS", "Server received PlayerChanged");
+            return;
+        }
+
+        Log.i("GPGS", "Player changed: " + mpc.changedPlayer.name);
+
+        switch (mpc.changeType) {
+            case MultiPlayerObjects.CHANGE_REMOVE:
+                allPlayers.remove(mpc.changedPlayer.name);
+                informRoomInhabitantsChanged(mpc);
+                break;
+            default:
+                addPlayer(mpc.changedPlayer.name, mpc.changedPlayer.tag);
+        }
+    }
+
+    private void handleHandshake(String senderParticipantId, MultiPlayerObjects.Handshake handshake) {
+        Log.i("GPGS", "Handshake received: " + handshake.lightblocksVersion + ", Participant " + senderParticipantId);
+
+        if (isOwner()) {
+            handshake.success = true;
+
+            // wir ordnen den Spieler ein wenn er eine passende Version hat
+            if (handshake.interfaceVersion != MultiPlayerObjects.INTERFACE_VERSION) {
+                handshake.success = false;
+                handshake.message = "Interface versions differ. Use same Lightblocks version.";
+            }
+
+            if (!handshake.success) {
+                informGotErrorMessage(handshake);
+                handshake.playerId = myPlayerId;
+                handshake.lightblocksVersion = LightBlocksGame.GAME_VERSIONSTRING;
+
+                Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null,
+                        serializeObject(handshake),
+                        room.getRoomId(), senderParticipantId);
+
+            } else {
+
+                // ansonsten zur Spierliste dazu und über Spieler informieren
+                addPlayer(handshake.playerId, senderParticipantId);
+
+                // Info über bisherige Spieler an den neuen Spieler senden
+                for (String playerId : allPlayers) {
+                    MultiPlayerObjects.PlayerChanged pc = new MultiPlayerObjects.PlayerChanged();
+                    pc.changedPlayer = new MultiPlayerObjects.Player();
+                    pc.changedPlayer.name = playerId;
+                    pc.changedPlayer.tag = playerToConnection.get(playerId);
+                    sendToPlayer(handshake.playerId, pc);
+                }
+
+                // das eigene UI wurde in addPlayer informiert
+                // TODO wenn es mehr als zwei Spieler geben würde müssten hier die anderen informiert werden
+
+            }
+        } else if (!isOwner() && !handshake.success) {
+            // wenn ein Handshake als Antwort kam, hat etwas nicht geklappt :(
+            informGotErrorMessage(handshake);
+            try {
+                leaveRoom(true);
+            } catch (VetoException e) {
+                // eat
+            }
+        }
     }
 
     // RoomStatusUpdateListener
@@ -323,6 +489,17 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
             this.room = room;
         }
 
+        // das ist dann jetzt die Stelle wo ich den Handshake schicke
+        // außer beim Automatching, denn dort ist der Owner hier noch nicht bekannt
+        if (!isOwner() && !roomWithAutoMatch) {
+            sendHandshake();
+        }
+    }
+
+    protected void sendHandshake() {
+        MultiPlayerObjects.Handshake handshake = new MultiPlayerObjects.Handshake();
+        handshake.playerId = myPlayerId;
+        sendToReferee(handshake);
     }
 
     @Override
@@ -340,22 +517,6 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
     public void onPeersConnected(Room room, List<String> list) {
         Log.i("GPGS", "onPeersConnected");
         this.room = room;
-
-        refreshPlayersList();
-
-    }
-
-    private void refreshPlayersList() {
-        // first, add the new arrived guys
-        for (Participant p : room.getParticipants()) {
-            String pid = p.getParticipantId();
-            System.out.println(pid + ": " + p.getDisplayName() + " " + p.isConnectedToRoom());
-            Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null, (Build.MODEL +
-                            myPlayerId).getBytes(),
-                    room.getRoomId(), p.getParticipantId());
-
-        }
-
     }
 
     @Override
@@ -364,7 +525,9 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         Log.i("GPGS", "onPeersDisconnected");
         // nur setzen wenn nicht schon null ist (dann wurde bereits disconnected)
         this.room = room;
-        refreshPlayersList();
+
+        // da nur zwei Spieler zugelassen sind muss das hier nicht behandelt werden
+        // ein Disconnect führt immer zum Close des Raums
     }
 
     @Override
@@ -384,27 +547,54 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
     @Override
     public void onRoomCreated(int statusCode, Room room) {
         // bekommt nur der Einladende
+        // Achtung: die Liste der Participants ist bei AutoMatch noch nicht vollständig
+        // daher kann der RoomOwner dann nur in roomConnected bestimmt werden
+        // da hier auf zwei Spieler begrenzt wird, ist das aber ok
         Log.i("GPGS", "onRoomCreated " + statusCode);
+
         synchronized (room) {
             this.room = room;
             roomCreationPending = false;
-            addPlayer(myPlayerId, "");
-            setRoomState(MultiPlayerObjects.RoomState.join);
+            resetRoomMembers();
+
+            if (room != null) {
+                for (Participant p : room.getParticipants())
+                    Log.i("GPGS", "Participant " + p.getParticipantId() + "/" + p.getDisplayName());
+
+                final String myParticipantId = getMyParticipantId();
+                addPlayer(myPlayerId, myParticipantId);
+                if (!roomWithAutoMatch) {
+                    setOwnerParticipantId(myParticipantId);
+                }
+
+                setRoomState(MultiPlayerObjects.RoomState.join);
+            }
         }
 
+    }
+
+    protected String getMyParticipantId() {
+        // room.getParticipantId(myPlayerId) funktioniert nicht :-/
+        if (room == null)
+            return null;
+
+        for (Participant p : room.getParticipants())
+            if (p.getDisplayName().equals(myPlayerId))
+                return p.getParticipantId();
+
+        return null;
     }
 
     public void addPlayer(String playerId, String participantId) {
 
         if (!allPlayers.contains(playerId)) {
-            allPlayers.add(myPlayerId);
-            if (!participantId.isEmpty()) {
-                //TODO
-            }
+            allPlayers.add(playerId);
+            connectionToPlayer.put(participantId, playerId);
+            playerToConnection.put(playerId, participantId);
 
             final MultiPlayerObjects.PlayerChanged pc = new MultiPlayerObjects.PlayerChanged();
             final MultiPlayerObjects.Player player = new MultiPlayerObjects.Player();
-            player.name = myPlayerId;
+            player.name = playerId;
             pc.changeType = MultiPlayerObjects.CHANGE_ADD;
             pc.changedPlayer = player;
 
@@ -419,9 +609,13 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         Log.i("GPGS", "onJoinedRoom " + statusCode);
         synchronized (room) {
             this.room = room;
-            addPlayer(myPlayerId, "");
-            roomCreationPending = false;
-            setRoomState(MultiPlayerObjects.RoomState.join);
+            resetRoomMembers();
+            if (room != null) {
+                addPlayer(myPlayerId, getMyParticipantId());
+                roomCreationPending = false;
+                setOwnerParticipantId(room.getCreatorId());
+                setRoomState(MultiPlayerObjects.RoomState.join);
+            }
         }
     }
 
@@ -442,6 +636,43 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         synchronized (room) {
             this.room = room;
             roomCreationPending = false;
+            allPlayersConnected = true;
+
+            if (roomWithAutoMatch) {
+                // im AutoMatch ist der Owner die kleinste participant id
+                String newOwnerId = getMyParticipantId();
+                for (String pid : room.getParticipantIds())
+                    if (pid.compareTo(newOwnerId) < 0) {
+                        newOwnerId = pid;
+                    }
+                setOwnerParticipantId(newOwnerId);
+
+                // beim Automatch kann dann erst jetzt der Handshake durchgeführt werden. Der Client meldet sich
+                if (!isOwner())
+                    sendHandshake();
+            }
+
         }
+    }
+
+    protected void setOwnerParticipantId(String newOwner) {
+        if (newOwner == null) {
+            iAmTheOwner = false;
+            ownerParticipantId = null;
+            Log.i("GPGS", "Room owner reset.");
+        } else {
+            if (ownerParticipantId != null)
+                throw new IllegalStateException("Tried to set owner, but is already set!");
+
+            this.ownerParticipantId = newOwner;
+            iAmTheOwner = (ownerParticipantId.equals(getMyParticipantId()));
+            Log.i("GPGS", "Room owner is " + ownerParticipantId);
+
+        }
+    }
+
+    protected void resetRoomMembers() {
+        allPlayersConnected = false;
+        setOwnerParticipantId(null);
     }
 }
