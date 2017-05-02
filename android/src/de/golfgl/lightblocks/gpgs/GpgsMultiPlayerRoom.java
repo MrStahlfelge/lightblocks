@@ -41,7 +41,10 @@ import de.golfgl.lightblocks.state.Player;
 public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements RoomUpdateListener,
         RealTimeMessageReceivedListener, RoomStatusUpdateListener {
 
+    // ACHTUNG: Wenn das hier aktiviert wird, dann im MenuScreen das Achievement Friendly Multiplayer
+    // nur nach Prüfung vergeben ob das aktuelle Spiel KEIN Automatching war
     private static final boolean AUTOMATCHING_ENABLED = LightBlocksGame.GAME_DEVMODE;
+
     // über GPGS nur zwei Spieler zulassen
     // dies ist vor allem so, weil ansonsten das Spiel nicht vorzeitig schon mit zwei Teilnehmern gestartet werden
     // kann. Ein nachträglich dazukommender Eingeladener kann nicht abgelehnt werden und tritt in den Raum ein.

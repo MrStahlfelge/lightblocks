@@ -50,6 +50,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     private Table gpgButtons;
     private FATextButton gpgShowInvitationsButton;
     private FATextButton gpgInviteButton;
+    private FATextButton shareAppButton;
 
     public MultiplayerMenuScreen(LightBlocksGame app) {
         super(app);
@@ -94,7 +95,16 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     @Override
     protected void fillButtonTable(Table buttons) {
 
-        buttonTableCell = buttons.add();
+        shareAppButton = new FATextButton(FontAwesome.NET_SHARE1, app.TEXTS.get("menuShareApp"), app.skin);
+        shareAppButton.addListener(new ChangeListener() {
+                                       public void changed(ChangeEvent event, Actor actor) {
+                                           app.share.shareText(app.TEXTS.get("gameTitle") + ": " +
+                                                   LightBlocksGame.GAME_STOREURL, null);
+                                       }
+                                   }
+        );
+
+        buttonTableCell = buttons.add(shareAppButton);
 
         // Die folgenden Elemente sind nicht in der Buttontable, aber die Initialisierung hier macht Sinn
 
@@ -260,6 +270,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     private void setInitMode() {
         initScreenGpgButtonCell.setActor(gpgButtons);
         initScreenLanButtonCell.setActor(lanButtons);
+        buttonTableCell.setActor(shareAppButton);
     }
 
     private void setGpgsMode() {
@@ -309,7 +320,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
     private boolean checkNewGpgsConnPreConditions() {
         if (app.gpgsClient == null || !app.gpgsClient.isConnected()) {
-            showDialog("Please sign in to Google Play Games first.");
+            showDialog(app.TEXTS.get("labelFirstSignIn"));
             return true;
         }
 

@@ -64,10 +64,10 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         mainTable.row();
         if (subtitle != null)
             mainTable.add(new Label(subtitle, app.skin, LightBlocksGame.SKIN_FONT_BIG));
-        mainTable.row().spaceTop(50);
+        mainTable.row().spaceTop(30);
         mainTable.add(sp);
         mainTable.row();
-        mainTable.add(buttons).spaceTop(50);
+        mainTable.add(buttons).spaceTop(30);
 
         stage.addActor(mainTable);
 

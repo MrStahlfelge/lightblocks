@@ -41,6 +41,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     public static final int nativeGameHeight = 800;
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
     public static final String GAME_URL = "http://www.golfgl.de/lightblocks/";
+    public static final String GAME_STOREURL = "http://play.google.com/store/apps/details?id=de.golfgl.lightblocks";
     // An den gleichen Eintrag im AndroidManifest denken!!!
     public static final String GAME_VERSIONSTRING = "0.70.051";
     // Abstand für Git

@@ -66,15 +66,15 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
         // die möglichen Inputs aufzählen
         inputButtons = new InputButtonTable(app, app.prefs.getInteger("inputType", 0));
 
-        menuTable.row();
+        menuTable.row().padTop(40);
         menuTable.add(new Label(app.TEXTS.get("labelBeginningLevel"), app.skin)).left();
         menuTable.row();
         menuTable.add(beginningLevelTable);
-        menuTable.row().padTop(20);
+        menuTable.row().padTop(40);
         menuTable.add(new Label(app.TEXTS.get("menuInputControl"), app.skin)).left();
         menuTable.row();
         menuTable.add(inputButtons);
-        menuTable.row();
+        menuTable.row().padBottom(40);
         menuTable.add(inputButtons.getInputLabel()).center();
     }
 
