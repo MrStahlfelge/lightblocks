@@ -24,10 +24,6 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class ScoreScreen extends AbstractScoreScreen {
 
-    //TODO ab size 3 muss die Anzeige gedreht werden. Dann nur noch Spalten Score/Lines
-    // dh für MultiplayerScore braucht es eh einen anderen Bildschirm
-
-
     private Array<IRoundScore> scoresToShow;
     private Array<String> scoresToShowLabels;
     private BestScore best;

@@ -42,9 +42,6 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     protected void populateScoreTable(Table scoreTable) {
         super.populateScoreTable(scoreTable);
 
-        //TODO (eventuell) Bei disconnect haben die Clients keinen Zugriff mehr auf ihre Punkte die erreicht wurden
-        // könnte man bei dem Event eventuell sonderbehandeln
-
         // Für die verschiedenen Spieler eine Zelle vorsehen. Noch nicht füllen, Infos stehen noch nicht zur Verfügung
         // das eingefügte ScoreLabel dient nur dazu den Platzbedarf festzulegen
         scoreTable.row();
@@ -180,7 +177,6 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
             super.removeGameBlocker(e);
 
-            //TODO hier sollte noch 3 Sekunden reingehen
             if (pausedByBlocker && isGameBlockersEmpty())
                 switchPause(true);
         } finally {
