@@ -123,6 +123,8 @@ public class GpgsHelper {
             return EVENT_MISSION_12_TYPEA_1D;
         if (gameModelId.equalsIgnoreCase("gravityB_2A"))
             return EVENT_MISSION_13_TYPEB_2A;
+        if (gameModelId.equalsIgnoreCase("garbage_1B"))
+            return EVENT_MISSION_14_GARBAGE_1B;
 
         return null;
     }

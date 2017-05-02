@@ -16,7 +16,7 @@ public class Mission {
 
     private static final String[] missions = {"tutorial", "typeA_1A", "typeB_1A", "typeA_1B", "special_1A", "typeA_1C",
             "special_1B", "typeB_1B", "special_1C", "garbage_1A", "typeB_1C",
-            "gravityA_2A", "typeA_1D", "gravityB_2A"};
+            "gravityA_2A", "typeA_1D", "gravityB_2A", "garbage_1B"};
 
     private String uniqueId;
     private int index;
