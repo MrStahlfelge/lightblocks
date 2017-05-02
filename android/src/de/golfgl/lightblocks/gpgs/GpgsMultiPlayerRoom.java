@@ -386,7 +386,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
                 informRoomInhabitantsChanged(mpc);
                 break;
             default:
-                addPlayer(mpc.changedPlayer.name, mpc.changedPlayer.tag);
+                addPlayer(mpc.changedPlayer.name, mpc.changedPlayer.address);
         }
     }
 
@@ -421,7 +421,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
                     MultiPlayerObjects.PlayerChanged pc = new MultiPlayerObjects.PlayerChanged();
                     pc.changedPlayer = new MultiPlayerObjects.Player();
                     pc.changedPlayer.name = playerId;
-                    pc.changedPlayer.tag = playerToConnection.get(playerId);
+                    pc.changedPlayer.address = playerToConnection.get(playerId);
                     sendToPlayer(handshake.playerId, pc);
                 }
 

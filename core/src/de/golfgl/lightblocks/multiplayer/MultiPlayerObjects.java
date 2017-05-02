@@ -15,7 +15,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 public class MultiPlayerObjects {
 
     // *** BEI JEDER ÄNDERUNG HOCHZÄHLEN!!! ***
-    public static final int INTERFACE_VERSION = 3;
+    public static final int INTERFACE_VERSION = 4;
 
     public static final int CHANGE_ADD = 1;
     public static final int CHANGE_UPDATE = 2;
@@ -88,6 +88,7 @@ public class MultiPlayerObjects {
 
     public static class Player {
         public String name;
+        public String address;
         public String tag;
         public String lightblocksVersion = LightBlocksGame.GAME_VERSIONSTRING;
     }
