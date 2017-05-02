@@ -169,6 +169,23 @@ public class BestScore implements IRoundScore, Json.Serializable {
             if (mission10Score != null && mission10Score.getRating() > 0)
                 gpgsClient.unlockAchievement(GpgsHelper.ACH_MISSION_10_ACCOMPLISHED);
 
+            // Mission 15 geschafft?
+            BestScore mission15Score = this.get(Mission.MISSION15ACHIEVEMENT);
+            if (mission15Score != null && mission15Score.getRating() > 0) {
+                gpgsClient.unlockAchievement(GpgsHelper.ACH_MISSION_15_ACCOMPLISHED);
+
+                // und dann auch prüfen ob alle perfekt waren
+                boolean perfectDone = true;
+                for (Mission mission : Mission.getMissionList()) {
+                    BestScore missionScore = this.get(mission.getUniqueId());
+
+                    if (missionScore == null || missionScore.getRating() < 7)
+                        perfectDone = false;
+                }
+
+                if (perfectDone)
+                    gpgsClient.unlockAchievement(GpgsHelper.ACH_ALL_MISSIONS_PERFECT);
+            }
         }
     }
 }

@@ -13,6 +13,8 @@ public class Mission {
 
     // GPGS Achievement "Mission 10 geschafft"
     public static final String MISSION10ACHIEVEMENT = "typeB_1C";
+    // GPGS Achievement "Mission 15 geschafft"
+    public static final String MISSION15ACHIEVEMENT = "typeB_1D";
 
     private static final String[] missions = {"tutorial", "typeA_1A", "typeB_1A", "typeA_1B", "special_1A", "typeA_1C",
             "special_1B", "typeB_1B", "special_1C", "garbage_1A", "typeB_1C",
