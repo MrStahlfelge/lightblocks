@@ -38,6 +38,8 @@ public class GpgsHelper {
     public static final String ACH_COMPLETE_TURNAROUND = "CgkI4vHs17ETEAIQIQ";
     public static final String ACH_PLUMBOUS_TETROMINOS = "CgkI4vHs17ETEAIQJA";
     public static final String ACH_MISSION_10_ACCOMPLISHED = "CgkI4vHs17ETEAIQKw";
+    public static final String ACH_MISSION_15_ACCOMPLISHED = "CgkI4vHs17ETEAIQOg";
+    public static final String ACH_ALL_MISSIONS_PERFECT = "CgkI4vHs17ETEAIQOw";
     public static final String LEAD_MARATHON_GESTURES = "CgkI4vHs17ETEAIQAA";
     public static final String LEAD_MARATHON_GRAVITY = "CgkI4vHs17ETEAIQCA";
     public static final String LEAD_MARATHON_GAMEPAD = "CgkI4vHs17ETEAIQCQ";
@@ -61,6 +63,10 @@ public class GpgsHelper {
     public static final String EVENT_MISSION_7_TYPEB_1B = "CgkI4vHs17ETEAIQMw";
     public static final String EVENT_MISSION_11_GRAVITYA_2A = "CgkI4vHs17ETEAIQNA";
     public static final String EVENT_INET_MULTIPLAYER_MATCH_STARTED = "CgkI4vHs17ETEAIQNQ";
+    public static final String EVENT_MISSION_12_TYPEA_1D = "CgkI4vHs17ETEAIQNg";
+    public static final String EVENT_MISSION_13_TYPEB_2A = "CgkI4vHs17ETEAIQNw";
+    public static final String EVENT_MISSION_14_GARBAGE_1B = "CgkI4vHs17ETEAIQOA";
+    public static final String EVENT_MISSION_15_TYPEB_1D = "CgkI4vHs17ETEAIQOQ";
 
     public static String getLeaderBoardIdByModelId(String gameModelId) {
         String retVal;
@@ -113,6 +119,8 @@ public class GpgsHelper {
             return EVENT_MISSION_10_TYPEB_1C;
         if (gameModelId.equalsIgnoreCase("gravityA_2A"))
             return EVENT_MISSION_11_GRAVITYA_2A;
+        if (gameModelId.equalsIgnoreCase("typeA_1D"))
+            return EVENT_MISSION_12_TYPEA_1D;
 
         return null;
     }
