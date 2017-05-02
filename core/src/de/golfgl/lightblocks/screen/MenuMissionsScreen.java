@@ -164,7 +164,6 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
         buttons.defaults().fill();
         buttons.add(highScoreButton).uniform();
         buttons.add(playButton).prefWidth(playButton.getPrefWidth() * 1.2f);
-
     }
 
     private void showHighscores() {
@@ -204,6 +203,9 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
     public void show() {
         super.show();
         refreshMenuTable(selectedIndex < 0);
+
+        getMenuScrollPane().validate();
+        getMenuScrollPane().scrollTo(0, ratingLabel[selectedIndex].getY(), 1, ratingLabel[selectedIndex].getHeight());
     }
 
     private EventListener getEventListener(final int idx) {

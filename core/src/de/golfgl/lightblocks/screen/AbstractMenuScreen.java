@@ -21,9 +21,14 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
     protected static final Color COLOR_TABLE_NORMAL = new Color(.5f, .5f, .5f, 1);
     protected static final Color COLOR_TABLE_HIGHLIGHTED = new Color(1, 1, 1, 1);
     private Button leaveButton;
+    private ScrollPane menuScrollPane;
 
     public AbstractMenuScreen(LightBlocksGame app) {
         super(app);
+    }
+
+    protected ScrollPane getMenuScrollPane() {
+        return menuScrollPane;
     }
 
     public Button getLeaveButton() {
@@ -36,9 +41,9 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         fillMenuTable(menuTable);
         // setFillParent verursacht Probleme mit ScrollPane
         menuTable.setFillParent(false);
-        ScrollPane sp = new ScrollPane(menuTable, app.skin);
-        sp.setSize(LightBlocksGame.nativeGameWidth, 150);
-        sp.setScrollingDisabled(true, false);
+        menuScrollPane = new ScrollPane(menuTable, app.skin);
+        menuScrollPane.setSize(LightBlocksGame.nativeGameWidth, 150);
+        menuScrollPane.setScrollingDisabled(true, false);
 
         //Titel
         // Der Titel wird nach der Menütabelle gefüllt, eventuell wird dort etwas gesetzt (=> Scores)
@@ -65,7 +70,7 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         if (subtitle != null)
             mainTable.add(new Label(subtitle, app.skin, LightBlocksGame.SKIN_FONT_BIG));
         mainTable.row().spaceTop(30);
-        mainTable.add(sp);
+        mainTable.add(menuScrollPane);
         mainTable.row();
         mainTable.add(buttons).spaceTop(30);
 
