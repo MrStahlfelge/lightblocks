@@ -81,6 +81,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     private Boolean playMusic;
     private Boolean showTouchPanel;
     private Boolean gpgsAutoLogin;
+    private Boolean dontAskForRating;
     private GamepadConfig gamepadConfig;
     private List<Mission> missionList;
     private HashMap<String, Mission> missionMap;
@@ -353,5 +354,18 @@ public class LightBlocksGame extends Game implements IGpgsListener {
             getMissionList();
 
         return missionMap.get(uid);
+    }
+
+    public Boolean getDontAskForRating() {
+        if (dontAskForRating == null)
+            dontAskForRating = prefs.getBoolean("dontAskForRating", false);
+
+        return dontAskForRating;
+    }
+
+    public void setDontAskForRating(Boolean dontAskForRating) {
+        this.dontAskForRating = dontAskForRating;
+        prefs.putBoolean("dontAskForRating", dontAskForRating);
+        prefs.flush();
     }
 }

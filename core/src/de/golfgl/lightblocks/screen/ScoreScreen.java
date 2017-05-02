@@ -1,10 +1,14 @@
 package de.golfgl.lightblocks.screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -218,5 +222,64 @@ public class ScoreScreen extends AbstractScoreScreen {
 
     public void setNewGameParams(InitGameParameters newGameParams) {
         this.newGameParams = newGameParams;
+    }
+
+    @Override
+    public void show() {
+        super.show();
+
+        // Wenn bereits 1000 Blöcke abgelegt sind und die Frage noch nicht verneint wurde bitten wir um ein Rating
+        if (!app.getDontAskForRating() && scoresToShow.size > 1 &&
+                app.savegame.getTotalScore().getDrawnTetrominos() >= 1000)
+            askIfEnjoyingTheGame();
+
+    }
+
+    private void askIfEnjoyingTheGame() {
+        Dialog dialog = new RunnableDialog("", app.skin);
+        Label askLabel = new Label(app.TEXTS.get("labelAskForRating1"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        askLabel.setWrap(true);
+        askLabel.setAlignment(Align.center);
+        dialog.getContentTable().add(askLabel).prefWidth
+                (LightBlocksGame.nativeGameWidth * .9f).pad(10);
+        final TextButton.TextButtonStyle buttonStyle = app.skin.get("big", TextButton.TextButtonStyle.class);
+        dialog.button(app.TEXTS.get("menuYes"), new Runnable() {
+            @Override
+            public void run() {
+                askForRating();
+            }
+        }, buttonStyle);
+        dialog.button(app.TEXTS.get("menuNo"), new Runnable() {
+            @Override
+            public void run() {
+                app.setDontAskForRating(true);
+            }
+        }, buttonStyle);
+        dialog.show(stage);
+
+
+    }
+
+    private void askForRating() {
+        Dialog dialog = new RunnableDialog("", app.skin);
+        Label askLabel = new Label(app.TEXTS.get("labelAskForRating2"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        askLabel.setWrap(true);
+        askLabel.setAlignment(Align.center);
+        dialog.getContentTable().add(askLabel).prefWidth
+                (LightBlocksGame.nativeGameWidth * .9f).pad(10);
+        final TextButton.TextButtonStyle buttonStyle = app.skin.get("big", TextButton.TextButtonStyle.class);
+        dialog.button(app.TEXTS.get("buttonIRateNow"), new Runnable() {
+            @Override
+            public void run() {
+                doRate();
+            }
+        }, buttonStyle);
+        dialog.button(app.TEXTS.get("buttonRemindMeLater"), null, buttonStyle);
+        dialog.show(stage);
+    }
+
+    private void doRate() {
+        app.setDontAskForRating(true);
+        Gdx.net.openURI(LightBlocksGame.GAME_STOREURL);
     }
 }

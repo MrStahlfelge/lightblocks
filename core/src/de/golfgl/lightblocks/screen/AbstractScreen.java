@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -113,13 +114,7 @@ public abstract class AbstractScreen implements Screen {
     }
 
     public Dialog showConfirmationDialog(String text, Runnable doWhenYes) {
-        Dialog dialog = new Dialog("", app.skin) {
-            @Override
-            protected void result(Object object) {
-                if (object instanceof Runnable)
-                    ((Runnable) object).run();
-            }
-        };
+        Dialog dialog = new RunnableDialog("", app.skin);
         Label errorMsgLabel = new Label(text, app.skin);
         errorMsgLabel.setWrap(true);
         dialog.getContentTable().add(errorMsgLabel).prefWidth
@@ -133,5 +128,19 @@ public abstract class AbstractScreen implements Screen {
 
     public void setBackScreen(Screen backScreen) {
         this.backScreen = backScreen;
+    }
+
+    public static class RunnableDialog extends Dialog {
+
+        public RunnableDialog(String title, Skin skin) {
+            super(title, skin);
+        }
+
+        @Override
+        protected void result(Object object) {
+            if (object instanceof Runnable)
+                ((Runnable) object).run();
+        }
+
     }
 }
