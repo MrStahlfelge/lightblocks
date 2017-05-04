@@ -321,9 +321,10 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         snapshot.getSnapshotContents().writeBytes(gameState);
 
         // Change metadata
+        // Description wird in Play Games app angezeigt
         SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder()
                 .fromMetadata(snapshot.getMetadata())
-                .setDescription("Game state")
+                .setDescription("Time to play again!")
                 .setProgressValue(progressValue)
                 .build();
 
