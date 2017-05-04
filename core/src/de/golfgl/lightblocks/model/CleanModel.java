@@ -10,9 +10,28 @@ import com.badlogic.gdx.utils.JsonValue;
  */
 
 public class CleanModel extends MissionModel {
+    // je 25 übige Blöcke den Bonusscore mit einem Faktor mehr multiplizieren
+    final static int BONUS_LEVELUP_NUM = 25;
+    final static int BONUS_PER_BLOCK = 100;
+
     @Override
     public int getRating() {
-        addBonusScore((getMaxBlocksToUse() - getScore().getDrawnTetrominos()) * 100);
+
+        final GameScore score = getScore();
+        int factorForBonus = getScore().getCurrentLevel() + 1;
+        int blocksLeft = getMaxBlocksToUse() - score.getDrawnTetrominos();
+
+        int bonusScore = 0;
+
+        while (blocksLeft > BONUS_LEVELUP_NUM) {
+            bonusScore += BONUS_LEVELUP_NUM * BONUS_PER_BLOCK * (factorForBonus);
+            factorForBonus++;
+            blocksLeft -= BONUS_LEVELUP_NUM;
+        }
+        bonusScore += blocksLeft * BONUS_PER_BLOCK * (factorForBonus);
+
+        addBonusScore(bonusScore);
+
         return super.getRating();
     }
 

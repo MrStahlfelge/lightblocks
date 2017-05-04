@@ -1,1 +1,1 @@
-{"class":"de.golfgl.lightblocks.model.CleanModel","gameModelVersion":"1.0.0","inputType":1,"modelId":"typeB_1B","initialGarbage":5,"maxBlocksToUse":200,"topRatingScore":35000,"beginningLevel":2}
+{"class":"de.golfgl.lightblocks.model.CleanModel","gameModelVersion":"1.0.0","inputType":1,"modelId":"typeB_1B","initialGarbage":5,"maxBlocksToUse":150,"topRatingScore":50000,"beginningLevel":2}
