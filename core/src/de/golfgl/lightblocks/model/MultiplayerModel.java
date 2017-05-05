@@ -178,7 +178,7 @@ public class MultiplayerModel extends GameModel {
         // da die Füllung bereits berechnet wurde
         if (!achTurnaroundSent) {
             if (!filledOver85Perc && meInGame.filledBlocks *
-                    100 / (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS) >= 85)
+                    100 / (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS) >= 80)
                 filledOver85Perc = true;
 
             if (filledOver85Perc && meInGame.filledBlocks *
