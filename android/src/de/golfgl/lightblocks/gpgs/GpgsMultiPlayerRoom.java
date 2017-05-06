@@ -9,11 +9,13 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessageReceivedListener;
+import com.google.android.gms.games.multiplayer.realtime.RealTimeMultiplayer;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
@@ -39,7 +41,7 @@ import de.golfgl.lightblocks.state.Player;
  */
 
 public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements RoomUpdateListener,
-        RealTimeMessageReceivedListener, RoomStatusUpdateListener {
+        RealTimeMessageReceivedListener, RoomStatusUpdateListener, RealTimeMultiplayer.ReliableMessageSentCallback {
 
     // ACHTUNG: Wenn das hier aktiviert wird, dann im MenuScreen das Achievement Friendly Multiplayer
     // nur nach Prüfung vergeben ob das aktuelle Spiel KEIN Automatching war
@@ -200,12 +202,30 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
             String participantId = playerToConnection.get(playerId);
 
             if (participantId != null)
-                Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null,
-                        serializeObject(message),
-                        room.getRoomId(), participantId);
+                sendReliableMessage(participantId, serializeObject(message));
             else
                 Log.e("GPGS", "sendToPlayer with unknown participant id for player " + playerId);
         }
+    }
+
+    protected void sendReliableMessage(String recipientId, byte[] message) {
+        if (message.length > Multiplayer.MAX_RELIABLE_MESSAGE_LEN)
+            Log.e("GPGS", "Message exceeded maximum size! Recipient " + recipientId + ", message: " + new String(message));
+        else if (message.length > (Multiplayer.MAX_RELIABLE_MESSAGE_LEN * .85f))
+            Log.w("GPGS", "Message exceeds 85% of maximum size! Recipient " + recipientId + ", message: " + new String(message));
+
+        int tokenId = Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(),
+                this,
+                message, room.getRoomId(), recipientId);
+
+        if (tokenId == GamesStatusCodes.STATUS_REAL_TIME_MESSAGE_SEND_FAILED)
+            Log.e("GPGS", "Message sent failed, recipient was: " + recipientId + ", message: " + new String(message));
+    }
+
+    @Override
+    public void onRealTimeMessageSent(int status, int token, String recipientId) {
+        if (status != GamesStatusCodes.STATUS_OK)
+            Log.e("GPGS", "Message sent failed, recipient was: " + recipientId + ", status: " + status);
     }
 
     @Override
@@ -232,9 +252,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         for (Participant p : room.getParticipants())
             if (p.isConnectedToRoom() && (exceptParticipant == null || !exceptParticipant.equals(p.getParticipantId()
             ))) {
-                Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null,
-                        serializedMessage,
-                        room.getRoomId(), p.getParticipantId());
+                sendReliableMessage(p.getParticipantId(), serializedMessage);
             }
 
 
@@ -247,9 +265,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         else if (iAmTheOwner)
             informGotRoomMessage(message);
         else
-            Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null,
-                    serializeObject(message),
-                    room.getRoomId(), ownerParticipantId);
+            sendReliableMessage(ownerParticipantId, serializeObject(message));
     }
 
     public byte[] serializeObject(Object message) {
@@ -410,9 +426,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
                 handshake.playerId = myPlayerId;
                 handshake.lightblocksVersion = LightBlocksGame.GAME_VERSIONSTRING;
 
-                Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(), null,
-                        serializeObject(handshake),
-                        room.getRoomId(), senderParticipantId);
+                sendReliableMessage(senderParticipantId, serializeObject(handshake));
 
             } else {
 
