@@ -3,7 +3,9 @@
 
     <string name="app_name">Falling Lightblocks</string>
     <string name="app_short_name">Lightblocks</string>
-    <string name="crash_toast_text">Something went wrong - please send the crash report to help us improve the application!</string>
-    <string name="app_id">666172602594</string>`
+    <string name="crash_toast_text">Something went wrong! Gathering data for crash report...</string>
+    <string name="app_id">666172602594</string>
+    <string name="crash_dialog_text">Falling Lightblocks crashed. This should not happen. Please send me the crash report log file for investigation and improvement of the game. Thank you!</string>
+    `
 
 </resources>
