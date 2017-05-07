@@ -313,17 +313,16 @@ public class MultiplayerModel extends GameModel {
             this.garbageHolePosition = o.garbageHolePosition;
 
             // ok, das war das init...
-            isInitialized = true;
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
+                    isInitialized = true;
                     MultiplayerModel.super.initializeActiveAndNextTetromino();
-
+                    // zurückmelden dass fertig initialisiert ist
+                    sendPlayerInGameStats();
                 }
             });
 
-            // zurückmelden dass fertig initialisiert ist
-            sendPlayerInGameStats();
         }
     }
 
@@ -553,5 +552,11 @@ public class MultiplayerModel extends GameModel {
     @Override
     public void read(Json json, JsonValue jsonData) {
         throw new UnsupportedOperationException("Not allowed in multiplayer");
+    }
+
+    @Override
+    public void update(float delta) {
+        if (isInitialized)
+            super.update(delta);
     }
 }
