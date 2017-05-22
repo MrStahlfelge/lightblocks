@@ -398,8 +398,8 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             mSaveGameData = snapshot.getSnapshotContents().readFully();
             gameListener.gpgsGameStateLoaded(mSaveGameData);
             return true;
-        } catch (IOException e) {
-            Log.e("GPGS", "Error while reading Snapshot.", e);
+        } catch (Throwable t) {
+            Log.e("GPGS", "Error while reading Snapshot.", t);
             gameListener.gpgsGameStateLoaded(null);
             return false;
         }
