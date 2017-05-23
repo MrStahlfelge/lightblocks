@@ -57,10 +57,9 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
     // Weiterhin drauf achten: AutoMatch und Invite darf auch zukünftig nicht gemischt werden, da Host bestimmen
     // dann bei den Eingeladenen schief laufen kann (in onJoinedRoom wird creatorId als Owner gesetzt)
     private static final int MAX_PLAYERS_GPGS = 2;
-
+    private final Object lockObj = new Object();
     private Activity context;
     private GpgsClient gpgsClient;
-
     private boolean roomCreationPending = false;
     private Room room;
     private Kryo kryo = new Kryo();
@@ -210,9 +209,11 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
 
     protected void sendReliableMessage(String recipientId, byte[] message) {
         if (message.length > Multiplayer.MAX_RELIABLE_MESSAGE_LEN)
-            Log.e("GPGS", "Message exceeded maximum size! Recipient " + recipientId + ", message: " + new String(message));
+            Log.e("GPGS", "Message exceeded maximum size! Recipient " + recipientId + ", message: " + new String
+                    (message));
         else if (message.length > (Multiplayer.MAX_RELIABLE_MESSAGE_LEN * .85f))
-            Log.w("GPGS", "Message exceeds 85% of maximum size! Recipient " + recipientId + ", message: " + new String(message));
+            Log.w("GPGS", "Message exceeds 85% of maximum size! Recipient " + recipientId + ", message: " + new
+                    String(message));
 
         int tokenId = Games.RealTimeMultiplayer.sendReliableMessage(gpgsClient.getGoogleApiClient(),
                 this,
@@ -502,7 +503,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         // auch beim Server erst dann wenn Spieler eintreten
         // danach folgt onPeersConnected
         Log.i("GPGS", "onConnectedToRoom");
-        synchronized (room) {
+        synchronized (lockObj) {
             this.room = room;
         }
 
@@ -569,7 +570,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         // da hier auf zwei Spieler begrenzt wird, ist das aber ok
         Log.i("GPGS", "onRoomCreated " + statusCode);
 
-        synchronized (room) {
+        synchronized (lockObj) {
             this.room = room;
             roomCreationPending = false;
             resetRoomMembers();
@@ -623,7 +624,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         // Called when the client attempts to join a real-time room.
         // (nur bei Engeladenen)
         Log.i("GPGS", "onJoinedRoom " + statusCode);
-        synchronized (room) {
+        synchronized (lockObj) {
             this.room = room;
             resetRoomMembers();
             if (room != null) {
@@ -639,7 +640,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
     public void onLeftRoom(int statusCode, String givenToLeave) {
         // Called when the client attempts to leaves the real-time room.
         Log.i("GPGS", "onLeftRoom " + statusCode);
-        synchronized (room) {
+        synchronized (lockObj) {
             this.room = null;
             setRoomState(MultiPlayerObjects.RoomState.closed);
         }
@@ -649,7 +650,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
     public void onRoomConnected(int statusCode, Room room) {
         // Called when ALL the participants in a real-time room are fully connected.
         Log.i("GPGS", "onRoomConnected " + statusCode);
-        synchronized (room) {
+        synchronized (lockObj) {
             this.room = room;
             roomCreationPending = false;
             allPlayersConnected = true;

@@ -35,6 +35,7 @@ public class MultiplayerModel extends GameModel {
 
     // Referee - aber auch die anderen pflegen die Werte, falls Übergabe erfolgt
     private static final byte DRAWYER_PACKAGESIZE = 3;
+    private final Object waitingGarbageLinesLock = new Object();
     private AbstractMultiplayerRoom playerRoom;
     private HashMap<String, MultiPlayerObjects.PlayerInGame> playerInGame;
     private HashSet<String> uninitializedPlayers;
@@ -81,7 +82,7 @@ public class MultiplayerModel extends GameModel {
         // aktiven Index gefüllt wurden.
 
         int numOfLines = 0;
-        synchronized (waitingGarbageLinesNum) {
+        synchronized (waitingGarbageLinesLock) {
             numOfLines = waitingGarbageLinesNum;
             waitingGarbageLinesNum = 0;
 
@@ -282,7 +283,7 @@ public class MultiplayerModel extends GameModel {
 
     protected void handleGarbageForYou(MultiPlayerObjects.GarbageForYou o) {
         boolean warningTreshold = false;
-        synchronized (waitingGarbageLinesNum) {
+        synchronized (waitingGarbageLinesLock) {
             int oldWaitingLines = waitingGarbageLinesNum;
             waitingGarbageLinesNum = waitingGarbageLinesNum + o.garbageLines;
 
