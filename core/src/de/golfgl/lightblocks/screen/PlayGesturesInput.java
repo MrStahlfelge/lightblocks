@@ -168,7 +168,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             }
         }
 
-        if (screenY - this.screenY < -4 * dragThreshold & !isPaused) {
+        if (screenY - this.screenY < -4 * dragThreshold & !isPaused && playScreen.app.getPauseSwipeEnabled()) {
             playScreen.switchPause(false);
         }
 

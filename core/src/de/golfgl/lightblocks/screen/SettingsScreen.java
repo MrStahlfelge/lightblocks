@@ -59,6 +59,15 @@ public class SettingsScreen extends AbstractMenuScreen {
                 touchPanelSizeChanged();
             }
         });
+        final Button pauseSwipeButton = new TextButton(FontAwesome.UP_ARROW, app.skin, FontAwesome
+                .SKIN_FONT_FA + "-checked");
+        pauseSwipeButton.setChecked(app.getPauseSwipeEnabled());
+        pauseSwipeButton.addListener(new ChangeListener() {
+                                         public void changed(ChangeEvent event, Actor actor) {
+                                             app.setPauseSwipeEnabled(pauseSwipeButton.isChecked());
+                                         }
+                                     }
+        );
 
         Button gamePadButton = new TextButton(PlayScreenInput.getInputFAIcon(3), app.skin, FontAwesome.SKIN_FONT_FA);
         gamePadButton.addListener(new ChangeListener() {
@@ -89,6 +98,9 @@ public class SettingsScreen extends AbstractMenuScreen {
         settingsTable.row();
         settingsTable.add();
         settingsTable.add(touchPanelSizeSlider).minHeight(40);
+        settingsTable.row();
+        settingsTable.add(pauseSwipeButton).uniform();
+        settingsTable.add(new Label(app.TEXTS.get("menuPauseSwipeEnabled"), app.skin));
 
         settingsTable.row().spaceTop(30);
         settingsTable.add(gamePadButton).uniform();

@@ -41,7 +41,8 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     public static final int nativeGameHeight = 800;
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
     public static final String GAME_URL = "http://www.golfgl.de/lightblocks/";
-    public static final String GAME_STOREURL = "http://play.google.com/store/apps/details?id=de.golfgl.lightblocks&referrer=utm_source%3Dflb";
+    public static final String GAME_STOREURL = "http://play.google.com/store/apps/details?id=de.golfgl" +
+            ".lightblocks&referrer=utm_source%3Dflb";
     // An den gleichen Eintrag im AndroidManifest denken!!!
     public static final String GAME_VERSIONSTRING = "0.70.055";
     // Abstand für Git
@@ -80,6 +81,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     private FPSLogger fpsLogger;
     private Boolean playMusic;
     private Boolean showTouchPanel;
+    private Boolean pauseSwipeEnabled;
     private Boolean gpgsAutoLogin;
     private Boolean dontAskForRating;
     private GamepadConfig gamepadConfig;
@@ -366,6 +368,19 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     public void setDontAskForRating(Boolean dontAskForRating) {
         this.dontAskForRating = dontAskForRating;
         prefs.putBoolean("dontAskForRating", dontAskForRating);
+        prefs.flush();
+    }
+
+    public Boolean getPauseSwipeEnabled() {
+        if (pauseSwipeEnabled == null)
+            pauseSwipeEnabled = prefs.getBoolean("pauseSwipe", true);
+
+        return pauseSwipeEnabled;
+    }
+
+    public void setPauseSwipeEnabled(Boolean pauseSwipeEnabled) {
+        this.pauseSwipeEnabled = pauseSwipeEnabled;
+        prefs.putBoolean("pauseSwipe", pauseSwipeEnabled);
         prefs.flush();
     }
 }
