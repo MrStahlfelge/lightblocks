@@ -16,15 +16,10 @@ import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
-import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.snapshot.Snapshot;
 import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
 import com.google.android.gms.games.snapshot.Snapshots;
 import com.google.example.games.basegameutils.BaseGameUtils;
-
-import java.io.IOException;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.golfgl.lightblocks.AndroidLauncher;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -115,8 +110,9 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             Invitation inv =
                     bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
 
-            Log.i("GPGS", "Multiplayer Invitation: " +  inv.getInvitationId() + " from "
-                    + inv.getInviter().getParticipantId());
+            if (inv != null)
+                Log.i("GPGS", "Multiplayer Invitation: " + inv.getInvitationId() + " from "
+                        + inv.getInviter().getParticipantId());
         }
 
     }
