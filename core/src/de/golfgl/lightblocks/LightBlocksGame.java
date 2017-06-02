@@ -322,7 +322,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
 
             gamepadConfig.pauseButton = prefs.getInteger("gpButtonPause", GamepadConfig.GC_BUTTON_START);
             gamepadConfig.verticalAxis = prefs.getInteger("gpAxisVertical", GamepadConfig.GC_AXIS_VERTICAL_ANDROID);
-            gamepadConfig.rotateClockwiseButton = prefs.getInteger("gpButtonClockwise", GamepadConfig.GC_BUTTON_START);
+            gamepadConfig.rotateClockwiseButton = prefs.getInteger("gpButtonClockwise", GamepadConfig.GC_BUTTON_CLOCKWISE);
         }
 
         return gamepadConfig;
