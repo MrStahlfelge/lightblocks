@@ -69,7 +69,8 @@ public abstract class AbstractScreen implements Screen {
 
     protected void swoshIn() {
         stage.getRoot().setPosition(LightBlocksGame.nativeGameWidth, 0);
-        app.swoshSound.play();
+        if (app.isPlaySounds())
+            app.swoshSound.play();
         stage.getRoot().addAction(Actions.moveTo(0, 0, .15f, Interpolation.circle));
     }
 

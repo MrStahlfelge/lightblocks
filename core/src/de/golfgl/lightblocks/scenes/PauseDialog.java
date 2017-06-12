@@ -66,7 +66,7 @@ public class PauseDialog extends Dialog {
                         playScreen.showInputHelp();
                     }
                 });
-        button(new MusicButton(app));
+        button(new MusicButton(app, null));
 //        button(new TextButton(FontAwesome.BIG_FORWARD, app.skin, FontAwesome.SKIN_FONT_FA),
 //                new Runnable() {
 //                    @Override

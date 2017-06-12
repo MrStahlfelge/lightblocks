@@ -80,7 +80,7 @@ public abstract class AbstractScoreScreen extends AbstractMenuScreen {
 
             if (bestScore > 0 && !isBestScore(i)) {
                 scoreLabel.setEmphasizeScore(bestScore, Color.RED);
-                scoreLabel.setEmphasizeSound(app.unlockedSound);
+                scoreLabel.setEmphasizeSound(app.isPlaySounds() ? app.unlockedSound : null);
             }
 
             scoreTable.add(scoreLabel).minWidth(prefLabelWidth);

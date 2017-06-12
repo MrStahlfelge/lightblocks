@@ -195,7 +195,8 @@ public class MainMenuScreen extends AbstractScreen {
                     run(new Runnable() {
                         @Override
                         public void run() {
-                            app.dropSound.play();
+                            if (app.isPlaySounds())
+                                app.dropSound.play();
                         }
                     }),
                     Actions.delay(0.1f),

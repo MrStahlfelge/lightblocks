@@ -80,6 +80,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     PlayerAccountMenuScreen accountScreen;
     private FPSLogger fpsLogger;
     private Boolean playMusic;
+    private Boolean playSounds;
     private Boolean showTouchPanel;
     private Boolean pauseSwipeEnabled;
     private Boolean gpgsAutoLogin;
@@ -238,6 +239,21 @@ public class LightBlocksGame extends Game implements IGpgsListener {
         if (this.playMusic != playMusic) {
             this.playMusic = playMusic;
             prefs.putBoolean("musicPlayback", playMusic);
+            prefs.flush();
+        }
+    }
+
+    public Boolean isPlaySounds() {
+        if (playSounds == null)
+            playSounds = prefs.getBoolean("soundPlayback", true);
+
+        return playSounds;
+    }
+
+    public void setPlaySounds(Boolean playSounds) {
+        if (this.playSounds != playSounds) {
+            this.playSounds = playSounds;
+            prefs.putBoolean("soundPlayback", playSounds);
             prefs.flush();
         }
     }

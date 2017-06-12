@@ -40,7 +40,8 @@ public class SettingsScreen extends AbstractMenuScreen {
 
     @Override
     protected void fillMenuTable(Table settingsTable) {
-        final Button menuMusicButton = new MusicButton(app);
+        final Label musicButtonLabel = new Label("", app.skin, app.SKIN_FONT_BIG);
+        final Button menuMusicButton = new MusicButton(app, musicButtonLabel);
 
         final Button touchPanelButton = new TextButton(PlayScreenInput.getInputFAIcon(1), app.skin, FontAwesome
                 .SKIN_FONT_FA + "-checked");
@@ -83,7 +84,7 @@ public class SettingsScreen extends AbstractMenuScreen {
         settingsTable.row();
         settingsTable.defaults().fill();
         settingsTable.add(menuMusicButton).uniform();
-        settingsTable.add(new Label(app.TEXTS.get("menuMusicButton"), app.skin, app.SKIN_FONT_BIG)).expandX();
+        settingsTable.add(musicButtonLabel).expandX();
 
         settingsTable.row().spaceTop(30);
         settingsTable.add(new Label(app.TEXTS.get("menuInputGestures"), app.skin, app.SKIN_FONT_BIG)).colspan(2);

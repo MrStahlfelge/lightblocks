@@ -473,8 +473,9 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
-                if (mpo.changeType == MultiPlayerObjects.CHANGE_ADD
+                if ((mpo.changeType == MultiPlayerObjects.CHANGE_ADD
                         || mpo.changeType == MultiPlayerObjects.CHANGE_REMOVE)
+                        && app.isPlaySounds())
                     app.rotateSound.play();
 
                 refreshPlayerList();
