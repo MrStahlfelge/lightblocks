@@ -23,7 +23,7 @@ public class MusicButton extends TextButton {
     private LightBlocksGame app;
 
     public MusicButton(final LightBlocksGame app, Label stateDescriptionLabel) {
-        super("", app.skin, FontAwesome.SKIN_FONT_FA + "-checked");
+        super("", app.skin, FontAwesome.SKIN_FONT_FA);
 
         this.state = (app.isPlayMusic() ? SOUND_MUSIC : app.isPlaySounds() ? NO_MUSIC : NO_SOUND);
         this.lblStateDesc = stateDescriptionLabel;
