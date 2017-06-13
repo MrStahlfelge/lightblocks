@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.opensource.lightblocks"
-    android:versionCode="23"
-    android:versionName="0.72.062" >
+    android:versionCode="24"
+    android:versionName="0.72.063" >
 
     <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="25" />
 
