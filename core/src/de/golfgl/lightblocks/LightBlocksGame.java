@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.golfgl.lightblocks.gpgs.IGpgsClient;
-import de.golfgl.lightblocks.gpgs.IGpgsListener;
+import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -36,7 +36,7 @@ import de.golfgl.lightblocks.state.Player;
 
 import static com.badlogic.gdx.Gdx.app;
 
-public class LightBlocksGame extends Game implements IGpgsListener {
+public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final int nativeGameWidth = 480;
     public static final int nativeGameHeight = 800;
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
@@ -204,7 +204,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
         super.pause();
 
         if (gpgsClient != null)
-            gpgsClient.disconnect(true);
+            gpgsClient.disconnect();
     }
 
     @Override
@@ -284,7 +284,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     }
 
     @Override
-    public void gpgsConnected() {
+    public void gsConnected() {
         player.setGamerId(gpgsClient.getPlayerDisplayName());
         setGpgsAutoLogin(true);
         handleAccountChanged();
@@ -309,13 +309,13 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     }
 
     @Override
-    public void gpgsDisconnected() {
+    public void gsDisconnected() {
         player.setGamerId(modelNameRunningOn);
         handleAccountChanged();
     }
 
     @Override
-    public void gpgsErrorMsg(final String msg) {
+    public void gsErrorMsg(final String msg) {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
@@ -328,7 +328,7 @@ public class LightBlocksGame extends Game implements IGpgsListener {
     }
 
     @Override
-    public void gpgsGameStateLoaded(byte[] gameState) {
+    public void gsGameStateLoaded(byte[] gameState) {
         savegame.gpgsLoadGameState(gameState);
     }
 

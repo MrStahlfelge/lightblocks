@@ -21,6 +21,8 @@ import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
 import com.google.android.gms.games.snapshot.Snapshots;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
+import de.golfgl.gdxgamesvcs.GameServiceException;
+import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.lightblocks.AndroidLauncher;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
@@ -33,11 +35,13 @@ import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, IGpgsClient {
 
+    public static final String GAMESERVICE_ID = "GPGS";
+
     public static final String NAME_SAVE_GAMESTATE = "gamestate.sav";
     private static final int MAX_SNAPSHOT_RESOLVE_RETRIES = 3;
     private static final int MAX_CONNECTFAIL_RETRIES = 4;
     private Activity myContext;
-    private IGpgsListener gameListener;
+    private IGameServiceListener gameListener;
     // Play Games
     private GoogleApiClient mGoogleApiClient;
     private boolean mResolvingConnectionFailure = false;
@@ -64,6 +68,11 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @Override
+    public String getGameServiceId() {
+        return GAMESERVICE_ID;
+    }
+
+    @Override
     public void connect(boolean autoStart) {
         if (isConnected())
             return;
@@ -75,6 +84,15 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @Override
+    public void logOff() {
+        this.disconnect(false);
+    }
+
+    @Override
+    public void disconnect() {
+        this.disconnect(true);
+    }
+
     public void disconnect(boolean autoEnd) {
 
         // kein disconnect wenn Multiplayer-Aktionen laufen
@@ -90,7 +108,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
                     // eat security exceptions when already signed out via gpgs ui
                 }
             mGoogleApiClient.disconnect();
-            gameListener.gpgsDisconnected();
+            gameListener.gsDisconnected();
         }
     }
 
@@ -103,7 +121,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         // beendet, aber länger nicht benutzt wird, kommt es wieder zu dem Problem dass
         // GPGS erst fälschlicherweise errCode 4 zurückgibt
         firstConnectAttempt = MAX_CONNECTFAIL_RETRIES;
-        gameListener.gpgsConnected();
+        gameListener.gsConnected();
 
         // TODO Erhaltene Einladungen... gleich in Multiplayer gehen
         if (bundle != null) {
@@ -210,40 +228,40 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             }
 
             if (errorMsg != null)
-                gameListener.gpgsErrorMsg("Google Play Games: " + errorMsg);
+                gameListener.gsErrorMsg("Google Play Games: " + errorMsg);
 
         }
     }
 
     @Override
-    public void showLeaderboards(String leaderBoardId) throws GpgsException {
+    public void showLeaderboards(String leaderBoardId) throws GameServiceException {
         if (isConnected())
             myContext.startActivityForResult(leaderBoardId != null ?
                     Games.Leaderboards.getLeaderboardIntent(mGoogleApiClient, leaderBoardId) :
                     Games.Leaderboards.getAllLeaderboardsIntent(mGoogleApiClient), AndroidLauncher.RC_LEADERBOARD);
         else
-            throw new GpgsException();
+            throw new GameServiceException();
     }
 
     @Override
-    public void showAchievements() throws GpgsException {
+    public void showAchievements() throws GameServiceException {
         if (isConnected())
             myContext.startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient),
                     AndroidLauncher.RC_ACHIEVEMENTS);
         else
-            throw new GpgsException();
+            throw new GameServiceException();
 
     }
 
     @Override
-    public void submitToLeaderboard(String leaderboardId, long score, String tag) throws GpgsException {
+    public void submitToLeaderboard(String leaderboardId, long score, String tag) throws GameServiceException {
         if (isConnected())
             if (tag != null)
                 Games.Leaderboards.submitScore(mGoogleApiClient, leaderboardId, score, tag);
             else
                 Games.Leaderboards.submitScore(mGoogleApiClient, leaderboardId, score);
         else
-            throw new GpgsException();
+            throw new GameServiceException();
     }
 
     @Override
@@ -267,7 +285,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             Games.Achievements.increment(mGoogleApiClient, achievementId, incNum);
     }
 
-    public void setGameListener(IGpgsListener gameListener) {
+    public void setGameListener(IGameServiceListener gameListener) {
         this.gameListener = gameListener;
     }
 
@@ -342,7 +360,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     public boolean loadGameState(boolean sync) {
 
         if (!isConnected()) {
-            gameListener.gpgsGameStateLoaded(null);
+            gameListener.gsGameStateLoaded(null);
             return false;
         }
 
@@ -384,7 +402,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
         if (snapshot == null) {
             Log.w("GPGS", "Could not open Snapshot.");
-            gameListener.gpgsGameStateLoaded(null);
+            gameListener.gsGameStateLoaded(null);
             return false;
         }
 
@@ -392,11 +410,11 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         try {
             byte[] mSaveGameData = null;
             mSaveGameData = snapshot.getSnapshotContents().readFully();
-            gameListener.gpgsGameStateLoaded(mSaveGameData);
+            gameListener.gsGameStateLoaded(mSaveGameData);
             return true;
         } catch (Throwable t) {
             Log.e("GPGS", "Error while reading Snapshot.", t);
-            gameListener.gpgsGameStateLoaded(null);
+            gameListener.gsGameStateLoaded(null);
             return false;
         }
 

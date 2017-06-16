@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.esotericsoftware.minlog.Log;
 
-import de.golfgl.lightblocks.gpgs.GpgsException;
+import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.state.BestScore;
@@ -491,7 +491,7 @@ public abstract class GameModel implements Json.Serializable {
             try {
                 gpgsClient.submitToLeaderboard(leaderboardId, score.getScore(), Integer.toString(score
                         .getClearedLines()));
-            } catch (GpgsException e) {
+            } catch (GameServiceException e) {
                 Log.error("GPGS", "Error submitting leaderboard score.");
             }
     }

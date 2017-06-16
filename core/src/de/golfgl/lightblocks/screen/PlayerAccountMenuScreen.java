@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.gpgs.GpgsException;
+import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.scenes.FATextButton;
 
 /**
@@ -63,7 +63,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
         if (app.gpgsClient.isConnected()) {
             app.savegame.gpgsSaveGameState(true);
             app.setGpgsAutoLogin(false);
-            app.gpgsClient.disconnect(false);
+            app.gpgsClient.logOff();
             app.savegame.resetLoadedFromCloud();
         } else
             app.gpgsClient.connect(false);
@@ -92,7 +92,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
             public void changed(ChangeEvent event, Actor actor) {
                 try {
                     app.gpgsClient.showLeaderboards(null);
-                } catch (GpgsException e) {
+                } catch (GameServiceException e) {
                     showDialog("Error showing leaderboards.");
                 }
             }
@@ -104,7 +104,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
             public void changed(ChangeEvent event, Actor actor) {
                 try {
                     app.gpgsClient.showAchievements();
-                } catch (GpgsException e) {
+                } catch (GameServiceException e) {
                     showDialog("Error showing achievements.");
                 }
             }

@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.gpgs.GpgsException;
+import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.scenes.FATextButton;
@@ -203,7 +203,7 @@ public class ScoreScreen extends AbstractScoreScreen {
                 public void changed(ChangeEvent event, Actor actor) {
                     try {
                         app.gpgsClient.showLeaderboards(leaderboardId);
-                    } catch (GpgsException e) {
+                    } catch (GameServiceException e) {
                         showDialog("Error showing leaderboard.");
                     }
                 }
