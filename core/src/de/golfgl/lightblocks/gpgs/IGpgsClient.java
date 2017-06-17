@@ -12,4 +12,7 @@ import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 public interface IGpgsClient extends de.golfgl.gdxgamesvcs.IGameServiceClient {
 
     public AbstractMultiplayerRoom getMultiPlayerRoom();
+
+    Boolean saveGameStateSync(byte[] gameState, long progressValue);
+
 }

@@ -302,7 +302,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
                 // (obwohl das Willkommen... Schild kam)
                 // Nun in UI Thread verlagert
                 if (!savegame.isAlreadyLoadedFromCloud() && gpgsClient.isConnected())
-                    gpgsClient.loadGameState(false);
+                    gpgsClient.loadGameState();
 
             }
         });

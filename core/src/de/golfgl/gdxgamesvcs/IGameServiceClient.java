@@ -76,7 +76,7 @@ public interface IGameServiceClient {
 
     void incrementAchievement(String achievementId, int incNum);
 
-    boolean saveGameState(boolean sync, byte[] gameState, long progressValue);
+    void saveGameState(byte[] gameState, long progressValue);
 
-    boolean loadGameState(boolean sync);
+    void loadGameState();
 }

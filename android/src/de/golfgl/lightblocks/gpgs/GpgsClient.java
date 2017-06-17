@@ -77,7 +77,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         if (isConnected())
             return;
 
-        Log.i("GPGS", "Trying to connect with autostart " + autoStart);
+        Log.i(GAMESERVICE_ID, "Trying to connect with autostart " + autoStart);
         mAutoStartSignInflow = autoStart;
         mSignInClicked = !autoStart;
         mGoogleApiClient.connect();
@@ -100,7 +100,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             return;
 
         if (isConnected()) {
-            Log.i("GPGS", "Disconnecting with autoEnd " + autoEnd);
+            Log.i(GAMESERVICE_ID, "Disconnecting with autoEnd " + autoEnd);
             if (!autoEnd)
                 try {
                     Games.signOut(mGoogleApiClient);
@@ -116,7 +116,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     public void onConnected(@Nullable Bundle bundle) {
         // The player is signed in. Hide the sign-in button and allow the
         // player to proceed.
-        Log.i("GPGS", "Successfully signed in with player id " + getPlayerDisplayName());
+        Log.i(GAMESERVICE_ID, "Successfully signed in with player id " + getPlayerDisplayName());
         // den Zähler für maximale Versuche wieder zurück setzen. Wenn die App nämlich nicht
         // beendet, aber länger nicht benutzt wird, kommt es wieder zu dem Problem dass
         // GPGS erst fälschlicherweise errCode 4 zurückgibt
@@ -129,7 +129,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
                     bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
 
             if (inv != null)
-                Log.i("GPGS", "Multiplayer Invitation: " + inv.getInvitationId() + " from "
+                Log.i(GAMESERVICE_ID, "Multiplayer Invitation: " + inv.getInvitationId() + " from "
                         + inv.getInviter().getParticipantId());
         }
 
@@ -148,7 +148,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.i("GPGS", "Connection suspended, trying to reconnect");
+        Log.i(GAMESERVICE_ID, "Connection suspended, trying to reconnect");
         // Attempt to reconnect
         mGoogleApiClient.connect();
     }
@@ -159,7 +159,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             // already resolving
             return;
         }
-        Log.w("GPGS", "onConnectFailed: " + connectionResult.getErrorCode());
+        Log.w(GAMESERVICE_ID, "onConnectFailed: " + connectionResult.getErrorCode());
 
         // if the sign-in button was clicked
         // launch the sign-in flow
@@ -181,7 +181,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         // Error code 4 tritt seit Zunahme Drive-API beim ersten Start auf. Dann einfach nochmal probieren?
         else if (firstConnectAttempt > 0 && connectionResult.getErrorCode() == 4) {
             firstConnectAttempt -= 1;
-            Log.w("GPGS", "Retrying to connect...");
+            Log.w(GAMESERVICE_ID, "Retrying to connect...");
 
             AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
                 @Override
@@ -209,7 +209,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         if (resultCode == Activity.RESULT_OK) {
             mGoogleApiClient.connect();
         } else {
-            Log.w("GPGS", "SignInResult - Unable to sign in");
+            Log.w(GAMESERVICE_ID, "SignInResult - Unable to sign in");
             // Bring up an error dialog to alert the user that sign-in
             // failed. The R.string.signin_failure should reference an error
             // string in your strings.xml file that tells the user they
@@ -290,28 +290,24 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @Override
-    public boolean saveGameState(boolean sync, final byte[] gameState, final long progressValue) {
+    public void saveGameState(final byte[] gameState, final long progressValue) {
 
-        if (!isConnected())
-            return false;
+        if (isConnected()) {
 
-        if (!sync) {
             AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
                 @Override
                 protected Boolean doInBackground(Void... params) {
-                    return saveGameStateSync(progressValue, gameState);
+                    return saveGameStateSync(gameState, progressValue);
                 }
             };
 
             task.execute();
-
-            return true;
-        } else
-            return saveGameStateSync(progressValue, gameState);
+        }
     }
 
     @NonNull
-    private Boolean saveGameStateSync(long progressValue, byte[] gameState) {
+    @Override
+    public Boolean saveGameStateSync(byte[] gameState, long progressValue) {
         if (!isConnected())
             return false;
 
@@ -322,12 +318,12 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         Snapshot snapshot = processSnapshotOpenResult(open, 0);
 
         if (snapshot == null) {
-            Log.w("GPGS", "Could not open Snapshot.");
+            Log.w(GAMESERVICE_ID, "Could not open Snapshot.");
             return false;
         }
 
         if (progressValue < snapshot.getMetadata().getProgressValue()) {
-            Log.e("GPGS", "Progress of saved game state higher than current one. Did not save.");
+            Log.e(GAMESERVICE_ID, "Progress of saved game state higher than current one. Did not save.");
             return false;
         }
 
@@ -346,37 +342,30 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
                 mGoogleApiClient, snapshot, metadataChange).await();
 
         if (!commit.getStatus().isSuccess()) {
-            Log.w("GPGS", "Failed to commit Snapshot:" + commit.getStatus().getStatusMessage());
+            Log.w(GAMESERVICE_ID, "Failed to commit Snapshot:" + commit.getStatus().getStatusMessage());
 
             return false;
         }
 
         // No failures
-        Log.i("GPGS", "Successfully saved gamestate with " + gameState.length + "B");
+        Log.i(GAMESERVICE_ID, "Successfully saved gamestate with " + gameState.length + "B");
         return true;
     }
 
     @Override
-    public boolean loadGameState(boolean sync) {
+    public void loadGameState() {
 
-        if (!isConnected()) {
+        if (!isConnected())
             gameListener.gsGameStateLoaded(null);
-            return false;
-        }
 
-        if (!sync) {
-            AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
-                @Override
-                protected Boolean doInBackground(Void... params) {
-                    return loadGameStateSync();
-                }
-            };
+        AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                return loadGameStateSync();
+            }
+        };
 
-            task.execute();
-
-            return true;
-        } else
-            return loadGameStateSync();
+        task.execute();
     }
 
     @Override
@@ -390,9 +379,9 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @NonNull
-    private Boolean loadGameStateSync() {
+    public Boolean loadGameStateSync() {
         if (!isConnected())
-            return false;
+            gameListener.gsGameStateLoaded(null);
 
         // Open the snapshot, creating if necessary
         Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
@@ -401,7 +390,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         Snapshot snapshot = processSnapshotOpenResult(open, 0);
 
         if (snapshot == null) {
-            Log.w("GPGS", "Could not open Snapshot.");
+            Log.w(GAMESERVICE_ID, "Could not open Snapshot.");
             gameListener.gsGameStateLoaded(null);
             return false;
         }
@@ -413,7 +402,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             gameListener.gsGameStateLoaded(mSaveGameData);
             return true;
         } catch (Throwable t) {
-            Log.e("GPGS", "Error while reading Snapshot.", t);
+            Log.e(GAMESERVICE_ID, "Error while reading Snapshot.", t);
             gameListener.gsGameStateLoaded(null);
             return false;
         }
@@ -429,7 +418,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         retryCount++;
 
         int status = result.getStatus().getStatusCode();
-        Log.i("GPGS", "Open Snapshot Result status: " + result.getStatus().getStatusMessage());
+        Log.i(GAMESERVICE_ID, "Open Snapshot Result status: " + result.getStatus().getStatusMessage());
 
         if (status == GamesStatusCodes.STATUS_OK) {
             return result.getSnapshot();

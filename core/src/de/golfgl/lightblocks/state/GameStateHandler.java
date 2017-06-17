@@ -175,8 +175,12 @@ public class GameStateHandler {
                 if (LightBlocksGame.GAME_DEVMODE)
                     Log.info("GameState", jsonString);
 
-                app.gpgsClient.saveGameState(sync, xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
-                        totalScore.getScore());
+                if (sync)
+                    app.gpgsClient.saveGameStateSync(xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
+                            totalScore.getScore());
+                else
+                    app.gpgsClient.saveGameState(xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
+                            totalScore.getScore());
             }
         }
     }
