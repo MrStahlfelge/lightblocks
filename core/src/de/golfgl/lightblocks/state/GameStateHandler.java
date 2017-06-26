@@ -6,7 +6,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.esotericsoftware.minlog.Log;
 
+import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.IGpgsClient;
 
 /**
  * Die Klasse lädt oder speichert einen Json-String der den Spielstand abbildet
@@ -176,11 +178,17 @@ public class GameStateHandler {
                     Log.info("GameState", jsonString);
 
                 if (sync)
-                    app.gpgsClient.saveGameStateSync(xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
+                    app.gpgsClient.saveGameStateSync(IGpgsClient.NAME_SAVE_GAMESTATE,
+                            xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
                             totalScore.getScore());
                 else
-                    app.gpgsClient.saveGameState(xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
-                            totalScore.getScore());
+                    try {
+                        app.gpgsClient.saveGameState(IGpgsClient.NAME_SAVE_GAMESTATE,
+                                xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
+                                totalScore.getScore());
+                    } catch (GameServiceException e) {
+                        // kann nicht passieren
+                    }
             }
         }
     }

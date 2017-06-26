@@ -19,6 +19,7 @@ import com.esotericsoftware.minlog.Log;
 import java.util.HashMap;
 import java.util.List;
 
+import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.lightblocks.model.Mission;
@@ -302,7 +303,11 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
                 // (obwohl das Willkommen... Schild kam)
                 // Nun in UI Thread verlagert
                 if (!savegame.isAlreadyLoadedFromCloud() && gpgsClient.isConnected())
-                    gpgsClient.loadGameState();
+                    try {
+                        gpgsClient.loadGameState(IGpgsClient.NAME_SAVE_GAMESTATE);
+                    } catch (GameServiceException e) {
+                        // eat - kann nicht auftreten
+                    }
 
             }
         });
@@ -315,7 +320,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     }
 
     @Override
-    public void gsErrorMsg(final String msg) {
+    public void gsErrorMsg(GsErrorType errType, final String msg) {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {

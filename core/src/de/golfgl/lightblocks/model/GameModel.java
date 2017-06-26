@@ -5,9 +5,7 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
-import com.esotericsoftware.minlog.Log;
 
-import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.state.BestScore;
@@ -488,12 +486,8 @@ public abstract class GameModel implements Json.Serializable {
         String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(getIdentifier());
 
         if (leaderboardId != null && gpgsClient != null && gpgsClient.isConnected())
-            try {
-                gpgsClient.submitToLeaderboard(leaderboardId, score.getScore(), Integer.toString(score
-                        .getClearedLines()));
-            } catch (GameServiceException e) {
-                Log.error("GPGS", "Error submitting leaderboard score.");
-            }
+            gpgsClient.submitToLeaderboard(leaderboardId, score.getScore(), Integer.toString(score
+                    .getClearedLines()));
     }
 
     /**

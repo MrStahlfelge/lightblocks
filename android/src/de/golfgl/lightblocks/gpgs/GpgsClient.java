@@ -37,7 +37,6 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     public static final String GAMESERVICE_ID = "GPGS";
 
-    public static final String NAME_SAVE_GAMESTATE = "gamestate.sav";
     private static final int MAX_SNAPSHOT_RESOLVE_RETRIES = 3;
     private static final int MAX_CONNECTFAIL_RETRIES = 4;
     private Activity myContext;
@@ -47,6 +46,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     private boolean mResolvingConnectionFailure = false;
     private boolean mAutoStartSignInflow = true;
     private boolean mSignInClicked = false;
+    private boolean isConnectionPending;
     private int firstConnectAttempt;
     private GpgsMultiPlayerRoom gpgsMPRoom;
 
@@ -73,14 +73,17 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @Override
-    public void connect(boolean autoStart) {
+    public boolean connect(boolean autoStart) {
         if (isConnected())
-            return;
+            return true;
 
         Log.i(GAMESERVICE_ID, "Trying to connect with autostart " + autoStart);
         mAutoStartSignInflow = autoStart;
         mSignInClicked = !autoStart;
+        isConnectionPending = true;
         mGoogleApiClient.connect();
+
+        return true;
     }
 
     @Override
@@ -121,6 +124,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         // beendet, aber länger nicht benutzt wird, kommt es wieder zu dem Problem dass
         // GPGS erst fälschlicherweise errCode 4 zurückgibt
         firstConnectAttempt = MAX_CONNECTFAIL_RETRIES;
+        isConnectionPending = false;
         gameListener.gsConnected();
 
         // TODO Erhaltene Einladungen... gleich in Multiplayer gehen
@@ -147,9 +151,20 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @Override
+    public boolean isConnectionPending() {
+        return isConnectionPending;
+    }
+
+    @Override
+    public boolean providesLeaderboardUI() {
+        return true;
+    }
+
+    @Override
     public void onConnectionSuspended(int i) {
         Log.i(GAMESERVICE_ID, "Connection suspended, trying to reconnect");
         // Attempt to reconnect
+        isConnectionPending = true;
         mGoogleApiClient.connect();
     }
 
@@ -176,6 +191,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
                     mGoogleApiClient, connectionResult,
                     AndroidLauncher.RC_GPGS_SIGNIN, "Unable to sign in.")) {
                 mResolvingConnectionFailure = false;
+                isConnectionPending = false;
             }
         }
         // Error code 4 tritt seit Zunahme Drive-API beim ersten Start auf. Dann einfach nochmal probieren?
@@ -200,16 +216,20 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
             task.execute();
 
-        }
+        } else
+            isConnectionPending = false;
     }
 
     public void signInResult(int resultCode, Intent data) {
         mSignInClicked = false;
         mResolvingConnectionFailure = false;
         if (resultCode == Activity.RESULT_OK) {
+            isConnectionPending = true;
             mGoogleApiClient.connect();
         } else {
             Log.w(GAMESERVICE_ID, "SignInResult - Unable to sign in");
+
+            isConnectionPending = false;
             // Bring up an error dialog to alert the user that sign-in
             // failed. The R.string.signin_failure should reference an error
             // string in your strings.xml file that tells the user they
@@ -228,7 +248,8 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
             }
 
             if (errorMsg != null)
-                gameListener.gsErrorMsg("Google Play Games: " + errorMsg);
+                gameListener.gsErrorMsg(IGameServiceListener.GsErrorType.errorLoginFailed,
+                        "Google Play Games: " + errorMsg);
 
         }
     }
@@ -244,6 +265,11 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @Override
+    public boolean providesAchievementsUI() {
+        return true;
+    }
+
+    @Override
     public void showAchievements() throws GameServiceException {
         if (isConnected())
             myContext.startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient),
@@ -254,50 +280,60 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @Override
-    public void submitToLeaderboard(String leaderboardId, long score, String tag) throws GameServiceException {
-        if (isConnected())
+    public boolean submitToLeaderboard(String leaderboardId, long score, String tag) {
+        if (isConnected()) {
             if (tag != null)
                 Games.Leaderboards.submitScore(mGoogleApiClient, leaderboardId, score, tag);
             else
                 Games.Leaderboards.submitScore(mGoogleApiClient, leaderboardId, score);
-        else
-            throw new GameServiceException();
+            return true;
+        } else
+            return false;
     }
 
     @Override
-    public void submitEvent(String eventId, int increment) {
+    public boolean submitEvent(String eventId, int increment) {
         // No exception, if not online events are dismissed
         if (!isConnected())
-            return;
+            return false;
 
         Games.Events.increment(mGoogleApiClient, eventId, increment);
+
+        return true;
     }
 
     @Override
-    public void unlockAchievement(String achievementId) {
-        if (isConnected())
+    public boolean unlockAchievement(String achievementId) {
+        if (isConnected()) {
             Games.Achievements.unlock(mGoogleApiClient, achievementId);
+            return true;
+        } else
+            return false;
     }
 
     @Override
-    public void incrementAchievement(String achievementId, int incNum) {
-        if (isConnected())
+    public boolean incrementAchievement(String achievementId, int incNum) {
+        if (isConnected()) {
             Games.Achievements.increment(mGoogleApiClient, achievementId, incNum);
+            return true;
+        } else
+            return false;
     }
 
-    public void setGameListener(IGameServiceListener gameListener) {
+    @Override
+    public void setListener(IGameServiceListener gameListener) {
         this.gameListener = gameListener;
     }
 
     @Override
-    public void saveGameState(final byte[] gameState, final long progressValue) {
+    public void saveGameState(final String id, final byte[] gameState, final long progressValue) {
 
         if (isConnected()) {
 
             AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
                 @Override
                 protected Boolean doInBackground(Void... params) {
-                    return saveGameStateSync(gameState, progressValue);
+                    return saveGameStateSync(id, gameState, progressValue);
                 }
             };
 
@@ -307,13 +343,13 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     @NonNull
     @Override
-    public Boolean saveGameStateSync(byte[] gameState, long progressValue) {
+    public Boolean saveGameStateSync(String id, byte[] gameState, long progressValue) {
         if (!isConnected())
             return false;
 
         // Open the snapshot, creating if necessary
         Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
-                mGoogleApiClient, NAME_SAVE_GAMESTATE, true).await();
+                mGoogleApiClient, id, true).await();
 
         Snapshot snapshot = processSnapshotOpenResult(open, 0);
 
@@ -353,7 +389,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @Override
-    public void loadGameState() {
+    public void loadGameState(final String id) {
 
         if (!isConnected())
             gameListener.gsGameStateLoaded(null);
@@ -361,11 +397,16 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
-                return loadGameStateSync();
+                return loadGameStateSync(id);
             }
         };
 
         task.execute();
+    }
+
+    @Override
+    public CloudSaveCapability supportsCloudGameState() {
+        return CloudSaveCapability.MultipleFilesSupported;
     }
 
     @Override
@@ -379,13 +420,13 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @NonNull
-    public Boolean loadGameStateSync() {
+    public Boolean loadGameStateSync(String id) {
         if (!isConnected())
             gameListener.gsGameStateLoaded(null);
 
         // Open the snapshot, creating if necessary
         Snapshots.OpenSnapshotResult open = Games.Snapshots.open(
-                mGoogleApiClient, NAME_SAVE_GAMESTATE, true).await();
+                mGoogleApiClient, id, true).await();
 
         Snapshot snapshot = processSnapshotOpenResult(open, 0);
 

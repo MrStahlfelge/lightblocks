@@ -53,7 +53,7 @@ public class AndroidLauncher extends AndroidApplication {
         game.share = new AndroidShareHandler();
 
         game.gpgsClient = gpgsClient;
-        gpgsClient.setGameListener(game);
+        gpgsClient.setListener(game);
 
         // Gerätemodell wird für den Spielernamen benötigt
         game.modelNameRunningOn = Build.MODEL;
