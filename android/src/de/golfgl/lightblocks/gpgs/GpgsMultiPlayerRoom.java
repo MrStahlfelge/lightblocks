@@ -59,7 +59,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
     private static final int MAX_PLAYERS_GPGS = 2;
     private final Object lockObj = new Object();
     private Activity context;
-    private GpgsClient gpgsClient;
+    private GpgsMultiPlayerClient gpgsClient;
     private boolean roomCreationPending = false;
     private Room room;
     private Kryo kryo = new Kryo();
@@ -74,7 +74,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
     private HashSet<String> allPlayers = new HashSet<>(MAX_PLAYERS_GPGS);
 
 
-    public void setGpgsClient(GpgsClient gpgsClient) {
+    public void setGpgsClient(GpgsMultiPlayerClient gpgsClient) {
         this.gpgsClient = gpgsClient;
         MultiPlayerObjects.register(kryo);
     }

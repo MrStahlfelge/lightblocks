@@ -8,7 +8,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.android.gms.games.GamesActivityResultCodes;
 
-import de.golfgl.lightblocks.gpgs.GpgsClient;
+import de.golfgl.lightblocks.gpgs.GpgsMultiPlayerClient;
 import de.golfgl.lightblocks.gpgs.GpgsMultiPlayerRoom;
 import de.golfgl.lightblocks.multiplayer.NsdAdapter;
 
@@ -24,7 +24,7 @@ public class AndroidLauncher extends AndroidApplication {
     // Network Service detection
     NsdAdapter nsdAdapter;
     //Google Play Games
-    GpgsClient gpgsClient;
+    GpgsMultiPlayerClient gpgsClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,8 @@ public class AndroidLauncher extends AndroidApplication {
 //        }
 
         // Create the Google Api Client with access to the Play Games services
-        gpgsClient = new GpgsClient(this);
+        gpgsClient = new GpgsMultiPlayerClient();
+        gpgsClient.initialize(this, true);
 
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.hideStatusBar = true;

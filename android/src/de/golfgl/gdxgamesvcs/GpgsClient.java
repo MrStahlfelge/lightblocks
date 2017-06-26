@@ -1,4 +1,4 @@
-package de.golfgl.lightblocks.gpgs;
+package de.golfgl.gdxgamesvcs;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.badlogic.gdx.Gdx;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
@@ -21,50 +22,52 @@ import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
 import com.google.android.gms.games.snapshot.Snapshots;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
-import de.golfgl.gdxgamesvcs.GameServiceException;
-import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.lightblocks.AndroidLauncher;
-import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
 /**
- * Client für Google Play Games
+ * Client for Google Play Games
  * <p>
  * Created by Benjamin Schulte on 26.03.2017.
  */
 
-public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, IGpgsClient {
-
+public class GpgsClient implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        IGameServiceClient {
     public static final String GAMESERVICE_ID = "GPGS";
-
+    protected static final int MAX_CONNECTFAIL_RETRIES = 4;
     private static final int MAX_SNAPSHOT_RESOLVE_RETRIES = 3;
-    private static final int MAX_CONNECTFAIL_RETRIES = 4;
-    private Activity myContext;
-    private IGameServiceListener gameListener;
+    protected Activity myContext;
+    protected IGameServiceListener gameListener;
     // Play Games
-    private GoogleApiClient mGoogleApiClient;
+    protected GoogleApiClient mGoogleApiClient;
+    protected int firstConnectAttempt;
+    protected boolean isConnectionPending;
+    protected boolean driveApiEnabled;
     private boolean mResolvingConnectionFailure = false;
     private boolean mAutoStartSignInflow = true;
     private boolean mSignInClicked = false;
-    private boolean isConnectionPending;
-    private int firstConnectAttempt;
-    private GpgsMultiPlayerRoom gpgsMPRoom;
 
-    public GpgsClient(Activity context) {
+    public GpgsClient initialize(Activity context, boolean enableDriveAPI) {
+
+        if (mGoogleApiClient != null)
+            throw new IllegalStateException("Already initialized.");
+
         myContext = context;
         firstConnectAttempt = MAX_CONNECTFAIL_RETRIES; // dreimal probieren in Play Games einzuloggen
-        mGoogleApiClient = new GoogleApiClient.Builder(myContext)
+
+        GoogleApiClient.Builder builder = new GoogleApiClient.Builder(myContext)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                // für Savegames
-                .addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER)
-                // add other APIs and scopes here as needed
-                .build();
-    }
+                .addApi(Games.API).addScope(Games.SCOPE_GAMES);
 
-    public GoogleApiClient getGoogleApiClient() {
-        return mGoogleApiClient;
+        driveApiEnabled = enableDriveAPI;
+        if (driveApiEnabled)
+            builder.addApi(Drive.API).addScope(Drive.SCOPE_APPFOLDER);
+
+        // add other APIs and scopes here as needed
+
+        mGoogleApiClient = builder.build();
+
+        return this;
     }
 
     @Override
@@ -74,6 +77,11 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public boolean connect(boolean autoStart) {
+        if (mGoogleApiClient == null) {
+            Gdx.app.error(GAMESERVICE_ID, "Call initialize first.");
+            throw new IllegalStateException();
+        }
+
         if (isConnected())
             return true;
 
@@ -97,10 +105,6 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public void disconnect(boolean autoEnd) {
-
-        // kein disconnect wenn Multiplayer-Aktionen laufen
-        if (autoEnd && gpgsMPRoom != null && gpgsMPRoom.isConnected())
-            return;
 
         if (isConnected()) {
             Log.i(GAMESERVICE_ID, "Disconnecting with autoEnd " + autoEnd);
@@ -326,7 +330,10 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @Override
-    public void saveGameState(final String id, final byte[] gameState, final long progressValue) {
+    public void saveGameState(final String id, final byte[] gameState, final long progressValue)
+            throws GameServiceException {
+        if (!driveApiEnabled)
+            throw new GameServiceException.NotSupportedException();
 
         if (isConnected()) {
 
@@ -342,7 +349,6 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @NonNull
-    @Override
     public Boolean saveGameStateSync(String id, byte[] gameState, long progressValue) {
         if (!isConnected())
             return false;
@@ -370,7 +376,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
         // Description wird in Play Games app angezeigt
         SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder()
                 .fromMetadata(snapshot.getMetadata())
-                .setDescription("Time to play again!")
+                .setDescription("Time to play again!") //TODO
                 .setProgressValue(progressValue)
                 .build();
 
@@ -389,7 +395,10 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
     }
 
     @Override
-    public void loadGameState(final String id) {
+    public void loadGameState(final String id) throws GameServiceException {
+
+        if (!driveApiEnabled)
+            throw new GameServiceException.NotSupportedException();
 
         if (!isConnected())
             gameListener.gsGameStateLoaded(null);
@@ -406,17 +415,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public CloudSaveCapability supportsCloudGameState() {
-        return CloudSaveCapability.MultipleFilesSupported;
-    }
-
-    @Override
-    public AbstractMultiplayerRoom getMultiPlayerRoom() {
-        if (gpgsMPRoom == null) {
-            gpgsMPRoom = new GpgsMultiPlayerRoom();
-            gpgsMPRoom.setContext(myContext);
-            gpgsMPRoom.setGpgsClient(this);
-        }
-        return gpgsMPRoom;
+        return (driveApiEnabled ? CloudSaveCapability.MultipleFilesSupported : CloudSaveCapability.NotSupported);
     }
 
     @NonNull
