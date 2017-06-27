@@ -22,8 +22,6 @@ import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
 import com.google.android.gms.games.snapshot.Snapshots;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
-import de.golfgl.lightblocks.AndroidLauncher;
-
 /**
  * Client for Google Play Games
  * <p>
@@ -32,6 +30,10 @@ import de.golfgl.lightblocks.AndroidLauncher;
 
 public class GpgsClient implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         IGameServiceClient {
+    public static final int RC_GPGS_SIGNIN = 9001;
+    public static final int RC_LEADERBOARD = 9002;
+    public static final int RC_ACHIEVEMENTS = 9003;
+
     public static final String GAMESERVICE_ID = "GPGS";
     protected static final int MAX_CONNECTFAIL_RETRIES = 4;
     private static final int MAX_SNAPSHOT_RESOLVE_RETRIES = 3;
@@ -46,6 +48,15 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
     private boolean mAutoStartSignInflow = true;
     private boolean mSignInClicked = false;
 
+    /**
+     * Initializes the GoogleApiClient. Give your main AndroidLauncher as context.
+     * <p>
+     * Don't forget to add onActivityResult method there with call to onGpgsActivityResult.
+     *
+     * @param context        your AndroidLauncher class
+     * @param enableDriveAPI yes if you activate save gamestate feature
+     * @return this for method chunking
+     */
     public GpgsClient initialize(Activity context, boolean enableDriveAPI) {
 
         if (mGoogleApiClient != null)
@@ -68,6 +79,29 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
         mGoogleApiClient = builder.build();
 
         return this;
+    }
+
+    /**
+     * Call this in the onActivityResult of the context you gave to initialize()
+     *
+     * @param requestCode requestCode
+     * @param resultCode  resultCode
+     * @param data        Intent
+     * @return yes if this was a Gpgs activity
+     */
+    public boolean onGpgsActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RC_GPGS_SIGNIN) {
+            signInResult(resultCode, data);
+            return true;
+
+            // check for "inconsistent state"
+        } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED &&
+                (requestCode == RC_LEADERBOARD || requestCode == RC_ACHIEVEMENTS)) {
+            // force a disconnect to sync up state, ensuring that mClient reports "not connected"
+            disconnect(false);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -193,7 +227,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
             // an issue with sign-in, please try again later."
             if (!BaseGameUtils.resolveConnectionFailure(myContext,
                     mGoogleApiClient, connectionResult,
-                    AndroidLauncher.RC_GPGS_SIGNIN, "Unable to sign in.")) {
+                    RC_GPGS_SIGNIN, "Unable to sign in.")) {
                 mResolvingConnectionFailure = false;
                 isConnectionPending = false;
             }
@@ -263,7 +297,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
         if (isConnected())
             myContext.startActivityForResult(leaderBoardId != null ?
                     Games.Leaderboards.getLeaderboardIntent(mGoogleApiClient, leaderBoardId) :
-                    Games.Leaderboards.getAllLeaderboardsIntent(mGoogleApiClient), AndroidLauncher.RC_LEADERBOARD);
+                    Games.Leaderboards.getAllLeaderboardsIntent(mGoogleApiClient), RC_LEADERBOARD);
         else
             throw new GameServiceException();
     }
@@ -277,7 +311,7 @@ public class GpgsClient implements GoogleApiClient.ConnectionCallbacks, GoogleAp
     public void showAchievements() throws GameServiceException {
         if (isConnected())
             myContext.startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient),
-                    AndroidLauncher.RC_ACHIEVEMENTS);
+                    RC_ACHIEVEMENTS);
         else
             throw new GameServiceException();
 
