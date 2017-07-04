@@ -1,1 +1,1 @@
-include 'desktop', 'android', 'html', 'core', 'BaseGameUtils'
+include 'desktop', 'android', 'html', 'core'

@@ -1,8 +1,7 @@
 package de.golfgl.lightblocks.gpgs;
 
-import android.app.Activity;
-
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
 
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
@@ -26,7 +25,7 @@ public class GpgsMultiPlayerClient extends de.golfgl.gdxgamesvcs.GpgsClient impl
         if (autoEnd && gpgsMPRoom != null && gpgsMPRoom.isConnected())
             return;
 
-        super.disconnect();
+        super.disconnect(autoEnd);
     }
 
     @Override
@@ -39,4 +38,10 @@ public class GpgsMultiPlayerClient extends de.golfgl.gdxgamesvcs.GpgsClient impl
         return gpgsMPRoom;
     }
 
+    @Override
+    protected SnapshotMetadataChange.Builder setSaveGameMetaData(SnapshotMetadataChange.Builder metaDataBuilder,
+                                                                 String id, byte[] gameState, long progressValue) {
+        return super.setSaveGameMetaData(metaDataBuilder, id, gameState, progressValue)
+                .setDescription("Time to play again!");
+    }
 }
