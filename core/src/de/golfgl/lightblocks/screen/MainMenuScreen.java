@@ -174,7 +174,9 @@ public class MainMenuScreen extends AbstractScreen {
                 gamerId = gamerId.substring(0, 10) + "...";
 
             accountButton.setText(gamerId);
-        } else
+        } else if (app.gpgsClient != null && app.gpgsClient.isConnectionPending())
+            accountButton.setText(app.TEXTS.get("menuGPGSConnecting"));
+        else
             accountButton.setText(app.TEXTS.get("menuAccount"));
     }
 

@@ -7,8 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
-import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.gdxgamesvcs.GameServiceException;
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.FATextButton;
 
 /**
@@ -50,10 +50,10 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
     protected void fillButtonTable(Table buttons) {
         logInOutButton = new FATextButton("", "", app.skin);
         logInOutButton.addListener(new ChangeListener() {
-                                    public void changed(ChangeEvent event, Actor actor) {
-                                        performGpgsLoginout();
-                                    }
-                                }
+                                       public void changed(ChangeEvent event, Actor actor) {
+                                           performGpgsLoginout();
+                                       }
+                                   }
         );
 
         buttons.add(logInOutButton).padLeft(50).minWidth(220);
@@ -136,13 +136,14 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
 
     public void refreshAccountChanged() {
         final boolean gpgsConnected = app.gpgsClient != null && app.gpgsClient.isConnected();
+        final boolean gpgsConnectPending = app.gpgsClient != null && app.gpgsClient.isConnectionPending();
         if (gpgsConnected) {
             logInOutButton.getFaLabel().setText(FontAwesome.NET_LOGOUT);
             logInOutButton.setText(app.TEXTS.get("menuSignOut"));
             signInState.setText(app.TEXTS.format("menuGPGSAccount", app.player.getName()));
         } else {
             logInOutButton.getFaLabel().setText(FontAwesome.NET_LOGIN);
-            logInOutButton.setText(app.TEXTS.get("menuSignInGPGS"));
+            logInOutButton.setText(app.TEXTS.get(gpgsConnectPending ? "menuGPGSConnecting" : "menuSignInGPGS"));
             signInState.setText(app.TEXTS.format("menuLocalAccount", app.player.getName()));
         }
 
