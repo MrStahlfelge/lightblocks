@@ -65,8 +65,10 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
             app.setGpgsAutoLogin(false);
             app.gpgsClient.logOff();
             app.savegame.resetLoadedFromCloud();
-        } else
+        } else {
             app.gpgsClient.connect(false);
+            refreshAccountChanged();
+        }
 
         // Die AutoLogin Einstellung wird bei erfolgtem Connect wieder zurück gesetzt
 
