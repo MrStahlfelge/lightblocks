@@ -256,21 +256,22 @@ public abstract class GameModel implements Json.Serializable {
         if (score.getDrawnTetrominos() > 10 && gameboard.calcGameboardFill() == 0)
             gpgsUpdateAchievement(GpgsHelper.ACH_CLEAN_COMPLETE);
 
-        gpgsUpdateAchievement(GpgsHelper.ACH_ADDICTION_LEVEL_1, removedLines);
-        gpgsUpdateAchievement(GpgsHelper.ACH_ADDICTION_LEVEL_2, removedLines);
-        gpgsUpdateAchievement(GpgsHelper.ACH_HIGH_LEVEL_ADDICTION, removedLines);
+        float fTotalClearedLines = totalScore.getClearedLines();
+        gpgsUpdateAchievement(GpgsHelper.ACH_ADDICTION_LEVEL_1, removedLines, fTotalClearedLines / 500);
+        gpgsUpdateAchievement(GpgsHelper.ACH_ADDICTION_LEVEL_2, removedLines, fTotalClearedLines / 5000);
+        gpgsUpdateAchievement(GpgsHelper.ACH_HIGH_LEVEL_ADDICTION, removedLines, fTotalClearedLines / 10000);
     }
 
     protected void achievementTSpin() {
         totalScore.incTSpins();
         gpgsUpdateAchievement(GpgsHelper.ACH_TSPIN);
-        gpgsUpdateAchievement(GpgsHelper.ACH_10_TSPINS, 1);
+        gpgsUpdateAchievement(GpgsHelper.ACH_10_TSPINS, 1, (float) totalScore.getTSpins() / 10);
     }
 
     protected void achievementFourLines() {
         totalScore.incFourLineCount();
         gpgsUpdateAchievement(GpgsHelper.ACH_FOUR_LINES);
-        gpgsUpdateAchievement(GpgsHelper.ACH_100_FOUR_LINES, 1);
+        gpgsUpdateAchievement(GpgsHelper.ACH_100_FOUR_LINES, 1, (float) totalScore.getFourLineCount() / 100);
     }
 
     /**
@@ -662,9 +663,9 @@ public abstract class GameModel implements Json.Serializable {
         }
     }
 
-    protected void gpgsUpdateAchievement(String achievementId, int incNum) {
+    protected void gpgsUpdateAchievement(String achievementId, int incNum, float completionPercentage) {
         if (gpgsClient != null && gpgsClient.isConnected()) {
-            gpgsClient.incrementAchievement(achievementId, incNum);
+            gpgsClient.incrementAchievement(achievementId, incNum, completionPercentage);
         }
     }
 

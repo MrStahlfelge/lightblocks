@@ -23,7 +23,7 @@ allprojects {
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
-        gamsvcsVersion = '0.0.1'
+        gamsvcsVersion = '0.1.1-SNAPSHOT'
     }
 
     repositories {
@@ -65,7 +65,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
-        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:0.0.2-SNAPSHOT"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamsvcsVersion"
     }
 }
 
