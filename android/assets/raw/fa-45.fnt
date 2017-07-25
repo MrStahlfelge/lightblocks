@@ -8,6 +8,7 @@ char id=32      x=0    y=0    width=0    height=0    xoffset=-6   yoffset=0    x
 char id=65      x=88   y=454  width=60   height=52   xoffset=0    yoffset=0    xadvance=60   page=0    chnl=0
 char id=66      x=154  y=454  width=60   height=52   xoffset=0    yoffset=0    xadvance=60   page=0    chnl=0
 char id=67      x=215  y=454  width=50   height=57   xoffset=3    yoffset=-1   xadvance=55   page=0    chnl=0
+char id=68      x=266  y=454  width=50   height=57   xoffset=3    yoffset=-1   xadvance=55   page=0    chnl=0
 char id=61441   x=294  y=0    width=51   height=54   xoffset=-6   yoffset=-3   xadvance=46   page=0    chnl=0
 char id=61444   x=325  y=212  width=57   height=51   xoffset=-6   yoffset=-3   xadvance=52   page=0    chnl=0 
 char id=61445   x=189  y=57   width=54   height=52   xoffset=-6   yoffset=-5   xadvance=49   page=0    chnl=0 
