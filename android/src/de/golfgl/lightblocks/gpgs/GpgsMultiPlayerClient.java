@@ -1,6 +1,12 @@
 package de.golfgl.lightblocks.gpgs;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.multiplayer.Invitation;
+import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
 
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -17,6 +23,22 @@ public class GpgsMultiPlayerClient extends de.golfgl.gdxgamesvcs.GpgsClient impl
 
     public GoogleApiClient getGoogleApiClient() {
         return mGoogleApiClient;
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        super.onConnected(bundle);
+
+        // TODO Erhaltene Einladungen... gleich in Multiplayer gehen
+        if (bundle != null) {
+            Invitation inv =
+                    bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
+
+            if (inv != null)
+                Log.i(GAMESERVICE_ID, "Multiplayer Invitation: " + inv.getInvitationId() + " from "
+                        + inv.getInviter().getParticipantId());
+        }
+
     }
 
     @Override
