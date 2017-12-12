@@ -256,8 +256,10 @@ public class GameStateHandler {
                             , SAVEGAMEKEY));
                 } catch (Throwable t) {
                     Log.error("Gamestate", "Error loading best scores - resetting.", t);
-                    bestScores = new BestScore.BestScoreMap();
+                    bestScores = null;
                 }
+                if (bestScores == null)
+                    bestScores = new BestScore.BestScoreMap();
             }
         }
     }
