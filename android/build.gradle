@@ -20,7 +20,7 @@ android {
     defaultConfig {
         applicationId "de.golfgl.lightblocks"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
     }
 
     buildTypes {
