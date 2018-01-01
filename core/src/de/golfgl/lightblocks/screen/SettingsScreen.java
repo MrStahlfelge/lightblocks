@@ -206,7 +206,7 @@ public class SettingsScreen extends AbstractMenuScreen {
         aboutButton.addListener(new ChangeListener() {
                                        public void changed(ChangeEvent event, Actor actor) {
                                            AboutScreen screen = new AboutScreen(app);
-                                           setBackScreen(SettingsScreen.this);
+                                           screen.setBackScreen(SettingsScreen.this);
                                            app.setScreen(screen);
                                        }
                                    }
