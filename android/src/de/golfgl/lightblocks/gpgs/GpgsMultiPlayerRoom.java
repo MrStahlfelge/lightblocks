@@ -172,6 +172,9 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
 
     @Override
     public void closeRoom(boolean force) throws VetoException {
+        if (roomCreationPending)
+            throw new VetoException("GPGS multiplayer room creation pending. Please some patience.");
+
         allPlayers.clear();
         connectionToPlayer.clear();
         playerToConnection.clear();
