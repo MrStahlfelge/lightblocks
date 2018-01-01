@@ -20,6 +20,7 @@ import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scenes.FATextButton;
 import de.golfgl.lightblocks.scenes.InputButtonTable;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
+import de.golfgl.lightblocks.scenes.ShareButton;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.MultiplayerMatch;
 
@@ -95,14 +96,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     @Override
     protected void fillButtonTable(Table buttons) {
 
-        shareAppButton = new FATextButton(FontAwesome.NET_SHARE1, app.TEXTS.get("menuShareApp"), app.skin);
-        shareAppButton.addListener(new ChangeListener() {
-                                       public void changed(ChangeEvent event, Actor actor) {
-                                           app.share.shareText(app.TEXTS.get("gameTitle") + ": " +
-                                                   LightBlocksGame.GAME_STOREURL, null);
-                                       }
-                                   }
-        );
+        shareAppButton = new ShareButton(app);
 
         buttonTableCell = buttons.add(shareAppButton);
 

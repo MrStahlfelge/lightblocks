@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.Scaling;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.BlockGroup;
+import de.golfgl.lightblocks.scenes.FATextButton;
 import de.golfgl.lightblocks.scenes.GamepadConfigDialog;
 import de.golfgl.lightblocks.scenes.MusicButton;
 
@@ -199,4 +200,18 @@ public class SettingsScreen extends AbstractMenuScreen {
         super.pause();
     }
 
+    @Override
+    protected void fillButtonTable(Table buttons) {
+        FATextButton aboutButton = new FATextButton(FontAwesome.COMMENT_STAR_HEART, app.TEXTS.get("menuAbout"), app.skin);
+        aboutButton.addListener(new ChangeListener() {
+                                       public void changed(ChangeEvent event, Actor actor) {
+                                           AboutScreen screen = new AboutScreen(app);
+                                           setBackScreen(SettingsScreen.this);
+                                           app.setScreen(screen);
+                                       }
+                                   }
+        );
+
+        buttons.add(aboutButton);
+    }
 }
