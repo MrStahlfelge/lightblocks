@@ -44,6 +44,7 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         menuScrollPane = new ScrollPane(menuTable, app.skin);
         menuScrollPane.setSize(LightBlocksGame.nativeGameWidth, 150);
         menuScrollPane.setScrollingDisabled(true, false);
+        menuScrollPane.setCancelTouchFocus(false);
 
         //Titel
         // Der Titel wird nach der Menütabelle gefüllt, eventuell wird dort etwas gesetzt (=> Scores)
