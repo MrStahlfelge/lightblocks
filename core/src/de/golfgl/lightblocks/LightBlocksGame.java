@@ -86,6 +86,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     private Boolean pauseSwipeEnabled;
     private Boolean gpgsAutoLogin;
     private Boolean dontAskForRating;
+    private Float gridIntensity;
     private GamepadConfig gamepadConfig;
     private List<Mission> missionList;
     private HashMap<String, Mission> missionMap;
@@ -394,7 +395,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public Boolean getPauseSwipeEnabled() {
         if (pauseSwipeEnabled == null)
-            pauseSwipeEnabled = prefs.getBoolean("pauseSwipe", true);
+            pauseSwipeEnabled = prefs.getBoolean("pauseSwipe", false);
 
         return pauseSwipeEnabled;
     }
@@ -402,6 +403,19 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public void setPauseSwipeEnabled(Boolean pauseSwipeEnabled) {
         this.pauseSwipeEnabled = pauseSwipeEnabled;
         prefs.putBoolean("pauseSwipe", pauseSwipeEnabled);
+        prefs.flush();
+    }
+
+    public float getGridIntensity() {
+        if (gridIntensity == null)
+            gridIntensity = prefs.getFloat("gridIntensity", 0);
+
+        return gridIntensity;
+    }
+
+    public void setGridIntensity(float gridIntensity) {
+        this.gridIntensity = gridIntensity;
+        prefs.putFloat("gridIntensity", gridIntensity);
         prefs.flush();
     }
 }

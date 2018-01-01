@@ -91,7 +91,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         nextTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
 
         // Die Blockgroup nimmt die Steinanimation auf
-        blockGroup = new BlockGroup();
+        blockGroup = new BlockGroup(app);
         blockGroup.setTransform(false);
         blockGroup.getColor().a = .4f;
 
@@ -687,7 +687,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     @Override
     public void showNextTetro(Integer[][] relativeBlockPositions) {
         // ein neuer nächster-Stein wurde bestimmt. Wir zeigen ihn einfach über dem Spielfeld an
-        // Er wird aber zunächst nicht der Blockgroup hinzugefügt, damit er wenn er einfliegt keine Steine auf dem
+        // Er wird der Blockgroup ganz unten hinzugefügt, damit er wenn er einfliegt keine Steine auf dem
         // Spielfeld überlagert
 
         final float offsetX = LightBlocksGame.nativeGameWidth - blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT -
@@ -704,7 +704,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             nextTetro[i].addAction(Actions.alpha(.5f, .5f, Interpolation.fade));
             nextTetro[i].getColor().a = 0;
 
-            blockGroup.addActorAt(0, nextTetro[i]);
+            blockGroup.addBlockAtBottom(nextTetro[i]);
         }
     }
 

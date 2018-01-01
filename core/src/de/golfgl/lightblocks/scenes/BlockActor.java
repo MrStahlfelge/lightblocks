@@ -16,10 +16,11 @@ import de.golfgl.lightblocks.LightBlocksGame;
 
 public class BlockActor extends Actor {
     public final static int blockWidth = 34;
+    public static final int shapeSize = 20;
     private final static float dislighentedAlpha = .4f;
     private final static float timeToEnlighten = .2f;
     private final static float timeToDislighten = .6f;
-    private static final int shapeSize = 20;
+    private final AlphaAction glowAction;
     Image imBlock;
     //Image imBlockDeactivated;
     Image imBlockEnlightened;
@@ -28,9 +29,6 @@ public class BlockActor extends Actor {
      * Das dient dazu, sie ggf. wieder zu entfernen wenn eine andere Bewegung nötig wird.
      */
     private Action moveAction;
-
-    private final AlphaAction glowAction;
-
     /**
      * Damit der Glow immer auf den Steinen ist, ruft die BockGroup die draw-Methode aller
      * Steine zweimal auf. Das erste Mal wird der Stein gezeichnet, das zweite Mal der Glow-Effekt
