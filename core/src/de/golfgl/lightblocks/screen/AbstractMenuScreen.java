@@ -44,6 +44,7 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         menuScrollPane = new ScrollPane(menuTable, app.skin);
         menuScrollPane.setSize(LightBlocksGame.nativeGameWidth, 150);
         menuScrollPane.setScrollingDisabled(true, false);
+        // für Slider nötig, bei großen Buttons oder Auswahlen aber sehr störend. dann wieder true setzen
         menuScrollPane.setCancelTouchFocus(false);
 
         //Titel

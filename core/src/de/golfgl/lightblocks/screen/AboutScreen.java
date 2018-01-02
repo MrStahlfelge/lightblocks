@@ -24,7 +24,7 @@ public class AboutScreen extends AbstractMenuScreen {
         super(app);
 
         initializeUI();
-
+        getMenuScrollPane().setCancelTouchFocus(true);
     }
 
     @Override
