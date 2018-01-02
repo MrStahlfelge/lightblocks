@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.opensource.lightblocks"
-    android:versionCode="1801"
-    android:versionName="1.00.1801" >
+    android:versionCode="1802"
+    android:versionName="1.00.1802" >
 
     <!-- Kryonet/Multiplayer -->
     <uses-permission android:name="android.permission.INTERNET"/>
