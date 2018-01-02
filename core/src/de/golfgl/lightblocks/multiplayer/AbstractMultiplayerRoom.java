@@ -252,4 +252,11 @@ public abstract class AbstractMultiplayerRoom {
      */
     public abstract boolean isLocalGame();
 
+    /**
+     * for locking the interface while connection to a server is established asynchronously
+     */
+    protected void informEstablishingConnection() {
+        for (IRoomListener l : listeners)
+            l.multiPlayerRoomEstablishingConnection();
+    }
 }

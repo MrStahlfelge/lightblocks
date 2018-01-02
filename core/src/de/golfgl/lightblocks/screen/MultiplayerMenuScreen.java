@@ -4,10 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 
 import java.util.HashMap;
 
@@ -32,6 +34,7 @@ import de.golfgl.lightblocks.state.MultiplayerMatch;
 
 public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomListener {
 
+    protected Dialog waitForConnectionOverlay;
     private FATextButton openRoomButton;
     private FATextButton joinRoomButton;
     private FATextButton startGameButton;
@@ -405,6 +408,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
+                    hideOverlay();
                     setOpenJoinRoomButtons();
 
                     // wenn raus, dann playerlist neu machen
@@ -571,6 +575,36 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 }
             });
 
+        }
+    }
+
+    @Override
+    public void multiPlayerRoomEstablishingConnection() {
+        showOverlay();
+    }
+
+    protected void showOverlay() {
+        if (waitForConnectionOverlay != null)
+            return;
+
+        waitForConnectionOverlay = new Dialog("", app.skin);
+
+        Label messageLabel = new Label(app.TEXTS.get("labelMultiplayerConnecting"), app.skin,
+                LightBlocksGame.SKIN_FONT_BIG);
+        messageLabel.setWrap(true);
+        messageLabel.setAlignment(Align.center);
+
+        final Table contentTable = waitForConnectionOverlay.getContentTable();
+        contentTable.defaults().pad(15);
+        contentTable.add(messageLabel).width(.75f * stage.getWidth());
+
+        waitForConnectionOverlay.show(stage);
+    }
+
+    protected void hideOverlay() {
+        if (waitForConnectionOverlay != null) {
+            waitForConnectionOverlay.hide();
+            waitForConnectionOverlay = null;
         }
     }
 

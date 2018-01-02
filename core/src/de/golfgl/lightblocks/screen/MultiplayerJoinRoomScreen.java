@@ -236,4 +236,9 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
     public void multiPlayerGotRoomMessage(Object o) {
         // interessiert mich nicht
     }
+
+    @Override
+    public void multiPlayerRoomEstablishingConnection() {
+        // kann bei TCP-Connection derzeit nicht auftreten
+    }
 }

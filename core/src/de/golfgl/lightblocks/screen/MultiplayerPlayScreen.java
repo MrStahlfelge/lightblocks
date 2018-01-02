@@ -260,4 +260,9 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     public void multiPlayerGotRoomMessage(Object o) {
         // bisher keine die hier zu verarbeiten sind.
     }
+
+    @Override
+    public void multiPlayerRoomEstablishingConnection() {
+        // kann hier nicht auftreten
+    }
 }

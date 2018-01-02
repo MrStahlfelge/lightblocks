@@ -167,6 +167,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
 
             RoomConfig roomConfig = roomConfigBuilder.build();
             Games.RealTimeMultiplayer.create(gpgsClient.getGoogleApiClient(), roomConfig);
+            informEstablishingConnection();
         }
     }
 
@@ -193,7 +194,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
                 .setInvitationIdToAccept(((GpgsRoomLocation) roomLoc).getInvitationId())
                 .build();
         Games.RealTimeMultiplayer.join(gpgsClient.getGoogleApiClient(), roomConfig);
-
+        informEstablishingConnection();
     }
 
     @Override

@@ -33,4 +33,6 @@ public interface IRoomListener {
     public void multiPlayerGotModelMessage(Object o);
 
     public void multiPlayerGotRoomMessage(Object o);
+
+    public void multiPlayerRoomEstablishingConnection();
 }
