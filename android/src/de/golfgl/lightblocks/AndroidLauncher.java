@@ -83,10 +83,10 @@ public class AndroidLauncher extends AndroidApplication {
         gpgsClient.onGpgsActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_SELECT_PLAYERS)
-            ((GpgsMultiPlayerRoom) gpgsClient.getMultiPlayerRoom()).selectPlayersResult(resultCode, data);
+            gpgsClient.getMultiPlayerRoom().selectPlayersResult(resultCode, data);
 
         else if (requestCode == RC_INVITATION_INBOX)
-            ((GpgsMultiPlayerRoom) gpgsClient.getMultiPlayerRoom()).selectInvitationResult(resultCode, data);
+            gpgsClient.getMultiPlayerRoom().selectInvitationResult(resultCode, data);
 
     }
 

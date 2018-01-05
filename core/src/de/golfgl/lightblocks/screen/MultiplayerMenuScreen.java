@@ -307,7 +307,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         matchStats.clearStats();
 
         try {
-            app.multiRoom = app.gpgsClient.getMultiPlayerRoom();
+            app.multiRoom = app.gpgsClient.createMultiPlayerRoom();
             app.multiRoom.addListener(this);
             app.multiRoom.openRoom(app.player);
         } catch (VetoException e) {
@@ -364,7 +364,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
     protected void joinGpgsButtonPressed() {
         try {
-            app.multiRoom = app.gpgsClient.getMultiPlayerRoom();
+            app.multiRoom = app.gpgsClient.createMultiPlayerRoom();
             app.multiRoom.addListener(this);
             app.multiRoom.startRoomDiscovery();
         } catch (VetoException e) {

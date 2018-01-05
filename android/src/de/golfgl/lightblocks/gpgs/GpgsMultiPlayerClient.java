@@ -51,12 +51,18 @@ public class GpgsMultiPlayerClient extends de.golfgl.gdxgamesvcs.GpgsClient impl
     }
 
     @Override
-    public AbstractMultiplayerRoom getMultiPlayerRoom() {
-        if (gpgsMPRoom == null) {
+    public AbstractMultiplayerRoom createMultiPlayerRoom() {
+        if (gpgsMPRoom != null && gpgsMPRoom.isConnected())
+            throw new IllegalStateException("GPGS room open but new one should be created");
+
             gpgsMPRoom = new GpgsMultiPlayerRoom();
-            gpgsMPRoom.setContext(myContext);
-            gpgsMPRoom.setGpgsClient(this);
-        }
+        gpgsMPRoom.setContext(myContext);
+        gpgsMPRoom.setGpgsClient(this);
+
+        return gpgsMPRoom;
+    }
+
+    public GpgsMultiPlayerRoom getMultiPlayerRoom() {
         return gpgsMPRoom;
     }
 
