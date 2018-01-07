@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -71,9 +72,14 @@ public class PlayGesturesInput extends PlayScreenInput {
     }
 
     public Group initializeTouchPanel(AbstractScreen playScreen, int dragTrashold) {
+        if (touchPanel != null)
+            touchPanel.remove();
+
         touchPanel = new Group();
         touchPanel.setTransform(false);
-        Vector2 touchCoordinates1 = new Vector2(0, 0);
+        Vector2 touchCoordinates1;
+
+        touchCoordinates1 = new Vector2(0, 0);
         touchCoordinates = new Vector2(dragTrashold, 0);
 
         playScreen.stage.getViewport().unproject(touchCoordinates);

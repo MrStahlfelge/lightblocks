@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
@@ -63,6 +64,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final BlockActor[] nextTetro;
     private final MotivationLabel motivatorLabel;
     private final ParticleEffectActor weldEffect;
+    private final Group centerGroup;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
     Music music;
@@ -82,6 +84,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             InputNotAvailableException, VetoException {
         super(app);
 
+        centerGroup = new Group();
+        centerGroup.setTransform(false);
+
         ParticleEffect pweldEffect = new ParticleEffect();
         //TODO wenn Atlas da, dann hier ändern
         pweldEffect.load(Gdx.files.internal("raw/explode.p"), Gdx.files.internal("raw"));
@@ -95,12 +100,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         blockGroup.setTransform(false);
         blockGroup.getColor().a = .4f;
 
-        // 10 Steine breit, 20 Steine hoch
-        blockGroup.setX((LightBlocksGame.nativeGameWidth - Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth) / 2);
-        blockGroup.setY((LightBlocksGame.nativeGameHeight - (Gameboard.GAMEBOARD_ALLROWS) * BlockActor.blockWidth) /
-                2);
-
-        stage.addActor(blockGroup);
+        blockGroup.setPosition(LightBlocksGame.nativeGameWidth / 2, LightBlocksGame.nativeGameHeight / 2, Align.center);
+        centerGroup.addActor(blockGroup);
 
         // Begrenzungen um die BlockGroup
         final int ninePatchBorderSize = 5;
@@ -108,20 +109,20 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 ninePatchBorderSize);
         Image imLine = new Image(line);
 
-        imLine.setX(blockGroup.getX() + Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth);
+        imLine.setX(blockGroup.getX() + blockGroup.getWidth());
         imLine.setY(blockGroup.getY() - ninePatchBorderSize);
-        imLine.addAction(Actions.sizeTo(imLine.getWidth(), (Gameboard.GAMEBOARD_NORMALROWS) * BlockActor.blockWidth +
+        imLine.addAction(Actions.sizeTo(imLine.getWidth(), blockGroup.getGridHeight() +
                 2 * ninePatchBorderSize, 1f, Interpolation.circleOut));
         imLine.setColor(.8f, .8f, .8f, 1);
-        stage.addActor(imLine);
+        centerGroup.addActor(imLine);
 
         imLine = new Image(line);
         imLine.setY(blockGroup.getY() - ninePatchBorderSize);
         imLine.setX(blockGroup.getX() - imLine.getWidth() - 2);
-        imLine.addAction(Actions.sizeTo(imLine.getWidth(), (Gameboard.GAMEBOARD_NORMALROWS) * BlockActor.blockWidth +
+        imLine.addAction(Actions.sizeTo(imLine.getWidth(), blockGroup.getGridHeight() +
                 2 * ninePatchBorderSize, 1f, Interpolation.circleOut));
         imLine.setColor(.8f, .8f, .8f, 1);
-        stage.addActor(imLine);
+        centerGroup.addActor(imLine);
 
         // Anzeige des Levels - muss in Group, Rotation funktioniert direkt auf Label nicht
         Group gameTypeLabels = new Group();
@@ -133,21 +134,21 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameTypeLabels.setRotation(90);
         //gameTypeLabels.addAction(Actions.rotateBy(90, 10f));
 
-        stage.addActor(gameTypeLabels);
+        centerGroup.addActor(gameTypeLabels);
 
         // Score Labels
         final Table scoreTable = new Table();
         populateScoreTable(scoreTable);
         // hinzufügen erst weiter unten (weil eventuell noch etwas dazu kommt)
 
-        stage.addActor(weldEffect);
+        centerGroup.addActor(weldEffect);
 
         labelGroup = new Group();
         labelGroup.setTransform(false);
-        labelGroup.setWidth(BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS);
-        labelGroup.setHeight(BlockActor.blockWidth * Gameboard.GAMEBOARD_NORMALROWS - 2);
+        labelGroup.setWidth(blockGroup.getWidth());
+        labelGroup.setHeight(blockGroup.getGridHeight() - 2);
         labelGroup.setPosition(blockGroup.getX(), blockGroup.getY());
-        stage.addActor(labelGroup);
+        centerGroup.addActor(labelGroup);
 
         pauseDialog = new PauseDialog(app, this);
 
@@ -164,7 +165,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         }
         scoreTable.setY(LightBlocksGame.nativeGameHeight - scoreTable.getPrefHeight() / 2 - 5);
         scoreTable.setX(scoreTable.getPrefWidth() / 2 + 5);
-        stage.addActor(scoreTable);
+        centerGroup.addActor(scoreTable);
+
+        centerGroup.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
+                (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
+        stage.addActor(centerGroup);
+
 
         Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
         String modelIdLabel = (mission != null ? app.TEXTS.format("labelMission", mission.getIndex())
@@ -899,5 +905,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         else {
             overlayWindow.showText(stage, app.TEXTS.format(message, (Object) params));
         }
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+
+        centerGroup.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
+                (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
+
+        // GestureInput neues TouchPanel
+        if (inputAdapter != null)
+            inputAdapter.setPlayScreen(this);
     }
 }

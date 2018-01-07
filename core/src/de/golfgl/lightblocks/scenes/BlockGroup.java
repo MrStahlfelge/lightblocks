@@ -38,6 +38,9 @@ public class BlockGroup extends Group {
 
             addActor(grid);
         }
+
+        setSize(Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth,
+                Gameboard.GAMEBOARD_ALLROWS * BlockActor.blockWidth);
     }
 
     @Override
@@ -53,5 +56,12 @@ public class BlockGroup extends Group {
         // 1 to add it before grid. Would be better with addActorAfter(grid, ), but not necessary to calculate the pos
         // on every call
         addActorAt(grid.getParent() != null ? 1 : 0, block);
+    }
+
+    /**
+     * @return height of the gameboard grid
+     */
+    public float getGridHeight() {
+        return Gameboard.GAMEBOARD_NORMALROWS * BlockActor.blockWidth;
     }
 }

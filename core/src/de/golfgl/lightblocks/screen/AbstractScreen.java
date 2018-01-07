@@ -15,8 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 
@@ -30,7 +32,7 @@ public abstract class AbstractScreen implements Screen {
 
     public AbstractScreen(LightBlocksGame app) {
         this.app = app;
-        stage = new Stage(new FitViewport(LightBlocksGame.nativeGameWidth, LightBlocksGame.nativeGameHeight));
+        stage = new Stage(new ExtendViewport(LightBlocksGame.nativeGameWidth, LightBlocksGame.nativeGameHeight));
     }
 
     @Override
@@ -45,6 +47,12 @@ public abstract class AbstractScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
+
+        // Dialoge neu positionieren
+        for (Actor a : stage.getActors()) {
+            if (a instanceof Window)
+                a.setPosition(stage.getWidth() / 2, stage.getHeight() / 2, Align.center);
+        }
     }
 
     @Override
@@ -68,7 +76,7 @@ public abstract class AbstractScreen implements Screen {
     }
 
     protected void swoshIn() {
-        stage.getRoot().setPosition(LightBlocksGame.nativeGameWidth, 0);
+        stage.getRoot().setPosition(stage.getWidth(), 0);
         if (app.isPlaySounds())
             app.swoshSound.play();
         stage.getRoot().addAction(Actions.moveTo(0, 0, .15f, Interpolation.circle));
@@ -107,7 +115,7 @@ public abstract class AbstractScreen implements Screen {
         Label errorMsgLabel = new Label(errorMsg, app.skin);
         errorMsgLabel.setWrap(true);
         dialog.getContentTable().add(errorMsgLabel).prefWidth
-                (LightBlocksGame.nativeGameWidth * .75f).pad(10);
+                (stage.getWidth() * .75f).pad(10);
         dialog.button("OK", null, app.skin.get("big", TextButton.TextButtonStyle.class));
         dialog.show(stage);
 
@@ -119,7 +127,7 @@ public abstract class AbstractScreen implements Screen {
         Label errorMsgLabel = new Label(text, app.skin);
         errorMsgLabel.setWrap(true);
         dialog.getContentTable().add(errorMsgLabel).prefWidth
-                (LightBlocksGame.nativeGameWidth * .75f).pad(10);
+                (stage.getWidth() * .75f).pad(10);
         final TextButton.TextButtonStyle buttonStyle = app.skin.get("big", TextButton.TextButtonStyle.class);
         dialog.button(app.TEXTS.get("menuYes"), doWhenYes, buttonStyle);
         dialog.button(app.TEXTS.get("menuNo"), null, buttonStyle);

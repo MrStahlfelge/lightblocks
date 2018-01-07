@@ -53,7 +53,7 @@ public class PlayGravityInput extends PlayScreenInput {
         if (isPaused)
             playScreen.switchPause(false);
         else
-            playScreen.gameModel.setRotate(screenX > LightBlocksGame.nativeGameWidth / 2);
+            playScreen.gameModel.setRotate(screenX > playScreen.stage.getWidth() / 2);
 
         return true;
     }
