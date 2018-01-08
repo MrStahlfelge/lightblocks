@@ -3,6 +3,7 @@ package de.golfgl.lightblocks;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -417,5 +418,20 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         this.gridIntensity = gridIntensity;
         prefs.putFloat("gridIntensity", gridIntensity);
         prefs.flush();
+    }
+
+    /**
+     * locks the orientation on Android to portrait, landscape or current
+     * @param orientation give null for current
+     */
+    public void lockOrientation(Input.Orientation orientation) {
+
+    }
+
+    /**
+     * unlocks the orientation
+     */
+    public void unlockOrientation() {
+
     }
 }

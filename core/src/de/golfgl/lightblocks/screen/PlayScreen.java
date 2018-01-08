@@ -309,6 +309,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // input initialisieren
         inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey);
         inputAdapter.setPlayScreen(this);
+        if (inputAdapter.getRequestedScreenOrientation() != null)
+            app.lockOrientation(inputAdapter.getRequestedScreenOrientation());
 
         // Highscores
         gameModel.totalScore = app.savegame.getTotalScore();
@@ -377,6 +379,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (inputAdapter != null)
             inputAdapter.dispose();
         setMusic(false);
+        app.unlockOrientation();
         weldEffect.dispose();
         super.dispose();
     }
@@ -427,6 +430,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 if (pauseMsgDialog != null && pauseMsgDialog.hasParent())
                     pauseMsgDialog.hide();
 
+                if (inputAdapter.getRequestedScreenOrientation() == null)
+                    app.lockOrientation(null);
+
                 //inform the game model that there was a pause
                 gameModel.fromPause();
             } else {
@@ -436,8 +442,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
                 // Spielstand speichern
                 saveGameState();
-
                 pauseDialog.show(stage);
+
+                if (inputAdapter.getRequestedScreenOrientation() == null)
+                    app.unlockOrientation();
             }
         }
     }

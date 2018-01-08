@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -167,5 +168,10 @@ public class PlayGravityInput extends PlayScreenInput {
 
         if (!hasCalibration)
             playScreen.addGameBlocker(gravityInputBlocker);
+    }
+
+    @Override
+    public Input.Orientation getRequestedScreenOrientation() {
+        return Input.Orientation.Portrait;
     }
 }

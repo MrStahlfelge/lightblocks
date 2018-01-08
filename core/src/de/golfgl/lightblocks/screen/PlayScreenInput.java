@@ -125,6 +125,13 @@ public abstract class PlayScreenInput extends InputAdapter {
     }
 
     /**
+     * @return needed orientation for this input, or null if no special orientation is necessary
+     */
+    public Input.Orientation getRequestedScreenOrientation() {
+        return null;
+    }
+
+    /**
      * clean up if necessary
      */
     public void dispose() {
