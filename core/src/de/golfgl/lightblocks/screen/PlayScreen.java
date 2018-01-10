@@ -86,6 +86,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         centerGroup = new Group();
         centerGroup.setTransform(false);
+        stage.addActor(centerGroup);
+        centerGroup.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
+                (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
 
         ParticleEffect pweldEffect = new ParticleEffect();
         //TODO wenn Atlas da, dann hier ändern
@@ -154,6 +157,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         motivatorLabel = new MotivationLabel(app.skin, LightBlocksGame.SKIN_FONT_TITLE, labelGroup);
 
+        // hier wird eventuell auch schon die erste Tutorial-Meldung angezeigt. Alles, was nach diesem Aufruf
+        // auf die Stage kommt, liegt vor dem OverlayWindow!
         initializeGameModel(initGameParametersParams);
 
         // Score Table vervollständigen
@@ -166,11 +171,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         scoreTable.setY(LightBlocksGame.nativeGameHeight - scoreTable.getPrefHeight() / 2 - 5);
         scoreTable.setX(scoreTable.getPrefWidth() / 2 + 5);
         centerGroup.addActor(scoreTable);
-
-        centerGroup.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
-                (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
-        stage.addActor(centerGroup);
-
 
         Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
         String modelIdLabel = (mission != null ? app.TEXTS.format("labelMission", mission.getIndex())
