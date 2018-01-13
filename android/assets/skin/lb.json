@@ -1,0 +1,157 @@
+{
+com.badlogic.gdx.graphics.g2d.BitmapFont: {
+	fa45: {
+		file: fa-45.fnt
+	}
+	qs-15-regular: {
+		file: font-export.fnt
+	}
+	qs-25-bold: {
+		file: qs-25-bold.fnt
+	}
+	qs-40-bold: {
+		file: qs-40-bold.fnt
+	}
+}
+com.badlogic.gdx.graphics.Color: {
+	disabled: {
+		r: 0.4
+		g: 0.4
+		b: 0.4
+		a: 1
+	}
+	lightselection: {
+		r: 0.7921569
+		g: 0.7921569
+		b: 0.7921569
+		a: 1
+	}
+	selected: {
+		r: 0.4
+		g: 0.4
+		b: 0.4
+		a: 1
+	}
+	white: {
+		r: 1
+		g: 1
+		b: 1
+		a: 1
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
+	button-disabled: {
+		name: button-pressed
+		color: disabled
+	}
+	slider-knob-disabled: {
+		name: slider-knob
+		color: disabled
+	}
+	selection: {
+		name: white
+		color: lightselection
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
+	default: {
+		up: button-pressed
+		over: button-over
+		checked: button
+		disabled: button-disabled
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
+	default: {
+		font: qs-15-regular
+	}
+	big: {
+		font: qs-25-bold
+	}
+	bigbigoutline: {
+		font: qs-40-bold
+	}
+	fontawesome: {
+		font: fa45
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
+	default: {
+		font: qs-25-bold
+		fontColorSelected: selected
+		fontColorUnselected: disabled
+		selection: selection
+		background: list
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
+	default: {
+		hScrollKnob: scroll-horizontal
+		vScrollKnob: scroll-vertical
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
+	default-horizontal: {
+		knobOver: slider-knob-pressed
+		background: slider
+		knob: slider-knob
+		disabledKnob: slider-knob-disabled
+		knobBefore: slider-before
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+	default: {
+		font: qs-15-regular
+		fontColor: white
+		disabledFontColor: disabled
+		up: button-pressed
+		over: button-over
+		disabled: button-disabled
+	}
+	checked: {
+		font: qs-15-regular
+		fontColor: white
+		disabledFontColor: disabled
+		up: button-pressed
+		over: button-over
+		checked: button
+		disabled: button-disabled
+	}
+	fontawesome: {
+		font: fa45
+		fontColor: white
+		disabledFontColor: disabled
+		up: button-pressed
+		over: button-over
+		disabled: button-disabled
+	}
+	fontawesome-checked: {
+		font: fa45
+		fontColor: white
+		disabledFontColor: disabled
+		up: button-pressed
+		over: button-over
+		checked: button
+		disabled: button-disabled
+	}
+	big: {
+		font: qs-25-bold
+		fontColor: white
+		disabledFontColor: disabled
+		up: button-pressed
+		over: button-over
+		disabled: button-disabled
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
+	default: {
+		label: default
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
+	default: {
+		background: window
+		titleFont: qs-15-regular
+	}
+}
+}

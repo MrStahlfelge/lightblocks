@@ -48,6 +48,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     // An den gleichen Eintrag im AndroidManifest denken!!!
     public static final String GAME_VERSIONSTRING = "1.00.1805";
     // Abstand für Git
+    // auch dran denken das data-Verzeichnis beim release wegzunehmen!
     public static final boolean GAME_DEVMODE = true;
 
     public static final String SKIN_FONT_TITLE = "bigbigoutline";
@@ -138,7 +139,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         I18NBundle.setSimpleFormatter(true);
 
-        skin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
+        skin = new Skin(Gdx.files.internal("skin/lb.json"));
 
         ObjectMap<String, BitmapFont> objectMap = skin.getAll(BitmapFont.class);
 
@@ -149,9 +150,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         assetManager = new AssetManager();
         assetManager.load("i18n/strings", I18NBundle.class);
-        assetManager.load("raw/block-deactivated.png", Texture.class);
-        assetManager.load("raw/block-light.png", Texture.class);
-        assetManager.load("raw/lineglow.png", Texture.class);
         assetManager.load("sound/switchon.ogg", Sound.class);
         assetManager.load("sound/switchflip.ogg", Sound.class);
         assetManager.load("sound/glow05.ogg", Sound.class);
@@ -163,12 +161,9 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         assetManager.finishLoading();
 
         TEXTS = assetManager.get("i18n/strings", I18NBundle.class);
-        trBlock = new TextureRegion(assetManager.get("raw/block-deactivated.png", Texture.class));
-        trBlock.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        trBlockEnlightened = new TextureRegion(assetManager.get("raw/block-light.png", Texture.class));
-        trBlockEnlightened.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        trGlowingLine = new TextureRegion(assetManager.get("raw/lineglow.png", Texture.class));
-        trGlowingLine.getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        trBlock = skin.getRegion("block-deactivated");
+        trBlockEnlightened = skin.getRegion("block-light");
+        trGlowingLine = skin.getRegion("lineglow");
         dropSound = assetManager.get("sound/switchon.ogg", Sound.class);
         rotateSound = assetManager.get("sound/switchflip.ogg", Sound.class);
         removeSound = assetManager.get("sound/glow05.ogg", Sound.class);

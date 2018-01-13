@@ -83,7 +83,7 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
 
     @Override
     protected void fillMenuTable(Table menuTable) {
-        hostList = new List<IRoomLocation>(app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        hostList = new List<IRoomLocation>(app.skin);
         selectedRoomLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         final TextButton enterManually = new TextButton(app.TEXTS.get("multiplayerJoinManually"), app.skin);
 

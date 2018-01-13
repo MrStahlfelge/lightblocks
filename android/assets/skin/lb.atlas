@@ -1,0 +1,157 @@
+
+lb.png
+size: 2048,2048
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+block-deactivated
+  rotate: false
+  xy: 515, 1042
+  size: 72, 72
+  orig: 72, 72
+  offset: 0, 0
+  index: -1
+block-light
+  rotate: false
+  xy: 1029, 1556
+  size: 72, 72
+  orig: 72, 72
+  offset: 0, 0
+  index: -1
+button
+  rotate: false
+  xy: 589, 1072
+  size: 46, 42
+  split: 17, 17, 15, 16
+  pad: 15, 15, 14, 14
+  orig: 46, 42
+  offset: 0, 0
+  index: -1
+button-over
+  rotate: false
+  xy: 1103, 1586
+  size: 46, 42
+  split: 17, 17, 15, 16
+  pad: 15, 15, 14, 14
+  orig: 46, 42
+  offset: 0, 0
+  index: -1
+button-pressed
+  rotate: false
+  xy: 1029, 1512
+  size: 46, 42
+  split: 17, 17, 15, 16
+  pad: 15, 15, 14, 14
+  orig: 46, 42
+  offset: 0, 0
+  index: -1
+fa-45
+  rotate: false
+  xy: 1, 1116
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+font-export
+  rotate: false
+  xy: 1, 88
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+lineglow
+  rotate: false
+  xy: 515, 989
+  size: 11, 11
+  orig: 11, 11
+  offset: 0, 0
+  index: -1
+list
+  rotate: false
+  xy: 515, 1002
+  size: 52, 38
+  split: 18, 18, 16, 16
+  pad: 14, 14, 12, 12
+  orig: 52, 38
+  offset: 0, 0
+  index: -1
+qs-25-bold
+  rotate: false
+  xy: 1, 602
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+qs-40-bold
+  rotate: false
+  xy: 515, 1116
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+scroll-horizontal
+  rotate: false
+  xy: 1, 1
+  size: 44, 27
+  split: 11, 11, 11, 11
+  pad: 0, 0, 0, 0
+  orig: 44, 27
+  offset: 0, 0
+  index: -1
+scroll-vertical
+  rotate: false
+  xy: 59, 42
+  size: 27, 44
+  split: 11, 11, 11, 11
+  pad: 0, 0, 0, 0
+  orig: 27, 44
+  offset: 0, 0
+  index: -1
+slider
+  rotate: false
+  xy: 637, 1092
+  size: 8, 22
+  split: 2, 2, 10, 10
+  pad: 0, 0, 0, 0
+  orig: 8, 22
+  offset: 0, 0
+  index: -1
+slider-before
+  rotate: false
+  xy: 1029, 1488
+  size: 1, 22
+  split: 0, 0, 9, 9
+  pad: 0, 0, 0, 0
+  orig: 1, 22
+  offset: 0, 0
+  index: -1
+slider-knob
+  rotate: false
+  xy: 569, 1030
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+slider-knob-pressed
+  rotate: false
+  xy: 589, 1060
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+white
+  rotate: false
+  xy: 1077, 1553
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+window
+  rotate: false
+  xy: 1, 30
+  size: 56, 56
+  split: 17, 16, 17, 17
+  pad: 16, 15, 16, 16
+  orig: 56, 56
+  offset: 0, 0
+  index: -1

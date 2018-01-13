@@ -92,7 +92,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         ParticleEffect pweldEffect = new ParticleEffect();
         //TODO wenn Atlas da, dann hier ändern
-        pweldEffect.load(Gdx.files.internal("raw/explode.p"), Gdx.files.internal("raw"));
+        pweldEffect.load(Gdx.files.internal("raw/explode.p"), app.skin.getAtlas());
         weldEffect = new ParticleEffectActor(pweldEffect);
 
         blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ALLROWS];
