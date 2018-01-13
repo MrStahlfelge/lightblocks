@@ -668,11 +668,13 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
                     }
                 setOwnerParticipantId(newOwnerId);
 
-                // beim Automatch kann dann erst jetzt der Handshake durchgeführt werden. Der Client meldet sich
-                if (!isOwner())
-                    sendHandshake();
             }
 
+            // beim Automatch kann dann erst jetzt der Handshake durchgeführt werden. Der Client meldet sich
+            // Da es in der Vergangenheit vorkam, dass bei Direktverbindung der Handshake nicht ankam, wird er
+            // hier zur Sicherheit auch ohne Automatch nochmal verschickt
+            if (!isOwner())
+                sendHandshake();
         }
     }
 
