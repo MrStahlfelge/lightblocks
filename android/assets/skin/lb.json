@@ -9,8 +9,17 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 	qs-25-bold: {
 		file: qs-25-bold.fnt
 	}
+	qs-25-reg: {
+		file: qs-25-reg.fnt
+	}
 	qs-40-bold: {
 		file: qs-40-bold.fnt
+	}
+	qs-60-bold: {
+		file: qs-60-bold.fnt
+	}
+	qs-60-boldglow: {
+		file: qs-60-boldglow.fnt
 	}
 }
 com.badlogic.gdx.graphics.Color: {
@@ -73,6 +82,12 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	}
 	fontawesome: {
 		font: fa45
+	}
+	qs60: {
+		font: qs-60-bold
+	}
+	qs60glow: {
+		font: qs-60-boldglow
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
