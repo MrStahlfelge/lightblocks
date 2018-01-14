@@ -327,6 +327,37 @@ atlasData: {
 			tintName: null
 			name: qs-60-boldglow
 		}
+		{
+			file: ../window-bl.9.png
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			visible: true
+			tint: null
+			tintName: null
+			name: window-bl
+		}
+		{
+			file: ../white.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			visible: true
+			tint: {
+				r: 0
+				g: 0
+				b: 0
+				a: 0.8627451
+			}
+			tintName: null
+			name: smoke
+		}
 	]
 }
 jsonData: {
@@ -2574,6 +2605,42 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: background
 						optional: true
+						value: window-bl
+					}
+					titleFont: {
+						class: com.ray3k.skincomposer.data.StyleProperty
+						type: com.badlogic.gdx.graphics.g2d.BitmapFont
+						name: titleFont
+						optional: false
+						value: qs-15-regular
+					}
+					titleFontColor: {
+						class: com.ray3k.skincomposer.data.StyleProperty
+						type: com.badlogic.gdx.graphics.Color
+						name: titleFontColor
+						optional: true
+						value: null
+					}
+					stageBackground: {
+						class: com.ray3k.skincomposer.data.StyleProperty
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: stageBackground
+						optional: true
+						value: smoke
+					}
+				}
+				deletable: false
+			}
+			{
+				class: com.ray3k.skincomposer.data.StyleData
+				name: overlay
+				clazz: com.badlogic.gdx.scenes.scene2d.ui.Window
+				properties: {
+					background: {
+						class: com.ray3k.skincomposer.data.StyleProperty
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: background
+						optional: true
 						value: window
 					}
 					titleFont: {
@@ -2598,7 +2665,7 @@ jsonData: {
 						value: null
 					}
 				}
-				deletable: false
+				deletable: true
 			}
 		]
 	}

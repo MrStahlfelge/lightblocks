@@ -21,7 +21,7 @@ public class OverlayMessage extends Dialog {
     private final Label messageLabel;
 
     public OverlayMessage(Skin skin, float width) {
-        super("", skin);
+        super("", skin, "overlay");
 
         setModal(false);
 

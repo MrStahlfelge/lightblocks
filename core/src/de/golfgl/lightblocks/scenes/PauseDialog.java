@@ -26,7 +26,7 @@ public class PauseDialog extends Dialog {
     private boolean emphasizeInputMsg;
 
     public PauseDialog(LightBlocksGame app, final PlayScreen playScreen) {
-        super("", app.skin);
+        super("", app.skin, "overlay");
 
 
         Table table = getContentTable();
