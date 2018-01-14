@@ -14,17 +14,23 @@ public class GlowLabel extends Label {
     static final float GLOW_IN_DURATION = .15f;
     static final float GLOW_OUT_DURATION = .5f;
     private static final String SKIN_LABEL60BOLD = "qs60";
+    private static final String SKIN_LABEL40BOLD = "bigbigoutline";
     private static final String SKIN_LABEL60GLOW = "qs60glow";
+    private static final String SKIN_LABEL40GLOW = "qs40glow";
     protected final float baseScaling;
     private final Label glowLabel;
     private boolean isGlowing;
 
     public GlowLabel(CharSequence text, Skin skin, float baseScaling) {
-        super(text, skin, SKIN_LABEL60BOLD);
+        super(text, skin, baseScaling > .65f ? SKIN_LABEL60BOLD : SKIN_LABEL40BOLD);
+
+        float orgScaling = baseScaling;
+        if (baseScaling <= .65f)
+            baseScaling = baseScaling * 60 / 40;
 
         this.baseScaling = baseScaling;
 
-        glowLabel = new Label(text, skin, SKIN_LABEL60GLOW);
+        glowLabel = new Label(text, skin, orgScaling <= .65f ? SKIN_LABEL40GLOW : SKIN_LABEL60GLOW);
         glowLabel.setAlignment(Align.center);
         glowLabel.getColor().a = 0;
 
@@ -70,28 +76,39 @@ public class GlowLabel extends Label {
     }
 
     @Override
-    public float getPrefHeight() {
-        return super.getPrefHeight() / getScaleY();
-    }
-
-    @Override
-    public float getPrefWidth() {
-        return super.getPrefWidth() / getScaleX();
-    }
-
-    @Override
     public void setScale(float scaleX, float scaleY) {
         super.setScale(scaleX, scaleY);
         setFontScale(baseScaling * scaleX, baseScaling * scaleY);
-        glowLabel.setFontScale(baseScaling * scaleX, baseScaling * scaleY);
+        glowLabel.setFontScale(baseScaling * scaleX, baseScaling * scaleY );
+    }
+
+    @Override
+    public void setHeight(float height) {
+        super.setHeight(height);
+        if (glowLabel != null)
+            glowLabel.setHeight(height);
+    }
+
+    @Override
+    public void setSize(float width, float height) {
+        super.setSize(width, height);
+        if (glowLabel != null)
+            glowLabel.setSize(width, height);
+    }
+
+    @Override
+    public void setWidth(float width) {
+        super.setWidth(width);
+        if (glowLabel != null)
+            glowLabel.setWidth(width);
     }
 
     @Override
     protected void sizeChanged() {
+        super.sizeChanged();
         // muss geprüft werden da vom Konstruktor aufgerufen
         if (glowLabel != null)
             glowLabel.setSize(getWidth(), getHeight());
-        super.sizeChanged();
     }
 
     @Override

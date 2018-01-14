@@ -15,6 +15,9 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 	qs-40-bold: {
 		file: qs-40-bold.fnt
 	}
+	qs-40-boldglow: {
+		file: qs-40-boldglow.fnt
+	}
 	qs-60-bold: {
 		file: qs-60-bold.fnt
 	}
@@ -97,6 +100,9 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	}
 	qs60glow: {
 		font: qs-60-boldglow
+	}
+	qs40glow: {
+		font: qs-40-boldglow
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {

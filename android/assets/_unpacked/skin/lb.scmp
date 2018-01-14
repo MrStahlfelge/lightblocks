@@ -358,6 +358,19 @@ atlasData: {
 			tintName: null
 			name: smoke
 		}
+		{
+			file: ../qs-40-boldglow.png
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			visible: false
+			tint: null
+			tintName: null
+			name: qs-40-boldglow
+		}
 	]
 }
 jsonData: {
@@ -428,6 +441,11 @@ jsonData: {
 			class: com.ray3k.skincomposer.data.FontData
 			name: qs-40-bold
 			file: ../qs-40-bold.fnt
+		}
+		{
+			class: com.ray3k.skincomposer.data.FontData
+			name: qs-40-boldglow
+			file: ../qs-40-boldglow.fnt
 		}
 		{
 			class: com.ray3k.skincomposer.data.FontData
@@ -1191,6 +1209,35 @@ jsonData: {
 						name: font
 						optional: false
 						value: qs-60-boldglow
+					}
+					fontColor: {
+						class: com.ray3k.skincomposer.data.StyleProperty
+						type: com.badlogic.gdx.graphics.Color
+						name: fontColor
+						optional: true
+						value: null
+					}
+					background: {
+						class: com.ray3k.skincomposer.data.StyleProperty
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: background
+						optional: true
+						value: null
+					}
+				}
+				deletable: true
+			}
+			{
+				class: com.ray3k.skincomposer.data.StyleData
+				name: qs40glow
+				clazz: com.badlogic.gdx.scenes.scene2d.ui.Label
+				properties: {
+					font: {
+						class: com.ray3k.skincomposer.data.StyleProperty
+						type: com.badlogic.gdx.graphics.g2d.BitmapFont
+						name: font
+						optional: false
+						value: qs-40-boldglow
 					}
 					fontColor: {
 						class: com.ray3k.skincomposer.data.StyleProperty

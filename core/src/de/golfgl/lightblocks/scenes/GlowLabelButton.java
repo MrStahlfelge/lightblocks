@@ -29,7 +29,17 @@ public class GlowLabelButton extends Button {
         disabledFontColor = skin.getColor("disabled");
         this.smallScaleFactor = smallScaleFactor;
 
-        labelGroup = new GlowLabel(text, skin, fontScale);
+        labelGroup = new GlowLabel(text, skin, fontScale) {
+            @Override
+            public float getPrefWidth() {
+                return super.getPrefWidth() / getScaleX();
+            }
+
+            @Override
+            public float getPrefHeight() {
+                return super.getPrefHeight() / getScaleY();
+            }
+        };
 
         add(labelGroup).expand().fill();
 
