@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 
 /**
@@ -27,12 +28,12 @@ import de.golfgl.lightblocks.LightBlocksGame;
  */
 public abstract class AbstractScreen implements Screen {
     protected final LightBlocksGame app;
-    protected Stage stage;
+    protected MyStage stage;
     protected Screen backScreen;
 
     public AbstractScreen(LightBlocksGame app) {
         this.app = app;
-        stage = new Stage(new ExtendViewport(LightBlocksGame.nativeGameWidth, LightBlocksGame.nativeGameHeight));
+        stage = new MyStage(new ExtendViewport(LightBlocksGame.nativeGameWidth, LightBlocksGame.nativeGameHeight));
     }
 
     @Override
