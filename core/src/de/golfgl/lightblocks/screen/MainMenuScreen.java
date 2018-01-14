@@ -57,7 +57,7 @@ public class MainMenuScreen extends AbstractScreen {
         stage.addActor(gameTitle);
 
         buttonTable = new Table();
-        buttonTable.defaults().fill().pad(5, 0, 5, 0);
+        buttonTable.defaults().pad(5, 0, 5, 0);
         stage.addActor(buttonTable);
 
         // Play new game!

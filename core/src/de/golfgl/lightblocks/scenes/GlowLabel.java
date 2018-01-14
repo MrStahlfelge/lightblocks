@@ -46,6 +46,11 @@ public class GlowLabel extends Label {
     public void act(float delta) {
         glowLabel.act(delta);
         super.act(delta);
+        colorChanged();
+    }
+
+    private void colorChanged() {
+        glowLabel.setColor(getColor().r, getColor().g, getColor().b, glowLabel.getColor().a);
     }
 
     @Override
@@ -84,7 +89,13 @@ public class GlowLabel extends Label {
     @Override
     public void setColor(Color color) {
         super.setColor(color);
-        glowLabel.setColor(color);
+        colorChanged();
+    }
+
+    @Override
+    public void setColor(float r, float g, float b, float a) {
+        super.setColor(r, g, b, a);
+        colorChanged();
     }
 
     @Override

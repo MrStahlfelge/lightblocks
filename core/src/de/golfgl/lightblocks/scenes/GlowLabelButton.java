@@ -15,7 +15,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
  * Created by Benjamin Schulte on 13.01.2018.
  */
 
-public class GlowLabelButton extends Button {
+public class GlowLabelButton extends Button implements ITouchActionButton {
 
     private final float smallScaleFactor;
     private final GlowLabel labelGroup;
@@ -68,7 +68,7 @@ public class GlowLabelButton extends Button {
         boolean activated = isOver();
 
         if (activated && !highlighted) {
-            labelGroup.setGlowing(true);
+            labelGroup.setGlowing(true, isFirstAct);
             if (smallScaleFactor < 1f) {
                 labelGroup.removeAction(scaleAction);
                 scaleAction = Actions.scaleTo(1f, 1f, GlowLabel.GLOW_IN_DURATION / 2, Interpolation.circle);
@@ -76,7 +76,7 @@ public class GlowLabelButton extends Button {
             }
             highlighted = true;
         } else if (!activated && highlighted || isFirstAct) {
-            labelGroup.setGlowing(false);
+            labelGroup.setGlowing(false, isFirstAct);
             if (smallScaleFactor < 1f) {
                 labelGroup.removeAction(scaleAction);
                 scaleAction = Actions.scaleTo(smallScaleFactor, smallScaleFactor, isFirstAct ? 0 :
@@ -112,6 +112,15 @@ public class GlowLabelButton extends Button {
 
 
         isFirstAct = false;
+    }
+
+    @Override
+    public void touchAction() {
+        if (!isPressed()) {
+            labelGroup.setColor(new Color(LightBlocksGame.EMPHASIZE_COLOR));
+            colorAction = Actions.color(getColor(), 1f, Interpolation.fade);
+            labelGroup.addAction(colorAction);
+        }
     }
 
     @Override
