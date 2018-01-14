@@ -8,6 +8,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -21,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.golfgl.gdxgamesvcs.GameServiceException;
-import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
+import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -55,6 +56,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public static final String SKIN_FONT_TITLE = "bigbigoutline";
     public static final String SKIN_FONT_BIG = "big";
+    public static final Color EMPHASIZE_COLOR = new Color(1, .3f, .3f, 1);
 
     public Skin skin;
     public AssetManager assetManager;
@@ -342,7 +344,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
             gamepadConfig.pauseButton = prefs.getInteger("gpButtonPause", GamepadConfig.GC_BUTTON_START);
             gamepadConfig.verticalAxis = prefs.getInteger("gpAxisVertical", GamepadConfig.GC_AXIS_VERTICAL_ANDROID);
-            gamepadConfig.rotateClockwiseButton = prefs.getInteger("gpButtonClockwise", GamepadConfig.GC_BUTTON_CLOCKWISE);
+            gamepadConfig.rotateClockwiseButton = prefs.getInteger("gpButtonClockwise", GamepadConfig
+                    .GC_BUTTON_CLOCKWISE);
         }
 
         return gamepadConfig;
@@ -419,6 +422,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     /**
      * locks the orientation on Android to portrait, landscape or current
+     *
      * @param orientation give null for current
      */
     public void lockOrientation(Input.Orientation orientation) {

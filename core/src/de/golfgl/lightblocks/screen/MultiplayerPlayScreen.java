@@ -113,7 +113,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
             if (notInitialized) {
                 // geht nicht beim Init, da dieser mit 100 erfolgt und dann auf 0 zurückgesetzt wird
-                lblPlayerFill.setEmphasizeTreshold(15, EMPHASIZE_COLOR);
+                lblPlayerFill.setEmphasizeTreshold(15, LightBlocksGame.EMPHASIZE_COLOR);
                 lblPlayerFill.setCountingSpeed(30);
                 lblPlayerFill.setMaxCountingTime(.3f);
             }

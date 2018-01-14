@@ -3,7 +3,6 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
@@ -57,7 +56,6 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
-    protected final Color EMPHASIZE_COLOR = new Color(1, .3f, .3f, 1);
     private final BlockGroup blockGroup;
     private final Group labelGroup;
     private final BlockActor[][] blockMatrix;
@@ -319,8 +317,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameModel.gpgsClient = app.gpgsClient;
 
         // erst nach dem Laden setzen, damit das noch ohne Animation läuft
-        levelNum.setEmphasizeTreshold(1, EMPHASIZE_COLOR);
-        scoreNum.setEmphasizeTreshold(1000, EMPHASIZE_COLOR);
+        levelNum.setEmphasizeTreshold(1, LightBlocksGame.EMPHASIZE_COLOR);
+        scoreNum.setEmphasizeTreshold(1000, LightBlocksGame.EMPHASIZE_COLOR);
 
     }
 

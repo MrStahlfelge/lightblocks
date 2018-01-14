@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.scenes;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -78,6 +79,12 @@ public class GlowLabel extends Label {
     public void setAlignment(int alignment) {
         super.setAlignment(alignment);
         glowLabel.setAlignment(alignment);
+    }
+
+    @Override
+    public void setColor(Color color) {
+        super.setColor(color);
+        glowLabel.setColor(color);
     }
 
     @Override
