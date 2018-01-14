@@ -6,9 +6,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.esotericsoftware.minlog.Log;
@@ -16,7 +16,8 @@ import com.esotericsoftware.minlog.Log;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
-import de.golfgl.lightblocks.scenes.FATextButton;
+import de.golfgl.lightblocks.scenes.GlowLabel;
+import de.golfgl.lightblocks.scenes.GlowLabelButton;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.forever;
@@ -28,48 +29,40 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 15.01.2017.
  */
 public class MainMenuScreen extends AbstractScreen {
-    private final TextButton accountButton;
-    private TextButton resumeGameButton;
+    private static final float FONT_SCALE_MENU = .6f;
+    private static final float SMALL_SCALE_MENU = .8f;
+    private final GlowLabelButton accountButton;
+    private final GlowLabel gameTitle;
+    private final BlockGroup blockGroup;
+    private final Table buttonTable;
+    private final Label gameVersion;
+    private Button resumeGameButton;
     private MenuMissionsScreen missionsScreen;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
         super(lightBlocksGame);
 
-        // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
-        final Table mainTable = new Table();
-        mainTable.setFillParent(true);
-
-        stage.addActor(mainTable);
-
         // Die Blockgroup nimmt die Steinanimation auf
-        final BlockGroup blockGroup = new BlockGroup();
+        blockGroup = new BlockGroup();
         blockGroup.setTransform(false);
-
-        mainTable.add(blockGroup).center().prefHeight(180);
-        mainTable.defaults().minWidth(LightBlocksGame.nativeGameWidth / 2).fill();
-
+        blockGroup.setHeight(180);
+        stage.addActor(blockGroup);
         // Der Titel
-        mainTable.row();
-
-        final Label gameTitle = new Label(app.TEXTS.get("gameTitle").toUpperCase(), app.skin, LightBlocksGame
-                .SKIN_FONT_TITLE);
+        gameTitle = new GlowLabel(app.TEXTS.get("gameTitle").toUpperCase(), app.skin, .9f);
         gameTitle.setWrap(true);
         gameTitle.setAlignment(Align.center);
-        mainTable.add(gameTitle).spaceTop(LightBlocksGame.nativeGameWidth / 12).
-                spaceBottom(LightBlocksGame.nativeGameWidth / 12).top().prefWidth(LightBlocksGame.nativeGameWidth *
-                .75f);
+        gameTitle.setWidth(LightBlocksGame.nativeGameWidth * .75f);
+        gameTitle.setHeight(LightBlocksGame.nativeGameWidth / 8 + gameTitle.getPrefHeight());
+        stage.addActor(gameTitle);
 
-
-        //nun die Buttons zum bedienen
-        Table buttons = new Table();
-        buttons.defaults().fill().uniform();
-
+        buttonTable = new Table();
+        buttonTable.defaults().fill().pad(5, 0, 5, 0);
+        stage.addActor(buttonTable);
 
         // Play new game!
-        TextButton missionButton = new FATextButton(FontAwesome.COMMENT_STAR_FLAG, app.TEXTS.get
-                ("menuPlayMissionButton"),
-                app.skin);
+        Button missionButton = new GlowLabelButton(app.TEXTS.get("menuPlayMissionButton"),
+                app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
         missionButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -79,11 +72,12 @@ public class MainMenuScreen extends AbstractScreen {
             }
         });
 
-        buttons.add(missionButton);
+        buttonTable.add(missionButton);
+        stage.addFocussableActor(missionButton);
 
-        TextButton singleMarathonButton = new FATextButton(FontAwesome.NET_PERSON, app.TEXTS.get
-                ("menuPlayMarathonButton"),
-                app.skin);
+        buttonTable.row();
+        Button singleMarathonButton = new GlowLabelButton(app.TEXTS.get("menuPlayMarathonButton"),
+                app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
         singleMarathonButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
                                                  //gotoPlayScreen(false);
@@ -92,11 +86,13 @@ public class MainMenuScreen extends AbstractScreen {
                                          }
         );
 
-        buttons.add(singleMarathonButton);
+        buttonTable.add(singleMarathonButton);
+        stage.addFocussableActor(singleMarathonButton);
 
         // Resume the game
-        buttons.row();
-        resumeGameButton = new TextButton(app.TEXTS.get("menuResumeGameButton"), app.skin);
+        buttonTable.row();
+        resumeGameButton = new GlowLabelButton(app.TEXTS.get("menuResumeGameButton"), app.skin, FONT_SCALE_MENU,
+                SMALL_SCALE_MENU);
         resumeGameButton.addListener(new ChangeListener() {
                                          public void changed(ChangeEvent event, Actor actor) {
                                              try {
@@ -111,55 +107,57 @@ public class MainMenuScreen extends AbstractScreen {
                                      }
         );
 
-        buttons.add(resumeGameButton).colspan(2).uniform(true, false).padBottom(10).minHeight(resumeGameButton
-                .getPrefHeight() * 1.2f);
+        buttonTable.add(resumeGameButton);
+        stage.addFocussableActor(resumeGameButton);
 
-        buttons.row();
-        TextButton playMultiplayerButton = new FATextButton(FontAwesome.NET_PEOPLE, app.TEXTS.get
-                ("menuPlayMultiplayerButton"), app.skin);
+        buttonTable.row();
+        Button playMultiplayerButton = new GlowLabelButton(app.TEXTS.get
+                ("menuPlayMultiplayerButton"), app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
         playMultiplayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 app.setScreen(new MultiplayerMenuScreen(app));
             }
         });
-        buttons.add(playMultiplayerButton).colspan(2).padBottom(20);
+        buttonTable.add(playMultiplayerButton);
+        stage.addFocussableActor(playMultiplayerButton);
 
-        buttons.row();
-        accountButton = new FATextButton(FontAwesome.GPGS_LOGO, "", app.skin);
+        buttonTable.row();
+        accountButton = new GlowLabelButton("", app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
         accountButton.addListener(new ChangeListener() {
                                       public void changed(ChangeEvent event, Actor actor) {
                                           app.setScreen(new PlayerAccountMenuScreen(app));
                                       }
                                   }
         );
-        buttons.add(accountButton);
+        buttonTable.add(accountButton);
+        stage.addFocussableActor(accountButton);
         refreshAccountInfo();
 
         // Settings
-        TextButton settingsButton = new FATextButton(FontAwesome.SETTINGS_GEARS, app.TEXTS.get("menuSettings"), app
-                .skin);
+        Button settingsButton = new GlowLabelButton(app.TEXTS.get("menuSettings"), app.skin, FONT_SCALE_MENU,
+                SMALL_SCALE_MENU);
         settingsButton.addListener(new ChangeListener() {
                                        public void changed(ChangeEvent event, Actor actor) {
                                            app.setScreen(new SettingsScreen(app));
                                        }
                                    }
         );
-        buttons.add(settingsButton).minWidth(160);
+        buttonTable.row();
+        buttonTable.add(settingsButton);
+        stage.addFocussableActor(settingsButton);
 
-        mainTable.row();
-        mainTable.add(buttons);
-
-        mainTable.row().expandY();
-        Label gameVersion = new Label(LightBlocksGame.GAME_VERSIONSTRING +
-                (LightBlocksGame.GAME_DEVMODE ? "-DEV\n" : "\n")
-                + app.TEXTS.get("gameAuthor"), app.skin);
+        gameVersion = new Label(LightBlocksGame.GAME_VERSIONSTRING +
+                (LightBlocksGame.GAME_DEVMODE ? "-DEV" : ""), app.skin);
         gameVersion.setColor(.5f, .5f, .5f, 1);
         gameVersion.setFontScale(.8f);
         gameVersion.setAlignment(Align.bottom);
-        mainTable.add(gameVersion);
+        stage.addActor(gameVersion);
 
         constructBlockAnimation(blockGroup);
+
+        buttonTable.validate();
+        stage.setFocussedActor(missionButton);
 
         stage.getRoot().setColor(Color.CLEAR);
         stage.getRoot().addAction(Actions.fadeIn(1));
@@ -208,6 +206,7 @@ public class MainMenuScreen extends AbstractScreen {
                             // Beim letzen Block die anderen alle anschalten
                             for (int i = 0; i < 3; i++)
                                 ((BlockActor) blockGroup.getChildren().get(i)).setEnlightened(true);
+                            gameTitle.setGlowing(true);
                         }
                     })));
         }
@@ -232,4 +231,14 @@ public class MainMenuScreen extends AbstractScreen {
 
     }
 
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+
+        blockGroup.setPosition(stage.getWidth() / 2, stage.getHeight() - blockGroup.getHeight(), Align.bottom);
+        gameTitle.setPosition(stage.getWidth() / 2, blockGroup.getY(), Align.top);
+        gameVersion.setPosition(stage.getWidth() / 2, 0, Align.bottom);
+        buttonTable.setSize(stage.getWidth(), gameTitle.getY() - gameVersion.getHeight());
+        buttonTable.setY(gameVersion.getHeight());
+    }
 }

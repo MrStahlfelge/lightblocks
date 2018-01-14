@@ -7,24 +7,27 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import de.golfgl.gdx.controllers.ControllerMenuStage;
+
 /**
  * Created by Benjamin Schulte on 13.01.2018.
  */
 
 public class GlowLabelButton extends Button {
 
-    private static final float SMALL_SCALE_FACTOR = .8f;
+    private final float smallScaleFactor;
     private final GlowLabel labelGroup;
     private final Color disabledFontColor;
     private boolean highlighted;
     private boolean isFirstAct;
 
-    public GlowLabelButton(String text, Skin skin, float fontScale) {
+    public GlowLabelButton(String text, Skin skin, float fontScale, float smallScaleFactor) {
         super();
         setSkin(skin);
         setStyle(new ButtonStyle());
 
         disabledFontColor = skin.getColor("disabled");
+        this.smallScaleFactor = smallScaleFactor;
 
         labelGroup = new GlowLabel(text, skin, fontScale);
 
@@ -38,16 +41,22 @@ public class GlowLabelButton extends Button {
     public void act(float delta) {
         super.act(delta);
 
-        if (isOver() && !highlighted) {
+        boolean activated = isOver() ;
+
+        if (activated && !highlighted) {
             labelGroup.setGlowing(true);
-            labelGroup.clearActions();
-            labelGroup.addAction(Actions.scaleTo(1f, 1f, GlowLabel.GLOW_IN_DURATION / 2, Interpolation.circle));
+            if (smallScaleFactor < 1f) {
+                labelGroup.clearActions();
+                labelGroup.addAction(Actions.scaleTo(1f, 1f, GlowLabel.GLOW_IN_DURATION / 2, Interpolation.circle));
+            }
             highlighted = true;
-        } else if (!isOver() && highlighted || isFirstAct) {
+        } else if (!activated && highlighted || isFirstAct) {
             labelGroup.setGlowing(false);
-            labelGroup.clearActions();
-            labelGroup.addAction(Actions.scaleTo(SMALL_SCALE_FACTOR, SMALL_SCALE_FACTOR, isFirstAct ? 0 :
-                    GlowLabel.GLOW_OUT_DURATION / 2, Interpolation.swingOut));
+            if (smallScaleFactor < 1f) {
+                labelGroup.clearActions();
+                labelGroup.addAction(Actions.scaleTo(smallScaleFactor, smallScaleFactor, isFirstAct ? 0 :
+                        GlowLabel.GLOW_OUT_DURATION / 2, Interpolation.swingOut));
+            }
             highlighted = false;
         }
 
@@ -77,8 +86,18 @@ public class GlowLabelButton extends Button {
     }
 
     @Override
+    public boolean isOver() {
+        return super.isOver() || getStage() != null && getStage() instanceof ControllerMenuStage &&
+                ((ControllerMenuStage) getStage()).getFocussedActor() == this;
+    }
+
+    @Override
     public void pack() {
         labelGroup.pack();
         super.pack();
+    }
+
+    public void setText(String text) {
+        labelGroup.setText(text);
     }
 }

@@ -95,6 +95,12 @@ public class GlowLabel extends Label {
     }
 
     @Override
+    public void setText(CharSequence newText) {
+        super.setText(newText);
+        glowLabel.setText(newText);
+    }
+
+    @Override
     public void setWrap(boolean wrap) {
         glowLabel.setWrap(true);
         super.setWrap(wrap);
