@@ -41,6 +41,8 @@ import static com.badlogic.gdx.Gdx.app;
 public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final int nativeGameWidth = 480;
     public static final int nativeGameHeight = 800;
+    public static final float nativeLandscapeHeight = nativeGameHeight * .8f;
+
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
     public static final String GAME_URL = "http://www.golfgl.de/lightblocks/";
     public static final String GAME_STOREURL = "http://play.google.com/store/apps/details?id=de.golfgl" +

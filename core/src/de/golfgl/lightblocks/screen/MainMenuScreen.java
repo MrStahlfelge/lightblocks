@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -38,11 +39,11 @@ public class MainMenuScreen extends AbstractScreen {
     private final Label gameVersion;
     private Button resumeGameButton;
     private MenuMissionsScreen missionsScreen;
+    private boolean oldIsLandscape;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
         super(lightBlocksGame);
-
         // Die Blockgroup nimmt die Steinanimation auf
         blockGroup = new BlockGroup();
         blockGroup.setTransform(false);
@@ -53,7 +54,6 @@ public class MainMenuScreen extends AbstractScreen {
         gameTitle.setWrap(true);
         gameTitle.setAlignment(Align.center);
         gameTitle.setWidth(LightBlocksGame.nativeGameWidth * .75f);
-        gameTitle.setHeight(LightBlocksGame.nativeGameWidth / 8 + gameTitle.getPrefHeight());
         stage.addActor(gameTitle);
 
         buttonTable = new Table();
@@ -233,12 +233,34 @@ public class MainMenuScreen extends AbstractScreen {
 
     @Override
     public void resize(int width, int height) {
+        boolean newIsLandscape = width > height * 1.3f;
+
+        if (oldIsLandscape != newIsLandscape)
+            stage.setViewport(createNewViewport(newIsLandscape));
+
         super.resize(width, height);
 
-        blockGroup.setPosition(stage.getWidth() / 2, stage.getHeight() - blockGroup.getHeight(), Align.bottom);
-        gameTitle.setPosition(stage.getWidth() / 2, blockGroup.getY(), Align.top);
+        if (newIsLandscape) {
+            blockGroup.setPosition(blockGroup.getHeight() / 2, stage.getHeight() - blockGroup.getHeight());
+            gameTitle.setPosition(stage.getWidth() / 2, (stage.getHeight() + blockGroup.getY()) / 2 ,
+                    Align.top);
+        } else {
+            blockGroup.setPosition(stage.getWidth() / 2, stage.getHeight() - blockGroup.getHeight(), Align.bottom);
+            gameTitle.setPosition(blockGroup.getX(), blockGroup.getY() - LightBlocksGame.nativeGameWidth / 8, Align
+                    .top);
+        }
+        buttonTable.setSize(stage.getWidth(), gameTitle.getY() - LightBlocksGame.nativeGameWidth / 16 - gameVersion
+                .getHeight());
+        buttonTable.setPosition(0, gameVersion.getHeight());
+
         gameVersion.setPosition(stage.getWidth() / 2, 0, Align.bottom);
-        buttonTable.setSize(stage.getWidth(), gameTitle.getY() - gameVersion.getHeight());
-        buttonTable.setY(gameVersion.getHeight());
+
+        oldIsLandscape = newIsLandscape;
+    }
+
+    protected ExtendViewport createNewViewport(boolean landscape) {
+        return new ExtendViewport(landscape ? LightBlocksGame.nativeGameHeight :
+                LightBlocksGame.nativeGameWidth,
+                landscape ? LightBlocksGame.nativeLandscapeHeight : LightBlocksGame.nativeGameHeight);
     }
 }

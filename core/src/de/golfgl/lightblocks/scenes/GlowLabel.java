@@ -31,7 +31,6 @@ public class GlowLabel extends Label {
         this.baseScaling = baseScaling;
 
         glowLabel = new Label(text, skin, orgScaling <= .65f ? SKIN_LABEL40GLOW : SKIN_LABEL60GLOW);
-        glowLabel.setAlignment(Align.center);
         glowLabel.getColor().a = 0;
 
         setAlignment(Align.center);
@@ -73,6 +72,12 @@ public class GlowLabel extends Label {
         }
 
         this.isGlowing = isGlowing;
+    }
+
+    @Override
+    public void setAlignment(int alignment) {
+        super.setAlignment(alignment);
+        glowLabel.setAlignment(alignment);
     }
 
     @Override
