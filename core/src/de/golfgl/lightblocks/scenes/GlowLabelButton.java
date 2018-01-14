@@ -87,17 +87,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
         }
 
         Color fontColor;
-        if (isDisabled() && disabledFontColor != null)
-            fontColor = disabledFontColor;
-        else if (isPressed())
-            fontColor = LightBlocksGame.EMPHASIZE_COLOR;
-            //else if (isChecked && style.checkedFontColor != null)
-            //    fontColor = (isOver() && style.checkedOverFontColor != null) ? style.checkedOverFontColor : style
-            // .checkedFontColor;
-            //else if (isOver() && style.overFontColor != null)
-            //    fontColor = style.overFontColor;
-        else
-            fontColor = getColor();
+        fontColor = getActiveColor();
 
         if (fontColor != null && !fontColor.equals(this.fontColor)) {
             this.fontColor = new Color(fontColor);
@@ -114,11 +104,27 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
         isFirstAct = false;
     }
 
+    protected Color getActiveColor() {
+        Color fontColor;
+        if (isDisabled() && disabledFontColor != null)
+            fontColor = disabledFontColor;
+        else if (isPressed())
+            fontColor = LightBlocksGame.EMPHASIZE_COLOR;
+            //else if (isChecked && style.checkedFontColor != null)
+            //    fontColor = (isOver() && style.checkedOverFontColor != null) ? style.checkedOverFontColor : style
+            // .checkedFontColor;
+            //else if (isOver() && style.overFontColor != null)
+            //    fontColor = style.overFontColor;
+        else
+            fontColor = getColor();
+        return fontColor;
+    }
+
     @Override
     public void touchAction() {
-        if (!isPressed()) {
+        if (!isPressed() && !isDisabled()) {
             labelGroup.setColor(new Color(LightBlocksGame.EMPHASIZE_COLOR));
-            colorAction = Actions.color(getColor(), 1f, Interpolation.fade);
+            colorAction = Actions.color(getActiveColor(), 1f, Interpolation.fade);
             labelGroup.addAction(colorAction);
         }
     }
