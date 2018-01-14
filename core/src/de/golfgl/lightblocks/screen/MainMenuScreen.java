@@ -241,9 +241,9 @@ public class MainMenuScreen extends AbstractScreen {
         super.resize(width, height);
 
         if (newIsLandscape) {
-            blockGroup.setPosition(blockGroup.getHeight() / 2, stage.getHeight() - blockGroup.getHeight());
-            gameTitle.setPosition(stage.getWidth() / 2, (stage.getHeight() + blockGroup.getY()) / 2 ,
+            gameTitle.setPosition(stage.getWidth() / 2, (stage.getHeight() - LightBlocksGame.nativeGameWidth / 8),
                     Align.top);
+            blockGroup.setPosition(gameTitle.getX() / 2, stage.getHeight() / 2 - 2 * BlockActor.blockWidth);
         } else {
             blockGroup.setPosition(stage.getWidth() / 2, stage.getHeight() - blockGroup.getHeight(), Align.bottom);
             gameTitle.setPosition(blockGroup.getX(), blockGroup.getY() - LightBlocksGame.nativeGameWidth / 8, Align
