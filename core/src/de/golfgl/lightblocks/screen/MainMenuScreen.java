@@ -2,11 +2,13 @@ package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -40,6 +42,9 @@ public class MainMenuScreen extends AbstractScreen {
     private Button resumeGameButton;
     private MenuMissionsScreen missionsScreen;
     private boolean oldIsLandscape;
+    private Group mainGroup;
+    private final Button missionButton;
+    private final Cell resumeGameCell;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
@@ -58,10 +63,36 @@ public class MainMenuScreen extends AbstractScreen {
 
         buttonTable = new Table();
         buttonTable.defaults().pad(5, 0, 5, 0);
-        stage.addActor(buttonTable);
+        buttonTable.setFillParent(true);
+
+        mainGroup = new Group();
+        stage.addActor(mainGroup);
+        mainGroup.addActor(buttonTable);
+
+        // Resume the game
+        buttonTable.row();
+        resumeGameButton = new GlowLabelButton(app.TEXTS.get("menuResumeGameButton"), app.skin, FONT_SCALE_MENU,
+                SMALL_SCALE_MENU);
+        resumeGameButton.addListener(new ChangeListener() {
+                                         public void changed(ChangeEvent event, Actor actor) {
+                                             try {
+                                                 PlayScreen.gotoPlayScreen(MainMenuScreen.this, null);
+                                             } catch (VetoException e) {
+                                                 showDialog(e.getMessage());
+                                             } catch (Throwable t) {
+                                                 Log.error("Error loading game", t);
+                                                 showDialog("Error loading game.");
+                                             }
+                                         }
+                                     }
+        );
+
+        resumeGameCell = buttonTable.add(resumeGameButton);
+        stage.addFocussableActor(resumeGameButton);
 
         // Play new game!
-        Button missionButton = new GlowLabelButton(app.TEXTS.get("menuPlayMissionButton"),
+        buttonTable.row();
+        missionButton = new GlowLabelButton(app.TEXTS.get("menuPlayMissionButton"),
                 app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
         missionButton.addListener(new ChangeListener() {
             @Override
@@ -88,27 +119,6 @@ public class MainMenuScreen extends AbstractScreen {
 
         buttonTable.add(singleMarathonButton);
         stage.addFocussableActor(singleMarathonButton);
-
-        // Resume the game
-        buttonTable.row();
-        resumeGameButton = new GlowLabelButton(app.TEXTS.get("menuResumeGameButton"), app.skin, FONT_SCALE_MENU,
-                SMALL_SCALE_MENU);
-        resumeGameButton.addListener(new ChangeListener() {
-                                         public void changed(ChangeEvent event, Actor actor) {
-                                             try {
-                                                 PlayScreen.gotoPlayScreen(MainMenuScreen.this, null);
-                                             } catch (VetoException e) {
-                                                 showDialog(e.getMessage());
-                                             } catch (Throwable t) {
-                                                 Log.error("Error loading game", t);
-                                                 showDialog("Error loading game.");
-                                             }
-                                         }
-                                     }
-        );
-
-        buttonTable.add(resumeGameButton);
-        stage.addFocussableActor(resumeGameButton);
 
         buttonTable.row();
         Button playMultiplayerButton = new GlowLabelButton(app.TEXTS.get
@@ -145,6 +155,7 @@ public class MainMenuScreen extends AbstractScreen {
         );
         buttonTable.row();
         buttonTable.add(settingsButton);
+
         stage.addFocussableActor(settingsButton);
 
         gameVersion = new Label(LightBlocksGame.GAME_VERSIONSTRING +
@@ -152,16 +163,21 @@ public class MainMenuScreen extends AbstractScreen {
         gameVersion.setColor(.5f, .5f, .5f, 1);
         gameVersion.setFontScale(.8f);
         gameVersion.setAlignment(Align.bottom);
-        stage.addActor(gameVersion);
+        mainGroup.addActor(gameVersion);
+
+        // den Platz für die Version in der Tabelle frei halten
+        buttonTable.row();
+        buttonTable.add().minHeight(gameVersion.getHeight());
 
         constructBlockAnimation(blockGroup);
-
-        buttonTable.validate();
-        stage.setFocussedActor(missionButton);
 
         stage.getRoot().setColor(Color.CLEAR);
         stage.getRoot().addAction(Actions.fadeIn(1));
 
+    }
+
+    protected Button proposeFocussedActor() {
+        return resumeGameButton.hasParent() ? resumeGameButton : missionButton;
     }
 
     public void refreshAccountInfo() {
@@ -224,11 +240,17 @@ public class MainMenuScreen extends AbstractScreen {
     public void show() {
         Gdx.input.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(false);
-        resumeGameButton.setDisabled(!app.savegame.hasSavedGame());
+        resumeGameCell.setActor(app.savegame.hasSavedGame() ? resumeGameButton : null);
+        if (stage.getFocussedActor() == null || !stage.getFocussedActor().hasParent())
+            stage.setFocussedActor(proposeFocussedActor());
 
-        if (stage.getRoot().getActions().size == 0)
-            swoshIn();
-
+        mainGroup.setScale(oldIsLandscape ? 1 : 0, oldIsLandscape ? 0 : 1);
+        if (stage.getRoot().getActions().size == 0) {
+            if (app.isPlaySounds())
+                app.swoshSound.play();
+            mainGroup.addAction(Actions.scaleTo(1, 1, .15f, Interpolation.fade));
+        } else
+            mainGroup.addAction(Actions.scaleTo(1, 1, .5f, Interpolation.swingOut));
     }
 
     @Override
@@ -243,17 +265,19 @@ public class MainMenuScreen extends AbstractScreen {
         if (newIsLandscape) {
             gameTitle.setPosition(stage.getWidth() / 2, (stage.getHeight() - LightBlocksGame.nativeGameWidth / 8),
                     Align.top);
-            blockGroup.setPosition(gameTitle.getX() / 2, stage.getHeight() / 2 - 2 * BlockActor.blockWidth);
+            blockGroup.setPosition(gameTitle.getX() / 2, stage.getHeight() * .66f - 2 * BlockActor.blockWidth);
+            mainGroup.setWidth(stage.getWidth() - gameTitle.getX() * 2);
+            mainGroup.setX(stage.getWidth() / 2, Align.bottom);
         } else {
             blockGroup.setPosition(stage.getWidth() / 2, stage.getHeight() - blockGroup.getHeight(), Align.bottom);
             gameTitle.setPosition(blockGroup.getX(), blockGroup.getY() - LightBlocksGame.nativeGameWidth / 8, Align
                     .top);
+            mainGroup.setWidth(stage.getWidth());
+            mainGroup.setX(0);
         }
-        buttonTable.setSize(stage.getWidth(), gameTitle.getY() - LightBlocksGame.nativeGameWidth / 16 - gameVersion
-                .getHeight());
-        buttonTable.setPosition(0, gameVersion.getHeight());
-
-        gameVersion.setPosition(stage.getWidth() / 2, 0, Align.bottom);
+        mainGroup.setHeight(gameTitle.getY() - LightBlocksGame.nativeGameWidth / 16);
+        mainGroup.setY(0);
+        gameVersion.setPosition(mainGroup.getWidth() / 2, 0, Align.bottom);
 
         oldIsLandscape = newIsLandscape;
     }
