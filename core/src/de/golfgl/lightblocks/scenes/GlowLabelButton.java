@@ -6,10 +6,13 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.ColorAction;
 import com.badlogic.gdx.scenes.scene2d.actions.ScaleToAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
  * Created by Benjamin Schulte on 13.01.2018.
@@ -26,8 +29,13 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
     private ScaleToAction scaleAction;
     private ColorAction colorAction;
     private Color fontColor;
+    private Label faLabel;
 
     public GlowLabelButton(String text, Skin skin, float fontScale, float smallScaleFactor) {
+        this("", text, skin, fontScale, smallScaleFactor);
+    }
+
+    public GlowLabelButton(String faText, String text, Skin skin, float fontScale, float smallScaleFactor) {
         super();
         setSkin(skin);
         setStyle(new ButtonStyle());
@@ -40,17 +48,26 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
             public float getPrefWidth() {
                 return super.getPrefWidth() / getScaleX();
             }
-
             @Override
             public float getPrefHeight() {
                 return super.getPrefHeight() / getScaleY();
             }
         };
 
-        add(labelGroup).expand().fill();
+        if (faText != null && faText.length() > 0) {
+            faLabel = new Label(faText, skin, FontAwesome.SKIN_FONT_FA);
+            setFaLabelAlignment();
+            add(faLabel).minWidth(faLabel.getPrefWidth()).minHeight(faLabel.getPrefHeight()).padRight(5);
+            labelGroup.setAlignment(Align.left);
+        }
+        add(labelGroup).expand();
 
         highlighted = true;
         isFirstAct = true;
+    }
+
+    private void setFaLabelAlignment() {
+        faLabel.setAlignment(labelGroup.getText().length() > 0 ? Align.right : Align.center);
     }
 
     public boolean isColorTransition() {
@@ -100,6 +117,10 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
                 labelGroup.setColor(this.fontColor);
         }
 
+        if (faLabel != null) {
+            faLabel.setColor(labelGroup.getColor());
+            faLabel.setFontScale(labelGroup.getScaleX());
+        }
 
         isFirstAct = false;
     }
@@ -138,10 +159,13 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
     @Override
     public void pack() {
         labelGroup.pack();
+        if (faLabel != null)
+            faLabel.pack();
         super.pack();
     }
 
     public void setText(String text) {
         labelGroup.setText(text);
+        setFaLabelAlignment();
     }
 }
