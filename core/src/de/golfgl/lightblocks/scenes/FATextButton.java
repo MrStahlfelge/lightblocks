@@ -46,9 +46,12 @@ public class FATextButton extends TextButton {
         else
             fontColor = getStyle().fontColor;
 
+        Color oldColor = faLabel.getStyle().fontColor;
         if (fontColor != null) faLabel.getStyle().fontColor = fontColor;
 
         super.draw(batch, parentAlpha);
+
+        faLabel.getStyle().fontColor = oldColor;
     }
 
     public Label getFaLabel() {
