@@ -199,19 +199,4 @@ public class SettingsScreen extends AbstractMenuScreen {
         flushChanges();
         super.pause();
     }
-
-    @Override
-    protected void fillButtonTable(Table buttons) {
-        FATextButton aboutButton = new FATextButton(FontAwesome.COMMENT_STAR_HEART, app.TEXTS.get("menuAbout"), app.skin);
-        aboutButton.addListener(new ChangeListener() {
-                                       public void changed(ChangeEvent event, Actor actor) {
-                                           AboutScreen screen = new AboutScreen(app);
-                                           screen.setBackScreen(SettingsScreen.this);
-                                           app.setScreen(screen);
-                                       }
-                                   }
-        );
-
-        buttons.add(aboutButton);
-    }
 }

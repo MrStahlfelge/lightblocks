@@ -33,18 +33,19 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  */
 public class MainMenuScreen extends AbstractScreen {
     private static final float FONT_SCALE_MENU = .6f;
+    private static final float ICON_SCALE_MENU = 1f;
     private static final float SMALL_SCALE_MENU = .8f;
     private final GlowLabelButton accountButton;
     private final GlowLabel gameTitle;
     private final BlockGroup blockGroup;
     private final Table buttonTable;
     private final Label gameVersion;
+    private final Button missionButton;
+    private final Cell resumeGameCell;
     private Button resumeGameButton;
     private MenuMissionsScreen missionsScreen;
     private boolean oldIsLandscape;
     private Group mainGroup;
-    private final Button missionButton;
-    private final Cell resumeGameCell;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
@@ -62,7 +63,6 @@ public class MainMenuScreen extends AbstractScreen {
         stage.addActor(gameTitle);
 
         buttonTable = new Table();
-        buttonTable.defaults().pad(5, 0, 5, 0);
         buttonTable.setFillParent(true);
 
         mainGroup = new Group();
@@ -71,6 +71,11 @@ public class MainMenuScreen extends AbstractScreen {
 
         // Resume the game
         buttonTable.row();
+
+        Table menuButtons = new Table();
+        menuButtons.defaults().pad(5, 0, 5, 0);
+        menuButtons.row();
+
         resumeGameButton = new GlowLabelButton(app.TEXTS.get("menuResumeGameButton"), app.skin, FONT_SCALE_MENU,
                 SMALL_SCALE_MENU);
         resumeGameButton.addListener(new ChangeListener() {
@@ -87,12 +92,12 @@ public class MainMenuScreen extends AbstractScreen {
                                      }
         );
 
-        resumeGameCell = buttonTable.add(resumeGameButton);
+        resumeGameCell = menuButtons.add(resumeGameButton);
         stage.addFocussableActor(resumeGameButton);
 
         // Play new game!
-        buttonTable.row();
-        missionButton = new GlowLabelButton(app.TEXTS.get("menuPlayMissionButton"),
+        menuButtons.row();
+        missionButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_FLAG, app.TEXTS.get("menuPlayMissionButton"),
                 app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
         missionButton.addListener(new ChangeListener() {
             @Override
@@ -103,11 +108,12 @@ public class MainMenuScreen extends AbstractScreen {
             }
         });
 
-        buttonTable.add(missionButton);
+        menuButtons.add(missionButton);
         stage.addFocussableActor(missionButton);
 
-        buttonTable.row();
-        Button singleMarathonButton = new GlowLabelButton(app.TEXTS.get("menuPlayMarathonButton"),
+        menuButtons.row();
+        Button singleMarathonButton = new GlowLabelButton(FontAwesome.NET_PERSON,
+                app.TEXTS.get("menuPlayMarathonButton"),
                 app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
         singleMarathonButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
@@ -117,11 +123,11 @@ public class MainMenuScreen extends AbstractScreen {
                                          }
         );
 
-        buttonTable.add(singleMarathonButton);
+        menuButtons.add(singleMarathonButton);
         stage.addFocussableActor(singleMarathonButton);
 
-        buttonTable.row();
-        Button playMultiplayerButton = new GlowLabelButton(app.TEXTS.get
+        menuButtons.row();
+        Button playMultiplayerButton = new GlowLabelButton(FontAwesome.NET_PEOPLE, app.TEXTS.get
                 ("menuPlayMultiplayerButton"), app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
         playMultiplayerButton.addListener(new ChangeListener() {
             @Override
@@ -129,34 +135,68 @@ public class MainMenuScreen extends AbstractScreen {
                 app.setScreen(new MultiplayerMenuScreen(app));
             }
         });
-        buttonTable.add(playMultiplayerButton);
+        menuButtons.add(playMultiplayerButton);
         stage.addFocussableActor(playMultiplayerButton);
 
+        buttonTable.add(menuButtons).expandY();
+
         buttonTable.row();
-        accountButton = new GlowLabelButton("", app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
+
+        Table smallButtonTable = new Table();
+        smallButtonTable.defaults().uniform().expandX().center();
+        accountButton = new GlowLabelButton(FontAwesome.GPGS_LOGO, "", app.skin, ICON_SCALE_MENU, SMALL_SCALE_MENU);
         accountButton.addListener(new ChangeListener() {
                                       public void changed(ChangeEvent event, Actor actor) {
                                           app.setScreen(new PlayerAccountMenuScreen(app));
                                       }
                                   }
         );
-        buttonTable.add(accountButton);
+        smallButtonTable.add(accountButton).padLeft(30);
         stage.addFocussableActor(accountButton);
         refreshAccountInfo();
 
-        // Settings
-        Button settingsButton = new GlowLabelButton(app.TEXTS.get("menuSettings"), app.skin, FONT_SCALE_MENU,
+        Button scoreButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_TROPHY, "", app.skin,
+                ICON_SCALE_MENU, SMALL_SCALE_MENU);
+        scoreButton.addListener(new ChangeListener() {
+                                    public void changed(ChangeEvent event, Actor actor) {
+                                        TotalScoreScreen scoreScreen = new TotalScoreScreen(app);
+                                        scoreScreen.setTotal(app.savegame.getTotalScore());
+                                        scoreScreen.setMaxCountingTime(1);
+                                        scoreScreen.initializeUI();
+                                        app.setScreen(scoreScreen);
+                                    }
+                                }
+        );
+        smallButtonTable.add(scoreButton);
+        stage.addFocussableActor(scoreButton);
+
+        // About
+        Button aboutButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_HEART, "", app.skin, ICON_SCALE_MENU,
                 SMALL_SCALE_MENU);
+        aboutButton.addListener(new ChangeListener() {
+                                    public void changed(ChangeEvent event, Actor actor) {
+                                        AboutScreen screen = new AboutScreen(app);
+                                        app.setScreen(screen);
+                                    }
+                                }
+        );
+        smallButtonTable.add(aboutButton);
+        stage.addFocussableActor(aboutButton);
+
+        // Settings
+        Button settingsButton = new GlowLabelButton(FontAwesome.SETTINGS_GEAR, "",
+                app.skin, ICON_SCALE_MENU, SMALL_SCALE_MENU);
         settingsButton.addListener(new ChangeListener() {
                                        public void changed(ChangeEvent event, Actor actor) {
                                            app.setScreen(new SettingsScreen(app));
                                        }
                                    }
         );
-        buttonTable.row();
-        buttonTable.add(settingsButton);
-
+        smallButtonTable.add(settingsButton).padRight(30);
         stage.addFocussableActor(settingsButton);
+
+        buttonTable.add(smallButtonTable).fill().top().minHeight(smallButtonTable.getPrefHeight() * 2)
+                .minWidth(gameTitle.getWidth()).expandX();
 
         gameVersion = new Label(LightBlocksGame.GAME_VERSIONSTRING +
                 (LightBlocksGame.GAME_DEVMODE ? "-DEV" : ""), app.skin);
@@ -181,17 +221,9 @@ public class MainMenuScreen extends AbstractScreen {
     }
 
     public void refreshAccountInfo() {
-        if (app.gpgsClient != null && app.gpgsClient.isConnected()) {
-            String gamerId = app.player.getGamerId();
-
-            if (gamerId.length() >= 12)
-                gamerId = gamerId.substring(0, 10) + "...";
-
-            accountButton.setText(gamerId);
-        } else if (app.gpgsClient != null && app.gpgsClient.isConnectionPending())
-            accountButton.setText(app.TEXTS.get("menuGPGSConnecting"));
-        else
-            accountButton.setText(app.TEXTS.get("menuAccount"));
+        accountButton.setColor(AbstractMenuScreen.COLOR_TABLE_NORMAL);
+        if (app.gpgsClient != null && app.gpgsClient.isConnected())
+            accountButton.setColor(Color.WHITE);
     }
 
     /**
@@ -266,7 +298,7 @@ public class MainMenuScreen extends AbstractScreen {
             gameTitle.setPosition(stage.getWidth() / 2, (stage.getHeight() - LightBlocksGame.nativeGameWidth / 8),
                     Align.top);
             blockGroup.setPosition(gameTitle.getX() / 2, stage.getHeight() * .66f - 2 * BlockActor.blockWidth);
-            mainGroup.setWidth(stage.getWidth() - gameTitle.getX() * 2);
+            mainGroup.setWidth(LightBlocksGame.nativeGameWidth);
             mainGroup.setX(stage.getWidth() / 2, Align.bottom);
         } else {
             blockGroup.setPosition(stage.getWidth() / 2, stage.getHeight() - blockGroup.getHeight(), Align.bottom);

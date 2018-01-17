@@ -81,13 +81,6 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
         signInState = new Label(app.player.getGamerId(), app.skin, app.SKIN_FONT_BIG);
         signInState.setAlignment(Align.center);
         signInState.setWrap(true);
-        TextButton scoreButton = new TextButton(FontAwesome.COMMENT_STAR_TROPHY, app.skin, FontAwesome.SKIN_FONT_FA);
-        scoreButton.addListener(new ChangeListener() {
-                                    public void changed(ChangeEvent event, Actor actor) {
-                                        gotoTotalScoreScreen();
-                                    }
-                                }
-        );
         leaderboardButton = new TextButton(FontAwesome.GPGS_LEADERBOARD, app.skin, FontAwesome.SKIN_FONT_FA);
         leaderboardButton.addListener(new ChangeListener() {
             @Override
@@ -124,10 +117,6 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
         menuTable.add(achievementsButton).uniform();
         menuTable.add(new Label("Achievements", app.skin, app.SKIN_FONT_BIG));
 
-        menuTable.row().padTop(30);
-        menuTable.add(scoreButton).uniform();
-        menuTable.add(new Label(app.TEXTS.get("labelTotalScores"), app.skin, app.SKIN_FONT_BIG));
-
     }
 
     @Override
@@ -153,22 +142,6 @@ public class PlayerAccountMenuScreen extends AbstractMenuScreen {
         achievementsButton.setDisabled(!gpgsConnected);
         logInOutButton.setDisabled(app.gpgsClient == null);
         // Achievements etc auch
-    }
-
-    private void gotoTotalScoreScreen() {
-
-        if (!app.savegame.canSaveState()) {
-            showDialog("Sorry, highscores are only saved in the native Android version of Lightblocks. Download it to" +
-                    " your mobile!");
-            return;
-        }
-
-        TotalScoreScreen scoreScreen = new TotalScoreScreen(app);
-        scoreScreen.setTotal(app.savegame.getTotalScore());
-        scoreScreen.setMaxCountingTime(1);
-        scoreScreen.setBackScreen(this);
-        scoreScreen.initializeUI();
-        app.setScreen(scoreScreen);
     }
 
 
