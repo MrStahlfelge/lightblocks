@@ -11,7 +11,7 @@ import de.golfgl.lightblocks.scenes.ITouchActionButton;
  */
 
 public class MyStage extends ControllerMenuStage {
-    private static final float TOUCH_INTERVAL = 4f;
+    private static final float TOUCH_INTERVAL = 2f;
     float timeSinceTouch;
 
     public MyStage(Viewport viewport) {
@@ -33,11 +33,5 @@ public class MyStage extends ControllerMenuStage {
                 actor.touchAction();
             }
         }
-    }
-
-    @Override
-    public boolean setFocussedActor(Actor actor) {
-        timeSinceTouch = 0;
-        return super.setFocussedActor(actor);
     }
 }

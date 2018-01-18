@@ -18,7 +18,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
  */
 public abstract class AbstractMenuScreen extends AbstractScreen {
     protected static final Color COLOR_TABLE_DEACTIVATED = new Color(.2f, .2f, .2f, 1);
-    protected static final Color COLOR_TABLE_NORMAL = new Color(.5f, .5f, .5f, 1);
+    protected static final Color COLOR_TABLE_NORMAL = LightBlocksGame.LIGHT_HIGHLIGHT_COLOR;
     protected static final Color COLOR_TABLE_HIGHLIGHTED = new Color(1, 1, 1, 1);
     private Button leaveButton;
     private ScrollPane menuScrollPane;

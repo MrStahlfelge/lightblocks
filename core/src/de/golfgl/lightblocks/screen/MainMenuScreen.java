@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.esotericsoftware.minlog.Log;
 
+import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
@@ -34,14 +35,14 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 public class MainMenuScreen extends AbstractScreen {
     private static final float FONT_SCALE_MENU = .6f;
     private static final float ICON_SCALE_MENU = 1f;
-    private static final float SMALL_SCALE_MENU = .8f;
-    private final GlowLabelButton accountButton;
+    private static final float SMALL_SCALE_MENU = .9f;
     private final GlowLabel gameTitle;
     private final BlockGroup blockGroup;
     private final Table buttonTable;
     private final Label gameVersion;
     private final Button missionButton;
     private final Cell resumeGameCell;
+    private GlowLabelButton accountButton;
     private Button resumeGameButton;
     private MenuMissionsScreen missionsScreen;
     private boolean oldIsLandscape;
@@ -69,11 +70,22 @@ public class MainMenuScreen extends AbstractScreen {
         stage.addActor(mainGroup);
         mainGroup.addActor(buttonTable);
 
-        // Resume the game
+        // Welcome :-)
+        String welcomeText = app.getWelcomeText();
+        if (welcomeText != null) {
+            buttonTable.row();
+            Label welcomeLabel = new Label(welcomeText, app.skin);
+            welcomeLabel.setWrap(true);
+            welcomeLabel.setAlignment(Align.center);
+            buttonTable.add(welcomeLabel).fill();
+        }
+
         buttonTable.row();
 
         Table menuButtons = new Table();
         menuButtons.defaults().pad(5, 0, 5, 0);
+
+        // Resume the game
         menuButtons.row();
 
         resumeGameButton = new GlowLabelButton(app.TEXTS.get("menuResumeGameButton"), app.skin, FONT_SCALE_MENU,
@@ -143,17 +155,31 @@ public class MainMenuScreen extends AbstractScreen {
         buttonTable.row();
 
         Table smallButtonTable = new Table();
+        smallButtonTable.add().width(30);
         smallButtonTable.defaults().uniform().expandX().center();
-        accountButton = new GlowLabelButton(FontAwesome.GPGS_LOGO, "", app.skin, ICON_SCALE_MENU, SMALL_SCALE_MENU);
-        accountButton.addListener(new ChangeListener() {
-                                      public void changed(ChangeEvent event, Actor actor) {
-                                          app.setScreen(new PlayerAccountMenuScreen(app));
+
+        if (app.gpgsClient != null) {
+            accountButton = new GlowLabelButton(
+                    app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_AMAZONGC_ID) ?
+                            FontAwesome.GC_LOGO : FontAwesome.GPGS_LOGO,
+                    "", app.skin, ICON_SCALE_MENU, SMALL_SCALE_MENU) {
+
+                @Override
+                protected Color getTouchColor() {
+                    return app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_AMAZONGC_ID) ?
+                            Color.ORANGE : Color.GREEN;
+                }
+            };
+            accountButton.addListener(new ChangeListener() {
+                                          public void changed(ChangeEvent event, Actor actor) {
+                                              app.setScreen(new PlayerAccountMenuScreen(app));
+                                          }
                                       }
-                                  }
-        );
-        smallButtonTable.add(accountButton).padLeft(30);
-        stage.addFocussableActor(accountButton);
-        refreshAccountInfo();
+            );
+            smallButtonTable.add(accountButton);
+            stage.addFocussableActor(accountButton);
+            refreshAccountInfo();
+        }
 
         Button scoreButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_TROPHY, "", app.skin,
                 ICON_SCALE_MENU, SMALL_SCALE_MENU);
@@ -172,7 +198,12 @@ public class MainMenuScreen extends AbstractScreen {
 
         // About
         Button aboutButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_HEART, "", app.skin, ICON_SCALE_MENU,
-                SMALL_SCALE_MENU);
+                SMALL_SCALE_MENU) {
+            @Override
+            protected Color getTouchColor() {
+                return LightBlocksGame.EMPHASIZE_COLOR;
+            }
+        };
         aboutButton.addListener(new ChangeListener() {
                                     public void changed(ChangeEvent event, Actor actor) {
                                         AboutScreen screen = new AboutScreen(app);
@@ -195,8 +226,7 @@ public class MainMenuScreen extends AbstractScreen {
         smallButtonTable.add(settingsButton).padRight(30);
         stage.addFocussableActor(settingsButton);
 
-        buttonTable.add(smallButtonTable).fill().top().minHeight(smallButtonTable.getPrefHeight() * 2)
-                .minWidth(gameTitle.getWidth()).expandX();
+        buttonTable.add(smallButtonTable).fill().top().minWidth(gameTitle.getWidth()).expandX();
 
         gameVersion = new Label(LightBlocksGame.GAME_VERSIONSTRING +
                 (LightBlocksGame.GAME_DEVMODE ? "-DEV" : ""), app.skin);
@@ -221,7 +251,7 @@ public class MainMenuScreen extends AbstractScreen {
     }
 
     public void refreshAccountInfo() {
-        accountButton.setColor(AbstractMenuScreen.COLOR_TABLE_NORMAL);
+        accountButton.setColor(LightBlocksGame.LIGHT_HIGHLIGHT_COLOR);
         if (app.gpgsClient != null && app.gpgsClient.isConnected())
             accountButton.setColor(Color.WHITE);
     }
@@ -307,7 +337,7 @@ public class MainMenuScreen extends AbstractScreen {
             mainGroup.setWidth(stage.getWidth());
             mainGroup.setX(0);
         }
-        mainGroup.setHeight(gameTitle.getY() - LightBlocksGame.nativeGameWidth / 16);
+        mainGroup.setHeight(gameTitle.getY() - LightBlocksGame.nativeGameWidth / 8);
         mainGroup.setY(0);
         gameVersion.setPosition(mainGroup.getWidth() / 2, 0, Align.bottom);
 

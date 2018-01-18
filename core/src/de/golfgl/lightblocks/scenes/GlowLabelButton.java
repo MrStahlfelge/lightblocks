@@ -2,8 +2,8 @@ package de.golfgl.lightblocks.scenes;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.ColorAction;
 import com.badlogic.gdx.scenes.scene2d.actions.ScaleToAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.screen.AbstractMenuScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
@@ -27,7 +28,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
     private boolean isFirstAct;
     private boolean colorTransition;
     private ScaleToAction scaleAction;
-    private ColorAction colorAction;
+    private Action colorAction;
     private Color fontColor;
     private Label faLabel;
 
@@ -48,6 +49,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
             public float getPrefWidth() {
                 return super.getPrefWidth() / getScaleX();
             }
+
             @Override
             public float getPrefHeight() {
                 return super.getPrefHeight() / getScaleY();
@@ -57,7 +59,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
         if (faText != null && faText.length() > 0) {
             faLabel = new Label(faText, skin, FontAwesome.SKIN_FONT_FA);
             setFaLabelAlignment();
-            add(faLabel).minWidth(faLabel.getPrefWidth()).minHeight(faLabel.getPrefHeight()).padRight(5);
+            add(faLabel).padRight(5).padLeft(5).width(faLabel.getPrefWidth()).height(faLabel.getPrefHeight());
             labelGroup.setAlignment(Align.left);
         }
         add(labelGroup).expand();
@@ -97,7 +99,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
             if (smallScaleFactor < 1f) {
                 labelGroup.removeAction(scaleAction);
                 scaleAction = Actions.scaleTo(smallScaleFactor, smallScaleFactor, isFirstAct ? 0 :
-                        GlowLabel.GLOW_OUT_DURATION / 2, Interpolation.swingOut);
+                        GlowLabel.GLOW_OUT_DURATION / 2, Interpolation.circleIn);
                 labelGroup.addAction(scaleAction);
             }
             highlighted = false;
@@ -144,10 +146,15 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
     @Override
     public void touchAction() {
         if (!isPressed() && !isDisabled()) {
-            labelGroup.setColor(new Color(LightBlocksGame.EMPHASIZE_COLOR));
-            colorAction = Actions.color(getActiveColor(), 1f, Interpolation.fade);
+            labelGroup.removeAction(colorAction);
+            colorAction = Actions.sequence(Actions.color(getTouchColor(), .5f, Interpolation.fade),
+                    Actions.color(getActiveColor(), 1f, Interpolation.fade));
             labelGroup.addAction(colorAction);
         }
+    }
+
+    protected Color getTouchColor() {
+        return LightBlocksGame.LIGHT_HIGHLIGHT_COLOR;
     }
 
     @Override
