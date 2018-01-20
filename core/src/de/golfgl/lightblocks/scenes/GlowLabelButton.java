@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.ScaleToAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
@@ -31,6 +32,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
     private Action colorAction;
     private Color fontColor;
     private Label faLabel;
+    private Cell faCell;
 
     public GlowLabelButton(String text, Skin skin, float fontScale, float smallScaleFactor) {
         this("", text, skin, fontScale, smallScaleFactor);
@@ -59,7 +61,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
         if (faText != null && faText.length() > 0) {
             faLabel = new Label(faText, skin, FontAwesome.SKIN_FONT_FA);
             setFaLabelAlignment();
-            add(faLabel).padRight(5).padLeft(5).width(faLabel.getPrefWidth()).height(faLabel.getPrefHeight());
+            faCell = add(faLabel).padRight(5).padLeft(5).width(faLabel.getPrefWidth()).height(faLabel.getPrefHeight());
             labelGroup.setAlignment(Align.left);
         }
         add(labelGroup).expand();
@@ -174,5 +176,13 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
     public void setText(String text) {
         labelGroup.setText(text);
         setFaLabelAlignment();
+    }
+
+    public void setFaText(String text) {
+        faLabel.setText(text);
+        faLabel.setFontScale(1);
+        faLabel.invalidate();
+        faCell.width(faLabel.getPrefWidth()).height(faLabel.getPrefHeight());
+        faLabel.setFontScale(labelGroup.getScaleX());
     }
 }

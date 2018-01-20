@@ -56,6 +56,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public static final String SKIN_FONT_TITLE = "bigbigoutline";
     public static final String SKIN_FONT_BIG = "big";
+    public static final String SKIN_WINDOW_FRAMELESS = "frameless";
 
     public static final Color EMPHASIZE_COLOR = new Color(1, .3f, .3f, 1);
     public static final Color LIGHT_HIGHLIGHT_COLOR = new Color(.5f, .5f, .5f, 1);
@@ -85,8 +86,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public String modelNameRunningOn;
     public MainMenuScreen mainMenuScreen;
     public INsdHelper nsdHelper;
-    // der AccountScreen um An-/Abmeldung dort anzuzeien
-    PlayerAccountMenuScreen accountScreen;
     private FPSLogger fpsLogger;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -112,10 +111,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
             prefs.flush();
         }
         this.gpgsAutoLogin = gpgsAutoLogin;
-    }
-
-    public void setAccountScreen(PlayerAccountMenuScreen accountScreen) {
-        this.accountScreen = accountScreen;
     }
 
     @Override
@@ -299,8 +294,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
             @Override
             public void run() {
                 mainMenuScreen.refreshAccountInfo();
-                if (accountScreen != null)
-                    accountScreen.refreshAccountChanged();
                 //beim ersten Connect Spielstand laden (wenn vorhanden)
                 // War zuerst in GpgsConnect, es wurde aber der allerste Login nicht mehr automatisch gesetzt.
                 // (obwohl das Willkommen... Schild kam)

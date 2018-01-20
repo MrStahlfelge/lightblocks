@@ -18,6 +18,7 @@ import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
 import de.golfgl.lightblocks.scenes.GlowLabel;
@@ -33,9 +34,9 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 15.01.2017.
  */
 public class MainMenuScreen extends AbstractScreen {
-    private static final float FONT_SCALE_MENU = .6f;
-    private static final float ICON_SCALE_MENU = 1f;
-    private static final float SMALL_SCALE_MENU = .9f;
+    public static final float FONT_SCALE_MENU = .6f;
+    public static final float ICON_SCALE_MENU = 1f;
+    public static final float SMALL_SCALE_MENU = .9f;
     private final GlowLabel gameTitle;
     private final BlockGroup blockGroup;
     private final Table buttonTable;
@@ -47,7 +48,6 @@ public class MainMenuScreen extends AbstractScreen {
     private MenuMissionsScreen missionsScreen;
     private boolean oldIsLandscape;
     private Group mainGroup;
-
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
         super(lightBlocksGame);
@@ -60,11 +60,12 @@ public class MainMenuScreen extends AbstractScreen {
         gameTitle = new GlowLabel(app.TEXTS.get("gameTitle").toUpperCase(), app.skin, .9f);
         gameTitle.setWrap(true);
         gameTitle.setAlignment(Align.center);
-        gameTitle.setWidth(LightBlocksGame.nativeGameWidth * .75f);
-        stage.addActor(gameTitle);
 
         buttonTable = new Table();
         buttonTable.setFillParent(true);
+
+        buttonTable.add(gameTitle).minWidth(LightBlocksGame.nativeGameWidth * .75f).
+                padBottom(LightBlocksGame.nativeGameWidth / 16);
 
         mainGroup = new Group();
         stage.addActor(mainGroup);
@@ -172,7 +173,7 @@ public class MainMenuScreen extends AbstractScreen {
             };
             accountButton.addListener(new ChangeListener() {
                                           public void changed(ChangeEvent event, Actor actor) {
-                                              app.setScreen(new PlayerAccountMenuScreen(app));
+                                              new PlayerAccountMenuScreen(app, mainGroup).show(stage);
                                           }
                                       }
             );
@@ -244,6 +245,10 @@ public class MainMenuScreen extends AbstractScreen {
         stage.getRoot().setColor(Color.CLEAR);
         stage.getRoot().addAction(Actions.fadeIn(1));
 
+    }
+
+    public boolean isLandscape() {
+        return oldIsLandscape;
     }
 
     protected Button proposeFocussedActor() {
@@ -325,21 +330,24 @@ public class MainMenuScreen extends AbstractScreen {
         super.resize(width, height);
 
         if (newIsLandscape) {
-            gameTitle.setPosition(stage.getWidth() / 2, (stage.getHeight() - LightBlocksGame.nativeGameWidth / 8),
-                    Align.top);
-            blockGroup.setPosition(gameTitle.getX() / 2, stage.getHeight() * .66f - 2 * BlockActor.blockWidth);
             mainGroup.setWidth(LightBlocksGame.nativeGameWidth);
             mainGroup.setX(stage.getWidth() / 2, Align.bottom);
+            blockGroup.setPosition(mainGroup.getX() / 2, stage.getHeight() * .66f - 2 * BlockActor.blockWidth);
+            mainGroup.setHeight(stage.getHeight() - LightBlocksGame.nativeGameWidth / 16);
         } else {
             blockGroup.setPosition(stage.getWidth() / 2, stage.getHeight() - blockGroup.getHeight(), Align.bottom);
-            gameTitle.setPosition(blockGroup.getX(), blockGroup.getY() - LightBlocksGame.nativeGameWidth / 8, Align
-                    .top);
             mainGroup.setWidth(stage.getWidth());
             mainGroup.setX(0);
+            mainGroup.setHeight(blockGroup.getY() - LightBlocksGame.nativeGameWidth / 16);
         }
-        mainGroup.setHeight(gameTitle.getY() - LightBlocksGame.nativeGameWidth / 8);
         mainGroup.setY(0);
         gameVersion.setPosition(mainGroup.getWidth() / 2, 0, Align.bottom);
+
+        // Dialoge neu positionieren
+        for (Actor a : stage.getActors()) {
+            if (a instanceof AbstractMenuDialog)
+                ((AbstractMenuDialog) a).reposition();
+        }
 
         oldIsLandscape = newIsLandscape;
     }
