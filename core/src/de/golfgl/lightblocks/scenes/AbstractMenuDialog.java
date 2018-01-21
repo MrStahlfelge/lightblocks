@@ -24,6 +24,7 @@ import de.golfgl.lightblocks.screen.FontAwesome;
 public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     private static final float TIME_SWOSHIN = .15f;
     private static final float TIME_SWOSHOUT = .2f;
+    private static final Interpolation INTERPOLATION = Interpolation.circle;
     protected final LightBlocksGame app;
     protected Actor actorToHide;
     private boolean wasCatchBackKey;
@@ -63,8 +64,8 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     public Dialog show(Stage stage) {
         setTransform(true);
         setScale(0, 1);
-        Action showAction = Actions.sequence(Actions.parallel(Actions.scaleTo(1, 1, TIME_SWOSHIN, Interpolation.circleOut),
-                Actions.moveTo(actorToHide.getX(), actorToHide.getY(), TIME_SWOSHIN, Interpolation.circleOut)),
+        Action showAction = Actions.sequence(Actions.parallel(Actions.scaleTo(1, 1, TIME_SWOSHIN, INTERPOLATION),
+                Actions.moveTo(actorToHide.getX(), actorToHide.getY(), TIME_SWOSHIN, INTERPOLATION)),
                 Actions.run
                         (new Runnable() {
                             @Override
@@ -79,8 +80,8 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
             app.swoshSound.play();
         Dialog dialog = show(stage, showAction);
         setSize(actorToHide.getWidth(), actorToHide.getHeight());
-        setPosition(actorToHide.getX() + actorToHide.getWidth() / 2, actorToHide.getY());
-        actorToHide.addAction(Actions.fadeOut(TIME_SWOSHIN, Interpolation.fade));
+        setPosition(actorToHide.getX() + actorToHide.getWidth(), actorToHide.getY());
+        actorToHide.addAction(Actions.scaleTo(0, 1, TIME_SWOSHIN, INTERPOLATION));
         return dialog;
     }
 
@@ -102,13 +103,14 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     @Override
     public void hide() {
         setTransform(true);
-        Action hideAction = Actions.parallel(Actions.scaleTo(0, 1, TIME_SWOSHOUT, Interpolation.circleOut),
-                Actions.moveTo(actorToHide.getX() + actorToHide.getWidth() / 2,
-                        actorToHide.getY(), TIME_SWOSHOUT, Interpolation.circleOut));
+        Action hideAction = Actions.parallel(Actions.scaleTo(0, 1, TIME_SWOSHOUT, INTERPOLATION),
+                Actions.moveTo(actorToHide.getX() + actorToHide.getWidth(),
+                        actorToHide.getY(), TIME_SWOSHOUT, INTERPOLATION));
         if (app.isPlaySounds())
             app.swoshSound.play();
         hide(hideAction);
-        actorToHide.addAction(Actions.fadeIn(TIME_SWOSHOUT, Interpolation.circleIn));
+        actorToHide.setScale(0, 1);
+        actorToHide.addAction(Actions.scaleTo(1, 1, TIME_SWOSHOUT, INTERPOLATION));
     }
 
     @Override
