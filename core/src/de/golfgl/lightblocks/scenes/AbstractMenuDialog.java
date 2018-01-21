@@ -7,8 +7,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 
@@ -25,10 +27,13 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     private static final float TIME_SWOSHIN = .15f;
     private static final float TIME_SWOSHOUT = .2f;
     private static final Interpolation INTERPOLATION = Interpolation.circle;
+    private static final int SCROLLBAR_WIDTH = 30;
     protected final LightBlocksGame app;
     protected Actor actorToHide;
     private boolean wasCatchBackKey;
     private Button leaveButton;
+    private ScrollPane scrollPane;
+    private Cell scrollPaneCell;
 
     public AbstractMenuDialog(LightBlocksGame app, Actor actorToHide) {
         super("", app.skin, LightBlocksGame.SKIN_WINDOW_FRAMELESS);
@@ -37,11 +42,30 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         this.actorToHide = actorToHide;
 
         Table content = getContentTable();
-        content.pad(0, 30, 0, 30);
+        int scollBarWidth = isScrolling() ? SCROLLBAR_WIDTH : 0;
+        content.pad(0, scollBarWidth, 0, 0);
 
-        content.add(new Label(getTitle(), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+        content.add(new Label(getTitle(), app.skin, LightBlocksGame.SKIN_FONT_TITLE))
+                .padRight(scollBarWidth);
 
-        fillMenuTable(content);
+        String subtitle = getSubtitle();
+        if (subtitle != null) {
+            content.row();
+            content.add(new Label(subtitle, app.skin, LightBlocksGame.SKIN_FONT_BIG))
+                    .padRight(scollBarWidth);
+        }
+
+        if (!isScrolling())
+            fillMenuTable(content);
+        else {
+            Table scrolled = new Table();
+            fillMenuTable(scrolled);
+            scrollPane = new ScrollPane(scrolled, getSkin());
+            scrollPane.setFadeScrollBars(false);
+            //scrollPane.setScrollingDisabled(true, false);
+            content.row();
+            scrollPaneCell = content.add(scrollPane).width(actorToHide.getWidth() - SCROLLBAR_WIDTH);
+        }
 
         // Back button
         leaveButton = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
@@ -56,8 +80,19 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
 
     protected abstract String getTitle();
 
+    protected String getSubtitle() {
+        return null;
+    }
+
     protected void fillButtonTable(Table buttons) {
 
+    }
+
+    /**
+     * @return true if dialog needs an outer scrollpane
+     */
+    protected boolean isScrolling() {
+        return false;
     }
 
     @Override
@@ -120,4 +155,11 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     }
 
     protected abstract void fillMenuTable(Table menuTable);
+
+    @Override
+    protected void sizeChanged() {
+        super.sizeChanged();
+        if (scrollPaneCell != null)
+            scrollPaneCell.width(getWidth() - SCROLLBAR_WIDTH);
+    }
 }

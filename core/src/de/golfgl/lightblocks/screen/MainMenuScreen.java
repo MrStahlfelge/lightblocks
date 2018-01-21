@@ -207,8 +207,7 @@ public class MainMenuScreen extends AbstractScreen {
         };
         aboutButton.addListener(new ChangeListener() {
                                     public void changed(ChangeEvent event, Actor actor) {
-                                        AboutScreen screen = new AboutScreen(app);
-                                        app.setScreen(screen);
+                                        new AboutScreen(app, mainGroup).show(stage);
                                     }
                                 }
         );

@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
 import de.golfgl.lightblocks.scenes.FATextButton;
 import de.golfgl.lightblocks.scenes.ShareButton;
 
@@ -16,15 +17,12 @@ import de.golfgl.lightblocks.scenes.ShareButton;
  * Created by Benjamin Schulte on 01.01.2018.
  */
 
-public class AboutScreen extends AbstractMenuScreen {
+public class AboutScreen extends AbstractMenuDialog {
     public static final String TWITTER_URL = "https://twitter.com/MrStahlfelge";
     public static final String WEBSITE_URL = "https://www.golfgl.de";
 
-    public AboutScreen(LightBlocksGame app) {
-        super(app);
-
-        initializeUI();
-        getMenuScrollPane().setCancelTouchFocus(true);
+    public AboutScreen(LightBlocksGame app, Actor toHide) {
+        super(app, toHide);
     }
 
     @Override
@@ -45,14 +43,13 @@ public class AboutScreen extends AbstractMenuScreen {
     @Override
     protected void fillMenuTable(Table menuTable) {
         menuTable.row();
-        menuTable.defaults();
 
         menuTable.add(new Label(app.TEXTS.get("labelCopyright") + " " + app.TEXTS.get("gameAuthor"), app.skin));
         menuTable.row().padTop(20);
         Label labelAbout1 = new Label(app.TEXTS.get("labelAbout1"), app.skin, app.SKIN_FONT_BIG);
         labelAbout1.setWrap(true);
         labelAbout1.setAlignment(Align.center);
-        menuTable.add(labelAbout1).fill().minWidth(app.nativeGameWidth * .9f);
+        menuTable.add(labelAbout1).fill().minWidth(app.nativeGameWidth * .8f);
         menuTable.row().padTop(20);
         menuTable.add(getWrapLabel(app.TEXTS.get("labelAbout2"))).fill();
 
@@ -93,6 +90,11 @@ public class AboutScreen extends AbstractMenuScreen {
         menuTable.row().padTop(5);
         menuTable.add(new InfoButton(app.TEXTS.get("labelMusic"), app.TEXTS.get("labelMusicDesc"),
                 "https://www.youtube.com/watch?v=QDNHYF0Hp4U")).fill();
+    }
+
+    @Override
+    protected boolean isScrolling() {
+        return true;
     }
 
     private Label getWrapLabel(String text) {
