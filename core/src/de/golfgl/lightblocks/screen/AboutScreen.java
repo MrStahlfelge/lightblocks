@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -20,6 +21,7 @@ import de.golfgl.lightblocks.scenes.ShareButton;
 public class AboutScreen extends AbstractMenuDialog {
     public static final String TWITTER_URL = "https://twitter.com/MrStahlfelge";
     public static final String WEBSITE_URL = "https://www.golfgl.de";
+    private Cell widthDefiningCell;
 
     public AboutScreen(LightBlocksGame app, Actor toHide) {
         super(app, toHide);
@@ -49,7 +51,7 @@ public class AboutScreen extends AbstractMenuDialog {
         Label labelAbout1 = new Label(app.TEXTS.get("labelAbout1"), app.skin, app.SKIN_FONT_BIG);
         labelAbout1.setWrap(true);
         labelAbout1.setAlignment(Align.center);
-        menuTable.add(labelAbout1).fill().minWidth(app.nativeGameWidth * .8f);
+        widthDefiningCell = menuTable.add(labelAbout1).fill().minWidth(getAvailableContentWidth());
         menuTable.row().padTop(20);
         menuTable.add(getWrapLabel(app.TEXTS.get("labelAbout2"))).fill();
 
@@ -118,6 +120,13 @@ public class AboutScreen extends AbstractMenuDialog {
 
         buttons.add(shareAppButton);
         buttons.add(storeButton);
+    }
+
+    @Override
+    protected void sizeChanged() {
+        super.sizeChanged();
+        if (widthDefiningCell != null)
+            widthDefiningCell.minWidth(getAvailableContentWidth());
     }
 
     private class InfoButton extends Button {

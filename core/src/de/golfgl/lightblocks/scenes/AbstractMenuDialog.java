@@ -89,6 +89,13 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     }
 
     /**
+     * @return width you can use for content without horizontal scrollbar
+     */
+    protected float getAvailableContentWidth() {
+        return isScrolling() ? actorToHide.getWidth() - 2 * SCROLLBAR_WIDTH : actorToHide.getWidth();
+    }
+
+    /**
      * @return true if dialog needs an outer scrollpane
      */
     protected boolean isScrolling() {
