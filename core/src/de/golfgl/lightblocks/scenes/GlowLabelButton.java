@@ -21,7 +21,8 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  */
 
 public class GlowLabelButton extends Button implements ITouchActionButton {
-
+    public static final float SMALL_SCALE_MENU = .9f;
+    public static final float FONT_SCALE_MENU = .6f;
     private final float smallScaleFactor;
     private final GlowLabel labelGroup;
     private final Color disabledFontColor;
@@ -36,6 +37,14 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
 
     public GlowLabelButton(String text, Skin skin, float fontScale, float smallScaleFactor) {
         this("", text, skin, fontScale, smallScaleFactor);
+    }
+
+    public GlowLabelButton(String faText, String text, Skin skin) {
+        this(faText, text, skin, FONT_SCALE_MENU);
+    }
+
+    public GlowLabelButton(String faText, String text, Skin skin, float fontScale) {
+        this(faText, text, skin, fontScale, SMALL_SCALE_MENU);
     }
 
     public GlowLabelButton(String faText, String text, Skin skin, float fontScale, float smallScaleFactor) {

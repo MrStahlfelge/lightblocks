@@ -34,9 +34,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 15.01.2017.
  */
 public class MainMenuScreen extends AbstractScreen {
-    public static final float FONT_SCALE_MENU = .6f;
     public static final float ICON_SCALE_MENU = 1f;
-    public static final float SMALL_SCALE_MENU = .9f;
     private final GlowLabel gameTitle;
     private final BlockGroup blockGroup;
     private final Table buttonTable;
@@ -89,8 +87,8 @@ public class MainMenuScreen extends AbstractScreen {
         // Resume the game
         menuButtons.row();
 
-        resumeGameButton = new GlowLabelButton(app.TEXTS.get("menuResumeGameButton"), app.skin, FONT_SCALE_MENU,
-                SMALL_SCALE_MENU);
+        resumeGameButton = new GlowLabelButton(app.TEXTS.get("menuResumeGameButton"), app.skin,
+                GlowLabelButton.FONT_SCALE_MENU, GlowLabelButton.SMALL_SCALE_MENU);
         resumeGameButton.addListener(new ChangeListener() {
                                          public void changed(ChangeEvent event, Actor actor) {
                                              try {
@@ -111,7 +109,7 @@ public class MainMenuScreen extends AbstractScreen {
         // Play new game!
         menuButtons.row();
         missionButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_FLAG, app.TEXTS.get("menuPlayMissionButton"),
-                app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
+                app.skin);
         missionButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -127,7 +125,7 @@ public class MainMenuScreen extends AbstractScreen {
         menuButtons.row();
         Button singleMarathonButton = new GlowLabelButton(FontAwesome.NET_PERSON,
                 app.TEXTS.get("menuPlayMarathonButton"),
-                app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
+                app.skin);
         singleMarathonButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
                                                  //gotoPlayScreen(false);
@@ -141,7 +139,7 @@ public class MainMenuScreen extends AbstractScreen {
 
         menuButtons.row();
         Button playMultiplayerButton = new GlowLabelButton(FontAwesome.NET_PEOPLE, app.TEXTS.get
-                ("menuPlayMultiplayerButton"), app.skin, FONT_SCALE_MENU, SMALL_SCALE_MENU);
+                ("menuPlayMultiplayerButton"), app.skin);
         playMultiplayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -163,7 +161,7 @@ public class MainMenuScreen extends AbstractScreen {
             accountButton = new GlowLabelButton(
                     app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_AMAZONGC_ID) ?
                             FontAwesome.GC_LOGO : FontAwesome.GPGS_LOGO,
-                    "", app.skin, ICON_SCALE_MENU, SMALL_SCALE_MENU) {
+                    "", app.skin, ICON_SCALE_MENU) {
 
                 @Override
                 protected Color getTouchColor() {
@@ -183,7 +181,7 @@ public class MainMenuScreen extends AbstractScreen {
         }
 
         Button scoreButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_TROPHY, "", app.skin,
-                ICON_SCALE_MENU, SMALL_SCALE_MENU);
+                ICON_SCALE_MENU);
         scoreButton.addListener(new ChangeListener() {
                                     public void changed(ChangeEvent event, Actor actor) {
                                         TotalScoreScreen scoreScreen = new TotalScoreScreen(app);
@@ -198,8 +196,7 @@ public class MainMenuScreen extends AbstractScreen {
         stage.addFocussableActor(scoreButton);
 
         // About
-        Button aboutButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_HEART, "", app.skin, ICON_SCALE_MENU,
-                SMALL_SCALE_MENU) {
+        Button aboutButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_HEART, "", app.skin, ICON_SCALE_MENU) {
             @Override
             protected Color getTouchColor() {
                 return LightBlocksGame.EMPHASIZE_COLOR;
@@ -216,7 +213,7 @@ public class MainMenuScreen extends AbstractScreen {
 
         // Settings
         Button settingsButton = new GlowLabelButton(FontAwesome.SETTINGS_GEAR, "",
-                app.skin, ICON_SCALE_MENU, SMALL_SCALE_MENU);
+                app.skin, ICON_SCALE_MENU);
         settingsButton.addListener(new ChangeListener() {
                                        public void changed(ChangeEvent event, Actor actor) {
                                            app.setScreen(new SettingsScreen(app));

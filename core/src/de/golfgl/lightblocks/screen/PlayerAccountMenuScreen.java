@@ -75,7 +75,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
         signInState.setAlignment(Align.center);
         signInState.setWrap(true);
         leaderboardButton = new GlowLabelButton(FontAwesome.GPGS_LEADERBOARD, "Leader Boards", app.skin,
-                .5f, MainMenuScreen.SMALL_SCALE_MENU);
+                .5f, GlowLabelButton.SMALL_SCALE_MENU);
         leaderboardButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -88,7 +88,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
         });
 
         achievementsButton = new GlowLabelButton(FontAwesome.GPGS_ACHIEVEMENT, "Achievements", app.skin,
-                .5f, MainMenuScreen.SMALL_SCALE_MENU);
+                .5f, GlowLabelButton.SMALL_SCALE_MENU);
         achievementsButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
