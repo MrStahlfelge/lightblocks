@@ -329,7 +329,8 @@ public class MainMenuScreen extends AbstractScreen {
         super.resize(width, height);
 
         if (newIsLandscape) {
-            mainGroup.setWidth(LightBlocksGame.nativeGameWidth);
+            mainGroup.setWidth(LightBlocksGame.nativeGameWidth
+                    * (((stage.getWidth() / stage.getHeight()) - 1f) / 3 + 1f));
             mainGroup.setX(stage.getWidth() / 2, Align.bottom);
             blockGroup.setPosition(mainGroup.getX() / 2, stage.getHeight() * .66f - 2 * BlockActor.blockWidth);
             mainGroup.setHeight(stage.getHeight() - LightBlocksGame.nativeGameWidth / 16);
