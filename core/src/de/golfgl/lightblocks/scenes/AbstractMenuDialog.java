@@ -18,6 +18,7 @@ import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.MainMenuScreen;
 
 /**
  * Created by Benjamin Schulte on 20.01.2018.
@@ -68,7 +69,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         }
 
         // Back button
-        leaveButton = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
+        leaveButton = new GlowLabelButton(FontAwesome.LEFT_ARROW, "", app.skin, MainMenuScreen.ICON_SCALE_MENU);
         button(leaveButton);
 
         fillButtonTable(getButtonTable());
@@ -123,7 +124,8 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         Dialog dialog = show(stage, showAction);
         setSize(actorToHide.getWidth(), actorToHide.getHeight());
         setPosition(actorToHide.getX() + actorToHide.getWidth(), actorToHide.getY());
-        actorToHide.addAction(Actions.scaleTo(0, 1, TIME_SWOSHIN, INTERPOLATION));
+        actorToHide.addAction(Actions.sequence(Actions.scaleTo(0, 1, TIME_SWOSHIN, INTERPOLATION),
+                Actions.hide()));
         return dialog;
     }
 
@@ -152,7 +154,8 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
             app.swoshSound.play();
         hide(hideAction);
         actorToHide.setScale(0, 1);
-        actorToHide.addAction(Actions.scaleTo(1, 1, TIME_SWOSHOUT, INTERPOLATION));
+        actorToHide.addAction(Actions.sequence(Actions.visible(true),
+                Actions.scaleTo(1, 1, TIME_SWOSHOUT, INTERPOLATION)));
     }
 
     @Override

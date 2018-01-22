@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scenes.GlowLabelButton;
 
 /**
  * Created by Benjamin Schulte on 24.02.2017.
@@ -56,7 +57,7 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         Table buttons = new Table();
 
         // Back button
-        leaveButton = new TextButton(FontAwesome.LEFT_ARROW, app.skin, FontAwesome.SKIN_FONT_FA);
+        leaveButton = new GlowLabelButton(FontAwesome.LEFT_ARROW, "", app.skin, MainMenuScreen.ICON_SCALE_MENU);
         setBackButton(leaveButton);
         buttons.add(leaveButton).uniform();
         fillButtonTable(buttons);

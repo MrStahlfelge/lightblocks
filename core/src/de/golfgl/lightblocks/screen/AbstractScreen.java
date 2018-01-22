@@ -30,6 +30,7 @@ public abstract class AbstractScreen implements Screen {
     protected final LightBlocksGame app;
     protected MyStage stage;
     protected Screen backScreen;
+    private boolean isLandscapeOrientation;
 
     public AbstractScreen(LightBlocksGame app) {
         this.app = app;
@@ -47,6 +48,13 @@ public abstract class AbstractScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        boolean newIsLandscape = width > height * 1.3f;
+        boolean changed = isLandscapeOrientation != newIsLandscape;
+        isLandscapeOrientation = newIsLandscape;
+
+        if (changed)
+            onOrientationChanged();
+
         stage.getViewport().update(width, height, true);
 
         // Dialoge neu positionieren
@@ -138,6 +146,18 @@ public abstract class AbstractScreen implements Screen {
 
     public void setBackScreen(Screen backScreen) {
         this.backScreen = backScreen;
+    }
+
+    public boolean isLandscape() {
+        return isLandscapeOrientation;
+    }
+
+    /**
+     * called by resize() if orientation changed from portrait to landscape or vice versa before stage's viewport
+     * is updated. Use to change stage's viewport if necessary.
+     */
+    protected void onOrientationChanged() {
+        // for overriding purpose
     }
 
     public static class RunnableDialog extends Dialog {

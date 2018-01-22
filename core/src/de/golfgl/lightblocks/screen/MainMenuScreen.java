@@ -44,7 +44,6 @@ public class MainMenuScreen extends AbstractScreen {
     private GlowLabelButton accountButton;
     private Button resumeGameButton;
     private MenuMissionsScreen missionsScreen;
-    private boolean oldIsLandscape;
     private Group mainGroup;
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
@@ -243,10 +242,6 @@ public class MainMenuScreen extends AbstractScreen {
 
     }
 
-    public boolean isLandscape() {
-        return oldIsLandscape;
-    }
-
     protected Button proposeFocussedActor() {
         return resumeGameButton.hasParent() ? resumeGameButton : missionButton;
     }
@@ -307,25 +302,22 @@ public class MainMenuScreen extends AbstractScreen {
         if (stage.getFocussedActor() == null || !stage.getFocussedActor().hasParent())
             stage.setFocussedActor(proposeFocussedActor());
 
-        mainGroup.setScale(oldIsLandscape ? 1 : 0, oldIsLandscape ? 0 : 1);
         if (stage.getRoot().getActions().size == 0) {
+            mainGroup.setScale(0, 1);
             if (app.isPlaySounds())
                 app.swoshSound.play();
-            mainGroup.addAction(Actions.scaleTo(1, 1, .15f, Interpolation.fade));
-        } else
+            mainGroup.addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
+        } else {
+            mainGroup.setScale(isLandscape() ? 1 : 0, isLandscape() ? 0 : 1);
             mainGroup.addAction(Actions.scaleTo(1, 1, .5f, Interpolation.swingOut));
+        }
     }
 
     @Override
     public void resize(int width, int height) {
-        boolean newIsLandscape = width > height * 1.3f;
-
-        if (oldIsLandscape != newIsLandscape)
-            stage.setViewport(createNewViewport(newIsLandscape));
-
         super.resize(width, height);
 
-        if (newIsLandscape) {
+        if (isLandscape()) {
             mainGroup.setWidth(LightBlocksGame.nativeGameWidth
                     * (((stage.getWidth() / stage.getHeight()) - 1f) / 3 + 1f));
             mainGroup.setX(stage.getWidth() / 2, Align.bottom);
@@ -345,13 +337,12 @@ public class MainMenuScreen extends AbstractScreen {
             if (a instanceof AbstractMenuDialog)
                 ((AbstractMenuDialog) a).reposition();
         }
-
-        oldIsLandscape = newIsLandscape;
     }
 
-    protected ExtendViewport createNewViewport(boolean landscape) {
-        return new ExtendViewport(landscape ? LightBlocksGame.nativeGameHeight :
+    @Override
+    protected void onOrientationChanged() {
+        stage.setViewport(new ExtendViewport(isLandscape() ? LightBlocksGame.nativeGameHeight :
                 LightBlocksGame.nativeGameWidth,
-                landscape ? LightBlocksGame.nativeLandscapeHeight : LightBlocksGame.nativeGameHeight);
+                isLandscape() ? LightBlocksGame.nativeLandscapeHeight : LightBlocksGame.nativeGameHeight));
     }
 }
