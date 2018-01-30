@@ -45,6 +45,7 @@ public class MainMenuScreen extends AbstractScreen {
     private Button resumeGameButton;
     private MenuMissionsScreen missionsScreen;
     private Group mainGroup;
+    private PlayerAccountMenuScreen lastAccountScreen;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
@@ -170,7 +171,10 @@ public class MainMenuScreen extends AbstractScreen {
             };
             accountButton.addListener(new ChangeListener() {
                                           public void changed(ChangeEvent event, Actor actor) {
-                                              new PlayerAccountMenuScreen(app, mainGroup).show(stage);
+                                              // Referenz lastAccountScreen wird nicht wieder zurückgesetzt
+                                              // so schlimm ist das aber nicht :-)
+                                              lastAccountScreen = new PlayerAccountMenuScreen(app, mainGroup);
+                                              lastAccountScreen.show(stage);
                                           }
                                       }
             );
@@ -248,6 +252,9 @@ public class MainMenuScreen extends AbstractScreen {
         accountButton.setColor(LightBlocksGame.LIGHT_HIGHLIGHT_COLOR);
         if (app.gpgsClient != null && app.gpgsClient.isConnected())
             accountButton.setColor(Color.WHITE);
+
+        if (lastAccountScreen != null && lastAccountScreen.hasParent())
+            lastAccountScreen.refreshAccountChanged();
     }
 
     /**

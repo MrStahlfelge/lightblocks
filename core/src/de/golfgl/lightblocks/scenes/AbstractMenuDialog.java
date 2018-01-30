@@ -84,8 +84,14 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     }
 
     protected void fillButtonTable(Table buttons) {
-        // Back button
+        buttons.defaults().uniform().expandX().center();
+
         leaveButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
+
+        if (!isScrolling())
+            buttons.defaults().minHeight(leaveButton.getPrefHeight() * 1.5f);
+
+        // Back button
         button(leaveButton);
     }
 
@@ -125,8 +131,6 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
                                 reposition();
                             }
                         }));
-        if (app.isPlaySounds())
-            app.swoshSound.play();
 
         // das muss vor dem show stattfinden, damit Doppelaufruf nicht möglich ist
         actorToHide.addAction(Actions.sequence(Actions.scaleTo(0, 1, TIME_SWOSHIN, INTERPOLATION),
@@ -136,6 +140,10 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
 
         setSize(actorToHide.getWidth(), actorToHide.getHeight());
         setPosition(actorToHide.getX() + actorToHide.getWidth(), actorToHide.getY());
+
+        // erst nach dem Show abspielen, da das show eventuell länger braucht
+        if (app.isPlaySounds())
+            app.swoshSound.play();
 
         return dialog;
     }

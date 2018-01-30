@@ -121,7 +121,9 @@ public class AboutScreen extends AbstractMenuDialog {
         });
 
         buttons.add(shareAppButton);
+        buttonsToAdd.add(shareAppButton);
         buttons.add(storeButton);
+        buttonsToAdd.add(shareAppButton);
     }
 
     @Override
