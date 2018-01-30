@@ -407,7 +407,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public float getGridIntensity() {
         if (gridIntensity == null)
-            gridIntensity = prefs.getFloat("gridIntensity", 0);
+            gridIntensity = prefs.getFloat("gridIntensity", 0.2f);
 
         return gridIntensity;
     }
