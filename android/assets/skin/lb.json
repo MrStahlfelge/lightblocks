@@ -188,7 +188,7 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		disabled: button-disabled
 	}
 	round: {
-		font: qs-25-bold
+		font: qs-40-bold
 		fontColor: white
 		downFontColor: black
 		up: button_small_font

@@ -12,13 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.screen.FontAwesome;
-import de.golfgl.lightblocks.screen.MainMenuScreen;
 
 /**
  * Created by Benjamin Schulte on 20.01.2018.
@@ -34,7 +32,8 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     private boolean wasCatchBackKey;
     private Button leaveButton;
     private ScrollPane scrollPane;
-    private Cell scrollPaneCell;
+    private Cell mainContentCell;
+    private boolean isShown;
 
     public AbstractMenuDialog(LightBlocksGame app, Actor actorToHide) {
         super("", app.skin, LightBlocksGame.SKIN_WINDOW_FRAMELESS);
@@ -56,21 +55,20 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
                     .padRight(scollBarWidth);
         }
 
+        content.row();
+
+        Table scrolled = new Table();
+        fillMenuTable(scrolled);
+
+        Actor mainActor;
         if (!isScrolling())
-            fillMenuTable(content);
+            mainActor = scrolled;
         else {
-            Table scrolled = new Table();
-            fillMenuTable(scrolled);
             scrollPane = new ScrollPane(scrolled, getSkin());
             scrollPane.setFadeScrollBars(false);
-            //scrollPane.setScrollingDisabled(true, false);
-            content.row();
-            scrollPaneCell = content.add(scrollPane).width(actorToHide.getWidth() - SCROLLBAR_WIDTH);
+            mainActor = scrollPane;
         }
-
-        // Back button
-        leaveButton = new GlowLabelButton(FontAwesome.LEFT_ARROW, "", app.skin, MainMenuScreen.ICON_SCALE_MENU);
-        button(leaveButton);
+        mainContentCell = content.add(mainActor).width(actorToHide.getWidth() - scollBarWidth).expandY();
 
         fillButtonTable(getButtonTable());
 
@@ -86,7 +84,9 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     }
 
     protected void fillButtonTable(Table buttons) {
-
+        // Back button
+        leaveButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
+        button(leaveButton);
     }
 
     /**
@@ -105,6 +105,12 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
 
     @Override
     public Dialog show(Stage stage) {
+        // wenn actortohide noch in transition ist, mache nix
+        if (isShown || actorToHide.hasActions())
+            return this;
+
+        isShown = true;
+
         setTransform(true);
         setScale(0, 1);
         Action showAction = Actions.sequence(Actions.parallel(Actions.scaleTo(1, 1, TIME_SWOSHIN, INTERPOLATION),
@@ -121,11 +127,16 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
                         }));
         if (app.isPlaySounds())
             app.swoshSound.play();
-        Dialog dialog = show(stage, showAction);
-        setSize(actorToHide.getWidth(), actorToHide.getHeight());
-        setPosition(actorToHide.getX() + actorToHide.getWidth(), actorToHide.getY());
+
+        // das muss vor dem show stattfinden, damit Doppelaufruf nicht möglich ist
         actorToHide.addAction(Actions.sequence(Actions.scaleTo(0, 1, TIME_SWOSHIN, INTERPOLATION),
                 Actions.hide()));
+
+        Dialog dialog = show(stage, showAction);
+
+        setSize(actorToHide.getWidth(), actorToHide.getHeight());
+        setPosition(actorToHide.getX() + actorToHide.getWidth(), actorToHide.getY());
+
         return dialog;
     }
 
@@ -156,6 +167,8 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         actorToHide.setScale(0, 1);
         actorToHide.addAction(Actions.sequence(Actions.visible(true),
                 Actions.scaleTo(1, 1, TIME_SWOSHOUT, INTERPOLATION)));
+
+        isShown = false;
     }
 
     @Override
@@ -169,7 +182,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     @Override
     protected void sizeChanged() {
         super.sizeChanged();
-        if (scrollPaneCell != null)
-            scrollPaneCell.width(getWidth() - SCROLLBAR_WIDTH);
+        if (mainContentCell != null)
+            mainContentCell.width(getWidth() - (isScrolling() ? SCROLLBAR_WIDTH : 0));
     }
 }

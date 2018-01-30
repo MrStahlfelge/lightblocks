@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -10,7 +11,8 @@ import com.badlogic.gdx.utils.Align;
 import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
-import de.golfgl.lightblocks.scenes.GlowLabelButton;
+import de.golfgl.lightblocks.scenes.RoundedTextButton;
+import de.golfgl.lightblocks.scenes.ScaledLabel;
 
 /**
  * Screen for player's account: Scores, Sign in/out a.s.o.
@@ -20,10 +22,9 @@ import de.golfgl.lightblocks.scenes.GlowLabelButton;
 
 public class PlayerAccountMenuScreen extends AbstractMenuDialog {
 
-    private Label signInState;
     private TextButton logInOutButton;
-    private GlowLabelButton leaderboardButton;
-    private GlowLabelButton achievementsButton;
+    private Button leaderboardButton;
+    private Button achievementsButton;
 
     public PlayerAccountMenuScreen(LightBlocksGame app, Actor actorToHide) {
         super(app, actorToHide);
@@ -38,18 +39,12 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
 
     @Override
     protected String getTitle() {
-        return app.TEXTS.get("menuAccount");
+        return app.TEXTS.get("menuAccountGpgs");
     }
 
     @Override
     protected void fillButtonTable(Table buttons) {
-        logInOutButton = new TextButton("", app.skin, "round");
-        logInOutButton.addListener(new ChangeListener() {
-                                       public void changed(ChangeEvent event, Actor actor) {
-                                           performGpgsLoginout();
-                                       }
-                                   }
-        );
+        super.fillButtonTable(buttons);
 
         buttons.add(logInOutButton).padLeft(50).minWidth(220);
         buttonsToAdd.add(logInOutButton);
@@ -71,11 +66,10 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
     }
 
     protected void fillMenuTable(Table menuTable) {
-        signInState = new Label(app.player.getGamerId(), app.skin, app.SKIN_FONT_BIG);
+        Label signInState = new ScaledLabel(app.TEXTS.get("menuGameService"), app.skin, app.SKIN_FONT_TITLE, LightBlocksGame.LABEL_SCALING);
         signInState.setAlignment(Align.center);
         signInState.setWrap(true);
-        leaderboardButton = new GlowLabelButton(FontAwesome.GPGS_LEADERBOARD, "Leader Boards", app.skin,
-                .5f, GlowLabelButton.SMALL_SCALE_MENU);
+        leaderboardButton = new RoundedTextButton("Leader Boards", app.skin);
         leaderboardButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -87,8 +81,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
             }
         });
 
-        achievementsButton = new GlowLabelButton(FontAwesome.GPGS_ACHIEVEMENT, "Achievements", app.skin,
-                .5f, GlowLabelButton.SMALL_SCALE_MENU);
+        achievementsButton = new RoundedTextButton("Achievements", app.skin);
         achievementsButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -100,8 +93,16 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
             }
         });
 
+        logInOutButton = new RoundedTextButton("", app.skin);
+        logInOutButton.addListener(new ChangeListener() {
+                                       public void changed(ChangeEvent event, Actor actor) {
+                                           performGpgsLoginout();
+                                       }
+                                   }
+        );
+
         menuTable.row();
-        menuTable.add(signInState).minHeight(120).fill();
+        menuTable.add(signInState).fill().expandX().pad(20);
 
         menuTable.row().padTop(30);
         menuTable.add(leaderboardButton);
@@ -110,8 +111,6 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
         menuTable.add(achievementsButton);
         buttonsToAdd.add(achievementsButton);
 
-        menuTable.row();
-        menuTable.add().expandY();
     }
 
     private void refreshAccountChanged() {
@@ -120,10 +119,8 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
         //logInOutButton.setFaText(getLogInOutIcon(gpgsConnected));
         if (gpgsConnected) {
             logInOutButton.setText(app.TEXTS.get("menuSignOut"));
-            signInState.setText(app.TEXTS.format("menuGPGSAccount", app.player.getName()));
         } else {
-            logInOutButton.setText(app.TEXTS.get(gpgsConnectPending ? "menuGPGSConnecting" : "menuSignInGPGS"));
-            signInState.setText(app.TEXTS.format("menuLocalAccount", app.player.getName()));
+            logInOutButton.setText(app.TEXTS.get(gpgsConnectPending ? "menuGPGSConnecting" : "menuSignIn"));
         }
 
         leaderboardButton.setDisabled(!gpgsConnected);

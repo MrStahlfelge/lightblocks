@@ -107,6 +107,8 @@ public class AboutScreen extends AbstractMenuDialog {
 
     @Override
     protected void fillButtonTable(Table buttons) {
+        super.fillButtonTable(buttons);
+
         ShareButton shareAppButton = new ShareButton(app);
 
         FATextButton storeButton = new FATextButton(FontAwesome.DEVICE_ANDROID, app.TEXTS.get("buttonStore"),

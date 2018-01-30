@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -54,7 +55,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     private Table gpgButtons;
     private FATextButton gpgShowInvitationsButton;
     private FATextButton gpgInviteButton;
-    private FATextButton shareAppButton;
+    private Button shareAppButton;
 
     public MultiplayerMenuScreen(LightBlocksGame app) {
         super(app);
@@ -222,7 +223,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
         initGameScreen = new Table();
         initGameScreen.row();
-        initGameScreen.add(new Label(app.TEXTS.get("menuSignInGPGS"), app.skin, LightBlocksGame.SKIN_FONT_BIG));
+        initGameScreen.add(new Label(app.TEXTS.get("menuAccountGpgs"), app.skin, LightBlocksGame.SKIN_FONT_BIG));
         initGameScreen.row();
         initScreenGpgButtonCell = initGameScreen.add(gpgButtons);
         initGameScreen.row();

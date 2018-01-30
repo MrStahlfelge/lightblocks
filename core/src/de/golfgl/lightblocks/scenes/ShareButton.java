@@ -10,9 +10,9 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  * Created by Benjamin Schulte on 01.01.2018.
  */
 
-public class ShareButton extends FATextButton {
+public class ShareButton extends FaButton {
     public ShareButton(final LightBlocksGame app) {
-        super(FontAwesome.NET_SHARE1, app.TEXTS.get("menuShareApp"), app.skin);
+        super(FontAwesome.NET_SHARE1, app.skin);
 
         addListener(new ChangeListener() {
                         public void changed(ChangeEvent event, Actor actor) {

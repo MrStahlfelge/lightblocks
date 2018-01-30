@@ -423,6 +423,19 @@ atlasData: {
 			tintName: black
 			name: black
 		}
+		{
+			file: ../button_round.9.png
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			visible: true
+			tint: null
+			tintName: null
+			name: button_round
+		}
 	]
 }
 jsonData: {
@@ -2617,7 +2630,7 @@ jsonData: {
 						type: com.badlogic.gdx.graphics.g2d.BitmapFont
 						name: font
 						optional: false
-						value: qs-25-bold
+						value: qs-40-bold
 					}
 					fontColor: {
 						class: com.ray3k.skincomposer.data.StyleProperty

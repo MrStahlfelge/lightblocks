@@ -8,10 +8,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scenes.FaButton;
 import de.golfgl.lightblocks.scenes.GlowLabelButton;
 
 /**
@@ -57,7 +57,7 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         Table buttons = new Table();
 
         // Back button
-        leaveButton = new GlowLabelButton(FontAwesome.LEFT_ARROW, "", app.skin, MainMenuScreen.ICON_SCALE_MENU);
+        leaveButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
         setBackButton(leaveButton);
         buttons.add(leaveButton).uniform();
         fillButtonTable(buttons);

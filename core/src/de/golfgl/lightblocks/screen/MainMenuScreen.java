@@ -21,6 +21,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
+import de.golfgl.lightblocks.scenes.FaButton;
 import de.golfgl.lightblocks.scenes.GlowLabel;
 import de.golfgl.lightblocks.scenes.GlowLabelButton;
 
@@ -34,7 +35,6 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 15.01.2017.
  */
 public class MainMenuScreen extends AbstractScreen {
-    public static final float ICON_SCALE_MENU = 1f;
     private final GlowLabel gameTitle;
     private final BlockGroup blockGroup;
     private final Table buttonTable;
@@ -45,6 +45,7 @@ public class MainMenuScreen extends AbstractScreen {
     private Button resumeGameButton;
     private MenuMissionsScreen missionsScreen;
     private Group mainGroup;
+
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
         super(lightBlocksGame);
@@ -157,10 +158,9 @@ public class MainMenuScreen extends AbstractScreen {
         smallButtonTable.defaults().uniform().expandX().center();
 
         if (app.gpgsClient != null) {
-            accountButton = new GlowLabelButton(
+            accountButton = new FaButton(
                     app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_AMAZONGC_ID) ?
-                            FontAwesome.GC_LOGO : FontAwesome.GPGS_LOGO,
-                    "", app.skin, ICON_SCALE_MENU) {
+                            FontAwesome.GC_LOGO : FontAwesome.GPGS_LOGO, app.skin) {
 
                 @Override
                 protected Color getTouchColor() {
@@ -179,8 +179,7 @@ public class MainMenuScreen extends AbstractScreen {
             refreshAccountInfo();
         }
 
-        Button scoreButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_TROPHY, "", app.skin,
-                ICON_SCALE_MENU);
+        Button scoreButton = new FaButton(FontAwesome.COMMENT_STAR_TROPHY, app.skin);
         scoreButton.addListener(new ChangeListener() {
                                     public void changed(ChangeEvent event, Actor actor) {
                                         TotalScoreScreen scoreScreen = new TotalScoreScreen(app);
@@ -195,7 +194,7 @@ public class MainMenuScreen extends AbstractScreen {
         stage.addFocussableActor(scoreButton);
 
         // About
-        Button aboutButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_HEART, "", app.skin, ICON_SCALE_MENU) {
+        Button aboutButton = new FaButton(FontAwesome.COMMENT_STAR_HEART, app.skin) {
             @Override
             protected Color getTouchColor() {
                 return LightBlocksGame.EMPHASIZE_COLOR;
@@ -211,8 +210,7 @@ public class MainMenuScreen extends AbstractScreen {
         stage.addFocussableActor(aboutButton);
 
         // Settings
-        Button settingsButton = new GlowLabelButton(FontAwesome.SETTINGS_GEAR, "",
-                app.skin, ICON_SCALE_MENU);
+        Button settingsButton = new FaButton(FontAwesome.SETTINGS_GEAR, app.skin);
         settingsButton.addListener(new ChangeListener() {
                                        public void changed(ChangeEvent event, Actor actor) {
                                            app.setScreen(new SettingsScreen(app));
