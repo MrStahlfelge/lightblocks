@@ -41,18 +41,15 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         this.app = app;
         this.actorToHide = actorToHide;
 
-        Table content = getContentTable();
+        Table content = isScrolling() ? new Table() : getContentTable();
         int scollBarWidth = isScrolling() ? SCROLLBAR_WIDTH : 0;
-        content.pad(0, scollBarWidth, 0, 0);
 
-        content.add(new Label(getTitle(), app.skin, LightBlocksGame.SKIN_FONT_TITLE))
-                .padRight(scollBarWidth);
+        content.add(new Label(getTitle(), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
 
         String subtitle = getSubtitle();
         if (subtitle != null) {
             content.row();
-            content.add(new Label(subtitle, app.skin, LightBlocksGame.SKIN_FONT_BIG))
-                    .padRight(scollBarWidth);
+            content.add(new Label(subtitle, app.skin, LightBlocksGame.SKIN_FONT_BIG));
         }
 
         content.row();
@@ -60,15 +57,15 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         Table scrolled = new Table();
         fillMenuTable(scrolled);
 
-        Actor mainActor;
-        if (!isScrolling())
-            mainActor = scrolled;
-        else {
-            scrollPane = new ScrollPane(scrolled, getSkin());
+        if (!isScrolling()) {
+            mainContentCell = content.add(scrolled);
+        } else {
+            content.add(scrolled);
+            scrollPane = new ScrollPane(content, getSkin());
             scrollPane.setFadeScrollBars(false);
-            mainActor = scrollPane;
+            mainContentCell = getContentTable().add(scrollPane).padLeft(scollBarWidth);
         }
-        mainContentCell = content.add(mainActor).width(actorToHide.getWidth() - scollBarWidth).expandY();
+        mainContentCell.width(actorToHide.getWidth() - scollBarWidth).expandY();
 
         fillButtonTable(getButtonTable());
 

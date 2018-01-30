@@ -123,14 +123,17 @@ public class AboutScreen extends AbstractMenuDialog {
         buttons.add(shareAppButton);
         buttonsToAdd.add(shareAppButton);
         buttons.add(storeButton);
-        buttonsToAdd.add(shareAppButton);
+        buttonsToAdd.add(storeButton);
     }
 
     @Override
     protected void sizeChanged() {
         super.sizeChanged();
-        if (widthDefiningCell != null)
+        if (widthDefiningCell != null) {
             widthDefiningCell.minWidth(getAvailableContentWidth());
+            widthDefiningCell.getTable().invalidate();
+            //widthDefiningCell.getTable().validate();
+        }
     }
 
     private class InfoButton extends Button {
