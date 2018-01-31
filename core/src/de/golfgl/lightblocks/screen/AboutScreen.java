@@ -1,6 +1,8 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -9,9 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
+import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
-import de.golfgl.lightblocks.scenes.FATextButton;
+import de.golfgl.lightblocks.scenes.FaButton;
+import de.golfgl.lightblocks.scenes.RoundedTextButton;
+import de.golfgl.lightblocks.scenes.ScaledLabel;
 import de.golfgl.lightblocks.scenes.ShareButton;
 
 /**
@@ -46,41 +51,44 @@ public class AboutScreen extends AbstractMenuDialog {
     protected void fillMenuTable(Table menuTable) {
         menuTable.row();
 
-        menuTable.add(new Label(app.TEXTS.get("labelCopyright") + " " + app.TEXTS.get("gameAuthor"), app.skin));
+        menuTable.add(new ScaledLabel(app.TEXTS.get("labelCopyright") + " " + app.TEXTS.get("gameAuthor"), app.skin,
+                LightBlocksGame.SKIN_FONT_REG));
         menuTable.row().padTop(20);
-        Label labelAbout1 = new Label(app.TEXTS.get("labelAbout1"), app.skin, app.SKIN_FONT_BIG);
+        Label labelAbout1 = new ScaledLabel(app.TEXTS.get("labelAbout1"), app.skin, app.SKIN_FONT_TITLE);
         labelAbout1.setWrap(true);
         labelAbout1.setAlignment(Align.center);
         widthDefiningCell = menuTable.add(labelAbout1).fill().minWidth(getAvailableContentWidth());
         menuTable.row().padTop(20);
         menuTable.add(getWrapLabel(app.TEXTS.get("labelAbout2"))).fill();
 
-        FATextButton websiteButton = new FATextButton(FontAwesome.CIRCLE_EMPTY, app.TEXTS.get("buttonWebsite"),
-                app.skin);
+        Button websiteButton = new RoundedTextButton(app.TEXTS.get("buttonWebsite"), app.skin);
         websiteButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.net.openURI(WEBSITE_URL);
             }
         });
-        FATextButton twitterButton = new FATextButton(FontAwesome.NET_TWITTER, app.TEXTS.get("buttonTwitter"),
-                app.skin);
-        twitterButton.addListener(new ChangeListener() {
+        buttonsToAdd.add(websiteButton);
+        Button storeButton = new RoundedTextButton(app.TEXTS.get("buttonStore"), app.skin);
+        storeButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Gdx.net.openURI(TWITTER_URL);
+                Gdx.net.openURI(LightBlocksGame.GAME_STOREURL);
             }
         });
+        buttonsToAdd.add(storeButton);
+
         Table myButtons = new Table();
         myButtons.defaults().uniform().fill();
         myButtons.add(websiteButton);
-        myButtons.add(twitterButton);
+        myButtons.row().padTop(10);
+        myButtons.add(storeButton);
 
         menuTable.row().padTop(20);
         menuTable.add(myButtons);
 
         menuTable.row().padTop(40);
-        menuTable.add(new Label(app.TEXTS.get("labelContributors1"), app.skin, app.SKIN_FONT_BIG));
+        menuTable.add(new ScaledLabel(app.TEXTS.get("labelContributors1"), app.skin, app.SKIN_FONT_TITLE));
         menuTable.row().padTop(10);
         menuTable.add(getWrapLabel(app.TEXTS.get("labelContributors2"))).fill();
         menuTable.row().padTop(5);
@@ -100,7 +108,7 @@ public class AboutScreen extends AbstractMenuDialog {
     }
 
     private Label getWrapLabel(String text) {
-        Label labelContribute2 = new Label(text, app.skin);
+        Label labelContribute2 = new ScaledLabel(text, app.skin, LightBlocksGame.SKIN_FONT_REG, .7f);
         labelContribute2.setWrap(true);
         return labelContribute2;
     }
@@ -109,21 +117,21 @@ public class AboutScreen extends AbstractMenuDialog {
     protected void fillButtonTable(Table buttons) {
         super.fillButtonTable(buttons);
 
-        ShareButton shareAppButton = new ShareButton(app);
-
-        FATextButton storeButton = new FATextButton(FontAwesome.DEVICE_ANDROID, app.TEXTS.get("buttonStore"),
-                app.skin);
-        storeButton.addListener(new ChangeListener() {
+        Button twitterButton = new FaButton(FontAwesome.NET_TWITTER, app.skin);
+        twitterButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Gdx.net.openURI(LightBlocksGame.GAME_STOREURL);
+                Gdx.net.openURI(TWITTER_URL);
             }
         });
+        buttons.add(twitterButton);
+        buttonsToAdd.add(twitterButton);
+
+        ShareButton shareAppButton = new ShareButton(app);
 
         buttons.add(shareAppButton);
         buttonsToAdd.add(shareAppButton);
-        buttons.add(storeButton);
-        buttonsToAdd.add(storeButton);
+
     }
 
     @Override
@@ -137,16 +145,20 @@ public class AboutScreen extends AbstractMenuDialog {
     }
 
     private class InfoButton extends Button {
+        private final Label titleLabel;
+        private final Label descLabel;
+
         InfoButton(String title, String description, final String url) {
 
-            super(app.skin);
-            Label titleLabel = new Label(title, app.skin, app.SKIN_FONT_BIG);
+            super(app.skin, LightBlocksGame.SKIN_BUTTON_ROUND);
+            titleLabel = new Label(title, app.skin, app.SKIN_FONT_BIG);
             titleLabel.setFontScale(.8f);
             titleLabel.pack();
 
             add(titleLabel).padTop(10);
             row();
-            add(getWrapLabel(description)).fill().expandX().pad(10);
+            descLabel = getWrapLabel(description);
+            add(descLabel).fill().expandX().pad(10);
 
             addListener(new ChangeListener() {
                 @Override
@@ -154,6 +166,26 @@ public class AboutScreen extends AbstractMenuDialog {
                     Gdx.net.openURI(url);
                 }
             });
+            buttonsToAdd.add(this);
         }
+
+        @Override
+        public void draw(Batch batch, float parentAlpha) {
+            if (isPressed()) {
+                descLabel.setColor(Color.BLACK);
+            } else {
+                descLabel.setColor(Color.WHITE);
+            }
+            titleLabel.setColor(descLabel.getColor());
+
+            super.draw(batch, parentAlpha);
+        }
+
+        @Override
+        public boolean isOver() {
+            return super.isOver() || getStage() != null && getStage() instanceof ControllerMenuStage &&
+                    ((ControllerMenuStage) getStage()).getFocussedActor() == this;
+        }
+
     }
 }

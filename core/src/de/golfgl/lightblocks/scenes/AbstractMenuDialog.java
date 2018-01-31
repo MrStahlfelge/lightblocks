@@ -49,7 +49,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         String subtitle = getSubtitle();
         if (subtitle != null) {
             content.row();
-            content.add(new Label(subtitle, app.skin, LightBlocksGame.SKIN_FONT_BIG));
+            content.add(new ScaledLabel(subtitle, app.skin, LightBlocksGame.SKIN_FONT_TITLE));
         }
 
         content.row();

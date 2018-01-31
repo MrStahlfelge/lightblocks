@@ -119,6 +119,9 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	qs40glow: {
 		font: qs-40-boldglow
 	}
+	qs25: {
+		font: qs-25-reg
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
 	default: {
