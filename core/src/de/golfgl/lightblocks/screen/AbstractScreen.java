@@ -31,6 +31,7 @@ public abstract class AbstractScreen implements Screen {
     protected MyStage stage;
     protected Screen backScreen;
     private boolean isLandscapeOrientation;
+    private boolean isDisposed = false;
 
     public AbstractScreen(LightBlocksGame app) {
         this.app = app;
@@ -81,7 +82,10 @@ public abstract class AbstractScreen implements Screen {
 
     @Override
     public void dispose() {
-        stage.dispose();
+        // es gab Crashes dass bereits disposed war. Grund nicht ersichtlich, evtl "Doppelklick" o.ä.
+        if (!isDisposed)
+            stage.dispose();
+        isDisposed = true;
     }
 
     protected void swoshIn() {
