@@ -19,6 +19,7 @@ import com.esotericsoftware.minlog.Log;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
+import de.golfgl.lightblocks.scenes.AnimatedLightblocksLogo;
 import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.BlockGroup;
 import de.golfgl.lightblocks.scenes.FaButton;
@@ -51,14 +52,13 @@ public class MainMenuScreen extends AbstractScreen {
 
         super(lightBlocksGame);
         // Die Blockgroup nimmt die Steinanimation auf
-        blockGroup = new BlockGroup();
-        blockGroup.setTransform(false);
-        blockGroup.setHeight(180);
+        blockGroup = new AnimatedLightblocksLogo(app);
         stage.addActor(blockGroup);
         // Der Titel
         gameTitle = new GlowLabel(app.TEXTS.get("gameTitle").toUpperCase(), app.skin, .9f);
         gameTitle.setWrap(true);
         gameTitle.setAlignment(Align.center);
+        gameTitle.setGlowing(true);
 
         buttonTable = new Table();
         buttonTable.setFillParent(true);
@@ -237,8 +237,6 @@ public class MainMenuScreen extends AbstractScreen {
         buttonTable.row();
         buttonTable.add().minHeight(gameVersion.getHeight());
 
-        constructBlockAnimation(blockGroup);
-
         stage.getRoot().setColor(Color.CLEAR);
         stage.getRoot().addAction(Actions.fadeIn(1));
 
@@ -255,48 +253,6 @@ public class MainMenuScreen extends AbstractScreen {
 
         if (lastAccountScreen != null && lastAccountScreen.hasParent())
             lastAccountScreen.refreshAccountChanged();
-    }
-
-    /**
-     * This method constructs the blocks animation when starting.
-     * It is then played via Actions
-     */
-    private void constructBlockAnimation(final Group blockGroup) {
-        for (int i = 0; i < 4; i++) {
-            BlockActor block = new BlockActor(app);
-            blockGroup.addActor(block);
-            block.setY(500);
-            block.setEnlightened(true);
-            if (i != 3) block.setX(blockGroup.getWidth() / 2 - BlockActor.blockWidth);
-
-            block.addAction(Actions.sequence(Actions.delay(2 * i),
-                    Actions.moveTo(block.getX(), (i == 3 ? 0 : i * BlockActor.blockWidth), 0.5f),
-                    run(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (app.isPlaySounds())
-                                app.dropSound.play();
-                        }
-                    }),
-                    Actions.delay(0.1f),
-                    run((i < 3) ? block.getDislightenAction() : new Runnable() {
-                        @Override
-                        public void run() {
-                            // Beim letzen Block die anderen alle anschalten
-                            for (int i = 0; i < 3; i++)
-                                ((BlockActor) blockGroup.getChildren().get(i)).setEnlightened(true);
-                            gameTitle.setGlowing(true);
-                        }
-                    })));
-        }
-
-        blockGroup.addAction(sequence(delay(10), forever(sequence(run(new Runnable() {
-            @Override
-            public void run() {
-                BlockActor block = (BlockActor) blockGroup.getChildren().get(MathUtils.random(0, 3));
-                block.setEnlightened(!block.isEnlightened());
-            }
-        }), delay(5)))));
     }
 
     @Override
