@@ -29,7 +29,7 @@ import de.golfgl.lightblocks.scenes.GlowLabelButton;
  * Created by Benjamin Schulte on 15.01.2017.
  */
 public class MainMenuScreen extends AbstractScreen {
-    private static final float MOVELOGODURATION = 1f;
+    private static final float MOVELOGODURATION = .5f;
     private final GlowLabel gameTitle;
     private final AnimatedLightblocksLogo blockGroup;
     private final Table buttonTable;
