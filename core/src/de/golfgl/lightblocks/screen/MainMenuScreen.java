@@ -3,7 +3,6 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -21,23 +20,18 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
 import de.golfgl.lightblocks.scenes.AnimatedLightblocksLogo;
 import de.golfgl.lightblocks.scenes.BlockActor;
-import de.golfgl.lightblocks.scenes.BlockGroup;
 import de.golfgl.lightblocks.scenes.FaButton;
 import de.golfgl.lightblocks.scenes.GlowLabel;
 import de.golfgl.lightblocks.scenes.GlowLabelButton;
-
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.forever;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 /**
  * Das Hauptmenü
  * Created by Benjamin Schulte on 15.01.2017.
  */
 public class MainMenuScreen extends AbstractScreen {
+    private static final float MOVELOGODURATION = 1f;
     private final GlowLabel gameTitle;
-    private final BlockGroup blockGroup;
+    private final AnimatedLightblocksLogo blockGroup;
     private final Table buttonTable;
     private final Label gameVersion;
     private final Button missionButton;
@@ -52,7 +46,13 @@ public class MainMenuScreen extends AbstractScreen {
 
         super(lightBlocksGame);
         // Die Blockgroup nimmt die Steinanimation auf
-        blockGroup = new AnimatedLightblocksLogo(app);
+        blockGroup = new AnimatedLightblocksLogo(app) {
+            @Override
+            protected void onAnimationDone() {
+                super.onAnimationDone();
+                addAction(Actions.moveTo(getLogoPosX(), getLogoPosY(), MOVELOGODURATION, Interpolation.fade));
+            }
+        };
         stage.addActor(blockGroup);
         // Der Titel
         gameTitle = new GlowLabel(app.TEXTS.get("gameTitle").toUpperCase(), app.skin, .9f);
@@ -237,9 +237,6 @@ public class MainMenuScreen extends AbstractScreen {
         buttonTable.row();
         buttonTable.add().minHeight(gameVersion.getHeight());
 
-        stage.getRoot().setColor(Color.CLEAR);
-        stage.getRoot().addAction(Actions.fadeIn(1));
-
     }
 
     protected Button proposeFocussedActor() {
@@ -263,14 +260,16 @@ public class MainMenuScreen extends AbstractScreen {
         if (stage.getFocussedActor() == null || !stage.getFocussedActor().hasParent())
             stage.setFocussedActor(proposeFocussedActor());
 
-        if (stage.getRoot().getActions().size == 0) {
+        if (blockGroup.isAnimationDone()) {
             mainGroup.setScale(0, 1);
             if (app.isPlaySounds())
                 app.swoshSound.play();
             mainGroup.addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
         } else {
-            mainGroup.setScale(isLandscape() ? 1 : 0, isLandscape() ? 0 : 1);
-            mainGroup.addAction(Actions.scaleTo(1, 1, .5f, Interpolation.swingOut));
+            mainGroup.setScale(0, 1);
+            mainGroup.addAction(Actions.sequence(
+                    Actions.delay(blockGroup.getAnimationDuration() + MOVELOGODURATION),
+                    Actions.scaleTo(1, 1, .5f, Interpolation.swingOut)));
         }
     }
 
@@ -278,17 +277,20 @@ public class MainMenuScreen extends AbstractScreen {
     public void resize(int width, int height) {
         super.resize(width, height);
 
+        // falls das Logo sich gerade bewegt, weg damit
+        blockGroup.clearActions();
+
         if (isLandscape()) {
             mainGroup.setWidth(LightBlocksGame.nativeGameWidth
                     * (((stage.getWidth() / stage.getHeight()) - 1f) / 3 + 1f));
             mainGroup.setX(stage.getWidth() / 2, Align.bottom);
-            blockGroup.setPosition(mainGroup.getX() / 2, stage.getHeight() * .66f - 2 * BlockActor.blockWidth);
+            blockGroup.setPosition(getLogoPosX(), getLogoPosY());
             mainGroup.setHeight(stage.getHeight() - LightBlocksGame.nativeGameWidth / 16);
         } else {
-            blockGroup.setPosition(stage.getWidth() / 2, stage.getHeight() - blockGroup.getHeight(), Align.bottom);
+            blockGroup.setPosition(getLogoPosX(), getLogoPosY());
             mainGroup.setWidth(stage.getWidth());
             mainGroup.setX(0);
-            mainGroup.setHeight(blockGroup.getY() - LightBlocksGame.nativeGameWidth / 16);
+            mainGroup.setHeight(getLogoPosY(true) - LightBlocksGame.nativeGameWidth / 16);
         }
         mainGroup.setY(0);
         gameVersion.setPosition(mainGroup.getWidth() / 2, 0, Align.bottom);
@@ -298,6 +300,21 @@ public class MainMenuScreen extends AbstractScreen {
             if (a instanceof AbstractMenuDialog)
                 ((AbstractMenuDialog) a).reposition();
         }
+    }
+
+    private float getLogoPosX() {
+        return !isLandscape() || !blockGroup.isAnimationDone() ? stage.getWidth() / 2 : mainGroup.getX() / 2;
+    }
+
+    private float getLogoPosY() {
+        return getLogoPosY(false);
+    }
+
+    private float getLogoPosY(boolean ignoreIsAnimationDone) {
+        return (!ignoreIsAnimationDone && !blockGroup.isAnimationDone()) ?
+                stage.getHeight() * .33f - 2 * BlockActor.blockWidth
+                : isLandscape() ? stage.getHeight() * .66f - 2 * BlockActor.blockWidth
+                : stage.getHeight() - blockGroup.getHeight();
     }
 
     @Override

@@ -89,7 +89,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
 
         ParticleEffect pweldEffect = new ParticleEffect();
-        //TODO wenn Atlas da, dann hier ändern
         pweldEffect.load(Gdx.files.internal("raw/explode.p"), app.skin.getAtlas());
         weldEffect = new ParticleEffectActor(pweldEffect);
 

@@ -1,5 +1,8 @@
 package de.golfgl.lightblocks.scenes;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -15,13 +18,22 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 01.02.2018.
  */
 public class AnimatedLightblocksLogo extends BlockGroup {
+    private static final float DURATION_MOVE = .5f;
+    private static final float DURATION_WELD = .5f;
     private LightBlocksGame app;
+    private ParticleEffectActor weldEffect;
+    private boolean isAnimationDone;
 
     public AnimatedLightblocksLogo(LightBlocksGame app) {
         this.app = app;
 
         setTransform(false);
-        setHeight(180);
+        setHeight(BlockActor.blockWidth * 4);
+
+        ParticleEffect pweldEffect = new ParticleEffect();
+        pweldEffect.load(Gdx.files.internal("raw/explode.p"), app.skin.getAtlas());
+        weldEffect = new ParticleEffectActor(pweldEffect);
+
     }
 
     @Override
@@ -39,39 +51,64 @@ public class AnimatedLightblocksLogo extends BlockGroup {
      * It is then played via Actions
      */
     private void constructBlockAnimation() {
+        final BlockActor[] allBlocks = new BlockActor[4];
+        addActor(weldEffect);
+        weldEffect.setPosition(0, .5f * BlockActor.blockWidth);
+
         for (int i = 0; i < 4; i++) {
             BlockActor block = new BlockActor(app);
+            allBlocks[i] = block;
             addActor(block);
-            block.setY(500);
-            block.setEnlightened(true);
-            if (i != 3) block.setX(getWidth() / 2 - BlockActor.blockWidth);
+            block.getColor().a = 0;
+            block.setX(((i == 0 || i == 2) ? -1 : 1) * LightBlocksGame.nativeGameWidth / 2);
+            block.setY(((i >= 2) ? 1 : -1) * LightBlocksGame.nativeGameHeight / 2);
 
-            block.addAction(Actions.sequence(Actions.delay(2 * i),
-                    Actions.moveTo(block.getX(), (i == 3 ? 0 : i * BlockActor.blockWidth), 0.5f),
-                    run(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (app.isPlaySounds())
-                                app.dropSound.play();
-                        }
-                    }),
-                    Actions.delay(0.1f),
-                    run((i < 3) ? block.getDislightenAction() : new Runnable() {
-                        @Override
-                        public void run() {
-                            // Beim letzen Block die anderen alle anschalten
-                            for (int i = 0; i < 3; i++)
-                                ((BlockActor) getChildren().get(i)).setEnlightened(true);
-                        }
-                    })));
+            block.addAction(Actions.fadeIn(DURATION_MOVE, Interpolation.fade));
+            block.addAction(Actions.sequence(Actions.moveTo(i != 3 ? -BlockActor.blockWidth : 0, i == 3 ? 0 : i *
+                            BlockActor.blockWidth,
+                    DURATION_MOVE, Interpolation.fade),
+                    run(block.getEnlightenAction())));
         }
 
-        addAction(sequence(delay(10), forever(sequence(run(new Runnable() {
+        weldEffect.addAction(Actions.sequence(Actions.delay(DURATION_MOVE - .1f),
+                run(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (app.isPlaySounds())
+                            app.cleanSpecialSound.play();
+                        weldEffect.start();
+                    }
+                }),
+                Actions.delay(DURATION_WELD),
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        onAnimationDone();
+                    }
+                })));
+
+        allBlocks[0].addAction(sequence(delay(getAnimationDuration() + 1), forever(sequence(run(new Runnable() {
             @Override
             public void run() {
-                BlockActor block = (BlockActor) getChildren().get(MathUtils.random(0, 3));
+                if (weldEffect != null) {
+                    weldEffect.dispose();
+                    weldEffect = null;
+                }
+                BlockActor block = allBlocks[MathUtils.random(0, 3)];
                 block.setEnlightened(!block.isEnlightened());
             }
-        }), delay(5)))));
+        }), delay(2f)))));
+    }
+
+    protected void onAnimationDone() {
+        isAnimationDone = true;
+    }
+
+    public boolean isAnimationDone() {
+        return isAnimationDone;
+    }
+
+    public float getAnimationDuration() {
+        return DURATION_MOVE + DURATION_WELD;
     }
 }
