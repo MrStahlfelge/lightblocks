@@ -120,7 +120,7 @@ public class TotalScore {
         // gar nicht der tatsächliche Spielstand ist, sondern nur ein geladener o.ä.
         // reduziert außerdem die Anzahl der Meldungen an GPGS
 
-        if (gpgsClient == null || !gpgsClient.isConnected())
+        if (gpgsClient == null || !gpgsClient.isSessionActive())
             return;
 
         if (score >= 1000000)

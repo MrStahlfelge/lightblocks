@@ -21,8 +21,8 @@ import com.esotericsoftware.minlog.Log;
 import java.util.HashMap;
 import java.util.List;
 
-import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
+import de.golfgl.gdxgamesvcs.gamestate.ILoadGameStateResponseListener;
 import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
@@ -139,7 +139,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         savegame = new GameStateHandler(this);
 
         if (getGpgsAutoLogin() && gpgsClient != null)
-            gpgsClient.connect(true);
+            gpgsClient.resumeSession();
 
         I18NBundle.setSimpleFormatter(true);
 
@@ -206,15 +206,15 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         super.pause();
 
         if (gpgsClient != null)
-            gpgsClient.disconnect();
+            gpgsClient.pauseSession();
     }
 
     @Override
     public void resume() {
         super.resume();
 
-        if (getGpgsAutoLogin() && gpgsClient != null && !gpgsClient.isConnected())
-            gpgsClient.connect(true);
+        if (getGpgsAutoLogin() && gpgsClient != null && !gpgsClient.isSessionActive())
+            gpgsClient.resumeSession();
     }
 
     @Override
@@ -286,7 +286,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     }
 
     @Override
-    public void gsConnected() {
+    public void gsOnSessionActive() {
         player.setGamerId(gpgsClient.getPlayerDisplayName());
         setGpgsAutoLogin(true);
         handleAccountChanged();
@@ -301,25 +301,26 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
                 // War zuerst in GpgsConnect, es wurde aber der allerste Login nicht mehr automatisch gesetzt.
                 // (obwohl das Willkommen... Schild kam)
                 // Nun in UI Thread verlagert
-                if (!savegame.isAlreadyLoadedFromCloud() && gpgsClient.isConnected())
-                    try {
-                        gpgsClient.loadGameState(IGpgsClient.NAME_SAVE_GAMESTATE);
-                    } catch (GameServiceException e) {
-                        // eat - kann nicht auftreten
-                    }
-
+                if (!savegame.isAlreadyLoadedFromCloud() && gpgsClient.isSessionActive())
+                    gpgsClient.loadGameState(IGpgsClient.NAME_SAVE_GAMESTATE,
+                            new ILoadGameStateResponseListener() {
+                                @Override
+                                public void gsGameStateLoaded(byte[] gameState) {
+                                    savegame.gpgsLoadGameState(gameState);
+                                }
+                            });
             }
         });
     }
 
     @Override
-    public void gsDisconnected() {
+    public void gsOnSessionInactive() {
         player.setGamerId(modelNameRunningOn);
         handleAccountChanged();
     }
 
     @Override
-    public void gsErrorMsg(GsErrorType errType, final String msg) {
+    public void gsShowErrorToUser(GsErrorType errType, final String msg, Throwable t) {
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
@@ -329,11 +330,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
             }
         });
-    }
-
-    @Override
-    public void gsGameStateLoaded(byte[] gameState) {
-        savegame.gpgsLoadGameState(gameState);
     }
 
     public GamepadConfig getGamepadConfig() {

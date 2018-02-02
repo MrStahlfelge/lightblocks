@@ -215,7 +215,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             caller.app.setScreen(currentGame);
 
             // GPGS Event
-            if (caller.app.gpgsClient != null && caller.app.gpgsClient.isConnected()) {
+            if (caller.app.gpgsClient != null && caller.app.gpgsClient.isSessionActive()) {
                 // Unterschied machen wenn Multiplayer
                 String modelId = currentGame.gameModel.getIdentifier();
                 String eventId = null;

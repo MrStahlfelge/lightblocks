@@ -112,7 +112,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
 
     @Override
     public void openRoom(Player player) throws VetoException {
-        if (!gpgsClient.isConnected())
+        if (!gpgsClient.isSessionActive())
             throw new VetoException("Please sign in to Google Play Games before starting a game over this service.");
 
         if (isConnected())
@@ -179,7 +179,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
         allPlayers.clear();
         connectionToPlayer.clear();
         playerToConnection.clear();
-        if (room != null && gpgsClient.isConnected())
+        if (room != null && gpgsClient.isSessionActive())
             Games.RealTimeMultiplayer.leave(gpgsClient.getGoogleApiClient(), this, room.getRoomId());
     }
 
@@ -287,7 +287,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
 
     @Override
     public void startRoomDiscovery() throws VetoException {
-        if (!gpgsClient.isConnected())
+        if (!gpgsClient.isSessionActive())
             throw new VetoException("Please sign in to Google Play Games before starting a game over this service.");
 
         if (isConnected())

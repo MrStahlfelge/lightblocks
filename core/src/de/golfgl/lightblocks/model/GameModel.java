@@ -486,7 +486,7 @@ public abstract class GameModel implements Json.Serializable {
     protected void submitToLeaderboard() {
         String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(getIdentifier());
 
-        if (leaderboardId != null && gpgsClient != null && gpgsClient.isConnected())
+        if (leaderboardId != null && gpgsClient != null && gpgsClient.isSessionActive())
             gpgsClient.submitToLeaderboard(leaderboardId, score.getScore(), Integer.toString(score
                     .getClearedLines()));
     }
@@ -653,18 +653,18 @@ public abstract class GameModel implements Json.Serializable {
      * GPGS sumbit event convencience - Check auf null und isConnected
      */
     protected void gpgsSubmitEvent(String eventId, int inc) {
-        if (gpgsClient != null && gpgsClient.isConnected())
+        if (gpgsClient != null && gpgsClient.isSessionActive())
             gpgsClient.submitEvent(eventId, inc);
     }
 
     protected void gpgsUpdateAchievement(String achievementId) {
-        if (gpgsClient != null && gpgsClient.isConnected()) {
+        if (gpgsClient != null && gpgsClient.isSessionActive()) {
             gpgsClient.unlockAchievement(achievementId);
         }
     }
 
     protected void gpgsUpdateAchievement(String achievementId, int incNum, float completionPercentage) {
-        if (gpgsClient != null && gpgsClient.isConnected()) {
+        if (gpgsClient != null && gpgsClient.isSessionActive()) {
             gpgsClient.incrementAchievement(achievementId, incNum, completionPercentage);
         }
     }

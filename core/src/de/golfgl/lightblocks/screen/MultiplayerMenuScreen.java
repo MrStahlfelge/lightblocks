@@ -317,7 +317,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     }
 
     private boolean checkNewGpgsConnPreConditions() {
-        if (app.gpgsClient == null || !app.gpgsClient.isConnected()) {
+        if (app.gpgsClient == null || !app.gpgsClient.isSessionActive()) {
             showDialog(app.TEXTS.get("labelFirstSignIn"));
             return true;
         }
@@ -446,7 +446,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
             app.multiRoom.gameModelStarted();
 
             // Achievements
-            if (app.gpgsClient != null && app.gpgsClient.isConnected()) {
+            if (app.gpgsClient != null && app.gpgsClient.isSessionActive()) {
                 if (app.multiRoom.getNumberOfPlayers() >= 3)
                     app.gpgsClient.unlockAchievement(GpgsHelper.ACH_MEGA_MULTI_PLAYER);
 

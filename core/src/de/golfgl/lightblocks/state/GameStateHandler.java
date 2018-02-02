@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.esotericsoftware.minlog.Log;
 
-import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.IGpgsClient;
 
@@ -155,7 +154,7 @@ public class GameStateHandler {
      * saves total score und progression to cloud. Does not save it to files.
      */
     public void gpgsSaveGameState(boolean sync) {
-        if (app.gpgsClient != null && app.gpgsClient.isConnected()) {
+        if (app.gpgsClient != null && app.gpgsClient.isSessionActive()) {
             synchronized (gameStateMonitor) {
                 getTotalScore(); // sicherstellen dass er geladen ist
                 loadBestScores(); // hier ebenso
@@ -180,15 +179,11 @@ public class GameStateHandler {
                 if (sync)
                     app.gpgsClient.saveGameStateSync(IGpgsClient.NAME_SAVE_GAMESTATE,
                             xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
-                            totalScore.getScore());
+                            totalScore.getScore(), null);
                 else
-                    try {
-                        app.gpgsClient.saveGameState(IGpgsClient.NAME_SAVE_GAMESTATE,
-                                xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
-                                totalScore.getScore());
-                    } catch (GameServiceException e) {
-                        // kann nicht passieren
-                    }
+                    app.gpgsClient.saveGameState(IGpgsClient.NAME_SAVE_GAMESTATE,
+                            xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
+                            totalScore.getScore(), null);
             }
         }
     }

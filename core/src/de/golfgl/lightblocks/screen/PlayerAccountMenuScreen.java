@@ -59,18 +59,18 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
 
         // der hier nur Default, wenn nicht eingeloggt
         buttonsToAdd.add(logInOutButton);
-        if (!app.gpgsClient.isConnected())
+        if (!app.gpgsClient.isSessionActive())
             buttonsToAdd.reverse();
     }
 
     private void performGpgsLoginout() {
-        if (app.gpgsClient.isConnected()) {
+        if (app.gpgsClient.isSessionActive()) {
             app.savegame.gpgsSaveGameState(true);
             app.setGpgsAutoLogin(false);
             app.gpgsClient.logOff();
             app.savegame.resetLoadedFromCloud();
         } else {
-            app.gpgsClient.connect(false);
+            app.gpgsClient.logIn();
             refreshAccountChanged();
         }
 
@@ -123,7 +123,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
     }
 
     public void refreshAccountChanged() {
-        final boolean gpgsConnected = app.gpgsClient != null && app.gpgsClient.isConnected();
+        final boolean gpgsConnected = app.gpgsClient != null && app.gpgsClient.isSessionActive();
         final boolean gpgsConnectPending = app.gpgsClient != null && app.gpgsClient.isConnectionPending();
 
         //logInOutButton.setFaText(getLogInOutIcon(gpgsConnected));

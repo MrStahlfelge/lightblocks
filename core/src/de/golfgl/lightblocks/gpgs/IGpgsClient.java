@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.gpgs;
 
 import de.golfgl.gdxgamesvcs.GameServiceException;
+import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
 /**
@@ -15,6 +16,6 @@ public interface IGpgsClient extends de.golfgl.gdxgamesvcs.IGameServiceClient {
 
     AbstractMultiplayerRoom createMultiPlayerRoom();
 
-    Boolean saveGameStateSync(String id, byte[] gameState, long progressValue);
+    Boolean saveGameStateSync(String id, byte[] gameState, long progressValue, ISaveGameStateResponseListener listener);
 
 }

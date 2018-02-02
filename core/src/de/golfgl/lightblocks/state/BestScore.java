@@ -161,7 +161,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
         }
 
         public void checkAchievements(IGpgsClient gpgsClient) {
-            if (gpgsClient == null || !gpgsClient.isConnected())
+            if (gpgsClient == null || !gpgsClient.isSessionActive())
                 return;
 
             // Mission 10 geschafft?
