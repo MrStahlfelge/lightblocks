@@ -10,12 +10,9 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.minlog.Log;
 
 import java.util.HashMap;
@@ -58,6 +55,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String SKIN_FONT_REG = "qs25";
     public static final String SKIN_WINDOW_FRAMELESS = "frameless";
     public static final String SKIN_BUTTON_ROUND = "round";
+    public static final String SKIN_COLOR_DISABLED = "disabled";
     public static final float LABEL_SCALING = .65f;
     public static final float ICON_SCALE_MENU = 1f;
 
@@ -143,6 +141,26 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         I18NBundle.setSimpleFormatter(true);
 
+        loadAndInitAssets();
+
+        mainMenuScreen = new MainMenuScreen(this);
+
+        if (savegame.hasGameState())
+            this.setScreen(mainMenuScreen);
+        else {
+            // beim ersten Mal ins Tutorial!
+            try {
+                PlayScreen ps = PlayScreen.gotoPlayScreen(mainMenuScreen, TutorialModel.getTutorialInitParams());
+                ps.setShowScoresWhenGameOver(false);
+                ps.setBackScreen(mainMenuScreen);
+            } catch (VetoException e) {
+                this.setScreen(mainMenuScreen);
+            }
+
+        }
+    }
+
+    private void loadAndInitAssets() {
         assetManager = new AssetManager();
         // den Sound als erstes und danach finish, damit er möglichst auf allen Geräten rechtzeitig zur Verfügung steht
         assetManager.load("sound/cleanspecial.ogg", Sound.class);
@@ -172,22 +190,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         garbageSound = assetManager.get("sound/garbage.ogg", Sound.class);
         cleanSpecialSound = assetManager.get("sound/cleanspecial.ogg", Sound.class);
         swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
-
-        mainMenuScreen = new MainMenuScreen(this);
-
-        if (savegame.hasGameState())
-            this.setScreen(mainMenuScreen);
-        else {
-            // beim ersten Mal ins Tutorial!
-            try {
-                PlayScreen ps = PlayScreen.gotoPlayScreen(mainMenuScreen, TutorialModel.getTutorialInitParams());
-                ps.setShowScoresWhenGameOver(false);
-                ps.setBackScreen(mainMenuScreen);
-            } catch (VetoException e) {
-                this.setScreen(mainMenuScreen);
-            }
-
-        }
     }
 
     @Override

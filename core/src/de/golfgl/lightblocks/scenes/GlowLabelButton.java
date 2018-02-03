@@ -52,7 +52,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
         setSkin(skin);
         setStyle(new ButtonStyle());
 
-        disabledFontColor = skin.getColor("disabled");
+        disabledFontColor = skin.getColor(LightBlocksGame.SKIN_COLOR_DISABLED);
         this.smallScaleFactor = smallScaleFactor;
 
         labelGroup = new GlowLabel(text, skin, fontScale) {
