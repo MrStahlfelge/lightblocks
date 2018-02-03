@@ -655,11 +655,11 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 Color lineColor;
 
                 if (!playerStat.isPresent())
-                    lineColor = new Color(COLOR_TABLE_DEACTIVATED);
+                    lineColor = new Color(LightBlocksGame.COLOR_DISABLED);
                 else if (app.multiRoom == null || !playerId.equals(app.multiRoom.getMyPlayerId()))
-                    lineColor = new Color(COLOR_TABLE_NORMAL);
+                    lineColor = new Color(.5f, .5f, .5f, 1);
                 else
-                    lineColor = new Color(COLOR_TABLE_HIGHLIGHTED);
+                    lineColor = Color.WHITE;
 
                 final Label playerIdLabel = new Label(playerId, app.skin, LightBlocksGame.SKIN_FONT_BIG);
                 playerIdLabel.setEllipsis(true);

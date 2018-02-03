@@ -55,12 +55,12 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String SKIN_FONT_REG = "qs25";
     public static final String SKIN_WINDOW_FRAMELESS = "frameless";
     public static final String SKIN_BUTTON_ROUND = "round";
-    public static final String SKIN_COLOR_DISABLED = "disabled";
     public static final float LABEL_SCALING = .65f;
     public static final float ICON_SCALE_MENU = 1f;
 
     public static final Color EMPHASIZE_COLOR = new Color(1, .3f, .3f, 1);
-    public static final Color LIGHT_HIGHLIGHT_COLOR = new Color(.5f, .5f, .5f, 1);
+    public static Color COLOR_DISABLED;
+    public static Color COLOR_SELECTED;
 
     public Skin skin;
     public AssetManager assetManager;
@@ -190,6 +190,9 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         garbageSound = assetManager.get("sound/garbage.ogg", Sound.class);
         cleanSpecialSound = assetManager.get("sound/cleanspecial.ogg", Sound.class);
         swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
+
+        COLOR_DISABLED = skin.getColor("disabled");
+        COLOR_SELECTED = skin.getColor("lightselection");
     }
 
     @Override

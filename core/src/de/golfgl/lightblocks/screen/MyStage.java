@@ -1,6 +1,10 @@
 package de.golfgl.lightblocks.screen;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
@@ -33,5 +37,20 @@ public class MyStage extends ControllerMenuStage {
                 actor.touchAction();
             }
         }
+    }
+
+    @Override
+    protected void onFocusGained(Actor focussedActor, Actor oldFocussed) {
+        super.onFocusGained(focussedActor, oldFocussed);
+
+        if (focussedActor instanceof ITouchActionButton) {
+            ((ITouchActionButton) focussedActor).touchAction();
+            timeSinceTouch = 0;
+        }
+    }
+
+    public static Action getTouchAction(Color emphColor, Color currColor) {
+        return Actions.sequence(Actions.color(emphColor, .3f, Interpolation.fade),
+                Actions.color(currColor, 1f, Interpolation.fade));
     }
 }

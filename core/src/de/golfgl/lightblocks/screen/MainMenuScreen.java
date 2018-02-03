@@ -244,7 +244,7 @@ public class MainMenuScreen extends AbstractScreen {
     }
 
     public void refreshAccountInfo() {
-        accountButton.setColor(LightBlocksGame.LIGHT_HIGHLIGHT_COLOR);
+        accountButton.setColor(LightBlocksGame.EMPHASIZE_COLOR);
         if (app.gpgsClient != null && app.gpgsClient.isSessionActive())
             accountButton.setColor(Color.WHITE);
 

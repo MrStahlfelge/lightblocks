@@ -33,21 +33,15 @@ com.badlogic.gdx.graphics.Color: {
 		a: 1
 	}
 	disabled: {
-		r: 0.4
-		g: 0.4
-		b: 0.4
+		r: 0.19607843
+		g: 0.19607843
+		b: 0.19607843
 		a: 1
 	}
 	lightselection: {
-		r: 0.7921569
-		g: 0.7921569
-		b: 0.7921569
-		a: 1
-	}
-	selected: {
-		r: 0.4
-		g: 0.4
-		b: 0.4
+		r: 0.25666666
+		g: 0.6800357
+		b: 1
 		a: 1
 	}
 	white: {
@@ -82,6 +76,15 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 	black: {
 		name: white
 		color: black
+	}
+	transparent: {
+		name: white
+		color: {
+			r: 1
+			g: 1
+			b: 1
+			a: 0
+		}
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
@@ -126,9 +129,9 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
 	default: {
 		font: qs-25-bold
-		fontColorSelected: selected
-		fontColorUnselected: disabled
-		selection: selection
+		fontColorSelected: lightselection
+		fontColorUnselected: white
+		selection: transparent
 		background: list
 	}
 }
@@ -194,6 +197,7 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		font: qs-40-bold
 		fontColor: white
 		downFontColor: black
+		disabledFontColor: disabled
 		up: button_small_font
 		down: button_small_font_filled
 		over: button_small_font_glow

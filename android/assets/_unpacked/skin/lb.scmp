@@ -436,6 +436,24 @@ atlasData: {
 			tintName: null
 			name: button_round
 		}
+		{
+			file: ../white.png
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			visible: true
+			tint: {
+				r: 1
+				g: 1
+				b: 1
+				a: 0
+			}
+			tintName: null
+			name: transparent
+		}
 	]
 }
 jsonData: {
@@ -453,9 +471,9 @@ jsonData: {
 		{
 			class: com.ray3k.skincomposer.data.ColorData
 			color: {
-				r: 0.4
-				g: 0.4
-				b: 0.4
+				r: 0.19607843
+				g: 0.19607843
+				b: 0.19607843
 				a: 1
 			}
 			name: disabled
@@ -463,22 +481,12 @@ jsonData: {
 		{
 			class: com.ray3k.skincomposer.data.ColorData
 			color: {
-				r: 0.7921569
-				g: 0.7921569
-				b: 0.7921569
+				r: 0.25666666
+				g: 0.6800357
+				b: 1
 				a: 1
 			}
 			name: lightselection
-		}
-		{
-			class: com.ray3k.skincomposer.data.ColorData
-			color: {
-				r: 0.4
-				g: 0.4
-				b: 0.4
-				a: 1
-			}
-			name: selected
 		}
 		{
 			class: com.ray3k.skincomposer.data.ColorData
@@ -1471,21 +1479,21 @@ jsonData: {
 						type: com.badlogic.gdx.graphics.Color
 						name: fontColorSelected
 						optional: false
-						value: selected
+						value: lightselection
 					}
 					fontColorUnselected: {
 						class: com.ray3k.skincomposer.data.StyleProperty
 						type: com.badlogic.gdx.graphics.Color
 						name: fontColorUnselected
 						optional: false
-						value: disabled
+						value: white
 					}
 					selection: {
 						class: com.ray3k.skincomposer.data.StyleProperty
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: selection
 						optional: false
-						value: selection
+						value: transparent
 					}
 					background: {
 						class: com.ray3k.skincomposer.data.StyleProperty
@@ -2701,7 +2709,7 @@ jsonData: {
 						type: com.badlogic.gdx.graphics.Color
 						name: disabledFontColor
 						optional: true
-						value: null
+						value: disabled
 					}
 					up: {
 						class: com.ray3k.skincomposer.data.StyleProperty

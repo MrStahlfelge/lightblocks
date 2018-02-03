@@ -15,6 +15,7 @@ import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.screen.AbstractMenuScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.MyStage;
 
 /**
  * Created by Benjamin Schulte on 13.01.2018.
@@ -52,7 +53,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
         setSkin(skin);
         setStyle(new ButtonStyle());
 
-        disabledFontColor = skin.getColor(LightBlocksGame.SKIN_COLOR_DISABLED);
+        disabledFontColor = LightBlocksGame.COLOR_DISABLED;
         this.smallScaleFactor = smallScaleFactor;
 
         labelGroup = new GlowLabel(text, skin, fontScale) {
@@ -156,6 +157,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
 
     @Override
     public void setDisabled(boolean isDisabled) {
+        // RoundedTextButton hat Copy
         if (isDisabled && colorAction != null)
             labelGroup.removeAction(colorAction);
 
@@ -164,16 +166,16 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
 
     @Override
     public void touchAction() {
+        // RoundedTextButton hat Copy
         if (!isPressed() && !isDisabled()) {
             labelGroup.removeAction(colorAction);
-            colorAction = Actions.sequence(Actions.color(getTouchColor(), .5f, Interpolation.fade),
-                    Actions.color(getActiveColor(), 1f, Interpolation.fade));
+            colorAction = MyStage.getTouchAction(getTouchColor(), getActiveColor());
             labelGroup.addAction(colorAction);
         }
     }
 
     protected Color getTouchColor() {
-        return LightBlocksGame.LIGHT_HIGHLIGHT_COLOR;
+        return LightBlocksGame.COLOR_SELECTED;
     }
 
     @Override
