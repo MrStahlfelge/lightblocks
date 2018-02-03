@@ -155,6 +155,14 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
     }
 
     @Override
+    public void setDisabled(boolean isDisabled) {
+        if (isDisabled && colorAction != null)
+            labelGroup.removeAction(colorAction);
+
+        super.setDisabled(isDisabled);
+    }
+
+    @Override
     public void touchAction() {
         if (!isPressed() && !isDisabled()) {
             labelGroup.removeAction(colorAction);
