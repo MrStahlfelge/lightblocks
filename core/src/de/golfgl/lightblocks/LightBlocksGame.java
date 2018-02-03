@@ -143,27 +143,23 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         I18NBundle.setSimpleFormatter(true);
 
-        skin = new Skin(Gdx.files.internal("skin/lb.json"));
-
-        ObjectMap<String, BitmapFont> objectMap = skin.getAll(BitmapFont.class);
-
-        //Sicherstellen dass alle Fonts optimal gerendet werden
-        for (BitmapFont font : objectMap.values()) {
-            font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        }
-
         assetManager = new AssetManager();
+        // den Sound als erstes und danach finish, damit er möglichst auf allen Geräten rechtzeitig zur Verfügung steht
+        assetManager.load("sound/cleanspecial.ogg", Sound.class);
+        assetManager.finishLoading();
+
+        assetManager.load("sound/swosh.ogg", Sound.class);
         assetManager.load("i18n/strings", I18NBundle.class);
         assetManager.load("sound/switchon.ogg", Sound.class);
         assetManager.load("sound/switchflip.ogg", Sound.class);
         assetManager.load("sound/glow05.ogg", Sound.class);
         assetManager.load("sound/gameover.ogg", Sound.class);
-        assetManager.load("sound/cleanspecial.ogg", Sound.class);
         assetManager.load("sound/unlocked.ogg", Sound.class);
-        assetManager.load("sound/swosh.ogg", Sound.class);
         assetManager.load("sound/garbage.ogg", Sound.class);
+        assetManager.load("skin/lb.json", Skin.class);
         assetManager.finishLoading();
 
+        skin = assetManager.get("skin/lb.json", Skin.class);
         TEXTS = assetManager.get("i18n/strings", I18NBundle.class);
         trBlock = skin.getRegion("block-deactivated");
         trBlockEnlightened = skin.getRegion("block-light");
