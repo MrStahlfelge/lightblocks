@@ -491,6 +491,16 @@ jsonData: {
 		{
 			class: com.ray3k.skincomposer.data.ColorData
 			color: {
+				r: 0.47843137
+				g: 0.47843137
+				b: 0.47843137
+				a: 1
+			}
+			name: unselected
+		}
+		{
+			class: com.ray3k.skincomposer.data.ColorData
+			color: {
 				r: 1
 				g: 1
 				b: 1
@@ -1479,14 +1489,14 @@ jsonData: {
 						type: com.badlogic.gdx.graphics.Color
 						name: fontColorSelected
 						optional: false
-						value: lightselection
+						value: white
 					}
 					fontColorUnselected: {
 						class: com.ray3k.skincomposer.data.StyleProperty
 						type: com.badlogic.gdx.graphics.Color
 						name: fontColorUnselected
 						optional: false
-						value: white
+						value: unselected
 					}
 					selection: {
 						class: com.ray3k.skincomposer.data.StyleProperty

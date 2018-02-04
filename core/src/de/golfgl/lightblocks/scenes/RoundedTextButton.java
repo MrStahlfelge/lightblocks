@@ -32,10 +32,10 @@ public class RoundedTextButton extends TextButton implements ITouchActionButton 
     @Override
     public void touchAction() {
         // leider in GlowLabelButton nochmal drin
-        if (!isPressed() && !isDisabled()) {
+        if (!isDisabled()) {
             if (colorAction != null)
                 removeAction(colorAction);
-            colorAction = MyStage.getTouchAction(LightBlocksGame.COLOR_SELECTED, getLabel().getColor());
+            colorAction = MyStage.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR, getLabel().getColor());
             addAction(colorAction);
         }
     }

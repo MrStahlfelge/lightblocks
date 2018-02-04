@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.screen.AbstractMenuScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.MyStage;
 
@@ -94,6 +93,9 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
 
     @Override
     public void act(float delta) {
+        if (isPressed() && colorAction != null)
+            labelGroup.removeAction(colorAction);
+
         super.act(delta);
 
         boolean activated = isOver();
@@ -175,7 +177,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
     }
 
     protected Color getTouchColor() {
-        return LightBlocksGame.COLOR_SELECTED;
+        return LightBlocksGame.COLOR_FOCUSSED_ACTOR;
     }
 
     @Override

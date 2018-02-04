@@ -104,8 +104,8 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
             if (selectable)
                 lastPossible = idx;
             Touchable touchable = (selectable ? Touchable.enabled : Touchable.disabled);
-            Color rowColor = (selectedIndex == idx ? LightBlocksGame.COLOR_SELECTED :
-                    (selectable ? Color.WHITE : LightBlocksGame.COLOR_DISABLED));
+            Color rowColor = (selectedIndex == idx ? Color.WHITE :
+                    (selectable ? LightBlocksGame.COLOR_UNSELECTED : LightBlocksGame.COLOR_DISABLED));
 
             isAncestorDone = (rating > 0);
 
@@ -135,9 +135,9 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
     public void setSelectedIndex(int idx) {
         if (idx != selectedIndex) {
             if (selectedIndex >= 0 && selectedIndex < idxLabel.length)
-                setRowColor(selectedIndex, Color.WHITE);
+                setRowColor(selectedIndex, LightBlocksGame.COLOR_UNSELECTED);
             selectedIndex = idx;
-            setRowColor(selectedIndex, LightBlocksGame.COLOR_SELECTED);
+            setRowColor(selectedIndex, Color.WHITE);
         }
     }
 

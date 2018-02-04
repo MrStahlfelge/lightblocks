@@ -657,7 +657,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 if (!playerStat.isPresent())
                     lineColor = new Color(LightBlocksGame.COLOR_DISABLED);
                 else if (app.multiRoom == null || !playerId.equals(app.multiRoom.getMyPlayerId()))
-                    lineColor = new Color(.5f, .5f, .5f, 1);
+                    lineColor = new Color(LightBlocksGame.COLOR_UNSELECTED);
                 else
                     lineColor = Color.WHITE;
 

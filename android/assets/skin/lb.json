@@ -44,6 +44,12 @@ com.badlogic.gdx.graphics.Color: {
 		b: 1
 		a: 1
 	}
+	unselected: {
+		r: 0.47843137
+		g: 0.47843137
+		b: 0.47843137
+		a: 1
+	}
 	white: {
 		r: 1
 		g: 1
@@ -129,8 +135,8 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
 	default: {
 		font: qs-25-bold
-		fontColorSelected: lightselection
-		fontColorUnselected: white
+		fontColorSelected: white
+		fontColorUnselected: unselected
 		selection: transparent
 		background: list
 	}

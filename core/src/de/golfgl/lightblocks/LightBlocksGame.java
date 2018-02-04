@@ -60,7 +60,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public static final Color EMPHASIZE_COLOR = new Color(1, .3f, .3f, 1);
     public static Color COLOR_DISABLED;
-    public static Color COLOR_SELECTED;
+    public static Color COLOR_UNSELECTED;
+    public static Color COLOR_FOCUSSED_ACTOR;
 
     public Skin skin;
     public AssetManager assetManager;
@@ -192,7 +193,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
 
         COLOR_DISABLED = skin.getColor("disabled");
-        COLOR_SELECTED = skin.getColor("lightselection");
+        COLOR_FOCUSSED_ACTOR = skin.getColor("lightselection");
+        COLOR_UNSELECTED = skin.getColor("unselected");
     }
 
     @Override
