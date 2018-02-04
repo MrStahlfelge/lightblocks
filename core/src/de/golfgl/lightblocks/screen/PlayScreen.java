@@ -548,10 +548,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
 
         if (linesToRemove.size > 0) {
-            if (app.isPlaySounds())
-                app.removeSound.play(.4f + linesToRemove.size * .2f);
-            if (special && app.isPlaySounds())
-                app.cleanSpecialSound.play(.8f);
+            if (app.isPlaySounds()) {
+                if (!special)
+                    app.removeSound.play(.4f + linesToRemove.size * .2f);
+                else
+                    app.cleanSpecialSound.play(.8f);
+            }
 
             for (int i = linesToRemove.size - 1; i >= 0; i--) {
                 int y = linesToRemove.get(i);
