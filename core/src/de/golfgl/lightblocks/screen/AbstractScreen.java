@@ -83,9 +83,13 @@ public abstract class AbstractScreen implements Screen {
     @Override
     public void dispose() {
         // es gab Crashes dass bereits disposed war. Grund nicht ersichtlich, evtl "Doppelklick" o.ä.
-        if (!isDisposed)
-            stage.dispose();
-        isDisposed = true;
+        try {
+            if (!isDisposed)
+                stage.dispose();
+            isDisposed = true;
+        } catch (IllegalArgumentException e) {
+            // egal
+        }
     }
 
     protected void swoshIn() {
