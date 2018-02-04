@@ -25,7 +25,6 @@ import de.golfgl.lightblocks.scenes.ShareButton;
 
 public class AboutScreen extends AbstractMenuDialog {
     public static final String TWITTER_URL = "https://twitter.com/MrStahlfelge";
-    public static final String WEBSITE_URL = "https://www.golfgl.de";
     private Cell widthDefiningCell;
 
     public AboutScreen(LightBlocksGame app, Actor toHide) {
@@ -65,7 +64,7 @@ public class AboutScreen extends AbstractMenuDialog {
         websiteButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Gdx.net.openURI(WEBSITE_URL);
+                Gdx.net.openURI(LightBlocksGame.GAME_URL);
             }
         });
         buttonsToAdd.add(websiteButton);
