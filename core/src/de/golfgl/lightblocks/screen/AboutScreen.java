@@ -79,12 +79,27 @@ public class AboutScreen extends AbstractMenuDialog {
 
         Table myButtons = new Table();
         myButtons.defaults().uniform().fill();
-        myButtons.add(websiteButton);
-        myButtons.row().padTop(10);
         myButtons.add(storeButton);
+        myButtons.row().padTop(10);
+        myButtons.add(websiteButton);
 
         menuTable.row().padTop(20);
         menuTable.add(myButtons);
+
+        menuTable.row().padTop(20);
+        menuTable.add(getWrapLabel(app.TEXTS.get("labelAbout3"))).fill();
+
+        Button mailButton = new RoundedTextButton(app.TEXTS.get("buttonMail"), app.skin);
+        mailButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.net.openURI("mailto:" + LightBlocksGame.GAME_EMAIL);
+            }
+        });
+        buttonsToAdd.add(mailButton);
+
+        menuTable.row().padTop(10);
+        menuTable.add(mailButton);
 
         menuTable.row().padTop(40);
         menuTable.add(new ScaledLabel(app.TEXTS.get("labelContributors1"), app.skin, app.SKIN_FONT_TITLE));
