@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
+import de.golfgl.gdx.controllers.ControllerScrollablePane;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
@@ -31,7 +32,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     protected Actor actorToHide;
     private boolean wasCatchBackKey;
     private Button leaveButton;
-    private ScrollPane scrollPane;
+    private ControllerScrollablePane scrollPane;
     private Cell mainContentCell;
     private boolean isShown;
 
@@ -61,7 +62,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
             mainContentCell = content.add(scrolled);
         } else {
             content.add(scrolled);
-            scrollPane = new ScrollPane(content, getSkin());
+            scrollPane = new ControllerScrollablePane(content, getSkin());
             scrollPane.setFadeScrollBars(false);
             mainContentCell = getContentTable().add(scrollPane).padLeft(scollBarWidth);
         }

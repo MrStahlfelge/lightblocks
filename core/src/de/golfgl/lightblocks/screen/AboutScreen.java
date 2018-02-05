@@ -146,18 +146,13 @@ public class AboutScreen extends AbstractMenuDialog {
         }
     }
 
-    private class InfoButton extends Button {
-        private final Label titleLabel;
+    private class InfoButton extends RoundedTextButton {
         private final Label descLabel;
 
         InfoButton(String title, String description, final String url) {
 
-            super(app.skin, LightBlocksGame.SKIN_BUTTON_ROUND);
-            titleLabel = new Label(title, app.skin, app.SKIN_FONT_BIG);
-            titleLabel.setFontScale(.8f);
-            titleLabel.pack();
+            super(title, app.skin);
 
-            add(titleLabel).padTop(10);
             row();
             descLabel = getWrapLabel(description);
             add(descLabel).fill().expandX().pad(10);
@@ -178,7 +173,6 @@ public class AboutScreen extends AbstractMenuDialog {
             } else {
                 descLabel.setColor(Color.WHITE);
             }
-            titleLabel.setColor(descLabel.getColor());
 
             super.draw(batch, parentAlpha);
         }
