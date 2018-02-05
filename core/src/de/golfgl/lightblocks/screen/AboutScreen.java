@@ -116,6 +116,9 @@ public class AboutScreen extends AbstractMenuDialog {
     protected void fillButtonTable(Table buttons) {
         super.fillButtonTable(buttons);
 
+        // back button als Default auswählen
+        buttonsToAdd.reverse();
+
         Button twitterButton = new FaButton(FontAwesome.NET_TWITTER, app.skin);
         twitterButton.addListener(new ChangeListener() {
             @Override

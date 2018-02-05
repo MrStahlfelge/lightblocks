@@ -48,19 +48,14 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
 
     @Override
     protected void fillButtonTable(Table buttons) {
-        // als erstes hinzufügen, damit Default
-        buttonsToAdd.add(leaderboardButton);
-
         super.fillButtonTable(buttons);
 
         buttons.add(achievementsButton);
         buttonsToAdd.add(achievementsButton);
         buttons.add(leaderboardButton);
+        buttonsToAdd.add(leaderboardButton);
 
-        // der hier nur Default, wenn nicht eingeloggt
         buttonsToAdd.add(logInOutButton);
-        if (!app.gpgsClient.isSessionActive())
-            buttonsToAdd.reverse();
     }
 
     private void performGpgsLoginout() {
