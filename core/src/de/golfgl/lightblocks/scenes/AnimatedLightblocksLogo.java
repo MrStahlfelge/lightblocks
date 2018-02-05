@@ -28,7 +28,7 @@ public class AnimatedLightblocksLogo extends BlockGroup {
         this.app = app;
 
         setTransform(false);
-        setHeight(BlockActor.blockWidth * 4);
+        setHeight(BlockActor.blockWidth * 5.25f);
 
         ParticleEffect pweldEffect = new ParticleEffect();
         pweldEffect.load(Gdx.files.internal("raw/explode.p"), app.skin.getAtlas());
