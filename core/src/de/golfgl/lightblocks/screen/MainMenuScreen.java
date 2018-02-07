@@ -136,7 +136,7 @@ public class MainMenuScreen extends AbstractScreen {
                                          }
         );
 
-        menuButtons.add(singleMarathonButton).padTop(10);;
+        menuButtons.add(singleMarathonButton).padTop(10);
         stage.addFocusableActor(singleMarathonButton);
 
         menuButtons.row();
@@ -148,7 +148,7 @@ public class MainMenuScreen extends AbstractScreen {
                 app.setScreen(new MultiplayerMenuScreen(app));
             }
         });
-        menuButtons.add(playMultiplayerButton).padTop(10);;
+        menuButtons.add(playMultiplayerButton).padTop(10);
         stage.addFocusableActor(playMultiplayerButton);
 
         buttonTable.add(menuButtons).expandY();
@@ -261,16 +261,21 @@ public class MainMenuScreen extends AbstractScreen {
         if (stage.getFocussedActor() == null || !stage.getFocussedActor().hasParent())
             stage.setFocussedActor(proposeFocussedActor());
 
-        if (blockGroup.isAnimationDone()) {
-            mainGroup.setScale(0, 1);
-            if (app.isPlaySounds())
-                app.swoshSound.play();
-            mainGroup.addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
-        } else {
+        if (!blockGroup.isAnimationDone()) {
             mainGroup.setScale(0, 1);
             mainGroup.addAction(Actions.sequence(
                     Actions.delay(blockGroup.getAnimationDuration() + MOVELOGODURATION),
                     Actions.scaleTo(1, 1, .5f, Interpolation.swingOut)));
+        } else if (!mainGroup.isVisible() || !isLandscape()) {
+            stage.getRoot().setScale(0, 1);
+            if (app.isPlaySounds())
+                app.swoshSound.play();
+            stage.getRoot().addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
+        } else {
+            mainGroup.setScale(0, 1);
+            if (app.isPlaySounds())
+                app.swoshSound.play();
+            mainGroup.addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
         }
     }
 
