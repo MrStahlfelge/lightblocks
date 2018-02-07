@@ -208,6 +208,15 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		down: button_small_font_filled
 		over: button_small_font_glow
 	}
+	round-fa: {
+		font: fa45
+		fontColor: white
+		downFontColor: black
+		disabledFontColor: disabled
+		up: button_small_font
+		down: button_small_font_filled
+		over: button_small_font_glow
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
 	default: {

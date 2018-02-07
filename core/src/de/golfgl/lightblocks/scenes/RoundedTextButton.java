@@ -16,11 +16,22 @@ import de.golfgl.lightblocks.screen.MyStage;
 
 public class RoundedTextButton extends TextButton implements ITouchActionButton {
     Action colorAction;
+    private ScaledLabel textLabel;
 
     public RoundedTextButton(String text, Skin skin) {
         super(text, skin, LightBlocksGame.SKIN_BUTTON_ROUND);
 
         getLabel().setFontScale(LightBlocksGame.LABEL_SCALING);
+    }
+
+    public RoundedTextButton(String faText, String text, Skin skin) {
+        super(faText, skin, LightBlocksGame.SKIN_BUTTON_FAROUND);
+
+        getLabel().setFontScale(LightBlocksGame.LABEL_SCALING);
+        getLabelCell().expand(true, false).pad(0, 5, 0, 5);
+
+        textLabel = new ScaledLabel(text, skin, LightBlocksGame.SKIN_FONT_TITLE);
+        add(textLabel);
     }
 
     @Override
@@ -52,8 +63,15 @@ public class RoundedTextButton extends TextButton implements ITouchActionButton 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         Color oldColor = getStyle().fontColor;
+        Color oldColor2 = null;
         getStyle().fontColor = getColor();
+        if (textLabel != null) {
+            oldColor2 = textLabel.getStyle().fontColor;
+            textLabel.getStyle().fontColor = isPressed() ? getStyle().downFontColor : getColor();
+        }
         super.draw(batch, parentAlpha);
         getStyle().fontColor = oldColor;
+        if (textLabel != null && oldColor2 != null)
+            textLabel.getStyle().fontColor = oldColor2;
     }
 }
