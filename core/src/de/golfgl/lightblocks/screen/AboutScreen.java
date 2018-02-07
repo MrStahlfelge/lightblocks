@@ -138,10 +138,12 @@ public class AboutScreen extends AbstractMenuDialog {
                 Gdx.net.openURI(TWITTER_URL);
             }
         });
+        twitterButton.addListener(scrollOnKeyDownListener);
         buttons.add(twitterButton);
         addFocusableActor(twitterButton);
 
         ShareButton shareAppButton = new ShareButton(app);
+        shareAppButton.addListener(scrollOnKeyDownListener);
 
         buttons.add(shareAppButton);
         addFocusableActor(shareAppButton);

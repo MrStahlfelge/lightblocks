@@ -4,13 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
@@ -18,6 +19,7 @@ import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.gdx.controllers.ControllerScrollablePane;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.MyStage;
 
 /**
  * Created by Benjamin Schulte on 20.01.2018.
@@ -29,6 +31,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     private static final Interpolation INTERPOLATION = Interpolation.circle;
     private static final int SCROLLBAR_WIDTH = 30;
     protected final LightBlocksGame app;
+    protected final InputListener scrollOnKeyDownListener;
     protected Actor actorToHide;
     private boolean wasCatchBackKey;
     private Button leaveButton;
@@ -52,6 +55,17 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
             content.row();
             content.add(new ScaledLabel(subtitle, app.skin, LightBlocksGame.SKIN_FONT_TITLE));
         }
+
+        scrollOnKeyDownListener = new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (scrollPane != null && getStage() instanceof MyStage
+                        && ((MyStage) getStage()).isGoDownKeyCode(keycode)) {
+                    return scrollPane.scroll(ControllerMenuStage.MoveFocusDirection.south);
+                }
+                return false;
+            }
+        };
 
         content.row();
 
@@ -85,6 +99,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         buttons.defaults().uniform().expandX().center();
 
         leaveButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
+        leaveButton.addListener(scrollOnKeyDownListener);
 
         if (!isScrolling())
             buttons.defaults().minHeight(leaveButton.getPrefHeight() * 1.5f);
