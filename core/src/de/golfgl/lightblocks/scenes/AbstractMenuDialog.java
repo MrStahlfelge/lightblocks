@@ -80,7 +80,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
             scrollPane.setFadeScrollBars(false);
             mainContentCell = getContentTable().add(scrollPane).padLeft(scollBarWidth);
         }
-        mainContentCell.width(actorToHide.getWidth() - scollBarWidth).expandY();
+        mainContentCell.width(actorToHide.getWidth() - scollBarWidth).expandY().fill();
 
         fillButtonTable(getButtonTable());
 
@@ -193,6 +193,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     public void hideImmediately() {
         hide(null);
         actorToHide.setVisible(true);
+        actorToHide.setScale(1);
     }
 
     @Override
