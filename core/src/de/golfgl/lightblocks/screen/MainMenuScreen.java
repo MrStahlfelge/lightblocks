@@ -23,6 +23,7 @@ import de.golfgl.lightblocks.scenes.BlockActor;
 import de.golfgl.lightblocks.scenes.FaButton;
 import de.golfgl.lightblocks.scenes.GlowLabel;
 import de.golfgl.lightblocks.scenes.GlowLabelButton;
+import de.golfgl.lightblocks.scenes.ScaledLabel;
 
 /**
  * Das Hauptmenü
@@ -74,7 +75,7 @@ public class MainMenuScreen extends AbstractScreen {
         String welcomeText = app.getWelcomeText();
         if (welcomeText != null) {
             buttonTable.row();
-            Label welcomeLabel = new Label(welcomeText, app.skin);
+            Label welcomeLabel = new ScaledLabel(welcomeText, app.skin, LightBlocksGame.SKIN_FONT_REG);
             welcomeLabel.setWrap(true);
             welcomeLabel.setAlignment(Align.center);
             buttonTable.add(welcomeLabel).fill();
@@ -120,7 +121,7 @@ public class MainMenuScreen extends AbstractScreen {
             }
         });
 
-        menuButtons.add(missionButton);
+        menuButtons.add(missionButton).padTop(10);
         stage.addFocussableActor(missionButton);
 
         menuButtons.row();
@@ -135,7 +136,7 @@ public class MainMenuScreen extends AbstractScreen {
                                          }
         );
 
-        menuButtons.add(singleMarathonButton);
+        menuButtons.add(singleMarathonButton).padTop(10);;
         stage.addFocussableActor(singleMarathonButton);
 
         menuButtons.row();
@@ -147,7 +148,7 @@ public class MainMenuScreen extends AbstractScreen {
                 app.setScreen(new MultiplayerMenuScreen(app));
             }
         });
-        menuButtons.add(playMultiplayerButton);
+        menuButtons.add(playMultiplayerButton).padTop(10);;
         stage.addFocussableActor(playMultiplayerButton);
 
         buttonTable.add(menuButtons).expandY();
