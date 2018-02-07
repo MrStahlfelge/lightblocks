@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scenes.VetoDialog;
 
 /**
  * Created by Benjamin Schulte on 17.01.2017.
@@ -128,12 +129,7 @@ public abstract class AbstractScreen implements Screen {
     }
 
     public Dialog showDialog(String errorMsg) {
-        Dialog dialog = new Dialog("", app.skin);
-        Label errorMsgLabel = new Label(errorMsg, app.skin);
-        errorMsgLabel.setWrap(true);
-        dialog.getContentTable().add(errorMsgLabel).prefWidth
-                (stage.getWidth() * .75f).pad(10);
-        dialog.button("OK", null, app.skin.get("big", TextButton.TextButtonStyle.class));
+        Dialog dialog = new VetoDialog(errorMsg, app.skin, stage.getWidth() * .75f);
         dialog.show(stage);
 
         return dialog;

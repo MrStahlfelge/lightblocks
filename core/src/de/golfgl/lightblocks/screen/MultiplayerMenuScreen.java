@@ -20,6 +20,7 @@ import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
+import de.golfgl.lightblocks.scenes.BeginningLevelChooser;
 import de.golfgl.lightblocks.scenes.FATextButton;
 import de.golfgl.lightblocks.scenes.InputButtonTable;
 import de.golfgl.lightblocks.scenes.ScoreLabel;
@@ -39,8 +40,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     private FATextButton openRoomButton;
     private FATextButton joinRoomButton;
     private FATextButton startGameButton;
-    private Slider beginningLevelSlider;
-    private Table beginningLevelTable;
+    private BeginningLevelChooser beginningLevelSlider;
     private InputButtonTable inputButtonTable;
     private Table initGameScreen;
     private Cell mainCell;
@@ -118,25 +118,20 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                                     }
         );
 
-        final Label beginningLevelLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        beginningLevelSlider = constructBeginningLevelSlider(beginningLevelLabel, 0, 5);
+        beginningLevelSlider = new BeginningLevelChooser(app, 0, 5);
 
         gameParameterListener = new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (app.multiRoom != null && app.multiRoom.isOwner()) {
                     MultiPlayerObjects.GameParameters gp = new MultiPlayerObjects.GameParameters();
-                    gp.beginningLevel = (int) beginningLevelSlider.getValue();
+                    gp.beginningLevel = beginningLevelSlider.getValue();
                     gp.chosenInput = inputButtonTable.getSelectedInput();
 
                     app.multiRoom.sendToAllPlayers(gp);
                 }
             }
         };
-
-        beginningLevelTable = new Table();
-        beginningLevelTable.add(beginningLevelSlider).minHeight(30).minWidth(200).right().fill();
-        beginningLevelTable.add(beginningLevelLabel).left().spaceLeft(10);
 
         inputButtonTable = new InputButtonTable(app, 0);
 
@@ -700,7 +695,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 playersTable.add(new Label(app.TEXTS.get("multiplayerRoundSettings"), app.skin, LightBlocksGame
                         .SKIN_FONT_BIG)).colspan(3);
                 playersTable.row();
-                playersTable.add(beginningLevelTable).colspan(3);
+                playersTable.add(beginningLevelSlider).colspan(3);
                 playersTable.row().padTop(5);
                 playersTable.add(inputButtonTable).colspan(3);
 

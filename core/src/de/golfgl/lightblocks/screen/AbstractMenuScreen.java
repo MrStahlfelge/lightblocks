@@ -1,18 +1,13 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scenes.FaButton;
-import de.golfgl.lightblocks.scenes.GlowLabelButton;
 
 /**
  * Created by Benjamin Schulte on 24.02.2017.
@@ -98,26 +93,5 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
     protected abstract String getTitle();
 
     protected abstract void fillMenuTable(Table menuTable);
-
-    protected Slider constructBeginningLevelSlider(final Label beginningLevelLabel, int defaultValue, int maxValue) {
-        // Startlevel
-        final Slider beginningLevelSlider = new Slider(0, maxValue, 1, false, app.skin);
-        beginningLevelSlider.setValue(defaultValue);
-
-        if (beginningLevelLabel != null) {
-            final ChangeListener changeListener = new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    beginningLevelLabel.setText(app.TEXTS.get("labelLevel") + " " + Integer.toString((int)
-                            beginningLevelSlider.getValue()));
-                }
-            };
-            beginningLevelSlider.addListener(changeListener);
-            changeListener.changed(null, null);
-        }
-
-        return beginningLevelSlider;
-    }
-
 
 }

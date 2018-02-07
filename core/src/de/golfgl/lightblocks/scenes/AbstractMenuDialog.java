@@ -190,6 +190,11 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         isShown = false;
     }
 
+    public void hideImmediately() {
+        hide(null);
+        actorToHide.setVisible(true);
+    }
+
     @Override
     public void hide(Action action) {
         Gdx.input.setCatchBackKey(wasCatchBackKey);

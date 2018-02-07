@@ -2,34 +2,35 @@ package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MarathonModel;
+import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
+import de.golfgl.lightblocks.scenes.BeginningLevelChooser;
 import de.golfgl.lightblocks.scenes.FATextButton;
 import de.golfgl.lightblocks.scenes.InputButtonTable;
+import de.golfgl.lightblocks.scenes.VetoDialog;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
  * Created by Benjamin Schulte on 16.02.2017.
  */
 
-public class MenuMarathonScreen extends AbstractMenuScreen {
+public class MenuMarathonScreen extends AbstractMenuDialog {
 
-    private Slider beginningLevelSlider;
+    private BeginningLevelChooser beginningLevelSlider;
     private InputButtonTable inputButtons;
 
-    public MenuMarathonScreen(final LightBlocksGame app) {
-        super(app);
-
-        initializeUI();
+    public MenuMarathonScreen(final LightBlocksGame app, Actor actorToHide) {
+        super(app, actorToHide);
     }
 
     @Override
     protected void fillButtonTable(Table buttons) {
+        super.fillButtonTable(buttons);
         TextButton playButton = new FATextButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
         playButton.addListener(new ChangeListener() {
                                    public void changed(ChangeEvent event, Actor actor) {
@@ -55,9 +56,8 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
     protected void fillMenuTable(Table menuTable) {
 
         final Label beginningLevelLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        beginningLevelSlider = constructBeginningLevelSlider(beginningLevelLabel, app.prefs.getInteger
+        beginningLevelSlider = new BeginningLevelChooser(app, app.prefs.getInteger
                 ("beginningLevel", 0), 9);
-
 
         Table beginningLevelTable = new Table();
         beginningLevelTable.add(beginningLevelSlider).minHeight(30).minWidth(200).right().fill();
@@ -95,9 +95,9 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
 
     protected void showHighscores() {
         if (!app.savegame.canSaveState()) {
-            showDialog("Sorry, highscores are only saved in the native Android " +
-                    "version of Lightblocks. Download it to" +
-                    " your mobile!");
+            new VetoDialog("Sorry, highscores are only saved in the native Android " +
+                    "version of Lightblocks. Download it to your mobile!",
+                    app.skin, getAvailableContentWidth() * .75f).show(getStage());
             return;
         }
 
@@ -106,7 +106,7 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
         scoreScreen.addScoreToShow(app.savegame.getBestScore("marathon" +
                         inputButtons.getSelectedInput()),
                 app.TEXTS.get("labelBestScores"));
-        scoreScreen.setBackScreen(MenuMarathonScreen.this);
+        scoreScreen.setBackScreen(app.getScreen());
         scoreScreen.setMaxCountingTime(1);
         scoreScreen.initializeUI();
         app.setScreen(scoreScreen);
@@ -115,7 +115,7 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
     protected void beginNewGame() {
         InitGameParameters initGameParametersParams = new InitGameParameters();
         initGameParametersParams.setGameModelClass(MarathonModel.class);
-        initGameParametersParams.setBeginningLevel((int) beginningLevelSlider.getValue());
+        initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
         initGameParametersParams.setInputKey(inputButtons.getSelectedInput());
 
         // Einstellungen speichern
@@ -125,10 +125,10 @@ public class MenuMarathonScreen extends AbstractMenuScreen {
         app.prefs.flush();
 
         try {
-            PlayScreen.gotoPlayScreen(MenuMarathonScreen.this, initGameParametersParams);
-            dispose();
+            PlayScreen.gotoPlayScreen((AbstractScreen) app.getScreen(), initGameParametersParams);
+            hideImmediately();
         } catch (VetoException e) {
-            showDialog(e.getMessage());
+            new VetoDialog(e.getMessage(), app.skin, getAvailableContentWidth() * .75f);
         }
     }
 

@@ -131,7 +131,7 @@ public class MainMenuScreen extends AbstractScreen {
         singleMarathonButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
                                                  //gotoPlayScreen(false);
-                                                 app.setScreen(new MenuMarathonScreen(app));
+                                                 new MenuMarathonScreen(app, mainGroup).show(stage);
                                              }
                                          }
         );
