@@ -67,7 +67,7 @@ public class AboutScreen extends AbstractMenuDialog {
                 Gdx.net.openURI(LightBlocksGame.GAME_URL);
             }
         });
-        buttonsToAdd.add(websiteButton);
+        addFocusableActor(websiteButton);
         Button storeButton = new RoundedTextButton(app.TEXTS.get("buttonStore"), app.skin);
         storeButton.addListener(new ChangeListener() {
             @Override
@@ -75,7 +75,7 @@ public class AboutScreen extends AbstractMenuDialog {
                 Gdx.net.openURI(LightBlocksGame.GAME_STOREURL);
             }
         });
-        buttonsToAdd.add(storeButton);
+        addFocusableActor(storeButton);
 
         Table myButtons = new Table();
         myButtons.defaults().uniform().fill();
@@ -96,7 +96,7 @@ public class AboutScreen extends AbstractMenuDialog {
                 Gdx.net.openURI("mailto:" + LightBlocksGame.GAME_EMAIL);
             }
         });
-        buttonsToAdd.add(mailButton);
+        addFocusableActor(mailButton);
 
         menuTable.row().padTop(10);
         menuTable.add(mailButton);
@@ -131,9 +131,6 @@ public class AboutScreen extends AbstractMenuDialog {
     protected void fillButtonTable(Table buttons) {
         super.fillButtonTable(buttons);
 
-        // back button als Default auswählen
-        buttonsToAdd.reverse();
-
         Button twitterButton = new FaButton(FontAwesome.NET_TWITTER, app.skin);
         twitterButton.addListener(new ChangeListener() {
             @Override
@@ -142,12 +139,12 @@ public class AboutScreen extends AbstractMenuDialog {
             }
         });
         buttons.add(twitterButton);
-        buttonsToAdd.add(twitterButton);
+        addFocusableActor(twitterButton);
 
         ShareButton shareAppButton = new ShareButton(app);
 
         buttons.add(shareAppButton);
-        buttonsToAdd.add(shareAppButton);
+        addFocusableActor(shareAppButton);
 
     }
 
@@ -178,7 +175,7 @@ public class AboutScreen extends AbstractMenuDialog {
                     Gdx.net.openURI(url);
                 }
             });
-            buttonsToAdd.add(this);
+            addFocusableActor(this);
         }
 
         @Override

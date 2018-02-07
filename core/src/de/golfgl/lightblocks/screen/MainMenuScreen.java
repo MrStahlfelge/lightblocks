@@ -106,7 +106,7 @@ public class MainMenuScreen extends AbstractScreen {
         );
 
         resumeGameCell = menuButtons.add(resumeGameButton);
-        stage.addFocussableActor(resumeGameButton);
+        stage.addFocusableActor(resumeGameButton);
 
         // Play new game!
         menuButtons.row();
@@ -122,7 +122,7 @@ public class MainMenuScreen extends AbstractScreen {
         });
 
         menuButtons.add(missionButton).padTop(10);
-        stage.addFocussableActor(missionButton);
+        stage.addFocusableActor(missionButton);
 
         menuButtons.row();
         Button singleMarathonButton = new GlowLabelButton(FontAwesome.NET_PERSON,
@@ -137,7 +137,7 @@ public class MainMenuScreen extends AbstractScreen {
         );
 
         menuButtons.add(singleMarathonButton).padTop(10);;
-        stage.addFocussableActor(singleMarathonButton);
+        stage.addFocusableActor(singleMarathonButton);
 
         menuButtons.row();
         Button playMultiplayerButton = new GlowLabelButton(FontAwesome.NET_PEOPLE, app.TEXTS.get
@@ -149,7 +149,7 @@ public class MainMenuScreen extends AbstractScreen {
             }
         });
         menuButtons.add(playMultiplayerButton).padTop(10);;
-        stage.addFocussableActor(playMultiplayerButton);
+        stage.addFocusableActor(playMultiplayerButton);
 
         buttonTable.add(menuButtons).expandY();
 
@@ -180,7 +180,7 @@ public class MainMenuScreen extends AbstractScreen {
                                       }
             );
             smallButtonTable.add(accountButton);
-            stage.addFocussableActor(accountButton);
+            stage.addFocusableActor(accountButton);
             refreshAccountInfo();
         }
 
@@ -196,7 +196,7 @@ public class MainMenuScreen extends AbstractScreen {
                                 }
         );
         smallButtonTable.add(scoreButton);
-        stage.addFocussableActor(scoreButton);
+        stage.addFocusableActor(scoreButton);
 
         // About
         Button aboutButton = new FaButton(FontAwesome.COMMENT_STAR_HEART, app.skin) {
@@ -212,7 +212,7 @@ public class MainMenuScreen extends AbstractScreen {
                                 }
         );
         smallButtonTable.add(aboutButton);
-        stage.addFocussableActor(aboutButton);
+        stage.addFocusableActor(aboutButton);
 
         // Settings
         Button settingsButton = new FaButton(FontAwesome.SETTINGS_GEAR, app.skin);
@@ -223,7 +223,7 @@ public class MainMenuScreen extends AbstractScreen {
                                    }
         );
         smallButtonTable.add(settingsButton).padRight(30);
-        stage.addFocussableActor(settingsButton);
+        stage.addFocusableActor(settingsButton);
 
         buttonTable.add(smallButtonTable).fill().top().minWidth(gameTitle.getWidth()).expandX();
 

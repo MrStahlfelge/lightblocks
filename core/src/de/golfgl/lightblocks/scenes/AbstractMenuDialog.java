@@ -156,8 +156,6 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         wasCatchBackKey = Gdx.input.isCatchBackKey();
         Gdx.input.setCatchBackKey(true);
         Dialog show = super.show(stage, action);
-        if (stage instanceof ControllerMenuStage)
-            ((ControllerMenuStage) stage).setEscapeActor(leaveButton);
         return show;
     }
 
@@ -190,5 +188,15 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         super.sizeChanged();
         if (mainContentCell != null)
             mainContentCell.width(getWidth() - (isScrolling() ? SCROLLBAR_WIDTH : 0));
+    }
+
+    @Override
+    protected Actor getConfiguredDefaultActor() {
+        return leaveButton;
+    }
+
+    @Override
+    protected Actor getConfiguredEscapeActor() {
+        return leaveButton;
     }
 }

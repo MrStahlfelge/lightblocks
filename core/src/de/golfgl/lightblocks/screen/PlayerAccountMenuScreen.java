@@ -51,11 +51,9 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
         super.fillButtonTable(buttons);
 
         buttons.add(achievementsButton);
-        buttonsToAdd.add(achievementsButton);
+        addFocusableActor(achievementsButton);
         buttons.add(leaderboardButton);
-        buttonsToAdd.add(leaderboardButton);
-
-        buttonsToAdd.add(logInOutButton);
+        addFocusableActor(leaderboardButton);
     }
 
     private void performGpgsLoginout() {
@@ -114,7 +112,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
 
         menuTable.row().padTop(30);
         menuTable.add(logInOutButton);
-        // hier noch nicht zu buttonsToAdd hinzufügen, damit er nicht default ist
+        addFocusableActor(logInOutButton);
     }
 
     public void refreshAccountChanged() {
