@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
-import de.golfgl.gdx.controllers.ControllerScrollablePane;
+import de.golfgl.gdx.controllers.ControllerScrollPane;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.MyStage;
@@ -35,7 +35,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     protected Actor actorToHide;
     private boolean wasCatchBackKey;
     private Button leaveButton;
-    private ControllerScrollablePane scrollPane;
+    private ControllerScrollPane scrollPane;
     private Cell mainContentCell;
     private boolean isShown;
 
@@ -61,7 +61,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
             public boolean keyDown(InputEvent event, int keycode) {
                 if (scrollPane != null && getStage() instanceof MyStage
                         && ((MyStage) getStage()).isGoDownKeyCode(keycode)) {
-                    return scrollPane.scroll(ControllerMenuStage.MoveFocusDirection.south);
+                    return scrollPane.onControllerScroll(ControllerMenuStage.MoveFocusDirection.south);
                 }
                 return false;
             }
@@ -76,7 +76,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
             mainContentCell = content.add(scrolled);
         } else {
             content.add(scrolled);
-            scrollPane = new ControllerScrollablePane(content, getSkin());
+            scrollPane = new ControllerScrollPane(content, getSkin());
             scrollPane.setFadeScrollBars(false);
             mainContentCell = getContentTable().add(scrollPane).padLeft(scollBarWidth);
         }
