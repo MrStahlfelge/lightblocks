@@ -17,7 +17,7 @@ import de.golfgl.lightblocks.screen.PlayScreenInput;
  */
 
 public class InputButtonTable extends Table {
-    private Label currentInputLabel;
+    private ScaledLabel currentInputLabel;
     private int inputChosen;
     private ChangeListener controllerChangeListener;
     private ButtonGroup<IntButton> inputButtonsGroup;
@@ -27,7 +27,7 @@ public class InputButtonTable extends Table {
         super();
 
         inputButtonsGroup = new ButtonGroup<IntButton>();
-        currentInputLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        currentInputLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         this.defaults().uniform().fill();
         controllerChangeListener = new ChangeListener() {
 

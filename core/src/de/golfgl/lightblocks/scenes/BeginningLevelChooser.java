@@ -17,7 +17,7 @@ public class BeginningLevelChooser extends Table {
     private final Slider beginningLevelSlider;
 
     public BeginningLevelChooser(final LightBlocksGame app, int initValue, int maxValue) {
-        beginningLevelLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        beginningLevelLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         beginningLevelSlider = new Slider(0, maxValue, 1, false, app.skin);
 
         setValue(initValue);
@@ -47,5 +47,10 @@ public class BeginningLevelChooser extends Table {
 
     public void setDisabled(boolean disabled) {
         beginningLevelSlider.setDisabled(disabled);
+    }
+
+    @Override
+    public boolean isTouchable() {
+        return super.isTouchable();
     }
 }

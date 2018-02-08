@@ -2,7 +2,6 @@ package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
@@ -13,6 +12,7 @@ import de.golfgl.lightblocks.scenes.BeginningLevelChooser;
 import de.golfgl.lightblocks.scenes.FaButton;
 import de.golfgl.lightblocks.scenes.GlowLabelButton;
 import de.golfgl.lightblocks.scenes.InputButtonTable;
+import de.golfgl.lightblocks.scenes.ScaledLabel;
 import de.golfgl.lightblocks.scenes.VetoDialog;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -56,11 +56,11 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         inputButtons = new InputButtonTable(app, app.prefs.getInteger("inputType", 0));
 
         params.row().padTop(40);
-        params.add(new Label(app.TEXTS.get("labelBeginningLevel"), app.skin)).left();
+        params.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel"), app.skin, LightBlocksGame.SKIN_FONT_BIG)).left();
         params.row();
         params.add(beginningLevelSlider);
         params.row().padTop(40);
-        params.add(new Label(app.TEXTS.get("menuInputControl"), app.skin)).left();
+        params.add(new ScaledLabel(app.TEXTS.get("menuInputControl"), app.skin, LightBlocksGame.SKIN_FONT_BIG)).left();
         params.row();
         params.add(inputButtons);
         params.row().padBottom(40);
