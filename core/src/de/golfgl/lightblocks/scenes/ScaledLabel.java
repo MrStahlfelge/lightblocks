@@ -20,4 +20,8 @@ public class ScaledLabel extends Label {
         setFontScale(scaling);
         pack();
     }
+
+    public ScaledLabel(String text, Skin skin) {
+        this(text, skin, LightBlocksGame.SKIN_FONT_REG);
+    }
 }

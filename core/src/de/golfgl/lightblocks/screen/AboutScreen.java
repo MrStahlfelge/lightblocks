@@ -50,8 +50,7 @@ public class AboutScreen extends AbstractMenuDialog {
     protected void fillMenuTable(Table menuTable) {
         menuTable.row();
 
-        menuTable.add(new ScaledLabel(app.TEXTS.get("labelCopyright") + " " + app.TEXTS.get("gameAuthor"), app.skin,
-                LightBlocksGame.SKIN_FONT_REG));
+        menuTable.add(new ScaledLabel(app.TEXTS.get("labelCopyright") + " " + app.TEXTS.get("gameAuthor"), app.skin));
         menuTable.row().padTop(20);
         Label labelAbout1 = new ScaledLabel(app.TEXTS.get("labelAbout1"), app.skin, app.SKIN_FONT_TITLE);
         labelAbout1.setWrap(true);

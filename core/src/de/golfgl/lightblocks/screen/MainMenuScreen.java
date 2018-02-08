@@ -75,7 +75,7 @@ public class MainMenuScreen extends AbstractScreen {
         String welcomeText = app.getWelcomeText();
         if (welcomeText != null) {
             buttonTable.row();
-            Label welcomeLabel = new ScaledLabel(welcomeText, app.skin, LightBlocksGame.SKIN_FONT_REG);
+            Label welcomeLabel = new ScaledLabel(welcomeText, app.skin);
             welcomeLabel.setWrap(true);
             welcomeLabel.setAlignment(Align.center);
             buttonTable.add(welcomeLabel).fill();
