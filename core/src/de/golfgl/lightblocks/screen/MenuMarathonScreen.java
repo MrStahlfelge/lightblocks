@@ -67,7 +67,7 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         params.add(inputButtons.getInputLabel()).center();
 
         addFocusableActor(inputButtons);
-        addFocusableActor(beginningLevelSlider);
+        addFocusableActor(beginningLevelSlider.getSlider());
 
         menuTable.row();
         menuTable.add(params).expandY();
