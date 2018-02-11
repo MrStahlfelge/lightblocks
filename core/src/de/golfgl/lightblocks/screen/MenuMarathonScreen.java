@@ -9,7 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Timer;
 
+import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
 import de.golfgl.lightblocks.scenes.BeginningLevelChooser;
@@ -31,24 +33,35 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
     private InputButtonTable inputButtons;
     private Button playButton;
     private ScoresGroup scoresGroup;
+    private Button leaderboardButton;
 
     public MenuMarathonScreen(final LightBlocksGame app, Actor actorToHide) {
         super(app, actorToHide);
     }
 
     @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        leaderboardButton.setVisible(app.gpgsClient != null && app.gpgsClient.isSessionActive());
+    }
+
+    @Override
     protected void fillButtonTable(Table buttons) {
         super.fillButtonTable(buttons);
-        Button highScoreButton = new FaButton(FontAwesome.COMMENT_STAR_TROPHY, app.skin);
-        highScoreButton.addListener(new ChangeListener() {
-                                        public void changed(ChangeEvent event, Actor actor) {
 
-                                        }
-                                    }
-        );
-
-        buttons.add(highScoreButton);
-        addFocusableActor(highScoreButton);
+        leaderboardButton = new FaButton(FontAwesome.GPGS_LEADERBOARD, app.skin);
+        leaderboardButton.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                try {
+                    app.gpgsClient.showLeaderboards(GpgsHelper.getLeaderBoardIdByModelId(getGameModelId()));
+                } catch (GameServiceException e) {
+                    new VetoDialog("Error showing leaderboard.", app.skin, getStage().getWidth()).show(getStage());
+                }
+            }
+        });
+        addFocusableActor(leaderboardButton);
+        buttons.add(leaderboardButton);
     }
 
     @Override
@@ -98,6 +111,7 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         menuTable.row();
         scoresGroup = new ScoresGroup(app);
         menuTable.add(scoresGroup).expandY().fill();
+        menuTable.setDebug(true);
     }
 
     @Override
@@ -113,7 +127,7 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         // es ist nötig dass alles schon korrekt angezeigt wird, damit die Animationen der ScoreGroup
         // korrekt laufen. Also sicherstellen, oder zeitlich nach hinten schieben
         if (getStage() != null && !hasActions())
-            scoresGroup.show(MarathonModel.MODEL_MARATHON_ID + inputButtons.getSelectedInput());
+            scoresGroup.show(getGameModelId());
         else {
             // delay this
             Timer.schedule(new Timer.Task() {
@@ -123,6 +137,10 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
                 }
             }, 1f);
         }
+    }
+
+    private String getGameModelId() {
+        return MarathonModel.MODEL_MARATHON_ID + inputButtons.getSelectedInput();
     }
 
     @Override
