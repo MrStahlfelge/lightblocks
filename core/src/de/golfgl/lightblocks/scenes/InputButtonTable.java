@@ -5,28 +5,30 @@ import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 
+import de.golfgl.gdx.controllers.ControllerMenuStage;
+import de.golfgl.gdx.controllers.IControllerActable;
+import de.golfgl.gdx.controllers.IControllerScrollable;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
 
 /**
  * Created by Benjamin Schulte on 20.03.2017.
  */
 
-public class InputButtonTable extends Table {
+public class InputButtonTable extends Table implements IControllerActable, ITouchActionButton, IControllerScrollable {
     private ScaledLabel currentInputLabel;
     private int inputChosen;
     private ChangeListener controllerChangeListener;
-    private ButtonGroup<IntButton> inputButtonsGroup;
+    private ButtonGroup<InputTypeButton> inputButtonsGroup;
     private ChangeListener externalChangeListener;
 
     public InputButtonTable(final LightBlocksGame app, int defaultValue) {
         super();
 
-        inputButtonsGroup = new ButtonGroup<IntButton>();
+        inputButtonsGroup = new ButtonGroup<InputTypeButton>();
         currentInputLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         this.defaults().uniform().fill();
         controllerChangeListener = new ChangeListener() {
@@ -34,7 +36,7 @@ public class InputButtonTable extends Table {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (inputButtonsGroup.getChecked() != null) {
-                    inputChosen = inputButtonsGroup.getChecked().getValue();
+                    inputChosen = inputButtonsGroup.getChecked().getInputType();
                     currentInputLabel.setText(app.TEXTS.get(PlayScreenInput.getInputTypeName(inputChosen)));
 
                     if (externalChangeListener != null)
@@ -51,9 +53,7 @@ public class InputButtonTable extends Table {
         while (true) {
             try {
 
-                IntButton inputButton = new IntButton(PlayScreenInput.getInputFAIcon(i), app.skin, FontAwesome
-                        .SKIN_FONT_FA + "-checked");
-                inputButton.setValue(i);
+                InputTypeButton inputButton = new InputTypeButton(i, app.skin);
                 inputButton.addListener(controllerChangeListener);
                 inputButton.setDisabled(!PlayScreenInput.isInputTypeAvailable(i));
 
@@ -89,30 +89,28 @@ public class InputButtonTable extends Table {
 
     public void setAllDisabledButSelected() {
         //führt dazu, dass nur der selektierte angewählt sichtbar ist. Für Multiplayer-Clients
-        for (IntButton btn : inputButtonsGroup.getButtons()) {
-            btn.setDisabled(btn.getValue() != inputChosen);
+        for (InputTypeButton btn : inputButtonsGroup.getButtons()) {
+            btn.setDisabled(btn.getInputType() != inputChosen);
         }
-
-
     }
 
     public void setInputDisabled(int i, boolean disabled) {
-        IntButton btn = getInputButton(i);
+        InputTypeButton btn = getInputButton(i);
         if (btn != null)
             btn.setDisabled(disabled || !PlayScreenInput.isInputTypeAvailable(i));
 
         // Falls der gerade aktive deaktiviert wurde, dann wechseln
-        if (inputButtonsGroup.getChecked().getValue() == i && disabled) {
-            IntButton btnAlwaysAvail = getInputButton(PlayScreenInput.KEY_INPUTTYPE_ALLAVAIL);
+        if (inputButtonsGroup.getChecked().getInputType() == i && disabled) {
+            InputTypeButton btnAlwaysAvail = getInputButton(PlayScreenInput.KEY_INPUTTYPE_ALLAVAIL);
             btnAlwaysAvail.setChecked(true);
         }
     }
 
-    protected IntButton getInputButton(int inputKey) {
-        IntButton retVal = null;
+    protected InputTypeButton getInputButton(int inputKey) {
+        InputTypeButton retVal = null;
 
-        for (IntButton btn : inputButtonsGroup.getButtons()) {
-            if (btn.getValue() == inputKey)
+        for (InputTypeButton btn : inputButtonsGroup.getButtons()) {
+            if (btn.getInputType() == inputKey)
                 retVal = btn;
         }
 
@@ -128,25 +126,76 @@ public class InputButtonTable extends Table {
     }
 
     public void setInputChecked(int chosenInput) {
-        IntButton btn = getInputButton(chosenInput);
+        InputTypeButton btn = getInputButton(chosenInput);
         btn.setChecked(true);
     }
 
-    public static class IntButton extends TextButton {
-
-        private int value;
-
-        public IntButton(String text, Skin skin, String styleName) {
-            super(text, skin, styleName);
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public void setValue(int value) {
-            this.value = value;
-        }
+    @Override
+    public boolean onControllerDefaultKeyDown() {
+        // nichts machen
+        return true;
     }
 
+    @Override
+    public boolean onControllerDefaultKeyUp() {
+        // nichts machen
+        return true;
+    }
+
+    @Override
+    public boolean onControllerScroll(ControllerMenuStage.MoveFocusDirection direction) {
+        Array<InputTypeButton> allButtons = inputButtonsGroup.getButtons();
+
+        switch (direction) {
+            case south:
+            case north:
+                return false;
+
+            case east:
+                for (int i = inputChosen + 1; i < allButtons.size; i++) {
+                    InputTypeButton currentButton = allButtons.get(i);
+                    if (!currentButton.isDisabled() && currentButton.isVisible()) {
+                        currentButton.setChecked(true);
+                        return true;
+                    }
+                }
+                return false;
+            case west:
+                for (int i = inputChosen - 1; i >= 0; i--) {
+                    InputTypeButton currentButton = allButtons.get(i);
+                    if (!currentButton.isDisabled() && currentButton.isVisible()) {
+                        currentButton.setChecked(true);
+                        return true;
+                    }
+                }
+                return false;
+        }
+        return false;
+    }
+
+    @Override
+    public void touchAction() {
+        InputTypeButton selected = inputButtonsGroup.getChecked();
+        if (selected != null)
+            selected.touchAction();
+    }
+
+    private class InputTypeButton extends GlowLabelButton {
+        private int inputType;
+
+        public InputTypeButton(int inputType, Skin skin) {
+            super(PlayScreenInput.getInputFAIcon(inputType), "", skin, 1f, .65f);
+            this.inputType = inputType;
+            pad(2, 12, 0, 12);
+        }
+
+        public int getInputType() {
+            return inputType;
+        }
+
+        @Override
+        public boolean isOver() {
+            return inputType == inputChosen;
+        }
+    }
 }
