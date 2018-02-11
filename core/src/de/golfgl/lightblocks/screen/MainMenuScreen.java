@@ -126,7 +126,7 @@ public class MainMenuScreen extends AbstractScreen {
 
         menuButtons.row();
         Button singleMarathonButton = new GlowLabelButton(FontAwesome.NET_PERSON,
-                app.TEXTS.get("menuPlayMarathonButton"),
+                app.TEXTS.get("labelMarathon"),
                 app.skin);
         singleMarathonButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
