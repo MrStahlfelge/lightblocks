@@ -80,7 +80,7 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
             }
         });
 
-        params.row().padTop(30);
+        params.row().padTop(20);
         params.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel"), app.skin, LightBlocksGame.SKIN_FONT_BIG))
                 .left();
         params.row();
@@ -96,7 +96,7 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         addFocusableActor(beginningLevelSlider.getSlider());
 
         menuTable.row();
-        menuTable.add(params);
+        menuTable.add(params).expandY();
 
         playButton = new GlowLabelButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
         playButton.addListener(new ChangeListener() {
@@ -110,8 +110,7 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         addFocusableActor(playButton);
         menuTable.row();
         scoresGroup = new ScoresGroup(app);
-        menuTable.add(scoresGroup).expandY().fill();
-        menuTable.setDebug(true);
+        menuTable.add(scoresGroup).height(playButton.getPrefHeight() * 2f).fill();
     }
 
     @Override
