@@ -24,4 +24,9 @@ public class ScaledLabel extends Label {
     public ScaledLabel(String text, Skin skin) {
         this(text, skin, LightBlocksGame.SKIN_FONT_REG);
     }
+
+    public ScaledLabel(CharSequence text, Skin skin, float scaling) {
+        this(text, skin, LightBlocksGame.SKIN_FONT_REG, scaling);
+    }
+
 }
