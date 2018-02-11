@@ -50,10 +50,10 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
     protected void fillButtonTable(Table buttons) {
         super.fillButtonTable(buttons);
 
-        buttons.add(achievementsButton);
-        addFocusableActor(achievementsButton);
         buttons.add(leaderboardButton);
         addFocusableActor(leaderboardButton);
+        buttons.add(achievementsButton);
+        addFocusableActor(achievementsButton);
     }
 
     private void performGpgsLoginout() {
