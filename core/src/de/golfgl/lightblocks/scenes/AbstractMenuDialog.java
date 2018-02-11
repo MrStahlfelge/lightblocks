@@ -186,8 +186,6 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         actorToHide.setScale(0, 1);
         actorToHide.addAction(Actions.sequence(Actions.visible(true),
                 Actions.scaleTo(1, 1, TIME_SWOSHOUT, INTERPOLATION)));
-
-        isShown = false;
     }
 
     public void hideImmediately() {
@@ -200,6 +198,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     public void hide(Action action) {
         Gdx.input.setCatchBackKey(wasCatchBackKey);
         super.hide(action);
+        isShown = false;
     }
 
     protected abstract void fillMenuTable(Table menuTable);
