@@ -1,10 +1,7 @@
 package de.golfgl.lightblocks.screen;
 
-import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Timer;
@@ -16,8 +13,8 @@ import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
 import de.golfgl.lightblocks.scenes.BeginningLevelChooser;
 import de.golfgl.lightblocks.scenes.FaButton;
-import de.golfgl.lightblocks.scenes.GlowLabelButton;
 import de.golfgl.lightblocks.scenes.InputButtonTable;
+import de.golfgl.lightblocks.scenes.PlayButton;
 import de.golfgl.lightblocks.scenes.ScaledLabel;
 import de.golfgl.lightblocks.scenes.ScoresGroup;
 import de.golfgl.lightblocks.scenes.VetoDialog;
@@ -98,7 +95,7 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         menuTable.row();
         menuTable.add(params).expandY();
 
-        playButton = new GlowLabelButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
+        playButton = new PlayButton(app);
         playButton.addListener(new ChangeListener() {
                                    public void changed(ChangeEvent event, Actor actor) {
                                        beginNewGame();
