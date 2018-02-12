@@ -76,7 +76,7 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         inputButtons.setExternalChangeListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                refreshScores();
+                refreshScores(0);
             }
         });
 
@@ -111,30 +111,24 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         menuTable.row();
         scoresGroup = new ScoresGroup(app);
         menuTable.add(scoresGroup).height(playButton.getPrefHeight() * 2f).fill();
+        refreshScores(0);
     }
 
-    @Override
-    public Dialog show(Stage stage, Action action) {
-        // die Scores erstmals anzeigen
-        if (getStage() == null && stage != null)
-            refreshScores();
-
-        return super.show(stage, action);
-    }
-
-    protected void refreshScores() {
+    protected void refreshScores(final int tryCount) {
         // es ist nötig dass alles schon korrekt angezeigt wird, damit die Animationen der ScoreGroup
         // korrekt laufen. Also sicherstellen, oder zeitlich nach hinten schieben
+        // Um ein Memory Leak zu verhindern, gibt es maxTries. Ansonsten würde die Aktion ewig in der Warteschleife
+        // hängen, wenn der Dialog einmal abgeräumt ist
         if (getStage() != null && !hasActions())
             scoresGroup.show(getGameModelId());
-        else {
+        else if (tryCount < 5) {
             // delay this
             Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
-                    refreshScores();
+                    refreshScores(tryCount + 1);
                 }
-            }, 1f);
+            }, 2f);
         }
     }
 
