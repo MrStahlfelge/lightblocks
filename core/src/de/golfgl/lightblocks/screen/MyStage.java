@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.screen;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
@@ -62,7 +63,7 @@ public class MyStage extends ControllerMenuStage {
     public boolean keyDown(int keyCode) {
         boolean handled = super.keyDown(keyCode);
 
-        if (handled)
+        if (handled && keyCode != Input.Keys.BACK)
             touchActionActivated = true;
 
         return handled;
