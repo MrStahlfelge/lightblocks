@@ -196,7 +196,9 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
 
     @Override
     public void hide(Action action) {
-        Gdx.input.setCatchBackKey(wasCatchBackKey);
+        // auf vorherigen Wert zurücksetzen. Aber nur, wenn auch noch der Menuscreen angezeigt wird
+        if (app.getScreen() == app.mainMenuScreen)
+            Gdx.input.setCatchBackKey(wasCatchBackKey);
         super.hide(action);
         isShown = false;
     }

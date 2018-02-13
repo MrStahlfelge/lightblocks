@@ -256,22 +256,25 @@ public class MainMenuScreen extends AbstractScreen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
-        Gdx.input.setCatchBackKey(false);
+        Gdx.input.setCatchBackKey(!mainGroup.isVisible());
         resumeGameCell.setActor(app.savegame.hasSavedGame() ? resumeGameButton : null);
         if (stage.getFocussedActor() == null || !stage.getFocussedActor().hasParent())
             stage.setFocussedActor(proposeFocussedActor());
 
         if (!blockGroup.isAnimationDone()) {
+            // die Intro-Sequenz läuft noch
             mainGroup.setScale(0, 1);
             mainGroup.addAction(Actions.sequence(
                     Actions.delay(blockGroup.getAnimationDuration() + MOVELOGODURATION),
                     Actions.scaleTo(1, 1, .5f, Interpolation.swingOut)));
         } else if (!mainGroup.isVisible() || !isLandscape()) {
+            // es wird gerade ein Dialog angezeigt und nicht das Main menu
             stage.getRoot().setScale(0, 1);
             if (app.isPlaySounds())
                 app.swoshSound.play();
             stage.getRoot().addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
         } else {
+            // Normalfall
             mainGroup.setScale(0, 1);
             if (app.isPlaySounds())
                 app.swoshSound.play();
