@@ -30,10 +30,11 @@ public class ScoresGroup extends Group {
         this.gameModelId = gameModelId;
 
         if (myScoresTable != null) {
-            myScoresTable.clearActions();
+            //myScoresTable.clearActions();
+            myScoresTable.setTransform(true);
+            myScoresTable.setOrigin(Align.center);
             myScoresTable.addAction(Actions.sequence(
-                    Actions.parallel(Actions.moveToAligned(0, getHeight() / 2, Align
-                                    .center, DURATION, Interpolation.fade),
+                    Actions.parallel(Actions.scaleTo(0, 0, DURATION, Interpolation.fade),
                             Actions.fadeOut(DURATION, Interpolation.fade)),
                     Actions.removeActor()));
             myScoresTable = null;
