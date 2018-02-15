@@ -17,13 +17,20 @@ import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.scenes.AbstractMenuDialog;
-import de.golfgl.lightblocks.scenes.AnimatedLightblocksLogo;
-import de.golfgl.lightblocks.scenes.BlockActor;
-import de.golfgl.lightblocks.scenes.FaButton;
-import de.golfgl.lightblocks.scenes.GlowLabel;
-import de.golfgl.lightblocks.scenes.GlowLabelButton;
-import de.golfgl.lightblocks.scenes.ScaledLabel;
+import de.golfgl.lightblocks.menu.AboutScreen;
+import de.golfgl.lightblocks.menu.AbstractMenuDialog;
+import de.golfgl.lightblocks.menu.AnimatedLightblocksLogo;
+import de.golfgl.lightblocks.menu.MenuMarathonScreen;
+import de.golfgl.lightblocks.menu.MenuMissionsScreen;
+import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
+import de.golfgl.lightblocks.menu.PlayerAccountMenuScreen;
+import de.golfgl.lightblocks.menu.SettingsScreen;
+import de.golfgl.lightblocks.menu.TotalScoreScreen;
+import de.golfgl.lightblocks.scene2d.BlockActor;
+import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.GlowLabel;
+import de.golfgl.lightblocks.scene2d.GlowLabelButton;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
 
 /**
  * Das Hauptmenü

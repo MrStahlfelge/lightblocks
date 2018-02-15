@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.menu.ScoreScreen;
 import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
@@ -34,13 +35,13 @@ import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
-import de.golfgl.lightblocks.scenes.BlockActor;
-import de.golfgl.lightblocks.scenes.BlockGroup;
-import de.golfgl.lightblocks.scenes.MotivationLabel;
-import de.golfgl.lightblocks.scenes.OverlayMessage;
-import de.golfgl.lightblocks.scenes.ParticleEffectActor;
-import de.golfgl.lightblocks.scenes.PauseDialog;
-import de.golfgl.lightblocks.scenes.ScoreLabel;
+import de.golfgl.lightblocks.scene2d.BlockActor;
+import de.golfgl.lightblocks.scene2d.BlockGroup;
+import de.golfgl.lightblocks.scene2d.MotivationLabel;
+import de.golfgl.lightblocks.scene2d.OverlayMessage;
+import de.golfgl.lightblocks.scene2d.ParticleEffectActor;
+import de.golfgl.lightblocks.menu.PauseDialog;
+import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor;

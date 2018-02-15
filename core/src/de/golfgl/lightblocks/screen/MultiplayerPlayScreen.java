@@ -13,7 +13,7 @@ import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
-import de.golfgl.lightblocks.scenes.ScoreLabel;
+import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
