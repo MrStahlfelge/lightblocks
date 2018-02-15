@@ -6,62 +6,30 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Timer;
 
-import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.MarathonModel;
-import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.AbstractScreen;
-import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
- * Created by Benjamin Schulte on 16.02.2017.
+ * Created by Benjamin Schulte on 15.02.2018.
  */
 
-public class MenuMarathonScreen extends AbstractMenuDialog {
-
+public class MarathonGroup extends Table {
+    private SinglePlayerScreen menuScreen;
     private BeginningLevelChooser beginningLevelSlider;
     private InputButtonTable inputButtons;
     private Button playButton;
     private ScoresGroup scoresGroup;
-    private Button leaderboardButton;
+    private LightBlocksGame app;
 
-    public MenuMarathonScreen(final LightBlocksGame app, Actor actorToHide) {
-        super(app, actorToHide);
-    }
-
-    @Override
-    public void act(float delta) {
-        super.act(delta);
-
-        leaderboardButton.setVisible(app.gpgsClient != null && app.gpgsClient.isSessionActive());
-    }
-
-    @Override
-    protected void fillButtonTable(Table buttons) {
-        super.fillButtonTable(buttons);
-
-        leaderboardButton = new FaButton(FontAwesome.GPGS_LEADERBOARD, app.skin);
-        leaderboardButton.addListener(new ChangeListener() {
-            public void changed(ChangeEvent event, Actor actor) {
-                try {
-                    app.gpgsClient.showLeaderboards(GpgsHelper.getLeaderBoardIdByModelId(getGameModelId()));
-                } catch (GameServiceException e) {
-                    new VetoDialog("Error showing leaderboard.", app.skin, getStage().getWidth()).show(getStage());
-                }
-            }
-        });
-        addFocusableActor(leaderboardButton);
-        buttons.add(leaderboardButton);
-    }
-
-    @Override
-    protected void fillMenuTable(Table menuTable) {
+    public MarathonGroup(SinglePlayerScreen myParentScreen, LightBlocksGame app) {
+        this.menuScreen = myParentScreen;
+        this.app = app;
 
         Table params = new Table();
         beginningLevelSlider = new BeginningLevelChooser(app, app.prefs.getInteger
@@ -73,6 +41,8 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 refreshScores(0);
+                // nur wenn es der aktive ist
+                menuScreen.onGameModelChange(getGameModelId());
             }
         });
 
@@ -88,11 +58,11 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         params.row();
         params.add(inputButtons.getInputLabel()).center();
 
-        addFocusableActor(inputButtons);
-        addFocusableActor(beginningLevelSlider.getSlider());
+        menuScreen.addFocusableActor(inputButtons);
+        menuScreen.addFocusableActor(beginningLevelSlider.getSlider());
 
-        menuTable.row();
-        menuTable.add(params).expandY();
+        row();
+        add(params).expandY();
 
         playButton = new PlayButton(app);
         playButton.addListener(new ChangeListener() {
@@ -101,13 +71,17 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
                                    }
                                }
         );
-        menuTable.row();
-        menuTable.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top();
-        addFocusableActor(playButton);
-        menuTable.row();
+        row();
+        add(playButton).minHeight(playButton.getPrefHeight() * 2f).top();
+        menuScreen.addFocusableActor(playButton);
+        row();
         scoresGroup = new ScoresGroup(app);
-        menuTable.add(scoresGroup).height(scoresGroup.getPrefHeight()).fill();
+        add(scoresGroup).height(scoresGroup.getPrefHeight()).fill();
         refreshScores(0);
+    }
+
+    protected String getGameModelId() {
+        return MarathonModel.MODEL_MARATHON_ID + inputButtons.getSelectedInput();
     }
 
     protected void refreshScores(final int tryCount) {
@@ -128,25 +102,6 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
         }
     }
 
-    private String getGameModelId() {
-        return MarathonModel.MODEL_MARATHON_ID + inputButtons.getSelectedInput();
-    }
-
-    @Override
-    protected String getTitleIcon() {
-        return FontAwesome.NET_PERSON;
-    }
-
-    @Override
-    protected String getSubtitle() {
-        return null;
-    }
-
-    @Override
-    protected String getTitle() {
-        return app.TEXTS.get("labelMarathon");
-    }
-
     protected void beginNewGame() {
         InitGameParameters initGameParametersParams = new InitGameParameters();
         initGameParametersParams.setGameModelClass(MarathonModel.class);
@@ -161,14 +116,13 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
 
         try {
             PlayScreen.gotoPlayScreen((AbstractScreen) app.getScreen(), initGameParametersParams);
-            hideImmediately();
+            menuScreen.hideImmediately();
         } catch (VetoException e) {
-            new VetoDialog(e.getMessage(), app.skin, getAvailableContentWidth() * .75f).show(getStage());
+            new VetoDialog(e.getMessage(), app.skin, menuScreen.getAvailableContentWidth() * .75f).show(getStage());
         }
     }
 
-    @Override
-    protected Actor getConfiguredDefaultActor() {
+    public Actor getConfiguredDefaultActor() {
         return playButton;
     }
 }

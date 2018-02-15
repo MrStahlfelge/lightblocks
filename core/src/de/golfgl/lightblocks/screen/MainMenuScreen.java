@@ -20,7 +20,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.AboutScreen;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.AnimatedLightblocksLogo;
-import de.golfgl.lightblocks.menu.MenuMarathonScreen;
+import de.golfgl.lightblocks.menu.SinglePlayerScreen;
 import de.golfgl.lightblocks.menu.MenuMissionsScreen;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.menu.PlayerAccountMenuScreen;
@@ -138,7 +138,7 @@ public class MainMenuScreen extends AbstractScreen {
         singleMarathonButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
                                                  //gotoPlayScreen(false);
-                                                 new MenuMarathonScreen(app, mainGroup).show(stage);
+                                                 new SinglePlayerScreen(app, mainGroup).show(stage);
                                              }
                                          }
         );

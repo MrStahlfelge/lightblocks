@@ -51,12 +51,15 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         Table content = isScrolling() ? new Table() : getContentTable();
         int scollBarWidth = isScrolling() ? SCROLLBAR_WIDTH : 0;
 
-        content.add(new Label(getTitle(), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+        String title = getTitle();
+        if (title != null) {
+            content.add(new Label(title, app.skin, LightBlocksGame.SKIN_FONT_TITLE));
 
-        String subtitle = getSubtitle();
-        if (subtitle != null) {
-            content.row();
-            content.add(new ScaledLabel(subtitle, app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+            String subtitle = getSubtitle();
+            if (subtitle != null) {
+                content.row();
+                content.add(new ScaledLabel(subtitle, app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+            }
         }
 
         scrollOnKeyDownListener = new InputListener() {
