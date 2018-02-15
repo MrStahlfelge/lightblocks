@@ -76,7 +76,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
             mainContentCell = content.add(scrolled);
         } else {
             content.add(scrolled);
-            scrollPane = new ControllerScrollPane(content, getSkin());
+            scrollPane = new BetterScrollPane(content, getSkin());
             scrollPane.setFadeScrollBars(false);
             mainContentCell = getContentTable().add(scrollPane).padLeft(scollBarWidth);
         }

@@ -1,12 +1,17 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scenes.BetterScrollPane;
 import de.golfgl.lightblocks.scenes.FaButton;
 
 /**
@@ -34,11 +39,9 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         fillMenuTable(menuTable);
         // setFillParent verursacht Probleme mit ScrollPane
         menuTable.setFillParent(false);
-        menuScrollPane = new ScrollPane(menuTable, app.skin);
+        menuScrollPane = new BetterScrollPane(menuTable, app.skin);
         menuScrollPane.setSize(LightBlocksGame.nativeGameWidth, 150);
         menuScrollPane.setScrollingDisabled(true, false);
-        // für Slider nötig, bei großen Buttons oder Auswahlen aber sehr störend. dann wieder true setzen
-        menuScrollPane.setCancelTouchFocus(false);
 
         //Titel
         // Der Titel wird nach der Menütabelle gefüllt, eventuell wird dort etwas gesetzt (=> Scores)

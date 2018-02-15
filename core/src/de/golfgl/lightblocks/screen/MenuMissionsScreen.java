@@ -38,7 +38,6 @@ public class MenuMissionsScreen extends AbstractMenuScreen {
         super(app);
 
         initializeUI();
-        getMenuScrollPane().setCancelTouchFocus(true);
     }
 
     @Override
