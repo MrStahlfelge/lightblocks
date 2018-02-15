@@ -163,7 +163,7 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
             PlayScreen.gotoPlayScreen((AbstractScreen) app.getScreen(), initGameParametersParams);
             hideImmediately();
         } catch (VetoException e) {
-            new VetoDialog(e.getMessage(), app.skin, getAvailableContentWidth() * .75f);
+            new VetoDialog(e.getMessage(), app.skin, getAvailableContentWidth() * .75f).show(getStage());
         }
     }
 
