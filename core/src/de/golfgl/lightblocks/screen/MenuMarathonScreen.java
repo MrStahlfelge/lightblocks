@@ -103,11 +103,11 @@ public class MenuMarathonScreen extends AbstractMenuDialog {
                                }
         );
         menuTable.row();
-        menuTable.add(playButton).minHeight(playButton.getPrefHeight() * 2.5f).top();
+        menuTable.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top();
         addFocusableActor(playButton);
         menuTable.row();
         scoresGroup = new ScoresGroup(app);
-        menuTable.add(scoresGroup).height(playButton.getPrefHeight() * 2f).fill();
+        menuTable.add(scoresGroup).height(scoresGroup.getPrefHeight()).fill();
         refreshScores(0);
     }
 
