@@ -11,8 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.gdx.controllers.ControllerSlider;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.MyStage;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
 
 /**
  * Created by Benjamin Schulte on 07.02.2018.
@@ -28,19 +28,19 @@ public class BeginningLevelChooser extends Table {
 
         setValue(initValue);
 
-        if (beginningLevelLabel != null) {
-            final ChangeListener changeListener = new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    beginningLevelLabel.setText(app.TEXTS.get("labelLevel") + " " + Integer.toString((int)
-                            beginningLevelSlider.getValue()));
-                }
-            };
-            beginningLevelSlider.addListener(changeListener);
-            changeListener.changed(null, null);
-        }
+        final ChangeListener changeListener = new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                beginningLevelLabel.setText(app.TEXTS.get("labelLevel") + " " + Integer.toString((int)
+                        beginningLevelSlider.getValue()));
+            }
+        };
+        beginningLevelSlider.addListener(changeListener);
+        changeListener.changed(null, null);
+
         add(beginningLevelSlider).minHeight(30).minWidth(200).right().fill();
-        add(beginningLevelLabel).left().spaceLeft(10);
+        // minWidth, damit sich verschieden breite Zahlen nicht durch Gewackel bemerkbar machen
+        add(beginningLevelLabel).left().spaceLeft(10).minWidth(beginningLevelLabel.getPrefWidth() * 1.1f);
     }
 
     public int getValue() {
