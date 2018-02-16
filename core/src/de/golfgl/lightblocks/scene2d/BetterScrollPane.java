@@ -17,6 +17,7 @@ import de.golfgl.gdx.controllers.ControllerScrollPane;
 public class BetterScrollPane extends ControllerScrollPane {
     public BetterScrollPane(Actor widget) {
         super(widget);
+        setup();
     }
 
     public BetterScrollPane(Actor widget, Skin skin) {
