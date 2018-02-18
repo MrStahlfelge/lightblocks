@@ -69,7 +69,8 @@ public class GpgsHelper {
     public static final String EVENT_MISSION_15_TYPEB_1D = "CgkI4vHs17ETEAIQOQ";
 
     public static String getLeaderBoardIdByModelId(String gameModelId) {
-        String retVal;
+        if (gameModelId == null)
+            return null;
 
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "1"))
             return LEAD_MARATHON_GESTURES;

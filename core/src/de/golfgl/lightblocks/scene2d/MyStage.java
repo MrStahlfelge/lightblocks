@@ -41,8 +41,8 @@ public class MyStage extends ControllerMenuStage {
 
             touchActionActivated = touchActionActivated || Controllers.getControllers().size > 0;
 
-            if (touchActionActivated && getFocussedActor() instanceof ITouchActionButton) {
-                ITouchActionButton actor = (ITouchActionButton) getFocussedActor();
+            if (touchActionActivated && getFocusedActor() instanceof ITouchActionButton) {
+                ITouchActionButton actor = (ITouchActionButton) getFocusedActor();
 
                 actor.touchAction();
             }

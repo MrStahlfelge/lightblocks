@@ -192,7 +192,7 @@ public class AboutScreen extends AbstractMenuDialog {
         @Override
         public boolean isOver() {
             return super.isOver() || getStage() != null && getStage() instanceof ControllerMenuStage &&
-                    ((ControllerMenuStage) getStage()).getFocussedActor() == this;
+                    ((ControllerMenuStage) getStage()).getFocusedActor() == this;
         }
 
     }

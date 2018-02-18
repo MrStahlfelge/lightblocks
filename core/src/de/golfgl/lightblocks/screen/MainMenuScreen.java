@@ -21,7 +21,6 @@ import de.golfgl.lightblocks.menu.AboutScreen;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.AnimatedLightblocksLogo;
 import de.golfgl.lightblocks.menu.SinglePlayerScreen;
-import de.golfgl.lightblocks.menu.MenuMissionsScreen;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.menu.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.menu.SettingsScreen;
@@ -42,13 +41,12 @@ public class MainMenuScreen extends AbstractScreen {
     private final AnimatedLightblocksLogo blockGroup;
     private final Table buttonTable;
     private final Label gameVersion;
-    private final Button missionButton;
     private final Cell resumeGameCell;
     private GlowLabelButton accountButton;
     private Button resumeGameButton;
-    private MenuMissionsScreen missionsScreen;
     private Group mainGroup;
     private PlayerAccountMenuScreen lastAccountScreen;
+    private final Button singlePlayerButton;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
@@ -115,36 +113,19 @@ public class MainMenuScreen extends AbstractScreen {
         resumeGameCell = menuButtons.add(resumeGameButton);
         stage.addFocusableActor(resumeGameButton);
 
-        // Play new game!
         menuButtons.row();
-        missionButton = new GlowLabelButton(FontAwesome.COMMENT_STAR_FLAG, app.TEXTS.get("menuPlayMissionButton"),
+        singlePlayerButton = new GlowLabelButton(FontAwesome.NET_PERSON,
+                app.TEXTS.get("menuSinglePlayer"),
                 app.skin);
-        missionButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                if (missionsScreen == null)
-                    missionsScreen = new MenuMissionsScreen(app);
-                app.setScreen(missionsScreen);
-            }
-        });
-
-        menuButtons.add(missionButton).padTop(10);
-        stage.addFocusableActor(missionButton);
-
-        menuButtons.row();
-        Button singleMarathonButton = new GlowLabelButton(FontAwesome.NET_PERSON,
-                app.TEXTS.get("labelMarathon"),
-                app.skin);
-        singleMarathonButton.addListener(new ChangeListener() {
+        singlePlayerButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
-                                                 //gotoPlayScreen(false);
                                                  new SinglePlayerScreen(app, mainGroup).show(stage);
                                              }
                                          }
         );
 
-        menuButtons.add(singleMarathonButton).padTop(10);
-        stage.addFocusableActor(singleMarathonButton);
+        menuButtons.add(singlePlayerButton).padTop(10);
+        stage.addFocusableActor(singlePlayerButton);
 
         menuButtons.row();
         Button playMultiplayerButton = new GlowLabelButton(FontAwesome.NET_PEOPLE, app.TEXTS.get
@@ -248,7 +229,7 @@ public class MainMenuScreen extends AbstractScreen {
     }
 
     protected Button proposeFocussedActor() {
-        return resumeGameButton.hasParent() ? resumeGameButton : missionButton;
+        return resumeGameButton.hasParent() ? resumeGameButton : singlePlayerButton;
     }
 
     public void refreshAccountInfo() {
@@ -265,8 +246,8 @@ public class MainMenuScreen extends AbstractScreen {
         Gdx.input.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(!mainGroup.isVisible());
         resumeGameCell.setActor(app.savegame.hasSavedGame() ? resumeGameButton : null);
-        if (stage.getFocussedActor() == null || !stage.getFocussedActor().hasParent())
-            stage.setFocussedActor(proposeFocussedActor());
+        if (stage.getFocusedActor() == null || !stage.getFocusedActor().hasParent())
+            stage.setFocusedActor(proposeFocussedActor());
 
         if (!blockGroup.isAnimationDone()) {
             // die Intro-Sequenz läuft noch

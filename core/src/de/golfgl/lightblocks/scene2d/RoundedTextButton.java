@@ -37,7 +37,7 @@ public class RoundedTextButton extends TextButton implements ITouchActionButton 
     @Override
     public boolean isOver() {
         return super.isOver() || getStage() != null && getStage() instanceof ControllerMenuStage &&
-                ((ControllerMenuStage) getStage()).getFocussedActor() == this;
+                ((ControllerMenuStage) getStage()).getFocusedActor() == this;
     }
 
     @Override

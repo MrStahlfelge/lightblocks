@@ -55,7 +55,7 @@ public class ScoresGroup extends Group {
     }
 
     public float getPrefHeight() {
-        return (myScoresTable != null ? myScoresTable.getPrefHeight() : 
+        return (myScoresTable != null ? myScoresTable.getPrefHeight() :
                 new ScaledLabel("X", app.skin, SCALING).getPrefHeight() * 4);
     }
 
@@ -70,7 +70,7 @@ public class ScoresGroup extends Group {
             ScaledLabel scoreLabel = new ScaledLabel(String.valueOf(myBestScores.getScore()), app.skin, LightBlocksGame
                     .SKIN_FONT_BIG);
             scoreLabel.setAlignment(Align.right);
-            add(scoreLabel).right().minWidth(titleLabel.getPrefWidth() *.7f);
+            add(scoreLabel).right().minWidth(titleLabel.getPrefWidth() * .7f);
             row();
             add(new ScaledLabel(app.TEXTS.get("labelLines").toUpperCase(), app.skin, SCALING)).left();
             add(new ScaledLabel(String.valueOf(myBestScores.getClearedLines()), app.skin, LightBlocksGame

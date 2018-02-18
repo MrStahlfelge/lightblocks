@@ -24,7 +24,13 @@ public class BeginningLevelChooser extends Table {
 
     public BeginningLevelChooser(final LightBlocksGame app, int initValue, int maxValue) {
         beginningLevelLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        beginningLevelSlider = new TouchableSlider(0, maxValue, 1, false, app.skin);
+        beginningLevelSlider = new TouchableSlider(0, maxValue, 1, false, app.skin) {
+            @Override
+            public boolean onControllerDefaultKeyDown() {
+                BeginningLevelChooser.this.onControllerDefaultKeyDown();
+                return super.onControllerDefaultKeyDown();
+            }
+        };
 
         setValue(initValue);
 
@@ -41,6 +47,10 @@ public class BeginningLevelChooser extends Table {
         add(beginningLevelSlider).minHeight(30).minWidth(200).right().fill();
         // minWidth, damit sich verschieden breite Zahlen nicht durch Gewackel bemerkbar machen
         add(beginningLevelLabel).left().spaceLeft(10).minWidth(beginningLevelLabel.getPrefWidth() * 1.1f);
+    }
+
+    protected void onControllerDefaultKeyDown() {
+
     }
 
     public int getValue() {
