@@ -145,7 +145,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
             titleLabel = new Label[missions.size()];
             ratingLabel = new Label[missions.size()];
 
-            table.defaults().space(7, 15, 7, 15);
+            table.defaults().space(0, 5, 0, 5);
 
             for (Mission mission : missions) {
                 final String uid = mission.getUniqueId();
@@ -153,11 +153,10 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
                 String lblUid = Mission.getLabelUid(uid);
 
                 // In Scaled Label umbauen!
-                idxLabel[idx] = new Label(Integer.toString(idx), app.skin, LightBlocksGame.SKIN_FONT_BIG);
-                titleLabel[idx] = new Label(app.TEXTS.get(lblUid), app.skin, LightBlocksGame
-                        .SKIN_FONT_BIG);
-                ratingLabel[idx] = new Label("", app.skin, FontAwesome.SKIN_FONT_FA);
-                ratingLabel[idx].setFontScale(.5f);
+                idxLabel[idx] = new ScaledLabel(Integer.toString(idx), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+                titleLabel[idx] = new ScaledLabel(app.TEXTS.get(lblUid), app.skin, LightBlocksGame
+                        .SKIN_FONT_TITLE);
+                ratingLabel[idx] = new ScaledLabel("", app.skin, FontAwesome.SKIN_FONT_FA, .5f);
                 ratingLabel[idx].setAlignment(Align.center);
 
                 EventListener idxEvent = new EventListener() {

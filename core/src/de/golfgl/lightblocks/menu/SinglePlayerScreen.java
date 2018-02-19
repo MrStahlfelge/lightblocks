@@ -2,8 +2,10 @@ package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -11,6 +13,8 @@ import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
+import de.golfgl.lightblocks.scene2d.RoundedTextButton;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
@@ -59,6 +63,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
     @Override
     protected void fillMenuTable(Table menuTable) {
         modePager = new PagedScrollPane();
+        modePager.addPage(new IntroGroup());
         modePager.addPage(new MissionChooseGroup(this, app));
         modePager.addPage(new MarathonGroup(this, app));
         modePager.addListener(new ChangeListener() {
@@ -112,6 +117,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
 
     /**
      * called by game mode groups when screen switched to play screen
+     *
      * @param backToMainMenu if true, SingplePlayerScreen will get closed
      */
     public void gameStarted(boolean backToMainMenu) {
@@ -126,5 +132,64 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         Actor getConfiguredDefaultActor();
 
         String getGameModelId();
+    }
+
+    private class IntroGroup extends Table implements IGameModeGroup {
+        private final Button missionsButton;
+        private final Button marathonButton;
+
+        public IntroGroup() {
+            missionsButton = new RoundedTextButton(app.TEXTS.get("menuPlayMissionButton"), app.skin);
+            missionsButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    modePager.scrollToPage(1);
+                }
+            });
+            addFocusableActor(missionsButton);
+            marathonButton = new RoundedTextButton(app.TEXTS.get("labelMarathon"), app.skin);
+            marathonButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    modePager.scrollToPage(2);
+                }
+            });
+            addFocusableActor(marathonButton);
+
+            pad(0, 20, 0, 20);
+            row();
+            Label label1 = new ScaledLabel(app.TEXTS.get("introGameModels"), app.skin,
+                    app.SKIN_FONT_BIG, .85f);
+            label1.setWrap(true);
+            label1.setAlignment(Align.center);
+            add(label1).fill().expandX();
+
+            row().padTop(30);
+            add(missionsButton);
+            row();
+            label1 = new ScaledLabel(app.TEXTS.get("introModelMissions"), app.skin, app.SKIN_FONT_REG, .75f);
+            label1.setWrap(true);
+            label1.setAlignment(Align.center);
+            add(label1).fill();
+
+            row().padTop(30);
+            add(marathonButton);
+            row();
+            label1 = new ScaledLabel(app.TEXTS.get("introModelMarathon") + " " + app.TEXTS.get
+                    ("goalModelMarathon"), app.skin, app.SKIN_FONT_REG, .75f);
+            label1.setWrap(true);
+            label1.setAlignment(Align.center);
+            add(label1).fill();
+        }
+
+        @Override
+        public Actor getConfiguredDefaultActor() {
+            return missionsButton;
+        }
+
+        @Override
+        public String getGameModelId() {
+            return null;
+        }
     }
 }
