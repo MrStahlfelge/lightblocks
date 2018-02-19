@@ -163,12 +163,12 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
     }
 
     public float getScrollPage() {
-        return getScrollX() / getMaxX();
+        return getScrollX() / getWidth();
     }
 
     public float getVisualScrollPage() {
         // für PageIndicator
-        return getVisualScrollX() / getMaxX();
+        return getVisualScrollX() / getWidth();
     }
 
     @Override
