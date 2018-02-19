@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.scene2d;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -11,16 +12,19 @@ import com.badlogic.gdx.utils.Array;
 /**
  * Created by Benjamin Schulte on 02.02.2017.
  */
-public class MotivationLabel extends Label {
+public class MotivationLabel extends GlowLabel {
 
+    private static final float OPACITY = 1f;
     private final Group groupBox;
     private final Array<String> motivationTexts;
     private final Array<Float> motivationDuration;
 
     private boolean isActive;
 
-    public MotivationLabel(Skin skin, String styleName, Group groupBox) {
-        super("", skin, styleName);
+    public MotivationLabel(Skin skin, Group groupBox) {
+        super("", skin, .65f);
+        setGlowColor(Color.BLACK);
+        setGlowing(true);
 
         this.groupBox = groupBox;
 
@@ -57,7 +61,7 @@ public class MotivationLabel extends Label {
 
             groupBox.addActor(this);
 
-            getColor().a = .8f;
+            getColor().a = OPACITY;
             this.addAction(Actions.sequence(Actions.moveTo(0, BlockActor.blockWidth, .2f, Interpolation.circleOut),
                     Actions.moveBy(0, BlockActor.blockWidth, 1f),
                     Actions.delay(Math.max(duration - 1f, 0)),
@@ -83,7 +87,7 @@ public class MotivationLabel extends Label {
             motivationTexts.removeIndex(0);
             motivationDuration.removeIndex(0);
 
-            this.addAction(Actions.sequence(Actions.alpha(.8f, .2f, Interpolation.fade),
+            this.addAction(Actions.sequence(Actions.alpha(OPACITY, .2f, Interpolation.fade),
                     Actions.delay(duration),
                     Actions.fadeOut(.3f, Interpolation.fade),
                     Actions.run(new Runnable() {

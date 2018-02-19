@@ -153,7 +153,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         pauseDialog = new PauseDialog(app, this);
 
-        motivatorLabel = new MotivationLabel(app.skin, LightBlocksGame.SKIN_FONT_TITLE, labelGroup);
+        motivatorLabel = new MotivationLabel(app.skin, labelGroup);
 
         // hier wird eventuell auch schon die erste Tutorial-Meldung angezeigt. Alles, was nach diesem Aufruf
         // auf die Stage kommt, liegt vor dem OverlayWindow!

@@ -21,6 +21,7 @@ public class GlowLabel extends Label {
     protected final float baseScaling;
     private final Label glowLabel;
     private boolean isGlowing;
+    private Color glowColor;
 
     public GlowLabel(CharSequence text, Skin skin, float baseScaling) {
         super(text, skin, baseScaling > .65f ? SKIN_LABEL60BOLD : SKIN_LABEL40BOLD);
@@ -50,13 +51,15 @@ public class GlowLabel extends Label {
     }
 
     private void colorChanged() {
-        glowLabel.setColor(getColor().r, getColor().g, getColor().b, glowLabel.getColor().a);
+        Color glowLabelColor = (glowColor != null ? glowColor : getColor());
+
+        glowLabel.setColor(glowLabelColor.r, glowLabelColor.g, glowLabelColor.b, glowLabel.getColor().a);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         glowLabel.setPosition(getX(), getY());
-        glowLabel.draw(batch, parentAlpha);
+        glowLabel.draw(batch, parentAlpha * getColor().a);
         super.draw(batch, parentAlpha);
     }
 
@@ -144,5 +147,14 @@ public class GlowLabel extends Label {
     public void setWrap(boolean wrap) {
         glowLabel.setWrap(true);
         super.setWrap(wrap);
+    }
+
+    public Color getGlowColor() {
+        return glowColor;
+    }
+
+    public void setGlowColor(Color glowColor) {
+        this.glowColor = glowColor;
+        colorChanged();
     }
 }
