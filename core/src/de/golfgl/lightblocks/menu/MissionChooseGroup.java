@@ -94,6 +94,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
             }
 
             needsRefresh = true;
+            menuScreen.gameStarted(false);
         } catch (VetoException e) {
             new VetoDialog(e.getMessage(), app.skin, menuScreen.getAvailableContentWidth() * .75f).show(getStage());
         }
@@ -138,6 +139,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
             setActor(table);
 
             setFadeScrollBars(false);
+            setScrollingDisabled(true, false);
 
             idxLabel = new Label[missions.size()];
             titleLabel = new Label[missions.size()];

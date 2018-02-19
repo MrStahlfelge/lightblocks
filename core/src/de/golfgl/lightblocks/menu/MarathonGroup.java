@@ -21,6 +21,8 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  */
 
 public class MarathonGroup extends Table implements SinglePlayerScreen.IGameModeGroup {
+    private static final String PREF_KEY_INPUT = "inputType";
+    private static final String PREF_KEY_LEVEL = "beginningLevel";
     private SinglePlayerScreen menuScreen;
     private BeginningLevelChooser beginningLevelSlider;
     private InputButtonTable inputButtons;
@@ -34,7 +36,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
 
         Table params = new Table();
         beginningLevelSlider = new BeginningLevelChooser(app, app.prefs.getInteger
-                ("beginningLevel", 0), 9) {
+                (PREF_KEY_LEVEL, 0), 9) {
             @Override
             protected void onControllerDefaultKeyDown() {
                 ((MyStage) getStage()).setFocusedActor(playButton);
@@ -42,7 +44,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
         };
 
         // die möglichen Inputs aufzählen
-        inputButtons = new InputButtonTable(app, app.prefs.getInteger("inputType", 0)) {
+        inputButtons = new InputButtonTable(app, app.prefs.getInteger(PREF_KEY_INPUT, 0)) {
             @Override
             public boolean onControllerDefaultKeyDown() {
                 ((MyStage) getStage()).setFocusedActor(playButton);
@@ -124,14 +126,14 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
         initGameParametersParams.setInputKey(inputButtons.getSelectedInput());
 
         // Einstellungen speichern
-        app.prefs.putInteger("inputType", inputButtons.getSelectedInput());
-        app.prefs.putInteger("beginningLevel", initGameParametersParams
+        app.prefs.putInteger(PREF_KEY_INPUT, inputButtons.getSelectedInput());
+        app.prefs.putInteger(PREF_KEY_LEVEL, initGameParametersParams
                 .getBeginningLevel());
         app.prefs.flush();
 
         try {
             PlayScreen.gotoPlayScreen((AbstractScreen) app.getScreen(), initGameParametersParams);
-            menuScreen.hideImmediately();
+            menuScreen.gameStarted(true);
         } catch (VetoException e) {
             new VetoDialog(e.getMessage(), app.skin, menuScreen.getAvailableContentWidth() * .75f).show(getStage());
         }
