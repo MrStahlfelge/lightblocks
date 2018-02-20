@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.utils.Align;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.InfoButton;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
@@ -104,13 +106,13 @@ public class AboutScreen extends AbstractMenuDialog {
         menuTable.row().padTop(10);
         menuTable.add(getWrapLabel(app.TEXTS.get("labelContributors2"))).fill();
         menuTable.row().padTop(5);
-        menuTable.add(new InfoButton("libGDX", app.TEXTS.get("labelLibgdx"), "http://github.com/libgdx/")).fill();
+        menuTable.add(new ThisInfoButton("libGDX", app.TEXTS.get("labelLibgdx"), "http://github.com/libgdx/")).fill();
         menuTable.row().padTop(5);
-        menuTable.add(new InfoButton("Ray3k", app.TEXTS.get("labelRay3k"), "https://ray3k.wordpress.com/")).fill();
+        menuTable.add(new ThisInfoButton("Ray3k", app.TEXTS.get("labelRay3k"), "https://ray3k.wordpress.com/")).fill();
         menuTable.row().padTop(5);
-        menuTable.add(new InfoButton("Sounds", app.TEXTS.get("labelSounds"), "http://freesound.org/")).fill();
+        menuTable.add(new ThisInfoButton("Sounds", app.TEXTS.get("labelSounds"), "http://freesound.org/")).fill();
         menuTable.row().padTop(5);
-        menuTable.add(new InfoButton(app.TEXTS.get("labelMusic"), app.TEXTS.get("labelMusicDesc"),
+        menuTable.add(new ThisInfoButton(app.TEXTS.get("labelMusic"), app.TEXTS.get("labelMusicDesc"),
                 "https://www.youtube.com/watch?v=QDNHYF0Hp4U")).fill();
     }
 
@@ -158,42 +160,16 @@ public class AboutScreen extends AbstractMenuDialog {
         }
     }
 
-    private class InfoButton extends RoundedTextButton {
-        private final Label descLabel;
-
-        InfoButton(String title, String description, final String url) {
-
-            super(title, app.skin);
-
-            row();
-            descLabel = getWrapLabel(description);
-            add(descLabel).fill().expandX().pad(10);
-
+    private class ThisInfoButton extends InfoButton {
+        public ThisInfoButton(String title, String description, final String url) {
+            super(title, description, app.skin);
+            addFocusableActor(this);
             addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     Gdx.net.openURI(url);
                 }
             });
-            addFocusableActor(this);
         }
-
-        @Override
-        public void draw(Batch batch, float parentAlpha) {
-            if (isPressed()) {
-                descLabel.setColor(Color.BLACK);
-            } else {
-                descLabel.setColor(Color.WHITE);
-            }
-
-            super.draw(batch, parentAlpha);
-        }
-
-        @Override
-        public boolean isOver() {
-            return super.isOver() || getStage() != null && getStage() instanceof ControllerMenuStage &&
-                    ((ControllerMenuStage) getStage()).getFocusedActor() == this;
-        }
-
     }
 }

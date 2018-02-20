@@ -11,9 +11,9 @@ import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.InfoButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
-import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
@@ -139,7 +139,8 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         private final Button marathonButton;
 
         public IntroGroup() {
-            missionsButton = new RoundedTextButton(app.TEXTS.get("menuPlayMissionButton"), app.skin);
+            missionsButton = new InfoButton(app.TEXTS.get("menuPlayMissionButton"),
+                    app.TEXTS.get("introModelMissions"), app.skin);
             missionsButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -147,7 +148,9 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
                 }
             });
             addFocusableActor(missionsButton);
-            marathonButton = new RoundedTextButton(app.TEXTS.get("labelMarathon"), app.skin);
+            marathonButton = new InfoButton(app.TEXTS.get("labelMarathon"),
+                    app.TEXTS.get("introModelMarathon") + " " + app.TEXTS.get("goalModelMarathon"),
+                    app.skin);
             marathonButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -165,21 +168,10 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
             add(label1).fill().expandX();
 
             row().padTop(30);
-            add(missionsButton);
-            row();
-            label1 = new ScaledLabel(app.TEXTS.get("introModelMissions"), app.skin, app.SKIN_FONT_REG, .75f);
-            label1.setWrap(true);
-            label1.setAlignment(Align.center);
-            add(label1).fill();
+            add(missionsButton).fill();
 
             row().padTop(30);
-            add(marathonButton);
-            row();
-            label1 = new ScaledLabel(app.TEXTS.get("introModelMarathon") + " " + app.TEXTS.get
-                    ("goalModelMarathon"), app.skin, app.SKIN_FONT_REG, .75f);
-            label1.setWrap(true);
-            label1.setAlignment(Align.center);
-            add(label1).fill();
+            add(marathonButton).fill();
         }
 
         @Override
