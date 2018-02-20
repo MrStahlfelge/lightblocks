@@ -1,12 +1,19 @@
 package de.golfgl.lightblocks.scene2d;
 
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 
@@ -17,6 +24,7 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
     private boolean wasPanDragFling = false;
 
     private Table content;
+    private float cellSpacing;
     private boolean sizeChanged;
     private Array<T> pages;
 
@@ -43,7 +51,7 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
 
     protected void setup() {
         content = new Table();
-        content.defaults().space(50);
+        setPageSpacing(50);
         pages = new Array<T>();
         setActor(content);
         setScrollingDisabled(false, true);
@@ -90,14 +98,17 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
         }
     }
 
+    public float getPageSpacing() {
+        return cellSpacing;
+    }
+
     public void setPageSpacing(float pageSpacing) {
-        if (content != null) {
-            content.defaults().space(pageSpacing);
-            for (Cell cell : content.getCells()) {
-                cell.space(pageSpacing);
-            }
-            content.invalidate();
+        cellSpacing = pageSpacing;
+        content.defaults().space(pageSpacing);
+        for (Cell cell : content.getCells()) {
+            cell.space(pageSpacing);
         }
+        content.invalidate();
     }
 
     private void positionToCurrentPage(boolean fireEvent) {
@@ -138,6 +149,17 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
         sizeChanged = false;
     }
 
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        Drawable hKnob = getStyle().hScrollKnob;
+        Drawable hBar = getStyle().hScroll;
+        getStyle().hScrollKnob = null;
+        getStyle().hScroll = null;
+        super.draw(batch, parentAlpha);
+        getStyle().hScrollKnob = hKnob;
+        getStyle().hScroll = hBar;
+    }
+
     public boolean scrollToPage(T actor) {
         if (!pages.contains(actor, true))
             return false;
@@ -163,17 +185,18 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
     }
 
     public float getScrollPage() {
-        return getScrollX() / getWidth();
+        return getScrollX() / (getWidth() + getPageSpacing());
     }
 
     public float getVisualScrollPage() {
         // für PageIndicator
-        return getVisualScrollX() / getWidth();
+        return getVisualScrollX() / (getWidth() + getPageSpacing());
     }
 
     @Override
     protected float getScrollAmount() {
-        return getWidth() / getMouseWheelX();
+        // scroll a whole page
+        return (getWidth() + getPageSpacing()) / getMouseWheelX();
     }
 
     @Override
@@ -183,5 +206,83 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
             positionToCurrentPage(true);
         //TODO auch den Fokus in die neue Page versetzen
         return handled;
+    }
+
+    public PageIndicator getPageIndicator() {
+        return new PageIndicator();
+    }
+
+    public class PageIndicator extends Widget {
+        public static final int transitionFade = 1;
+        public static final int transitionMove = 0;
+        final private Drawable pageIndicator;
+        final private Drawable positionIndicator;
+        private boolean fadeStyle;
+
+        public PageIndicator() {
+            pageIndicator = getStyle().hScroll;
+            positionIndicator = getStyle().hScrollKnob;
+            this.setTouchable(Touchable.enabled);
+            addListener(new InputListener() {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    scrollToPage(MathUtils.floor(x * pages.size / getWidth()));
+                    return true;
+                }
+            });
+        }
+
+        public PageIndicator setTransitionStyle(int transitionStyle) {
+            this.fadeStyle = (transitionStyle == transitionFade);
+            return this;
+        }
+
+        @Override
+        public float getPrefWidth() {
+            return Math.max(getStyle().hScrollKnob.getMinWidth(),
+                    getStyle().hScroll.getMinWidth()) * pages.size;
+        }
+
+        @Override
+        public float getPrefHeight() {
+            return Math.max(getStyle().hScrollKnob.getMinHeight(), getStyle().hScroll.getMinHeight());
+        }
+
+        @Override
+        public void draw(Batch batch, float parentAlpha) {
+            super.draw(batch, parentAlpha);
+            Color color = getColor();
+            batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
+            //draw the page indicators
+            float width = getWidth() / pages.size;
+
+            float offsetX = getX() + (width - pageIndicator.getMinWidth()) / 2;
+            float offsetY = getY() + (getHeight() - pageIndicator.getMinHeight()) / 2;
+            for (int i = 0; i < pages.size; i++) {
+                pageIndicator.draw(batch, width * i + offsetX, offsetY,
+                        pageIndicator.getMinWidth(), pageIndicator.getMinHeight());
+            }
+
+            offsetX = getX() + (width - positionIndicator.getMinWidth()) / 2;
+            offsetY = getY() + (getHeight() - positionIndicator.getMinWidth()) / 2;
+            float visualScrollPage = getVisualScrollPage();
+            if (fadeStyle) {
+                int pos1 = MathUtils.floor(visualScrollPage);
+                int pos2 = MathUtils.ceil(visualScrollPage);
+
+                if (pos1 >= 0) {
+                    batch.setColor(color.r, color.g, color.b, color.a * parentAlpha * (1 - visualScrollPage + pos1));
+                    positionIndicator.draw(batch, pos1 * width + offsetX, offsetY,
+                            positionIndicator.getMinWidth(), positionIndicator.getMinHeight());
+                }
+                if (pos2 > pos1 && pos2 < pages.size) {
+                    batch.setColor(color.r, color.g, color.b, color.a * parentAlpha * (visualScrollPage - pos1));
+                    positionIndicator.draw(batch, pos2 * width + offsetX, offsetY,
+                            positionIndicator.getMinWidth(), positionIndicator.getMinHeight());
+                }
+            } else
+                positionIndicator.draw(batch, width * visualScrollPage + offsetX, offsetY,
+                        positionIndicator.getMinWidth(), positionIndicator.getMinHeight());
+        }
     }
 }

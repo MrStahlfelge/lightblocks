@@ -146,6 +146,10 @@ com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
 		hScrollKnob: scroll-horizontal
 		vScrollKnob: scroll-vertical
 	}
+	pager: {
+		hScroll: radio
+		hScrollKnob: radio-over
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
 	default-horizontal: {

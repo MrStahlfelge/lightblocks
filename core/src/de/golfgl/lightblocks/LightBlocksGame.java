@@ -57,6 +57,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String SKIN_WINDOW_FRAMELESS = "frameless";
     public static final String SKIN_BUTTON_ROUND = "round";
     public static final String SKIN_BUTTON_FAROUND = "round-fa";
+    public static final String STYLE_PAGER = "pager";
     public static final float LABEL_SCALING = .65f;
     public static final float ICON_SCALE_MENU = 1f;
 
