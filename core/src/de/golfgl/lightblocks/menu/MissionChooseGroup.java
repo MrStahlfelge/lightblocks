@@ -2,8 +2,6 @@ package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -11,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 import java.util.List;
@@ -159,22 +158,10 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
                 ratingLabel[idx] = new ScaledLabel("", app.skin, FontAwesome.SKIN_FONT_FA, .5f);
                 ratingLabel[idx].setAlignment(Align.center);
 
-                EventListener idxEvent = new EventListener() {
+                ClickListener idxEvent = new ClickListener() {
                     @Override
-                    public boolean handle(Event event) {
-                        if (event instanceof InputEvent) {
-                            switch (((InputEvent) event).getType()) {
-                                case touchUp:
-                                    missionsTable.setSelectedIndex(idx);
-                                case touchDown:
-                                    // damit touchUp gesendet wird auch touchDown annehmen
-                                    return true;
-                                default:
-                                    return false;
-                            }
-                        }
-
-                        return false;
+                    public void clicked(InputEvent event, float x, float y) {
+                        missionsTable.setSelectedIndex(idx);
                     }
                 };
 
