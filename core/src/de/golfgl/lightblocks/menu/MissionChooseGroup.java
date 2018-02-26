@@ -105,11 +105,13 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
         super.act(delta);
         if (needsRefresh) {
             needsRefresh = false;
-            missionsTable.refreshMenuTable(missionsTable.getSelectedIndex() < 0);
-// hier wird nicht richtig gescrollt, und Tastaturbedienbarkeit geht auch gar nicht
+            int currentSelected = missionsTable.getSelectedIndex();
+            missionsTable.refreshMenuTable(currentSelected < 0 ||
+                    currentSelected == missionsTable.getLastPossible());
             menuScreen.validate();
             missionsTable.scrollToSelected();
             missionsTable.updateVisualScroll();
+            scoresGroup.show(getGameModelId());
         }
     }
 
@@ -131,6 +133,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
         private Label[] ratingLabel;
         private Table table;
         private int selectedIndex = -1;
+        private int lastPossible;
 
         public MissionsTable() {
             super(null, app.skin);
@@ -151,7 +154,6 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
                 final int idx = mission.getIndex();
                 String lblUid = Mission.getLabelUid(uid);
 
-                // In Scaled Label umbauen!
                 idxLabel[idx] = new ScaledLabel(Integer.toString(idx), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
                 titleLabel[idx] = new ScaledLabel(app.TEXTS.get(lblUid), app.skin, LightBlocksGame
                         .SKIN_FONT_TITLE);
@@ -179,7 +181,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
         public void refreshMenuTable(boolean selectLastPossible) {
             boolean isAncestorDone = true;
-            int lastPossible = 0;
+            lastPossible = 0;
 
             for (int idx = 0; idx < getMissionNum(); idx++) {
 
@@ -287,6 +289,10 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
                     ratingLabel[selectedIndex].getColor()));
             idxLabel[selectedIndex].addAction(MyStage.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR,
                     ratingLabel[selectedIndex].getColor()));
+        }
+
+        public int getLastPossible() {
+            return lastPossible;
         }
     }
 }

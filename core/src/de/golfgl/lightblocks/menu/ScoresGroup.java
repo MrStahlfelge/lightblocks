@@ -20,15 +20,22 @@ public class ScoresGroup extends Group {
     private final LightBlocksGame app;
     private String gameModelId;
     private BestScore myBestScores;
-    private Table myScoresTable;
+    private MyBestScoreTable myScoresTable;
 
     public ScoresGroup(LightBlocksGame app) {
         this.app = app;
     }
 
     public void show(String gameModelId) {
-        if (gameModelId.equals(this.gameModelId))
+        myBestScores = app.savegame.getBestScore(gameModelId);
+
+        if (gameModelId.equals(this.gameModelId)) {
+            // nur ein Refresh der angezeigten Daten durchführen
+            if (myScoresTable != null)
+                myScoresTable.refreshLabels();
             return;
+        }
+
         this.gameModelId = gameModelId;
 
         if (myScoresTable != null) {
@@ -42,7 +49,6 @@ public class ScoresGroup extends Group {
             myScoresTable = null;
         }
 
-        myBestScores = app.savegame.getBestScore(gameModelId);
         if (myBestScores.getScore() > 0 || myBestScores.getClearedLines() > 0) {
             myScoresTable = new MyBestScoreTable();
             addActor(myScoresTable);
@@ -60,6 +66,10 @@ public class ScoresGroup extends Group {
     }
 
     private class MyBestScoreTable extends Table {
+        private final ScaledLabel scoreLabel;
+        private final ScaledLabel linesLabel;
+        private final ScaledLabel drawnBlocksLabel;
+
         public MyBestScoreTable() {
             row();
             ScaledLabel titleLabel = new ScaledLabel(app.TEXTS.get("labelYourBest").toUpperCase(), app.skin,
@@ -67,18 +77,25 @@ public class ScoresGroup extends Group {
             add(titleLabel).colspan(2);
             row();
             add(new ScaledLabel(app.TEXTS.get("labelScore").toUpperCase(), app.skin, SCALING)).left();
-            ScaledLabel scoreLabel = new ScaledLabel(String.valueOf(myBestScores.getScore()), app.skin, LightBlocksGame
-                    .SKIN_FONT_BIG);
+            scoreLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
             scoreLabel.setAlignment(Align.right);
             add(scoreLabel).right().minWidth(titleLabel.getPrefWidth() * .7f);
             row();
             add(new ScaledLabel(app.TEXTS.get("labelLines").toUpperCase(), app.skin, SCALING)).left();
-            add(new ScaledLabel(String.valueOf(myBestScores.getClearedLines()), app.skin, LightBlocksGame
-                    .SKIN_FONT_BIG)).right();
+            linesLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
+            add(linesLabel).right();
             row();
             add(new ScaledLabel(app.TEXTS.get("labelBlocks").toUpperCase(), app.skin, SCALING)).left();
-            add(new ScaledLabel(String.valueOf(myBestScores.getDrawnTetrominos()), app.skin, LightBlocksGame
-                    .SKIN_FONT_BIG, SCALING)).right();
+            drawnBlocksLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_BIG, SCALING);
+            add(drawnBlocksLabel).right();
+
+            refreshLabels();
+        }
+
+        public void refreshLabels() {
+            scoreLabel.setText(String.valueOf(myBestScores.getScore()));
+            linesLabel.setText(String.valueOf(myBestScores.getClearedLines()));
+            drawnBlocksLabel.setText(String.valueOf(myBestScores.getDrawnTetrominos()));
         }
     }
 }
