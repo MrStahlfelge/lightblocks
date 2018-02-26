@@ -25,7 +25,7 @@ public class OverlayMessage extends Dialog {
 
         setModal(false);
 
-        messageLabel = new Label("", skin, LightBlocksGame.SKIN_FONT_BIG);
+        messageLabel = new ScaledLabel("", skin, LightBlocksGame.SKIN_FONT_TITLE);
         messageLabel.setWrap(true);
         messageLabel.setAlignment(Align.center);
 

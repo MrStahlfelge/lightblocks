@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.MusicButton;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
 
@@ -34,18 +35,18 @@ public class PauseDialog extends Dialog {
 
         table.defaults();
         table.row();
-        titleLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        titleLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .8f);
         table.add(titleLabel).pad(20, 20, 10, 20);
 
         table.row();
-        textLabel = new Label("", app.skin);
+        textLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_BIG, .75f);
         textLabel.setWrap(true);
         textLabel.setAlignment(Align.center);
         table.add(textLabel).prefWidth
                 (LightBlocksGame.nativeGameWidth * .75f).pad(10);
 
         table.row();
-        inputMsgLabel = new Label("", app.skin);
+        inputMsgLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_BIG, .85f);
         inputMsgLabel.setWrap(true);
         inputMsgLabel.setAlignment(Align.center);
         table.add(inputMsgLabel).prefWidth
