@@ -1,6 +1,5 @@
 package de.golfgl.lightblocks.menu;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -43,12 +42,8 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
     protected void fillButtonTable(Table buttons) {
         super.fillButtonTable(buttons);
 
-        // TODO Kommt wieder raus, wenn ich weiß was cooler ist :-)
-        if (MathUtils.randomBoolean())
-            buttons.add(modePager.getPageIndicator());
-        else
-            buttons.add(modePager.getPageIndicator()
-                    .setTransitionStyle(PagedScrollPane.PageIndicator.transitionFade)).fill();
+        buttons.add(modePager.getPageIndicator()
+                .setTransitionStyle(PagedScrollPane.PageIndicator.transitionFade)).fill();
 
         leaderboardButton = new FaButton(FontAwesome.GPGS_LEADERBOARD, app.skin);
         leaderboardButton.addListener(new ChangeListener() {
