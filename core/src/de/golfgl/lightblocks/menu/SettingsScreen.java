@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.utils.Scaling;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
@@ -29,7 +31,7 @@ import de.golfgl.lightblocks.screen.PlayScreenInput;
  * Created by Benjamin Schulte on 21.02.2017.
  */
 
-public class SettingsScreen extends AbstractMenuScreen {
+public class SettingsScreen extends AbstractMenuDialog {
 
     PlayGesturesInput pgi;
     Group touchPanel;
@@ -37,11 +39,8 @@ public class SettingsScreen extends AbstractMenuScreen {
     private Slider gridIntensitySlider;
     private Image gridPreview;
 
-    public SettingsScreen(final LightBlocksGame app) {
-        super(app);
-
-        initializeUI();
-
+    public SettingsScreen(final LightBlocksGame app, Actor toHide) {
+        super(app, toHide);
     }
 
     @Override
@@ -93,8 +92,7 @@ public class SettingsScreen extends AbstractMenuScreen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 GamepadConfigDialog gpc = new GamepadConfigDialog(app);
-
-                gpc.show(stage);
+                gpc.show(getStage());
             }
         });
 
@@ -164,7 +162,7 @@ public class SettingsScreen extends AbstractMenuScreen {
 
         if (touchPanel != null && touchPanel.hasParent())
             touchPanel.remove();
-        touchPanel = pgi.initializeTouchPanel(SettingsScreen.this,
+        touchPanel = pgi.initializeTouchPanel((AbstractScreen) app.getScreen(),
                 (int) touchPanelSizeSlider.getValue());
         touchPanel.setVisible(true);
         touchPanel.setTouchable(Touchable.disabled);
@@ -172,18 +170,12 @@ public class SettingsScreen extends AbstractMenuScreen {
         Vector2 position = new Vector2(0, 0);
         position = touchPanelSizeSlider.localToStageCoordinates(position);
 
-        touchPanel.setPosition(stage.getWidth() / 2, position.y - 30);
+        touchPanel.setPosition(getWidth() / 2, position.y - 30);
         Color c = pgi.rotateRightColor;
         c.a = 1;
         pgi.setTouchPanelColor(c);
         touchPanel.addAction(Actions.sequence(Actions.delay(1f), Actions.fadeOut(1f, Interpolation.fade),
                 Actions.removeActor()));
-    }
-
-    @Override
-    protected void goBackToMenu() {
-        flushChanges();
-        super.goBackToMenu();
     }
 
     /**
@@ -195,8 +187,15 @@ public class SettingsScreen extends AbstractMenuScreen {
     }
 
     @Override
-    public void pause() {
+    protected boolean isScrolling() {
+        return true;
+    }
+
+    @Override
+    public void hide(Action action) {
+        if (touchPanel != null && touchPanel.hasParent())
+            touchPanel.remove();
         flushChanges();
-        super.pause();
+        super.hide(action);
     }
 }

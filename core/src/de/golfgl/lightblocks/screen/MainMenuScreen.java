@@ -206,7 +206,7 @@ public class MainMenuScreen extends AbstractScreen {
         Button settingsButton = new FaButton(FontAwesome.SETTINGS_GEAR, app.skin);
         settingsButton.addListener(new ChangeListener() {
                                        public void changed(ChangeEvent event, Actor actor) {
-                                           app.setScreen(new SettingsScreen(app));
+                                           new SettingsScreen(app, mainGroup).show(stage);
                                        }
                                    }
         );
