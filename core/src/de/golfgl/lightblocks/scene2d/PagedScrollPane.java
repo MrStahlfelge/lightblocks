@@ -204,7 +204,6 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
         boolean handled = super.onControllerScroll(direction);
         if (handled)
             positionToCurrentPage(true);
-        //TODO auch den Fokus in die neue Page versetzen
         return handled;
     }
 

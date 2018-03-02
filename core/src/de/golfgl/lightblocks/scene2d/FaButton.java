@@ -10,6 +10,6 @@ import de.golfgl.lightblocks.LightBlocksGame;
 
 public class FaButton extends GlowLabelButton {
     public FaButton(String fatext, Skin skin) {
-        super(fatext, "", skin, LightBlocksGame.ICON_SCALE_MENU);
+        super(fatext.length() > 0 ? fatext : ".", "", skin, LightBlocksGame.ICON_SCALE_MENU);
     }
 }

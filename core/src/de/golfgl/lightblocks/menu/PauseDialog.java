@@ -10,7 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.menu.MusicButton;
+import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -53,22 +54,24 @@ public class PauseDialog extends Dialog {
                 (LightBlocksGame.nativeGameWidth * .75f).pad(10, 10, 30, 10);
 
         getButtonTable();
-        getButtonTable().defaults().uniform().padBottom(20).fill();
-        button(new TextButton(FontAwesome.MISC_CROSS, app.skin, FontAwesome.SKIN_FONT_FA),
+        getButtonTable().defaults().uniform().padBottom(20).minWidth(80).fill();
+        button(new FaButton(FontAwesome.MISC_CROSS, app.skin),
                 new Runnable() {
                     @Override
                     public void run() {
                         playScreen.goBackToMenu();
                     }
                 });
-        button(new TextButton("?", app.skin, LightBlocksGame.SKIN_FONT_BIG),
+        button(new GlowLabelButton("", "?", app.skin, GlowLabelButton.SMALL_SCALE_MENU),
                 new Runnable() {
                     @Override
                     public void run() {
                         playScreen.showInputHelp();
                     }
                 });
-        button(new MusicButton(app, null));
+        FaButton musicButton = new FaButton("", app.skin);
+        musicButton.addListener(new MusicButtonListener(app, false, musicButton));
+        button(musicButton);
 //        button(new TextButton(FontAwesome.BIG_FORWARD, app.skin, FontAwesome.SKIN_FONT_FA),
 //                new Runnable() {
 //                    @Override

@@ -14,13 +14,14 @@ import com.badlogic.gdx.utils.Align;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.ITouchActionButton;
+import de.golfgl.lightblocks.menu.MusicButtonListener;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
  * Created by Benjamin Schulte on 13.01.2018.
  */
 
-public class GlowLabelButton extends Button implements ITouchActionButton {
+public class GlowLabelButton extends Button implements ITouchActionButton, MusicButtonListener.IMusicButton {
     public static final float SMALL_SCALE_MENU = .9f;
     public static final float FONT_SCALE_MENU = .6f;
     private final float smallScaleFactor;
@@ -73,7 +74,8 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
             faCell = add(faLabel).padRight(5).padLeft(5).width(faLabel.getPrefWidth()).height(faLabel.getPrefHeight());
             labelGroup.setAlignment(Align.left);
         }
-        add(labelGroup).expand();
+        add(labelGroup);
+        setLabelExpansion();
 
         highlighted = true;
         isFirstAct = true;
@@ -196,7 +198,12 @@ public class GlowLabelButton extends Button implements ITouchActionButton {
 
     public void setText(String text) {
         labelGroup.setText(text);
+        setLabelExpansion();
         setFaLabelAlignment();
+    }
+
+    protected void setLabelExpansion() {
+        getCell(labelGroup).expand(labelGroup.getText().length() > 0, true);
     }
 
     public void setFaText(String text) {

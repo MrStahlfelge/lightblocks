@@ -5,16 +5,18 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.ITouchActionButton;
+import de.golfgl.lightblocks.menu.MusicButtonListener;
 
 /**
  * Created by Benjamin Schulte on 30.01.2018.
  */
 
-public class RoundedTextButton extends TextButton implements ITouchActionButton {
+public class RoundedTextButton extends TextButton implements ITouchActionButton, MusicButtonListener.IMusicButton {
     Action colorAction;
     private ScaledLabel textLabel;
 
@@ -28,10 +30,11 @@ public class RoundedTextButton extends TextButton implements ITouchActionButton 
         super(faText, skin, LightBlocksGame.SKIN_BUTTON_FAROUND);
 
         getLabel().setFontScale(LightBlocksGame.LABEL_SCALING);
-        getLabelCell().expand(true, false).pad(0, 5, 0, 5);
+        getLabel().setAlignment(Align.right);
+        getLabelCell().pad(0, 5, 0, 5);
 
         textLabel = new ScaledLabel(text, skin, LightBlocksGame.SKIN_FONT_TITLE);
-        add(textLabel);
+        add(textLabel).expand().fill();
     }
 
     @Override
@@ -64,14 +67,28 @@ public class RoundedTextButton extends TextButton implements ITouchActionButton 
     public void draw(Batch batch, float parentAlpha) {
         Color oldColor = getStyle().fontColor;
         Color oldColor2 = null;
-        getStyle().fontColor = getColor();
         if (textLabel != null) {
             oldColor2 = textLabel.getStyle().fontColor;
             textLabel.getStyle().fontColor = isPressed() ? getStyle().downFontColor : getColor();
         }
+        getStyle().fontColor = getColor();
         super.draw(batch, parentAlpha);
         getStyle().fontColor = oldColor;
-        if (textLabel != null && oldColor2 != null)
+        if (textLabel != null)
             textLabel.getStyle().fontColor = oldColor2;
+    }
+
+    @Override
+    public void setFaText(String text) {
+        if (textLabel != null)
+            super.setText(text);
+    }
+
+    @Override
+    public void setText(String text) {
+        if (textLabel != null)
+            textLabel.setText(text);
+        else
+            super.setText(text);
     }
 }
