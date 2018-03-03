@@ -56,6 +56,7 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
         setActor(content);
         setScrollingDisabled(false, true);
         setOverscroll(true, false);
+        setFlingTime(.5f);
     }
 
     public void addPages(T... pages) {
