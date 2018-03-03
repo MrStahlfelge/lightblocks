@@ -19,7 +19,7 @@ import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
-import de.golfgl.lightblocks.scene2d.FATextButton;
+import de.golfgl.lightblocks.scene2d.OldFATextButton;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.MultiplayerPlayScreen;
@@ -38,9 +38,9 @@ import de.golfgl.lightblocks.state.MultiplayerMatch;
 public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomListener {
 
     protected Dialog waitForConnectionOverlay;
-    private FATextButton openRoomButton;
-    private FATextButton joinRoomButton;
-    private FATextButton startGameButton;
+    private OldFATextButton openRoomButton;
+    private OldFATextButton joinRoomButton;
+    private OldFATextButton startGameButton;
     private BeginningLevelChooser beginningLevelSlider;
     private InputButtonTable inputButtonTable;
     private Table initGameScreen;
@@ -54,8 +54,8 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
     private Cell initScreenGpgButtonCell;
     private Table lanButtons;
     private Table gpgButtons;
-    private FATextButton gpgShowInvitationsButton;
-    private FATextButton gpgInviteButton;
+    private OldFATextButton gpgShowInvitationsButton;
+    private OldFATextButton gpgInviteButton;
     private Button shareAppButton;
 
     public MultiplayerMenuScreen(LightBlocksGame app) {
@@ -107,7 +107,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
 
         // Die folgenden Elemente sind nicht in der Buttontable, aber die Initialisierung hier macht Sinn
 
-        startGameButton = new FATextButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
+        startGameButton = new OldFATextButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
         startGameButton.addListener(new ChangeListener() {
                                         public void changed(ChangeEvent event, Actor actor) {
                                             try {
@@ -168,7 +168,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         gpgHelp.setWrap(true);
 
         gpgButtons = new Table();
-        gpgInviteButton = new FATextButton(FontAwesome.GPGS_LOGO, app.TEXTS.get
+        gpgInviteButton = new OldFATextButton(FontAwesome.GPGS_LOGO, app.TEXTS.get
                 ("menuInvitePlayers"), app.skin);
         gpgInviteButton.addListener(new ChangeListener() {
             @Override
@@ -185,7 +185,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         });
         gpgButtons.add(gpgInviteButton);
 
-        gpgShowInvitationsButton = new FATextButton(FontAwesome.NET_LOGIN, app.TEXTS.get
+        gpgShowInvitationsButton = new OldFATextButton(FontAwesome.NET_LOGIN, app.TEXTS.get
                 ("menuShowInvitations"), app.skin);
         gpgShowInvitationsButton.addListener(new ChangeListener() {
             @Override
@@ -198,7 +198,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
         gpgButtons.add(gpgShowInvitationsButton);
 
         lanButtons = new Table();
-        openRoomButton = new FATextButton(FontAwesome.NET_SQUARELINK, app.TEXTS.get("labelMultiplayerOpenRoom"), app
+        openRoomButton = new OldFATextButton(FontAwesome.NET_SQUARELINK, app.TEXTS.get("labelMultiplayerOpenRoom"), app
                 .skin);
         openRoomButton.addListener(new ChangeListener() {
             @Override
@@ -206,7 +206,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
                 buttonOpenLocalRoomPressed();
             }
         });
-        joinRoomButton = new FATextButton(FontAwesome.NET_LOGIN, app.TEXTS.get("labelMultiplayerJoinRoom"), app.skin);
+        joinRoomButton = new OldFATextButton(FontAwesome.NET_LOGIN, app.TEXTS.get("labelMultiplayerJoinRoom"), app.skin);
         joinRoomButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

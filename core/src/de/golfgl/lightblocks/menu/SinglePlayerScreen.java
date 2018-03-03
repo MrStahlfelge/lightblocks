@@ -65,7 +65,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
 
     @Override
     protected void fillMenuTable(Table menuTable) {
-        modePager = new PagedScrollPane(app.skin, LightBlocksGame.STYLE_PAGER);
+        modePager = new PagedScrollPane(app.skin, LightBlocksGame.SKIN_STYLE_PAGER);
         modePager.addPage(new IntroGroup());
         modePager.addPage(new MissionChooseGroup(this, app));
         modePager.addPage(new MarathonGroup(this, app));

@@ -20,6 +20,8 @@ import com.badlogic.gdx.utils.Scaling;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
+import de.golfgl.lightblocks.scene2d.FaCheckbox;
+import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -49,7 +51,7 @@ public class SettingsScreen extends AbstractMenuDialog {
     protected void fillMenuTable(Table menuTable) {
         generalGroup = new GeneralSettings();
 
-        groupPager = new PagedScrollPane(app.skin, LightBlocksGame.STYLE_PAGER);
+        groupPager = new PagedScrollPane(app.skin, LightBlocksGame.SKIN_STYLE_PAGER);
         groupPager.addPage(generalGroup);
         gesturesGroup = new GestureSettings();
         groupPager.addPage(gesturesGroup);
@@ -58,7 +60,8 @@ public class SettingsScreen extends AbstractMenuDialog {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (actor == groupPager)
-                    ((ISettingsGroup) groupPager.getCurrentPage()).getDefaultActor();
+                    ((MyStage) getStage()).setFocusedActor(((ISettingsGroup) groupPager.getCurrentPage())
+                            .getDefaultActor());
 
             }
         });
@@ -143,6 +146,9 @@ public class SettingsScreen extends AbstractMenuDialog {
             defaults().expandY();
 
             row();
+            add(new ScaledLabel(app.TEXTS.get("menuGeneral"), app.skin, app.SKIN_FONT_TITLE, .8f)).top();
+
+            row();
             add(menuMusicButton);
 
             row();
@@ -177,13 +183,13 @@ public class SettingsScreen extends AbstractMenuDialog {
     }
 
     private class GestureSettings extends Table implements ISettingsGroup {
+        private final Button touchPanelButton;
         PlayGesturesInput pgi;
         Group touchPanel;
         private Slider touchPanelSizeSlider;
 
         public GestureSettings() {
-            final Button touchPanelButton = new TextButton(PlayScreenInput.getInputFAIcon(1), app.skin, FontAwesome
-                    .SKIN_FONT_FA + "-checked");
+            touchPanelButton = new FaCheckbox(app.TEXTS.get("menuShowTouchPanel"), app.skin);
             touchPanelButton.setChecked(app.getShowTouchPanel());
             touchPanelButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
@@ -191,7 +197,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                                              }
                                          }
             );
-            touchPanelSizeSlider = new Slider(25, Gdx.graphics.getWidth() * .33f, 1, false, app.skin);
+            touchPanelSizeSlider = new TouchableSlider(25, Gdx.graphics.getWidth() * .33f, 1, false, app.skin);
             touchPanelSizeSlider.setValue(app.getTouchPanelSize());
             touchPanelSizeSlider.addListener(new ChangeListener() {
                 @Override
@@ -199,8 +205,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                     touchPanelSizeChanged();
                 }
             });
-            final Button pauseSwipeButton = new TextButton(FontAwesome.UP_ARROW, app.skin, FontAwesome
-                    .SKIN_FONT_FA + "-checked");
+            final Button pauseSwipeButton = new FaCheckbox(app.TEXTS.get("menuPauseSwipeEnabled"), app.skin);
             pauseSwipeButton.setChecked(app.getPauseSwipeEnabled());
             pauseSwipeButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
@@ -209,24 +214,31 @@ public class SettingsScreen extends AbstractMenuDialog {
                                          }
             );
 
-            defaults().fill();
-            row().spaceTop(30);
-            add(new Label(app.TEXTS.get("menuInputGestures"), app.skin, app.SKIN_FONT_BIG)).colspan(2);
+            pad(0, 20, 0, 20);
+            defaults().expand().fillX();
+
             row();
-            add(touchPanelButton).uniform();
-            Label tg = new Label(app.TEXTS.get("menuShowTouchPanel"), app.skin);
-            tg.setWrap(true);
-            add(tg).prefWidth(LightBlocksGame.nativeGameWidth * 0.5f);
+            add(new ScaledLabel(app.TEXTS.get("menuInputGestures"), app.skin, app.SKIN_FONT_TITLE, .8f))
+                    .top().fill(false);
+
             row();
-            add();
-            add(new Label(app.TEXTS.get("menuSizeOfTouchPanel"), app.skin));
+            add(touchPanelButton).bottom();
+
+            Table touchPanelTable = new Table();
+            touchPanelTable.add(new ScaledLabel(app.TEXTS.get("menuSizeOfTouchPanel"), app.skin, app.SKIN_FONT_REG,
+                    .8f));
+            touchPanelTable.row();
+            touchPanelTable.add(touchPanelSizeSlider).minHeight(40).fill();
+
+            row().padTop(20);
+            add(touchPanelTable).top();
+
             row();
-            add();
-            add(touchPanelSizeSlider).minHeight(40).fill(false, true)
-                    .width(.5f * LightBlocksGame.nativeGameWidth).left();
-            row();
-            add(pauseSwipeButton).uniform();
-            add(new Label(app.TEXTS.get("menuPauseSwipeEnabled"), app.skin));
+            add(pauseSwipeButton);
+
+            addFocusableActor(touchPanelButton);
+            addFocusableActor(touchPanelSizeSlider);
+            addFocusableActor(pauseSwipeButton);
         }
 
         protected void touchPanelSizeChanged() {
@@ -257,7 +269,7 @@ public class SettingsScreen extends AbstractMenuDialog {
 
         @Override
         public Actor getDefaultActor() {
-            return touchPanelSizeSlider;
+            return touchPanelButton;
         }
     }
 

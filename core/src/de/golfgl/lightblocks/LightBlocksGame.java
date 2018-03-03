@@ -56,11 +56,12 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String SKIN_FONT_REG = "qs25";
     public static final String SKIN_WINDOW_FRAMELESS = "frameless";
     public static final String SKIN_BUTTON_ROUND = "round";
-    public static final String STYLE_PAGER = "pager";
+    public static final String SKIN_BUTTON_CHECKBOX = "checkbox";
+    public static final String SKIN_STYLE_PAGER = "pager";
     public static final float LABEL_SCALING = .65f;
     public static final float ICON_SCALE_MENU = 1f;
 
-    public static final Color EMPHASIZE_COLOR = new Color(1, .3f, .3f, 1);
+    public static Color EMPHASIZE_COLOR;
     public static Color COLOR_DISABLED;
     public static Color COLOR_UNSELECTED;
     public static Color COLOR_FOCUSSED_ACTOR;
@@ -197,6 +198,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         COLOR_DISABLED = skin.getColor("disabled");
         COLOR_FOCUSSED_ACTOR = skin.getColor("lightselection");
         COLOR_UNSELECTED = skin.getColor("unselected");
+        EMPHASIZE_COLOR = skin.getColor("emphasize");
     }
 
     @Override

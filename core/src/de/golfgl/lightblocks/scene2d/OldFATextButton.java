@@ -15,11 +15,11 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  * Created by Benjamin Schulte on 17.02.2017.
  */
 
-public class FATextButton extends TextButton {
+public class OldFATextButton extends TextButton {
 
     private final Label faLabel;
 
-    public FATextButton(String fa, String text, Skin skin) {
+    public OldFATextButton(String fa, String text, Skin skin) {
         super(text, skin);
 
         Label label = getLabel();

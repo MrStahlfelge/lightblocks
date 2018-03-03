@@ -15,7 +15,7 @@ import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.Mission;
-import de.golfgl.lightblocks.scene2d.FATextButton;
+import de.golfgl.lightblocks.scene2d.OldFATextButton;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -177,7 +177,7 @@ public class ScoreScreen extends AbstractScoreScreen {
                 }
             }
 
-            Button retryOrNext = new FATextButton(retryOrNextIcon, app.TEXTS.get(retryOrNextLabel), app.skin);
+            Button retryOrNext = new OldFATextButton(retryOrNextIcon, app.TEXTS.get(retryOrNextLabel), app.skin);
             retryOrNext.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -199,7 +199,7 @@ public class ScoreScreen extends AbstractScoreScreen {
         // Leader Board
         final String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(gameModelId);
         if (leaderboardId != null) {
-            Button leaderboard = new FATextButton(FontAwesome.GPGS_LEADERBOARD,
+            Button leaderboard = new OldFATextButton(FontAwesome.GPGS_LEADERBOARD,
                     app.TEXTS.get("menuLeaderboard"), app.skin);
             leaderboard.addListener(new ChangeListener() {
                 @Override

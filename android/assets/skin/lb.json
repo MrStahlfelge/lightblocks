@@ -38,6 +38,12 @@ com.badlogic.gdx.graphics.Color: {
 		b: 0.19607843
 		a: 1
 	}
+	emphasize: {
+		r: 1
+		g: 0.3137255
+		b: 0.3137255
+		a: 1
+	}
 	lightselection: {
 		r: 0.25666666
 		g: 0.6800357
@@ -169,30 +175,12 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		over: button-over
 		disabled: button-disabled
 	}
-	checked: {
-		font: qs-15-regular
-		fontColor: white
-		disabledFontColor: disabled
-		up: button-pressed
-		over: button-over
-		checked: button
-		disabled: button-disabled
-	}
 	fontawesome: {
 		font: fa45
 		fontColor: white
 		disabledFontColor: disabled
 		up: button-pressed
 		over: button-over
-		disabled: button-disabled
-	}
-	fontawesome-checked: {
-		font: fa45
-		fontColor: white
-		disabledFontColor: disabled
-		up: button-pressed
-		over: button-over
-		checked: button
 		disabled: button-disabled
 	}
 	big: {
@@ -211,6 +199,12 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		up: button_small_font
 		down: button_small_font_filled
 		over: button_small_font_glow
+	}
+	checkbox: {
+		font: qs-40-bold
+		fontColor: white
+		downFontColor: emphasize
+		disabledFontColor: disabled
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {

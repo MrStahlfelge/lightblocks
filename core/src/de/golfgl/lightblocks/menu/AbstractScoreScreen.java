@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.scene2d.FATextButton;
+import de.golfgl.lightblocks.scene2d.OldFATextButton;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
@@ -37,7 +37,7 @@ public abstract class AbstractScoreScreen extends AbstractMenuScreen {
     @Override
     protected void fillButtonTable(Table buttons) {
         // Share Button
-        Button share = new FATextButton(FontAwesome.NET_SHARE1, app.TEXTS.get("menuShare"), app.skin);
+        Button share = new OldFATextButton(FontAwesome.NET_SHARE1, app.TEXTS.get("menuShare"), app.skin);
         share.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
                 app.share.shareText(getShareText(), null);

@@ -17,7 +17,7 @@ import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
 import de.golfgl.lightblocks.multiplayer.KryonetRoomLocation;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
-import de.golfgl.lightblocks.scene2d.FATextButton;
+import de.golfgl.lightblocks.scene2d.OldFATextButton;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.VetoException;
 
@@ -57,7 +57,7 @@ public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRo
     @Override
     protected void fillButtonTable(Table buttons) {
         super.fillButtonTable(buttons);
-        joinRoomButton = new FATextButton(FontAwesome.NET_LOGIN,
+        joinRoomButton = new OldFATextButton(FontAwesome.NET_LOGIN,
                 app.TEXTS.get("labelMultiplayerJoinRoom"), app.skin);
 
         joinRoomButton.addListener(new ChangeListener() {
