@@ -11,6 +11,7 @@ import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.ITouchActionButton;
 import de.golfgl.lightblocks.menu.MusicButtonListener;
+import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
  * Created by Benjamin Schulte on 30.01.2018.
@@ -18,7 +19,7 @@ import de.golfgl.lightblocks.menu.MusicButtonListener;
 
 public class RoundedTextButton extends TextButton implements ITouchActionButton, MusicButtonListener.IMusicButton {
     Action colorAction;
-    private ScaledLabel textLabel;
+    private ScaledLabel faLabel;
 
     public RoundedTextButton(String text, Skin skin) {
         super(text, skin, LightBlocksGame.SKIN_BUTTON_ROUND);
@@ -27,14 +28,12 @@ public class RoundedTextButton extends TextButton implements ITouchActionButton,
     }
 
     public RoundedTextButton(String faText, String text, Skin skin) {
-        super(faText, skin, LightBlocksGame.SKIN_BUTTON_FAROUND);
-
-        getLabel().setFontScale(LightBlocksGame.LABEL_SCALING);
-        getLabel().setAlignment(Align.right);
-        getLabelCell().pad(0, 5, 0, 5);
-
-        textLabel = new ScaledLabel(text, skin, LightBlocksGame.SKIN_FONT_TITLE);
-        add(textLabel).expand().fill();
+        this(text, skin);
+        clearChildren();
+        faLabel = new ScaledLabel(faText, skin, FontAwesome.SKIN_FONT_FA);
+        faLabel.setAlignment(Align.right);
+        add(faLabel).pad(0, 5, 0, 5).expand().fill();
+        add(getLabel()).expand().fill();
     }
 
     @Override
@@ -67,28 +66,19 @@ public class RoundedTextButton extends TextButton implements ITouchActionButton,
     public void draw(Batch batch, float parentAlpha) {
         Color oldColor = getStyle().fontColor;
         Color oldColor2 = null;
-        if (textLabel != null) {
-            oldColor2 = textLabel.getStyle().fontColor;
-            textLabel.getStyle().fontColor = isPressed() ? getStyle().downFontColor : getColor();
+        if (faLabel != null) {
+            oldColor2 = faLabel.getStyle().fontColor;
+            faLabel.getStyle().fontColor = isPressed() ? getStyle().downFontColor : getColor();
         }
         getStyle().fontColor = getColor();
         super.draw(batch, parentAlpha);
         getStyle().fontColor = oldColor;
-        if (textLabel != null)
-            textLabel.getStyle().fontColor = oldColor2;
+        if (faLabel != null)
+            faLabel.getStyle().fontColor = oldColor2;
     }
 
     @Override
     public void setFaText(String text) {
-        if (textLabel != null)
-            super.setText(text);
-    }
-
-    @Override
-    public void setText(String text) {
-        if (textLabel != null)
-            textLabel.setText(text);
-        else
-            super.setText(text);
+        faLabel.setText(text);
     }
 }
