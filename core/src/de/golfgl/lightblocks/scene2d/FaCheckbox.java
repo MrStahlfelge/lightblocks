@@ -13,12 +13,12 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  * Created by Benjamin Schulte on 03.03.2018.
  */
 
-public class FaCheckbox extends FaTextButton {
+public class FaCheckbox extends GlowLabelButton {
     private final Table checkbox;
     private boolean checkedState;
 
     public FaCheckbox(String text, Skin skin) {
-        super(FontAwesome.CIRCLE_CROSS, text, skin, LightBlocksGame.SKIN_BUTTON_CHECKBOX);
+        super(FontAwesome.CIRCLE_CROSS, text, skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
         checkedState = isChecked();
         changeIcon();
         checkbox = new Table();

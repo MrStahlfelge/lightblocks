@@ -24,16 +24,17 @@ import de.golfgl.lightblocks.screen.FontAwesome;
 public class GlowLabelButton extends Button implements ITouchActionButton, MusicButtonListener.IMusicButton {
     public static final float SMALL_SCALE_MENU = .9f;
     public static final float FONT_SCALE_MENU = .6f;
+    public static final float FONT_SCALE_SUBMENU = .45f;
     private final float smallScaleFactor;
     private final GlowLabel labelGroup;
     private final Color disabledFontColor;
+    protected Label faLabel;
     private boolean highlighted;
     private boolean isFirstAct;
     private boolean colorTransition;
     private ScaleToAction scaleAction;
     private Action colorAction;
     private Color fontColor;
-    private Label faLabel;
     private Cell faCell;
 
     public GlowLabelButton(String text, Skin skin, float fontScale, float smallScaleFactor) {
@@ -71,10 +72,11 @@ public class GlowLabelButton extends Button implements ITouchActionButton, Music
         if (faText != null && faText.length() > 0) {
             faLabel = new Label(faText, skin, FontAwesome.SKIN_FONT_FA);
             setFaLabelAlignment();
-            faCell = add(faLabel).padRight(5).padLeft(5).width(faLabel.getPrefWidth()).height(faLabel.getPrefHeight());
+            faCell = add(faLabel).padRight(5).padLeft(5).width(faLabel.getPrefWidth())
+                    .height(faLabel.getPrefHeight()).expand();
             labelGroup.setAlignment(Align.left);
         }
-        add(labelGroup);
+        add(labelGroup).fill();
         setLabelExpansion();
 
         highlighted = true;

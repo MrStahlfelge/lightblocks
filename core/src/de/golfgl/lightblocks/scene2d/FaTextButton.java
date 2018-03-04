@@ -18,7 +18,7 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  * Created by Benjamin Schulte on 03.03.2018.
  */
 
-class FaTextButton extends TextButton implements ITouchActionButton, MusicButtonListener.IMusicButton {
+public class FaTextButton extends TextButton implements ITouchActionButton, MusicButtonListener.IMusicButton {
     protected Label faLabel;
     Action colorAction;
 
