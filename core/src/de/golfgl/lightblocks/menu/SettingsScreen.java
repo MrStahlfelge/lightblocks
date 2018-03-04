@@ -11,16 +11,15 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Scaling;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
 import de.golfgl.lightblocks.scene2d.FaCheckbox;
+import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
@@ -55,7 +54,6 @@ public class SettingsScreen extends AbstractMenuDialog {
         groupPager.addPage(generalGroup);
         gesturesGroup = new GestureSettings();
         groupPager.addPage(gesturesGroup);
-        groupPager.addPage(new GamepadSettings());
         groupPager.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -114,12 +112,12 @@ public class SettingsScreen extends AbstractMenuDialog {
     }
 
     private class GeneralSettings extends Table implements ISettingsGroup {
-        private final RoundedTextButton menuMusicButton;
+        private final GlowLabelButton menuMusicButton;
         private Slider gridIntensitySlider;
         private Image gridPreview;
 
         private GeneralSettings() {
-            menuMusicButton = new RoundedTextButton("", "", app.skin);
+            menuMusicButton = new GlowLabelButton(".", ".", app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
             menuMusicButton.addListener(new MusicButtonListener(app, true, menuMusicButton));
 
             gridIntensitySlider = new TouchableSlider(0, 1, .1f, false, app.skin);
@@ -128,6 +126,16 @@ public class SettingsScreen extends AbstractMenuDialog {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     gridIntensityChanged();
+                }
+            });
+
+            Button gamePadButton = new GlowLabelButton(PlayScreenInput.getInputFAIcon(3), app.TEXTS.get
+                    ("menuGamepadConfig"), app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
+            gamePadButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    GamepadConfigDialog gpc = new GamepadConfigDialog(app);
+                    gpc.show(getStage());
                 }
             });
 
@@ -163,9 +171,12 @@ public class SettingsScreen extends AbstractMenuDialog {
                     .width(.5f * LightBlocksGame.nativeGameWidth).left();
             add(gridIntensity);
 
+            row();
+            add(gamePadButton);
+
             addFocusableActor(menuMusicButton);
             addFocusableActor(gridIntensitySlider);
-
+            addFocusableActor(gamePadButton);
         }
 
         protected void gridIntensityChanged() {
@@ -270,33 +281,6 @@ public class SettingsScreen extends AbstractMenuDialog {
         @Override
         public Actor getDefaultActor() {
             return touchPanelButton;
-        }
-    }
-
-    private class GamepadSettings extends Table implements ISettingsGroup {
-        private final Button gamePadButton;
-
-        public GamepadSettings() {
-            gamePadButton = new TextButton(PlayScreenInput.getInputFAIcon(3), app.skin, FontAwesome
-                    .SKIN_FONT_FA);
-            gamePadButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    GamepadConfigDialog gpc = new GamepadConfigDialog(app);
-                    gpc.show(getStage());
-                }
-            });
-
-            defaults().fill();
-            row().spaceTop(30);
-            add(gamePadButton).uniform();
-            add(new Label(app.TEXTS.get("menuGamepadConfig"), app.skin, app.SKIN_FONT_BIG));
-
-        }
-
-        @Override
-        public Actor getDefaultActor() {
-            return gamePadButton;
         }
     }
 }
