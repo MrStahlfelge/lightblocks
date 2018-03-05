@@ -134,8 +134,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             gamePadButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    GamepadConfigDialog gpc = new GamepadConfigDialog(app);
-                    gpc.show(getStage());
+                    new GamepadSettingsDialog(app).show(getStage());
                 }
             });
 

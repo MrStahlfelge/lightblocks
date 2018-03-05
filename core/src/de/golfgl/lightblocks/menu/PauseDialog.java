@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -29,7 +28,7 @@ public class PauseDialog extends Dialog {
     private boolean emphasizeInputMsg;
 
     public PauseDialog(LightBlocksGame app, final PlayScreen playScreen) {
-        super("", app.skin, "overlay");
+        super("", app.skin, LightBlocksGame.SKIN_WINDOW_OVERLAY);
 
 
         Table table = getContentTable();

@@ -1,4 +1,4 @@
-package rs.pedjaapps.smc.view;
+package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
@@ -11,16 +11,18 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.mapping.ControllerMappings;
-import rs.pedjaapps.smc.MaryoGame;
-import rs.pedjaapps.smc.assets.Assets;
+import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scene2d.MyStage;
+import de.golfgl.lightblocks.scene2d.RoundedTextButton;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
 
 /**
  * Created by Benjamin Schulte on 04.11.2017.
@@ -28,22 +30,24 @@ import rs.pedjaapps.smc.assets.Assets;
 
 public class GamepadSettingsDialog extends ControllerMenuDialog {
 
-    private final ColorableTextButton closeButton;
+    private final RoundedTextButton closeButton;
+    private final LightBlocksGame app;
     private Button refreshButton;
     private RefreshListener controllerListener;
     private ControllerMappings mappings;
     private boolean runsOnChrome;
 
-    public GamepadSettingsDialog(Skin skin, ControllerMappings mappings, String isRunningOn) {
-        super("", skin, Assets.WINDOW_SMALL);
+    public GamepadSettingsDialog(LightBlocksGame app) {
+        super("", app.skin);
 
-        this.mappings = mappings;
+        this.app = app;
+        this.mappings = app.controllerMappings;
 
-        getButtonTable().defaults().pad(20, 40, 0, 40);
-        closeButton = new ColorableTextButton("Close", skin, Assets.BUTTON_SMALL);
+        getButtonTable().defaults().pad(20, 40, 20, 40);
+        closeButton = new RoundedTextButton("Close", app.skin);
         button(closeButton);
 
-        refreshButton = new ColorableTextButton("Refresh", getSkin(), Assets.BUTTON_SMALL);
+        refreshButton = new RoundedTextButton("Refresh", getSkin());
         refreshButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -52,11 +56,9 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
         });
 
         getButtonTable().add(refreshButton);
-        buttonsToAdd.add(refreshButton);
+        addFocusableActor(refreshButton);
 
         controllerListener = new RefreshListener();
-
-        runsOnChrome = (isRunningOn != null && isRunningOn.toLowerCase().contains("chrome/"));
     }
 
     private void refreshShownControllers() {
@@ -72,20 +74,20 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
 
         Array<Controller> controllers = Controllers.getControllers();
 
-        contentTable.add(new Label(controllers.size == 0 ? "No controllers found." : "Controllers found:",
-                getSkin(), Assets.LABEL_SIMPLE25)).padBottom(30);
+        contentTable.pad(15);
+        contentTable.row();
+        contentTable.add(new ScaledLabel(controllers.size == 0 ? app.TEXTS.get("configGamepadNoneFound")
+                : app.TEXTS.get("configGamepadInit"), getSkin(), LightBlocksGame.SKIN_FONT_TITLE)).padBottom(10);
 
         Table controllerList = new Table();
-        controllerList.defaults().pad(10);
+        controllerList.defaults().pad(5);
         for (int i = 0; i < controllers.size; i++) {
             controllerList.row();
             final Controller controller = controllers.get(i);
             String shownName = controller.getName();
-            if (shownName.length() > 40)
-                shownName = shownName.substring(0, 38) + "...";
-            controllerList.add(new Label(shownName, getSkin(), Assets.LABEL_SIMPLE25)).left().expandX();
-            ColorableTextButton configureButton = new ColorableTextButton("Configure", getSkin(), Assets
-                    .BUTTON_SMALL_FRAMELESS);
+            if (shownName.length() > 25)
+                shownName = shownName.substring(0, 23) + "...";
+            TextButton configureButton = new RoundedTextButton(shownName, getSkin());
             configureButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -93,27 +95,29 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
                 }
             });
             controllerList.add(configureButton);
-            buttonsToAdd.add(configureButton);
+            addFocusableActor(configureButton);
             if (getStage() != null)
-                ((MenuStage) getStage()).addFocussableActor(configureButton);
+                ((MyStage) getStage()).addFocusableActor(configureButton);
         }
         contentTable.row();
         contentTable.add(controllerList);
 
-        contentTable.row().padTop(30);
-        Label hint = new Label("If a connected controller does not show up,\ntry pressing a button.\n" +
+        contentTable.row().padTop(20);
+        Label hint = new ScaledLabel(app.TEXTS.get("configGamepadHelp") +
                 (Gdx.app.getType() == Application.ApplicationType.WebGL && runsOnChrome ?
-                        "If you face problems with controllers on Chrome, press a button, reload the game, try again.\n" +
+                        "\nIf you face problems with controllers on Chrome, press a button, reload the game, try " +
+                                "again" +
+                                ".\n" +
                                 "If that does not help, try Mozilla Firefox." : ""),
-                getSkin(), Assets.LABEL_SIMPLE25);
+                getSkin(), LightBlocksGame.SKIN_FONT_BIG, .8f);
         hint.setFontScale(.8f);
         hint.setWrap(true);
         hint.setAlignment(Align.center);
-        contentTable.add(hint).fill().minWidth(MaryoGame.NATIVE_WIDTH * .7f);
+        contentTable.add(hint).fill().minWidth(LightBlocksGame.nativeGameWidth * .7f);
     }
 
     private void startControllerConfiguration(Controller controller) {
-        Dialog configurationDialog = new GamepadMappingDialog(getSkin(), controller, mappings);
+        Dialog configurationDialog = new GamepadMappingDialog(app, controller);
 
         configurationDialog.show(getStage());
     }
@@ -125,8 +129,8 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
 
         super.show(stage, action);
 
-        if (stage instanceof MenuStage)
-            ((MenuStage) stage).setEscapeActor(closeButton);
+        if (stage instanceof MyStage)
+            ((MyStage) stage).setEscapeActor(closeButton);
 
         Controllers.addListener(controllerListener);
         return this;

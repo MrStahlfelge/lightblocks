@@ -96,6 +96,7 @@ project(":core") {
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion"
         compile "com.esotericsoftware:kryonet:2.22.0-RC1"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-scene2d:$cuversion"
+        compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-mapping:$cuversion"
     }
 }
 

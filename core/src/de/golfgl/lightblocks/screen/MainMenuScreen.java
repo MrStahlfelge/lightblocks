@@ -244,6 +244,7 @@ public class MainMenuScreen extends AbstractScreen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        app.controllerMappings.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(!mainGroup.isVisible());
         resumeGameCell.setActor(app.savegame.hasSavedGame() ? resumeGameButton : null);
         if (stage.getFocusedActor() == null || !stage.getFocusedActor().hasParent())

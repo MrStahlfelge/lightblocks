@@ -78,6 +78,7 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
     public void show() {
         Gdx.input.setCatchBackKey(true);
         Gdx.input.setInputProcessor(stage);
+        app.controllerMappings.setInputProcessor(stage);
 
         swoshIn();
 

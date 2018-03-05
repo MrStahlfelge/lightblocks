@@ -68,4 +68,9 @@ public class MyStage extends ControllerMenuStage {
 
         return handled;
     }
+
+    @Override
+    public boolean isDefaultActionKeyCode(int keyCode) {
+        return super.isDefaultActionKeyCode(keyCode) || keyCode == Input.Keys.SPACE || keyCode == Input.Keys.ALT_LEFT;
+    }
 }

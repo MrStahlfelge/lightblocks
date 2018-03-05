@@ -8,6 +8,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -31,6 +32,7 @@ import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
 import de.golfgl.lightblocks.state.GamepadConfig;
+import de.golfgl.lightblocks.state.MyControllerMapping;
 import de.golfgl.lightblocks.state.Player;
 
 import static com.badlogic.gdx.Gdx.app;
@@ -55,6 +57,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String SKIN_FONT_BIG = "big";
     public static final String SKIN_FONT_REG = "qs25";
     public static final String SKIN_WINDOW_FRAMELESS = "frameless";
+    public static final String SKIN_WINDOW_OVERLAY = "overlay";
     public static final String SKIN_BUTTON_ROUND = "round";
     public static final String SKIN_BUTTON_CHECKBOX = "checkbox";
     public static final String SKIN_STYLE_PAGER = "pager";
@@ -91,6 +94,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public String modelNameRunningOn;
     public MainMenuScreen mainMenuScreen;
     public INsdHelper nsdHelper;
+    public MyControllerMapping controllerMappings;
     private FPSLogger fpsLogger;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -146,6 +150,13 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         I18NBundle.setSimpleFormatter(true);
 
         loadAndInitAssets();
+
+        try {
+            controllerMappings = new MyControllerMapping(this);
+            Controllers.addListener(controllerMappings.controllerToInputAdapter);
+        } catch (Throwable t) {
+            Gdx.app.error("Application", "Controllers not instantiated", t);
+        }
 
         mainMenuScreen = new MainMenuScreen(this);
 
@@ -337,6 +348,15 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
             }
         });
+    }
+
+    public String loadControllerMappings() {
+        return prefs.getString("controllerMappings", "");
+    }
+
+    public void saveControllerMappings(String json) {
+        prefs.putString("controllerMappings", json);
+        prefs.flush();
     }
 
     public GamepadConfig getGamepadConfig() {

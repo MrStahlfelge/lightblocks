@@ -213,6 +213,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 currentGame = new PlayScreen(caller.app, newGameParams);
 
             Gdx.input.setInputProcessor(null);
+            caller.app.controllerMappings.setInputProcessor(null);
             caller.app.setScreen(currentGame);
 
             // GPGS Event
@@ -345,6 +346,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         multiplexer.addProcessor(stage);
         multiplexer.addProcessor(inputAdapter);
         Gdx.input.setInputProcessor(multiplexer);
+        app.controllerMappings.setInputProcessor(multiplexer);
         swoshIn();
     }
 
