@@ -49,9 +49,9 @@ public class InputButtonTable extends Table implements IControllerActable, ITouc
 
 
         if (!PlayScreenInput.isInputTypeAvailable(defaultValue))
-            defaultValue = 0;
+            defaultValue = PlayScreenInput.KEY_INPUTTYPE_MIN;
 
-        int i = 0;
+        int i = PlayScreenInput.KEY_INPUTTYPE_MIN;
         while (true) {
             try {
 
@@ -148,13 +148,18 @@ public class InputButtonTable extends Table implements IControllerActable, ITouc
     public boolean onControllerScroll(ControllerMenuStage.MoveFocusDirection direction) {
         Array<InputTypeButton> allButtons = inputButtonsGroup.getButtons();
 
+        int currentIdx = 0;
+        for (int idx = 0; idx < allButtons.size; idx++)
+            if (allButtons.get(idx).getInputType() == inputChosen)
+                currentIdx = idx;
+
         switch (direction) {
             case south:
             case north:
                 return false;
 
             case east:
-                for (int i = inputChosen + 1; i < allButtons.size; i++) {
+                for (int i = currentIdx + 1; i < allButtons.size; i++) {
                     InputTypeButton currentButton = allButtons.get(i);
                     if (!currentButton.isDisabled() && currentButton.isVisible()) {
                         currentButton.setChecked(true);
@@ -163,7 +168,7 @@ public class InputButtonTable extends Table implements IControllerActable, ITouc
                 }
                 return false;
             case west:
-                for (int i = inputChosen - 1; i >= 0; i--) {
+                for (int i = currentIdx - 1; i >= 0; i--) {
                     InputTypeButton currentButton = allButtons.get(i);
                     if (!currentButton.isDisabled() && currentButton.isVisible()) {
                         currentButton.setChecked(true);

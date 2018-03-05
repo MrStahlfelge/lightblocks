@@ -1,7 +1,8 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.controllers.Controllers;
+
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
-import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -66,7 +67,8 @@ public class MarathonModel extends GameModel {
     protected void achievementsClearedLines(int levelBeforeRemove, int removedLines) {
         super.achievementsClearedLines(levelBeforeRemove, removedLines);
 
-        if (inputTypeKey == PlayScreenInput.KEY_GAMEPAD && !gamepadMarathonAchievementPosted) {
+        if (inputTypeKey == PlayScreenInput.KEY_KEYSORGAMEPAD && !gamepadMarathonAchievementPosted
+                && Controllers.getControllers().size > 0) {
             gpgsUpdateAchievement(GpgsHelper.ACH_GAMEPAD_OWNER);
             gamepadMarathonAchievementPosted = true;
         }

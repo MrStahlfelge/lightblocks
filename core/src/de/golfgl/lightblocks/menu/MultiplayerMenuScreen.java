@@ -134,7 +134,7 @@ public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomLi
             }
         };
 
-        inputButtonTable = new InputButtonTable(app, 0);
+        inputButtonTable = new InputButtonTable(app, PlayScreenInput.KEY_INPUTTYPE_ALLAVAIL);
 
         beginningLevelSlider.addListener(gameParameterListener);
         inputButtonTable.setExternalChangeListener(gameParameterListener);

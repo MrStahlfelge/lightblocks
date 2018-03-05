@@ -9,12 +9,13 @@ import com.badlogic.gdx.controllers.Controllers;
  * Created by Benjamin Schulte on 25.01.2017.
  */
 public abstract class PlayScreenInput extends InputAdapter {
+    public static final int KEY_INPUTTYPE_MIN = 1;
     public static final int KEY_INPUTTYPE_MAX = 3;
+    //TODO das muss weg! der ist nicht immer da
     public static final int KEY_INPUTTYPE_ALLAVAIL = 1;
-    public static final int KEY_KEYBOARD = 0;
     public static final int KEY_TOUCHSCREEN = 1;
     public static final int KEY_ACCELEROMETER = 2;
-    public static final int KEY_GAMEPAD = 3;
+    public static final int KEY_KEYSORGAMEPAD = 3;
 
     public boolean isPaused = true;
     protected boolean isGameOver;
@@ -30,8 +31,6 @@ public abstract class PlayScreenInput extends InputAdapter {
                 return new PlayGesturesInput();
             case KEY_ACCELEROMETER:
                 return new PlayGravityInput();
-            case KEY_GAMEPAD:
-                return new PlayGamepadInput();
             default:
                 return new PlayKeyboardInput();
         }
@@ -42,14 +41,13 @@ public abstract class PlayScreenInput extends InputAdapter {
             case KEY_TOUCHSCREEN:
                 // Touchscreen wird simuliert
                 return true;
-            case KEY_GAMEPAD:
-                return Controllers.getControllers().size > 0;
+            case KEY_KEYSORGAMEPAD:
+                return Controllers.getControllers().size > 0 || Gdx.input.isPeripheralAvailable(Input.Peripheral
+                        .HardwareKeyboard);
             case KEY_ACCELEROMETER:
                 return Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
-            case KEY_KEYBOARD:
-                return Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard);
             default:
-                throw new IllegalArgumentException("Not supported");
+                return false;
         }
     }
 
@@ -64,14 +62,13 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     public static String getInputTypeName(int key) {
         switch (key) {
-            case KEY_KEYBOARD:
-                return "menuInputKeyboard";
             case KEY_TOUCHSCREEN:
                 return "menuInputGestures";
             case KEY_ACCELEROMETER:
                 return "menuInputAccelerometer";
-            case KEY_GAMEPAD:
-                return "menuInputGamepad";
+            case KEY_KEYSORGAMEPAD:
+                return Controllers.getControllers().size == 0 && Gdx.input.isPeripheralAvailable(Input.Peripheral
+                        .HardwareKeyboard) ? "menuInputKeyboard" : "menuInputGamepad";
             default:
                 throw new IllegalArgumentException("Not supported");
         }
@@ -79,14 +76,13 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     public static String getInputFAIcon(int key) {
         switch (key) {
-            case KEY_KEYBOARD:
-                return FontAwesome.DEVICE_KEYBOARD;
             case KEY_TOUCHSCREEN:
                 return FontAwesome.DEVICE_GESTURE2;
             case KEY_ACCELEROMETER:
                 return FontAwesome.DEVICE_GRAVITY;
-            case KEY_GAMEPAD:
-                return FontAwesome.DEVICE_GAMEPAD;
+            case KEY_KEYSORGAMEPAD:
+                return Controllers.getControllers().size == 0 && Gdx.input.isPeripheralAvailable(Input.Peripheral
+                        .HardwareKeyboard) ? FontAwesome.DEVICE_KEYBOARD : FontAwesome.DEVICE_GAMEPAD;
             default:
                 throw new IllegalArgumentException("Not supported");
         }

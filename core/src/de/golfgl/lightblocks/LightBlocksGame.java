@@ -31,7 +31,6 @@ import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
-import de.golfgl.lightblocks.state.GamepadConfig;
 import de.golfgl.lightblocks.state.MyControllerMapping;
 import de.golfgl.lightblocks.state.Player;
 
@@ -103,7 +102,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     private Boolean gpgsAutoLogin;
     private Boolean dontAskForRating;
     private Float gridIntensity;
-    private GamepadConfig gamepadConfig;
     private List<Mission> missionList;
     private HashMap<String, Mission> missionMap;
 
@@ -356,29 +354,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public void saveControllerMappings(String json) {
         prefs.putString("controllerMappings", json);
-        prefs.flush();
-    }
-
-    public GamepadConfig getGamepadConfig() {
-        if (gamepadConfig == null) {
-            gamepadConfig = new GamepadConfig();
-
-            gamepadConfig.pauseButton = prefs.getInteger("gpButtonPause", GamepadConfig.GC_BUTTON_START);
-            gamepadConfig.verticalAxis = prefs.getInteger("gpAxisVertical", GamepadConfig.GC_AXIS_VERTICAL_ANDROID);
-            gamepadConfig.rotateClockwiseButton = prefs.getInteger("gpButtonClockwise", GamepadConfig
-                    .GC_BUTTON_CLOCKWISE);
-        }
-
-        return gamepadConfig;
-    }
-
-    public void setGamepadConfig(GamepadConfig gamepadConfig) {
-        this.gamepadConfig = gamepadConfig;
-
-        prefs.putInteger("gpButtonPause", gamepadConfig.pauseButton);
-        prefs.putInteger("gpAxisVertical", gamepadConfig.verticalAxis);
-        prefs.putInteger("gpButtonClockwise", gamepadConfig.rotateClockwiseButton);
-
         prefs.flush();
     }
 
