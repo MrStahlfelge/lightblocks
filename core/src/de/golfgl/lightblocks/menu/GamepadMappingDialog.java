@@ -41,24 +41,25 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
         this.mappings = app.controllerMappings;
         this.controller = controller;
 
-        instructionLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        instructionLabel.setWrap(true);
-
         instructionIntro = app.TEXTS.get("configGamepadStepIntro") + "\n";
+        instructionLabel = new ScaledLabel(instructionIntro, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+        instructionLabel.setWrap(true);
 
         String name = controller.getName();
         if (name.length() > 25)
             name = name.substring(0, 23) + "...";
 
-        getContentTable().add(new ScaledLabel(name, app.skin, LightBlocksGame.SKIN_FONT_TITLE)).colspan(2);
+        getContentTable().pad(20, 20, 0, 20);
+        getContentTable().add(new ScaledLabel(name, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .75f)).colspan(2);
         getContentTable().row();
         getContentTable().add(instructionLabel).fill().minWidth(LightBlocksGame.nativeGameWidth * .7f)
-                .minHeight(LightBlocksGame.nativeGameWidth * .7f).colspan(2);
+                .minHeight(instructionLabel.getPrefHeight() * 3f).colspan(2);
         instructionLabel.setAlignment(Align.center);
 
-        getButtonTable().defaults().pad(20, 40, 20, 40);
+        getButtonTable().pad(20);
+        getButtonTable().defaults().expandX();
 
-        skipButton = new RoundedTextButton("Skip", app.skin);
+        skipButton = new RoundedTextButton(app.TEXTS.get("configGamepadSkip"), app.skin);
         skipButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -73,7 +74,7 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
         getButtonTable().add(skipButton);
         addFocusableActor(skipButton);
 
-        TextButton restartButton = new RoundedTextButton("Restart", getSkin());
+        TextButton restartButton = new RoundedTextButton(app.TEXTS.get("configGamepadRestart"), getSkin());
         restartButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

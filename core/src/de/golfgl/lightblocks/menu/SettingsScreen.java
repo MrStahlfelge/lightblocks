@@ -129,7 +129,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                 }
             });
 
-            Button gamePadButton = new GlowLabelButton(PlayScreenInput.getInputFAIcon(3), app.TEXTS.get
+            Button gamePadButton = new GlowLabelButton(FontAwesome.DEVICE_GAMEPAD, app.TEXTS.get
                     ("menuGamepadConfig"), app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
             gamePadButton.addListener(new ChangeListener() {
                 @Override

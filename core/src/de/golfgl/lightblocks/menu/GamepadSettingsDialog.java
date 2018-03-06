@@ -20,9 +20,11 @@ import com.badlogic.gdx.utils.Array;
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.mapping.ControllerMappings;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
  * Created by Benjamin Schulte on 04.11.2017.
@@ -30,7 +32,7 @@ import de.golfgl.lightblocks.scene2d.ScaledLabel;
 
 public class GamepadSettingsDialog extends ControllerMenuDialog {
 
-    private final RoundedTextButton closeButton;
+    private final Button closeButton;
     private final LightBlocksGame app;
     private Button refreshButton;
     private RefreshListener controllerListener;
@@ -44,10 +46,10 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
         this.mappings = app.controllerMappings;
 
         getButtonTable().defaults().pad(20, 40, 20, 40);
-        closeButton = new RoundedTextButton("Close", app.skin);
+        closeButton = new FaButton(FontAwesome.MISC_CROSS, app.skin);
         button(closeButton);
 
-        refreshButton = new RoundedTextButton("Refresh", getSkin());
+        refreshButton = new FaButton(FontAwesome.ROTATE_RELOAD, getSkin());
         refreshButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
