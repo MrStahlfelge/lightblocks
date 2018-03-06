@@ -892,7 +892,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private void refreshResumeFromPauseText() {
         String blockText = "";
         if (gameBlockers.isEmpty())
-            blockText = inputAdapter.getResumeMessage();
+            blockText = "";
         else {
             Iterator<GameBlocker> gbi = gameBlockers.iterator();
             while (gbi.hasNext()) {

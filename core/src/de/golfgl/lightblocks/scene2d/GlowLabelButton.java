@@ -71,9 +71,9 @@ public class GlowLabelButton extends Button implements ITouchActionButton, Music
 
         if (faText != null && faText.length() > 0) {
             faLabel = new Label(faText, skin, FontAwesome.SKIN_FONT_FA);
-            setFaLabelAlignment();
             faCell = add(faLabel).padRight(5).padLeft(5).width(faLabel.getPrefWidth())
                     .height(faLabel.getPrefHeight()).expand();
+            setFaLabelAlignment();
             labelGroup.setAlignment(Align.left);
         }
         add(labelGroup).fill();
@@ -84,7 +84,12 @@ public class GlowLabelButton extends Button implements ITouchActionButton, Music
     }
 
     private void setFaLabelAlignment() {
-        faLabel.setAlignment(labelGroup.getText().length() > 0 ? Align.right : Align.center);
+        if (faLabel != null) {
+            if (labelGroup.getText().length() > 0)
+                faCell.right();
+            else
+                faCell.center();
+        }
     }
 
     public boolean isColorTransition() {

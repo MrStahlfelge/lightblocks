@@ -88,8 +88,6 @@ public abstract class PlayScreenInput extends InputAdapter {
         }
     }
 
-    public abstract String getResumeMessage();
-
     public abstract String getInputHelpText();
 
     public void setGameOver() {

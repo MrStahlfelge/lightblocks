@@ -29,11 +29,6 @@ public class PlayGesturesInput extends PlayScreenInput {
     private Label rotationLabel;
 
     @Override
-    public String getResumeMessage() {
-        return playScreen.app.TEXTS.get("labelTapToPlay");
-    }
-
-    @Override
     public String getInputHelpText() {
         return playScreen.app.TEXTS.get("inputGesturesHelp");
     }

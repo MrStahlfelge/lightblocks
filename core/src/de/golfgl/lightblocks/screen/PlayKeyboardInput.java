@@ -17,11 +17,6 @@ public class PlayKeyboardInput extends PlayScreenInput {
     private ControllerAdapter controllerAdapter = new MyControllerAdapter();
 
     @Override
-    public String getResumeMessage() {
-        return playScreen.app.TEXTS.get(isOnKeyboard() ? "labelPressEnterToPlay" : "labelPressStartToPlay");
-    }
-
-    @Override
     public String getInputHelpText() {
         return playScreen.app.TEXTS.get(isOnKeyboard() ? "inputKeyboardHelp" : "inputGamepadHelp");
     }
@@ -43,8 +38,15 @@ public class PlayKeyboardInput extends PlayScreenInput {
     @Override
     public void dispose() {
         super.dispose();
-        Controllers.removeListener(controllerAdapter);
-        controllerAdapter = null;
+        // removeListener darf erst im nächsten Call passieren, da es eine Exception gibt wenn diese Aktion
+        // aus einem Controller-Aufruf heraus passiert
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                Controllers.removeListener(controllerAdapter);
+                controllerAdapter = null;
+            }
+        });
     }
 
     @Override

@@ -60,11 +60,6 @@ public class PlayGravityInput extends PlayScreenInput {
     }
 
     @Override
-    public String getResumeMessage() {
-        return playScreen.app.TEXTS.get("labelTapToPlay");
-    }
-
-    @Override
     public String getInputHelpText() {
         return playScreen.app.TEXTS.get("inputGravityHelp");
     }
