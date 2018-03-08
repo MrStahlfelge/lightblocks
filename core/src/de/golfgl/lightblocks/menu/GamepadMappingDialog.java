@@ -2,20 +2,17 @@ package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonWriter;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.mapping.ControllerMappings;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.scene2d.RoundedTextButton;
+import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
-import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.state.MyControllerMapping;
 
 /**
@@ -27,12 +24,12 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
     private final LightBlocksGame app;
     private final ControllerMappings mappings;
     private final Controller controller;
-    private final TextButton skipButton;
+    private final GlowLabelButton skipButton;
     private final Label instructionLabel;
+    private final String instructionIntro;
     private int currentStep = 0;
     private float timeSinceLastRecord = 0;
     private int inputToRecord = -1;
-    private final String instructionIntro;
 
     public GamepadMappingDialog(LightBlocksGame app, Controller controller) {
         super("", app.skin);
@@ -59,7 +56,8 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
         getButtonTable().pad(20);
         getButtonTable().defaults().expandX();
 
-        skipButton = new RoundedTextButton(app.TEXTS.get("configGamepadSkip"), app.skin);
+        skipButton = new GlowLabelButton(app.TEXTS.get("configGamepadSkip"), app.skin, GlowLabelButton
+                .FONT_SCALE_SUBMENU, 1f);
         skipButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -74,7 +72,8 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
         getButtonTable().add(skipButton);
         addFocusableActor(skipButton);
 
-        TextButton restartButton = new RoundedTextButton(app.TEXTS.get("configGamepadRestart"), getSkin());
+        Button restartButton = new GlowLabelButton(app.TEXTS.get("configGamepadRestart"), app.skin, GlowLabelButton
+                .FONT_SCALE_SUBMENU, 1f);
         restartButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
