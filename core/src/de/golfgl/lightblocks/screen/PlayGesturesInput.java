@@ -2,7 +2,6 @@ package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -13,10 +12,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
  */
 public class PlayGesturesInput extends PlayScreenInput {
 
+    private static final float SCREEN_BORDER_PERCENTAGE = 0.1f;
     public Color rotateRightColor = new Color(.1f, 1, .3f, .8f);
     public Color rotateLeftColor = new Color(.2f, .8f, 1, .8f);
     int screenX;
     int screenY;
+    boolean touchDownValid = false;
     boolean beganHorizontalMove;
     boolean beganSoftDrop;
     boolean didSomething;
@@ -49,7 +50,13 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (button == Input.Buttons.RIGHT) {
             playScreen.goBackToMenu();
             return true;
-        }
+        } else if (pointer != 0 || button != Input.Buttons.LEFT)
+            return false;
+
+        touchDownValid = screenY > Gdx.graphics.getHeight() * SCREEN_BORDER_PERCENTAGE * (isPaused ? 2 : 1);
+
+        if (!touchDownValid)
+            return false;
 
         this.screenX = screenX;
         this.screenY = screenY;
@@ -145,6 +152,8 @@ public class PlayGesturesInput extends PlayScreenInput {
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         // Bei mehr als dragThreshold Pixeln erkennen wir eine Bewegung an...
+        if (pointer != 0 || !touchDownValid)
+            return false;
 
         if (!beganSoftDrop) {
             if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > dragThreshold)) {
@@ -185,6 +194,8 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if (pointer != 0 || !touchDownValid || button != Input.Buttons.LEFT)
+            return false;
 
         playScreen.gameModel.setInputFreezeInterval(0);
 
