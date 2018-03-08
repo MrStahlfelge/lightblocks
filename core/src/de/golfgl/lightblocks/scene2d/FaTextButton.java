@@ -49,7 +49,7 @@ public class FaTextButton extends TextButton implements ITouchActionButton, Musi
         if (!isDisabled()) {
             if (colorAction != null)
                 removeAction(colorAction);
-            colorAction = MyStage.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR, getLabel().getColor());
+            colorAction = MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR, getLabel().getColor());
             addAction(colorAction);
         }
     }

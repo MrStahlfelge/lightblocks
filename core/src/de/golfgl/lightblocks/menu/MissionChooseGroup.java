@@ -20,7 +20,7 @@ import de.golfgl.gdx.controllers.IControllerScrollable;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
-import de.golfgl.lightblocks.scene2d.MyStage;
+import de.golfgl.lightblocks.scene2d.MyActions;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.AbstractScreen;
@@ -283,11 +283,11 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
         @Override
         public void touchAction() {
-            ratingLabel[selectedIndex].addAction(MyStage.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR,
+            ratingLabel[selectedIndex].addAction(MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR,
                     ratingLabel[selectedIndex].getColor()));
-            titleLabel[selectedIndex].addAction(MyStage.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR,
+            titleLabel[selectedIndex].addAction(MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR,
                     ratingLabel[selectedIndex].getColor()));
-            idxLabel[selectedIndex].addAction(MyStage.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR,
+            idxLabel[selectedIndex].addAction(MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR,
                     ratingLabel[selectedIndex].getColor()));
         }
 

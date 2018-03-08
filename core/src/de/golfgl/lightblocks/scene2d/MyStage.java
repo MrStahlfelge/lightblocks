@@ -25,11 +25,6 @@ public class MyStage extends ControllerMenuStage {
         super(viewport);
     }
 
-    public static Action getTouchAction(Color emphColor, Color currColor) {
-        return Actions.sequence(Actions.color(emphColor, .3f, Interpolation.fade),
-                Actions.color(currColor, 1f, Interpolation.fade));
-    }
-
     @Override
     public void act(float delta) {
         super.act(delta);

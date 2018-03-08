@@ -22,7 +22,7 @@ public class TouchableSlider extends ControllerSlider implements ITouchActionBut
     @Override
     public void touchAction() {
         removeAction(colorAction);
-        colorAction = MyStage.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR, getColor());
+        colorAction = MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR, getColor());
         addAction(colorAction);
     }
 

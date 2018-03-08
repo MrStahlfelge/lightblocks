@@ -1,10 +1,13 @@
 package de.golfgl.lightblocks.menu;
 
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scene2d.MyActions;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
@@ -20,6 +23,7 @@ public class MusicButtonListener extends ChangeListener {
     private int state;
     private LightBlocksGame app;
     private boolean useLabel;
+    private Action changeAction;
 
     public MusicButtonListener(LightBlocksGame app, boolean useLabel, IMusicButton actor) {
         this.app = app;
@@ -28,14 +32,26 @@ public class MusicButtonListener extends ChangeListener {
         setIconAndLabelFromState(actor);
     }
 
-    public void changed(ChangeEvent event, Actor actor) {
+    public void changed(ChangeEvent event, final Actor actor) {
         state--;
         if (state < 0)
             state = SOUND_MUSIC;
 
         app.setPlayMusic(state == SOUND_MUSIC);
         app.setPlaySounds(state > NO_SOUND);
-        setIconAndLabelFromState(((IMusicButton) actor));
+
+        if (changeAction != null)
+            actor.removeAction(changeAction);
+
+        actor.setOrigin(Align.center);
+        ((Button) actor).setTransform(true);
+        changeAction = MyActions.getChangeSequence(new Runnable() {
+            @Override
+            public void run() {
+                setIconAndLabelFromState(((IMusicButton) actor));
+            }
+        });
+        actor.addAction(changeAction);
     }
 
     protected void setIconAndLabelFromState(IMusicButton actor) {

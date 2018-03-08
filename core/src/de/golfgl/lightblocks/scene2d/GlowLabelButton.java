@@ -180,7 +180,7 @@ public class GlowLabelButton extends Button implements ITouchActionButton, Music
         // RoundedTextButton hat Copy
         if (!isPressed() && !isDisabled()) {
             labelGroup.removeAction(colorAction);
-            colorAction = MyStage.getTouchAction(getTouchColor(), getActiveColor());
+            colorAction = MyActions.getTouchAction(getTouchColor(), getActiveColor());
             labelGroup.addAction(colorAction);
         }
     }
