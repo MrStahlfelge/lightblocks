@@ -27,6 +27,7 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
     private float cellSpacing;
     private boolean sizeChanged;
     private Array<T> pages;
+    private int currentPageIndex;
 
     public PagedScrollPane() {
         super(null);
@@ -89,11 +90,13 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
         sizeChanged = true;
         super.sizeChanged();
         if (content != null) {
+            float width = getWidth();
             for (Cell cell : content.getCells()) {
-                cell.width(getWidth());
+                cell.width(width);
             }
             content.invalidate();
             validate();
+            scrollTo(currentPageIndex * width, 0, width, getHeight());
             positionToCurrentPage(false);
             updateVisualScroll();
         }
@@ -132,6 +135,8 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
                 }
                 setScrollX(MathUtils.clamp(pageX - (width - pageWidth) / 2, 0, maxX));
             }
+
+            currentPageIndex = MathUtils.round(getScrollPage());
 
             if (fireEvent) {
                 ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent.class);
@@ -182,7 +187,7 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
     }
 
     public int getCurrentPageIndex() {
-        return MathUtils.round(getScrollPage());
+        return currentPageIndex;
     }
 
     public float getScrollPage() {
