@@ -54,9 +54,9 @@ public class AndroidLauncher extends AndroidApplication {
                 if (orientation == null)
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
                 else if (orientation.equals(Input.Orientation.Landscape))
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 else
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
 
             @Override
