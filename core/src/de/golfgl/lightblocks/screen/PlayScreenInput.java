@@ -98,11 +98,16 @@ public abstract class PlayScreenInput extends InputAdapter {
     @Override
     public boolean keyDown(int keycode) {
         // der Android Back Button gilt für alle
-        if (keycode == Input.Keys.BACK) {
-            playScreen.goBackToMenu();
-            return true;
+        switch (keycode) {
+            case Input.Keys.ESCAPE:
+            case Input.Keys.BACK:
+            case Input.Keys.BACKSPACE:
+                playScreen.goBackToMenu();
+                return true;
+
+            default:
+                return super.keyDown(keycode);
         }
-        return super.keyDown(keycode);
     }
 
     /**

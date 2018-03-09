@@ -52,12 +52,6 @@ public class PlayKeyboardInput extends PlayScreenInput {
     @Override
     public boolean keyDown(int keycode) {
         switch (keycode) {
-            case Input.Keys.ESCAPE:
-            case Input.Keys.BACK:
-            case Input.Keys.BACKSPACE:
-                playScreen.goBackToMenu();
-                return true;
-
             case Input.Keys.ENTER:
                 playScreen.switchPause(false);
                 return true;
