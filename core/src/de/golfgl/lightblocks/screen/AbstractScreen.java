@@ -49,7 +49,7 @@ public abstract class AbstractScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        boolean newIsLandscape = width > height * 1.3f;
+        boolean newIsLandscape = width > height * 1f;
         boolean changed = isLandscapeOrientation != newIsLandscape;
         isLandscapeOrientation = newIsLandscape;
 
