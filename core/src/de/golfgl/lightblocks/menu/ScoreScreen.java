@@ -15,7 +15,9 @@ import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.Mission;
-import de.golfgl.lightblocks.scene2d.OldFATextButton;
+import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -29,7 +31,7 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  * Created by Benjamin Schulte on 08.02.2017.
  */
 
-public class ScoreScreen extends AbstractMenuScreen {
+public class ScoreScreen extends AbstractScreen {
 
     private static final int MAX_COUNTING_TIME = 2;
     private Array<IRoundScore> scoresToShow;
@@ -37,6 +39,8 @@ public class ScoreScreen extends AbstractMenuScreen {
     private BestScore best;
     private String gameModelId;
     private InitGameParameters newGameParams;
+    private Button leaveButton;
+    private Actor defaultActor;
 
     private boolean newHighscore;
 
@@ -65,7 +69,52 @@ public class ScoreScreen extends AbstractMenuScreen {
         return scoreLabelString;
     }
 
-    @Override
+    public void initializeUI() {
+
+        Table menuTable = new Table();
+        fillMenuTable(menuTable);
+
+        //Titel
+        // Der Titel wird nach der Menütabelle gefüllt, eventuell wird dort etwas gesetzt (=> Scores)
+        Label title = new Label(getTitle().toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+        final String subtitle = getSubtitle();
+
+        // Buttons
+        Table buttons = new Table();
+        buttons.defaults().uniform().expandX().center();
+
+        // Back button
+        leaveButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
+        setBackButton(leaveButton);
+        buttons.add(leaveButton);
+        stage.addFocusableActor(leaveButton);
+        stage.setEscapeActor(leaveButton);
+        defaultActor = leaveButton;
+        fillButtonTable(buttons);
+
+        // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
+        final Table mainTable = new Table();
+        mainTable.setFillParent(true);
+        mainTable.row();
+        mainTable.add(new Label(getTitleIcon(), app.skin, FontAwesome.SKIN_FONT_FA));
+        mainTable.row();
+        mainTable.add(title);
+        mainTable.row().expandY().top();
+        if (subtitle != null)
+            mainTable.add(new ScaledLabel(subtitle, app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+        mainTable.row();
+        mainTable.add(menuTable).width(LightBlocksGame.nativeGameWidth).pad(20);
+        Button retryOrNext = addRetryOrNextButton();
+        if (retryOrNext != null) {
+            mainTable.row().expandY();
+            mainTable.add(retryOrNext);
+        }
+        mainTable.row();
+        mainTable.add(buttons).pad(20, 0, 20, 0).fillX();
+
+        stage.addActor(mainTable);
+    }
+
     protected String getTitleIcon() {
         if (scoresToShow.size >= 1 && scoresToShow.get(0).getRating() > 0)
             return getFARatingString(scoresToShow.get(0).getRating());
@@ -91,7 +140,6 @@ public class ScoreScreen extends AbstractMenuScreen {
         this.gameModelId = gameModelId;
     }
 
-    @Override
     protected String getSubtitle() {
         Mission mission = app.getMissionFromUid(gameModelId);
         String title = (mission != null ? app.TEXTS.format("labelMission", mission.getIndex())
@@ -100,7 +148,6 @@ public class ScoreScreen extends AbstractMenuScreen {
         return title;
     }
 
-    @Override
     protected String getTitle() {
         if (newHighscore)
             return app.TEXTS.get("motivationNewHighscore");
@@ -115,7 +162,6 @@ public class ScoreScreen extends AbstractMenuScreen {
                 "shareText"), scoresToShow.get(0).getScore(), LightBlocksGame.GAME_URL_SHORT, getSubtitle());
     }
 
-    @Override
     protected void fillMenuTable(Table menuTable) {
 
         ScoreTable scoreTable = new ScoreTable(app) {
@@ -163,9 +209,36 @@ public class ScoreScreen extends AbstractMenuScreen {
         menuTable.add(scoreTable);
     }
 
-    @Override
     protected void fillButtonTable(Table buttons) {
+        // Share Button
+        Button share = new ShareButton(app, getShareText());
+        buttons.add(share);
+        stage.addFocusableActor(share);
 
+        // Leader Board
+        final String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(gameModelId);
+        if (leaderboardId != null) {
+            Button leaderboard = new FaButton(FontAwesome.GPGS_LEADERBOARD, app.skin);
+            leaderboard.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    try {
+                        app.gpgsClient.showLeaderboards(leaderboardId);
+                    } catch (GameServiceException e) {
+                        showDialog("Error showing leaderboard.");
+                    }
+                }
+            });
+            leaderboard.setDisabled(app.gpgsClient == null || !app.gpgsClient.isSessionActive());
+            buttons.add(leaderboard);
+            stage.addFocusableActor(leaderboard);
+
+        }
+
+    }
+
+    private Button addRetryOrNextButton() {
+        PlayButton retryOrNext = null;
         // Retry button
         if (newGameParams != null) {
             String retryOrNextIcon = FontAwesome.ROTATE_RIGHT;
@@ -185,7 +258,9 @@ public class ScoreScreen extends AbstractMenuScreen {
                 }
             }
 
-            Button retryOrNext = new OldFATextButton(retryOrNextIcon, app.TEXTS.get(retryOrNextLabel), app.skin);
+            retryOrNext = new PlayButton(app);
+            retryOrNext.setText(app.TEXTS.get(retryOrNextLabel));
+            retryOrNext.setFaText(retryOrNextIcon);
             retryOrNext.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -199,39 +274,10 @@ public class ScoreScreen extends AbstractMenuScreen {
                 }
             });
 
-            buttons.add(retryOrNext).prefWidth(retryOrNext.getPrefWidth() * 1.2f).uniform(false, false);
+            stage.addFocusableActor(retryOrNext);
+            defaultActor = retryOrNext;
         }
-
-        // Share Button
-        Button share = new OldFATextButton(FontAwesome.NET_SHARE1, app.TEXTS.get("menuShare"), app.skin);
-        share.addListener(new ChangeListener() {
-            public void changed(ChangeEvent event, Actor actor) {
-                app.share.shareText(getShareText(), null);
-            }
-        });
-
-        buttons.add(share).fill().uniform();
-
-        // Leader Board
-        final String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(gameModelId);
-        if (leaderboardId != null) {
-            Button leaderboard = new OldFATextButton(FontAwesome.GPGS_LEADERBOARD,
-                    app.TEXTS.get("menuLeaderboard"), app.skin);
-            leaderboard.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    try {
-                        app.gpgsClient.showLeaderboards(leaderboardId);
-                    } catch (GameServiceException e) {
-                        showDialog("Error showing leaderboard.");
-                    }
-                }
-            });
-            leaderboard.setDisabled(app.gpgsClient == null || !app.gpgsClient.isSessionActive());
-            buttons.add(leaderboard);
-
-        }
-
+        return retryOrNext;
     }
 
     public void setNewGameParams(InitGameParameters newGameParams) {
@@ -240,7 +286,13 @@ public class ScoreScreen extends AbstractMenuScreen {
 
     @Override
     public void show() {
-        super.show();
+        Gdx.input.setCatchBackKey(true);
+        Gdx.input.setInputProcessor(stage);
+        app.controllerMappings.setInputProcessor(stage);
+
+        stage.setFocusedActor(defaultActor);
+
+        swoshIn();
 
         // Wenn bereits 1000 Blöcke abgelegt sind und die Frage noch nicht verneint wurde bitten wir um ein Rating
         if (!app.getDontAskForRating() && scoresToShow.size > 1 &&

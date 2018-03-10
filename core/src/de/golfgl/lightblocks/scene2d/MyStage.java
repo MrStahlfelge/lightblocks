@@ -19,7 +19,7 @@ import de.golfgl.lightblocks.menu.ITouchActionButton;
 public class MyStage extends ControllerMenuStage {
     private static final float TOUCH_INTERVAL = 1.5f;
     private float timeSinceTouch;
-    private boolean touchActionActivated = false;
+    private static boolean touchActionActivated = false;
 
     public MyStage(Viewport viewport) {
         super(viewport);

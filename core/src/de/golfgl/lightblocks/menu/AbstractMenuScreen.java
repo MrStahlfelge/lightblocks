@@ -24,14 +24,6 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         super(app);
     }
 
-    protected ScrollPane getMenuScrollPane() {
-        return menuScrollPane;
-    }
-
-    public Button getLeaveButton() {
-        return leaveButton;
-    }
-
     public void initializeUI() {
 
         Table menuTable = new Table();
