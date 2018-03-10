@@ -93,7 +93,7 @@ public class ScoreScreen extends AbstractMenuScreen {
         // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
         final Table mainTable = new Table();
         mainTable.setFillParent(true);
-        mainTable.row();
+        mainTable.row().padTop(20);
         mainTable.add(new Label(getTitleIcon(), app.skin, FontAwesome.SKIN_FONT_FA));
         mainTable.row();
         mainTable.add(title);

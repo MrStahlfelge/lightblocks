@@ -78,7 +78,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
                                }
         );
         params.row();
-        params.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top();
+        params.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top().fillX();
         menuScreen.addFocusableActor(playButton);
 
         menuScreen.addFocusableActor(inputButtons);
