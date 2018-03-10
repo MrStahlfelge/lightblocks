@@ -20,6 +20,7 @@ import de.golfgl.gdx.controllers.IControllerScrollable;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
+import de.golfgl.lightblocks.scene2d.GlowLabel;
 import de.golfgl.lightblocks.scene2d.MyActions;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
@@ -38,6 +39,7 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGameModeGroup {
 
     private final MissionsTable missionsTable;
+    private final Label missionTitle;
     boolean needsRefresh = false;
     private List<Mission> missions;
     private SinglePlayerScreen menuScreen;
@@ -55,10 +57,15 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
         row();
         add(new ScaledLabel(app.TEXTS.get("menuPlayMissionButton"), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+        row().padTop(20);
+        add(new ScaledLabel(app.TEXTS.get("labelChooseMission"), app.skin, LightBlocksGame.SKIN_FONT_BIG, .75f))
+                .bottom();
         row();
         menuScreen.addFocusableActor(missionsTable);
-        add(missionsTable).expand().fill().pad(20, 50, 20, 30);
+        add(missionsTable).expand().fill();
         row();
+        missionTitle = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .95f);
+        add(missionTitle).expand().top();
 
         // Gleich wie bei Marathon, nochmal auslagern
         playButton = new PlayButton(app);
@@ -128,35 +135,35 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
     private class MissionsTable extends ScrollPane implements IControllerScrollable, IControllerActable,
             ITouchActionButton {
-        private Label[] idxLabel;
-        private Label[] titleLabel;
+        private GlowLabel[] idxLabel;
+        private String[] titles;
         private Label[] ratingLabel;
+        private boolean[] selectable;
         private Table table;
         private int selectedIndex = -1;
         private int lastPossible;
 
         public MissionsTable() {
-            super(null, app.skin);
+            super(null);
             table = new Table();
             setActor(table);
 
-            setFadeScrollBars(false);
-            setScrollingDisabled(true, false);
+            //setFadeScrollBars(false);
+            setScrollingDisabled(false, true);
 
-            idxLabel = new Label[missions.size()];
-            titleLabel = new Label[missions.size()];
+            idxLabel = new GlowLabel[missions.size()];
+            titles = new String[missions.size()];
             ratingLabel = new Label[missions.size()];
-
-            table.defaults().space(0, 5, 0, 5);
+            selectable = new boolean[missions.size()];
 
             for (Mission mission : missions) {
                 final String uid = mission.getUniqueId();
                 final int idx = mission.getIndex();
                 String lblUid = Mission.getLabelUid(uid);
 
-                idxLabel[idx] = new ScaledLabel(Integer.toString(idx), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-                titleLabel[idx] = new ScaledLabel(app.TEXTS.get(lblUid), app.skin, LightBlocksGame
-                        .SKIN_FONT_TITLE);
+                idxLabel[idx] = new GlowLabel(Integer.toString(idx), app.skin, 1f);
+                idxLabel[idx].setAlignment(Align.center);
+                titles[idx] = app.TEXTS.get(lblUid);
                 ratingLabel[idx] = new ScaledLabel("", app.skin, FontAwesome.SKIN_FONT_FA, .5f);
                 ratingLabel[idx].setAlignment(Align.center);
 
@@ -169,14 +176,24 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
                 idxLabel[idx].addListener(idxEvent);
                 ratingLabel[idx].addListener(idxEvent);
-                titleLabel[idx].addListener(idxEvent);
-
-                table.row();
-                table.add(idxLabel[idx]).align(Align.right);
-                table.add(titleLabel[idx]).fill().expandX();
-                table.add(ratingLabel[idx]).fill();
             }
 
+            table.add().uniform().width(LightBlocksGame.nativeGameWidth / 5);
+            for (int idx = 0; idx < missions.size(); idx++) {
+                table.add(idxLabel[idx]).uniform().fill();
+            }
+            table.add().uniform();
+            table.row();
+            table.add();
+            for (int idx = 0; idx < missions.size(); idx++) {
+                table.add(ratingLabel[idx]).center();
+            }
+            table.add();
+        }
+
+        @Override
+        public float getMinHeight() {
+            return getPrefHeight();
         }
 
         public void refreshMenuTable(boolean selectLastPossible) {
@@ -187,12 +204,12 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
                 final String uid = missions.get(idx).getUniqueId();
                 int rating = app.savegame.getBestScore(uid).getRating();
-                boolean selectable = isAncestorDone || rating > 0;
-                if (selectable)
+                selectable[idx] = isAncestorDone || rating > 0;
+                if (selectable[idx])
                     lastPossible = idx;
-                Touchable touchable = (selectable ? Touchable.enabled : Touchable.disabled);
+                Touchable touchable = (selectable[idx] ? Touchable.enabled : Touchable.disabled);
                 Color rowColor = (selectedIndex == idx ? Color.WHITE :
-                        (selectable ? LightBlocksGame.COLOR_UNSELECTED : LightBlocksGame.COLOR_DISABLED));
+                        (selectable[idx] ? LightBlocksGame.COLOR_UNSELECTED : LightBlocksGame.COLOR_DISABLED));
 
                 isAncestorDone = (rating > 0);
 
@@ -200,12 +217,11 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
                 if (rating >= 1) {
                     scoreLabelString = ScoreScreen.getFARatingString(rating);
                 } else
-                    scoreLabelString = (selectable ? FontAwesome.CIRCLE_PLAY : FontAwesome.CIRCLE_CROSS);
+                    scoreLabelString = "";
 
                 ratingLabel[idx].setText(scoreLabelString);
                 setRowColor(idx, rowColor);
                 ratingLabel[idx].setTouchable(touchable);
-                titleLabel[idx].setTouchable(touchable);
                 idxLabel[idx].setTouchable(touchable);
             }
 
@@ -216,22 +232,23 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
         protected void setRowColor(int idx, Color rowColor) {
             ratingLabel[idx].clearActions();
             ratingLabel[idx].setColor(rowColor);
-            titleLabel[idx].clearActions();
-            titleLabel[idx].setColor(rowColor);
             idxLabel[idx].clearActions();
             idxLabel[idx].setColor(rowColor);
+            idxLabel[idx].setGlowing(rowColor == Color.WHITE);
         }
 
         public void scrollToSelected() {
-            scrollTo(0, ratingLabel[selectedIndex].getY(), 1, ratingLabel[selectedIndex].getHeight());
+            scrollTo(idxLabel[selectedIndex].getX(), ratingLabel[selectedIndex].getY(),
+                    ratingLabel[selectedIndex].getWidth(), ratingLabel[selectedIndex].getHeight(),
+                    true, false);
         }
 
         public int getSelectedIndex() {
             return selectedIndex;
         }
 
-        public void setSelectedIndex(int idx) {
-            if (idx != selectedIndex) {
+        public boolean setSelectedIndex(int idx) {
+            if (idx != selectedIndex && selectable[idx]) {
                 if (selectedIndex >= 0 && selectedIndex < getMissionNum())
                     setRowColor(selectedIndex, LightBlocksGame.COLOR_UNSELECTED);
                 selectedIndex = idx;
@@ -239,7 +256,10 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
                 menuScreen.onGameModelIdChanged();
                 scoresGroup.show(getGameModelId());
+                missionTitle.setText(titles[idx]);
+                scrollToSelected();
             }
+            return (selectedIndex == idx);
         }
 
         protected int getMissionNum() {
@@ -259,24 +279,27 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
         @Override
         public boolean onControllerScroll(ControllerMenuStage.MoveFocusDirection direction) {
+            int idxToChange = 1;
             switch (direction) {
-                case east:
-                case west:
-                    return false;
                 case north:
-                    if (getSelectedIndex() > 0) {
-                        setSelectedIndex(getSelectedIndex() - 1);
-                        scrollToSelected();
-                        return true;
+                case south:
+                    return false;
+                case west:
+                    while (getSelectedIndex() - idxToChange >= 0) {
+                        if (setSelectedIndex(getSelectedIndex() - idxToChange))
+                            return true;
+                        else
+                            idxToChange++;
                     }
                     return false;
-                case south:
-                    if (getSelectedIndex() < getMissionNum() - 1) {
-                        setSelectedIndex(getSelectedIndex() + 1);
-                        scrollToSelected();
-                        return true;
-                    } else
-                        return false;
+                case east:
+                    while (getSelectedIndex() + idxToChange < getMissionNum()) {
+                        if (setSelectedIndex(getSelectedIndex() + idxToChange))
+                            return true;
+                        else
+                            idxToChange++;
+                    }
+                    return false;
             }
             return false;
         }
@@ -285,14 +308,19 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
         public void touchAction() {
             ratingLabel[selectedIndex].addAction(MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR,
                     ratingLabel[selectedIndex].getColor()));
-            titleLabel[selectedIndex].addAction(MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR,
-                    ratingLabel[selectedIndex].getColor()));
             idxLabel[selectedIndex].addAction(MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR,
                     ratingLabel[selectedIndex].getColor()));
         }
 
         public int getLastPossible() {
             return lastPossible;
+        }
+
+        @Override
+        protected void sizeChanged() {
+            super.sizeChanged();
+            if (ratingLabel != null && selectedIndex >= 0)
+                scrollToSelected();
         }
     }
 }
