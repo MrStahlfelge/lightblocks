@@ -119,7 +119,7 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
                                     }
         );
 
-        beginningLevelSlider = new BeginningLevelChooser(app, 0, 5);
+        beginningLevelSlider = new BeginningLevelChooser(app, 0, 9);
 
         gameParameterListener = new ChangeListener() {
             @Override
