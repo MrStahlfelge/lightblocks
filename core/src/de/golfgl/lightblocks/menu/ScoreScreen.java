@@ -2,13 +2,11 @@ package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.gdxgamesvcs.GameServiceException;
@@ -18,7 +16,6 @@ import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.AbstractMenuScreen;
-import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -296,53 +293,41 @@ public class ScoreScreen extends AbstractMenuScreen {
         swoshIn();
 
         // Wenn bereits 1000 Blöcke abgelegt sind und die Frage noch nicht verneint wurde bitten wir um ein Rating
+        // das ganze zeitlich verzögert, damit der Bildschirm sauber aufgebaut ist
         if (!app.getDontAskForRating() && scoresToShow.size > 1 &&
                 app.savegame.getTotalScore().getDrawnTetrominos() >= 1000)
-            askIfEnjoyingTheGame();
-
+            stage.getRoot().addAction(Actions.after(Actions.sequence(Actions.delay(.3f, Actions.run(new Runnable() {
+                @Override
+                public void run() {
+                    askIfEnjoyingTheGame();
+                }
+            })))));
     }
 
     private void askIfEnjoyingTheGame() {
-        Dialog dialog = new RunnableDialog("", app.skin);
-        Label askLabel = new Label(app.TEXTS.get("labelAskForRating1"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        askLabel.setWrap(true);
-        askLabel.setAlignment(Align.center);
-        dialog.getContentTable().add(askLabel).prefWidth
-                (LightBlocksGame.nativeGameWidth * .9f).pad(10);
-        final TextButton.TextButtonStyle buttonStyle = app.skin.get("big", TextButton.TextButtonStyle.class);
-        dialog.button(app.TEXTS.get("menuYes"), new Runnable() {
-            @Override
-            public void run() {
-                askForRating();
-            }
-        }, buttonStyle);
-        dialog.button(app.TEXTS.get("menuNo"), new Runnable() {
-            @Override
-            public void run() {
-                app.setDontAskForRating(true);
-            }
-        }, buttonStyle);
-        dialog.show(stage);
-
-
+        showConfirmationDialog(app.TEXTS.get("labelAskForRating1"),
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        //TODO focusedactor kommt durcheinander da der neue Dialog erst hochkommt und dann der alte geht
+                        askForRating();
+                    }
+                }, new Runnable() {
+                    @Override
+                    public void run() {
+                        app.setDontAskForRating(true);
+                    }
+                });
     }
 
     private void askForRating() {
-        Dialog dialog = new RunnableDialog("", app.skin);
-        Label askLabel = new Label(app.TEXTS.get("labelAskForRating2"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        askLabel.setWrap(true);
-        askLabel.setAlignment(Align.center);
-        dialog.getContentTable().add(askLabel).prefWidth
-                (LightBlocksGame.nativeGameWidth * .9f).pad(10);
-        final TextButton.TextButtonStyle buttonStyle = app.skin.get("big", TextButton.TextButtonStyle.class);
-        dialog.button(app.TEXTS.get("buttonIRateNow"), new Runnable() {
-            @Override
-            public void run() {
-                doRate();
-            }
-        }, buttonStyle);
-        dialog.button(app.TEXTS.get("buttonRemindMeLater"), null, buttonStyle);
-        dialog.show(stage);
+        showConfirmationDialog(app.TEXTS.get("labelAskForRating2"),
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        doRate();
+                    }
+                }, null, app.TEXTS.get("buttonIRateNow"), app.TEXTS.get("buttonRemindMeLater"));
     }
 
     private void doRate() {

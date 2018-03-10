@@ -13,15 +13,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
+import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.scene2d.VetoDialog;
+import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
 
 /**
  * Created by Benjamin Schulte on 17.01.2017.
@@ -135,14 +137,23 @@ public abstract class AbstractScreen implements Screen {
     }
 
     public Dialog showConfirmationDialog(String text, Runnable doWhenYes) {
+        return showConfirmationDialog(text, doWhenYes, null);
+    }
+
+    public Dialog showConfirmationDialog(String text, Runnable doWhenYes, Runnable doWhenNo, String... buttonLabels) {
         Dialog dialog = new RunnableDialog("", app.skin);
-        Label errorMsgLabel = new Label(text, app.skin);
+        Label errorMsgLabel = new ScaledLabel(text, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         errorMsgLabel.setWrap(true);
+        errorMsgLabel.setAlignment(Align.center);
         dialog.getContentTable().add(errorMsgLabel).prefWidth
-                (stage.getWidth() * .75f).pad(10);
-        final TextButton.TextButtonStyle buttonStyle = app.skin.get("big", TextButton.TextButtonStyle.class);
-        dialog.button(app.TEXTS.get("menuYes"), doWhenYes, buttonStyle);
-        dialog.button(app.TEXTS.get("menuNo"), null, buttonStyle);
+                (LightBlocksGame.nativeGameWidth * .8f).pad(20);
+        dialog.getButtonTable().defaults().expandX().pad(20);
+        dialog.button(new GlowLabelButton(buttonLabels.length >= 1 ? buttonLabels[0] : app.TEXTS.get("menuYes"),
+                app.skin, GlowLabelButton.FONT_SCALE_SUBMENU / GlowLabelButton.SMALL_SCALE_MENU,
+                GlowLabelButton.SMALL_SCALE_MENU), doWhenYes);
+        dialog.button(new GlowLabelButton(buttonLabels.length >= 2 ? buttonLabels[1] : app.TEXTS.get("menuNo"), app.skin,
+                GlowLabelButton.FONT_SCALE_SUBMENU / GlowLabelButton.SMALL_SCALE_MENU,
+                GlowLabelButton.SMALL_SCALE_MENU), doWhenNo);
         dialog.show(stage);
         return dialog;
     }
@@ -163,7 +174,7 @@ public abstract class AbstractScreen implements Screen {
         // for overriding purpose, see AbstractMenuScreen
     }
 
-    public static class RunnableDialog extends Dialog {
+    public static class RunnableDialog extends ControllerMenuDialog {
 
         public RunnableDialog(String title, Skin skin) {
             super(title, skin);
