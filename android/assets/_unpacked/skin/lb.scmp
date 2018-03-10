@@ -480,6 +480,19 @@ atlasData: {
 			tintName: null
 			name: radio-over
 		}
+		{
+			file: ../button_small_font.9.png
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			visible: true
+			tint: null
+			tintName: disabled
+			name: button_small_font_disabled
+		}
 	]
 }
 jsonData: {
@@ -2565,7 +2578,7 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: disabled
 						optional: true
-						value: null
+						value: button_small_font_disabled
 					}
 					pressedOffsetX: {
 						class: com.ray3k.skincomposer.data.StyleProperty

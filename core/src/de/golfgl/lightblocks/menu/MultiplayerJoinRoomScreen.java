@@ -2,7 +2,12 @@ package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.LifecycleListener;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -12,12 +17,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
 import de.golfgl.lightblocks.multiplayer.KryonetRoomLocation;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
-import de.golfgl.lightblocks.scene2d.OldFATextButton;
+import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.RoundedTextButton;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.VetoException;
 
@@ -27,38 +36,33 @@ import de.golfgl.lightblocks.screen.VetoException;
  * Created by Benjamin Schulte on 26.02.2017.
  */
 
-public class MultiplayerJoinRoomScreen extends OldAbstractMenuScreen implements IRoomListener {
+public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements IRoomListener, LifecycleListener {
+    private final LightBlocksGame app;
     private List<IRoomLocation> hostList;
     private float timeSinceHostListRefresh;
     private IRoomLocation lastSelectedRoom;
     private Label selectedRoomLabel;
-    private TextButton joinRoomButton;
+    private Button joinRoomButton;
+    private Button leaveButton;
 
+    public MultiplayerJoinRoomScreen(final LightBlocksGame app) {
+        super("", app.skin);
 
-    public MultiplayerJoinRoomScreen(LightBlocksGame app) {
-        super(app);
-    }
+        this.app = app;
 
-    @Override
-    protected String getTitleIcon() {
-        return FontAwesome.NET_PEOPLE;
-    }
+        // Back button
+        getButtonTable().defaults().uniform().fillX().expandX();
+        getButtonTable().pad(10);
+        leaveButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
+        joinRoomButton = new RoundedTextButton(app.TEXTS.get("labelMultiplayerJoinRoom"), app.skin);
+        button(leaveButton);
 
-    @Override
-    protected String getSubtitle() {
-        return app.TEXTS.get("labelMultiplayerLan") + ": " + app.TEXTS.get("labelMultiplayerJoinRoom");
-    }
-
-    @Override
-    protected String getTitle() {
-        return app.TEXTS.get("menuPlayMultiplayerButton");
-    }
-
-    @Override
-    protected void fillButtonTable(Table buttons) {
-        super.fillButtonTable(buttons);
-        joinRoomButton = new OldFATextButton(FontAwesome.NET_LOGIN,
-                app.TEXTS.get("labelMultiplayerJoinRoom"), app.skin);
+        Table contentTable = getContentTable();
+        contentTable.pad(15);
+        contentTable.add(new ScaledLabel(app.TEXTS.get("labelMultiplayerLan") + ": " + app.TEXTS.get
+                ("labelMultiplayerJoinRoom").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+        contentTable.row().padTop(15);
+        fillMenuTable(contentTable);
 
         joinRoomButton.addListener(new ChangeListener() {
             @Override
@@ -70,7 +74,7 @@ public class MultiplayerJoinRoomScreen extends OldAbstractMenuScreen implements 
                     app.multiRoom.joinRoom(lastSelectedRoom, app.player);
                     joinRoomButton.setDisabled(true);
                 } catch (VetoException e) {
-                    showDialog(e.getMessage());
+                    new VetoDialog(e.getMessage(), app.skin, LightBlocksGame.nativeGameWidth * .8f).show(getStage());
                 }
 
                 // wenn bis hierher gekommen, dann ist die Connection aufgebaut und der Handshake gesendet.
@@ -80,14 +84,25 @@ public class MultiplayerJoinRoomScreen extends OldAbstractMenuScreen implements 
         });
         joinRoomButton.setDisabled(true);
 
-        buttons.add(joinRoomButton).uniform();
+        addFocusableActor(joinRoomButton);
     }
 
     @Override
+    protected Actor getConfiguredEscapeActor() {
+        return leaveButton;
+    }
+
+    @Override
+    protected Actor getConfiguredDefaultActor() {
+        return hostList;
+    }
+
     protected void fillMenuTable(Table menuTable) {
         hostList = new List<IRoomLocation>(app.skin);
         selectedRoomLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        final TextButton enterManually = new TextButton(app.TEXTS.get("multiplayerJoinManually"), app.skin);
+        final TextButton enterManually = new RoundedTextButton(app.TEXTS.get("multiplayerJoinManually"), app.skin);
+        enterManually.getLabel().setFontScale(LightBlocksGame.LABEL_SCALING);
+        addFocusableActor(enterManually);
 
         hostList.addListener(new ChangeListener() {
             @Override
@@ -109,7 +124,7 @@ public class MultiplayerJoinRoomScreen extends OldAbstractMenuScreen implements 
                             KryonetRoomLocation newRoom = new KryonetRoomLocation(text, InetAddress.getByName(text));
                             roomSelect(newRoom);
                         } catch (UnknownHostException e) {
-                            showDialog("Not valid - " + e.getMessage());
+                            new VetoDialog("Not valid - " + e.getMessage(), app.skin, .8f).show(getStage());
                         }
                     }
 
@@ -121,14 +136,18 @@ public class MultiplayerJoinRoomScreen extends OldAbstractMenuScreen implements 
             }
         });
 
-        menuTable.add(new Label(app.TEXTS.get("multiplayerJoinRoomHelp1"), app.skin)).fill();
+        menuTable.add(new ScaledLabel(app.TEXTS.get("multiplayerJoinRoomHelp1"), app.skin,
+                LightBlocksGame.SKIN_FONT_REG, .7f)).fill();
         menuTable.row();
         menuTable.add(hostList).minWidth(LightBlocksGame.nativeGameWidth * .75f).minHeight(LightBlocksGame
-                .nativeGameHeight * .15f).pad(10);
+                .nativeGameHeight * .15f).pad(5);
         menuTable.row();
         menuTable.add(selectedRoomLabel);
         menuTable.row();
-        final Label multiplayerJoinRoomHelp2 = new Label(app.TEXTS.get("multiplayerJoinRoomHelp2"), app.skin);
+        menuTable.add(joinRoomButton);
+        menuTable.row().padTop(15);
+        final Label multiplayerJoinRoomHelp2 = new ScaledLabel(app.TEXTS.get("multiplayerJoinRoomHelp2"), app.skin,
+                LightBlocksGame.SKIN_FONT_REG, .7f);
         multiplayerJoinRoomHelp2.setWrap(true);
         menuTable.add(multiplayerJoinRoomHelp2).fill();
         menuTable.row();
@@ -143,14 +162,29 @@ public class MultiplayerJoinRoomScreen extends OldAbstractMenuScreen implements 
 
     @Override
     public void pause() {
+        // bei hide und vom LifecycleListener gestartet
         app.multiRoom.stopRoomDiscovery();
+    }
 
-        super.pause();
+    @Override
+    public void resume() {
+        // bei show und vom LifecycleListener gestartet
+        try {
+            app.multiRoom.startRoomDiscovery();
+        } catch (VetoException e) {
+            new VetoDialog(e.getMessage(), app.skin, LightBlocksGame.nativeGameWidth * .9f).show(getStage());
+        }
     }
 
     @Override
     public void dispose() {
-        app.multiRoom.stopRoomDiscovery();
+        // nicht benötigt
+    }
+
+    @Override
+    public void hide(Action action) {
+        Gdx.app.removeLifecycleListener(this);
+        pause();
         app.multiRoom.removeListener(this);
 
         // Verbindungsanfrage hängt oder es wurde keine gestellt
@@ -161,24 +195,24 @@ public class MultiplayerJoinRoomScreen extends OldAbstractMenuScreen implements 
                 // kann nichts kommen
             }
 
-        super.dispose();
+        super.hide(action);
     }
 
     @Override
-    public void show() {
-        super.show();
+    public Dialog show(Stage stage, Action action) {
+        super.show(stage, action);
 
-        try {
-            app.multiRoom.addListener(this);
-            app.multiRoom.startRoomDiscovery();
-        } catch (VetoException e) {
-            showDialog(e.getMessage());
-        }
+        Gdx.app.addLifecycleListener(this);
+
+        app.multiRoom.addListener(this);
+        resume();
+
+        return this;
     }
 
     @Override
-    public void render(float delta) {
-        super.render(delta);
+    public void act(float delta) {
+        super.act(delta);
 
         timeSinceHostListRefresh += delta;
 
@@ -206,7 +240,7 @@ public class MultiplayerJoinRoomScreen extends OldAbstractMenuScreen implements 
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    goBackToMenu();
+                    hide();
 
                 }
             });
@@ -223,7 +257,8 @@ public class MultiplayerJoinRoomScreen extends OldAbstractMenuScreen implements 
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    showDialog(((MultiPlayerObjects.Handshake) o).message);
+                    new VetoDialog(((MultiPlayerObjects.Handshake) o).message, app.skin,
+                            LightBlocksGame.nativeGameWidth * .9f).show(getStage());
                     joinRoomButton.setDisabled(false);
                 }
             });

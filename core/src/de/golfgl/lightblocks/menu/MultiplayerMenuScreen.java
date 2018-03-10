@@ -40,7 +40,7 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
     protected Dialog waitForConnectionOverlay;
     private OldFATextButton openRoomButton;
     private OldFATextButton joinRoomButton;
-    private OldFATextButton startGameButton;
+    private Button startGameButton;
     private BeginningLevelChooser beginningLevelSlider;
     private InputButtonTable inputButtonTable;
     private Table initGameScreen;
@@ -107,7 +107,7 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
 
         // Die folgenden Elemente sind nicht in der Buttontable, aber die Initialisierung hier macht Sinn
 
-        startGameButton = new OldFATextButton(FontAwesome.BIG_PLAY, app.TEXTS.get("menuStart"), app.skin);
+        startGameButton = new PlayButton(app);
         startGameButton.addListener(new ChangeListener() {
                                         public void changed(ChangeEvent event, Actor actor) {
                                             try {
@@ -376,10 +376,7 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
                 app.multiRoom = null;
             } else {
                 initializeKryonetRoom();
-                final MultiplayerJoinRoomScreen joinScreen = new MultiplayerJoinRoomScreen(app);
-                joinScreen.setBackScreen(this);
-                joinScreen.initializeUI();
-                app.setScreen(joinScreen);
+                new MultiplayerJoinRoomScreen(app).show(stage);
             }
 
         } catch (VetoException e) {

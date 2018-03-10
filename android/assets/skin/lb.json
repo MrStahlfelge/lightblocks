@@ -98,6 +98,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 			a: 0
 		}
 	}
+	button_small_font_disabled: {
+		name: button_small_font
+		color: disabled
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 	default: {
@@ -199,6 +203,7 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		up: button_small_font
 		down: button_small_font_filled
 		over: button_small_font_glow
+		disabled: button_small_font_disabled
 	}
 	checkbox: {
 		font: qs-40-bold
