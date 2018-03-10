@@ -17,6 +17,7 @@ import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.screen.AbstractMenuScreen;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -31,7 +32,7 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  * Created by Benjamin Schulte on 08.02.2017.
  */
 
-public class ScoreScreen extends AbstractScreen {
+public class ScoreScreen extends AbstractMenuScreen {
 
     private static final int MAX_COUNTING_TIME = 2;
     private Array<IRoundScore> scoresToShow;

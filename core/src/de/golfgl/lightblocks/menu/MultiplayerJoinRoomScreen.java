@@ -27,7 +27,7 @@ import de.golfgl.lightblocks.screen.VetoException;
  * Created by Benjamin Schulte on 26.02.2017.
  */
 
-public class MultiplayerJoinRoomScreen extends AbstractMenuScreen implements IRoomListener {
+public class MultiplayerJoinRoomScreen extends OldAbstractMenuScreen implements IRoomListener {
     private List<IRoomLocation> hostList;
     private float timeSinceHostListRefresh;
     private IRoomLocation lastSelectedRoom;

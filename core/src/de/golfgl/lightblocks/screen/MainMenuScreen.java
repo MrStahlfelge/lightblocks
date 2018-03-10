@@ -35,7 +35,7 @@ import de.golfgl.lightblocks.scene2d.ScaledLabel;
  * Das Hauptmenü
  * Created by Benjamin Schulte on 15.01.2017.
  */
-public class MainMenuScreen extends AbstractScreen {
+public class MainMenuScreen extends AbstractMenuScreen {
     private static final float MOVELOGODURATION = .5f;
     private final GlowLabel gameTitle;
     private final AnimatedLightblocksLogo blockGroup;
@@ -309,12 +309,5 @@ public class MainMenuScreen extends AbstractScreen {
                 stage.getHeight() * .33f - 2 * BlockActor.blockWidth
                 : isLandscape() ? stage.getHeight() * .66f - 2 * BlockActor.blockWidth
                 : stage.getHeight() - blockGroup.getHeight();
-    }
-
-    @Override
-    protected void onOrientationChanged() {
-        stage.setViewport(new ExtendViewport(isLandscape() ? LightBlocksGame.nativeGameHeight :
-                LightBlocksGame.nativeGameWidth,
-                isLandscape() ? LightBlocksGame.nativeLandscapeHeight : LightBlocksGame.nativeGameHeight));
     }
 }

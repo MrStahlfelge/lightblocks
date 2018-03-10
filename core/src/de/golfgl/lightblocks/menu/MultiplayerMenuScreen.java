@@ -35,7 +35,7 @@ import de.golfgl.lightblocks.state.MultiplayerMatch;
  * Created by Benjamin Schulte on 24.02.2017.
  */
 
-public class MultiplayerMenuScreen extends AbstractMenuScreen implements IRoomListener {
+public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoomListener {
 
     protected Dialog waitForConnectionOverlay;
     private OldFATextButton openRoomButton;

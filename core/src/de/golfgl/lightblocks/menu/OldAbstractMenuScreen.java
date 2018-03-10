@@ -16,11 +16,11 @@ import de.golfgl.lightblocks.screen.FontAwesome;
 /**
  * Created by Benjamin Schulte on 24.02.2017.
  */
-public abstract class AbstractMenuScreen extends AbstractScreen {
+public abstract class OldAbstractMenuScreen extends AbstractScreen {
     private Button leaveButton;
     private ScrollPane menuScrollPane;
 
-    public AbstractMenuScreen(LightBlocksGame app) {
+    public OldAbstractMenuScreen(LightBlocksGame app) {
         super(app);
     }
 

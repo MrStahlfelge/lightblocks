@@ -160,7 +160,7 @@ public abstract class AbstractScreen implements Screen {
      * is updated. Use to change stage's viewport if necessary.
      */
     protected void onOrientationChanged() {
-        // for overriding purpose
+        // for overriding purpose, see AbstractMenuScreen
     }
 
     public static class RunnableDialog extends Dialog {
