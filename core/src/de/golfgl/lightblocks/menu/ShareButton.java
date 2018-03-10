@@ -12,15 +12,22 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  */
 
 public class ShareButton extends FaButton {
+    private String shareText;
+
     public ShareButton(final LightBlocksGame app) {
         super(FontAwesome.NET_SHARE1, app.skin);
+        shareText = app.TEXTS.get("gameTitle") + ": " + LightBlocksGame.GAME_STOREURL;
 
         addListener(new ChangeListener() {
                         public void changed(ChangeEvent event, Actor actor) {
-                            app.share.shareText(app.TEXTS.get("gameTitle") + ": " +
-                                    LightBlocksGame.GAME_STOREURL, null);
+                            app.share.shareText(shareText, null);
                         }
                     }
         );
+    }
+
+    public ShareButton(LightBlocksGame app, String shareMessage) {
+        this(app);
+        this.shareText = shareMessage;
     }
 }

@@ -175,11 +175,7 @@ public class MainMenuScreen extends AbstractScreen {
         Button scoreButton = new FaButton(FontAwesome.COMMENT_STAR_TROPHY, app.skin);
         scoreButton.addListener(new ChangeListener() {
                                     public void changed(ChangeEvent event, Actor actor) {
-                                        TotalScoreScreen scoreScreen = new TotalScoreScreen(app);
-                                        scoreScreen.setTotal(app.savegame.getTotalScore());
-                                        scoreScreen.setMaxCountingTime(1);
-                                        scoreScreen.initializeUI();
-                                        app.setScreen(scoreScreen);
+                                        new TotalScoreScreen(app, mainGroup).show(stage);
                                     }
                                 }
         );

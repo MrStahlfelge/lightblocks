@@ -29,8 +29,9 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  * Created by Benjamin Schulte on 08.02.2017.
  */
 
-public class ScoreScreen extends AbstractScoreScreen {
+public class ScoreScreen extends AbstractMenuScreen {
 
+    private static final int MAX_COUNTING_TIME = 2;
     private Array<IRoundScore> scoresToShow;
     private Array<String> scoresToShowLabels;
     private BestScore best;
@@ -69,7 +70,7 @@ public class ScoreScreen extends AbstractScoreScreen {
         if (scoresToShow.size >= 1 && scoresToShow.get(0).getRating() > 0)
             return getFARatingString(scoresToShow.get(0).getRating());
         else
-            return super.getTitleIcon();
+            return FontAwesome.COMMENT_STAR_TROPHY;
     }
 
     public void addScoreToShow(IRoundScore score, String label) {
@@ -109,16 +110,21 @@ public class ScoreScreen extends AbstractScoreScreen {
             return app.TEXTS.get("labelScores");
     }
 
-    @Override
     protected String getShareText() {
-        return app.TEXTS.format((newHighscore || isBestScore(0) ? "shareBestText" :
+        return app.TEXTS.format((newHighscore ? "shareBestText" :
                 "shareText"), scoresToShow.get(0).getScore(), LightBlocksGame.GAME_URL_SHORT, getSubtitle());
     }
 
     @Override
-    protected void fillMenuTable(Table scoreTable) {
+    protected void fillMenuTable(Table menuTable) {
 
-        super.fillMenuTable(scoreTable);
+        ScoreTable scoreTable = new ScoreTable(app) {
+            @Override
+            protected boolean isBestScore(int i) {
+                return (scoresToShow.get(i) instanceof BestScore);
+            }
+        };
+        scoreTable.setMaxCountingTime(MAX_COUNTING_TIME);
 
         // Die Reihe mit den Labels
         if (scoresToShowLabels.size > 1) {
@@ -135,24 +141,26 @@ public class ScoreScreen extends AbstractScoreScreen {
             scores.add((long) scoresToShow.get(i).getScore());
 
             if (best != null && scoresToShow.get(i).getScore() >= best.getScore() && best.getScore() > 1000
-                    && scoresToShow.get(i).getRating() >= best.getRating() && !isBestScore(i))
+                    && scoresToShow.get(i).getRating() >= best.getRating() && !scoreTable.isBestScore(i))
                 newHighscore = true;
         }
-        addScoresLine(scoreTable, "labelScore", 8, scores, (best != null ? best.getScore() : 0));
+        scoreTable.addScoresLine("labelScore", 8, scores, (best != null ? best.getScore() : 0));
 
         // LINES
         scores.clear();
         for (int i = 0; i < scoresToShow.size; i++)
             scores.add((long) scoresToShow.get(i).getClearedLines());
 
-        addScoresLine(scoreTable, "labelLines", 0, scores, (best != null ? best.getClearedLines() : 0));
+        scoreTable.addScoresLine("labelLines", 0, scores, (best != null ? best.getClearedLines() : 0));
 
         // BLOCKS
         scores.clear();
         for (int i = 0; i < scoresToShow.size; i++)
             scores.add((long) scoresToShow.get(i).getDrawnTetrominos());
 
-        addScoresLine(scoreTable, "labelBlocks", 0, scores, (best != null ? best.getDrawnTetrominos() : 0));
+        scoreTable.addScoresLine("labelBlocks", 0, scores, (best != null ? best.getDrawnTetrominos() : 0));
+
+        menuTable.add(scoreTable);
     }
 
     @Override
@@ -194,7 +202,15 @@ public class ScoreScreen extends AbstractScoreScreen {
             buttons.add(retryOrNext).prefWidth(retryOrNext.getPrefWidth() * 1.2f).uniform(false, false);
         }
 
-        super.fillButtonTable(buttons);
+        // Share Button
+        Button share = new OldFATextButton(FontAwesome.NET_SHARE1, app.TEXTS.get("menuShare"), app.skin);
+        share.addListener(new ChangeListener() {
+            public void changed(ChangeEvent event, Actor actor) {
+                app.share.shareText(getShareText(), null);
+            }
+        });
+
+        buttons.add(share).fill().uniform();
 
         // Leader Board
         final String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(gameModelId);
@@ -216,11 +232,6 @@ public class ScoreScreen extends AbstractScoreScreen {
 
         }
 
-    }
-
-    @Override
-    protected boolean isBestScore(int i) {
-        return (scoresToShow.get(i) instanceof BestScore);
     }
 
     public void setNewGameParams(InitGameParameters newGameParams) {

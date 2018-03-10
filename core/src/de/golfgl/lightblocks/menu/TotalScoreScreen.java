@@ -1,9 +1,10 @@
 package de.golfgl.lightblocks.menu;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.menu.AbstractScoreScreen;
+import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.state.TotalScore;
 
 /**
@@ -12,16 +13,13 @@ import de.golfgl.lightblocks.state.TotalScore;
  * Created by Benjamin Schulte on 08.02.2017.
  */
 
-public class TotalScoreScreen extends AbstractScoreScreen {
+public class TotalScoreScreen extends AbstractMenuDialog {
 
+    private static final int MAX_COUNTING_TIME = 1;
     private TotalScore total;
 
-    public TotalScoreScreen(LightBlocksGame app) {
-        super(app);
-    }
-
-    public void setTotal(TotalScore total) {
-        this.total = total;
+    public TotalScoreScreen(LightBlocksGame app, Actor actorToHide) {
+        super(app, actorToHide);
     }
 
     @Override
@@ -35,21 +33,34 @@ public class TotalScoreScreen extends AbstractScoreScreen {
     }
 
     @Override
-    protected String getShareText() {
-        return app.TEXTS.format("shareTotalText", total.getDrawnTetrominos(), LightBlocksGame
-                .GAME_URL_SHORT);
+    protected String getTitleIcon() {
+        return FontAwesome.COMMENT_STAR_TROPHY;
     }
 
     @Override
-    protected void fillMenuTable(Table scoreTable) {
-        super.fillMenuTable(scoreTable);
+    protected void fillMenuTable(Table menuTable) {
+        total = app.savegame.getTotalScore();
 
-        addScoresLine(scoreTable, "labelScore", 10, total.getScore());
-        addScoresLine(scoreTable, "labelLines", 0, total.getClearedLines());
-        addScoresLine(scoreTable, "labelBlocks", 0, total.getDrawnTetrominos());
-        addScoresLine(scoreTable, "labelFourLines", 0, total.getFourLineCount());
-        addScoresLine(scoreTable, "labelTSpin", 0, total.getTSpins());
-        addScoresLine(scoreTable, "labelMultiPlayerWon", 0, total.getMultiPlayerMatchesWon());
+        ScoreTable scoreTable = new ScoreTable(app);
+        scoreTable.setMaxCountingTime(MAX_COUNTING_TIME);
+        scoreTable.addScoresLine("labelScore", 10, total.getScore());
+        scoreTable.addScoresLine("labelLines", 0, total.getClearedLines());
+        scoreTable.addScoresLine("labelBlocks", 0, total.getDrawnTetrominos());
+        scoreTable.addScoresLine("labelFourLines", 0, total.getFourLineCount());
+        scoreTable.addScoresLine("labelTSpin", 0, total.getTSpins());
+        scoreTable.addScoresLine("labelMultiPlayerWon", 0, total.getMultiPlayerMatchesWon());
+
+        menuTable.add(scoreTable);
+    }
+
+    @Override
+    protected void fillButtonTable(Table buttons) {
+        super.fillButtonTable(buttons);
+
+        ShareButton shareButton = new ShareButton(app, app.TEXTS.format("shareTotalText", total.getDrawnTetrominos
+                (), LightBlocksGame.GAME_URL_SHORT));
+        buttons.add(shareButton);
+        addFocusableActor(shareButton);
     }
 
 }

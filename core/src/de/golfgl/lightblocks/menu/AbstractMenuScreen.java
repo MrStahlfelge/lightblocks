@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.BetterScrollPane;
 import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
@@ -64,7 +65,7 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
         mainTable.add(title);
         mainTable.row();
         if (subtitle != null)
-            mainTable.add(new Label(subtitle, app.skin, LightBlocksGame.SKIN_FONT_BIG));
+            mainTable.add(new ScaledLabel(subtitle, app.skin, LightBlocksGame.SKIN_FONT_TITLE));
         mainTable.row().spaceTop(30);
         mainTable.add(menuScrollPane);
         mainTable.row();
