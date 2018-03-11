@@ -25,6 +25,7 @@ public class VetoDialog extends ControllerMenuDialog {
         errorMsgLabel.setWrap(true);
         errorMsgLabel.setAlignment(Align.center);
         getContentTable().add(errorMsgLabel).prefWidth(prefWidth).pad(10);
+        getButtonTable().defaults().expandX().fill();
         Button okButton = new FaButton(FontAwesome.CIRCLE_CHECK, skin);
         button(okButton);
     }

@@ -59,11 +59,6 @@ public class GlowLabelButton extends Button implements ITouchActionButton, Music
 
         labelGroup = new GlowLabel(text, skin, fontScale) {
             @Override
-            public float getPrefWidth() {
-                return super.getPrefWidth() / getScaleX();
-            }
-
-            @Override
             public float getPrefHeight() {
                 return super.getPrefHeight() / getScaleY();
             }
@@ -83,8 +78,16 @@ public class GlowLabelButton extends Button implements ITouchActionButton, Music
         isFirstAct = true;
     }
 
+    @Override
+    public float getMinWidth() {
+        // der MinWidth des Buttons wird so erhöht, dass er in jeder Skalierung passt. Gleichzeitig ist die einzelne
+        // Zelle aber nicht vergrößert, damit die mittige Ausrichtung von mehreren Zellen gewahrt ist
+        return super.getMinWidth() - (labelGroup.getPrefWidth() + labelGroup.getPrefWidth() / labelGroup.getScaleX());
+    }
+
     private void setFaLabelAlignment() {
         if (faLabel != null) {
+            faLabel.setAlignment(labelGroup.getText().length() > 0 ? Align.right : Align.center);
             if (labelGroup.getText().length() > 0)
                 faCell.right();
             else

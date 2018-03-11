@@ -147,7 +147,7 @@ public abstract class AbstractScreen implements Screen {
         errorMsgLabel.setAlignment(Align.center);
         dialog.getContentTable().add(errorMsgLabel).prefWidth
                 (LightBlocksGame.nativeGameWidth * .8f).pad(20);
-        dialog.getButtonTable().defaults().expandX().pad(20);
+        dialog.getButtonTable().defaults().expandX().pad(20).fill();
         dialog.button(new GlowLabelButton(buttonLabels.length >= 1 ? buttonLabels[0] : app.TEXTS.get("menuYes"),
                 app.skin, GlowLabelButton.FONT_SCALE_SUBMENU / GlowLabelButton.SMALL_SCALE_MENU,
                 GlowLabelButton.SMALL_SCALE_MENU), doWhenYes);
