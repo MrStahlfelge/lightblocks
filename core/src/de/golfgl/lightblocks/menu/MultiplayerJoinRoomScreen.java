@@ -128,6 +128,13 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
         enterManually.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                String proposal = "";
+
+                if (lastSelectedRoom != null && lastSelectedRoom instanceof KryonetRoomLocation) {
+                    // Desktop hat Darstellungsfehler, aber unter Android ist es ok
+                    proposal = ((KryonetRoomLocation) lastSelectedRoom).address.getHostAddress();
+                }
+
                 Gdx.input.getTextInput(new Input.TextInputListener() {
                     @Override
                     public void input(String text) {
@@ -145,7 +152,7 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
                     public void canceled() {
                         //nix
                     }
-                }, app.TEXTS.get("gameTitle"), "", app.TEXTS.get("multiplayerJoinManually"));
+                }, app.TEXTS.get("gameTitle"), proposal, app.TEXTS.get("multiplayerJoinManually"));
             }
         });
 
