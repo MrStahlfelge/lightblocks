@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -24,8 +23,10 @@ import de.golfgl.lightblocks.multiplayer.IRoomLocation;
 import de.golfgl.lightblocks.multiplayer.KryonetRoomLocation;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.TouchableList;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -38,12 +39,12 @@ import de.golfgl.lightblocks.screen.VetoException;
 
 public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements IRoomListener, LifecycleListener {
     private final LightBlocksGame app;
-    private List<IRoomLocation> hostList;
+    private TouchableList<IRoomLocation> hostList;
     private float timeSinceHostListRefresh;
     private IRoomLocation lastSelectedRoom;
-    private Label selectedRoomLabel;
-    private Button joinRoomButton;
+    private TextButton joinRoomButton;
     private Button leaveButton;
+    private TextButton enterManually;
 
     public MultiplayerJoinRoomScreen(final LightBlocksGame app) {
         super("", app.skin);
@@ -52,7 +53,6 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
 
         // Back button
         getButtonTable().defaults().uniform().fillX().expandX();
-        getButtonTable().pad(10);
         leaveButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
         joinRoomButton = new RoundedTextButton(app.TEXTS.get("labelMultiplayerJoinRoom"), app.skin);
         button(leaveButton);
@@ -60,7 +60,7 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
         Table contentTable = getContentTable();
         contentTable.pad(15);
         contentTable.add(new ScaledLabel(app.TEXTS.get("labelMultiplayerLan") + ": " + app.TEXTS.get
-                ("labelMultiplayerJoinRoom").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+                ("labelMultiplayerJoinRoom"), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
         contentTable.row().padTop(15);
         fillMenuTable(contentTable);
 
@@ -94,13 +94,24 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
 
     @Override
     protected Actor getConfiguredDefaultActor() {
-        return hostList;
+        return hostList.getSelectedIndex() >= 0 ? joinRoomButton : enterManually;
     }
 
     protected void fillMenuTable(Table menuTable) {
-        hostList = new List<IRoomLocation>(app.skin);
-        selectedRoomLabel = new Label("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        final TextButton enterManually = new RoundedTextButton(app.TEXTS.get("multiplayerJoinManually"), app.skin);
+        hostList = new TouchableList<IRoomLocation>(app.skin) {
+            @Override
+            public boolean onControllerDefaultKeyDown() {
+                ((MyStage) getStage()).setFocusedActor(joinRoomButton);
+                return true;
+            }
+
+            @Override
+            protected void setup() {
+                //nicht einfach den ersten selektieren
+            }
+        };
+        addFocusableActor(hostList);
+        enterManually = new RoundedTextButton(app.TEXTS.get("multiplayerJoinManually"), app.skin);
         enterManually.getLabel().setFontScale(LightBlocksGame.LABEL_SCALING);
         addFocusableActor(enterManually);
 
@@ -123,8 +134,10 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
                         try {
                             KryonetRoomLocation newRoom = new KryonetRoomLocation(text, InetAddress.getByName(text));
                             roomSelect(newRoom);
+                            ((MyStage) getStage()).setFocusedActor(joinRoomButton);
                         } catch (UnknownHostException e) {
-                            new VetoDialog("Not valid - " + e.getMessage(), app.skin, .8f).show(getStage());
+                            new VetoDialog("Not valid - " + e.getMessage(), app.skin,
+                                    LightBlocksGame.nativeGameWidth * .8f).show(getStage());
                         }
                     }
 
@@ -140,9 +153,7 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
                 LightBlocksGame.SKIN_FONT_REG, .7f)).fill();
         menuTable.row();
         menuTable.add(hostList).minWidth(LightBlocksGame.nativeGameWidth * .75f).minHeight(LightBlocksGame
-                .nativeGameHeight * .15f).pad(5);
-        menuTable.row();
-        menuTable.add(selectedRoomLabel);
+                .nativeGameHeight * .15f).pad(5).expand();
         menuTable.row();
         menuTable.add(joinRoomButton);
         menuTable.row().padTop(15);
@@ -157,7 +168,10 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
     protected void roomSelect(IRoomLocation selectedRoom) {
         lastSelectedRoom = selectedRoom;
         joinRoomButton.setDisabled(false);
-        selectedRoomLabel.setText(selectedRoom.getRoomName());
+        String shownRoomName = selectedRoom.getRoomName();
+        if (shownRoomName.length() >= 13)
+            shownRoomName = shownRoomName.substring(0, 10) + "...";
+        joinRoomButton.setText(app.TEXTS.get("labelMultiplayerJoinRoom") + ": " + shownRoomName);
     }
 
     @Override
@@ -219,8 +233,6 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
         if (timeSinceHostListRefresh > .5f && hostList != null) {
             timeSinceHostListRefresh = timeSinceHostListRefresh - .5f;
 
-            IRoomLocation lastSelected = hostList.getSelected();
-
             hostList.clearItems();
 
             final java.util.List<IRoomLocation> discoveredRooms = app.multiRoom.getDiscoveredRooms();
@@ -228,7 +240,11 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
                 for (IRoomLocation a : discoveredRooms)
                     hostList.getItems().add(a);
 
-
+            if (lastSelectedRoom == null && hostList.getItems().size > 0) {
+                hostList.setSelectedIndex(0);
+                ((MyStage) getStage()).setFocusedActor(joinRoomButton);
+            } else if (lastSelectedRoom != null && hostList.getItems().contains(lastSelectedRoom, false))
+                hostList.setSelected(lastSelectedRoom);
         }
 
     }

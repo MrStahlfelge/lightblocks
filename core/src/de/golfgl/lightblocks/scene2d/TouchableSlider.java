@@ -25,9 +25,4 @@ public class TouchableSlider extends ControllerSlider implements ITouchActionBut
         colorAction = MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR, getColor());
         addAction(colorAction);
     }
-
-    @Override
-    public boolean onControllerScroll(ControllerMenuStage.MoveFocusDirection direction) {
-        return super.onControllerScroll(direction);
-    }
 }
