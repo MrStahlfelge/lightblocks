@@ -696,7 +696,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             app.gameOverSound.play();
         inputAdapter.setGameOver();
         saveGameState();
-        app.savegame.gpgsSaveGameState(false);
+        app.savegame.gpgsSaveGameState(null);
     }
 
     @Override

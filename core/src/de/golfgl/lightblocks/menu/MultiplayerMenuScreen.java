@@ -16,6 +16,7 @@ import java.util.HashMap;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
@@ -312,7 +313,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
         matchStats.clearStats();
 
         try {
-            app.multiRoom = app.gpgsClient.createMultiPlayerRoom();
+            app.multiRoom = ((IMultiplayerGsClient) app.gpgsClient).createMultiPlayerRoom();
             app.multiRoom.addListener(this);
             app.multiRoom.openRoom(app.player);
         } catch (VetoException e) {
@@ -369,7 +370,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
     protected void joinGpgsButtonPressed() {
         try {
-            app.multiRoom = app.gpgsClient.createMultiPlayerRoom();
+            app.multiRoom = ((IMultiplayerGsClient) app.gpgsClient).createMultiPlayerRoom();
             app.multiRoom.addListener(this);
             app.multiRoom.startRoomDiscovery();
         } catch (VetoException e) {

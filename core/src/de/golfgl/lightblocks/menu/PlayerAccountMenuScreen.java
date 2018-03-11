@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
+import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
@@ -58,10 +59,15 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
 
     private void performGpgsLoginout() {
         if (app.gpgsClient.isSessionActive()) {
-            app.savegame.gpgsSaveGameState(true);
             app.setGpgsAutoLogin(false);
-            app.gpgsClient.logOff();
+            logInOutButton.setDisabled(true);
             app.savegame.resetLoadedFromCloud();
+            app.savegame.gpgsSaveGameState(new ISaveGameStateResponseListener() {
+                @Override
+                public void onGameStateSaved(boolean success, String errorCode) {
+                    app.gpgsClient.logOff();
+                }
+            });
         } else {
             app.gpgsClient.logIn();
             refreshAccountChanged();

@@ -6,8 +6,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
+import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
-import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.TotalScore;
@@ -26,7 +26,7 @@ public abstract class GameModel implements Json.Serializable {
     // Speicherhaltung
     private final IntArray linesToRemove;
     public TotalScore totalScore;
-    public IGpgsClient gpgsClient;
+    public IGameServiceClient gpgsClient;
     /**
      * hier am GameModel verwaltet, da die Eingabemethode mit dem Modell ins Savegame kommt (und von dort geladen wird)
      */

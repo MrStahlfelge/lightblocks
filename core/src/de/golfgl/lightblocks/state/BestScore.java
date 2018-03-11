@@ -5,8 +5,8 @@ import com.badlogic.gdx.utils.JsonValue;
 
 import java.util.HashMap;
 
+import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
-import de.golfgl.lightblocks.gpgs.IGpgsClient;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Mission;
 
@@ -160,7 +160,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
             }
         }
 
-        public void checkAchievements(IGpgsClient gpgsClient) {
+        public void checkAchievements(IGameServiceClient gpgsClient) {
             if (gpgsClient == null || !gpgsClient.isSessionActive())
                 return;
 

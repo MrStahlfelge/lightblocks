@@ -17,7 +17,7 @@ import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
  * Created by Benjamin Schulte on 26.03.2017.
  */
 
-public class GpgsMultiPlayerClient extends de.golfgl.gdxgamesvcs.GpgsClient implements IGpgsClient {
+public class GpgsMultiPlayerClient extends de.golfgl.gdxgamesvcs.GpgsClient implements IMultiplayerGsClient {
 
     private GpgsMultiPlayerRoom gpgsMPRoom;
 

@@ -1,7 +1,7 @@
 package de.golfgl.lightblocks.state;
 
+import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
-import de.golfgl.lightblocks.gpgs.IGpgsClient;
 
 /**
  * Der Total Score nimmt die gesamten Punktzahlen für den Spieler auf
@@ -115,7 +115,7 @@ public class TotalScore {
             multiPlayerMatchesWon = totalScore.getMultiPlayerMatchesWon();
     }
 
-    public void checkAchievements(IGpgsClient gpgsClient) {
+    public void checkAchievements(IGameServiceClient gpgsClient) {
         // Warum werden die Achievements nicht immer kontrolliert? Ganz einfach: Falls dieses Objekt
         // gar nicht der tatsächliche Spielstand ist, sondern nur ein geladener o.ä.
         // reduziert außerdem die Anzahl der Meldungen an GPGS

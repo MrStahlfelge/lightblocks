@@ -19,9 +19,10 @@ import com.esotericsoftware.minlog.Log;
 import java.util.HashMap;
 import java.util.List;
 
+import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.gamestate.ILoadGameStateResponseListener;
-import de.golfgl.lightblocks.gpgs.IGpgsClient;
+import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -88,7 +89,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public ShareHandler share;
     public AbstractMultiplayerRoom multiRoom;
     public Player player;
-    public IGpgsClient gpgsClient;
+    public IGameServiceClient gpgsClient;
     // Android Modellname des Geräts
     public String modelNameRunningOn;
     public MainMenuScreen mainMenuScreen;
@@ -318,7 +319,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
                 // (obwohl das Willkommen... Schild kam)
                 // Nun in UI Thread verlagert
                 if (!savegame.isAlreadyLoadedFromCloud() && gpgsClient.isSessionActive())
-                    gpgsClient.loadGameState(IGpgsClient.NAME_SAVE_GAMESTATE,
+                    gpgsClient.loadGameState(IMultiplayerGsClient.NAME_SAVE_GAMESTATE,
                             new ILoadGameStateResponseListener() {
                                 @Override
                                 public void gsGameStateLoaded(byte[] gameState) {

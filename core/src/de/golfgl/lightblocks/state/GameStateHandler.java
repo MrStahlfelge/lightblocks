@@ -6,8 +6,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.esotericsoftware.minlog.Log;
 
+import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.gpgs.IGpgsClient;
+import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 
 /**
  * Die Klasse lädt oder speichert einen Json-String der den Spielstand abbildet
@@ -153,7 +154,7 @@ public class GameStateHandler {
     /**
      * saves total score und progression to cloud. Does not save it to files.
      */
-    public void gpgsSaveGameState(boolean sync) {
+    public void gpgsSaveGameState(ISaveGameStateResponseListener success) {
         if (app.gpgsClient != null && app.gpgsClient.isSessionActive()) {
             synchronized (gameStateMonitor) {
                 getTotalScore(); // sicherstellen dass er geladen ist
@@ -176,14 +177,9 @@ public class GameStateHandler {
                 if (LightBlocksGame.GAME_DEVMODE)
                     Log.info("GameState", jsonString);
 
-                if (sync)
-                    app.gpgsClient.saveGameStateSync(IGpgsClient.NAME_SAVE_GAMESTATE,
-                            xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
-                            totalScore.getScore(), null);
-                else
-                    app.gpgsClient.saveGameState(IGpgsClient.NAME_SAVE_GAMESTATE,
-                            xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
-                            totalScore.getScore(), null);
+                app.gpgsClient.saveGameState(IMultiplayerGsClient.NAME_SAVE_GAMESTATE,
+                        xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
+                        totalScore.getScore(), success);
             }
         }
     }
