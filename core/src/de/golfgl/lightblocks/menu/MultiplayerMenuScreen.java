@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -21,6 +22,7 @@ import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scene2d.OldFATextButton;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.MultiplayerPlayScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -35,7 +37,7 @@ import de.golfgl.lightblocks.state.MultiplayerMatch;
  * Created by Benjamin Schulte on 24.02.2017.
  */
 
-public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoomListener {
+public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomListener {
 
     protected Dialog waitForConnectionOverlay;
     private OldFATextButton openRoomButton;
@@ -57,34 +59,37 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
     private OldFATextButton gpgShowInvitationsButton;
     private OldFATextButton gpgInviteButton;
     private Button shareAppButton;
+    private boolean screenNotActive = false;
 
-    public MultiplayerMenuScreen(LightBlocksGame app) {
-        super(app);
-
-        initializeUI();
-
+    public MultiplayerMenuScreen(LightBlocksGame app, Actor actorToHide) {
+        super(app, actorToHide);
     }
 
     @Override
-    protected void goBackToMenu() {
-        if (app.multiRoom != null && app.multiRoom.isConnected())
+    protected void result(Object object) {
+        if (app.multiRoom != null && app.multiRoom.isConnected()) {
             showDialog("You are still member of a room. Please leave it first.");
-        else
-            super.goBackToMenu();
+            cancel();
+        }
     }
 
     @Override
-    public void dispose() {
+    public void hide(Action action) {
         // und weg mit dem Zeug
         app.multiRoom = null;
 
-        super.dispose();
+        super.hide(action);
     }
 
     @Override
-    public void show() {
+    public void act(float delta) {
+        super.act(delta);
 
-        super.show();
+        //den folgenden Code nur ausführen, wenn wir aus dem PlayScreen zurück kommen
+        if (!screenNotActive)
+            return;
+
+        screenNotActive = false;
 
         if (hasToRefresh)
             refreshPlayerList();
@@ -100,6 +105,7 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
 
     @Override
     protected void fillButtonTable(Table buttons) {
+        super.fillButtonTable(buttons);
 
         shareAppButton = new ShareButton(app);
 
@@ -206,7 +212,8 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
                 buttonOpenLocalRoomPressed();
             }
         });
-        joinRoomButton = new OldFATextButton(FontAwesome.NET_LOGIN, app.TEXTS.get("labelMultiplayerJoinRoom"), app.skin);
+        joinRoomButton = new OldFATextButton(FontAwesome.NET_LOGIN, app.TEXTS.get("labelMultiplayerJoinRoom"), app
+                .skin);
         joinRoomButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -274,17 +281,18 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
 
     private void confirmForcedRoomClose() {
         // mehr als ein Spieler - dann nachfragen ob wirklich geschlossen werden soll
-        showConfirmationDialog(app.TEXTS.get("multiplayerDisconnectClients"), new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    app.multiRoom.closeRoom(true);
-                    app.multiRoom = null;
-                } catch (VetoException e) {
-                    showDialog(e.getMessage());
-                }
-            }
-        });
+        ((AbstractScreen) app.getScreen()).showConfirmationDialog(app.TEXTS.get("multiplayerDisconnectClients"),
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            app.multiRoom.closeRoom(true);
+                            app.multiRoom = null;
+                        } catch (VetoException e) {
+                            showDialog(e.getMessage());
+                        }
+                    }
+                });
     }
 
     private void initializeKryonetRoom() {
@@ -376,7 +384,7 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
                 app.multiRoom = null;
             } else {
                 initializeKryonetRoom();
-                new MultiplayerJoinRoomScreen(app).show(stage);
+                new MultiplayerJoinRoomScreen(app).show(getStage());
             }
 
         } catch (VetoException e) {
@@ -430,9 +438,9 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
         initGameParametersParams.setMultiplayerRoom(app.multiRoom);
 
         try {
-            MultiplayerPlayScreen mps = (MultiplayerPlayScreen) PlayScreen.gotoPlayScreen(this,
-                    initGameParametersParams);
-            mps.setBackScreen(this);
+            MultiplayerPlayScreen mps = (MultiplayerPlayScreen) PlayScreen.gotoPlayScreen(
+                    ((AbstractScreen) app.getScreen()), initGameParametersParams);
+            screenNotActive = true;
             ((MultiplayerModel) mps.gameModel).setMatchStats(matchStats);
 
             app.multiRoom.addListener(mps);
@@ -515,7 +523,7 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    if (app.getScreen() == MultiplayerMenuScreen.this)
+                    if (app.getScreen() == app.mainMenuScreen)
                         showDialog("Error connecting with " + ((MultiPlayerObjects.Handshake) o).playerId + ": " +
                                 ((MultiPlayerObjects.Handshake) o).message);
                 }
@@ -590,9 +598,9 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
 
         final Table contentTable = waitForConnectionOverlay.getContentTable();
         contentTable.defaults().pad(15);
-        contentTable.add(messageLabel).width(.75f * stage.getWidth());
+        contentTable.add(messageLabel).width(.75f * getStage().getWidth());
 
-        waitForConnectionOverlay.show(stage);
+        waitForConnectionOverlay.show(getStage());
     }
 
     protected void hideOverlay() {
@@ -625,7 +633,7 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
     protected void refreshPlayerList() {
         final Actor newActor;
 
-        if (app.getScreen() != this)
+        if (app.getScreen() != app.mainMenuScreen)
             hasToRefresh = true;
 
         if (matchStats.getNumberOfPlayers() == 0) {
@@ -707,5 +715,9 @@ public class MultiplayerMenuScreen extends OldAbstractMenuScreen implements IRoo
         mainCell.setActor(newActor);
 
         hasToRefresh = false;
+    }
+
+    private void showDialog(String message) {
+        ((AbstractScreen) app.getScreen()).showDialog(message);
     }
 }

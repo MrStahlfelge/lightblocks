@@ -133,7 +133,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
         playMultiplayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                app.setScreen(new MultiplayerMenuScreen(app));
+                new MultiplayerMenuScreen(app, mainGroup).show(stage);
             }
         });
         menuButtons.add(playMultiplayerButton).padTop(10);
