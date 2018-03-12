@@ -21,8 +21,9 @@ import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
-import de.golfgl.lightblocks.scene2d.OldFATextButton;
-import de.golfgl.lightblocks.scene2d.ScoreLabel;
+import de.golfgl.lightblocks.scene2d.GlowLabelButton;
+import de.golfgl.lightblocks.scene2d.MyStage;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.MultiplayerPlayScreen;
@@ -41,8 +42,8 @@ import de.golfgl.lightblocks.state.MultiplayerMatch;
 public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomListener {
 
     protected Dialog waitForConnectionOverlay;
-    private OldFATextButton openRoomButton;
-    private OldFATextButton joinRoomButton;
+    private GlowLabelButton openRoomButton;
+    private GlowLabelButton joinRoomButton;
     private Button startGameButton;
     private BeginningLevelChooser beginningLevelSlider;
     private InputButtonTable inputButtonTable;
@@ -52,13 +53,10 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
     private HashMap<String, boolean[]> availablePlayerInputs = new HashMap<String, boolean[]>();
     private boolean hasToRefresh = false;
     private ChangeListener gameParameterListener;
-    private Cell buttonTableCell;
-    private Cell initScreenLanButtonCell;
-    private Cell initScreenGpgButtonCell;
     private Table lanButtons;
     private Table gpgButtons;
-    private OldFATextButton gpgShowInvitationsButton;
-    private OldFATextButton gpgInviteButton;
+    private GlowLabelButton gpgShowInvitationsButton;
+    private GlowLabelButton gpgInviteButton;
     private Button shareAppButton;
     private boolean screenNotActive = false;
 
@@ -68,10 +66,28 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
     @Override
     protected void result(Object object) {
+        // der Leave-Button wurde gedrückt
         if (app.multiRoom != null && app.multiRoom.isConnected()) {
-            showDialog("You are still member of a room. Please leave it first.");
+            leaveCurrentRoom();
             cancel();
         }
+    }
+
+    private void leaveCurrentRoom() {
+        if (app.multiRoom == null || !app.multiRoom.isConnected())
+            return;
+
+        // die verfügbaren Buttons abgehen
+        if (!app.multiRoom.isLocalGame()) {
+            try {
+                app.multiRoom.leaveRoom(true);
+            } catch (VetoException e) {
+                // eat
+            }
+        } else if (app.multiRoom.isOwner())
+            buttonOpenLocalRoomPressed();
+        else
+            joinLocalButtonPressed();
     }
 
     @Override
@@ -110,7 +126,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
         shareAppButton = new ShareButton(app);
 
-        buttonTableCell = buttons.add(shareAppButton);
+        buttons.add(shareAppButton);
+        addFocusableActor(shareAppButton);
 
         // Die folgenden Elemente sind nicht in der Buttontable, aber die Initialisierung hier macht Sinn
 
@@ -125,8 +142,10 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
                                         }
                                     }
         );
+        addFocusableActor(startGameButton);
 
         beginningLevelSlider = new BeginningLevelChooser(app, 0, 9);
+        addFocusableActor(beginningLevelSlider.getSlider());
 
         gameParameterListener = new ChangeListener() {
             @Override
@@ -142,6 +161,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
         };
 
         inputButtonTable = new InputButtonTable(app, PlayScreenInput.KEY_INPUTTYPE_ALLAVAIL);
+        addFocusableActor(inputButtonTable);
 
         beginningLevelSlider.addListener(gameParameterListener);
         inputButtonTable.setExternalChangeListener(gameParameterListener);
@@ -168,32 +188,29 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
     @Override
     protected void fillMenuTable(Table menuTable) {
 
-        Label lanHelp = new Label(app.TEXTS.get("multiplayerLanHelp"), app.skin);
+        Label lanHelp = new ScaledLabel(app.TEXTS.get("multiplayerLanHelp"), app.skin,
+                LightBlocksGame.SKIN_FONT_REG, .75f);
         lanHelp.setWrap(true);
 
-        Label gpgHelp = new Label(app.TEXTS.get("multiplayerGpgHelp"), app.skin);
+        Label gpgHelp = new ScaledLabel(app.TEXTS.get("multiplayerGpgHelp"), app.skin,
+                LightBlocksGame.SKIN_FONT_REG, .75f);
         gpgHelp.setWrap(true);
 
         gpgButtons = new Table();
-        gpgInviteButton = new OldFATextButton(FontAwesome.GPGS_LOGO, app.TEXTS.get
-                ("menuInvitePlayers"), app.skin);
+        gpgInviteButton = new GlowLabelButton(app.TEXTS.get
+                ("menuInvitePlayers"), app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
         gpgInviteButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (app.multiRoom != null && app.multiRoom.isConnected())
-                    try {
-                        app.multiRoom.leaveRoom(true);
-                    } catch (VetoException e) {
-                        // eat
-                    }
-                else
+                if (app.multiRoom == null || !app.multiRoom.isConnected())
                     initializeGpgsRoom();
             }
         });
         gpgButtons.add(gpgInviteButton);
+        addFocusableActor(gpgInviteButton);
 
-        gpgShowInvitationsButton = new OldFATextButton(FontAwesome.NET_LOGIN, app.TEXTS.get
-                ("menuShowInvitations"), app.skin);
+        gpgShowInvitationsButton = new GlowLabelButton(app.TEXTS.get
+                ("menuShowInvitations"), app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
         gpgShowInvitationsButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -202,19 +219,21 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
                 joinGpgsButtonPressed();
             }
         });
+        gpgButtons.row();
         gpgButtons.add(gpgShowInvitationsButton);
+        addFocusableActor(gpgShowInvitationsButton);
 
         lanButtons = new Table();
-        openRoomButton = new OldFATextButton(FontAwesome.NET_SQUARELINK, app.TEXTS.get("labelMultiplayerOpenRoom"), app
-                .skin);
+        openRoomButton = new GlowLabelButton(app.TEXTS.get("labelMultiplayerOpenRoom"),
+                app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
         openRoomButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 buttonOpenLocalRoomPressed();
             }
         });
-        joinRoomButton = new OldFATextButton(FontAwesome.NET_LOGIN, app.TEXTS.get("labelMultiplayerJoinRoom"), app
-                .skin);
+        joinRoomButton = new GlowLabelButton(app.TEXTS.get("labelMultiplayerJoinRoom"),
+                app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
         joinRoomButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -222,23 +241,35 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
             }
         });
         lanButtons.row();
-        lanButtons.add(openRoomButton).uniform().fill();
-        lanButtons.add(joinRoomButton).uniform().fill();
+        lanButtons.add(openRoomButton);
+        addFocusableActor(openRoomButton);
+        lanButtons.row();
+        lanButtons.add(joinRoomButton);
+        addFocusableActor(joinRoomButton);
 
         initGameScreen = new Table();
-        initGameScreen.row();
-        initGameScreen.add(new Label(app.TEXTS.get("menuAccountGpgs"), app.skin, LightBlocksGame.SKIN_FONT_BIG));
-        initGameScreen.row();
-        initScreenGpgButtonCell = initGameScreen.add(gpgButtons);
-        initGameScreen.row();
-        initGameScreen.add(gpgHelp).fill().minWidth(LightBlocksGame.nativeGameWidth * .9f);
+
+        if (app.gpgsClient != null && app.gpgsClient instanceof IMultiplayerGsClient) {
+            initGameScreen.row();
+
+            Table title = new Table();
+            title.add(new ScaledLabel(FontAwesome.GPGS_LOGO, app.skin, FontAwesome.SKIN_FONT_FA));
+            title.add(new ScaledLabel(app.TEXTS.get("menuAccountGpgs"), app.skin, LightBlocksGame
+                    .SKIN_FONT_TITLE));
+            initGameScreen.add(title);
+            initGameScreen.row();
+            initGameScreen.add(gpgHelp).fill().minWidth(LightBlocksGame.nativeGameWidth * .9f);
+            initGameScreen.row();
+            initGameScreen.add(gpgButtons);
+        }
 
         initGameScreen.row().padTop(30);
-        initGameScreen.add(new Label(app.TEXTS.get("labelMultiplayerLan"), app.skin, LightBlocksGame.SKIN_FONT_BIG));
-        initGameScreen.row();
-        initScreenLanButtonCell = initGameScreen.add(lanButtons);
+        initGameScreen.add(new ScaledLabel(app.TEXTS.get("labelMultiplayerLan"), app.skin, LightBlocksGame
+                .SKIN_FONT_TITLE));
         initGameScreen.row();
         initGameScreen.add(lanHelp).fill().minWidth(LightBlocksGame.nativeGameWidth * .9f);
+        initGameScreen.row();
+        initGameScreen.add(lanButtons);
 
         mainCell = menuTable.add(initGameScreen);
 
@@ -262,22 +293,6 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
         } catch (VetoException e) {
             showDialog(e.getMessage());
         }
-    }
-
-    private void setLocalMode() {
-        initScreenGpgButtonCell.setActor(gpgButtons);
-        buttonTableCell.setActor(lanButtons);
-    }
-
-    private void setInitMode() {
-        initScreenGpgButtonCell.setActor(gpgButtons);
-        initScreenLanButtonCell.setActor(lanButtons);
-        buttonTableCell.setActor(shareAppButton);
-    }
-
-    private void setGpgsMode() {
-        initScreenLanButtonCell.setActor(lanButtons);
-        buttonTableCell.setActor(gpgButtons);
     }
 
     private void confirmForcedRoomClose() {
@@ -335,37 +350,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
     }
 
     private void setOpenJoinRoomButtons() {
-        if (app.multiRoom == null || !app.multiRoom.isConnected()) {
-            openRoomButton.setText(app.TEXTS.get("labelMultiplayerOpenRoom"));
-            openRoomButton.getFaLabel().setText(FontAwesome.NET_SQUARELINK);
-            joinRoomButton.setText(app.TEXTS.get("labelMultiplayerJoinRoom"));
-            joinRoomButton.getFaLabel().setText(FontAwesome.NET_LOGIN);
-
-            joinRoomButton.setDisabled(false);
-            openRoomButton.setDisabled(false);
-
-            gpgInviteButton.setText(app.TEXTS.get("menuInvitePlayers"));
-            gpgShowInvitationsButton.setDisabled(false);
-
-        } else {
-            openRoomButton.setText(app.TEXTS.get("labelMultiplayerCloseRoom"));
-            openRoomButton.getFaLabel().setText(FontAwesome.MISC_CROSS);
-            joinRoomButton.setText(app.TEXTS.get("labelMultiplayerLeaveRoom"));
-            joinRoomButton.getFaLabel().setText(FontAwesome.NET_LOGOUT);
-
-            openRoomButton.setDisabled(!app.multiRoom.isOwner());
-            joinRoomButton.setDisabled(app.multiRoom.isOwner());
-
-            gpgInviteButton.setText(app.TEXTS.get("labelMultiplayerLeaveRoom"));
-            gpgShowInvitationsButton.setDisabled(true);
-
-            if (app.multiRoom.getRoomState() == MultiPlayerObjects.RoomState.join) {
-                if (app.multiRoom.isLocalGame())
-                    setLocalMode();
-                else
-                    setGpgsMode();
-            }
-        }
+        ((GlowLabelButton) getLeaveButton()).setFaText(app.multiRoom == null || !app.multiRoom.isConnected() ?
+                FontAwesome.LEFT_ARROW : FontAwesome.MISC_CROSS);
     }
 
     protected void joinGpgsButtonPressed() {
@@ -434,7 +420,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
         InitGameParameters initGameParametersParams = new InitGameParameters();
         initGameParametersParams.setGameModelClass(MultiplayerModel.class);
 
-        initGameParametersParams.setBeginningLevel((int) beginningLevelSlider.getValue());
+        initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
         initGameParametersParams.setInputKey(inputButtonTable.getSelectedInput());
         initGameParametersParams.setMultiplayerRoom(app.multiRoom);
 
@@ -633,22 +619,23 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
     protected void refreshPlayerList() {
         final Actor newActor;
+        Actor toFocus = null;
 
         if (app.getScreen() != app.mainMenuScreen)
             hasToRefresh = true;
 
         if (matchStats.getNumberOfPlayers() == 0) {
             newActor = initGameScreen;
-
-            setInitMode();
+            toFocus = openRoomButton;
         } else {
             Table playersTable = new Table();
 
             playersTable.defaults().pad(5);
 
             playersTable.add();
-            playersTable.add(new Label("#OP", app.skin)).right();
-            playersTable.add(new Label(app.TEXTS.get("labelTotalScores"), app.skin)).right();
+            playersTable.add(new ScaledLabel("#OP", app.skin, LightBlocksGame.SKIN_FONT_BIG)).right();
+            playersTable.add(new ScaledLabel(app.TEXTS.get("labelTotalScores"),
+                    app.skin, LightBlocksGame.SKIN_FONT_BIG)).right();
 
             for (String playerId : matchStats.getPlayers()) {
                 playersTable.row();
@@ -663,12 +650,12 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
                 else
                     lineColor = Color.WHITE;
 
-                final Label playerIdLabel = new Label(playerId, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                final Label playerIdLabel = new ScaledLabel(playerId, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
                 playerIdLabel.setEllipsis(true);
-                Label playerOutplaysLabel = new ScoreLabel(1, playerStat.getNumberOutplays(), app.skin,
-                        LightBlocksGame.SKIN_FONT_BIG);
-                Label playerScoreLabel = new ScoreLabel(1, playerStat.getTotalScore(), app.skin, LightBlocksGame
-                        .SKIN_FONT_BIG);
+                Label playerOutplaysLabel = new ScaledLabel(String.valueOf(playerStat.getNumberOutplays()), app.skin,
+                        LightBlocksGame.SKIN_FONT_TITLE);
+                Label playerScoreLabel = new ScaledLabel(String.valueOf(playerStat.getTotalScore()), app.skin,
+                        LightBlocksGame.SKIN_FONT_TITLE);
 
                 playerIdLabel.setColor(lineColor);
                 playerOutplaysLabel.setColor(lineColor);
@@ -685,13 +672,17 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
             if (app.multiRoom != null && !app.multiRoom.getRoomState().equals(MultiPlayerObjects.RoomState
                     .closed)) {
                 if (app.multiRoom.getNumberOfPlayers() < 2) {
-                    toAdd = new Label(app.TEXTS.get("multiplayerJoinNotEnoughPlayers"), app.skin);
-                } else if (app.multiRoom.isOwner())
+                    toAdd = new ScaledLabel(app.TEXTS.get("multiplayerJoinNotEnoughPlayers"), app.skin,
+                            LightBlocksGame.SKIN_FONT_BIG, .75f);
+                } else if (app.multiRoom.isOwner()) {
                     toAdd = startGameButton;
-                else
-                    toAdd = new Label(app.TEXTS.get("multiplayerJoinWaitForStart"), app.skin);
+                    toFocus = startGameButton;
+                } else
+                    toAdd = new ScaledLabel(app.TEXTS.get("multiplayerJoinWaitForStart"), app.skin,
+                            LightBlocksGame.SKIN_FONT_BIG, .75f);
             } else
-                toAdd = new Label(app.TEXTS.get("multiplayerLanDisconnected"), app.skin);
+                toAdd = new ScaledLabel(app.TEXTS.get("multiplayerLanDisconnected"), app.skin,
+                        LightBlocksGame.SKIN_FONT_BIG, .75f);
 
             playersTable.row().padTop(30);
             playersTable.add(toAdd).colspan(3).minWidth(150);
@@ -707,6 +698,9 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
                 playersTable.add(inputButtonTable).colspan(3);
 
                 beginningLevelSlider.setDisabled(!app.multiRoom.isOwner());
+                if (toFocus == null && app.multiRoom.isOwner())
+                    toFocus = beginningLevelSlider.getSlider();
+
                 inputButtonTable.setAllDisabledButSelected();
             }
 
@@ -714,11 +708,20 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
         }
 
         mainCell.setActor(newActor);
+        if (toFocus == null)
+            toFocus = getLeaveButton();
+
+        ((MyStage) getStage()).setFocusedActor(toFocus);
 
         hasToRefresh = false;
     }
 
     private void showDialog(String message) {
         ((AbstractScreen) app.getScreen()).showDialog(message);
+    }
+
+    @Override
+    protected Actor getConfiguredDefaultActor() {
+        return openRoomButton;
     }
 }

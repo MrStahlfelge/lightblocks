@@ -227,4 +227,8 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     protected Actor getConfiguredEscapeActor() {
         return leaveButton;
     }
+
+    public Button getLeaveButton() {
+        return leaveButton;
+    }
 }
