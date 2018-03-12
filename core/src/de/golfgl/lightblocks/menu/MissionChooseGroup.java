@@ -239,7 +239,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
         public void scrollToSelected() {
             scrollTo(idxLabel[selectedIndex].getX(), ratingLabel[selectedIndex].getY(),
-                    ratingLabel[selectedIndex].getWidth(), ratingLabel[selectedIndex].getHeight(),
+                    idxLabel[selectedIndex].getWidth(), ratingLabel[selectedIndex].getHeight(),
                     true, false);
         }
 
