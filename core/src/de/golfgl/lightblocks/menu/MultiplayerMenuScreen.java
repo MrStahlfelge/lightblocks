@@ -43,7 +43,7 @@ import de.golfgl.lightblocks.state.MultiplayerMatch;
  */
 
 public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomListener {
-
+    private static final String PREF_KEY_ACTIVEPAGE = "multiplayerPage";
     protected Dialog waitForConnectionOverlay;
     private Button startGameButton;
     private BeginningLevelChooser beginningLevelSlider;
@@ -171,6 +171,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
         setOpenJoinRoomButtons();
 
+        validate();
+        modePager.scrollToPage(app.prefs.getInteger(PREF_KEY_ACTIVEPAGE, 0));
     }
 
     @Override
@@ -195,10 +197,12 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
         modePager.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (actor == modePager)
+                if (actor == modePager && getStage() != null) {
                     ((MyStage) getStage()).setFocusedActor(((IMultiplayerModePage) modePager.getCurrentPage())
                             .getDefaultActor());
-
+                    app.prefs.putInteger(PREF_KEY_ACTIVEPAGE, modePager.getCurrentPageIndex());
+                    app.prefs.flush();
+                }
             }
         });
         modePager.addPage(new LocalGameTable());
