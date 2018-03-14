@@ -13,6 +13,8 @@ import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
+import de.golfgl.lightblocks.scene2d.BlockActor;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -45,20 +47,21 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
         // Für die verschiedenen Spieler eine Zelle vorsehen. Noch nicht füllen, Infos stehen noch nicht zur Verfügung
         // das eingefügte ScoreLabel dient nur dazu den Platzbedarf festzulegen
         scoreTable.row();
-        Label fillLabel = new Label(app.TEXTS.get("labelFill").toUpperCase(), app.skin);
-        scoreTable.add(fillLabel).right().bottom().padBottom(3).spaceRight(3);
+        Label fillLabel = new ScaledLabel(app.TEXTS.get("labelFill").toUpperCase(), app.skin,
+                LightBlocksGame.SKIN_FONT_REG);
+        scoreTable.add(fillLabel).right().bottom().padBottom(-4).spaceRight(3);
 
         // noch eine Tabelle für die Spieler
         Table fillingTable = new Table();
         playerLabels = new HashMap<String, ScoreLabel>(app.multiRoom.getNumberOfPlayers());
 
         for (String playerId : app.multiRoom.getPlayers()) {
-            fillingTable.add(new Label(playerId.substring(0, 1), app.skin)).top();
-            ScoreLabel lblFilling = new ScoreLabel(2, 100, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+            fillingTable.add(new ScaledLabel(playerId.substring(0, 1), app.skin)).top().padTop(2);
+            ScoreLabel lblFilling = new ScoreLabel(2, 100, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
             lblFilling.setExceedChar('X');
             fillingTable.add(lblFilling);
             playerLabels.put(playerId, lblFilling);
-            fillingTable.add(new Label("%", app.skin)).padRight(10).bottom().padBottom(3);
+            fillingTable.add(new ScaledLabel("%", app.skin)).padRight(10).bottom().padBottom(4);
         }
 
         scoreTable.add(fillingTable).colspan(3).align(Align.left);

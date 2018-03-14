@@ -3,9 +3,6 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 	fa45: {
 		file: fa-45.fnt
 	}
-	qs-15-regular: {
-		file: font-export.fnt
-	}
 	qs-25-bold: {
 		file: qs-25-bold.fnt
 	}
@@ -64,10 +61,6 @@ com.badlogic.gdx.graphics.Color: {
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
-	button-disabled: {
-		name: button-pressed
-		color: disabled
-	}
 	slider-knob-disabled: {
 		name: slider-knob
 		color: disabled
@@ -104,12 +97,6 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
-	default: {
-		up: button-pressed
-		over: button-over
-		checked: button
-		disabled: button-disabled
-	}
 	round: {
 		up: button_small_font
 		down: button_small_font_filled
@@ -118,7 +105,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 }
 com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	default: {
-		font: qs-15-regular
+		font: qs-25-reg
 	}
 	big: {
 		font: qs-25-bold
@@ -171,30 +158,6 @@ com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
-	default: {
-		font: qs-15-regular
-		fontColor: white
-		disabledFontColor: disabled
-		up: button-pressed
-		over: button-over
-		disabled: button-disabled
-	}
-	fontawesome: {
-		font: fa45
-		fontColor: white
-		disabledFontColor: disabled
-		up: button-pressed
-		over: button-over
-		disabled: button-disabled
-	}
-	big: {
-		font: qs-25-bold
-		fontColor: white
-		disabledFontColor: disabled
-		up: button-pressed
-		over: button-over
-		disabled: button-disabled
-	}
 	round: {
 		font: qs-40-bold
 		fontColor: white
@@ -220,12 +183,12 @@ com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
 	default: {
 		background: window-bl
-		titleFont: qs-15-regular
+		titleFont: qs-25-bold
 		stageBackground: smoke
 	}
 	overlay: {
 		background: window
-		titleFont: qs-15-regular
+		titleFont: qs-25-bold
 	}
 	frameless: {
 		titleFont: qs-25-bold

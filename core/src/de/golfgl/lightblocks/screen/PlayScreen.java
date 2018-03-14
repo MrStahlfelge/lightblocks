@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.menu.PauseDialog;
 import de.golfgl.lightblocks.menu.ScoreScreen;
 import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
@@ -40,7 +41,7 @@ import de.golfgl.lightblocks.scene2d.BlockGroup;
 import de.golfgl.lightblocks.scene2d.MotivationLabel;
 import de.golfgl.lightblocks.scene2d.OverlayMessage;
 import de.golfgl.lightblocks.scene2d.ParticleEffectActor;
-import de.golfgl.lightblocks.menu.PauseDialog;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -127,10 +128,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         // Anzeige des Levels - muss in Group, Rotation funktioniert direkt auf Label nicht
         Group gameTypeLabels = new Group();
-        Label gameType = new Label("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        Label gameType = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         gameType.setColor(.7f, .7f, .7f, 1);
         //gameType.setFontScale(.9f);
-        gameTypeLabels.setPosition(imLine.getX() - gameType.getPrefHeight() / 2 - 5, blockGroup.getY());
+        gameTypeLabels.setPosition(imLine.getX(), blockGroup.getY());
         gameTypeLabels.addActor(gameType);
         gameTypeLabels.setRotation(90);
         //gameTypeLabels.addAction(Actions.rotateBy(90, 10f));
@@ -139,6 +140,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         // Score Labels
         final Table scoreTable = new Table();
+        scoreTable.defaults().height(BlockActor.blockWidth * .8f);
         populateScoreTable(scoreTable);
         // hinzufügen erst weiter unten (weil eventuell noch etwas dazu kommt)
 
@@ -162,8 +164,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Score Table vervollständigen
         if (gameModel.getMaxBlocksToUse() > 0) {
             scoreTable.row();
-            final Label labelBlocks = new Label(app.TEXTS.get("labelBlocksScore").toUpperCase(), app.skin);
-            scoreTable.add(labelBlocks).right().bottom().padBottom(3).spaceRight(3);
+            final Label labelBlocks = new ScaledLabel(app.TEXTS.get("labelBlocksScore").toUpperCase(), app.skin);
+            scoreTable.add(labelBlocks).right().bottom().padBottom(-2).spaceRight(3);
             scoreTable.add(blocksLeft).left().colspan(3);
         }
         scoreTable.setY(LightBlocksGame.nativeGameHeight - scoreTable.getPrefHeight() / 2 - 5);
@@ -243,25 +245,25 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     protected void populateScoreTable(Table scoreTable) {
         scoreTable.row();
-        Label levelLabel = new Label(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
-        scoreTable.add(levelLabel).right().bottom().padBottom(3).spaceRight(3);
-        levelNum = new ScoreLabel(2, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        Label levelLabel = new ScaledLabel(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
+        scoreTable.add(levelLabel).right().bottom().padBottom(-2).spaceRight(3);
+        levelNum = new ScoreLabel(2, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         scoreTable.add(levelNum).left();
-        Label linesLabel = new Label(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
-        scoreTable.add(linesLabel).right().bottom().padBottom(3).spaceLeft(10).spaceRight(3);
-        linesNum = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        Label linesLabel = new ScaledLabel(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
+        scoreTable.add(linesLabel).right().bottom().padBottom(-2).spaceLeft(10).spaceRight(3);
+        linesNum = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         linesNum.setCountingSpeed(100);
         scoreTable.add(linesNum).left();
         scoreTable.row();
-        Label scoreLabel = new Label(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
-        scoreTable.add(scoreLabel).right().bottom().padBottom(3).spaceRight(3);
-        scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        Label scoreLabel = new ScaledLabel(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
+        scoreTable.add(scoreLabel).right().bottom().padBottom(-2).spaceRight(3);
+        scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         scoreNum.setCountingSpeed(2000);
         scoreNum.setMaxCountingTime(1);
         scoreTable.add(scoreNum).left().colspan(3);
 
         // in jedem Fall initialisieren, damit der beim ersten updateScore gefüllt wird
-        blocksLeft = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        blocksLeft = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
     }
 
     /**

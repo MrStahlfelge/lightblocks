@@ -7,6 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import de.golfgl.lightblocks.LightBlocksGame;
+
 /**
  * Das ScoreLabel zeigt einen Punktstand mit gegebener Formatierung an.
  * Wenn es aktualisiert, wird es hochzählen. Entweder mit vorgegebenem
@@ -42,6 +44,7 @@ public class ScoreLabel extends Label {
 
     public ScoreLabel(int digits, long score, Skin skin, String styleName) {
         super("0", skin, styleName);
+        setFontScale(LightBlocksGame.LABEL_SCALING);
 
         getBitmapFontCache().getFont().setFixedWidthGlyphs("0123456789-+X");
 

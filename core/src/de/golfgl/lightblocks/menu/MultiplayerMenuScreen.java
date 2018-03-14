@@ -514,8 +514,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
         waitForConnectionOverlay = new Dialog("", app.skin);
 
-        Label messageLabel = new Label(app.TEXTS.get("labelMultiplayerConnecting"), app.skin,
-                LightBlocksGame.SKIN_FONT_BIG);
+        Label messageLabel = new ScaledLabel(app.TEXTS.get("labelMultiplayerConnecting"), app.skin,
+                LightBlocksGame.SKIN_FONT_TITLE);
         messageLabel.setWrap(true);
         messageLabel.setAlignment(Align.center);
 

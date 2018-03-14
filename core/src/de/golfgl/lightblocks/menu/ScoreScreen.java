@@ -175,8 +175,8 @@ public class ScoreScreen extends AbstractMenuScreen {
             scoreTable.add();
 
             for (int i = 0; i < scoresToShowLabels.size; i++)
-                scoreTable.add(new Label(scoresToShowLabels.get(i).toUpperCase(), app.skin, LightBlocksGame
-                        .SKIN_FONT_BIG));
+                scoreTable.add(new ScaledLabel(scoresToShowLabels.get(i).toUpperCase(), app.skin, LightBlocksGame
+                        .SKIN_FONT_TITLE));
         }
 
         // SCORE

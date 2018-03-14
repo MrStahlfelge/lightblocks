@@ -43,7 +43,6 @@ public class ScoreTable extends Table {
 
         for (int i = 0; i < score.size; i++) {
             ScoreLabel scoreLabel = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-            scoreLabel.setFontScale(LightBlocksGame.LABEL_SCALING);
             scoreLabel.setMaxCountingTime(maxCountingTime);
             scoreLabel.setCountingSpeed(digits == 0 ? SCORE_COUNTING_SPEED / 10 : SCORE_COUNTING_SPEED);
             float prefLabelWidth = scoreLabel.getPrefWidth() * digits;
