@@ -168,8 +168,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             scoreTable.add(labelBlocks).right().bottom().padBottom(-2).spaceRight(3);
             scoreTable.add(blocksLeft).left().colspan(3);
         }
+        scoreTable.validate();
+        scoreTable.align(Align.left);
         scoreTable.setY(LightBlocksGame.nativeGameHeight - scoreTable.getPrefHeight() / 2 - 5);
-        scoreTable.setX(scoreTable.getPrefWidth() / 2 + 5);
+        scoreTable.setX(10);
         centerGroup.addActor(scoreTable);
 
         Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
