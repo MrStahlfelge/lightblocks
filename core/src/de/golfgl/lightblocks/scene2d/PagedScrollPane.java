@@ -73,7 +73,6 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
 
     @Override
     public void act(float delta) {
-        // TODO Rendern nur wenn nötig - visible weg, wenn gar nicht sichtbar
         super.act(delta);
         if (wasPanDragFling && !isPanning() && !isDragging() && !isFlinging()) {
             wasPanDragFling = false;
@@ -222,7 +221,7 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
         public static final int transitionMove = 0;
         final private Drawable pageIndicator;
         final private Drawable positionIndicator;
-        private boolean fadeStyle;
+        private boolean fadeStyle = true;
 
         public PageIndicator() {
             pageIndicator = getStyle().hScroll;
