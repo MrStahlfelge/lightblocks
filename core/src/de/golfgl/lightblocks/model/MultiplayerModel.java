@@ -93,7 +93,7 @@ public class MultiplayerModel extends GameModel {
         int[] retVal = new int[numOfLines];
 
         for (int garbageLine = 0; garbageLine < numOfLines; garbageLine++) {
-            System.out.println(currentGarbageHolePosIndex + ";" + currentGarbageHolePosUsed);
+            //System.out.println(currentGarbageHolePosIndex + ";" + currentGarbageHolePosUsed);
             retVal[garbageLine] = garbageHolePosition[currentGarbageHolePosIndex];
             currentGarbageHolePosUsed++;
 
