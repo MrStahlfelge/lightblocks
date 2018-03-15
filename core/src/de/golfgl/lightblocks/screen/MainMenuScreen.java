@@ -69,7 +69,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
         buttonTable = new Table();
         buttonTable.setFillParent(true);
 
-        buttonTable.add(gameTitle).minWidth(LightBlocksGame.nativeGameWidth * .75f).
+        buttonTable.add(gameTitle).minWidth(LightBlocksGame.nativeGameWidth * .85f).
                 padBottom(LightBlocksGame.nativeGameWidth / 16);
 
         mainGroup = new Group();
@@ -80,7 +80,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
         String welcomeText = app.getWelcomeText();
         if (welcomeText != null) {
             buttonTable.row();
-            Label welcomeLabel = new ScaledLabel(welcomeText, app.skin);
+            Label welcomeLabel = new ScaledLabel(welcomeText, app.skin, .75f);
             welcomeLabel.setWrap(true);
             welcomeLabel.setAlignment(Align.center);
             buttonTable.add(welcomeLabel).fill();
@@ -88,12 +88,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
 
         buttonTable.row();
 
-        Table menuButtons = new Table();
-        menuButtons.defaults().pad(5, 0, 5, 0);
-
         // Resume the game
-        menuButtons.row();
-
         resumeGameButton = new GlowLabelButton(app.TEXTS.get("menuResumeGameButton"), app.skin,
                 GlowLabelButton.FONT_SCALE_MENU, GlowLabelButton.SMALL_SCALE_MENU);
         resumeGameButton.addListener(new ChangeListener() {
@@ -110,10 +105,8 @@ public class MainMenuScreen extends AbstractMenuScreen {
                                      }
         );
 
-        resumeGameCell = menuButtons.add(resumeGameButton);
         stage.addFocusableActor(resumeGameButton);
 
-        menuButtons.row();
         singlePlayerButton = new GlowLabelButton(FontAwesome.NET_PERSON,
                 app.TEXTS.get("menuSinglePlayer"),
                 app.skin);
@@ -123,11 +116,8 @@ public class MainMenuScreen extends AbstractMenuScreen {
                                              }
                                          }
         );
-
-        menuButtons.add(singlePlayerButton).padTop(10);
         stage.addFocusableActor(singlePlayerButton);
 
-        menuButtons.row();
         Button playMultiplayerButton = new GlowLabelButton(FontAwesome.NET_PEOPLE, app.TEXTS.get
                 ("menuPlayMultiplayerButton"), app.skin);
         playMultiplayerButton.addListener(new ChangeListener() {
@@ -136,10 +126,24 @@ public class MainMenuScreen extends AbstractMenuScreen {
                 new MultiplayerMenuScreen(app, mainGroup).show(stage);
             }
         });
-        menuButtons.add(playMultiplayerButton).padTop(10);
+
+        Table menuButtons = new Table();
+        menuButtons.defaults().expand().maxHeight(resumeGameButton.getPrefHeight());;
+        menuButtons.row();
+        menuButtons.add().maxHeight(0);
+        menuButtons.row();
+        resumeGameCell = menuButtons.add(resumeGameButton);
+        menuButtons.row();
+
+        menuButtons.add(singlePlayerButton);
+        menuButtons.row();
+        menuButtons.add(playMultiplayerButton);
+        menuButtons.row();
+        menuButtons.add().maxHeight(0);
+
         stage.addFocusableActor(playMultiplayerButton);
 
-        buttonTable.add(menuButtons).expandY();
+        buttonTable.add(menuButtons).expandY().fill();
 
         buttonTable.row();
 
@@ -211,10 +215,9 @@ public class MainMenuScreen extends AbstractMenuScreen {
 
         buttonTable.add(smallButtonTable).fill().top().minWidth(gameTitle.getWidth()).expandX();
 
-        gameVersion = new Label(LightBlocksGame.GAME_VERSIONSTRING +
+        gameVersion = new ScaledLabel(LightBlocksGame.GAME_VERSIONSTRING +
                 (LightBlocksGame.GAME_DEVMODE ? "-DEV" : ""), app.skin);
         gameVersion.setColor(.5f, .5f, .5f, 1);
-        gameVersion.setFontScale(.8f);
         gameVersion.setAlignment(Align.bottom);
         mainGroup.addActor(gameVersion);
 
@@ -243,6 +246,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
         app.controllerMappings.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(!mainGroup.isVisible());
         resumeGameCell.setActor(app.savegame.hasSavedGame() ? resumeGameButton : null);
+        resumeGameCell.expand(true, resumeGameCell.hasActor());
         if (stage.getFocusedActor() == null || !stage.getFocusedActor().hasParent())
             stage.setFocusedActor(proposeFocussedActor());
 
