@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
@@ -65,6 +66,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final MotivationLabel motivatorLabel;
     private final ParticleEffectActor weldEffect;
     private final Group centerGroup;
+    private final Table scoreTable;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
     Music music;
@@ -126,7 +128,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         imLine.setColor(.8f, .8f, .8f, 1);
         centerGroup.addActor(imLine);
 
-        // Anzeige des Levels - muss in Group, Rotation funktioniert direkt auf Label nicht
+        // Anzeige des Levelnamens - muss in Group, Rotation funktioniert direkt auf Label nicht
         Group gameTypeLabels = new Group();
         Label gameType = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         gameType.setColor(.7f, .7f, .7f, 1);
@@ -139,7 +141,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         centerGroup.addActor(gameTypeLabels);
 
         // Score Labels
-        final Table scoreTable = new Table();
+        scoreTable = new Table();
         scoreTable.defaults().height(BlockActor.blockWidth * .8f);
         populateScoreTable(scoreTable);
         // hinzufügen erst weiter unten (weil eventuell noch etwas dazu kommt)
@@ -169,9 +171,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             scoreTable.add(blocksLeft).left().colspan(3);
         }
         scoreTable.validate();
-        scoreTable.align(Align.left);
-        scoreTable.setY(LightBlocksGame.nativeGameHeight - scoreTable.getPrefHeight() / 2 - 5);
-        scoreTable.setX(10);
         centerGroup.addActor(scoreTable);
 
         Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
@@ -710,7 +709,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Spielfeld überlagert
 
         final float offsetX = LightBlocksGame.nativeGameWidth - blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT -
-                .3f) * BlockActor.blockWidth;
+                .3f) * BlockActor.blockWidth + Math.min(centerGroup.getX() / 2, BlockActor.blockWidth * 2.5f);
         final float offsetY = (Gameboard.GAMEBOARD_NORMALROWS + .3f) * BlockActor.blockWidth;
 
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
@@ -926,6 +925,14 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         centerGroup.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
                 (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
+
+        // sobald Platz neben Spielfeld breiter ist als Scoretable, diese dann mittig positionieren
+        // und dann auch langsam herunterschieben aber maximal zwei Zeilen
+        scoreTable.validate();
+        scoreTable.setX(Math.max(10 - centerGroup.getX() + scoreTable.getPrefWidth() / 2, -centerGroup.getX() / 2));
+        scoreTable.setY(LightBlocksGame.nativeGameHeight
+                - MathUtils.clamp(centerGroup.getX() / 2 - scoreTable.getPrefWidth() / 2,
+                scoreTable.getPrefHeight() / 2 + 5, levelNum.getPrefHeight() * 2 + scoreTable.getPrefHeight() / 2));
 
         // GestureInput neues TouchPanel
         if (inputAdapter != null)
