@@ -19,8 +19,6 @@ import de.golfgl.lightblocks.screen.MultiplayerPlayScreen;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.MultiplayerMatch;
 
-import static de.golfgl.lightblocks.model.IGameModelListener.MotivationTypes.watchOutGarbage;
-
 /**
  * Das Multiplayer-Modell
  * <p>
@@ -88,6 +86,13 @@ public class MultiplayerModel extends GameModel {
 
             //TODO hier dann einblenden von wem die Zeilen kamen
             waitingGarbageLinesFrom = null;
+
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    userInterface.showGarbageAmount(waitingGarbageLinesNum);
+                }
+            });
         }
 
         int[] retVal = new int[numOfLines];
@@ -283,7 +288,6 @@ public class MultiplayerModel extends GameModel {
     }
 
     protected void handleGarbageForYou(MultiPlayerObjects.GarbageForYou o) {
-        boolean warningTreshold = false;
         synchronized (waitingGarbageLinesLock) {
             int oldWaitingLines = waitingGarbageLinesNum;
             waitingGarbageLinesNum = waitingGarbageLinesNum + o.garbageLines;
@@ -294,17 +298,13 @@ public class MultiplayerModel extends GameModel {
             else if (waitingGarbageLinesFrom != null && !waitingGarbageLinesFrom.equalsIgnoreCase(o.fromPlayerId))
                 waitingGarbageLinesFrom = null;
 
-            if (waitingGarbageLinesNum >= 4 && oldWaitingLines < 4)
-                warningTreshold = true;
-        }
-
-        if (warningTreshold)
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    userInterface.showMotivation(watchOutGarbage, null);
+                    userInterface.showGarbageAmount(waitingGarbageLinesNum);
                 }
             });
+        }
     }
 
     protected void handleInitGame(MultiPlayerObjects.InitGame o) {

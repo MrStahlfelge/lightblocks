@@ -43,11 +43,13 @@ public interface IGameModelListener {
 
     void showMotivation(MotivationTypes achievement, String extra);
 
-    public void showOverlayMessage(String message, float autoHide, String... params);
+    void showOverlayMessage(String message, float autoHide, String... params);
+
+    void showGarbageAmount(int lines);
 
     enum MotivationTypes {
         newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
-        boardCleared, newHighscore, gameOver, gameWon, gameSuccess, playerOver, watchOutGarbage,
+        boardCleared, newHighscore, gameOver, gameWon, gameSuccess, playerOver,
         bonusScore
     }
 }

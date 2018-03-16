@@ -13,7 +13,6 @@ import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
-import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
@@ -35,6 +34,8 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     public MultiplayerPlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
         super(app, initGameParametersParams);
+
+        imGarbageIndicator.setVisible(true);
 
         // Blocker bis alle initialisiert sind
         addGameBlocker(initializeBlocker);

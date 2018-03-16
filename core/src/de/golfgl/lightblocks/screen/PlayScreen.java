@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
@@ -59,6 +60,8 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
+    private static final int NINE_PATCH_BORDER_SIZE = 5;
+    protected final Image imGarbageIndicator;
     private final BlockGroup blockGroup;
     private final Group labelGroup;
     private final BlockActor[][] blockMatrix;
@@ -108,23 +111,30 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         centerGroup.addActor(blockGroup);
 
         // Begrenzungen um die BlockGroup
-        final int ninePatchBorderSize = 5;
-        NinePatch line = new NinePatch(app.trGlowingLine, ninePatchBorderSize, ninePatchBorderSize, ninePatchBorderSize,
-                ninePatchBorderSize);
+        NinePatch line = new NinePatch(app.trGlowingLine, NINE_PATCH_BORDER_SIZE, NINE_PATCH_BORDER_SIZE,
+                NINE_PATCH_BORDER_SIZE, NINE_PATCH_BORDER_SIZE);
         Image imLine = new Image(line);
 
         imLine.setX(blockGroup.getX() + blockGroup.getWidth());
-        imLine.setY(blockGroup.getY() - ninePatchBorderSize);
+        imLine.setY(blockGroup.getY() - NINE_PATCH_BORDER_SIZE);
         imLine.addAction(Actions.sizeTo(imLine.getWidth(), blockGroup.getGridHeight() +
-                2 * ninePatchBorderSize, 1f, Interpolation.circleOut));
+                2 * NINE_PATCH_BORDER_SIZE, 1f, Interpolation.circleOut));
         imLine.setColor(.8f, .8f, .8f, 1);
         centerGroup.addActor(imLine);
 
+        imGarbageIndicator = new Image(line);
+        imGarbageIndicator.setX(imLine.getX());
+        imGarbageIndicator.setY(imLine.getY());
+        imGarbageIndicator.setHeight(NINE_PATCH_BORDER_SIZE * 2);
+        imGarbageIndicator.setColor(new Color(1, .2f, .2f, 1));
+        imGarbageIndicator.setVisible(false);
+        centerGroup.addActor(imGarbageIndicator);
+
         imLine = new Image(line);
-        imLine.setY(blockGroup.getY() - ninePatchBorderSize);
+        imLine.setY(blockGroup.getY() - NINE_PATCH_BORDER_SIZE);
         imLine.setX(blockGroup.getX() - imLine.getWidth() - 2);
         imLine.addAction(Actions.sizeTo(imLine.getWidth(), blockGroup.getGridHeight() +
-                2 * ninePatchBorderSize, 1f, Interpolation.circleOut));
+                2 * NINE_PATCH_BORDER_SIZE, 1f, Interpolation.circleOut));
         imLine.setColor(.8f, .8f, .8f, 1);
         centerGroup.addActor(imLine);
 
@@ -813,11 +823,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 duration = 10;
                 playSound = false;
                 break;
-            case watchOutGarbage:
-                text = app.TEXTS.format("motivationGarbage");
-                playSound = false;
-                duration = 3;
-                break;
             case bonusScore:
                 text = app.TEXTS.format("motivationBonusScore", extraMsg);
                 playSound = true;
@@ -830,6 +835,14 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         if (!text.isEmpty())
             motivatorLabel.addMotivationText(text.toUpperCase(), duration);
+    }
+
+    @Override
+    public void showGarbageAmount(int lines) {
+        imGarbageIndicator.setVisible(true);
+        imGarbageIndicator.clearActions();
+        imGarbageIndicator.addAction(Actions.sizeTo(imGarbageIndicator.getWidth(),
+                BlockActor.blockWidth * lines + NINE_PATCH_BORDER_SIZE * 2, .2f, Interpolation.fade));
     }
 
     @Override
