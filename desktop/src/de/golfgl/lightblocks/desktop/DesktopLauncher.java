@@ -10,7 +10,7 @@ import de.golfgl.gdxgamesvcs.achievement.IAchievement;
 import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.gpgs.IGpgsClient;
+import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
 public class DesktopLauncher {
@@ -24,7 +24,7 @@ public class DesktopLauncher {
         new LwjglApplication(game, config);
     }
 
-    private static class MyTestClient extends MockGameServiceClient implements IGpgsClient {
+    private static class MyTestClient extends MockGameServiceClient implements IMultiplayerGsClient {
 
         public MyTestClient() {
             super(.5f);
@@ -37,12 +37,6 @@ public class DesktopLauncher {
 
         @Override
         public AbstractMultiplayerRoom createMultiPlayerRoom() {
-            return null;
-        }
-
-        @Override
-        public Boolean saveGameStateSync(String id, byte[] gameState, long progressValue,
-                                         ISaveGameStateResponseListener listener) {
             return null;
         }
 
