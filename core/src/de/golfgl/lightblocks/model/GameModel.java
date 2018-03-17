@@ -34,8 +34,8 @@ public abstract class GameModel implements Json.Serializable {
     protected BestScore bestScore;
     // wieviel ist der aktuelle Stein schon ungerundet gefallen
     protected float currentSpeed;
-    IGameModelListener userInterface;
-    TetrominoDrawyer drawyer;
+    protected IGameModelListener userInterface;
+    protected TetrominoDrawyer drawyer;
     private GameScore score;
     private boolean isBestScore = false;
     private Tetromino activeTetromino;

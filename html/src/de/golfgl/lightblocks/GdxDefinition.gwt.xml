@@ -2,6 +2,9 @@
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://google-web-toolkit.googlecode.com/svn/trunk/distro-source/core/src/gwt-module.dtd">
 <module rename-to="html">
 	<inherits name='com.badlogic.gdx.backends.gdx_backends_gwt' />
+	<inherits name="de.golfgl.gdxgamesvcs.gdx_gamesvcs_gwt" />
+	<inherits name="de.golfgl.gdx.controllers.controller_scene2d" />
+	<inherits name="com.badlogic.gdx.controllers.controllers-gwt"/>
 
 	<inherits name='LightBlocksGame' />
 	<entry-point class='de.golfgl.lightblocks.client.HtmlLauncher' />

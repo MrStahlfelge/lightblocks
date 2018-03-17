@@ -2,16 +2,15 @@ package de.golfgl.lightblocks;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import de.golfgl.lightblocks.gpgs.GpgsMultiPlayerClient;
+import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 import de.golfgl.lightblocks.multiplayer.NsdAdapter;
 
 public class AndroidLauncher extends AndroidApplication {
@@ -48,7 +47,7 @@ public class AndroidLauncher extends AndroidApplication {
         // nach Wechsel der Anwendung bleibt der Bereich manchmal schwarz, außerdem beim Runterziehen der Notifications
         // mehrmaliges Resize 
 
-        LightBlocksGame game = new LightBlocksGame() {
+        LightBlocksGame game = new MultiplayerLightblocks() {
             @Override
             public void lockOrientation(Input.Orientation orientation) {
                 if (orientation == null)

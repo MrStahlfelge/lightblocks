@@ -42,6 +42,7 @@ project(":desktop") {
 
     dependencies {
         compile project(":core")
+        compile project(":multiplayer")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
@@ -56,6 +57,7 @@ project(":android") {
 
     dependencies {
         compile project(":core")
+        compile project(":multiplayer")
         compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         compile 'com.github.rafakob:NsdHelper:0.1.4'
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
@@ -83,6 +85,18 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion:sources"
+        compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-scene2d:$cuversion:sources"
+        compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-mapping:$cuversion:sources"
+
+    }
+}
+
+project(":multiplayer") {
+    apply plugin: "java"
+
+    dependencies {
+        compile project(":core")
+        compile "com.esotericsoftware:kryonet:2.22.0-RC1"
     }
 }
 
@@ -94,7 +108,6 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion"
-        compile "com.esotericsoftware:kryonet:2.22.0-RC1"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-scene2d:$cuversion"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-mapping:$cuversion"
     }

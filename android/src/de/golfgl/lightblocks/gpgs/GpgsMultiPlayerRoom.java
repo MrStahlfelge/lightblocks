@@ -33,6 +33,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
+import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.Player;
 
@@ -76,7 +77,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
 
     public void setGpgsClient(GpgsMultiPlayerClient gpgsClient) {
         this.gpgsClient = gpgsClient;
-        MultiPlayerObjects.register(kryo);
+        MultiplayerLightblocks.register(kryo);
     }
 
     public void setContext(Activity context) {

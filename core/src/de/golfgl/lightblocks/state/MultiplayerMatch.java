@@ -1,6 +1,6 @@
 package de.golfgl.lightblocks.state;
 
-import com.esotericsoftware.minlog.Log;
+import com.badlogic.gdx.Gdx;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -111,7 +111,7 @@ public class MultiplayerMatch {
 
         public void setFromPlayerInMatch(MultiPlayerObjects.PlayerInMatch pim) {
             if (!pim.playerId.equals(playerId))
-                Log.error("Multiplayer", "Wrong player in match stat received - ignored");
+                Gdx.app.error("Multiplayer", "Wrong player in match stat received - ignored");
             else {
                 numberOutplays = pim.numOutplayed;
                 totalScore = pim.totalScore;

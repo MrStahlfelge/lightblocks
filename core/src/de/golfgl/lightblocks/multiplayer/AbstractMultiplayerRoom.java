@@ -1,7 +1,7 @@
 package de.golfgl.lightblocks.multiplayer;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.esotericsoftware.minlog.Log;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -123,7 +123,7 @@ public abstract class AbstractMultiplayerRoom {
         // die gequeuten abarbeiten
         synchronized (queuedMessages) {
             if (queuedMessages.size() > 0)
-                Log.info("Multiplayer", "Delivering queued messages: " + queuedMessages.size());
+                Gdx.app.log("Multiplayer", "Delivering queued messages: " + queuedMessages.size());
 
             for (Object o : queuedMessages)
                 for (IRoomListener l : listeners)
@@ -226,11 +226,11 @@ public abstract class AbstractMultiplayerRoom {
     protected void informGotGameModelMessage(final Object o) {
         if (!roomState.equals(MultiPlayerObjects.RoomState.inGame)) {
             // Game Model message werden verworfen wenn nicht im Spiel
-            Log.warn("Multiplayer", "Ignored game model message - room not in game mode.");
+            Gdx.app.log("Multiplayer", "Ignored game model message - room not in game mode.");
             return;
         }
 
-        Log.info("Multiplayer", "Got game object: " + o.toString());
+        Gdx.app.log("Multiplayer", "Got game object: " + o.toString());
 
         synchronized (queuedMessages) {
             if (gameModelStarted)
@@ -238,7 +238,7 @@ public abstract class AbstractMultiplayerRoom {
                     l.multiPlayerGotModelMessage(o);
 
             else {
-                Log.info("Multiplayer", "Queued incoming game model message.");
+                Gdx.app.log("Multiplayer", "Queued incoming game model message.");
                 queuedMessages.add(o);
             }
         }

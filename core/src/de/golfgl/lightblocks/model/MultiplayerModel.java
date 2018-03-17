@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Timer;
-import com.esotericsoftware.minlog.Log;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -268,7 +267,7 @@ public class MultiplayerModel extends GameModel {
 
         if (o instanceof MultiPlayerObjects.NextTetrosDrawn) {
             if (playerRoom.isOwner())
-                Log.error("Multiplayer", "Drawn tetros received but I am the referee.");
+                Gdx.app.error("Multiplayer", "Drawn tetros received but I am the referee.");
             else {
                 final int[] receivedTetros = ((MultiPlayerObjects.NextTetrosDrawn) o).nextTetrominos;
                 drawyer.queueNextTetrominos(receivedTetros);
@@ -309,7 +308,7 @@ public class MultiplayerModel extends GameModel {
 
     protected void handleInitGame(MultiPlayerObjects.InitGame o) {
         if (isInitialized)
-            Log.error("Multiplayer", "InitGame message received but already initialized");
+            Gdx.app.error("Multiplayer", "InitGame message received but already initialized");
         else {
             drawyer.queueNextTetrominos(o.firstTetrominos);
             this.garbageHolePosition = o.garbageHolePosition;
@@ -330,7 +329,7 @@ public class MultiplayerModel extends GameModel {
 
     private void handleLinesRemoved(MultiPlayerObjects.LinesRemoved lr) {
         if (!playerRoom.isOwner()) {
-            Log.error("Multiplayer", "Got LinesRemoved message, but I am not the referee.");
+            Gdx.app.error("Multiplayer", "Got LinesRemoved message, but I am not the referee.");
             return;
         }
 

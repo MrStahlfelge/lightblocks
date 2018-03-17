@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
-import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -175,7 +174,7 @@ public class GameStateHandler {
                 String jsonString = json.toJson(cgs);
 
                 if (LightBlocksGame.GAME_DEVMODE)
-                    Log.info("GameState", jsonString);
+                    Gdx.app.log("GameState", jsonString);
 
                 app.gpgsClient.saveGameState(IMultiplayerGsClient.NAME_SAVE_GAMESTATE,
                         xorWithKey(jsonString.getBytes(), SAVEGAMEKEY.getBytes()),
@@ -202,7 +201,7 @@ public class GameStateHandler {
                 final String jsonString = new String(xorWithKey(gameState, SAVEGAMEKEY.getBytes()));
 
                 if (LightBlocksGame.GAME_DEVMODE)
-                    Log.info("GameState", jsonString);
+                    Gdx.app.log("GameState", jsonString);
 
                 CloudGameState cgs = json.fromJson(CloudGameState.class, jsonString);
                 futureUseFromCloudSaveGame = cgs.futureUse;
@@ -212,7 +211,7 @@ public class GameStateHandler {
                 bestScores.mergeWithOther(cgs.bestScores);
 
             } catch (Throwable t) {
-                Log.error("GameState", "Error reading saved gamestate. Ignored.", t);
+                Gdx.app.error("GameState", "Error reading saved gamestate. Ignored.", t);
             }
 
             totalScore.checkAchievements(app.gpgsClient);
@@ -237,7 +236,7 @@ public class GameStateHandler {
 
         synchronized (gameStateMonitor) {
             if (!canSaveState() || !Gdx.files.local(FILENAME_BESTSCORES).exists()) {
-                Log.info("Gamestate", "No scores found.");
+                Gdx.app.log("Gamestate", "No scores found.");
                 bestScores = new BestScore.BestScoreMap();
             } else {
                 Json json = new Json();
@@ -246,7 +245,7 @@ public class GameStateHandler {
                                     (FILENAME_BESTSCORES).readString()
                             , SAVEGAMEKEY));
                 } catch (Throwable t) {
-                    Log.error("Gamestate", "Error loading best scores - resetting.", t);
+                    Gdx.app.error("Gamestate", "Error loading best scores - resetting.", t);
                     bestScores = null;
                 }
                 if (bestScores == null)

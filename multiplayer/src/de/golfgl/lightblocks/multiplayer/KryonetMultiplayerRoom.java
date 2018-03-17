@@ -100,7 +100,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
             closeRoom(true);
             throw new VetoException(e.getLocalizedMessage());
         }
-        MultiPlayerObjects.register(server.getKryo());
+        MultiplayerLightblocks.register(server.getKryo());
 
         server.addListener(thisListener);
 
@@ -169,7 +169,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         } catch (IOException e) {
             throw new VetoException(e.getLocalizedMessage());
         }
-        MultiPlayerObjects.register(client.getKryo());
+        MultiplayerLightblocks.register(client.getKryo());
         client.addListener(thisListener);
 
         MultiPlayerObjects.Handshake handshake = new MultiPlayerObjects.Handshake();

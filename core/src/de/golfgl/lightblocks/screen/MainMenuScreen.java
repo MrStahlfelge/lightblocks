@@ -12,8 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.esotericsoftware.minlog.Log;
 
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -21,7 +19,6 @@ import de.golfgl.lightblocks.menu.AboutScreen;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.AnimatedLightblocksLogo;
 import de.golfgl.lightblocks.menu.SinglePlayerScreen;
-import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.menu.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.menu.SettingsScreen;
 import de.golfgl.lightblocks.menu.TotalScoreScreen;
@@ -98,7 +95,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
                                              } catch (VetoException e) {
                                                  showDialog(e.getMessage());
                                              } catch (Throwable t) {
-                                                 Log.error("Error loading game", t);
+                                                 Gdx.app.error("Gamestate", "Error loading game", t);
                                                  showDialog("Error loading game.");
                                              }
                                          }
@@ -123,7 +120,13 @@ public class MainMenuScreen extends AbstractMenuScreen {
         playMultiplayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                new MultiplayerMenuScreen(app, mainGroup).show(stage);
+                AbstractMenuDialog multiplayerMenu = app.getNewMultiplayerMenu(mainGroup);
+
+                if (multiplayerMenu != null) {
+                    multiplayerMenu.show(stage);
+                } else
+                    showDialog("This version of Falling Lightblocks does not support multiplayer.\n" +
+                            "Please download another version of the game.");
             }
         });
 

@@ -1,7 +1,5 @@
 package de.golfgl.lightblocks.multiplayer;
 
-import com.esotericsoftware.kryo.Kryo;
-
 import java.util.ArrayList;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -22,47 +20,6 @@ public class MultiPlayerObjects {
     public static final int CHANGE_REMOVE = 3;
 
     public static final String PLAYERS_ALL = "*";
-
-    // This registers objects that are going to be sent over the network.
-    public static void register(Kryo kryo) {
-        // *** HANDSHAKE MUSS DIE ERSTE REGISTRIERTE KLASSE SEIN!!! ***
-        kryo.register(Handshake.class);
-        // und nun die weiteren Klassen registrieren =>
-        kryo.register(RoomState.class);
-        kryo.register(RoomStateChanged.class);
-        kryo.register(Player.class);
-        kryo.register(PlayerChanged.class);
-        kryo.register(GameParameters.class);
-        kryo.register(ArrayList.class);
-        kryo.register(RelayToPlayer.class);
-        kryo.register(ChatMessage.class);
-        kryo.register(GeneralKryoMessage.class);
-        kryo.register(PlayerInMatch.class);
-        kryo.register(boolean[].class);
-        kryo.register(PlayerInRoom.class);
-
-        // GameModel
-        kryo.register(SwitchedPause.class);
-        kryo.register(PlayerIsOver.class);
-        kryo.register(GameIsOver.class);
-        kryo.register(BonusScore.class);
-        kryo.register(PlayerInGame.class);
-        kryo.register(InitGame.class);
-        kryo.register(int[].class);
-        kryo.register(NextTetrosDrawn.class);
-        kryo.register(LinesRemoved.class);
-        kryo.register(GarbageForYou.class);
-
-        // Watch play
-        kryo.register(WatchPlayInsertNewBlock.class);
-        kryo.register(WatchPlayMoveTetro.class);
-        kryo.register(WatchPlayRotateTetro.class);
-        kryo.register(WatchPlayClearAndInsertLines.class);
-        kryo.register(WatchPlayShowNextTetro.class);
-        kryo.register(WatchPlayActivateNextTetro.class);
-        kryo.register(WatchPlayPinTetromino.class);
-        kryo.register(WatchPlayMarkConflict.class);
-    }
 
     public enum RoomState {closed, join, inGame}
 

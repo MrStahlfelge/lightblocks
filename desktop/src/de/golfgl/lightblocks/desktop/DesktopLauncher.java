@@ -7,24 +7,24 @@ import com.badlogic.gdx.utils.Array;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.MockGameServiceClient;
 import de.golfgl.gdxgamesvcs.achievement.IAchievement;
-import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.gpgs.IGpgsClient;
+import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
+import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 
 public class DesktopLauncher {
     public static void main(String[] arg) {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.width = 540; //LightBlocksGame.nativeGameWidth;
-        config.height = 960; //LightBlocksGame.nativeGameHeight;
-        LightBlocksGame game = new LightBlocksGame();
+        config.width = LightBlocksGame.nativeGameWidth;
+        config.height = LightBlocksGame.nativeGameHeight;
+        LightBlocksGame game = new MultiplayerLightblocks();
         game.gpgsClient = new MyTestClient();
         game.gpgsClient.setListener(game);
         new LwjglApplication(game, config);
     }
 
-    private static class MyTestClient extends MockGameServiceClient implements IGpgsClient {
+    private static class MyTestClient extends MockGameServiceClient implements IMultiplayerGsClient {
 
         public MyTestClient() {
             super(.5f);
@@ -37,12 +37,6 @@ public class DesktopLauncher {
 
         @Override
         public AbstractMultiplayerRoom createMultiPlayerRoom() {
-            return null;
-        }
-
-        @Override
-        public Boolean saveGameStateSync(String id, byte[] gameState, long progressValue,
-                                         ISaveGameStateResponseListener listener) {
             return null;
         }
 
@@ -68,7 +62,7 @@ public class DesktopLauncher {
 
         @Override
         public String getGameServiceId() {
-            return IGameServiceClient.GS_AMAZONGC_ID;
+            return IGameServiceClient.GS_GOOGLEPLAYGAMES_ID;
         }
     }
 }

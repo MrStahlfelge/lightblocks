@@ -12,9 +12,9 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
-import com.esotericsoftware.minlog.Log;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +23,7 @@ import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.gamestate.ILoadGameStateResponseListener;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
+import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -126,7 +127,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         if (GAME_DEVMODE)
             fpsLogger = new FPSLogger();
         else {
-            Log.set(Log.LEVEL_WARN);
             Gdx.app.setLogLevel(Application.LOG_ERROR);
         }
 
@@ -434,7 +434,16 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     }
 
     public String getWelcomeText() {
+        // So kann auch die Farbe verändert werden:
+        //Color.WHITE.set(0.2f, 1, 0.2f, 1);
+        // Aber durch Klick auf das Label wieder zurücksetzen
+        // 17.3. St Patrick's Day - Lightblocks Hintergrundmusik!
+
         // Hier kann "Welcome back :-)", "Have a good morning" usw. stehen, "Hi MrStahlfelge"
+        return null;
+    }
+
+    public AbstractMenuDialog getNewMultiplayerMenu(Actor actorToHide) {
         return null;
     }
 }

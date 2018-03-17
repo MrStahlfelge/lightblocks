@@ -20,7 +20,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Timer;
-import com.esotericsoftware.minlog.Log;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -242,7 +241,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     eventId = GpgsHelper.EVENT_INET_MULTIPLAYER_MATCH_STARTED;
 
                 if (eventId != null) {
-                    Log.info("GPGS", "Submitting newly started game " + modelId);
+                    Gdx.app.log("GPGS", "Submitting newly started game " + modelId);
                     caller.app.gpgsClient.submitEvent(eventId, 1);
                 }
             }
@@ -300,7 +299,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 gameModel = json.fromJson(GameModel.class,
                         app.savegame.loadMission(initGameParametersParams.getMissionId()));
             } catch (Throwable t) {
-                Log.error("Gamestate", "Error loading mission", t);
+                Gdx.app.error("Gamestate", "Error loading mission", t);
                 throw new IllegalStateException("Mission corrupted.", t);
             }
 
