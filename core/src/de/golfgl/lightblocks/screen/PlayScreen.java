@@ -308,7 +308,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 throw new IllegalStateException("Mission corrupted: " + initGameParametersParams.getMissionId());
         } else {
             try {
-                gameModel = initGameParametersParams.getGameModelClass().newInstance();
+                gameModel = initGameParametersParams.newGameModelInstance();
             } catch (Exception e) {
                 throw new IllegalArgumentException("Given game model class is not appropriate.", e);
             }
@@ -397,11 +397,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     private void saveGameState() {
-        if (app.savegame.canSaveState()) {
-            app.savegame.saveTotalScore();
-            app.savegame.saveBestScores();
-            app.savegame.saveGame(gameModel.saveGameModel());
-        }
+        app.savegame.saveTotalScore();
+        app.savegame.saveBestScores();
+        app.savegame.saveGame(gameModel.saveGameModel());
     }
 
     @Override
@@ -467,10 +465,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         ScoreScreen scoreScreen = new ScoreScreen(app);
         scoreScreen.setGameModelId(gameModel.getIdentifier());
         scoreScreen.addScoreToShow(gameModel.getScore(), app.TEXTS.get("labelRoundScore"));
-        if (app.savegame.canSaveState()) {
-            scoreScreen.setBest(gameModel.getBestScore());
-            scoreScreen.addScoreToShow(gameModel.getBestScore(), app.TEXTS.get("labelBestScore"));
-        }
+        scoreScreen.setBest(gameModel.getBestScore());
+        scoreScreen.addScoreToShow(gameModel.getBestScore(), app.TEXTS.get("labelBestScore"));
         scoreScreen.setNewGameParams(gameModel.getInitParameters());
         scoreScreen.setBackScreen(this.backScreen);
         scoreScreen.initializeUI();

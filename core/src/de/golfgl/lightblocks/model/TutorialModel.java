@@ -21,7 +21,7 @@ public class TutorialModel extends GameModel {
 
     public static InitGameParameters getTutorialInitParams() {
         InitGameParameters initGameParametersParams = new InitGameParameters();
-        initGameParametersParams.setGameModelClass(TutorialModel.class);
+        initGameParametersParams.setGameMode(InitGameParameters.GameMode.Tutorial);
         return initGameParametersParams;
     }
 

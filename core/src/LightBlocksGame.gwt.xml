@@ -2,4 +2,6 @@
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://google-web-toolkit.googlecode.com/svn/trunk/distro-source/core/src/gwt-module.dtd">
 <module>
 	<source path="de/golfgl/lightblocks" />
+	<extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model" />
+	<extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.state" />
 </module>

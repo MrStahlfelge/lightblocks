@@ -1,7 +1,9 @@
 package de.golfgl.lightblocks.state;
 
 import de.golfgl.lightblocks.model.GameModel;
+import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.MultiplayerModel;
+import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
 /**
@@ -15,7 +17,7 @@ public class InitGameParameters {
     private int inputKey;
     private int beginningLevel;
     private String missionId;
-    private Class<? extends GameModel> gameModelClass;
+    private GameMode gameMode;
     private AbstractMultiplayerRoom multiplayerRoom;
 
     public String getMissionId() {
@@ -35,7 +37,7 @@ public class InitGameParameters {
     }
 
     public boolean isMultiplayer() {
-        return gameModelClass != null && MultiplayerModel.class.isAssignableFrom(gameModelClass);
+        return GameMode.Multiplayer.equals(gameMode);
     }
 
     public int getBeginningLevel() {
@@ -46,12 +48,12 @@ public class InitGameParameters {
         this.beginningLevel = beginningLevel;
     }
 
-    public Class<? extends GameModel> getGameModelClass() {
-        return gameModelClass;
+    public GameMode getGameMode() {
+        return gameMode;
     }
 
-    public void setGameModelClass(Class<? extends GameModel> gameModelClass) {
-        this.gameModelClass = gameModelClass;
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
     }
 
     public AbstractMultiplayerRoom getMultiplayerRoom() {
@@ -61,4 +63,18 @@ public class InitGameParameters {
     public void setMultiplayerRoom(AbstractMultiplayerRoom multiplayerRoom) {
         this.multiplayerRoom = multiplayerRoom;
     }
+
+    public GameModel newGameModelInstance() {
+        switch (gameMode) {
+            case Multiplayer:
+                return new MultiplayerModel();
+            case Marathon:
+                return new MarathonModel();
+            case Tutorial:
+                return new TutorialModel();
+        }
+        throw new IllegalStateException("Unsupported game mode");
+    }
+
+    public enum GameMode {Multiplayer, Marathon, Tutorial}
 }

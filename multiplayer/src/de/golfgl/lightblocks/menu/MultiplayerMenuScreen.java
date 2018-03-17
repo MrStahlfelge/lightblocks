@@ -357,7 +357,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
     private void beginNewMultiplayerGame() {
         InitGameParameters initGameParametersParams = new InitGameParameters();
-        initGameParametersParams.setGameModelClass(MultiplayerModel.class);
+        initGameParametersParams.setGameMode(InitGameParameters.GameMode.Multiplayer);
 
         initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
         initGameParametersParams.setInputKey(inputButtonTable.getSelectedInput());

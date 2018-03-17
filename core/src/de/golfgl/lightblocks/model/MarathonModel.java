@@ -33,7 +33,7 @@ public class MarathonModel extends GameModel {
 
         retVal.setBeginningLevel(getScore().getStartingLevel());
         retVal.setInputKey(inputTypeKey);
-        retVal.setGameModelClass(MarathonModel.class);
+        retVal.setGameMode(InitGameParameters.GameMode.Tutorial);
 
         return retVal;
     }

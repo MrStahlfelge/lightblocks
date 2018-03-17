@@ -121,7 +121,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
 
     protected void beginNewGame() {
         InitGameParameters initGameParametersParams = new InitGameParameters();
-        initGameParametersParams.setGameModelClass(MarathonModel.class);
+        initGameParametersParams.setGameMode(InitGameParameters.GameMode.Marathon);
         initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
         initGameParametersParams.setInputKey(inputButtons.getSelectedInput());
 

@@ -52,12 +52,11 @@ public class GameStateHandler {
         return out;
     }
 
-    public boolean canSaveState() {
-        return Gdx.files.isLocalStorageAvailable();
-    }
-
     public boolean hasSavedGame() {
-        return canSaveState() && Gdx.files.local(FILENAME_SAVEGAME).exists();
+        if (Gdx.files.isLocalStorageAvailable())
+            return Gdx.files.local(FILENAME_SAVEGAME).exists();
+        else
+            return app.prefs.contains(FILENAME_SAVEGAME);
     }
 
     public String loadGame() {
@@ -65,7 +64,9 @@ public class GameStateHandler {
             throw new IndexOutOfBoundsException("cannot load game");
 
         try {
-            return decode(Gdx.files.local(FILENAME_SAVEGAME).readString(), SAVEGAMEKEY);
+            return decode(Gdx.files.isLocalStorageAvailable() ?
+                    Gdx.files.local(FILENAME_SAVEGAME).readString()
+                    : app.prefs.getString(FILENAME_SAVEGAME), SAVEGAMEKEY);
         } catch (Throwable t) {
             return null;
         }
@@ -78,9 +79,6 @@ public class GameStateHandler {
      * @return true when successful
      */
     public boolean saveGame(String jsonString) {
-        if (!canSaveState())
-            return false;
-
         if (jsonString == null)
             return resetGame();
 
@@ -88,7 +86,13 @@ public class GameStateHandler {
             System.out.println(jsonString);
 
         try {
-            Gdx.files.local(FILENAME_SAVEGAME).writeString(encode(jsonString, SAVEGAMEKEY), false);
+            String encoded = encode(jsonString, SAVEGAMEKEY);
+            if (Gdx.files.isLocalStorageAvailable()) {
+                Gdx.files.local(FILENAME_SAVEGAME).writeString(encoded, false);
+            } else {
+                app.prefs.putString(FILENAME_SAVEGAME, encoded);
+                app.prefs.flush();
+            }
             return true;
         } catch (Throwable t) {
             return false;
@@ -97,8 +101,14 @@ public class GameStateHandler {
 
     public boolean resetGame() {
         try {
-            Json json;
-            return Gdx.files.local(FILENAME_SAVEGAME).delete();
+            if (Gdx.files.isLocalStorageAvailable())
+                return Gdx.files.local(FILENAME_SAVEGAME).delete();
+            else {
+                app.prefs.remove(FILENAME_SAVEGAME);
+                app.prefs.flush();
+                return true;
+            }
+
         } catch (Throwable t) {
             return false;
         }
@@ -119,17 +129,23 @@ public class GameStateHandler {
      * @return true if there already was played
      */
     public boolean hasGameState() {
-        return Gdx.files.local(FILENAME_TOTALSCORE).exists();
+        if (Gdx.files.isLocalStorageAvailable())
+            return Gdx.files.local(FILENAME_TOTALSCORE).exists();
+        else
+            return app.prefs.contains(FILENAME_TOTALSCORE);
     }
 
     protected void loadTotalScore() {
         synchronized (gameStateMonitor) {
-            if (!canSaveState() || !Gdx.files.local(FILENAME_TOTALSCORE).exists()) {
+            if (!hasGameState()) {
                 totalScore = new TotalScore();
             } else {
                 Json json = new Json();
                 try {
-                    totalScore = json.fromJson(TotalScore.class, Gdx.files.local(FILENAME_TOTALSCORE));
+                    if (Gdx.files.isLocalStorageAvailable())
+                        totalScore = json.fromJson(TotalScore.class, Gdx.files.local(FILENAME_TOTALSCORE));
+                    else
+                        totalScore = json.fromJson(TotalScore.class, app.prefs.getString(FILENAME_TOTALSCORE));
                 } catch (Throwable t) {
                     totalScore = new TotalScore();
                 }
@@ -141,11 +157,14 @@ public class GameStateHandler {
      * saves the total score to file. Does not save it to cloud storage.
      */
     public void saveTotalScore() {
-        if (canSaveState()) {
-            synchronized (gameStateMonitor) {
-                Json json = new Json();
-                json.setOutputType(JsonWriter.OutputType.json);
+        synchronized (gameStateMonitor) {
+            Json json = new Json();
+            json.setOutputType(JsonWriter.OutputType.json);
+            if (Gdx.files.isLocalStorageAvailable())
                 json.toJson(totalScore, Gdx.files.local(FILENAME_TOTALSCORE));
+            else {
+                app.prefs.putString(FILENAME_TOTALSCORE, json.toJson(totalScore));
+                app.prefs.flush();
             }
         }
     }
@@ -235,15 +254,19 @@ public class GameStateHandler {
             return;
 
         synchronized (gameStateMonitor) {
-            if (!canSaveState() || !Gdx.files.local(FILENAME_BESTSCORES).exists()) {
+            if (!(Gdx.files.isLocalStorageAvailable() ? Gdx.files.local(FILENAME_BESTSCORES).exists()
+                    : app.prefs.contains(FILENAME_BESTSCORES))) {
                 Gdx.app.log("Gamestate", "No scores found.");
                 bestScores = new BestScore.BestScoreMap();
             } else {
                 Json json = new Json();
                 try {
-                    bestScores = json.fromJson(BestScore.BestScoreMap.class, decode(Gdx.files.local
-                                    (FILENAME_BESTSCORES).readString()
-                            , SAVEGAMEKEY));
+                    String decoded;
+                    if (Gdx.files.isLocalStorageAvailable())
+                        decoded = decode(Gdx.files.local(FILENAME_BESTSCORES).readString(), SAVEGAMEKEY);
+                    else
+                        decoded = decode(app.prefs.getString(FILENAME_BESTSCORES), SAVEGAMEKEY);
+                    bestScores = json.fromJson(BestScore.BestScoreMap.class, decoded);
                 } catch (Throwable t) {
                     Gdx.app.error("Gamestate", "Error loading best scores - resetting.", t);
                     bestScores = null;
@@ -255,11 +278,15 @@ public class GameStateHandler {
     }
 
     public void saveBestScores() {
-        if (canSaveState()) {
-            synchronized (gameStateMonitor) {
-                Json json = new Json();
-                json.setOutputType(JsonWriter.OutputType.minimal);
-                Gdx.files.local(FILENAME_BESTSCORES).writeString(encode(json.toJson(bestScores), SAVEGAMEKEY), false);
+        synchronized (gameStateMonitor) {
+            Json json = new Json();
+            json.setOutputType(JsonWriter.OutputType.minimal);
+            String encoded = encode(json.toJson(bestScores), SAVEGAMEKEY);
+            if (Gdx.files.isLocalStorageAvailable())
+                Gdx.files.local(FILENAME_BESTSCORES).writeString(encoded, false);
+            else {
+                app.prefs.putString(FILENAME_BESTSCORES, encoded);
+                app.prefs.flush();
             }
         }
     }
