@@ -160,4 +160,8 @@ public class PauseDialog extends ControllerMenuDialog {
     protected Actor getConfiguredEscapeActor() {
         return exitButton;
     }
+
+    public void setResumeLabel() {
+        firstShow = false;
+    }
 }

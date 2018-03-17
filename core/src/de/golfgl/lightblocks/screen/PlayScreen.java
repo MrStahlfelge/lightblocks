@@ -197,9 +197,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         }
         refreshResumeFromPauseText();
 
-        if (!gameModel.beginPaused() && gameBlockers.isEmpty())
+        if (!gameModel.beginPaused() && gameBlockers.isEmpty()) {
             switchPause(true);
-        else
+            pauseDialog.setResumeLabel();
+        } else
             pauseDialog.show(stage);
 
     }
