@@ -49,7 +49,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String GAME_STOREURL = "http://play.google.com/store/apps/details?id=de.golfgl" +
             ".lightblocks&referrer=utm_source%3Dflb";
     // An den gleichen Eintrag im AndroidManifest denken!!!
-    public static final String GAME_VERSIONSTRING = "1.1.1812";
+    public static final String GAME_VERSIONSTRING = "1.1.1813";
     // Abstand für Git
     // auch dran denken das data-Verzeichnis beim release wegzunehmen!
     public static final boolean GAME_DEVMODE = true;
