@@ -31,6 +31,7 @@ import de.golfgl.lightblocks.multiplayer.INsdHelper;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
 import de.golfgl.lightblocks.state.MyControllerMapping;
@@ -159,10 +160,10 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         mainMenuScreen = new MainMenuScreen(this);
 
-        if (savegame.hasGameState())
+        if (savegame.hasGameState() || !PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN))
             this.setScreen(mainMenuScreen);
         else {
-            // beim ersten Mal ins Tutorial!
+            // beim ersten Mal ins Tutorial (nur für Touchinput)!
             try {
                 PlayScreen ps = PlayScreen.gotoPlayScreen(mainMenuScreen, TutorialModel.getTutorialInitParams());
                 ps.setShowScoresWhenGameOver(false);

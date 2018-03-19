@@ -1,9 +1,12 @@
 package de.golfgl.lightblocks.screen;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.controllers.Controllers;
+
+import de.golfgl.lightblocks.LightBlocksGame;
 
 /**
  * Created by Benjamin Schulte on 25.01.2017.
@@ -39,8 +42,10 @@ public abstract class PlayScreenInput extends InputAdapter {
     public static boolean isInputTypeAvailable(int key) {
         switch (key) {
             case KEY_TOUCHSCREEN:
-                // Touchscreen wird simuliert
-                return true;
+                // Touchscreen wird auf Desktop im DevMode simuliert
+                return Gdx.input.isPeripheralAvailable(Input.Peripheral.MultitouchScreen)
+                        || LightBlocksGame.GAME_DEVMODE && Gdx.app.getType().equals(Application.ApplicationType
+                        .Desktop);
             case KEY_KEYSORGAMEPAD:
                 return Controllers.getControllers().size > 0 || Gdx.input.isPeripheralAvailable(Input.Peripheral
                         .HardwareKeyboard);
