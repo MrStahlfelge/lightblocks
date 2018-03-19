@@ -27,7 +27,7 @@ public abstract class PlayScreenInput extends InputAdapter {
     public static PlayScreenInput getPlayInput(int key) throws InputNotAvailableException {
 
         if (!isInputTypeAvailable(key))
-            throw new InputNotAvailableException();
+            throw new InputNotAvailableException(key);
 
         switch (key) {
             case KEY_TOUCHSCREEN:

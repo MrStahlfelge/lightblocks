@@ -250,7 +250,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             return currentGame;
 
         } catch (InputNotAvailableException inp) {
-            throw new VetoException(caller.app.TEXTS.get("errorInputNotAvail"));
+            throw new VetoException(caller.app.TEXTS.format("errorInputNotAvail",
+                    caller.app.TEXTS.get(PlayScreenInput.getInputTypeName(inp.getInputKey()))));
         }
     }
 
