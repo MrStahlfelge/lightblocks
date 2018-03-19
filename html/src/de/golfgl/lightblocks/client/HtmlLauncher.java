@@ -18,7 +18,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 public class HtmlLauncher extends GwtApplication {
 
     // padding is to avoid scrolling in iframes, set to 20 if you have problems
-    private static final int PADDING = 100;
+    private static final int PADDING = LightBlocksGame.GAME_DEVMODE ? 100 : 10;
     private GwtApplicationConfiguration cfg;
 
     @Override

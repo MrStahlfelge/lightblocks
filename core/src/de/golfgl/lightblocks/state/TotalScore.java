@@ -1,5 +1,8 @@
 package de.golfgl.lightblocks.state;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 
@@ -9,7 +12,7 @@ import de.golfgl.lightblocks.gpgs.GpgsHelper;
  * Created by Benjamin Schulte on 07.02.2017.
  */
 
-public class TotalScore {
+public class TotalScore implements Json.Serializable {
     // der aktuelle Punktestand
     private long score;
     // die abgebauten Reihen
@@ -125,5 +128,29 @@ public class TotalScore {
 
         if (score >= 1000000)
             gpgsClient.unlockAchievement(GpgsHelper.ACH_SCORE_MILLIONAIRE);
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("score", score);
+        json.writeValue("clearedLines", clearedLines);
+        json.writeValue("drawnTetrominos", drawnTetrominos);
+        json.writeValue("fourLineCount", fourLineCount);
+        json.writeValue("tSpins", tSpins);
+        json.writeValue("doubles", doubles);
+        json.writeValue("multiPlayerMatchesWon", multiPlayerMatchesWon);
+        json.writeValue("multiPlayerMatchesStarted", multiPlayerMatchesStarted);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        score = jsonData.getLong("score", 0);
+        clearedLines = jsonData.getLong("clearedLines", 0);
+        drawnTetrominos = jsonData.getLong("drawnTetrominos", 0);
+        fourLineCount = jsonData.getLong("fourLineCount", 0);
+        tSpins = jsonData.getLong("tSpins", 0);
+        doubles = jsonData.getLong("doubles", 0);
+        multiPlayerMatchesWon = jsonData.getLong("multiPlayerMatchesWon", 0);
+        multiPlayerMatchesStarted = jsonData.getLong("multiPlayerMatchesStarted", 0);
     }
 }

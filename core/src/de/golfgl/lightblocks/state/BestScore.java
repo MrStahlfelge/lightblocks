@@ -135,7 +135,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
         return (this.rating == rating);
     }
 
-    protected static class BestScoreMap extends HashMap<String, BestScore> implements Json.Serializable {
+    public static class BestScoreMap extends HashMap<String, BestScore> implements Json.Serializable {
 
         @Override
         public void write(Json json) {
