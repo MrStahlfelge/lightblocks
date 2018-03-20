@@ -22,7 +22,6 @@ import de.golfgl.lightblocks.scene2d.FaCheckbox;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
-import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.TouchableSlider;
 import de.golfgl.lightblocks.screen.AbstractScreen;
@@ -53,7 +52,8 @@ public class SettingsScreen extends AbstractMenuDialog {
         groupPager = new PagedScrollPane(app.skin, LightBlocksGame.SKIN_STYLE_PAGER);
         groupPager.addPage(generalGroup);
         gesturesGroup = new GestureSettings();
-        groupPager.addPage(gesturesGroup);
+        if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN))
+            groupPager.addPage(gesturesGroup);
         groupPager.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
