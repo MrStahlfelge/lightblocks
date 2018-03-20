@@ -15,8 +15,7 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
 
     @Override
     public String getInputHelpText() {
-        //TODO
-        return null;
+        return keyboard.getInputHelpText();
     }
 
     @Override
