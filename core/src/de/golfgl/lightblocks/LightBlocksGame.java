@@ -160,7 +160,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         mainMenuScreen = new MainMenuScreen(this);
 
-        if (savegame.hasGameState() || !PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN))
+        if (savegame.hasGameState() || !TutorialModel.tutorialAvailable())
             this.setScreen(mainMenuScreen);
         else {
             // beim ersten Mal ins Tutorial (nur für Touchinput)!

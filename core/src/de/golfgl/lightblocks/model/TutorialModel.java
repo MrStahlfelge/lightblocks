@@ -25,6 +25,11 @@ public class TutorialModel extends GameModel {
         return initGameParametersParams;
     }
 
+    public static boolean tutorialAvailable() {
+        // das Tutorial ist nur verfügbar bei Touch-Input
+        return PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
+    }
+
     private void nextTutorialStep() {
         tutorialStep++;
 
