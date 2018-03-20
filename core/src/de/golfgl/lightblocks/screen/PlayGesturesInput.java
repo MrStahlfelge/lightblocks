@@ -53,7 +53,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         } else if (pointer != 0 || button != Input.Buttons.LEFT)
             return false;
 
-        touchDownValid = screenY > Gdx.graphics.getHeight() * SCREEN_BORDER_PERCENTAGE * (isPaused ? 2 : 1);
+        touchDownValid = screenY > Gdx.graphics.getHeight() * SCREEN_BORDER_PERCENTAGE * (isPaused() ? 2 : 1);
 
         if (!touchDownValid)
             return false;
@@ -61,7 +61,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         this.screenX = screenX;
         this.screenY = screenY;
 
-        if (isPaused) {
+        if (isPaused()) {
             playScreen.switchPause(false);
             didSomething = true;
         } else {
@@ -178,7 +178,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             }
         }
 
-        if (screenY - this.screenY < -4 * dragThreshold & !isPaused && playScreen.app.getPauseSwipeEnabled()) {
+        if (screenY - this.screenY < -4 * dragThreshold & !isPaused() && playScreen.app.getPauseSwipeEnabled()) {
             playScreen.switchPause(false);
         }
 

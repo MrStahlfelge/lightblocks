@@ -48,10 +48,10 @@ public class PlayGravityInput extends PlayScreenInput {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (isPaused && !hasCalibration && !isGameOver)
+        if (isPaused() && !hasCalibration && !isGameOver)
             return true;
 
-        if (isPaused)
+        if (isPaused())
             playScreen.switchPause(false);
         else
             playScreen.gameModel.setRotate(screenX > playScreen.stage.getWidth() / 2);
@@ -77,7 +77,7 @@ public class PlayGravityInput extends PlayScreenInput {
 
         updateFromSensor(currentInputVector);
 
-        if (isPaused) {
+        if (isPaused()) {
             currentInputVector.sub(calibrationVector);
             // Kallibrieren
             if (!hasCalibration || currentInputVector.len() > 2)

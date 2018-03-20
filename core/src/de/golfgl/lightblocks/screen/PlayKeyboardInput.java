@@ -70,14 +70,14 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
             case Input.Keys.CONTROL_LEFT:
             case Input.Keys.ALT_LEFT:
-                if (isPaused)
+                if (isPaused())
                     playScreen.switchPause(false);
                 else
                     playScreen.gameModel.setRotate(false);
                 return true;
 
             case Input.Keys.SPACE:
-                if (isPaused)
+                if (isPaused())
                     playScreen.switchPause(false);
                 else
                     playScreen.gameModel.setRotate(true);

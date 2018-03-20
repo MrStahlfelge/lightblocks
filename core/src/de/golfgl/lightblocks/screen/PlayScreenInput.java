@@ -16,11 +16,11 @@ public abstract class PlayScreenInput extends InputAdapter {
     public static final int KEY_INPUTTYPE_MAX = 3;
     //TODO das muss weg! der ist nicht immer da
     public static final int KEY_INPUTTYPE_ALLAVAIL = 1;
+    public static final int KEY_KEYORTOUCH = 4;
     public static final int KEY_TOUCHSCREEN = 1;
     public static final int KEY_ACCELEROMETER = 2;
     public static final int KEY_KEYSORGAMEPAD = 3;
 
-    public boolean isPaused = true;
     protected boolean isGameOver;
     PlayScreen playScreen;
 
@@ -30,6 +30,13 @@ public abstract class PlayScreenInput extends InputAdapter {
             throw new InputNotAvailableException(key);
 
         switch (key) {
+            case KEY_KEYORTOUCH:
+                if (isInputTypeAvailable(KEY_TOUCHSCREEN) && isInputTypeAvailable(KEY_KEYSORGAMEPAD))
+                    return new PlayKeyOrTouchInput();
+                else if (isInputTypeAvailable(KEY_TOUCHSCREEN))
+                    return getPlayInput(KEY_TOUCHSCREEN);
+                else
+                    return getPlayInput(KEY_KEYSORGAMEPAD);
             case KEY_TOUCHSCREEN:
                 return new PlayGesturesInput();
             case KEY_ACCELEROMETER:
@@ -41,6 +48,8 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     public static boolean isInputTypeAvailable(int key) {
         switch (key) {
+            case KEY_KEYORTOUCH:
+                return isInputTypeAvailable(KEY_TOUCHSCREEN) || isInputTypeAvailable(KEY_KEYSORGAMEPAD);
             case KEY_TOUCHSCREEN:
                 // Touchscreen wird auf Desktop im DevMode simuliert
                 return Gdx.input.isPeripheralAvailable(Input.Peripheral.MultitouchScreen)
@@ -97,7 +106,6 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     public void setGameOver() {
         this.isGameOver = true;
-        this.isPaused = true;
     }
 
     @Override
@@ -139,5 +147,9 @@ public abstract class PlayScreenInput extends InputAdapter {
      * clean up if necessary
      */
     public void dispose() {
+    }
+
+    public boolean isPaused() {
+        return playScreen.isPaused() || isGameOver;
     }
 }

@@ -422,9 +422,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
             final float fadingInterval = immediately ? 0 : .2f;
 
-            //inform input adapter, too
-            inputAdapter.isPaused = isPaused;
-
             blockGroup.clearActions();
 
             if (!isPaused) {
