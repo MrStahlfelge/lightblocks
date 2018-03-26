@@ -1,5 +1,7 @@
 package de.golfgl.lightblocks.scene2d;
 
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -7,6 +9,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.menu.ITouchActionButton;
+import de.golfgl.lightblocks.screen.PlayScreenInput;
 
 /**
  * Created by Benjamin Schulte on 14.01.2018.
@@ -19,6 +22,11 @@ public class MyStage extends ControllerMenuStage {
 
     public MyStage(Viewport viewport) {
         super(viewport);
+
+        // Falls unter Android keine Touchscreen-Eingabe vorhanden, dann TouchAction sofort aktivieren
+        if (Gdx.app.getType().equals(Application.ApplicationType.Android) &&
+                !PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN))
+            touchActionActivated = true;
     }
 
     @Override
