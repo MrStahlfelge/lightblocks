@@ -2,11 +2,7 @@ package de.golfgl.lightblocks.scene2d;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
@@ -18,8 +14,8 @@ import de.golfgl.lightblocks.menu.ITouchActionButton;
 
 public class MyStage extends ControllerMenuStage {
     private static final float TOUCH_INTERVAL = 1.5f;
-    private float timeSinceTouch;
     private static boolean touchActionActivated = false;
+    private float timeSinceTouch;
 
     public MyStage(Viewport viewport) {
         super(viewport);
@@ -58,7 +54,8 @@ public class MyStage extends ControllerMenuStage {
     public boolean keyDown(int keyCode) {
         boolean handled = super.keyDown(keyCode);
 
-        if (handled && keyCode != Input.Keys.BACK)
+        if (handled && keyCode != Input.Keys.BACK &&
+                keyCode != Input.Keys.VOLUME_DOWN && keyCode != Input.Keys.VOLUME_UP)
             touchActionActivated = true;
 
         return handled;
