@@ -63,6 +63,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String SKIN_BUTTON_ROUND = "round";
     public static final String SKIN_BUTTON_CHECKBOX = "checkbox";
     public static final String SKIN_STYLE_PAGER = "pager";
+    public static final String SKIN_LIST = "list";
     public static final float LABEL_SCALING = .65f;
     public static final float ICON_SCALE_MENU = 1f;
 

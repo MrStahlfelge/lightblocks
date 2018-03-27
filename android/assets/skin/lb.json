@@ -131,11 +131,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 }
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
 	default: {
-		font: qs-25-bold
+		font: qs-40-bold
 		fontColorSelected: white
 		fontColorUnselected: unselected
 		selection: transparent
-		background: list
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
@@ -146,6 +145,11 @@ com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
 	pager: {
 		hScroll: radio
 		hScrollKnob: radio-over
+	}
+	list: {
+		background: list
+		hScrollKnob: scroll-horizontal
+		vScrollKnob: scroll-vertical
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {

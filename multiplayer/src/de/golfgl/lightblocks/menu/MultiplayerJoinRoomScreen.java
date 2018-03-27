@@ -5,10 +5,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.LifecycleListener;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -17,6 +20,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
+import de.golfgl.gdx.controllers.ControllerMenuStage;
+import de.golfgl.gdx.controllers.ControllerScrollPane;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
@@ -45,6 +50,7 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
     private TextButton joinRoomButton;
     private Button leaveButton;
     private TextButton enterManually;
+    private ScrollPane hostListScrollPane;
 
     public MultiplayerJoinRoomScreen(final LightBlocksGame app) {
         super("", app.skin);
@@ -82,6 +88,18 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
 
             }
         });
+        joinRoomButton.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                // automatische Selektion funktioniert nicht immer wegen der umgebenden ScrollPane
+                // also hier hart bei nach oben-Button wechseln
+                if (((MyStage) getStage()).isGoUpKeyCode(keycode)) {
+                    ((MyStage) getStage()).setFocusedActor(hostList);
+                    return true;
+                }
+                return super.keyDown(event, keycode);
+            }
+        });
         joinRoomButton.setDisabled(true);
 
         addFocusableActor(joinRoomButton);
@@ -106,14 +124,29 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
             }
 
             @Override
+            public boolean onControllerScroll(ControllerMenuStage.MoveFocusDirection direction) {
+                boolean scrolled = super.onControllerScroll(direction);
+
+                if (scrolled && hostListScrollPane != null)
+                    hostListScrollPane.scrollTo(0, hostList.getHeight() -
+                                    hostList.getItemHeight() * (1 + hostList.getSelectedIndex()),
+                            hostList.getWidth(), hostList.getItemHeight());
+
+                return scrolled;
+            }
+
+            @Override
             protected void setup() {
-                //nicht einfach den ersten selektieren
+                getStyle().font.getData().setScale(LightBlocksGame.LABEL_SCALING);
+                //kein super, hier nicht den ersten selektieren
             }
         };
         addFocusableActor(hostList);
         enterManually = new RoundedTextButton(app.TEXTS.get("multiplayerJoinManually"), app.skin);
         enterManually.getLabel().setFontScale(LightBlocksGame.LABEL_SCALING);
         addFocusableActor(enterManually);
+
+        hostListScrollPane = new ControllerScrollPane(hostList, app.skin, LightBlocksGame.SKIN_LIST);
 
         hostList.addListener(new ChangeListener() {
             @Override
@@ -159,7 +192,7 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
         menuTable.add(new ScaledLabel(app.TEXTS.get("multiplayerJoinRoomHelp1"), app.skin,
                 LightBlocksGame.SKIN_FONT_REG, .7f)).fill();
         menuTable.row();
-        menuTable.add(hostList).minWidth(LightBlocksGame.nativeGameWidth * .75f).minHeight(LightBlocksGame
+        menuTable.add(hostListScrollPane).minWidth(LightBlocksGame.nativeGameWidth * .75f).minHeight(LightBlocksGame
                 .nativeGameHeight * .15f).pad(5).expand();
         menuTable.row();
         menuTable.add(joinRoomButton);
