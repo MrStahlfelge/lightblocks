@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import java.util.HashMap;
 
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Mission;
@@ -160,7 +161,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
             }
         }
 
-        public void checkAchievements(IGameServiceClient gpgsClient) {
+        public void checkAchievements(IGameServiceClient gpgsClient, LightBlocksGame app) {
             if (gpgsClient == null || !gpgsClient.isSessionActive())
                 return;
 
@@ -176,7 +177,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
 
                 // und dann auch prüfen ob alle perfekt waren
                 boolean perfectDone = true;
-                for (Mission mission : Mission.getMissionList()) {
+                for (Mission mission : app.getMissionList()) {
                     BestScore missionScore = this.get(mission.getUniqueId());
 
                     if (missionScore == null || missionScore.getRating() < 7)

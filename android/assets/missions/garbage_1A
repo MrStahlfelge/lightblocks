@@ -1,1 +1,1 @@
-{"class":"de.golfgl.lightblocks.model.GarbageModel","gameModelVersion":"1.0.0","inputType":1,"modelId":"garbage_1A","maxBlocksToUse":75,"topRatingScore":50000,"beginningLevel":2,"garbageChance":.3,"welcomeMsgPref":"tutorialMission09_","welcomeMsgNum":2}
+{"class":"de.golfgl.lightblocks.model.GarbageModel","gameModelVersion":"1.0.0","inputType":4,"modelId":"garbage_1A","maxBlocksToUse":75,"topRatingScore":50000,"beginningLevel":2,"garbageChance":.3,"welcomeMsgPref":"tutorialMission09_","welcomeMsgNum":2}

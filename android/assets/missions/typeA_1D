@@ -1,1 +1,1 @@
-{"class":"de.golfgl.lightblocks.model.RelaxModel","gameModelVersion":"1.0.0","inputType":1,"modelId":"typeA_1D","linesToClear":75,"topRatingScore":200000,"maxBlocksToUse":300,"beginningLevel":5}
+{"class":"de.golfgl.lightblocks.model.RelaxModel","gameModelVersion":"1.0.0","inputType":4,"modelId":"typeA_1D","linesToClear":75,"topRatingScore":200000,"maxBlocksToUse":300,"beginningLevel":5}

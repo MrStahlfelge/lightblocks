@@ -1,7 +1,11 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.utils.Array;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import de.golfgl.lightblocks.screen.PlayScreenInput;
 
 /**
  * Helper class for the missions
@@ -20,18 +24,32 @@ public class Mission {
             "special_1B", "typeB_1B", "special_1C", "garbage_1A", "typeB_1C",
             "gravityA_2A", "typeA_1D", "gravityB_2A", "garbage_1B", "typeB_1D"};
 
+    private static final String[] needGesture = {"tutorial"};
+    private static final String[] needGravity = {"gravityA_2A", "gravityB_2A"};
+
     private String uniqueId;
     private int index;
 
     public static List<Mission> getMissionList() {
+        Array<String> needsGestures = new Array<String>(needGesture);
+        Array<String> needsGravity = new Array<String>(needGravity);
+        boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
+        boolean gravityAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_ACCELEROMETER);
 
         List<Mission> missionsList = new ArrayList<Mission>(missions.length);
+        int added = 0;
 
         for (int i = 0; i < missions.length; i++) {
-            Mission mission = new Mission();
-            mission.setUniqueId(missions[i]);
-            mission.setIndex(i);
-            missionsList.add(mission);
+            String uid = missions[i];
+            if (!(needsGestures.contains(uid, false) && !touchAvailable)
+                    && !(needsGravity.contains(uid, false) && !gravityAvailable)) {
+
+                Mission mission = new Mission();
+                mission.setUniqueId(uid);
+                mission.setIndex(added);
+                missionsList.add(mission);
+                added++;
+            }
         }
 
         return missionsList;

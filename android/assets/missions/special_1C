@@ -1,1 +1,1 @@
-{"class":"de.golfgl.lightblocks.model.MissionSpecialModel","gameModelVersion":"1.0.0","inputType":1,"modelId":"special_1C","numDoubleSpecials":1,"maxBlocksToUse":75,"topRatingScore":17500,"beginningLevel":3,"welcomeMsgPref":"tutorialMission08_","welcomeMsgNum":2}
+{"class":"de.golfgl.lightblocks.model.MissionSpecialModel","gameModelVersion":"1.0.0","inputType":4,"modelId":"special_1C","numDoubleSpecials":1,"maxBlocksToUse":75,"topRatingScore":17500,"beginningLevel":3,"welcomeMsgPref":"tutorialMission08_","welcomeMsgNum":2}
