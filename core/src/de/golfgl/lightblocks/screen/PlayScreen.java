@@ -915,14 +915,29 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void showOverlayMessage(String message, float autoHide, String... params) {
+    public void showOverlayMessage(final String message, final float autoHide, final String... params) {
         if (overlayWindow == null)
             overlayWindow = new OverlayMessage(app.skin, labelGroup.getWidth());
 
         if (message == null)
             overlayWindow.hide();
         else {
-            overlayWindow.showText(stage, app.TEXTS.format(message, (Object) params));
+            String localizedMessage = app.TEXTS.format(message, (Object) params);
+            if (localizedMessage.contains("_CONTINUE_")) {
+                if (inputAdapter != null)
+                    localizedMessage = localizedMessage.replace("_CONTINUE_", inputAdapter.getTutorialContinueText());
+                else {
+                    // => eine Schleife nach hinten schieben, da noch nicht initialisiert ist
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            showOverlayMessage(message, autoHide, params);
+                        }
+                    });
+                    return;
+                }
+            }
+            overlayWindow.showText(stage, localizedMessage);
         }
     }
 

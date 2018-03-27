@@ -21,6 +21,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
         return playScreen.app.TEXTS.get(isOnKeyboard() ? "inputKeyboardHelp" : "inputGamepadHelp");
     }
 
+    @Override
+    public String getTutorialContinueText() {
+        return playScreen.app.TEXTS.get(isOnKeyboard() ? "tutorialContinueKeyboard" : "tutorialContinueGamepad");
+    }
+
     protected boolean isOnKeyboard() {
         return Controllers.getControllers().size == 0 && Gdx.input.isPeripheralAvailable(Input.Peripheral
                 .HardwareKeyboard);

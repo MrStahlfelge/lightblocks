@@ -104,6 +104,8 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     public abstract String getInputHelpText();
 
+    public abstract String getTutorialContinueText();
+
     public void setGameOver() {
         this.isGameOver = true;
     }

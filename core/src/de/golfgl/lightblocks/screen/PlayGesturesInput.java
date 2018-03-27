@@ -35,6 +35,11 @@ public class PlayGesturesInput extends PlayScreenInput {
     }
 
     @Override
+    public String getTutorialContinueText() {
+        return playScreen.app.TEXTS.get("tutorialContinueGestures");
+    }
+
+    @Override
     public void setPlayScreen(PlayScreen playScreen) {
         super.setPlayScreen(playScreen);
 

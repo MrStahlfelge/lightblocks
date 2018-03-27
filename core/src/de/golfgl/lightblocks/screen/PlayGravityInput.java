@@ -65,6 +65,11 @@ public class PlayGravityInput extends PlayScreenInput {
     }
 
     @Override
+    public String getTutorialContinueText() {
+        return playScreen.app.TEXTS.get("tutorialContinueGestures");
+    }
+
+    @Override
     public void doPoll(float delta) {
 
         if (isGameOver)

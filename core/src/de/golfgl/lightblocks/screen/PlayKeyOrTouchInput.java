@@ -19,6 +19,11 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     }
 
     @Override
+    public String getTutorialContinueText() {
+        return keyboard.getInputHelpText();
+    }
+
+    @Override
     public void setGameOver() {
         super.setGameOver();
         keyboard.setGameOver();
