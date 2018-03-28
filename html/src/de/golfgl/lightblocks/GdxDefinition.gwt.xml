@@ -10,4 +10,5 @@
 	<entry-point class='de.golfgl.lightblocks.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 	<set-configuration-property name="gdx.assetpath" value="../android/assets" />
+	<set-configuration-property name="gdx.assetfilterclass" value="de.golfgl.lightblocks.AssetFilter"/>
 </module>
