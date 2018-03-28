@@ -4,6 +4,8 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
+import com.badlogic.gdx.backends.gwt.GwtInput;
+import com.badlogic.gdx.backends.gwt.MyGwtApp;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.google.gwt.canvas.client.Canvas;
@@ -15,7 +17,7 @@ import com.google.gwt.user.client.Window;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 
-public class HtmlLauncher extends GwtApplication {
+public class HtmlLauncher extends MyGwtApp {
 
     // padding is to avoid scrolling in iframes, set to 20 if you have problems
     private static final int PADDING = LightBlocksGame.GAME_DEVMODE ? 100 : 10;
