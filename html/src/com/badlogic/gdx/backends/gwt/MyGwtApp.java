@@ -15,7 +15,7 @@ public abstract class MyGwtApp extends GwtApplication {
     @Override
     void setupLoop() {
         super.setupLoop();
-        Gdx.input = new GwtInput(graphics.canvas) {
+        GwtInput input = new GwtInput(graphics.canvas) {
             @Override
             public boolean isPeripheralAvailable(Peripheral peripheral) {
                 if (peripheral == Peripheral.HardwareKeyboard) return !isMobileDevice();
@@ -23,6 +23,9 @@ public abstract class MyGwtApp extends GwtApplication {
                 return super.isPeripheralAvailable(peripheral);
             }
         };
+        input.setInputProcessor(Gdx.input.getInputProcessor());
+        Gdx.input.setInputProcessor(null);
+        Gdx.input = input;
     }
 
     /**
