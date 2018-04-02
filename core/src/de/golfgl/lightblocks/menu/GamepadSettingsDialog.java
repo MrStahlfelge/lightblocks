@@ -46,7 +46,7 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
         this.mappings = app.controllerMappings;
 
         getButtonTable().defaults().pad(20, 40, 20, 40);
-        closeButton = new FaButton(FontAwesome.MISC_CROSS, app.skin);
+        closeButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
         button(closeButton);
 
         refreshButton = new FaButton(FontAwesome.ROTATE_RELOAD, getSkin());
