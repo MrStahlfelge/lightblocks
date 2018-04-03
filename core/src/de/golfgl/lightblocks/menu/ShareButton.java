@@ -16,7 +16,7 @@ public class ShareButton extends FaButton {
 
     public ShareButton(final LightBlocksGame app) {
         super(FontAwesome.NET_SHARE1, app.skin);
-        shareText = app.TEXTS.get("gameTitle") + ": " + LightBlocksGame.GAME_STOREURL;
+        shareText = app.TEXTS.get("gameTitle") + ": " + LightBlocksGame.GAME_URL;
 
         addListener(new ChangeListener() {
                         public void changed(ChangeEvent event, Actor actor) {

@@ -46,7 +46,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
     public static final String GAME_EMAIL = "lightblocks@golfgl.de";
-    public static final String GAME_URL = "http://www.golfgl.de/lightblocks/";
+    public static final String GAME_URL = "https://www.golfgl.de/lightblocks/";
     public static final String GAME_STOREURL = "http://play.google.com/store/apps/details?id=de.golfgl" +
             ".lightblocks&referrer=utm_source%3Dflb";
     // An den gleichen Eintrag im AndroidManifest denken!!!
