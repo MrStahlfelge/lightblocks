@@ -24,7 +24,7 @@ allprojects {
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
         gamsvcsVersion = '0.2.3-SNAPSHOT'
-        cuversion = '0.1.1-SNAPSHOT'
+        cuversion = '0.1.1'
     }
 
     repositories {
