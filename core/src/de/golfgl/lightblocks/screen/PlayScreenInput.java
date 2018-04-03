@@ -14,8 +14,6 @@ import de.golfgl.lightblocks.LightBlocksGame;
 public abstract class PlayScreenInput extends InputAdapter {
     public static final int KEY_INPUTTYPE_MIN = 1;
     public static final int KEY_INPUTTYPE_MAX = 3;
-    //TODO das muss weg! der ist nicht immer da
-    public static final int KEY_INPUTTYPE_ALLAVAIL = 1;
     public static final int KEY_KEYORTOUCH = 4;
     public static final int KEY_TOUCHSCREEN = 1;
     public static final int KEY_ACCELEROMETER = 2;

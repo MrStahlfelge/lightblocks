@@ -163,7 +163,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
             }
         };
 
-        inputButtonTable = new InputButtonTable(app, PlayScreenInput.KEY_INPUTTYPE_ALLAVAIL);
+        inputButtonTable = new InputButtonTable(app, PlayScreenInput.KEY_INPUTTYPE_MIN);
         inputButtonTable.setAutoEnableGamepad(false);
         addFocusableActor(inputButtonTable);
 

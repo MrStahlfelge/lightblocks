@@ -102,14 +102,34 @@ public class InputButtonTable extends Table implements IControllerActable, ITouc
 
     public void setInputDisabled(int i, boolean disabled) {
         InputTypeButton btn = getInputButton(i);
-        if (btn != null)
-            btn.setDisabled(disabled || !PlayScreenInput.isInputTypeAvailable(i));
+        if (btn == null)
+            return;
+
+        btn.setDisabled(disabled || !PlayScreenInput.isInputTypeAvailable(i));
 
         // Falls der gerade aktive deaktiviert wurde, dann wechseln
         if (inputButtonsGroup.getChecked().getInputType() == i && disabled) {
-            InputTypeButton btnAlwaysAvail = getInputButton(PlayScreenInput.KEY_INPUTTYPE_ALLAVAIL);
-            btnAlwaysAvail.setChecked(true);
+            Array<InputTypeButton> buttons = inputButtonsGroup.getButtons();
+            int found = 0;
+            for (int j = 0; j < buttons.size; j++)
+                if (!buttons.get(j).isDisabled()) {
+                    found = j;
+                    break;
+                }
+
+            buttons.get(found).setChecked(true);
         }
+
+    }
+
+    public int getEnabledInputCount() {
+        int retVal = 0;
+        for (InputTypeButton btn : inputButtonsGroup.getButtons()) {
+            if (!btn.isDisabled())
+                retVal++;
+        }
+
+        return retVal;
     }
 
     protected InputTypeButton getInputButton(int inputKey) {
@@ -205,9 +225,8 @@ public class InputButtonTable extends Table implements IControllerActable, ITouc
 
                 getInputButton(PlayScreenInput.KEY_KEYSORGAMEPAD).refreshIcon();
 
-                // ggf. auch den Beschreibungstext aktualisieren
-                if (getSelectedInput() == PlayScreenInput.KEY_KEYSORGAMEPAD)
-                    controllerChangeListener.changed(null, null);
+                // ggf. InputLabel aktualisieren und Parent über Änderung informieren
+                controllerChangeListener.changed(null, null);
             }
 
             lastControllerNum = Controllers.getControllers().size;

@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Timer;
@@ -23,6 +24,8 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 public class MarathonGroup extends Table implements SinglePlayerScreen.IGameModeGroup {
     private static final String PREF_KEY_INPUT = "inputType";
     private static final String PREF_KEY_LEVEL = "beginningLevel";
+    private final Cell choseInputCell;
+    private final ScaledLabel choseInputLabel;
     private SinglePlayerScreen menuScreen;
     private BeginningLevelChooser beginningLevelSlider;
     private InputButtonTable inputButtons;
@@ -56,6 +59,8 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
             public void changed(ChangeEvent event, Actor actor) {
                 refreshScores(0);
                 menuScreen.onGameModelIdChanged();
+
+                setInputButtonTableVisibility();
             }
         });
 
@@ -65,9 +70,10 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
         params.row();
         params.add(beginningLevelSlider);
         params.row().padTop(15);
-        params.add(new ScaledLabel(app.TEXTS.get("menuInputControl"), app.skin, LightBlocksGame.SKIN_FONT_BIG)).left();
+        choseInputLabel = new ScaledLabel(app.TEXTS.get("menuInputControl"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        params.add(choseInputLabel).left();
         params.row();
-        params.add(inputButtons);
+        choseInputCell = params.add();
         params.row();
         params.add(inputButtons.getInputLabel()).center();
         playButton = new PlayButton(app);
@@ -83,6 +89,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
 
         menuScreen.addFocusableActor(inputButtons);
         menuScreen.addFocusableActor(beginningLevelSlider.getSlider());
+        setInputButtonTableVisibility();
 
         row();
         add(new ScaledLabel(app.TEXTS.get("labelMarathon"), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
@@ -95,6 +102,22 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
 
         // TODO erst auslösen wenn Seite erstmals angezeigt wird
         refreshScores(0);
+    }
+
+    protected void setInputButtonTableVisibility() {
+        boolean inputChoserVisible = inputButtons.getEnabledInputCount() != 1;
+        choseInputCell.setActor(inputChoserVisible ? inputButtons : null);
+        choseInputLabel.setVisible(inputChoserVisible);
+        inputButtons.getInputLabel().setVisible(inputChoserVisible);
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        // die InputButtons trotzdem ihren Kram machen lassen - sonst erscheinen sie nicht :-)
+        if (!inputButtons.hasParent())
+            inputButtons.act(delta);
     }
 
     public String getGameModelId() {
