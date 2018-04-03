@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.menu;
 
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -26,6 +27,9 @@ public class InputButtonTable extends Table implements IControllerActable, ITouc
     private ChangeListener controllerChangeListener;
     private ButtonGroup<InputTypeButton> inputButtonsGroup;
     private ChangeListener externalChangeListener;
+    private int lastControllerNum;
+    private float waitTime;
+    private boolean autoEnableGamepad = true;
 
     public InputButtonTable(final LightBlocksGame app, int defaultValue) {
         super();
@@ -187,6 +191,34 @@ public class InputButtonTable extends Table implements IControllerActable, ITouc
             selected.touchAction();
     }
 
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        // alle 200 ms aktualisieren, wenn Controller da oder weg
+        waitTime += delta;
+        if (waitTime > .2f) {
+            if (lastControllerNum != Controllers.getControllers().size) {
+                if (autoEnableGamepad)
+                    setInputDisabled(PlayScreenInput.KEY_KEYSORGAMEPAD,
+                            !PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_KEYSORGAMEPAD));
+
+                getInputButton(PlayScreenInput.KEY_KEYSORGAMEPAD).refreshIcon();
+
+                // ggf. auch den Beschreibungstext aktualisieren
+                if (getSelectedInput() == PlayScreenInput.KEY_KEYSORGAMEPAD)
+                    controllerChangeListener.changed(null, null);
+            }
+
+            lastControllerNum = Controllers.getControllers().size;
+            waitTime = 0;
+        }
+    }
+
+    public void setAutoEnableGamepad(boolean autoEnableGamepad) {
+        this.autoEnableGamepad = autoEnableGamepad;
+    }
+
     private class InputTypeButton extends GlowLabelButton {
         private int inputType;
 
@@ -203,6 +235,10 @@ public class InputButtonTable extends Table implements IControllerActable, ITouc
         @Override
         public boolean isOver() {
             return inputType == inputChosen;
+        }
+
+        public void refreshIcon() {
+            setFaText(PlayScreenInput.getInputFAIcon(inputType));
         }
     }
 }
