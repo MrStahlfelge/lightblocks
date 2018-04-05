@@ -258,7 +258,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public boolean isPlayMusic() {
         if (playMusic == null)
-            playMusic = prefs.getBoolean("musicPlayback", true);
+            playMusic = prefs.getBoolean("musicPlayback", !isWebAppOnMobileDevice());
 
         return playMusic;
     }
@@ -273,7 +273,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public Boolean isPlaySounds() {
         if (playSounds == null)
-            playSounds = prefs.getBoolean("soundPlayback", true);
+            playSounds = prefs.getBoolean("soundPlayback", !isWebAppOnMobileDevice());
 
         return playSounds;
     }

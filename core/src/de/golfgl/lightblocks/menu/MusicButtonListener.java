@@ -30,6 +30,8 @@ public class MusicButtonListener extends ChangeListener {
         this.useLabel = useLabel;
         this.state = (app.isPlayMusic() ? SOUND_MUSIC : app.isPlaySounds() ? NO_MUSIC : NO_SOUND);
         setIconAndLabelFromState(actor);
+        if (LightBlocksGame.isWebAppOnMobileDevice())
+            actor.setDisabled(true);
     }
 
     public void changed(ChangeEvent event, final Actor actor) {
@@ -77,5 +79,7 @@ public class MusicButtonListener extends ChangeListener {
         void setFaText(String text);
 
         void setText(String text);
+
+        void setDisabled(boolean disabled);
     }
 }
