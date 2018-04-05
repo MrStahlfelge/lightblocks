@@ -46,14 +46,11 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
     public static final String GAME_EMAIL = "lightblocks@golfgl.de";
     public static final String GAME_URL = "https://www.golfgl.de/lightblocks/";
-    public static final String GAME_STOREURL = "http://play.google.com/store/apps/details?id=de.golfgl" +
-            ".lightblocks&referrer=utm_source%3Dflb";
     // An den gleichen Eintrag im AndroidManifest denken!!!
     public static final String GAME_VERSIONSTRING = "1.1.1813";
     // Abstand für Git
     // auch dran denken das data-Verzeichnis beim release wegzunehmen!
     public static final boolean GAME_DEVMODE = true;
-
     public static final String SKIN_FONT_TITLE = "bigbigoutline";
     public static final String SKIN_FONT_BIG = "big";
     public static final String SKIN_FONT_REG = "qs25";
@@ -65,7 +62,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String SKIN_LIST = "list";
     public static final float LABEL_SCALING = .65f;
     public static final float ICON_SCALE_MENU = 1f;
-
+    public static String gameStoreUrl;
     public static Color EMPHASIZE_COLOR;
     public static Color COLOR_DISABLED;
     public static Color COLOR_UNSELECTED;

@@ -63,6 +63,8 @@ public class AndroidLauncher extends AndroidApplication {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             }
         };
+        LightBlocksGame.gameStoreUrl = "http://play.google.com/store/apps/details?id=de.golfgl" +
+                ".lightblocks&referrer=utm_source%3Dflb";
 
         // Sharing is caring - daher mit diesem Handler den nativen Android-Dialog aufrufen
         game.share = new AndroidShareHandler();

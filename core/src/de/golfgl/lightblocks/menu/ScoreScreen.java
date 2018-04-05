@@ -332,6 +332,7 @@ public class ScoreScreen extends AbstractMenuScreen {
 
     private void doRate() {
         app.setDontAskForRating(true);
-        Gdx.net.openURI(LightBlocksGame.GAME_STOREURL);
+        if (LightBlocksGame.gameStoreUrl != null)
+            Gdx.net.openURI(LightBlocksGame.gameStoreUrl);
     }
 }
