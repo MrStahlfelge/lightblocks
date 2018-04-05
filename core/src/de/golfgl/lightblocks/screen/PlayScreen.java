@@ -8,13 +8,17 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
@@ -61,6 +65,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     private static final int NINE_PATCH_BORDER_SIZE = 5;
     protected final Image imGarbageIndicator;
+    protected final Button pauseButton;
     private final BlockGroup blockGroup;
     private final Group labelGroup;
     private final BlockActor[][] blockMatrix;
@@ -164,6 +169,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         labelGroup.setPosition(blockGroup.getX(), blockGroup.getY());
         centerGroup.addActor(labelGroup);
 
+        pauseButton = new TextButton(FontAwesome.CIRCLE_PAUSE, app.skin, FontAwesome.SKIN_FONT_FA);
+        pauseButton.setY(imLine.getY());
+        pauseButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                switchPause(false);
+            }
+        });
+        // Im Webbrowser ohne Tastatur den PauseButton anzeigen
+        pauseButton.setVisible(LightBlocksGame.isWebAppOnMobileDevice());
+
         pauseDialog = new PauseDialog(app, this);
 
         motivatorLabel = new MotivationLabel(app.skin, labelGroup);
@@ -180,7 +196,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             scoreTable.add(blocksLeft).left().colspan(3);
         }
         scoreTable.validate();
+
+        // nun die allerletzten Actor auf die Stage
         centerGroup.addActor(scoreTable);
+        stage.addActor(pauseButton);
 
         Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
         String modelIdLabel = (mission != null ? app.TEXTS.format("labelMission", mission.getIndex())
@@ -704,6 +723,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         inputAdapter.setGameOver();
         saveGameState();
         app.savegame.gpgsSaveGameState(null);
+        pauseButton.setVisible(false);
     }
 
     @Override
@@ -955,6 +975,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         scoreTable.setY(LightBlocksGame.nativeGameHeight
                 - MathUtils.clamp(centerGroup.getX() / 2 - scoreTable.getPrefWidth() / 2,
                 scoreTable.getPrefHeight() / 2 + 5, levelNum.getPrefHeight() * 2 + scoreTable.getPrefHeight() / 2));
+
+        pauseButton.setX(Math.max(LightBlocksGame.nativeGameWidth / 2 - 5 + stage.getWidth() / 2,
+                stage.getWidth() - pauseButton.getY()), Align.right);
 
         // GestureInput neues TouchPanel
         if (inputAdapter != null)

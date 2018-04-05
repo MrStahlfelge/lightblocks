@@ -31,7 +31,6 @@ import de.golfgl.lightblocks.multiplayer.INsdHelper;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
-import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
 import de.golfgl.lightblocks.state.MyControllerMapping;
@@ -108,6 +107,14 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     private Float gridIntensity;
     private List<Mission> missionList;
     private HashMap<String, Mission> missionMap;
+
+    /**
+     * @return true wenn das ganze auf einem Smartphone/Tablet im Webbrowser läuft
+     */
+    public static boolean isWebAppOnMobileDevice() {
+        return Gdx.app.getType().equals(Application.ApplicationType.WebGL) &&
+                !Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard);
+    }
 
     public Boolean getGpgsAutoLogin() {
         if (gpgsAutoLogin == null)

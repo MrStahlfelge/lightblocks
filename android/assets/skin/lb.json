@@ -162,6 +162,11 @@ com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+	default: {
+		font: qs-40-bold
+		fontColor: white
+		disabledFontColor: disabled
+	}
 	round: {
 		font: qs-40-bold
 		fontColor: white
@@ -174,6 +179,12 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 	}
 	checkbox: {
 		font: qs-40-bold
+		fontColor: white
+		downFontColor: emphasize
+		disabledFontColor: disabled
+	}
+	fontawesome: {
+		font: fa45
 		fontColor: white
 		downFontColor: emphasize
 		disabledFontColor: disabled
