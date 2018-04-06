@@ -24,6 +24,7 @@ import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.gamestate.ILoadGameStateResponseListener;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
+import de.golfgl.lightblocks.menu.CompetitionMenuScreen;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -450,6 +451,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     }
 
     public AbstractMenuDialog getNewMultiplayerMenu(Actor actorToHide) {
-        return null;
+        return new CompetitionMenuScreen(this, actorToHide);
     }
 }

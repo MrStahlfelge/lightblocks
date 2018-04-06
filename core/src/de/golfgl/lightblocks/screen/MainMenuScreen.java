@@ -122,11 +122,8 @@ public class MainMenuScreen extends AbstractMenuScreen {
             public void changed(ChangeEvent event, Actor actor) {
                 AbstractMenuDialog multiplayerMenu = app.getNewMultiplayerMenu(mainGroup);
 
-                if (multiplayerMenu != null) {
+                if (multiplayerMenu != null)
                     multiplayerMenu.show(stage);
-                } else
-                    showDialog("This version of Falling Lightblocks does not support multiplayer.\n" +
-                            "Please download another version of the game.");
             }
         });
 
