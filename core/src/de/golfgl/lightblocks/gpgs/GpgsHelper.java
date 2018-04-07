@@ -70,6 +70,12 @@ public class GpgsHelper {
 
     public static final String GJ_APP_ID = "259654";
     public static final String GJ_PRIVATE_KEY = "***REMOVED***";
+    public static final String GJ_WEBEVENT_PREFIX = "webEvent_";
+    public static final String GJ_MOBILEEVENT_PREFIX = "mobileEvent_";
+    public static final String GJ_ANDROIDEVENT_PREFIX = "androidEvent_";
+    public static final String GJ_EVENT_MISSION = "EVENT_MISSION_STARED";
+    public static final String GJ_EVENT_MARATHON = "EVENT_MARATHON_STARED";
+    public static final String GJ_EVENT_LINES_CLEARED = "EVENT_LINES_CLEARED";
 
     public static String getLeaderBoardIdByModelId(String gameModelId) {
         if (gameModelId == null)
@@ -135,10 +141,46 @@ public class GpgsHelper {
         return null;
     }
 
+    public static String mapGsEventToGjEvent(String independantId) {
+        if (independantId == null)
+            return null;
+
+        else if (independantId.equals(EVENT_GESTURE_MARATHON_STARTED)
+                || independantId.equals(EVENT_GRAVITY_MARATHON_STARTED)
+                || independantId.equals(EVENT_GAMEPAD_MARATHON_STARTED))
+            return GJ_EVENT_MARATHON;
+
+        else if (independantId.equals(EVENT_LINES_CLEARED))
+            return GJ_EVENT_LINES_CLEARED;
+
+        else if (independantId.equals(EVENT_MISSION_1_TYPEA_1A)
+                || independantId.equals(EVENT_MISSION_2_TYPEB_1A)
+                || independantId.equals(EVENT_MISSION_3_TYPEA_1B)
+                || independantId.equals(EVENT_MISSION_4_SPECIAL_1A)
+                || independantId.equals(EVENT_MISSION_5_TYPEA_1C)
+                || independantId.equals(EVENT_MISSION_6_SPECIAL_1B)
+                || independantId.equals(EVENT_MISSION_7_TYPEB_1B)
+                || independantId.equals(EVENT_MISSION_8_SPECIAL_1C)
+                || independantId.equals(EVENT_MISSION_9_GARBAGE_1A)
+                || independantId.equals(EVENT_MISSION_10_TYPEB_1C)
+                || independantId.equals(EVENT_MISSION_11_GRAVITYA_2A)
+                || independantId.equals(EVENT_MISSION_12_TYPEA_1D)
+                || independantId.equals(EVENT_MISSION_13_TYPEB_2A)
+                || independantId.equals(EVENT_MISSION_14_GARBAGE_1B)
+                || independantId.equals(EVENT_MISSION_2_TYPEB_1A)
+                || independantId.equals(EVENT_MISSION_15_TYPEB_1D))
+            return GJ_EVENT_MISSION;
+
+        else
+            return null;
+    }
+
     public static class GamejoltScoreboardMapper implements IGameServiceIdMapper<Integer> {
         @Override
         public Integer mapToGsId(String independantId) {
-            if (independantId != null)
+            if (independantId.equals(LEAD_MARATHON_GESTURES)
+                    || independantId.equals(LEAD_MARATHON_GAMEPAD)
+                    || independantId.equals(LEAD_MARATHON_GRAVITY))
                 return 264029;
             else
                 return null;
@@ -151,17 +193,17 @@ public class GpgsHelper {
             if (independantId == null)
                 return null;
 
-            if (independantId.equals(GpgsHelper.ACH_FOUR_LINES))
+            if (independantId.equals(ACH_FOUR_LINES))
                 return 79026;
-            else if (independantId.equals(GpgsHelper.ACH_DOUBLE_SPECIAL))
+            else if (independantId.equals(ACH_DOUBLE_SPECIAL))
                 return 79027;
-            else if (independantId.equals(GpgsHelper.ACH_TSPIN))
+            else if (independantId.equals(ACH_TSPIN))
                 return 79028;
-            else if (independantId.equals(GpgsHelper.ACH_LONGCLEANER))
+            else if (independantId.equals(ACH_LONGCLEANER))
                 return 79029;
-            else if (independantId.equals(GpgsHelper.ACH_MARATHON_SCORE_100000))
+            else if (independantId.equals(ACH_MARATHON_SCORE_100000))
                 return 79030;
-            else if (independantId.equals(GpgsHelper.ACH_MARATHON_SCORE_200000))
+            else if (independantId.equals(ACH_MARATHON_SCORE_200000))
                 return 79031;
             else
                 return null;

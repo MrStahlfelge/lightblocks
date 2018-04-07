@@ -650,10 +650,10 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     /**
-     * GPGS sumbit event convencience - Check auf null und isConnected
+     * GPGS sumbit event convencience - Check auf null
      */
     protected void gpgsSubmitEvent(String eventId, int inc) {
-        if (gpgsClient != null && gpgsClient.isSessionActive())
+        if (gpgsClient != null)
             gpgsClient.submitEvent(eventId, inc);
     }
 
