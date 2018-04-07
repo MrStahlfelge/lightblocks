@@ -12,7 +12,7 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  * Created by Benjamin Schulte on 21.04.2017.
  */
 
-abstract class MissionModel extends GameModel {
+public abstract class MissionModel extends GameModel {
     private String modelId;
     private String welcomeMsg;
     private int welcomeMsgNum;
@@ -78,11 +78,21 @@ abstract class MissionModel extends GameModel {
     }
 
     @Override
+    public void setSoftDropFactor(float newVal) {
+        if (!hasMoreWelcomeMsgs())
+            super.setSoftDropFactor(newVal);
+    }
+
+    @Override
     public void setRotate(boolean clockwise) {
-        if (welcomeMsgNum > 0 && curMsgIdx <= welcomeMsgNum)
+        if (hasMoreWelcomeMsgs())
             showNextWelcomeMsg();
         else
             super.setRotate(clockwise);
+    }
+
+    protected boolean hasMoreWelcomeMsgs() {
+        return welcomeMsgNum > 0 && curMsgIdx <= welcomeMsgNum;
     }
 
     @Override
