@@ -13,14 +13,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
-import de.golfgl.gdxgamesvcs.IGameServiceClient;
+import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.AboutScreen;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.AnimatedLightblocksLogo;
-import de.golfgl.lightblocks.menu.SinglePlayerScreen;
 import de.golfgl.lightblocks.menu.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.menu.SettingsScreen;
+import de.golfgl.lightblocks.menu.SinglePlayerScreen;
 import de.golfgl.lightblocks.menu.TotalScoreScreen;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.FaButton;
@@ -39,11 +39,11 @@ public class MainMenuScreen extends AbstractMenuScreen {
     private final Table buttonTable;
     private final Label gameVersion;
     private final Cell resumeGameCell;
+    private final Button singlePlayerButton;
     private GlowLabelButton accountButton;
     private Button resumeGameButton;
     private Group mainGroup;
     private PlayerAccountMenuScreen lastAccountScreen;
-    private final Button singlePlayerButton;
 
     public MainMenuScreen(LightBlocksGame lightBlocksGame) {
 
@@ -108,10 +108,10 @@ public class MainMenuScreen extends AbstractMenuScreen {
                 app.TEXTS.get("menuSinglePlayer"),
                 app.skin);
         singlePlayerButton.addListener(new ChangeListener() {
-                                             public void changed(ChangeEvent event, Actor actor) {
-                                                 new SinglePlayerScreen(app, mainGroup).show(stage);
-                                             }
-                                         }
+                                           public void changed(ChangeEvent event, Actor actor) {
+                                               new SinglePlayerScreen(app, mainGroup).show(stage);
+                                           }
+                                       }
         );
         stage.addFocusableActor(singlePlayerButton);
 
@@ -128,7 +128,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
         });
 
         Table menuButtons = new Table();
-        menuButtons.defaults().expand().maxHeight(resumeGameButton.getPrefHeight());;
+        menuButtons.defaults().expand().maxHeight(resumeGameButton.getPrefHeight());
         menuButtons.row();
         menuButtons.add().maxHeight(0);
         menuButtons.row();
@@ -151,15 +151,14 @@ public class MainMenuScreen extends AbstractMenuScreen {
         smallButtonTable.add().width(30);
         smallButtonTable.defaults().uniform().expandX().center();
 
-        if (app.gpgsClient != null) {
-            accountButton = new FaButton(
-                    app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_AMAZONGC_ID) ?
-                            FontAwesome.GC_LOGO : FontAwesome.GPGS_LOGO, app.skin) {
+        if (app.gpgsClient != null && !app.gpgsClient.getGameServiceId().equals(NoGameServiceClient.GAMESERVICE_ID)) {
+            accountButton = new FaButton(PlayerAccountMenuScreen.getGameServiceLogo(app.gpgsClient.getGameServiceId()),
+                    app.skin) {
 
                 @Override
                 protected Color getTouchColor() {
-                    return app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_AMAZONGC_ID) ?
-                            Color.ORANGE : Color.GREEN;
+                    Color gsColor = PlayerAccountMenuScreen.getGameServiceColor(app.gpgsClient.getGameServiceId());
+                    return gsColor != null ? gsColor : super.getTouchColor();
                 }
             };
             accountButton.addListener(new ChangeListener() {

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.gdxgamesvcs.GameServiceException;
+import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.Mission;
@@ -228,6 +229,8 @@ public class ScoreScreen extends AbstractMenuScreen {
                 }
             });
             leaderboard.setDisabled(app.gpgsClient == null || !app.gpgsClient.isSessionActive());
+            leaderboard.setVisible(app.gpgsClient != null
+                    && app.gpgsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.ShowLeaderboardUI));
             buttons.add(leaderboard);
             stage.addFocusableActor(leaderboard);
 

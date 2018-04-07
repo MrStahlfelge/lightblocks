@@ -150,8 +150,11 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         savegame = new GameStateHandler(this);
 
-        if (getGpgsAutoLogin() && gpgsClient != null)
-            gpgsClient.resumeSession();
+        if (gpgsClient != null) {
+            gpgsClient.setListener(this);
+            if (getGpgsAutoLogin())
+                gpgsClient.resumeSession();
+        }
 
         I18NBundle.setSimpleFormatter(true);
 

@@ -2,12 +2,9 @@ package de.golfgl.lightblocks.client;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.badlogic.gdx.backends.gwt.GwtInput;
 import com.badlogic.gdx.backends.gwt.MyGwtApp;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -15,7 +12,10 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 
+import de.golfgl.gdxgamesvcs.GameJoltClient;
+import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
 
 public class HtmlLauncher extends MyGwtApp {
 
@@ -37,7 +37,34 @@ public class HtmlLauncher extends MyGwtApp {
 
     @Override
     public ApplicationListener createApplicationListener() {
-        return new LightBlocksGame();
+        LightBlocksGame lightBlocksGame = new LightBlocksGame();
+
+        String hostName = Window.Location.getHostName();
+        final String gjUsername = Window.Location.
+                getParameter(GameJoltClient.GJ_USERNAME_PARAM);
+
+        // On GameJolt, use the GameJolt API
+        // TODO -> Immer zufügen, aber verstekcen wenn dies nicht ist
+        final boolean isOnGamejolt = gjUsername != null && !gjUsername.isEmpty() || hostName.contains("gamejolt");
+
+        GameJoltClient gjClient = new GameJoltClient() {
+            @Override
+            public String getGameServiceId() {
+                return isOnGamejolt ? super.getGameServiceId() : NoGameServiceClient.GAMESERVICE_ID;
+            }
+        };
+        gjClient.initialize(GpgsHelper.GJ_APP_ID, GpgsHelper.GJ_PRIVATE_KEY);
+        // TODO Events not activated
+        gjClient.setUserName(gjUsername)
+                .setUserToken(com.google.gwt.user.client.Window.Location.
+                        getParameter(GameJoltClient.GJ_USERTOKEN_PARAM))
+                .setGuestName("Guest user")
+                .setGjScoreTableMapper(new GpgsHelper.GamejoltScoreboardMapper())
+                .setGjTrophyMapper(new GpgsHelper.GamejoltTrophyMapper());
+
+        lightBlocksGame.gpgsClient = gjClient;
+
+        return lightBlocksGame;
     }
 
     @Override

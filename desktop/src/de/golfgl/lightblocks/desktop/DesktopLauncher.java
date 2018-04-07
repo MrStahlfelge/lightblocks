@@ -20,7 +20,6 @@ public class DesktopLauncher {
         config.height = LightBlocksGame.nativeGameHeight;
         LightBlocksGame game = new MultiplayerLightblocks();
         game.gpgsClient = new MyTestClient();
-        game.gpgsClient.setListener(game);
         new LwjglApplication(game, config);
     }
 

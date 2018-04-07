@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.menu;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -35,6 +36,24 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
         refreshAccountChanged();
     }
 
+    public static String getGameServiceLogo(String gameServiceId) {
+        if (gameServiceId.equals(IGameServiceClient.GS_AMAZONGC_ID))
+            return FontAwesome.GC_LOGO;
+        if (gameServiceId.equals(IGameServiceClient.GS_GOOGLEPLAYGAMES_ID))
+            return FontAwesome.GPGS_LOGO;
+
+        return FontAwesome.NET_CLOUDSAVE;
+    }
+
+    public static Color getGameServiceColor(String gameServiceId) {
+        if (gameServiceId.equals(IGameServiceClient.GS_AMAZONGC_ID))
+            return Color.ORANGE;
+        if (gameServiceId.equals(IGameServiceClient.GS_GOOGLEPLAYGAMES_ID))
+            return Color.GREEN;
+
+        return null;
+    }
+
     @Override
     protected String getTitleIcon() {
         return app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_AMAZONGC_ID) ?
@@ -43,8 +62,11 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
 
     @Override
     protected String getTitle() {
-        return app.TEXTS.get(app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_AMAZONGC_ID) ?
-                "menuAccountGc" : "menuAccountGpgs");
+        if (app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_GAMEJOLT_ID)) {
+            return "GameJolt";
+        } else
+            return app.TEXTS.get(app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_AMAZONGC_ID) ?
+                    "menuAccountGc" : "menuAccountGpgs");
     }
 
     @Override
@@ -92,6 +114,8 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
                 }
             }
         });
+        leaderboardButton.setVisible(app.gpgsClient.isFeatureSupported(
+                IGameServiceClient.GameServiceFeature.ShowAllLeaderboardsUI));
 
         achievementsButton = new FaButton(FontAwesome.GPGS_ACHIEVEMENT, app.skin);
         achievementsButton.addListener(new ChangeListener() {
@@ -104,6 +128,8 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
                 }
             }
         });
+        achievementsButton.setVisible(app.gpgsClient.isFeatureSupported(
+                IGameServiceClient.GameServiceFeature.ShowAchievementsUI));
 
         logInOutButton = new RoundedTextButton("", app.skin);
         logInOutButton.addListener(new ChangeListener() {
@@ -138,7 +164,8 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
         leaderboardButton.setDisabled(!gpgsConnected);
         achievementsButton.setDisabled(!gpgsConnected);
         //TODO auf canLogin oder ähnliches checken
-        logInOutButton.setDisabled(app.gpgsClient == null);
+        logInOutButton.setDisabled(app.gpgsClient == null
+                || app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_GAMEJOLT_ID));
         // Achievements etc auch
     }
 }

@@ -1,7 +1,7 @@
 package de.golfgl.lightblocks.gpgs;
 
+import de.golfgl.gdxgamesvcs.IGameServiceIdMapper;
 import de.golfgl.lightblocks.model.MarathonModel;
-import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.model.TutorialModel;
 
 /**
@@ -68,6 +68,9 @@ public class GpgsHelper {
     public static final String EVENT_MISSION_14_GARBAGE_1B = "CgkI4vHs17ETEAIQOA";
     public static final String EVENT_MISSION_15_TYPEB_1D = "CgkI4vHs17ETEAIQOQ";
 
+    public static final String GJ_APP_ID = "259654";
+    public static final String GJ_PRIVATE_KEY = "***REMOVED***";
+
     public static String getLeaderBoardIdByModelId(String gameModelId) {
         if (gameModelId == null)
             return null;
@@ -132,4 +135,36 @@ public class GpgsHelper {
         return null;
     }
 
+    public static class GamejoltScoreboardMapper implements IGameServiceIdMapper<Integer> {
+        @Override
+        public Integer mapToGsId(String independantId) {
+            if (independantId != null)
+                return 264029;
+            else
+                return null;
+        }
+    }
+
+    public static class GamejoltTrophyMapper implements IGameServiceIdMapper<Integer> {
+        @Override
+        public Integer mapToGsId(String independantId) {
+            if (independantId == null)
+                return null;
+
+            if (independantId.equals(GpgsHelper.ACH_FOUR_LINES))
+                return 79026;
+            else if (independantId.equals(GpgsHelper.ACH_DOUBLE_SPECIAL))
+                return 79027;
+            else if (independantId.equals(GpgsHelper.ACH_TSPIN))
+                return 79028;
+            else if (independantId.equals(GpgsHelper.ACH_LONGCLEANER))
+                return 79029;
+            else if (independantId.equals(GpgsHelper.ACH_MARATHON_SCORE_100000))
+                return 79030;
+            else if (independantId.equals(GpgsHelper.ACH_MARATHON_SCORE_200000))
+                return 79031;
+            else
+                return null;
+        }
+    }
 }

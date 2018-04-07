@@ -87,6 +87,8 @@ project(":html") {
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-scene2d:$cuversion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-mapping:$cuversion:sources"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core-gamejolt:$gamsvcsVersion"
+        compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core-gamejolt:$gamsvcsVersion:sources"
 
     }
 }
