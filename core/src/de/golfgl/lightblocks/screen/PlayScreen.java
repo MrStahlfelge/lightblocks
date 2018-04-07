@@ -38,8 +38,10 @@ import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.Mission;
+import de.golfgl.lightblocks.model.MissionModel;
 import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.model.Tetromino;
+import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
@@ -220,6 +222,20 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             pauseDialog.setResumeLabel();
         } else
             pauseDialog.show(stage);
+
+        // sollte das Tutorial nicht verfügbar sein und dies das allerste Spiel sein (aber nicht Multiplayer)
+        // dann dem Spieler die Eingabehilfe zeigen
+        if (!TutorialModel.tutorialAvailable() && gameModel.totalScore.getClearedLines() < 1
+                && (gameModel.beginPaused() || gameModel instanceof MissionModel)) {
+            // mit postRunnable arbeiten, da das OverlayWindow auch bereits damit trickst und sich sonst drüber legt
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    showInputHelp();
+                }
+            });
+        }
+
 
     }
 
