@@ -50,6 +50,7 @@ import de.golfgl.lightblocks.scene2d.OverlayMessage;
 import de.golfgl.lightblocks.scene2d.ParticleEffectActor;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor;
@@ -903,7 +904,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
 
     public void showInputHelp() {
-        pauseMsgDialog = showDialog(inputAdapter.getInputHelpText());
+        pauseMsgDialog = new VetoDialog(inputAdapter.getInputHelpText(), app.skin,
+                LightBlocksGame.nativeGameWidth * .9f);
+        pauseMsgDialog.show(stage);
     }
 
     @Override
