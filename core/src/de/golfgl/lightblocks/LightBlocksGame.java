@@ -48,10 +48,11 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String GAME_EMAIL = "lightblocks@golfgl.de";
     public static final String GAME_URL = "https://www.golfgl.de/lightblocks/";
     // An den gleichen Eintrag im AndroidManifest denken!!!
-    public static final String GAME_VERSIONSTRING = "1.1.1813";
+    public static final String GAME_VERSIONSTRING = "1.1.1814";
     // Abstand für Git
     // auch dran denken das data-Verzeichnis beim release wegzunehmen!
     public static final boolean GAME_DEVMODE = true;
+
     public static final String SKIN_FONT_TITLE = "bigbigoutline";
     public static final String SKIN_FONT_BIG = "big";
     public static final String SKIN_FONT_REG = "qs25";
