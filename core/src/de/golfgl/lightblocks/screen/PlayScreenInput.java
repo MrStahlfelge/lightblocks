@@ -54,8 +54,9 @@ public abstract class PlayScreenInput extends InputAdapter {
                         || LightBlocksGame.GAME_DEVMODE && Gdx.app.getType().equals(Application.ApplicationType
                         .Desktop);
             case KEY_KEYSORGAMEPAD:
-                return Controllers.getControllers().size > 0 || Gdx.input.isPeripheralAvailable(Input.Peripheral
-                        .HardwareKeyboard);
+                return Controllers.getControllers().size > 0 ||
+                        Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard)
+                        || LightBlocksGame.isOnAndroidTV();
             case KEY_ACCELEROMETER:
                 return Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
             default:
@@ -78,6 +79,7 @@ public abstract class PlayScreenInput extends InputAdapter {
                 return "menuInputGestures";
             case KEY_ACCELEROMETER:
                 return "menuInputAccelerometer";
+            case KEY_KEYORTOUCH:
             case KEY_KEYSORGAMEPAD:
                 return Controllers.getControllers().size == 0 && Gdx.input.isPeripheralAvailable(Input.Peripheral
                         .HardwareKeyboard) ? "menuInputKeyboard" : "menuInputGamepad";

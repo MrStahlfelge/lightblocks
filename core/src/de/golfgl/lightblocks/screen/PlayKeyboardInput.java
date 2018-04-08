@@ -6,6 +6,7 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.badlogic.gdx.controllers.Controllers;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameBlocker;
 
 /**
@@ -15,15 +16,27 @@ import de.golfgl.lightblocks.model.GameBlocker;
 public class PlayKeyboardInput extends PlayScreenInput {
     protected GameBlocker.NoGamepadGameBlocker gamepadInputBlocker = new GameBlocker.NoGamepadGameBlocker();
     private ControllerAdapter controllerAdapter = new MyControllerAdapter();
+    private final boolean useTvRemoteControl;
+
+    public PlayKeyboardInput() {
+        this.useTvRemoteControl = LightBlocksGame.isOnAndroidTV() && Controllers.getControllers().size == 0;
+    }
 
     @Override
     public String getInputHelpText() {
-        return playScreen.app.TEXTS.get(isOnKeyboard() ? "inputKeyboardHelp" : "inputGamepadHelp");
+        //TODO
+        return isOnRemote() ? "Use your TV remote control to play or connect a game controller."
+                : playScreen.app.TEXTS.get(isOnKeyboard() ? "inputKeyboardHelp" : "inputGamepadHelp");
     }
 
     @Override
     public String getTutorialContinueText() {
-        return playScreen.app.TEXTS.get(isOnKeyboard() ? "tutorialContinueKeyboard" : "tutorialContinueGamepad");
+        return playScreen.app.TEXTS.get(isOnRemote() ? "tutorialContinueTv" :
+                isOnKeyboard() ? "tutorialContinueKeyboard" : "tutorialContinueGamepad");
+    }
+
+    protected boolean isOnRemote() {
+        return Controllers.getControllers().size == 0 && useTvRemoteControl;
     }
 
     protected boolean isOnKeyboard() {
@@ -117,7 +130,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     private class MyControllerAdapter extends ControllerAdapter {
         @Override
         public void disconnected(Controller controller) {
-            if (Controllers.getControllers().size <= 0 && !isOnKeyboard())
+            if (Controllers.getControllers().size <= 0 && !isOnKeyboard() && !isOnRemote())
                 playScreen.addGameBlocker(gamepadInputBlocker);
         }
 

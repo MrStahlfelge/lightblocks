@@ -114,6 +114,14 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
                 !Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard);
     }
 
+    /**
+     * @return true wenn (wahrscheinlich) auf FireTV/AndroidTV
+     */
+    public static boolean isOnAndroidTV() {
+        return Gdx.app.getType().equals(Application.ApplicationType.Android) &&
+                !Gdx.input.isPeripheralAvailable(Input.Peripheral.MultitouchScreen);
+    }
+
     public Boolean getGpgsAutoLogin() {
         if (gpgsAutoLogin == null)
             gpgsAutoLogin = prefs.getBoolean("gpgsAutoLogin", true);
