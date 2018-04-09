@@ -11,6 +11,16 @@ android {
             assets.srcDirs = ['assets']
             jniLibs.srcDirs = ['libs']
         }
+        amazon {
+            java.srcDirs = ['src-amazon']
+        }
+        google {
+            java.srcDirs = ['src-google']
+            manifest.srcFile 'AndroidManifest-google.xml'
+        }
+        generic {
+            java.srcDirs = ['src-generic']
+        }
 
         instrumentTest.setRoot('tests')
     }
@@ -23,6 +33,13 @@ android {
         targetSdkVersion 26
     }
 
+    flavorDimensions "type"
+    productFlavors {
+        amazon { dimension "type" }
+        google { dimension "type" }
+        generic { dimension "type" }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -32,6 +49,9 @@ android {
     }
 }
 
+dependencies {
+    googleCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamsvcsVersion"
+}
 
 // called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders

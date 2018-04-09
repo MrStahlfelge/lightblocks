@@ -9,33 +9,17 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
-import de.golfgl.lightblocks.gpgs.GpgsMultiPlayerClient;
+import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 import de.golfgl.lightblocks.multiplayer.NsdAdapter;
 
-public class AndroidLauncher extends AndroidApplication {
-    public static final int RC_SELECT_PLAYERS = 10000;
-    public final static int RC_INVITATION_INBOX = 10001;
-
+public class GeneralAndroidLauncher extends AndroidApplication {
     // Network Service detection
     NsdAdapter nsdAdapter;
-    //Google Play Games
-    GpgsMultiPlayerClient gpgsClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // auch hiermit lassen sich Fehler vermeiden wenn über anderen Launcher gestartet
-        // launchMode: singleTask im Manifest tut aber das gleiche, ist nur evtl. zu viel
-//        if (!isTaskRoot()) {
-//            finish();
-//            return;
-//        }
-
-        // Create the Google Api Client with access to the Play Games services
-        gpgsClient = new GpgsMultiPlayerClient();
-        gpgsClient.initialize(this, true);
 
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.hideStatusBar = true;
@@ -63,13 +47,10 @@ public class AndroidLauncher extends AndroidApplication {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             }
         };
-        LightBlocksGame.gameStoreUrl = "http://play.google.com/store/apps/details?id=de.golfgl" +
-                ".lightblocks&referrer=utm_source%3Dflb";
-
         // Sharing is caring - daher mit diesem Handler den nativen Android-Dialog aufrufen
         game.share = new AndroidShareHandler();
 
-        game.gpgsClient = gpgsClient;
+        initFlavor(game);
 
         // Gerätemodell wird für den Spielernamen benötigt
         game.modelNameRunningOn = Build.MODEL;
@@ -79,6 +60,13 @@ public class AndroidLauncher extends AndroidApplication {
         game.nsdHelper = nsdAdapter;
 
         initialize(game, config);
+    }
+
+    protected void initFlavor(LightBlocksGame game) {
+        LightBlocksGame.gameStoreUrl = "http://play.google.com/store/apps/details?id=de.golfgl" +
+                ".lightblocks&referrer=utm_source%3Dflb";
+
+        game.gpgsClient = new NoGameServiceClient();
     }
 
     @Override
@@ -96,18 +84,6 @@ public class AndroidLauncher extends AndroidApplication {
         }
 
         super.onDestroy();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        gpgsClient.onGpgsActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RC_SELECT_PLAYERS)
-            gpgsClient.getMultiPlayerRoom().selectPlayersResult(resultCode, data);
-
-        else if (requestCode == RC_INVITATION_INBOX)
-            gpgsClient.getMultiPlayerRoom().selectInvitationResult(resultCode, data);
-
     }
 
     public class AndroidShareHandler extends ShareHandler {
