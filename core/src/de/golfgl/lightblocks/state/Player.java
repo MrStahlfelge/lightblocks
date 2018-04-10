@@ -1,7 +1,5 @@
 package de.golfgl.lightblocks.state;
 
-import com.badlogic.gdx.math.MathUtils;
-
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 
 /**
@@ -26,6 +24,9 @@ public class Player {
     }
 
     public void setGamerId(String gamerId) {
+        if (gamerId == null)
+            gamerId = "";
+
         this.gamerId = gamerId;
     }
 
