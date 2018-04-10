@@ -16,26 +16,27 @@ import de.golfgl.lightblocks.model.GameBlocker;
 public class PlayKeyboardInput extends PlayScreenInput {
     protected GameBlocker.NoGamepadGameBlocker gamepadInputBlocker = new GameBlocker.NoGamepadGameBlocker();
     private ControllerAdapter controllerAdapter = new MyControllerAdapter();
-    private final boolean useTvRemoteControl;
+    private boolean useTvRemoteControl;
 
     public PlayKeyboardInput() {
         this.useTvRemoteControl = LightBlocksGame.isOnAndroidTV() && Controllers.getControllers().size == 0;
+        Gdx.input.setCatchMenuKey(useTvRemoteControl);
     }
 
     @Override
     public String getInputHelpText() {
         //TODO
-        return isOnRemote() ? "Use your TV remote control to play or connect a game controller."
-                : playScreen.app.TEXTS.get(isOnKeyboard() ? "inputKeyboardHelp" : "inputGamepadHelp");
+        return playScreen.app.TEXTS.get(isOnTvRemote() ? "inputTvRemoteHelp" :
+                isOnKeyboard() ? "inputKeyboardHelp" : "inputGamepadHelp");
     }
 
     @Override
     public String getTutorialContinueText() {
-        return playScreen.app.TEXTS.get(isOnRemote() ? "tutorialContinueTv" :
+        return playScreen.app.TEXTS.get(isOnTvRemote() ? "tutorialContinueTv" :
                 isOnKeyboard() ? "tutorialContinueKeyboard" : "tutorialContinueGamepad");
     }
 
-    protected boolean isOnRemote() {
+    protected boolean isOnTvRemote() {
         return Controllers.getControllers().size == 0 && useTvRemoteControl;
     }
 
@@ -56,6 +57,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
     @Override
     public void dispose() {
         super.dispose();
+        Gdx.input.setCatchMenuKey(false);
+
         // removeListener darf erst im nächsten Call passieren, da es eine Exception gibt wenn diese Aktion
         // aus einem Controller-Aufruf heraus passiert
         Gdx.app.postRunnable(new Runnable() {
@@ -69,6 +72,20 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public boolean keyDown(int keycode) {
+
+        // Spezialfall TV Remote
+        if (!isPaused() && isOnTvRemote()) {
+            switch (keycode) {
+                case Input.Keys.UP:
+                case Input.Keys.MENU:
+                    playScreen.gameModel.setRotate(false);
+                    return true;
+                case Input.Keys.DPAD_CENTER:
+                    playScreen.gameModel.setRotate(true);
+                    return true;
+            }
+        }
+
         switch (keycode) {
             case Input.Keys.ENTER:
                 playScreen.switchPause(false);
@@ -130,13 +147,14 @@ public class PlayKeyboardInput extends PlayScreenInput {
     private class MyControllerAdapter extends ControllerAdapter {
         @Override
         public void disconnected(Controller controller) {
-            if (Controllers.getControllers().size <= 0 && !isOnKeyboard() && !isOnRemote())
+            if (Controllers.getControllers().size <= 0 && !isOnKeyboard() && !isOnTvRemote())
                 playScreen.addGameBlocker(gamepadInputBlocker);
         }
 
         @Override
         public void connected(Controller controller) {
             playScreen.removeGameBlocker(gamepadInputBlocker);
+            useTvRemoteControl = false;
         }
 
     }
