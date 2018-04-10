@@ -4,24 +4,29 @@
           android:versionCode="1814"
           android:versionName="1.1.1814">
 
-    <!-- Kryonet/Multiplayer -->
+    <!-- Kryonet/Multiplayer, GameJolt and GameCircle -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- IP Information and GameCircle -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- Tell the system this app requires OpenGL ES 2.0. -->
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true"/>
 
+    <!-- FireTV and Android TV supported -->
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false"/>
 
+    <uses-feature android:name="android.software.leanback"
+                  android:required="false" />
+
+    <!-- Gamepad supported -->
     <uses-feature
         android:name="android.hardware.gamepad"
         android:required="false" />
-
-    <uses-feature android:name="android.software.leanback"
-                  android:required="false" />
 
     <application
         android:allowBackup="true"
