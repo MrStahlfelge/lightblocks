@@ -4,8 +4,6 @@ package de.golfgl.lightblocks;
  * AMAZON
  */
 public class AndroidLauncher extends GeneralAndroidLauncher {
-    // keine Änderung
-
     @Override
     protected void initFlavor(LightBlocksGame game) {
         LightBlocksGame.gameStoreUrl = "http://www.amazon.com/gp/mas/dl/android?p=de.golfgl.lightblocks";

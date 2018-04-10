@@ -53,6 +53,7 @@ android {
 dependencies {
     googleCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamsvcsVersion"
     amazonCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-amazongc:$gamsvcsVersion"
+    amazonCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core-gamejolt:$gamsvcsVersion"
 }
 
 // called every time gradle gets executed, takes the native dependencies of
