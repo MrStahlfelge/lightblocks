@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.View;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -60,6 +62,19 @@ public class GeneralAndroidLauncher extends AndroidApplication {
         game.nsdHelper = nsdAdapter;
 
         initialize(game, config);
+
+        if (LightBlocksGame.isOnAndroidTV())
+            input.addKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if (keyCode == Input.Keys.MEDIA_FAST_FORWARD) {
+                        input.onKey(v, Input.Keys.SPACE, event);
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
     }
 
     protected void initFlavor(LightBlocksGame game) {
