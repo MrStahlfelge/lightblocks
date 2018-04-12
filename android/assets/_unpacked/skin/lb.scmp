@@ -2065,7 +2065,7 @@ jsonData: {
 						type: com.badlogic.gdx.graphics.Color
 						name: downFontColor
 						optional: true
-						value: null
+						value: emphasize
 					}
 					overFontColor: {
 						class: com.ray3k.skincomposer.data.StyleProperty
