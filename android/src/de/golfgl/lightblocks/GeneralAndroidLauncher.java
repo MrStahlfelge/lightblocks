@@ -12,6 +12,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
+import de.golfgl.lightblocks.multiplayer.AndroidNetUtils;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 import de.golfgl.lightblocks.multiplayer.NsdAdapter;
 
@@ -33,7 +34,7 @@ public class GeneralAndroidLauncher extends AndroidApplication {
         // nach Wechsel der Anwendung bleibt der Bereich manchmal schwarz, außerdem beim Runterziehen der Notifications
         // mehrmaliges Resize 
 
-        LightBlocksGame game = new MultiplayerLightblocks() {
+        MultiplayerLightblocks game = new MultiplayerLightblocks() {
             @Override
             public void lockOrientation(Input.Orientation orientation) {
                 if (orientation == null)
@@ -49,8 +50,10 @@ public class GeneralAndroidLauncher extends AndroidApplication {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             }
         };
-        // Sharing is caring - daher mit diesem Handler den nativen Android-Dialog aufrufen
+
+        // Initialize Android dependant classes
         game.share = new AndroidShareHandler();
+        game.netUtils = new AndroidNetUtils(getContext());
 
         initFlavor(game);
 

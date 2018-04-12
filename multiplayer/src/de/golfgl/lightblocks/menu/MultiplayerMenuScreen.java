@@ -22,6 +22,8 @@ import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
+import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
+import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
@@ -58,8 +60,12 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
     private PagedScrollPane modePager;
     private PagedScrollPane.PageIndicator pageIndicator;
 
-    public MultiplayerMenuScreen(LightBlocksGame app, Actor actorToHide) {
+    public MultiplayerMenuScreen(MultiplayerLightblocks app, Actor actorToHide) {
         super(app, actorToHide);
+    }
+
+    public MultiplayerLightblocks getApp() {
+        return (MultiplayerLightblocks) app;
     }
 
     @Override
@@ -647,7 +653,11 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
             if (app.multiRoom != null && !app.multiRoom.getRoomState().equals(MultiPlayerObjects.RoomState
                     .closed)) {
                 if (app.multiRoom.getNumberOfPlayers() < 2) {
-                    toAdd = new ScaledLabel(app.TEXTS.get("multiplayerJoinNotEnoughPlayers"), app.skin,
+                    String ipAddress = getApp().netUtils.getLocalIpAsString();
+                    if (ipAddress.length() > 20)
+                        ipAddress = "\n" + ipAddress;
+
+                    toAdd = new ScaledLabel(app.TEXTS.format("multiplayerJoinNotEnoughPlayers", ipAddress), app.skin,
                             LightBlocksGame.SKIN_FONT_BIG, .75f);
                 } else if (app.multiRoom.isOwner()) {
                     toAdd = startGameButton;
@@ -715,14 +725,28 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
             lanButtons.add(openRoomButton);
             addFocusableActor(openRoomButton);
             lanButtons.row().padTop(10);
-            ;
+
             lanButtons.add(joinRoomButton);
             addFocusableActor(joinRoomButton);
+
+            if (getApp().netUtils.shouldShowAdvancedWifiSettings()) {
+                Button openWifiSettings = new FaTextButton("Open Wifi settings", app.skin, "default");
+                openWifiSettings.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        ((MultiplayerLightblocks) app).netUtils.showAdvancedWifiSettings();
+                    }
+                });
+
+                lanButtons.row().padTop(10);
+                lanButtons.add(openWifiSettings);
+                addFocusableActor(openWifiSettings);
+            }
 
             add(new ScaledLabel(app.TEXTS.get("labelMultiplayerLan"), app.skin, LightBlocksGame
                     .SKIN_FONT_TITLE, .8f));
             row();
-            add(lanHelp).fill().expandX().pad(20);
+            add(lanHelp).fill().expandX().pad(10, 20, 10, 20);
             row();
             add(lanButtons).expandY();
         }

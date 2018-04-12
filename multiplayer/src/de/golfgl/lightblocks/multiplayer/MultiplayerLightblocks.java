@@ -15,6 +15,7 @@ import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
  */
 
 public class MultiplayerLightblocks extends LightBlocksGame {
+    public NetUtils netUtils;
 
     @Override
     public void create() {
@@ -26,6 +27,9 @@ public class MultiplayerLightblocks extends LightBlocksGame {
 
     @Override
     public AbstractMenuDialog getNewMultiplayerMenu(Actor actorToHide) {
+        if (netUtils == null)
+            netUtils = new NetUtils();
+
         return new MultiplayerMenuScreen(this, actorToHide);
     }
 
