@@ -14,6 +14,7 @@ import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.InfoButton;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
@@ -60,7 +61,7 @@ public class AboutScreen extends AbstractMenuDialog {
         websiteButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Gdx.net.openURI(LightBlocksGame.GAME_URL);
+                openOrShowUri(LightBlocksGame.GAME_URL);
             }
         });
         addFocusableActor(websiteButton);
@@ -73,7 +74,7 @@ public class AboutScreen extends AbstractMenuDialog {
             storeButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    Gdx.net.openURI(LightBlocksGame.gameStoreUrl);
+                    openOrShowUri(LightBlocksGame.gameStoreUrl);
                 }
             });
             addFocusableActor(storeButton);
@@ -89,17 +90,19 @@ public class AboutScreen extends AbstractMenuDialog {
         menuTable.row().padTop(20);
         menuTable.add(getWrapLabel(app.TEXTS.get("labelAbout3"))).fill();
 
-        Button mailButton = new RoundedTextButton(app.TEXTS.get("buttonMail"), app.skin);
-        mailButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.net.openURI("mailto:" + LightBlocksGame.GAME_EMAIL);
-            }
-        });
-        addFocusableActor(mailButton);
+        if (!LightBlocksGame.isOnAndroidTV()) {
+            Button mailButton = new RoundedTextButton(app.TEXTS.get("buttonMail"), app.skin);
+            mailButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Gdx.net.openURI("mailto:" + LightBlocksGame.GAME_EMAIL);
+                }
+            });
+            addFocusableActor(mailButton);
 
-        menuTable.row().padTop(10);
-        menuTable.add(mailButton);
+            menuTable.row().padTop(10);
+            menuTable.add(mailButton);
+        }
 
         menuTable.row().padTop(40);
         menuTable.add(new ScaledLabel(app.TEXTS.get("labelContributors1"), app.skin, app.SKIN_FONT_TITLE));
@@ -135,7 +138,7 @@ public class AboutScreen extends AbstractMenuDialog {
         twitterButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Gdx.net.openURI(TWITTER_URL);
+                openOrShowUri(TWITTER_URL);
             }
         });
         twitterButton.addListener(scrollOnKeyDownListener);
@@ -160,6 +163,14 @@ public class AboutScreen extends AbstractMenuDialog {
         }
     }
 
+    private void openOrShowUri(String uri) {
+        boolean success = Gdx.net.openURI(uri);
+
+        if (!success) {
+            ((AbstractScreen) app.getScreen()).showDialog(app.TEXTS.format("errorOpenUri", uri));
+        }
+    }
+
     private class ThisInfoButton extends InfoButton {
         public ThisInfoButton(String title, String description, final String url) {
             super(title, description, app.skin);
@@ -167,7 +178,7 @@ public class AboutScreen extends AbstractMenuDialog {
             addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    Gdx.net.openURI(url);
+                    openOrShowUri(url);
                 }
             });
         }
