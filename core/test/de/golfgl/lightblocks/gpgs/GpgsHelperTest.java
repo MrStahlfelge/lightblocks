@@ -79,6 +79,7 @@ public class GpgsHelperTest {
         gjClient.initializeOrResetEventKey(GpgsHelper.GJ_EVENT_MISSION);
         gjClient.initializeOrResetEventKey(GpgsHelper.GJ_EVENT_MARATHON);
         gjClient.initializeOrResetEventKey(GpgsHelper.GJ_EVENT_LINES_CLEARED);
-        Thread.sleep(1000); // give the HTTP request some time before app is killed
+        gjClient.initializeOrResetEventKey(GpgsHelper.GJ_EVENT_LOCAL_MULTIPLAYER);
+        Thread.sleep(1500); // give the HTTP request some time before app is killed
     }
 }

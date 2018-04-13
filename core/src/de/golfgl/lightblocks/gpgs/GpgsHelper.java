@@ -76,6 +76,7 @@ public class GpgsHelper {
     public static final String GJ_EVENT_MISSION = "EVENT_MISSION_STARED";
     public static final String GJ_EVENT_MARATHON = "EVENT_MARATHON_STARED";
     public static final String GJ_EVENT_LINES_CLEARED = "EVENT_LINES_CLEARED";
+    public static final String GJ_EVENT_LOCAL_MULTIPLAYER = "EVENT_LMULTI_STARTED";
 
     public static String getLeaderBoardIdByModelId(String gameModelId) {
         if (gameModelId == null)
@@ -170,6 +171,9 @@ public class GpgsHelper {
                 || independantId.equals(EVENT_MISSION_2_TYPEB_1A)
                 || independantId.equals(EVENT_MISSION_15_TYPEB_1D))
             return GJ_EVENT_MISSION;
+
+        else if (independantId.equals(EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED))
+            return GJ_EVENT_LOCAL_MULTIPLAYER;
 
         else
             return null;
