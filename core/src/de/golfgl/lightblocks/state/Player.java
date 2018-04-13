@@ -13,8 +13,8 @@ public class Player {
     private String gamerId;
 
     public String getName() {
-        if (gamerId == null)
-            return "SUPERDEV";
+        if (gamerId == null || gamerId.isEmpty())
+            return "John";
         else
             return gamerId;
     }

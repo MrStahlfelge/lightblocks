@@ -100,7 +100,19 @@ public class InputButtonTable extends Table implements IControllerActable, ITouc
         }
     }
 
-    public void setInputDisabled(int i, boolean disabled) {
+    public void setEnabledInputs(boolean[] bitmask) {
+        for (int i = 0; i < bitmask.length; i++)
+            setInputDisabled(i, !bitmask[i]);
+    }
+
+    public void resetEnabledInputs() {
+        setEnabledInputs(PlayScreenInput.getInputAvailableBitset());
+
+        if (!PlayScreenInput.isInputTypeAvailable(inputChosen))
+            selectFirstEnabledButton();
+    }
+
+    private void setInputDisabled(int i, boolean disabled) {
         InputTypeButton btn = getInputButton(i);
         if (btn == null)
             return;
@@ -109,17 +121,20 @@ public class InputButtonTable extends Table implements IControllerActable, ITouc
 
         // Falls der gerade aktive deaktiviert wurde, dann wechseln
         if (inputButtonsGroup.getChecked().getInputType() == i && disabled) {
-            Array<InputTypeButton> buttons = inputButtonsGroup.getButtons();
-            int found = 0;
-            for (int j = 0; j < buttons.size; j++)
-                if (!buttons.get(j).isDisabled()) {
-                    found = j;
-                    break;
-                }
-
-            buttons.get(found).setChecked(true);
+            selectFirstEnabledButton();
         }
+    }
 
+    public void selectFirstEnabledButton() {
+        Array<InputTypeButton> buttons = inputButtonsGroup.getButtons();
+        int found = 0;
+        for (int j = 0; j < buttons.size; j++)
+            if (!buttons.get(j).isDisabled()) {
+                found = j;
+                break;
+            }
+
+        buttons.get(found).setChecked(true);
     }
 
     public int getEnabledInputCount() {

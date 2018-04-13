@@ -505,8 +505,13 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
                 @Override
                 public void run() {
                     beginningLevelSlider.setValue(((MultiPlayerObjects.GameParameters) o).beginningLevel);
-                    inputButtonTable.setInputChecked(((MultiPlayerObjects.GameParameters) o).chosenInput);
-                    inputButtonTable.setAllDisabledButSelected();
+                    int chosenInput = ((MultiPlayerObjects.GameParameters) o).chosenInput;
+
+                    if (PlayScreenInput.isInputTypeAvailable(chosenInput)) {
+                        inputButtonTable.setInputChecked(chosenInput);
+                        inputButtonTable.setAllDisabledButSelected();
+                    } else
+                        inputButtonTable.resetEnabledInputs();
                 }
             });
 
@@ -559,8 +564,16 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
                     allSupportedInputs[i] = allSupportedInputs[i] && playerInputAvail[i];
         }
 
+        // checken ob mindestens ein gemeinsamer Inputtyp verfügbar ist
+        boolean hasEnabledOne = false;
         for (int i = 0; i < allSupportedInputs.length; i++)
-            inputButtonTable.setInputDisabled(i, !allSupportedInputs[i]);
+            hasEnabledOne = hasEnabledOne || allSupportedInputs[i];
+
+        // wenn es eh keinen gemeinsamen gibt, dann zurückfallen alle verfügbaren zu aktivieren
+        if (hasEnabledOne)
+            inputButtonTable.setEnabledInputs(allSupportedInputs);
+        else
+            inputButtonTable.resetEnabledInputs();
     }
 
     protected void refreshPlayerList() {
