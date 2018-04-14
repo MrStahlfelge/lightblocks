@@ -81,6 +81,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
                     playScreen.gameModel.setRotate(false);
                     return true;
                 case Input.Keys.DPAD_CENTER:
+                case Input.Keys.MEDIA_FAST_FORWARD:
                     playScreen.gameModel.setRotate(true);
                     return true;
             }
