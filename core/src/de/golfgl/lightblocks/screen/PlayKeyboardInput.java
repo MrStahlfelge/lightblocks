@@ -87,6 +87,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
         }
 
         switch (keycode) {
+            case Input.Keys.DPAD_CENTER:
             case Input.Keys.ENTER:
                 playScreen.switchPause(false);
                 return true;
