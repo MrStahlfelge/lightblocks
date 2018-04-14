@@ -107,7 +107,7 @@ public class MyGameCircleClient extends GameCircleClient {
     public void showLeaderboards(String leaderBoardId) throws GameServiceException {
         String gcLeader = mapLeaderboards(leaderBoardId);
 
-        if (gcLeader != null)
+        if (gcLeader != null || leaderBoardId == null)
             super.showLeaderboards(gcLeader);
     }
 
