@@ -106,6 +106,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     private Float gridIntensity;
     private List<Mission> missionList;
     private HashMap<String, Mission> missionMap;
+    private boolean openWeblinks = true;
 
     /**
      * @return true wenn das ganze auf einem Smartphone/Tablet im Webbrowser läuft
@@ -450,6 +451,17 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
      */
     public void unlockOrientation() {
 
+    }
+
+    /**
+     * @return ob es erlaubt ist, Weblinks zu öffnen (=> Android TV)
+     */
+    public boolean allowOpenWeblinks() {
+        return openWeblinks;
+    }
+
+    public void setOpenWeblinks(boolean openWeblinks) {
+        this.openWeblinks = openWeblinks;
     }
 
     public String getWelcomeText() {

@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 
 import de.golfgl.lightblocks.gpgs.GpgsMultiPlayerClient;
 
@@ -21,6 +22,17 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
         gpgsClient.initialize(this, true);
 
         game.gpgsClient = gpgsClient;
+
+        // on Google Play Android TV, don't even try to open web links :-(
+        if (isOnGooglePlayAndroidTV())
+            game.setOpenWeblinks(false);
+    }
+
+    /** im Gegensatz zu LightBlocksGame.isOnAndroidTV() gibt diese hier nicht für FireTV true */
+    private boolean isOnGooglePlayAndroidTV() {
+        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+                || getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK_ONLY); //NON-NLS
+
     }
 
     @Override

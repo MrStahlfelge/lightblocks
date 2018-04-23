@@ -74,7 +74,7 @@ public class AboutScreen extends AbstractMenuDialog {
             storeButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    openOrShowUri(LightBlocksGame.gameStoreUrl);
+                    Gdx.net.openURI(LightBlocksGame.gameStoreUrl);
                 }
             });
             addFocusableActor(storeButton);
@@ -164,7 +164,10 @@ public class AboutScreen extends AbstractMenuDialog {
     }
 
     private void openOrShowUri(String uri) {
-        boolean success = Gdx.net.openURI(uri);
+        boolean success = false;
+
+        if (app.allowOpenWeblinks())
+            success = Gdx.net.openURI(uri);
 
         if (!success) {
             ((AbstractScreen) app.getScreen()).showDialog(app.TEXTS.format("errorOpenUri", uri));
