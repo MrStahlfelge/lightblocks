@@ -55,7 +55,7 @@ public class GpgsMultiPlayerClient extends de.golfgl.gdxgamesvcs.GpgsClient impl
         if (gpgsMPRoom != null && gpgsMPRoom.isConnected())
             throw new IllegalStateException("GPGS room open but new one should be created");
 
-            gpgsMPRoom = new GpgsMultiPlayerRoom();
+        gpgsMPRoom = new GpgsMultiPlayerRoom();
         gpgsMPRoom.setContext(myContext);
         gpgsMPRoom.setGpgsClient(this);
 

@@ -25,6 +25,9 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (gpgsClient == null)
+            return;
+
         gpgsClient.onGpgsActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_SELECT_PLAYERS)
