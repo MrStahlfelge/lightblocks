@@ -495,8 +495,9 @@ public abstract class GameModel implements Json.Serializable {
      * die Methode aktiviert den bisherigen "Next" Tetromino im UI und zeichnet den nächsten next-Tetromino
      */
     protected void fireUserInterfaceTetrominoSwap() {
-        userInterface.activateNextTetro(activeTetromino.getCurrentBlockPositions());
-        userInterface.showNextTetro(nextTetromino.getBlockPositions(new Vector2(0, 0), 0));
+        userInterface.activateNextTetro(activeTetromino.getCurrentBlockPositions(), activeTetromino.getIndex());
+        userInterface.showNextTetro(nextTetromino.getBlockPositions(new Vector2(0, 0), 0),
+                nextTetromino.getIndex());
     }
 
     public boolean isGameOver() {
@@ -572,7 +573,7 @@ public abstract class GameModel implements Json.Serializable {
         for (int y = 0; y < blockSquares.length; y++)
             for (int x = 0; x < blockSquares[y].length; x++)
                 if (blockSquares[y][x] != Gameboard.SQUARE_EMPTY)
-                    userInterface.insertNewBlock(x, y);
+                    userInterface.insertNewBlock(x, y, blockSquares[y][x]);
 
         // und auch die aktiven Tetrominos
         fireUserInterfaceTetrominoSwap();

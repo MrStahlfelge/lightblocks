@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
 import de.golfgl.lightblocks.scene2d.ParticleEffectActor;
@@ -59,7 +60,7 @@ public class AnimatedLightblocksLogo extends BlockGroup {
         weldEffect.setPosition(0, .5f * BlockActor.blockWidth);
 
         for (int i = 0; i < 4; i++) {
-            BlockActor block = new BlockActor(app);
+            BlockActor block = new BlockActor(app, Tetromino.TETRO_IDX_L);
             allBlocks[i] = block;
             addActor(block);
             block.getColor().a = 0;

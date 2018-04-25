@@ -10,7 +10,7 @@ import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 
 public interface IGameModelListener {
 
-    void insertNewBlock(int x, int y);
+    void insertNewBlock(int x, int y, int blockType);
 
     void moveTetro(Integer[][] v, int dx, int dy);
 
@@ -29,9 +29,9 @@ public interface IGameModelListener {
 
     void setGameOver();
 
-    void showNextTetro(Integer[][] relativeBlockPositions);
+    void showNextTetro(Integer[][] relativeBlockPositions, int blockType);
 
-    void activateNextTetro(Integer[][] boardBlockPositions);
+    void activateNextTetro(Integer[][] boardBlockPositions, int blockType);
 
     void pinTetromino(Integer[][] currentBlockPositions);
 

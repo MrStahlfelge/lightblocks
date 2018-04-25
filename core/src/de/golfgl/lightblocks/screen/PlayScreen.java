@@ -511,8 +511,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void insertNewBlock(int x, int y) {
-        BlockActor block = new BlockActor(app);
+    public void insertNewBlock(int x, int y, int blockType) {
+        BlockActor block = new BlockActor(app, blockType);
         insertBlock(x, y, block);
     }
 
@@ -716,7 +716,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
                 for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
                     if (x != holePos) {
-                        BlockActor block = new BlockActor(app);
+                        BlockActor block = new BlockActor(app, Gameboard.SQUARE_GARBAGE);
                         block.setX(x * BlockActor.blockWidth);
                         block.setY((y - linesToInsert) * BlockActor.blockWidth);
                         block.setEnlightened(true, true);
@@ -744,7 +744,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void showNextTetro(Integer[][] relativeBlockPositions) {
+    public void showNextTetro(Integer[][] relativeBlockPositions, int blockType) {
         // ein neuer nächster-Stein wurde bestimmt. Wir zeigen ihn einfach über dem Spielfeld an
         // Er wird der Blockgroup ganz unten hinzugefügt, damit er wenn er einfliegt keine Steine auf dem
         // Spielfeld überlagert
@@ -754,7 +754,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         final float offsetY = (Gameboard.GAMEBOARD_NORMALROWS + .3f) * BlockActor.blockWidth;
 
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
-            nextTetro[i] = new BlockActor(app);
+            nextTetro[i] = new BlockActor(app, blockType);
             nextTetro[i].setPosition((i == 0 || i == 2) ? -BlockActor.blockWidth : LightBlocksGame.nativeGameWidth +
                             BlockActor.blockWidth,
                     (i >= 2) ? 0 : LightBlocksGame.nativeGameHeight);
@@ -768,7 +768,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void activateNextTetro(Integer[][] boardBlockPositions) {
+    public void activateNextTetro(Integer[][] boardBlockPositions, int blockType) {
 
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
             // den bereits in nextTetro instantiierten Block ins Spielfeld an die gewünschte Stelle bringen
@@ -780,7 +780,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             if (block == null) {
                 //beim Spielstart noch nicht gesetzt und die Animation macht auch keinen Sinn,
                 //dann gleich an Zielposition instanziieren
-                block = new BlockActor(app);
+                block = new BlockActor(app, blockType);
                 insertBlock(x, y, block);
             } else {
                 nextTetro[i] = null;

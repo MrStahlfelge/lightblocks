@@ -29,6 +29,7 @@ import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
+import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -103,6 +104,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     private Boolean pauseSwipeEnabled;
     private Boolean gpgsAutoLogin;
     private Boolean dontAskForRating;
+    private Integer blockColorMode;
     private Float gridIntensity;
     private List<Mission> missionList;
     private HashMap<String, Mission> missionMap;
@@ -294,6 +296,22 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
             this.playSounds = playSounds;
             prefs.putBoolean("soundPlayback", playSounds);
             prefs.flush();
+        }
+    }
+
+    public Integer getBlockColorMode() {
+        if (blockColorMode == null)
+            blockColorMode = prefs.getInteger("blockColorMode", BlockActor.COLOR_MODE_NONE);
+
+        return blockColorMode;
+    }
+
+    public void setBlockColorMode(Integer blockColorMode) {
+        if (this.blockColorMode != blockColorMode) {
+            this.blockColorMode = blockColorMode;
+            prefs.putInteger("blockColorMode", blockColorMode);
+            prefs.flush();
+            BlockActor.initColor(blockColorMode);
         }
     }
 

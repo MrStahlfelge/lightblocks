@@ -9,21 +9,34 @@ import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.Tetromino;
 
 /**
  * Created by Benjamin Schulte on 15.01.2017.
  */
 
 public class BlockActor extends Actor {
-    public final static int blockWidth = 34;
+    public static final int blockWidth = 34;
     public static final int shapeSize = 20;
+
+    public static final int COLOR_MODE_NONE = 0;
+    public static final int COLOR_MODE_SHADEOFGREY = 1;
     private final static float dislighentedAlpha = .4f;
     private final static float timeToEnlighten = .2f;
     private final static float timeToDislighten = .6f;
+    private static Color COLOR_L;
+    private static Color COLOR_I;
+    private static Color COLOR_J;
+    private static Color COLOR_Z;
+    private static Color COLOR_S;
+    private static Color COLOR_O;
+    private static Color COLOR_T;
+    private static Color COLOR_GARBAGE;
     private final AlphaAction glowAction;
-    Image imBlock;
-    //Image imBlockDeactivated;
-    Image imBlockEnlightened;
+    private final int blockType;
+    private Image imBlock;
+
+    private Image imBlockEnlightened;
     /**
      * wenn der Stein gerade bewegt wird, ist dies hier die Action die ihn bewegt.
      * Das dient dazu, sie ggf. wieder zu entfernen wenn eine andere Bewegung nötig wird.
@@ -41,14 +54,65 @@ public class BlockActor extends Actor {
     /**
      * constructor adds the Textures and Images
      */
-    public BlockActor(LightBlocksGame app) {
+    public BlockActor(LightBlocksGame app, int blockType) {
+        if (COLOR_L == null) {
+            initColor(app.getBlockColorMode());
+        }
+
         glowAction = Actions.action(AlphaAction.class);
+        this.blockType = blockType;
 
         imBlock = new Image(app.trBlock);
-        //imBlockDeactivated = new Image(app.trBlockDeactivated);
         imBlockEnlightened = new Image(app.trBlockEnlightened);
-        imBlockEnlightened.setColor(1, 1, 1, dislighentedAlpha);
 
+        Color blockTypeColor = getBlockTypeColor();
+        imBlockEnlightened.setColor(blockTypeColor.r, blockTypeColor.g, blockTypeColor.b, dislighentedAlpha);
+        imBlock.setColor(blockTypeColor);
+    }
+
+    public static void initColor(Integer blockColorMode) {
+        switch (blockColorMode) {
+            case COLOR_MODE_SHADEOFGREY:
+                COLOR_L = new Color(1, 1, 1, 1);
+                COLOR_I = new Color(.92f, .92f, .92f, 1);
+                COLOR_J = new Color(.84f, .84f, .84f, 1);
+                COLOR_Z = new Color(.76f, .76f, .76f, 1);
+                COLOR_S = new Color(.68f, .68f, .68f, 1);
+                COLOR_O = new Color(.6f, .6f, .6f, 1);
+                COLOR_T = new Color(.52f, .52f, .52f, 1);
+                COLOR_GARBAGE = new Color(.44f, .44f, .44f, 1);
+                break;
+            default:
+                COLOR_L = new Color(1, 1, 1, 1);
+                COLOR_I = COLOR_L;
+                COLOR_J = COLOR_L;
+                COLOR_Z = COLOR_L;
+                COLOR_S = COLOR_L;
+                COLOR_O = COLOR_L;
+                COLOR_T = COLOR_L;
+                COLOR_GARBAGE = COLOR_L;
+        }
+    }
+
+    private Color getBlockTypeColor() {
+        switch (blockType) {
+            case Tetromino.TETRO_IDX_L:
+                return COLOR_L;
+            case Tetromino.TETRO_IDX_I:
+                return COLOR_I;
+            case Tetromino.TETRO_IDX_J:
+                return COLOR_J;
+            case Tetromino.TETRO_IDX_O:
+                return COLOR_O;
+            case Tetromino.TETRO_IDX_S:
+                return COLOR_S;
+            case Tetromino.TETRO_IDX_Z:
+                return COLOR_Z;
+            case Tetromino.TETRO_IDX_T:
+                return COLOR_T;
+            default:
+                return COLOR_GARBAGE;
+        }
     }
 
     /**
@@ -136,19 +200,6 @@ public class BlockActor extends Actor {
         }
 
         drawGlow = !drawGlow;
-    }
-
-    @Override
-    public void setColor(Color color) {
-        setColor(color.r, color.g, color.b, color.a);
-    }
-
-    @Override
-    public void setColor(float r, float g, float b, float a) {
-        super.setColor(r, g, b, a);
-        imBlock.setColor(r, g, b, a);
-        //imBlockDeactivated.setColor(r, g, b, a);
-        imBlockEnlightened.setColor(r, g, b, imBlockEnlightened.getColor().a);
     }
 
     /**

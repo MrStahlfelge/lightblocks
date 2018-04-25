@@ -14,6 +14,14 @@ public class Tetromino {
     // und jeder besteht aus vier Blöcken
     public static final int TETROMINO_BLOCKCOUNT = 4;
 
+    public static final int TETRO_IDX_I = 0;
+    public static final int TETRO_IDX_T = 1;
+    public static final int TETRO_IDX_L = 2;
+    public static final int TETRO_IDX_J = 3;
+    public static final int TETRO_IDX_Z = 4;
+    public static final int TETRO_IDX_S = 5;
+    public static final int TETRO_IDX_O = 6;
+
     //Die 7 Tetrominos
     // wiki/Nintendo_Rotation_System
     private static Vector2[][][] tetrominoTemplates = {
@@ -133,7 +141,7 @@ public class Tetromino {
      * WICHTIG: das T rotiert um Position 1,1
      */
     public boolean isT() {
-        return tetrominoIndex == 1;
+        return tetrominoIndex == TETRO_IDX_T;
     }
 
     public int getLastMovementType() {

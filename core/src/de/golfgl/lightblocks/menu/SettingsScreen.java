@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Scaling;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
 import de.golfgl.lightblocks.scene2d.FaCheckbox;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
@@ -129,6 +130,16 @@ public class SettingsScreen extends AbstractMenuDialog {
                 }
             });
 
+            final Button colorModeCheck = new FaCheckbox(app.TEXTS.get("menuBlockColorShades"), app.skin);
+            colorModeCheck.setChecked(app.getBlockColorMode() != BlockActor.COLOR_MODE_NONE);
+            colorModeCheck.addListener(new ChangeListener() {
+                                           public void changed(ChangeEvent event, Actor actor) {
+                                               app.setBlockColorMode(colorModeCheck.isChecked() ? BlockActor
+                                                       .COLOR_MODE_SHADEOFGREY : BlockActor.COLOR_MODE_NONE);
+                                           }
+                                       }
+            );
+
             Button gamePadButton = new GlowLabelButton(FontAwesome.DEVICE_GAMEPAD, app.TEXTS.get
                     ("menuGamepadConfig"), app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
             gamePadButton.addListener(new ChangeListener() {
@@ -171,10 +182,14 @@ public class SettingsScreen extends AbstractMenuDialog {
             add(gridIntensity);
 
             row();
+            add(colorModeCheck);
+
+            row();
             add(gamePadButton);
 
             addFocusableActor(menuMusicButton);
             addFocusableActor(gridIntensitySlider);
+            addFocusableActor(colorModeCheck);
             addFocusableActor(gamePadButton);
         }
 
