@@ -666,12 +666,16 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
             if (app.multiRoom != null && !app.multiRoom.getRoomState().equals(MultiPlayerObjects.RoomState
                     .closed)) {
                 if (app.multiRoom.getNumberOfPlayers() < 2) {
-                    String ipAddress = getApp().netUtils.getLocalIpAsString();
-                    if (ipAddress.length() > 20)
-                        ipAddress = "\n" + ipAddress;
+                    String labelText = app.TEXTS.get("multiplayerJoinNotEnoughPlayers");
 
-                    toAdd = new ScaledLabel(app.TEXTS.format("multiplayerJoinNotEnoughPlayers", ipAddress), app.skin,
-                            LightBlocksGame.SKIN_FONT_BIG, .75f);
+                    if (app.multiRoom.isLocalGame()) {
+                        String ipAddress = getApp().netUtils.getLocalIpAsString();
+                        if (ipAddress.length() > 20)
+                            ipAddress = "\n" + ipAddress;
+
+                        labelText = labelText + "\n" + app.TEXTS.format("multiplayerJoinIpAddress", ipAddress);
+                    }
+                    toAdd = new ScaledLabel(labelText, app.skin, LightBlocksGame.SKIN_FONT_BIG, .75f);
                 } else if (app.multiRoom.isOwner()) {
                     toAdd = startGameButton;
                     defaultActor = startGameButton;
