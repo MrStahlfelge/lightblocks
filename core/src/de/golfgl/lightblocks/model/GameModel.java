@@ -20,9 +20,13 @@ public abstract class GameModel implements Json.Serializable {
     // das Spielgeschehen
     public static final String GAMEMODEL_VERSION = "1.0.0";
     // Für die Steuerung
+    public static final float FACTOR_SOFT_DROP = 1f;
+    public static final float FACTOR_HARD_DROP = 100f;
+    public static final float FACTOR_NO_DROP = 0f;
     private static final float REPEAT_START_OFFSET = 0.3f;
     private static final float REPEAT_INTERVAL = 0.05f;
     private static final float SOFT_DROP_SPEED = 30.0f;
+    private static final float MAX_DROP_SCORE = 2f;
     // Speicherhaltung
     private final IntArray linesToRemove;
     public TotalScore totalScore;
@@ -137,7 +141,7 @@ public abstract class GameModel implements Json.Serializable {
         }
 
         if (SOFT_DROP_SPEED * softDropFactor > currentSpeed)
-            score.addSoftDropScore(maxDistance * softDropFactor);
+            score.addSoftDropScore(maxDistance * Math.min(softDropFactor, MAX_DROP_SCORE));
 
         // wenn nicht bewegen konnte, dann festnageln und nächsten aktivieren
         if (maxDistance < distance)

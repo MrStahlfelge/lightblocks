@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
+import de.golfgl.lightblocks.model.GameModel;
+
 /**
  * Created by Benjamin Schulte on 25.01.2017.
  */
@@ -175,11 +177,11 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (!beganHorizontalMove) {
             if (screenY - this.screenY > dragThreshold && !beganSoftDrop) {
                 beganSoftDrop = true;
-                playScreen.gameModel.setSoftDropFactor(1);
+                playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
             }
             if (screenY - this.screenY < dragThreshold && beganSoftDrop) {
                 beganSoftDrop = false;
-                playScreen.gameModel.setSoftDropFactor(0);
+                playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
             }
         }
 
@@ -211,7 +213,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             playScreen.gameModel.setRotate(screenX >= Gdx.graphics.getWidth() / 2);
 
         else
-            playScreen.gameModel.setSoftDropFactor(0);
+            playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
 
         if (beganHorizontalMove) {
             playScreen.gameModel.endMoveHorizontal(true);

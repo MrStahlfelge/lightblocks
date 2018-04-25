@@ -8,6 +8,7 @@ import com.badlogic.gdx.controllers.Controllers;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameBlocker;
+import de.golfgl.lightblocks.model.GameModel;
 
 /**
  * Created by Benjamin Schulte on 17.01.2017.
@@ -94,7 +95,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
                 return true;
 
             case Input.Keys.DOWN:
-                playScreen.gameModel.setSoftDropFactor(1);
+                playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
+                return true;
+
+            case Input.Keys.UP:
+                playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
                 return true;
 
             case Input.Keys.LEFT:
@@ -128,8 +133,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public boolean keyUp(int keycode) {
-        if (keycode == Input.Keys.DOWN) {
-            playScreen.gameModel.setSoftDropFactor(0);
+        if (keycode == Input.Keys.DOWN || keycode == Input.Keys.UP) {
+            playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
             return true;
         }
 
