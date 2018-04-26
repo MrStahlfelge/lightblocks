@@ -7,9 +7,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Timer;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.Tetromino;
+
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 /**
  * Created by Benjamin Schulte on 15.01.2017.
@@ -160,13 +163,38 @@ public class BlockActor extends Actor {
      *
      * @param newMoveAction
      */
-    public void setMoveAction(Action newMoveAction) {
-        if (moveAction != null && moveAction.getTarget() != null)
-            this.removeAction(moveAction);
+    public void setMoveAction(Action newMoveAction, float delay) {
+        // wenn es noch einen in der Pipeline gibt...
+        if (moveAction != null && moveAction.getTarget() != null) {
+            // dann entfernen wenn es keine Zeitverzögerung gibt.
+            if (delay == 0)
+                this.removeAction(moveAction);
+            else {
+                // ansonsten das entfernen nach hinten verzögern und raus hier
+                // ACHTUNG: nur korrekt, weil es momentan nur einen Delay gibt. Problematisch wird es, wenn es
+                // verschiedene Delayintervalle geben würde und hier immer der zuletzt gequeuete gewinnt statt des
+                // zuletzt auszuführenden
+                final Action delayedMoveAction = newMoveAction;
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        setMoveAction(delayedMoveAction, 0);
+                    }
+                }, delay);
+                return;
+            }
+        }
+
+        if (delay > 0)
+            newMoveAction = sequence(Actions.delay(delay), newMoveAction);
 
         this.addAction(newMoveAction);
         moveAction = newMoveAction;
 
+    }
+
+    public void setMoveAction(Action newMoveAction) {
+        setMoveAction(newMoveAction, 0);
     }
 
     @Override

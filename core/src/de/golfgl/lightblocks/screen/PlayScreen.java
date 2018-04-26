@@ -621,9 +621,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                                 BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
                     else if (y == i && linesToInsert == 0)
                         // die untersten zusammenhängenden Zeilen rausschieben
-                        // TODO delay ggf. ebenfalls über Timer falls es Grafikprobleme beim Rausschieben gibt
-                        block.setMoveAction(sequence(Actions.delay(removeDelayTime), Actions.moveBy(0, -2 *
-                                BlockActor.blockWidth, moveActorsTime)));
+                        block.setMoveAction(Actions.moveBy(0, -2 * BlockActor.blockWidth, moveActorsTime),
+                                removeDelayTime);
 
                     block.addAction(sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
                             Actions.removeActor()));
