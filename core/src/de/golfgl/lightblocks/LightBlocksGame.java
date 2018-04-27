@@ -32,6 +32,7 @@ import de.golfgl.lightblocks.multiplayer.INsdHelper;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
+import de.golfgl.lightblocks.screen.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
@@ -101,7 +102,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     private Boolean playMusic;
     private Boolean playSounds;
     private Boolean showTouchPanel;
-    private Boolean pauseSwipeEnabled;
+    private Integer swipeUpType;
     private Boolean gpgsAutoLogin;
     private Boolean dontAskForRating;
     private Integer blockColorMode;
@@ -429,16 +430,16 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         prefs.flush();
     }
 
-    public Boolean getPauseSwipeEnabled() {
-        if (pauseSwipeEnabled == null)
-            pauseSwipeEnabled = prefs.getBoolean("pauseSwipe", false);
+    public int getSwipeUpType() {
+        if (swipeUpType == null)
+            swipeUpType = prefs.getInteger("swipeUpType", PlayGesturesInput.SWIPEUP_DONOTHING);
 
-        return pauseSwipeEnabled;
+        return swipeUpType;
     }
 
-    public void setPauseSwipeEnabled(Boolean pauseSwipeEnabled) {
-        this.pauseSwipeEnabled = pauseSwipeEnabled;
-        prefs.putBoolean("pauseSwipe", pauseSwipeEnabled);
+    public void setSwipeUpType(Integer swipeUpType) {
+        this.swipeUpType = swipeUpType;
+        prefs.putInteger("swipeUpType", swipeUpType);
         prefs.flush();
     }
 

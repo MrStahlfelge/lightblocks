@@ -13,6 +13,9 @@ import de.golfgl.lightblocks.model.GameModel;
  * Created by Benjamin Schulte on 25.01.2017.
  */
 public class PlayGesturesInput extends PlayScreenInput {
+    public static final int SWIPEUP_DONOTHING = 0;
+    public static final int SWIPEUP_PAUSE = 1;
+    public static final int SWIPEUP_HARDDROP = 2;
 
     private static final float SCREEN_BORDER_PERCENTAGE = 0.1f;
     public Color rotateRightColor = new Color(.1f, 1, .3f, .8f);
@@ -30,6 +33,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     private Label toTheLeft;
     private Label toDrop;
     private Label rotationLabel;
+    private boolean didDrop;
 
     @Override
     public String getInputHelpText() {
@@ -67,6 +71,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         this.screenX = screenX;
         this.screenY = screenY;
+        didDrop = false;
 
         if (isPaused()) {
             playScreen.switchPause(false);
@@ -185,8 +190,14 @@ public class PlayGesturesInput extends PlayScreenInput {
             }
         }
 
-        if (screenY - this.screenY < -4 * dragThreshold & !isPaused() && playScreen.app.getPauseSwipeEnabled()) {
-            playScreen.switchPause(false);
+        int swipeUpType = playScreen.app.getSwipeUpType();
+        if (screenY - this.screenY < -4 * dragThreshold && swipeUpType != SWIPEUP_DONOTHING) {
+            if (swipeUpType == SWIPEUP_PAUSE && !isPaused())
+                playScreen.switchPause(false);
+            else if (swipeUpType == SWIPEUP_HARDDROP && !didDrop) {
+                playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
+                didDrop = true;
+            }
         }
 
         // rotate vermeiden

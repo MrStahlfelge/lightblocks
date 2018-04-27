@@ -20,6 +20,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
 import de.golfgl.lightblocks.scene2d.FaCheckbox;
+import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
@@ -230,13 +231,18 @@ public class SettingsScreen extends AbstractMenuDialog {
                     touchPanelSizeChanged();
                 }
             });
-            final Button pauseSwipeButton = new FaCheckbox(app.TEXTS.get("menuPauseSwipeEnabled"), app.skin);
-            pauseSwipeButton.setChecked(app.getPauseSwipeEnabled());
-            pauseSwipeButton.addListener(new ChangeListener() {
-                                             public void changed(ChangeEvent event, Actor actor) {
-                                                 app.setPauseSwipeEnabled(pauseSwipeButton.isChecked());
-                                             }
-                                         }
+            final FaRadioButton<Integer> swipeUpButtons = new FaRadioButton(app);
+            swipeUpButtons.addEntry(app.TEXTS.get("menuSwipeUpToNothing"), PlayGesturesInput.SWIPEUP_DONOTHING);
+            swipeUpButtons.addEntry(app.TEXTS.get("menuSwipeUpToPause"), PlayGesturesInput.SWIPEUP_PAUSE);
+            swipeUpButtons.addEntry(app.TEXTS.get("menuSwipeUpToHardDrop"), PlayGesturesInput.SWIPEUP_HARDDROP);
+
+            swipeUpButtons.setValue(app.getSwipeUpType());
+            swipeUpButtons.addListener(new ChangeListener() {
+                                           public void changed(ChangeEvent event, Actor actor) {
+                                               if (actor == swipeUpButtons)
+                                                   app.setSwipeUpType(swipeUpButtons.getValue());
+                                           }
+                                       }
             );
 
             pad(0, 20, 0, 20);
@@ -258,12 +264,16 @@ public class SettingsScreen extends AbstractMenuDialog {
             row().padTop(20);
             add(touchPanelTable).top();
 
+            Table swipeUp = new Table();
+            swipeUp.add(new ScaledLabel(app.TEXTS.get("menuSwipeUpTo"), app.skin, app.SKIN_FONT_TITLE)).left();
+            swipeUp.row();
+            swipeUp.add(swipeUpButtons).fill();
             row();
-            add(pauseSwipeButton);
+            add(swipeUp);
 
             addFocusableActor(touchPanelButton);
             addFocusableActor(touchPanelSizeSlider);
-            addFocusableActor(pauseSwipeButton);
+            buttonsToAdd.addAll(swipeUpButtons.getButtons());
         }
 
         protected void touchPanelSizeChanged() {
