@@ -40,6 +40,7 @@
         android:banner="@drawable/tvbanner"
         android:icon="@mipmap/ic_launcher"
         android:isGame="true"
+        android:appCategory="game"
         android:label="@string/app_name"
         android:theme="@style/GdxTheme">
 
