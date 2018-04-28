@@ -20,7 +20,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
 import de.golfgl.lightblocks.scene2d.FaCheckbox;
-import de.golfgl.lightblocks.scene2d.FaRadioButton;
+import de.golfgl.lightblocks.scene2d.RadioButtonTable;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
@@ -231,7 +231,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                     touchPanelSizeChanged();
                 }
             });
-            final FaRadioButton<Integer> swipeUpButtons = new FaRadioButton(app);
+            final RadioButtonTable<Integer> swipeUpButtons = new RadioButtonTable(app);
             swipeUpButtons.addEntry(app.TEXTS.get("menuSwipeUpToNothing"), PlayGesturesInput.SWIPEUP_DONOTHING);
             swipeUpButtons.addEntry(app.TEXTS.get("menuSwipeUpToPause"), PlayGesturesInput.SWIPEUP_PAUSE);
             swipeUpButtons.addEntry(app.TEXTS.get("menuSwipeUpToHardDrop"), PlayGesturesInput.SWIPEUP_HARDDROP);

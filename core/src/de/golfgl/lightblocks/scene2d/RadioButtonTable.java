@@ -23,7 +23,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
  * Created by Benjamin Schulte on 26.04.2018.
  */
 
-public class FaRadioButton<T> extends Table {
+public class RadioButtonTable<T> extends Table {
     private final ButtonGroup<GlowLabelButton> group;
     private final Table buttonTable;
     private final Widget indicator;
@@ -34,7 +34,7 @@ public class FaRadioButton<T> extends Table {
     private T currentValue = null;
     private boolean layedOut;
 
-    public FaRadioButton(LightBlocksGame app) {
+    public RadioButtonTable(LightBlocksGame app) {
         this.app = app;
         group = new ButtonGroup<GlowLabelButton>();
         buttonTable = new Table();
@@ -47,7 +47,7 @@ public class FaRadioButton<T> extends Table {
         add(buttonTable);
     }
 
-    public FaRadioButton<T> addEntry(String text, final T value) {
+    public RadioButtonTable<T> addEntry(String text, final T value) {
         GlowLabelButton button = new GlowLabelButton(text, app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
         group.add(button);
         buttonTable.row();
@@ -59,7 +59,7 @@ public class FaRadioButton<T> extends Table {
                     currentValue = value;
                     onCheckChange();
                     ChangeEvent changeEvent = Pools.obtain(ChangeEvent.class);
-                    FaRadioButton.this.fire(changeEvent);
+                    RadioButtonTable.this.fire(changeEvent);
                 }
             }
         });
