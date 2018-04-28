@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -14,13 +15,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
 import de.golfgl.lightblocks.scene2d.FaCheckbox;
-import de.golfgl.lightblocks.scene2d.RadioButtonTable;
+import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
@@ -231,10 +233,10 @@ public class SettingsScreen extends AbstractMenuDialog {
                     touchPanelSizeChanged();
                 }
             });
-            final RadioButtonTable<Integer> swipeUpButtons = new RadioButtonTable(app);
-            swipeUpButtons.addEntry(app.TEXTS.get("menuSwipeUpToNothing"), PlayGesturesInput.SWIPEUP_DONOTHING);
-            swipeUpButtons.addEntry(app.TEXTS.get("menuSwipeUpToPause"), PlayGesturesInput.SWIPEUP_PAUSE);
-            swipeUpButtons.addEntry(app.TEXTS.get("menuSwipeUpToHardDrop"), PlayGesturesInput.SWIPEUP_HARDDROP);
+            final FaRadioButton<Integer> swipeUpButtons = new FaRadioButton<Integer>(app.skin);
+            swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_DONOTHING, "", app.TEXTS.get("menuSwipeUpToNothing"));
+            swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_PAUSE, "", app.TEXTS.get("menuSwipeUpToPause"));
+            swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_HARDDROP, "", app.TEXTS.get("menuSwipeUpToHardDrop"));
 
             swipeUpButtons.setValue(app.getSwipeUpType());
             swipeUpButtons.addListener(new ChangeListener() {
@@ -265,15 +267,22 @@ public class SettingsScreen extends AbstractMenuDialog {
             add(touchPanelTable).top();
 
             Table swipeUp = new Table();
-            swipeUp.add(new ScaledLabel(app.TEXTS.get("menuSwipeUpTo"), app.skin, app.SKIN_FONT_TITLE)).left();
-            swipeUp.row();
-            swipeUp.add(swipeUpButtons).fill();
+            ScaledLabel menuSwipeUpToLabel = new ScaledLabel(app.TEXTS.get("menuSwipeUpTo"), app.skin, app.SKIN_FONT_TITLE);
+            menuSwipeUpToLabel.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    swipeUpButtons.changeValue();
+                }
+            });
+            swipeUp.add(menuSwipeUpToLabel);
+            swipeUp.row().padTop(-10);
+            swipeUp.add(swipeUpButtons);
             row();
             add(swipeUp);
 
             addFocusableActor(touchPanelButton);
             addFocusableActor(touchPanelSizeSlider);
-            buttonsToAdd.addAll(swipeUpButtons.getButtons());
+            addFocusableActor(swipeUpButtons);
         }
 
         protected void touchPanelSizeChanged() {
