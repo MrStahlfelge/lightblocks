@@ -22,8 +22,6 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  */
 
 public class MarathonGroup extends Table implements SinglePlayerScreen.IGameModeGroup {
-    private static final String PREF_KEY_INPUT = "inputType";
-    private static final String PREF_KEY_LEVEL = "beginningLevel";
     private final Cell choseInputCell;
     private final ScaledLabel choseInputLabel;
     private SinglePlayerScreen menuScreen;
@@ -38,8 +36,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
         this.app = app;
 
         Table params = new Table();
-        beginningLevelSlider = new BeginningLevelChooser(app, app.prefs.getInteger
-                (PREF_KEY_LEVEL, 0), 9) {
+        beginningLevelSlider = new BeginningLevelChooser(app, app.localPrefs.getMarathonBeginningLevel(), 9) {
             @Override
             protected void onControllerDefaultKeyDown() {
                 ((MyStage) getStage()).setFocusedActor(playButton);
@@ -47,7 +44,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
         };
 
         // die möglichen Inputs aufzählen
-        inputButtons = new InputButtonTable(app, app.prefs.getInteger(PREF_KEY_INPUT, 0)) {
+        inputButtons = new InputButtonTable(app, app.localPrefs.getMarathonLastUsedInput()) {
             @Override
             public boolean onControllerDefaultKeyDown() {
                 ((MyStage) getStage()).setFocusedActor(playButton);
@@ -149,10 +146,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
         initGameParametersParams.setInputKey(inputButtons.getSelectedInput());
 
         // Einstellungen speichern
-        app.prefs.putInteger(PREF_KEY_INPUT, inputButtons.getSelectedInput());
-        app.prefs.putInteger(PREF_KEY_LEVEL, initGameParametersParams
-                .getBeginningLevel());
-        app.prefs.flush();
+        app.localPrefs.saveMarathonLevelAndInput(initGameParametersParams.getBeginningLevel(), inputButtons.getSelectedInput());
 
         try {
             PlayScreen.gotoPlayScreen((AbstractScreen) app.getScreen(), initGameParametersParams);

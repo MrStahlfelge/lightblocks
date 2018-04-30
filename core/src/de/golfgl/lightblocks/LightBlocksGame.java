@@ -29,13 +29,12 @@ import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
-import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
-import de.golfgl.lightblocks.screen.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
+import de.golfgl.lightblocks.state.LocalPrefs;
 import de.golfgl.lightblocks.state.MyControllerMapping;
 import de.golfgl.lightblocks.state.Player;
 
@@ -51,6 +50,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String GAME_URL = "https://www.golfgl.de/lightblocks/";
     // An den gleichen Eintrag im AndroidManifest denken!!!
     public static final String GAME_VERSIONSTRING = "1.1.1818";
+    public static final int GAME_VERSIONNUMBER = 1818;
     // Abstand für Git
     // auch dran denken das data-Verzeichnis beim release wegzunehmen!
     public static final boolean GAME_DEVMODE = true;
@@ -76,7 +76,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public Skin skin;
     public AssetManager assetManager;
     public I18NBundle TEXTS;
-    public Preferences prefs;
+    public LocalPrefs localPrefs;
     public GameStateHandler savegame;
     // these resources are used in the whole game... so we are loading them here
     public TextureRegion trBlock;
@@ -100,14 +100,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public INsdHelper nsdHelper;
     public MyControllerMapping controllerMappings;
     private FPSLogger fpsLogger;
-    private Boolean playMusic;
-    private Boolean playSounds;
-    private Boolean showTouchPanel;
-    private Integer swipeUpType;
-    private Boolean gpgsAutoLogin;
-    private Boolean dontAskForRating;
-    private Integer blockColorMode;
-    private Float gridIntensity;
     private List<Mission> missionList;
     private HashMap<String, Mission> missionMap;
     private boolean openWeblinks = true;
@@ -128,21 +120,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
                 !Gdx.input.isPeripheralAvailable(Input.Peripheral.MultitouchScreen);
     }
 
-    public Boolean getGpgsAutoLogin() {
-        if (gpgsAutoLogin == null)
-            gpgsAutoLogin = prefs.getBoolean("gpgsAutoLogin", true);
-
-        return gpgsAutoLogin;
-    }
-
-    public void setGpgsAutoLogin(Boolean gpgsAutoLogin) {
-        if (gpgsAutoLogin != this.gpgsAutoLogin) {
-            prefs.putBoolean("gpgsAutoLogin", gpgsAutoLogin);
-            prefs.flush();
-        }
-        this.gpgsAutoLogin = gpgsAutoLogin;
-    }
-
     @Override
     public void create() {
         if (GAME_DEVMODE)
@@ -151,7 +128,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
             Gdx.app.setLogLevel(Application.LOG_ERROR);
         }
 
-        prefs = app.getPreferences("lightblocks");
+        Preferences lbPrefs = app.getPreferences("lightblocks");
+        localPrefs = new LocalPrefs(lbPrefs);
 
         if (share == null)
             share = new ShareHandler();
@@ -162,11 +140,11 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
             player.setGamerId(modelNameRunningOn);
         }
 
-        savegame = new GameStateHandler(this);
+        savegame = new GameStateHandler(this, lbPrefs);
 
         if (gpgsClient != null) {
             gpgsClient.setListener(this);
-            if (getGpgsAutoLogin())
+            if (localPrefs.getGpgsAutoLogin())
                 gpgsClient.resumeSession();
         }
 
@@ -254,7 +232,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public void resume() {
         super.resume();
 
-        if (getGpgsAutoLogin() && gpgsClient != null && !gpgsClient.isSessionActive())
+        if (localPrefs.getGpgsAutoLogin() && gpgsClient != null && !gpgsClient.isSessionActive())
             gpgsClient.resumeSession();
     }
 
@@ -271,81 +249,10 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         skin.dispose();
     }
 
-    public boolean isPlayMusic() {
-        if (playMusic == null)
-            playMusic = prefs.getBoolean("musicPlayback", !isWebAppOnMobileDevice());
-
-        return playMusic;
-    }
-
-    public void setPlayMusic(boolean playMusic) {
-        if (this.playMusic != playMusic) {
-            this.playMusic = playMusic;
-            prefs.putBoolean("musicPlayback", playMusic);
-            prefs.flush();
-        }
-    }
-
-    public Boolean isPlaySounds() {
-        if (playSounds == null)
-            playSounds = prefs.getBoolean("soundPlayback", !isWebAppOnMobileDevice());
-
-        return playSounds;
-    }
-
-    public void setPlaySounds(Boolean playSounds) {
-        if (this.playSounds != playSounds) {
-            this.playSounds = playSounds;
-            prefs.putBoolean("soundPlayback", playSounds);
-            prefs.flush();
-        }
-    }
-
-    public Integer getBlockColorMode() {
-        if (blockColorMode == null)
-            blockColorMode = prefs.getInteger("blockColorMode", BlockActor.COLOR_MODE_NONE);
-
-        return blockColorMode;
-    }
-
-    public void setBlockColorMode(Integer blockColorMode) {
-        if (this.blockColorMode != blockColorMode) {
-            this.blockColorMode = blockColorMode;
-            prefs.putInteger("blockColorMode", blockColorMode);
-            prefs.flush();
-            BlockActor.initColor(blockColorMode);
-        }
-    }
-
-    public boolean getShowTouchPanel() {
-        if (showTouchPanel == null)
-            showTouchPanel = prefs.getBoolean("showTouchPanel", true);
-
-        return showTouchPanel;
-    }
-
-    public void setShowTouchPanel(boolean showTouchPanel) {
-        if (this.showTouchPanel != showTouchPanel) {
-            this.showTouchPanel = showTouchPanel;
-
-            prefs.putBoolean("showTouchPanel", showTouchPanel);
-            prefs.flush();
-        }
-    }
-
-    public int getTouchPanelSize() {
-        return prefs.getInteger("touchPanelSize", 50);
-    }
-
-    public void setTouchPanelSize(int touchPanelSize) {
-        prefs.putInteger("touchPanelSize", touchPanelSize);
-        prefs.flush();
-    }
-
     @Override
     public void gsOnSessionActive() {
         player.setGamerId(gpgsClient.getPlayerDisplayName());
-        setGpgsAutoLogin(true);
+        localPrefs.setGpgsAutoLogin(true);
         handleAccountChanged();
     }
 
@@ -389,15 +296,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         });
     }
 
-    public String loadControllerMappings() {
-        return prefs.getString("controllerMappings", "");
-    }
-
-    public void saveControllerMappings(String json) {
-        prefs.putString("controllerMappings", json);
-        prefs.flush();
-    }
-
     public List<Mission> getMissionList() {
         if (missionList == null) {
             missionList = Mission.getMissionList();
@@ -416,45 +314,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
             getMissionList();
 
         return missionMap.get(uid);
-    }
-
-    public Boolean getDontAskForRating() {
-        if (dontAskForRating == null)
-            dontAskForRating = prefs.getBoolean("dontAskForRating", false);
-
-        return dontAskForRating;
-    }
-
-    public void setDontAskForRating(Boolean dontAskForRating) {
-        this.dontAskForRating = dontAskForRating;
-        prefs.putBoolean("dontAskForRating", dontAskForRating);
-        prefs.flush();
-    }
-
-    public int getSwipeUpType() {
-        if (swipeUpType == null)
-            swipeUpType = prefs.getInteger("swipeUpType", PlayGesturesInput.SWIPEUP_DONOTHING);
-
-        return swipeUpType;
-    }
-
-    public void setSwipeUpType(Integer swipeUpType) {
-        this.swipeUpType = swipeUpType;
-        prefs.putInteger("swipeUpType", swipeUpType);
-        prefs.flush();
-    }
-
-    public float getGridIntensity() {
-        if (gridIntensity == null)
-            gridIntensity = prefs.getFloat("gridIntensity", 0.2f);
-
-        return gridIntensity;
-    }
-
-    public void setGridIntensity(float gridIntensity) {
-        this.gridIntensity = gridIntensity;
-        prefs.putFloat("gridIntensity", gridIntensity);
-        prefs.flush();
     }
 
     /**

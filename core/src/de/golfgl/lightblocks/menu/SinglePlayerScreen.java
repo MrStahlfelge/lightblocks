@@ -24,8 +24,6 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  */
 
 public class SinglePlayerScreen extends AbstractMenuDialog {
-
-    private static final String PREF_KEY_ACTIVEPAGE = "singlePlayerPage";
     private PagedScrollPane modePager;
     private Button leaderboardButton;
 
@@ -60,7 +58,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         buttons.add(leaderboardButton);
 
         validate();
-        modePager.scrollToPage(app.prefs.getInteger(PREF_KEY_ACTIVEPAGE, 0));
+        modePager.scrollToPage(app.localPrefs.getLastSinglePlayerMenuPage());
         onGameModeChanged();
     }
 
@@ -127,8 +125,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
      * @param backToMainMenu if true, SingplePlayerScreen will get closed
      */
     public void gameStarted(boolean backToMainMenu) {
-        app.prefs.putInteger(PREF_KEY_ACTIVEPAGE, modePager.getCurrentPageIndex());
-        app.prefs.flush();
+        app.localPrefs.saveLastUsedSinglePlayerMenuPage(modePager.getCurrentPageIndex());
 
         if (backToMainMenu)
             hideImmediately();

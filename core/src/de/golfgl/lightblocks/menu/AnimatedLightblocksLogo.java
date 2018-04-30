@@ -78,7 +78,7 @@ public class AnimatedLightblocksLogo extends BlockGroup {
                 run(new Runnable() {
                     @Override
                     public void run() {
-                        if (app.isPlaySounds())
+                        if (app.localPrefs.isPlaySounds())
                             app.cleanSpecialSound.play();
                         weldEffect.start();
                     }

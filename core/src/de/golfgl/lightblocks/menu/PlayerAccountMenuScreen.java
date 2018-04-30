@@ -81,7 +81,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
 
     private void performGpgsLoginout() {
         if (app.gpgsClient.isSessionActive()) {
-            app.setGpgsAutoLogin(false);
+            app.localPrefs.setGpgsAutoLogin(false);
             logInOutButton.setDisabled(true);
             app.savegame.resetLoadedFromCloud();
             app.savegame.gpgsSaveGameState(new ISaveGameStateResponseListener() {

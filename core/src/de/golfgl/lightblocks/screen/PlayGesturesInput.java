@@ -49,9 +49,9 @@ public class PlayGesturesInput extends PlayScreenInput {
     public void setPlayScreen(PlayScreen playScreen) {
         super.setPlayScreen(playScreen);
 
-        dragThreshold = playScreen.app.getTouchPanelSize();
+        dragThreshold = playScreen.app.localPrefs.getTouchPanelSize();
 
-        if (playScreen.app.getShowTouchPanel())
+        if (playScreen.app.localPrefs.getShowTouchPanel())
             initializeTouchPanel(playScreen, dragThreshold);
     }
 
@@ -190,7 +190,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             }
         }
 
-        int swipeUpType = playScreen.app.getSwipeUpType();
+        int swipeUpType = playScreen.app.localPrefs.getSwipeUpType();
         if (screenY - this.screenY < -4 * dragThreshold && swipeUpType != SWIPEUP_DONOTHING) {
             if (swipeUpType == SWIPEUP_PAUSE && !isPaused())
                 playScreen.switchPause(false);

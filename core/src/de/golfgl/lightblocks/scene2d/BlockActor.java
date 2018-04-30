@@ -59,7 +59,7 @@ public class BlockActor extends Actor {
      */
     public BlockActor(LightBlocksGame app, int blockType) {
         if (COLOR_L == null) {
-            initColor(app.getBlockColorMode());
+            initColor(app.localPrefs.getBlockColorMode());
         }
 
         glowAction = Actions.action(AlphaAction.class);

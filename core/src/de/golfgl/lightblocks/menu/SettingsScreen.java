@@ -96,8 +96,8 @@ public class SettingsScreen extends AbstractMenuDialog {
      * speichert die Einstellungen die nicht sofort gespeichert werden
      */
     private void flushChanges() {
-        app.setTouchPanelSize(gesturesGroup.getTouchPanelSize());
-        app.setGridIntensity(generalGroup.getGridIntensity());
+        app.localPrefs.setTouchPanelSize(gesturesGroup.getTouchPanelSize());
+        app.localPrefs.setGridIntensity(generalGroup.getGridIntensity());
     }
 
     @Override
@@ -125,7 +125,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             menuMusicButton.addListener(new MusicButtonListener(app, true, menuMusicButton));
 
             gridIntensitySlider = new TouchableSlider(0, 1, .1f, false, app.skin);
-            gridIntensitySlider.setValue(app.getGridIntensity());
+            gridIntensitySlider.setValue(app.localPrefs.getGridIntensity());
             gridIntensitySlider.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -134,10 +134,10 @@ public class SettingsScreen extends AbstractMenuDialog {
             });
 
             final Button colorModeCheck = new FaCheckbox(app.TEXTS.get("menuBlockColorShades"), app.skin);
-            colorModeCheck.setChecked(app.getBlockColorMode() != BlockActor.COLOR_MODE_NONE);
+            colorModeCheck.setChecked(app.localPrefs.getBlockColorMode() != BlockActor.COLOR_MODE_NONE);
             colorModeCheck.addListener(new ChangeListener() {
                                            public void changed(ChangeEvent event, Actor actor) {
-                                               app.setBlockColorMode(colorModeCheck.isChecked() ? BlockActor
+                                               app.localPrefs.setBlockColorMode(colorModeCheck.isChecked() ? BlockActor
                                                        .COLOR_MODE_SHADEOFGREY : BlockActor.COLOR_MODE_NONE);
                                            }
                                        }
@@ -218,15 +218,15 @@ public class SettingsScreen extends AbstractMenuDialog {
 
         public GestureSettings() {
             touchPanelButton = new FaCheckbox(app.TEXTS.get("menuShowTouchPanel"), app.skin);
-            touchPanelButton.setChecked(app.getShowTouchPanel());
+            touchPanelButton.setChecked(app.localPrefs.getShowTouchPanel());
             touchPanelButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
-                                                 app.setShowTouchPanel(touchPanelButton.isChecked());
+                                                 app.localPrefs.setShowTouchPanel(touchPanelButton.isChecked());
                                              }
                                          }
             );
             touchPanelSizeSlider = new TouchableSlider(25, Gdx.graphics.getWidth() * .33f, 1, false, app.skin);
-            touchPanelSizeSlider.setValue(app.getTouchPanelSize());
+            touchPanelSizeSlider.setValue(app.localPrefs.getTouchPanelSize());
             touchPanelSizeSlider.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -238,11 +238,11 @@ public class SettingsScreen extends AbstractMenuDialog {
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_PAUSE, "", app.TEXTS.get("menuSwipeUpToPause"));
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_HARDDROP, "", app.TEXTS.get("menuSwipeUpToHardDrop"));
 
-            swipeUpButtons.setValue(app.getSwipeUpType());
+            swipeUpButtons.setValue(app.localPrefs.getSwipeUpType());
             swipeUpButtons.addListener(new ChangeListener() {
                                            public void changed(ChangeEvent event, Actor actor) {
                                                if (actor == swipeUpButtons)
-                                                   app.setSwipeUpType(swipeUpButtons.getValue());
+                                                   app.localPrefs.setSwipeUpType(swipeUpButtons.getValue());
                                            }
                                        }
             );

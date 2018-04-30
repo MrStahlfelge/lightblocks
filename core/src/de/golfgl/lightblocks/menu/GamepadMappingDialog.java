@@ -154,7 +154,7 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
                 break;
             default:
                 instructionLabel.setText(app.TEXTS.get("configGamepadDone"));
-                app.saveControllerMappings(mappings.toJson().toJson(JsonWriter.OutputType.json));
+                app.localPrefs.saveControllerMappings(mappings.toJson().toJson(JsonWriter.OutputType.json));
                 skipButton.setText("OK");
 
                 inputToRecord = -1;

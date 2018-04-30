@@ -297,7 +297,7 @@ public class ScoreScreen extends AbstractMenuScreen {
 
         // Wenn bereits 1000 Blöcke abgelegt sind und die Frage noch nicht verneint wurde bitten wir um ein Rating
         // das ganze zeitlich verzögert, damit der Bildschirm sauber aufgebaut ist
-        if (!app.getDontAskForRating() && scoresToShow.size > 1 &&
+        if (!app.localPrefs.getDontAskForRating() && scoresToShow.size > 1 &&
                 app.savegame.getTotalScore().getDrawnTetrominos() >= 1000)
             stage.getRoot().addAction(Actions.after(Actions.sequence(Actions.delay(.3f, Actions.run(new Runnable() {
                 @Override
@@ -318,7 +318,7 @@ public class ScoreScreen extends AbstractMenuScreen {
                 }, new Runnable() {
                     @Override
                     public void run() {
-                        app.setDontAskForRating(true);
+                        app.localPrefs.setDontAskForRating(true);
                     }
                 });
     }
@@ -334,7 +334,7 @@ public class ScoreScreen extends AbstractMenuScreen {
     }
 
     private void doRate() {
-        app.setDontAskForRating(true);
+        app.localPrefs.setDontAskForRating(true);
         if (LightBlocksGame.gameStoreUrl != null)
             Gdx.net.openURI(LightBlocksGame.gameStoreUrl);
     }

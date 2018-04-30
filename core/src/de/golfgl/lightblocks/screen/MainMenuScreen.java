@@ -259,13 +259,13 @@ public class MainMenuScreen extends AbstractMenuScreen {
         } else if (!mainGroup.isVisible() || !isLandscape()) {
             // es wird gerade ein Dialog angezeigt und nicht das Main menu
             stage.getRoot().setScale(0, 1);
-            if (app.isPlaySounds())
+            if (app.localPrefs.isPlaySounds())
                 app.swoshSound.play();
             stage.getRoot().addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
         } else {
             // Normalfall
             mainGroup.setScale(0, 1);
-            if (app.isPlaySounds())
+            if (app.localPrefs.isPlaySounds())
                 app.swoshSound.play();
             mainGroup.addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
         }

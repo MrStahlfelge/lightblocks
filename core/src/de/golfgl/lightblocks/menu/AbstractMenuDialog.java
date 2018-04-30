@@ -161,7 +161,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         setPosition(actorToHide.getX() + actorToHide.getWidth(), actorToHide.getY());
 
         // erst nach dem Show abspielen, da das show eventuell länger braucht
-        if (app.isPlaySounds())
+        if (app.localPrefs.isPlaySounds())
             app.swoshSound.play();
 
         return dialog;
@@ -186,7 +186,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         Action hideAction = Actions.parallel(Actions.scaleTo(0, 1, TIME_SWOSHOUT, INTERPOLATION),
                 Actions.moveTo(actorToHide.getX() + actorToHide.getWidth(),
                         actorToHide.getY(), TIME_SWOSHOUT, INTERPOLATION));
-        if (app.isPlaySounds())
+        if (app.localPrefs.isPlaySounds())
             app.swoshSound.play();
         hide(hideAction);
         actorToHide.setScale(0, 1);

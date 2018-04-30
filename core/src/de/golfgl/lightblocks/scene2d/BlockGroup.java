@@ -25,8 +25,8 @@ public class BlockGroup extends Group {
         // Grid
         grid = new Group();
 
-        if (app.getGridIntensity() > 0) {
-            float gridIntensity = app.getGridIntensity() * GRIDINTENSITYFACTOR;
+        if (app.localPrefs.getGridIntensity() > 0) {
+            float gridIntensity = app.localPrefs.getGridIntensity() * GRIDINTENSITYFACTOR;
             for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++)
                 for (int y = 0; y < Gameboard.GAMEBOARD_NORMALROWS; y++) {
                     Image imGrid = new Image(app.trBlock);

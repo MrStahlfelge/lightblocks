@@ -462,7 +462,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
             if (!isPaused) {
 
-                setMusic(app.isPlayMusic());
+                setMusic(app.localPrefs.isPlayMusic());
                 if (music != null)
                     music.play();
 
@@ -556,7 +556,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     @Override
     public void rotateTetro(Integer[][] vOld, Integer[][] vNew) {
-        if (app.isPlaySounds())
+        if (app.localPrefs.isPlaySounds())
             app.rotateSound.play();
 
         // erst alle vom Spielbrett einsammeln...
@@ -593,7 +593,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
 
         if (linesToRemove.size > 0) {
-            if (app.isPlaySounds()) {
+            if (app.localPrefs.isPlaySounds()) {
                 if (!special)
                     app.removeSound.play(.4f + linesToRemove.size * .2f);
                 else
@@ -699,7 +699,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         }
 
         if (linesToInsert > 0) {
-            if (app.isPlaySounds())
+            if (app.localPrefs.isPlaySounds())
                 app.garbageSound.play(.4f + linesToInsert * .2f);
             // nun die Referenz hochziehen
             for (int i = Gameboard.GAMEBOARD_ALLROWS - 1; i >= linesToInsert; i--)
@@ -734,7 +734,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void setGameOver() {
         if (music != null)
             music.stop();
-        if (app.isPlaySounds())
+        if (app.localPrefs.isPlaySounds())
             app.gameOverSound.play();
         inputAdapter.setGameOver();
         saveGameState();
@@ -794,7 +794,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     @Override
     public void pinTetromino(Integer[][] currentBlockPositions) {
-        if (app.isPlaySounds())
+        if (app.localPrefs.isPlaySounds())
             app.dropSound.play();
         for (Integer[] vAfterMove : currentBlockPositions)
             blockMatrix[vAfterMove[0]][vAfterMove[1]].setEnlightened(false);
@@ -860,7 +860,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 break;
         }
 
-        if (playSound && app.isPlaySounds())
+        if (playSound && app.localPrefs.isPlaySounds())
             app.unlockedSound.play();
 
         if (!text.isEmpty())

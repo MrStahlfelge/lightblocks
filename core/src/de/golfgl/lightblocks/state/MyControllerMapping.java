@@ -42,7 +42,7 @@ public class MyControllerMapping extends ControllerMappings {
         loadedSavedSettings = false;
 
         try {
-            String json = app.loadControllerMappings();
+            String json = app.localPrefs.loadControllerMappings();
             JsonValue jsonValue = new JsonReader().parse(json);
             if (jsonValue != null)
                 loadedSavedSettings = fillFromJson(jsonValue);

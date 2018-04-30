@@ -45,7 +45,6 @@ import de.golfgl.lightblocks.state.MultiplayerMatch;
  */
 
 public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomListener {
-    private static final String PREF_KEY_ACTIVEPAGE = "multiplayerPage";
     protected Dialog waitForConnectionOverlay;
     private Button startGameButton;
     private BeginningLevelChooser beginningLevelSlider;
@@ -179,7 +178,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
         setOpenJoinRoomButtons();
 
         validate();
-        modePager.scrollToPage(app.prefs.getInteger(PREF_KEY_ACTIVEPAGE, 0));
+        modePager.scrollToPage(app.localPrefs.getLastMultiPlayerMenuPage());
     }
 
     @Override
@@ -207,8 +206,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
                 if (actor == modePager && getStage() != null) {
                     ((MyStage) getStage()).setFocusedActor(((IMultiplayerModePage) modePager.getCurrentPage())
                             .getDefaultActor());
-                    app.prefs.putInteger(PREF_KEY_ACTIVEPAGE, modePager.getCurrentPageIndex());
-                    app.prefs.flush();
+                    app.localPrefs.saveLastUsedMultiPlayerMenuPage(modePager.getCurrentPageIndex());
                 }
             }
         });
@@ -408,7 +406,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
             public void run() {
                 if ((mpo.changeType == MultiPlayerObjects.CHANGE_ADD
                         || mpo.changeType == MultiPlayerObjects.CHANGE_REMOVE)
-                        && app.isPlaySounds())
+                        && app.localPrefs.isPlaySounds())
                     app.rotateSound.play();
 
                 refreshPlayerList();

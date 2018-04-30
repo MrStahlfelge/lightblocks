@@ -51,7 +51,7 @@ public class ScoreTable extends Table {
 
             if (bestScore > 0 && !isBestScore(i)) {
                 scoreLabel.setEmphasizeScore(bestScore, Color.RED);
-                scoreLabel.setEmphasizeSound(app.isPlaySounds() ? app.unlockedSound : null);
+                scoreLabel.setEmphasizeSound(app.localPrefs.isPlaySounds() ? app.unlockedSound : null);
             }
 
             add(scoreLabel).minWidth(prefLabelWidth);
