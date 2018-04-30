@@ -62,6 +62,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String SKIN_WINDOW_OVERLAY = "overlay";
     public static final String SKIN_BUTTON_ROUND = "round";
     public static final String SKIN_BUTTON_CHECKBOX = "checkbox";
+    public static final String SKIN_BUTTON_WELCOME = "welcome";
     public static final String SKIN_STYLE_PAGER = "pager";
     public static final String SKIN_LIST = "list";
     public static final float LABEL_SCALING = .65f;
@@ -481,16 +482,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public void setOpenWeblinks(boolean openWeblinks) {
         this.openWeblinks = openWeblinks;
-    }
-
-    public String getWelcomeText() {
-        // So kann auch die Farbe verändert werden:
-        //Color.WHITE.set(0.2f, 1, 0.2f, 1);
-        // Aber durch Klick auf das Label wieder zurücksetzen
-        // 17.3. St Patrick's Day - Lightblocks Hintergrundmusik!
-
-        // Hier kann "Welcome back :-)", "Have a good morning" usw. stehen, "Hi MrStahlfelge"
-        return null;
     }
 
     public AbstractMenuDialog getNewMultiplayerMenu(Actor actorToHide) {

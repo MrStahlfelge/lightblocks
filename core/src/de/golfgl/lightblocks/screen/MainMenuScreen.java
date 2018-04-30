@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -22,6 +23,7 @@ import de.golfgl.lightblocks.menu.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.menu.SettingsScreen;
 import de.golfgl.lightblocks.menu.SinglePlayerScreen;
 import de.golfgl.lightblocks.menu.TotalScoreScreen;
+import de.golfgl.lightblocks.menu.WelcomeButton;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabel;
@@ -74,13 +76,12 @@ public class MainMenuScreen extends AbstractMenuScreen {
         mainGroup.addActor(buttonTable);
 
         // Welcome :-)
-        String welcomeText = app.getWelcomeText();
-        if (welcomeText != null) {
+        Array<WelcomeButton.WelcomeText> welcomeText = initWelcomeTexts();
+        if (welcomeText != null && welcomeText.size > 0) {
             buttonTable.row();
-            Label welcomeLabel = new ScaledLabel(welcomeText, app.skin, .75f);
-            welcomeLabel.setWrap(true);
-            welcomeLabel.setAlignment(Align.center);
-            buttonTable.add(welcomeLabel).fill();
+            WelcomeButton welcomeButton = new WelcomeButton(app, welcomeText);
+            buttonTable.add(welcomeButton).fill();
+            stage.addFocusableActor(welcomeButton);
         }
 
         buttonTable.row();
@@ -312,5 +313,19 @@ public class MainMenuScreen extends AbstractMenuScreen {
                 stage.getHeight() * .33f - 2 * BlockActor.blockWidth
                 : isLandscape() ? stage.getHeight() * .66f - 2 * BlockActor.blockWidth
                 : stage.getHeight() - blockGroup.getHeight();
+    }
+
+    private Array<WelcomeButton.WelcomeText> initWelcomeTexts() {
+        // So kann auch die Farbe verändert werden:
+        //Color.WHITE.set(0.2f, 1, 0.2f, 1);
+        // Aber durch Klick auf das Label wieder zurücksetzen
+        // 17.3. St Patrick's Day - Lightblocks Hintergrundmusik!
+
+        // Hier kann "Welcome back :-)", "Have a good morning" usw. stehen, "Hi MrStahlfelge"
+        Array<WelcomeButton.WelcomeText> welcomes = new Array();
+
+        //welcomes.add(new WelcomeButton.WelcomeText("Have a good morning", null));
+        //welcomes.add(new WelcomeButton.WelcomeText("Have a\ngood day", null));
+        return welcomes;
     }
 }

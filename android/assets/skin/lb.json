@@ -190,6 +190,11 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		downFontColor: emphasize
 		disabledFontColor: disabled
 	}
+	welcome: {
+		font: qs-25-reg
+		downFontColor: emphasize
+		disabledFontColor: disabled
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
 	default: {
