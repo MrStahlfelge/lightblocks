@@ -25,6 +25,7 @@ public class WelcomeTextUtils {
 
         int lastUsedVersion = app.localPrefs.getLastUsedLbVersion();
         long clearedLines = app.savegame.getTotalScore().getClearedLines();
+        int daysSinceLastStart = app.localPrefs.getDaysSinceLastStart();
 
         // bis einschl 1818 wurde Version nicht gespeichert
         if (lastUsedVersion == 0 && clearedLines > 10)
@@ -47,6 +48,11 @@ public class WelcomeTextUtils {
                     sp.showMissionPage();
                 }
             }));
+
+        // noch kein Text da? Dann eventuell allgemeine Begrüßung
+        if (welcomes.size == 0 && daysSinceLastStart >= 5) {
+            welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeAfterSomeTime"), null));
+        }
 
         //welcomes.add(new WelcomeButton.WelcomeText("Have a good morning", null));
         //welcomes.add(new WelcomeButton.WelcomeText("Have a\ngood day", null));

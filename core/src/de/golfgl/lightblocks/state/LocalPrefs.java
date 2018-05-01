@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.state;
 
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.BlockActor;
@@ -20,6 +21,7 @@ public class LocalPrefs {
     private static final String PREF_KEY_MPACTIVEPAGE = "multiplayerPage";
     private static final String KEY_SCREENSHOWNPREFIX = "versionShownScreen_";
     private static final String KEY_LASTSTARTEDVERSION = "lastStartedVersion";
+    private static final String KEY_LASTSTARTTIME = "lastStartTime";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -30,6 +32,7 @@ public class LocalPrefs {
     private Integer blockColorMode;
     private Float gridIntensity;
     private Integer lastUsedVersion;
+    private Integer daysSinceLastStart;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -226,5 +229,26 @@ public class LocalPrefs {
         }
 
         return lastUsedVersion;
+    }
+
+    /**
+     * @return -1 wenn unbekannt oder länger als ein Jahr, 0 für letzte 24 Stunden usw.
+     */
+    public int getDaysSinceLastStart() {
+        if (daysSinceLastStart == null) {
+            long lastStartedMs = prefs.getLong(KEY_LASTSTARTTIME, 0);
+            long millis = TimeUtils.millis();
+
+            prefs.putLong(KEY_LASTSTARTTIME, millis);
+            prefs.flush();
+
+            if (lastStartedMs < millis - (1000 * 60 * 60 * 24 * 365))
+                daysSinceLastStart = -1;
+            else {
+                daysSinceLastStart = (int) (((millis - lastStartedMs) / 1000) / (60 * 60));
+            }
+        }
+
+        return daysSinceLastStart;
     }
 }
