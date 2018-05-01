@@ -7,6 +7,7 @@ import de.golfgl.lightblocks.menu.SinglePlayerScreen;
 import de.golfgl.lightblocks.menu.WelcomeButton;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
+import de.golfgl.lightblocks.screen.PlayScreenInput;
 
 /**
  * Created by Benjamin Schulte on 01.05.2018.
@@ -34,9 +35,10 @@ public class WelcomeTextUtils {
         // ganz neuer User
         if (lastUsedVersion == 0) {
             welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeNew"), null));
+        } else if (lastUsedVersion < LightBlocksGame.GAME_VERSIONNUMBER || LightBlocksGame.GAME_DEVMODE) {
+            // Update-Hinweise
+            listNewFeatures(welcomes, app, lastUsedVersion);
         }
-
-        // hier Updates checken
 
         // Unter 50 Reihen und tutorial verfügbar und nicht gemacht: anbieten
         if (clearedLines < 100 && TutorialModel.tutorialAvailable() &&
@@ -58,5 +60,29 @@ public class WelcomeTextUtils {
         //welcomes.add(new WelcomeButton.WelcomeText("Have a\ngood day", null));
 
         return welcomes;
+    }
+
+    protected static void listNewFeatures(Array<WelcomeButton.WelcomeText> welcomes,
+                                          LightBlocksGame app, int listChangesSince) {
+        // Neue Features in 1819: Shades of Grey, Hard Drop
+        if (listChangesSince < 1819) {
+            welcomes.add(new WelcomeButton.WelcomeText("Lightblocks can now perform hard drops. " +
+                    (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN) ?
+                            "For gesture input, enable it on swipe up in the settings." : "Use the UP button or key.")
+                    + "\nThere's also a new option for block shadings.", new ShowSettingsRunnable(app)));
+        }
+    }
+
+    private static class ShowSettingsRunnable implements Runnable {
+        private final LightBlocksGame app;
+
+        public ShowSettingsRunnable(LightBlocksGame app) {
+            this.app = app;
+        }
+
+        @Override
+        public void run() {
+            app.mainMenuScreen.showSettings();
+        }
     }
 }

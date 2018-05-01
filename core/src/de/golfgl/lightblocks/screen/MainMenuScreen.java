@@ -205,7 +205,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
         Button settingsButton = new FaButton(FontAwesome.SETTINGS_GEAR, app.skin);
         settingsButton.addListener(new ChangeListener() {
                                        public void changed(ChangeEvent event, Actor actor) {
-                                           new SettingsScreen(app, mainGroup).show(stage);
+                                           showSettings();
                                        }
                                    }
         );
@@ -321,5 +321,11 @@ public class MainMenuScreen extends AbstractMenuScreen {
         SinglePlayerScreen singlePlayerScreen = new SinglePlayerScreen(app, mainGroup);
         singlePlayerScreen.show(stage);
         return singlePlayerScreen;
+    }
+
+    public SettingsScreen showSettings() {
+        SettingsScreen settingsScreen = new SettingsScreen(app, mainGroup);
+        settingsScreen.show(stage);
+        return settingsScreen;
     }
 }
