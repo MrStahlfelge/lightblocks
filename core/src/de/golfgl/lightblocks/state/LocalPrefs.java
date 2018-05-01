@@ -19,6 +19,7 @@ public class LocalPrefs {
     private static final String PREF_KEY_SPACTIVEPAGE = "singlePlayerPage";
     private static final String PREF_KEY_MPACTIVEPAGE = "multiplayerPage";
     private static final String KEY_SCREENSHOWNPREFIX = "versionShownScreen_";
+    private static final String KEY_LASTSTARTEDVERSION = "lastStartedVersion";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -28,6 +29,7 @@ public class LocalPrefs {
     private Boolean dontAskForRating;
     private Integer blockColorMode;
     private Float gridIntensity;
+    private Integer lastUsedVersion;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -211,5 +213,18 @@ public class LocalPrefs {
     public void setScreenShownInThisVersion(String screenKey) {
         prefs.putInteger(KEY_SCREENSHOWNPREFIX + screenKey, LightBlocksGame.GAME_VERSIONNUMBER);
         prefs.flush();
+    }
+
+    /**
+     * @return letzte Lightblocks-Version die vor diesem Sitzungsstart genutzt wurde, oder 0 für ganz neue User
+     */
+    public int getLastUsedLbVersion() {
+        if (lastUsedVersion == null) {
+            lastUsedVersion = prefs.getInteger(KEY_LASTSTARTEDVERSION, 0);
+            prefs.putInteger(KEY_LASTSTARTEDVERSION, LightBlocksGame.GAME_VERSIONNUMBER);
+            prefs.flush();
+        }
+
+        return lastUsedVersion;
     }
 }

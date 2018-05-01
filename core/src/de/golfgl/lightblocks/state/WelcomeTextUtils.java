@@ -13,21 +13,34 @@ import de.golfgl.lightblocks.model.TutorialModel;
  */
 
 public class WelcomeTextUtils {
-        // So kann auch die Farbe verändert werden:
-        //Color.WHITE.set(0.2f, 1, 0.2f, 1);
-        // Aber durch Klick auf das Label wieder zurücksetzen
-        // 17.3. St Patrick's Day - Lightblocks Hintergrundmusik!
+    // So kann auch die Farbe verändert werden:
+    //Color.WHITE.set(0.2f, 1, 0.2f, 1);
+    // Aber durch Klick auf das Label wieder zurücksetzen
+    // 17.3. St Patrick's Day - Lightblocks Hintergrundmusik!
 
-        // Hier kann "Welcome back :-)", "Have a good morning" usw. stehen, "Hi MrStahlfelge"
+    // Hier kann "Welcome back :-)", "Have a good morning" usw. stehen, "Hi MrStahlfelge"
 
     public static Array<WelcomeButton.WelcomeText> fillWelcomes(final LightBlocksGame app) {
         Array<WelcomeButton.WelcomeText> welcomes = new Array<WelcomeButton.WelcomeText>();
 
+        int lastUsedVersion = app.localPrefs.getLastUsedLbVersion();
+        long clearedLines = app.savegame.getTotalScore().getClearedLines();
+
+        // bis einschl 1818 wurde Version nicht gespeichert
+        if (lastUsedVersion == 0 && clearedLines > 10)
+            lastUsedVersion = 1818;
+
+        // ganz neuer User
+        if (lastUsedVersion == 0) {
+            welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeNew"), null));
+        }
+
+        // hier Updates checken
+
         // Unter 50 Reihen und tutorial verfügbar und nicht gemacht: anbieten
-        if (app.savegame.getTotalScore().getClearedLines() < 100 && TutorialModel.tutorialAvailable() &&
+        if (clearedLines < 100 && TutorialModel.tutorialAvailable() &&
                 app.savegame.getBestScore(Mission.KEY_TUTORIAL).getRating() == 0)
-            welcomes.add(new WelcomeButton.WelcomeText("Welcome, new user! Play the tutorial to learn about " +
-                    "Lightblock's gesture controls.", new Runnable() {
+            welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeTutorial"), new Runnable() {
                 @Override
                 public void run() {
                     SinglePlayerScreen sp = app.mainMenuScreen.showSinglePlayerScreen();
