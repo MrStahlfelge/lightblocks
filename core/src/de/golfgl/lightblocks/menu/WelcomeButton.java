@@ -3,7 +3,6 @@ package de.golfgl.lightblocks.menu;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.RepeatAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
@@ -18,16 +17,14 @@ import de.golfgl.lightblocks.scene2d.FaTextButton;
 
 public class WelcomeButton extends FaTextButton {
     private static final float DURATION = 10f;
-    private final Array<WelcomeText> texts;
     private final Label welcomeLabel;
-    private final RepeatAction forever;
+    private Array<WelcomeText> texts;
     private int currentPage = -1;
-    private boolean changing;
     private float oneLineHeight;
+    private float nextChange;
 
-    public WelcomeButton(LightBlocksGame app, Array<WelcomeText> textList) {
+    public WelcomeButton(LightBlocksGame app) {
         super(" ", app.skin, LightBlocksGame.SKIN_BUTTON_WELCOME);
-        this.texts = textList;
 
         welcomeLabel = getLabel();
         welcomeLabel.setFontScale(.75f);
@@ -35,37 +32,34 @@ public class WelcomeButton extends FaTextButton {
         welcomeLabel.setAlignment(Align.center);
         oneLineHeight = welcomeLabel.getPrefHeight();
 
-        setPage(0);
-
         this.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 clicked();
             }
         });
+    }
 
-        forever = Actions.forever(Actions.sequence(Actions.delay(DURATION),
-                Actions.run(new Runnable() {
-                    @Override
-                    public void run() {
-                        changePage();
-                    }
-                })));
-        addAction(forever);
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        nextChange -= delta;
+
+        if (nextChange < 0 && nextChange + delta >= 0)
+            changePage();
     }
 
     private void changePage() {
-        if (texts.size == 1 || changing)
+        if (texts == null || texts.size <= 1 || DURATION - nextChange < .5f)
             return;
 
-        changing = true;
-        forever.restart();
-
-        final int newPage = currentPage < texts.size - 1 ? currentPage + 1 : 0;
+        nextChange = DURATION;
 
         addAction(Actions.sequence(Actions.fadeOut(.3f, Interpolation.fade), Actions.run(new Runnable() {
             @Override
             public void run() {
+                final int newPage = currentPage < texts.size - 1 ? currentPage + 1 : 0;
                 setPage(newPage);
             }
         }), Actions.fadeIn(.3f, Interpolation.fade)));
@@ -81,15 +75,24 @@ public class WelcomeButton extends FaTextButton {
     }
 
     private void setPage(int pageIdx) {
+        pageIdx = Math.min(pageIdx, (texts == null ? 0 : texts.size) - 1);
         currentPage = pageIdx;
-        WelcomeText wt = texts.get(pageIdx);
-        welcomeLabel.setText(wt.text);
-        changing = false;
+        if (currentPage >= 0) {
+            WelcomeText wt = texts.get(pageIdx);
+            welcomeLabel.setText(wt.text);
+        }
+        setVisible(currentPage >= 0);
     }
 
     @Override
     public float getPrefHeight() {
-        return oneLineHeight * 2;
+        return isVisible() ? oneLineHeight * 2 : 1;
+    }
+
+    public void setTexts(Array<WelcomeText> welcomeTexts) {
+        texts = welcomeTexts;
+        setPage(0);
+        nextChange = DURATION;
     }
 
     public static class WelcomeText {

@@ -13,11 +13,12 @@ import de.golfgl.lightblocks.screen.PlayGesturesInput;
  */
 
 public class LocalPrefs {
+    public static final String KEY_SETTINGS_SCREEN = "settings";
     private static final String PREF_KEY_INPUT = "inputType";
     private static final String PREF_KEY_LEVEL = "beginningLevel";
     private static final String PREF_KEY_SPACTIVEPAGE = "singlePlayerPage";
     private static final String PREF_KEY_MPACTIVEPAGE = "multiplayerPage";
-
+    private static final String KEY_SCREENSHOWNPREFIX = "versionShownScreen_";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -195,6 +196,20 @@ public class LocalPrefs {
 
     public void saveLastUsedMultiPlayerMenuPage(int currentPageIndex) {
         prefs.putInteger(PREF_KEY_MPACTIVEPAGE, currentPageIndex);
+        prefs.flush();
+    }
+
+    public int getScreenLastShownVersion(String screenKey, int defaultVersion) {
+        int lastUsedVersion = prefs.getInteger(KEY_SCREENSHOWNPREFIX + screenKey, defaultVersion);
+        return lastUsedVersion;
+    }
+
+    /**
+     * Speichert, dass der übergebene Screen in der aktuellen Version angezeigt wurde (für Anzeige von Änderungen
+     * nach Update)
+     */
+    public void setScreenShownInThisVersion(String screenKey) {
+        prefs.putInteger(KEY_SCREENSHOWNPREFIX + screenKey, LightBlocksGame.GAME_VERSIONNUMBER);
         prefs.flush();
     }
 }

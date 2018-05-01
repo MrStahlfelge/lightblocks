@@ -32,6 +32,7 @@ import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
+import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
  * Einstellungen
@@ -47,6 +48,8 @@ public class SettingsScreen extends AbstractMenuDialog {
 
     public SettingsScreen(final LightBlocksGame app, Actor toHide) {
         super(app, toHide);
+
+        app.localPrefs.setScreenShownInThisVersion(LocalPrefs.KEY_SETTINGS_SCREEN);
     }
 
     @Override

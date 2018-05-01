@@ -14,14 +14,15 @@ import de.golfgl.lightblocks.screen.PlayScreenInput;
  */
 
 public class Mission {
+    public static final String KEY_TUTORIAL = "tutorial";
 
     // GPGS Achievement "Mission 10 geschafft"
     public static final String MISSION10ACHIEVEMENT = "typeB_1C";
     // GPGS Achievement "Mission 15 geschafft"
     public static final String MISSION15ACHIEVEMENT = "typeB_1D";
 
-    private static final String[] missions = {"tutorial", "typeA_1A", "typeB_1A", "typeA_1B", "special_1A", "typeA_1C",
-            "special_1B", "typeB_1B", "special_1C", "garbage_1A", "typeB_1C",
+    private static final String[] missions = {KEY_TUTORIAL, "typeA_1A", "typeB_1A", "typeA_1B", "special_1A",
+            "typeA_1C", "special_1B", "typeB_1B", "special_1C", "garbage_1A", "typeB_1C",
             "gravityA_2A", "typeA_1D", "gravityB_2A", "garbage_1B", "typeB_1D"};
 
     private static final String[] needGesture = {"tutorial"};

@@ -29,6 +29,7 @@ import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabel;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.state.WelcomeTextUtils;
 
 /**
  * Das Hauptmenü
@@ -42,6 +43,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
     private final Label gameVersion;
     private final Cell resumeGameCell;
     private final Button singlePlayerButton;
+    private final WelcomeButton welcomeButton;
     private GlowLabelButton accountButton;
     private Button resumeGameButton;
     private Group mainGroup;
@@ -76,13 +78,10 @@ public class MainMenuScreen extends AbstractMenuScreen {
         mainGroup.addActor(buttonTable);
 
         // Welcome :-)
-        Array<WelcomeButton.WelcomeText> welcomeText = initWelcomeTexts();
-        if (welcomeText != null && welcomeText.size > 0) {
-            buttonTable.row();
-            WelcomeButton welcomeButton = new WelcomeButton(app, welcomeText);
-            buttonTable.add(welcomeButton).fill();
-            stage.addFocusableActor(welcomeButton);
-        }
+        buttonTable.row();
+        welcomeButton = new WelcomeButton(app);
+        buttonTable.add(welcomeButton).fill();
+        stage.addFocusableActor(welcomeButton);
 
         buttonTable.row();
 
@@ -110,7 +109,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
                 app.skin);
         singlePlayerButton.addListener(new ChangeListener() {
                                            public void changed(ChangeEvent event, Actor actor) {
-                                               new SinglePlayerScreen(app, mainGroup).show(stage);
+                                               showSinglePlayerScreen();
                                            }
                                        }
         );
@@ -269,6 +268,9 @@ public class MainMenuScreen extends AbstractMenuScreen {
                 app.swoshSound.play();
             mainGroup.addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
         }
+
+        welcomeButton.setTexts(WelcomeTextUtils.fillWelcomes(app));
+
     }
 
     @Override
@@ -315,17 +317,9 @@ public class MainMenuScreen extends AbstractMenuScreen {
                 : stage.getHeight() - blockGroup.getHeight();
     }
 
-    private Array<WelcomeButton.WelcomeText> initWelcomeTexts() {
-        // So kann auch die Farbe verändert werden:
-        //Color.WHITE.set(0.2f, 1, 0.2f, 1);
-        // Aber durch Klick auf das Label wieder zurücksetzen
-        // 17.3. St Patrick's Day - Lightblocks Hintergrundmusik!
-
-        // Hier kann "Welcome back :-)", "Have a good morning" usw. stehen, "Hi MrStahlfelge"
-        Array<WelcomeButton.WelcomeText> welcomes = new Array();
-
-        //welcomes.add(new WelcomeButton.WelcomeText("Have a good morning", null));
-        //welcomes.add(new WelcomeButton.WelcomeText("Have a\ngood day", null));
-        return welcomes;
+    public SinglePlayerScreen showSinglePlayerScreen() {
+        SinglePlayerScreen singlePlayerScreen = new SinglePlayerScreen(app, mainGroup);
+        singlePlayerScreen.show(stage);
+        return singlePlayerScreen;
     }
 }

@@ -24,6 +24,7 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  */
 
 public class SinglePlayerScreen extends AbstractMenuDialog {
+    private static final int PAGEIDX_MISSION = 1;
     private PagedScrollPane modePager;
     private Button leaderboardButton;
 
@@ -77,6 +78,10 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         });
 
         menuTable.add(modePager).fill().expand();
+    }
+
+    public void showMissionPage() {
+        modePager.scrollToPage(PAGEIDX_MISSION);
     }
 
     /**

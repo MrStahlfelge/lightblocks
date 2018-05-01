@@ -242,6 +242,10 @@ public class GameStateHandler {
 
     }
 
+    /**
+     * @param identifier (Mission, Marathon oder ähnlich)
+     * @return niemals null
+     */
     public BestScore getBestScore(String identifier) {
         if (bestScores == null)
             loadBestScores();
