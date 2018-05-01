@@ -61,7 +61,7 @@ public class AboutScreen extends AbstractMenuDialog {
         websiteButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                openOrShowUri(LightBlocksGame.GAME_URL);
+                app.openOrShowUri(LightBlocksGame.GAME_URL);
             }
         });
         addFocusableActor(websiteButton);
@@ -138,7 +138,7 @@ public class AboutScreen extends AbstractMenuDialog {
         twitterButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                openOrShowUri(TWITTER_URL);
+                app.openOrShowUri(TWITTER_URL);
             }
         });
         twitterButton.addListener(scrollOnKeyDownListener);
@@ -163,17 +163,6 @@ public class AboutScreen extends AbstractMenuDialog {
         }
     }
 
-    private void openOrShowUri(String uri) {
-        boolean success = false;
-
-        if (app.allowOpenWeblinks())
-            success = Gdx.net.openURI(uri);
-
-        if (!success) {
-            ((AbstractScreen) app.getScreen()).showDialog(app.TEXTS.format("errorOpenUri", uri));
-        }
-    }
-
     private class ThisInfoButton extends InfoButton {
         public ThisInfoButton(String title, String description, final String url) {
             super(title, description, app.skin);
@@ -181,7 +170,7 @@ public class AboutScreen extends AbstractMenuDialog {
             addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    openOrShowUri(url);
+                    app.openOrShowUri(url);
                 }
             });
         }

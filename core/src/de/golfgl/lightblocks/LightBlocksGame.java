@@ -48,6 +48,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
     public static final String GAME_EMAIL = "lightblocks@golfgl.de";
     public static final String GAME_URL = "https://www.golfgl.de/lightblocks/";
+    public static final String CONTROLLER_RECOMMENDATION_URL = "https://www.golfgl.de/lightblocks/#controller";
     // An den gleichen Eintrag im AndroidManifest denken!!!
     public static final String GAME_VERSIONSTRING = "1.1.1818";
     public static final int GAME_VERSIONNUMBER = 1818;
@@ -345,5 +346,20 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public AbstractMenuDialog getNewMultiplayerMenu(Actor actorToHide) {
         return new CompetitionMenuScreen(this, actorToHide);
+    }
+
+    /**
+     * URI öffnen, wenn möglich. Falls nicht möglich, Hinweisdialog zeigen
+     * @param uri
+     */
+    public void openOrShowUri(String uri) {
+        boolean success = false;
+
+        if (allowOpenWeblinks())
+            success = Gdx.net.openURI(uri);
+
+        if (!success) {
+            ((AbstractScreen) getScreen()).showDialog(TEXTS.format("errorOpenUri", uri));
+        }
     }
 }

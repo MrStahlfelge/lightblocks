@@ -36,14 +36,12 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
     private final LightBlocksGame app;
     private Button refreshButton;
     private RefreshListener controllerListener;
-    private ControllerMappings mappings;
     private boolean runsOnChrome;
 
     public GamepadSettingsDialog(LightBlocksGame app) {
         super("", app.skin);
 
         this.app = app;
-        this.mappings = app.controllerMappings;
 
         getButtonTable().defaults().pad(20, 40, 20, 40);
         closeButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
@@ -70,6 +68,9 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
         setPosition(getStage().getWidth() / 2, getStage().getHeight() / 2, Align.center);
     }
 
+    /**
+     * füllt die Liste der Controller und das Umfeld. Wird bei Anschluss eines Controllers neu ausgeführt
+     */
     private void fillContentTable() {
         Table contentTable = getContentTable();
         contentTable.clear();
@@ -101,6 +102,22 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
             if (getStage() != null)
                 ((MyStage) getStage()).addFocusableActor(configureButton);
         }
+
+        if (controllers.size == 0) {
+            controllerList.row();
+            TextButton recommendedControllers = new RoundedTextButton(app.TEXTS.get("configGamepadShowRecommendations"), getSkin());
+            recommendedControllers.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.openOrShowUri(LightBlocksGame.CONTROLLER_RECOMMENDATION_URL);
+                }
+            });
+            controllerList.add(recommendedControllers);
+            addFocusableActor(recommendedControllers);
+            if (getStage() != null)
+                ((MyStage) getStage()).addFocusableActor(recommendedControllers);
+        }
+
         contentTable.row();
         contentTable.add(controllerList);
 
@@ -111,8 +128,7 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
                                 "again" +
                                 ".\n" +
                                 "If that does not help, try Mozilla Firefox." : ""),
-                getSkin(), LightBlocksGame.SKIN_FONT_BIG, .8f);
-        hint.setFontScale(.8f);
+                getSkin(), LightBlocksGame.SKIN_FONT_BIG);
         hint.setWrap(true);
         hint.setAlignment(Align.center);
         contentTable.add(hint).fill().minWidth(LightBlocksGame.nativeGameWidth * .7f);
