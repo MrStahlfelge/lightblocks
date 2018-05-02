@@ -27,9 +27,10 @@ public class WelcomeTextUtils {
         int lastUsedVersion = app.localPrefs.getLastUsedLbVersion();
         long clearedLines = app.savegame.getTotalScore().getClearedLines();
         int daysSinceLastStart = app.localPrefs.getDaysSinceLastStart();
+        boolean isLongTimePlayer = app.savegame.getTotalScore().getDrawnTetrominos() >= 1000;
 
         // bis einschl 1818 wurde Version nicht gespeichert
-        if (lastUsedVersion == 0 && clearedLines > 10)
+        if (lastUsedVersion == 0 && isLongTimePlayer)
             lastUsedVersion = 1818;
 
         // ganz neuer User
