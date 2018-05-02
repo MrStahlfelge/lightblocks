@@ -245,7 +245,7 @@ public class LocalPrefs {
             if (lastStartedMs < millis - (1000 * 60 * 60 * 24 * 365))
                 daysSinceLastStart = -1;
             else {
-                daysSinceLastStart = (int) (((millis - lastStartedMs) / 1000) / (60 * 60));
+                daysSinceLastStart = (int) (((millis - lastStartedMs) / 1000) / (60 * 60 * 24));
             }
         }
 
