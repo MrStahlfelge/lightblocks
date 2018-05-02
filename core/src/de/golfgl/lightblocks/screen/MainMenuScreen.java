@@ -80,7 +80,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
         // Welcome :-)
         buttonTable.row();
         welcomeButton = new WelcomeButton(app);
-        buttonTable.add(welcomeButton).fill();
+        buttonTable.add(welcomeButton).fill().pad(0, 10, 0, 10);
         stage.addFocusableActor(welcomeButton);
 
         buttonTable.row();

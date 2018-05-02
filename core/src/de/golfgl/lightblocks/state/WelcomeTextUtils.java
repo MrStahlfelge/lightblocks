@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.state;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -20,6 +21,7 @@ public class WelcomeTextUtils {
     // 17.3. St Patrick's Day - Lightblocks Hintergrundmusik!
 
     // Hier kann "Welcome back :-)", "Have a good morning" usw. stehen, "Hi MrStahlfelge"
+    private static boolean alreadyShownDaysSinceLastStart = false;
 
     public static Array<WelcomeButton.WelcomeText> fillWelcomes(final LightBlocksGame app) {
         Array<WelcomeButton.WelcomeText> welcomes = new Array<WelcomeButton.WelcomeText>();
@@ -33,6 +35,9 @@ public class WelcomeTextUtils {
         if (lastUsedVersion == 0 && isLongTimePlayer)
             lastUsedVersion = 1818;
 
+        // AB HIER DIE EINBLENDUNGEN
+
+        // 1. UPDATE HINWEISE
         // ganz neuer User
         if (lastUsedVersion == 0) {
             welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeNew"), null));
@@ -40,6 +45,8 @@ public class WelcomeTextUtils {
             // Update-Hinweise
             listNewFeatures(welcomes, app, lastUsedVersion);
         }
+
+        // 2. EINBLENDUNGEN ZU NOCH NICHT GESPIELTEN MODIS ODER UNGENUTZTEN FEATURES
 
         // Unter 50 Reihen und tutorial verfügbar und nicht gemacht: anbieten
         if (clearedLines < 100 && TutorialModel.tutorialAvailable() &&
@@ -52,10 +59,24 @@ public class WelcomeTextUtils {
                 }
             }));
 
-        // noch kein Text da? Dann eventuell allgemeine Begrüßung
-        if (welcomes.size == 0 && daysSinceLastStart >= 5) {
+        // 3. BESONDERE TAGE ODER SOWAS (WEIHNACHTEN ETC)
+
+
+        // 4. WENN NOCH KEIN TEXT DA, BEGRÜSSEN WIR SPORADISCHE NUTZER
+        if (welcomes.size == 0 && daysSinceLastStart >= 5 && !alreadyShownDaysSinceLastStart) {
             welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeAfterSomeTime"), null));
+            alreadyShownDaysSinceLastStart = true;
         }
+
+        // 5. WERBUNG UND ÄHNLICHES, DASS NACH ZUFALLSPRINZIP EINGEBLENDET WIRD
+        // wird aufgrund von 4. nur für wiederkehrende Nutzer angezeigt
+        if (welcomes.size == 0) {
+            if (isLongTimePlayer && MathUtils.randomBoolean(.05f))
+                welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeOtherPlatforms"),
+                        new OpenWebsiteRunnable(app)));
+        }
+
+        // ENDE
 
         //welcomes.add(new WelcomeButton.WelcomeText("Have a good morning", null));
         //welcomes.add(new WelcomeButton.WelcomeText("Have a\ngood day", null));
@@ -84,6 +105,19 @@ public class WelcomeTextUtils {
         @Override
         public void run() {
             app.mainMenuScreen.showSettings();
+        }
+    }
+
+    private static class OpenWebsiteRunnable implements Runnable {
+        private final LightBlocksGame app;
+
+        public OpenWebsiteRunnable(LightBlocksGame app) {
+            this.app = app;
+        }
+
+        @Override
+        public void run() {
+            app.openOrShowUri(LightBlocksGame.GAME_URL);
         }
     }
 }
