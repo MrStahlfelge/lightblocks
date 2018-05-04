@@ -18,6 +18,9 @@ public class PlayGesturesInput extends PlayScreenInput {
     public static final int SWIPEUP_HARDDROP = 2;
 
     private static final float SCREEN_BORDER_PERCENTAGE = 0.1f;
+    // Flipped Mode: Tap löst horizontale Bewegung aus, Swipe rotiert
+    private static final boolean flippedMode = false;
+
     public Color rotateRightColor = new Color(.1f, 1, .3f, .8f);
     public Color rotateLeftColor = new Color(.2f, .8f, 1, .8f);
     int screenX;
@@ -77,7 +80,9 @@ public class PlayGesturesInput extends PlayScreenInput {
             playScreen.switchPause(false);
             didSomething = true;
         } else {
-            playScreen.gameModel.setInputFreezeInterval(.1f);
+            if (!flippedMode)
+                playScreen.gameModel.setInputFreezeInterval(.1f);
+
             setTouchPanel(screenX, screenY);
             didSomething = false;
         }
@@ -132,7 +137,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     public void setTouchPanel(int screenX, int screenY) {
 
-        if (touchPanel == null)
+        if (touchPanel == null || flippedMode)
             return;
 
         touchCoordinates.set(screenX, screenY);
@@ -168,14 +173,22 @@ public class PlayGesturesInput extends PlayScreenInput {
             return false;
 
         if (!beganSoftDrop) {
-            if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > dragThreshold)) {
-                beganHorizontalMove = true;
-                playScreen.gameModel.startMoveHorizontal(screenX - this.screenX < 0);
+            if (!flippedMode) {
+                if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > dragThreshold)) {
+                    beganHorizontalMove = true;
+                    playScreen.gameModel.startMoveHorizontal(screenX - this.screenX < 0);
+                }
+                if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < dragThreshold)) {
+                    playScreen.gameModel.endMoveHorizontal(true);
+                    playScreen.gameModel.endMoveHorizontal(false);
+                    beganHorizontalMove = false;
+                }
             }
-            if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < dragThreshold)) {
-                playScreen.gameModel.endMoveHorizontal(true);
-                playScreen.gameModel.endMoveHorizontal(false);
-                beganHorizontalMove = false;
+            if (flippedMode) {
+                if (Math.abs(screenX - this.screenX) > dragThreshold) {
+                    playScreen.gameModel.setRotate(screenX - this.screenX > 0);
+                    touchDownValid = false;
+                }
             }
         }
 
@@ -220,10 +233,13 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (touchPanel != null)
             touchPanel.setVisible(false);
 
-        if (!didSomething)
-            playScreen.gameModel.setRotate(screenX >= Gdx.graphics.getWidth() / 2);
+        if (!didSomething) {
+            if (!flippedMode)
+                playScreen.gameModel.setRotate(screenX >= Gdx.graphics.getWidth() / 2);
+            else
+                playScreen.gameModel.doOneHorizontalMove(screenX <= Gdx.graphics.getWidth() / 2);
 
-        else
+        } else
             playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
 
         if (beganHorizontalMove) {

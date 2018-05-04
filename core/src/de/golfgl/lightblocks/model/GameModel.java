@@ -97,6 +97,13 @@ public abstract class GameModel implements Json.Serializable {
             isInputRotate = 0;
         }
 
+        // soll nur einmal bewegt werden? (kommt nur bei flipped Gestures vor bisher)
+        if ((isInputMovingLeft >= 3 || isInputMovingRight >= 3)) {
+            moveHorizontal(isInputMovingLeft > 0 ? -1 : 1);
+            isInputMovingLeft = 0;
+            isInputMovingRight = 0;
+        }
+
         // horizontale Bewegung - nicht wenn beide Tasten gedrückt
         if (((isInputMovingLeft > 0) && (isInputMovingRight == 0)) ||
                 (isInputMovingLeft == 0 && isInputMovingRight > 0)) {
@@ -516,12 +523,20 @@ public abstract class GameModel implements Json.Serializable {
         isInputRotate = (clockwise ? 1 : -1);
     }
 
+    /**
+     *  beginnt Horizontalbewegung. Classicmode wie bei NES mit DAS. Sonst mit allgemeinem Inputfreeze-Delay
+     */
     public void startMoveHorizontal(boolean isLeft) {
         if (isLeft)
             isInputMovingLeft = 2;
         else
             isInputMovingRight = 2;
         movingCountdown = REPEAT_START_OFFSET;
+    }
+
+    public void doOneHorizontalMove(boolean isLeft) {
+        isInputMovingLeft = isLeft ? 3 : 0;
+        isInputMovingRight = isLeft ? 0 : 3;
     }
 
     public void endMoveHorizontal(boolean isLeft) {
