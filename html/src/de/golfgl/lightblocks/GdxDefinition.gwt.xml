@@ -5,6 +5,7 @@
 	<inherits name="de.golfgl.gdxgamesvcs.gdx_gamesvcs_gwt" />
 	<inherits name="de.golfgl.gdx.controllers.controller_scene2d" />
 	<inherits name="com.badlogic.gdx.controllers.controllers-gwt"/>
+    <inherits name="de.golfgl.gdxgameanalytics.gdxgameanalytics"/>
 
 	<inherits name='LightBlocksGame' />
 	<entry-point class='de.golfgl.lightblocks.client.HtmlLauncher' />

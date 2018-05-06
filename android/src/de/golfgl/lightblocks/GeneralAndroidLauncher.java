@@ -11,6 +11,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
+import de.golfgl.gdxgameanalytics.AndroidGameAnalytics;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.multiplayer.AndroidNetUtils;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
@@ -54,6 +55,7 @@ public class GeneralAndroidLauncher extends AndroidApplication {
         // Initialize Android dependant classes
         game.share = new AndroidShareHandler();
         game.netUtils = new AndroidNetUtils(getContext());
+        game.gameAnalytics = new AndroidGameAnalytics();
 
         initFlavor(game);
 

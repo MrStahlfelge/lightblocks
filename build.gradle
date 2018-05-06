@@ -25,6 +25,7 @@ allprojects {
         aiVersion = '1.8.0'
         gamsvcsVersion = '0.2.3'
         cuversion = '0.1.1'
+        gaVersion = '0.1.0-SNAPSHOT'
     }
 
     repositories {
@@ -67,6 +68,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
+        compile "de.golfgl.gdxgameanalytics:gdx-gameanalytics-android:$gaVersion"
     }
 }
 
@@ -88,7 +90,9 @@ project(":html") {
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-mapping:$cuversion:sources"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core-gamejolt:$gamsvcsVersion"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core-gamejolt:$gamsvcsVersion:sources"
-
+        compile "de.golfgl.gdxgameanalytics:gdx-gameanalytics-core:$gaVersion:sources"
+        compile "de.golfgl.gdxgameanalytics:gdx-gameanalytics-html:$gaVersion"
+        compile "de.golfgl.gdxgameanalytics:gdx-gameanalytics-html:$gaVersion:sources"
     }
 }
 
@@ -111,6 +115,7 @@ project(":core") {
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-scene2d:$cuversion"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-mapping:$cuversion"
+        compile "de.golfgl.gdxgameanalytics:gdx-gameanalytics-core:$gaVersion"
 
         testCompile "junit:junit:4.12"
         testCompile "org.mockito:mockito-core:2.2.7"

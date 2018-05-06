@@ -19,9 +19,11 @@ import com.badlogic.gdx.utils.I18NBundle;
 import java.util.HashMap;
 import java.util.List;
 
+import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.gamestate.ILoadGameStateResponseListener;
+import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.CompetitionMenuScreen;
@@ -100,6 +102,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public MainMenuScreen mainMenuScreen;
     public INsdHelper nsdHelper;
     public MyControllerMapping controllerMappings;
+    public GameAnalytics gameAnalytics;
     private FPSLogger fpsLogger;
     private List<Mission> missionList;
     private HashMap<String, Mission> missionMap;
@@ -123,6 +126,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     @Override
     public void create() {
+        Gdx.app.setLogLevel(Application.LOG_DEBUG);
         if (GAME_DEVMODE)
             fpsLogger = new FPSLogger();
         else {
@@ -134,6 +138,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         if (share == null)
             share = new ShareHandler();
+
+        initGameAnalytics(lbPrefs);
 
         // GPGS: Wenn beim letzten Mal angemeldet, dann wieder anmelden
         if (player == null) {
@@ -175,6 +181,22 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
             }
 
         }
+    }
+
+    protected void initGameAnalytics(Preferences lbPrefs) {
+        if (gameAnalytics == null) {
+            gameAnalytics = new GameAnalytics();
+            gameAnalytics.setPlatformVersionString("1");
+        }
+
+        gameAnalytics.setGameBuildNumber(GAME_DEVMODE ? "debug" : String.valueOf(GAME_VERSIONNUMBER));
+        gameAnalytics.setCustom1(Gdx.input.isPeripheralAvailable(Input.Peripheral.MultitouchScreen) ?
+                "withTouch" : "noTouch");
+
+        gameAnalytics.setPrefs(lbPrefs);
+        gameAnalytics.setGameKey(GaHelper.GA_APP_KEY);
+        gameAnalytics.setGameSecretKey(GaHelper.GA_SECRET_KEY);
+        gameAnalytics.startSession();
     }
 
     private void loadAndInitAssets() {
@@ -227,6 +249,10 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         if (gpgsClient != null)
             gpgsClient.pauseSession();
+
+        if (gameAnalytics != null)
+            gameAnalytics.closeSession();
+
     }
 
     @Override
@@ -235,6 +261,9 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         if (localPrefs.getGpgsAutoLogin() && gpgsClient != null && !gpgsClient.isSessionActive())
             gpgsClient.resumeSession();
+
+        if (gameAnalytics != null)
+            gameAnalytics.startSession();
     }
 
     @Override
@@ -350,6 +379,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     /**
      * URI öffnen, wenn möglich. Falls nicht möglich, Hinweisdialog zeigen
+     *
      * @param uri
      */
     public void openOrShowUri(String uri) {

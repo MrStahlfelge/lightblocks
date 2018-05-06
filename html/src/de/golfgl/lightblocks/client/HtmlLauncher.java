@@ -12,6 +12,7 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 
+import de.golfgl.gdxgameanalytics.GwtGameAnalytics;
 import de.golfgl.gdxgamesvcs.GameJoltClient;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -72,6 +73,7 @@ public class HtmlLauncher extends MyGwtApp {
                         GpgsHelper.GJ_MOBILEEVENT_PREFIX : GpgsHelper.GJ_WEBEVENT_PREFIX);
 
         lightBlocksGame.gpgsClient = gjClient;
+        lightBlocksGame.gameAnalytics = new GwtGameAnalytics();
 
         return lightBlocksGame;
     }
