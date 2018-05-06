@@ -204,7 +204,8 @@ public class PlayGesturesInput extends PlayScreenInput {
         }
 
         int swipeUpType = playScreen.app.localPrefs.getSwipeUpType();
-        if (screenY - this.screenY < -4 * dragThreshold && swipeUpType != SWIPEUP_DONOTHING) {
+        int swipeUpTresholdFactor = swipeUpType == SWIPEUP_HARDDROP ? 3 : 4;
+        if (screenY - this.screenY < -swipeUpTresholdFactor * dragThreshold && swipeUpType != SWIPEUP_DONOTHING) {
             if (swipeUpType == SWIPEUP_PAUSE && !isPaused())
                 playScreen.switchPause(false);
             else if (swipeUpType == SWIPEUP_HARDDROP && !didDrop) {
