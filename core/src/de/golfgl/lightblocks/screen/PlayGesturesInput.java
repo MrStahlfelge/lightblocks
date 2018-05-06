@@ -250,4 +250,9 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         return true;
     }
+
+    @Override
+    public String getAnalyticsKey() {
+        return "gestures";
+    }
 }

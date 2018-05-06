@@ -6,7 +6,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
-import de.golfgl.gdxgamesvcs.IGameServiceClient;
+import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
@@ -30,7 +31,7 @@ public abstract class GameModel implements Json.Serializable {
     // Speicherhaltung
     private final IntArray linesToRemove;
     public TotalScore totalScore;
-    public IGameServiceClient gpgsClient;
+    public LightBlocksGame app;
     /**
      * hier am GameModel verwaltet, da die Eingabemethode mit dem Modell ins Savegame kommt (und von dort geladen wird)
      */
@@ -202,8 +203,8 @@ public abstract class GameModel implements Json.Serializable {
                     drawnTetrominos));
 
         // Alle 10 Tetros auch Ereignis an GPGS melden
-        if (gpgsClient != null && Math.floor(drawnTetrominos / 10) > Math.floor((drawnTetrominos - 1) / 10))
-            gpgsSubmitEvent(GpgsHelper.EVENT_BLOCK_DROP, 10);
+        if (app.gpgsClient != null && Math.floor(drawnTetrominos / 10) > Math.floor((drawnTetrominos - 1) / 10))
+            submitEvent(GpgsHelper.EVENT_BLOCK_DROP, 10);
 
         // Highscores updaten
         if (bestScore.setBestScores(score)) {
@@ -319,7 +320,7 @@ public abstract class GameModel implements Json.Serializable {
             boolean doubleSpecial = score.incClearedLines(removeLinesCount, isSpecial, isTSpin);
             achievementDoubleSpecial(doubleSpecial);
 
-            gpgsSubmitEvent(GpgsHelper.EVENT_LINES_CLEARED, removeLinesCount);
+            submitEvent(GpgsHelper.EVENT_LINES_CLEARED, removeLinesCount);
             linesRemoved(removeLinesCount, isSpecial, doubleSpecial);
 
             setCurrentSpeed();
@@ -478,8 +479,7 @@ public abstract class GameModel implements Json.Serializable {
         userInterface.showMotivation(IGameModelListener.MotivationTypes.gameOver, null);
         userInterface.setGameOver();
 
-        submitToLeaderboard();
-
+        submitGameEnded(false);
     }
 
     protected void setGameOverWon() {
@@ -491,15 +491,17 @@ public abstract class GameModel implements Json.Serializable {
         userInterface.showMotivation(type, null);
         userInterface.setGameOver();
 
-        submitToLeaderboard();
+        submitGameEnded(true);
     }
 
-    protected void submitToLeaderboard() {
+    protected void submitGameEnded(boolean success) {
         String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(getIdentifier());
 
-        if (leaderboardId != null && gpgsClient != null && gpgsClient.isSessionActive())
-            gpgsClient.submitToLeaderboard(leaderboardId, score.getScore(), Integer.toString(score
+        if (leaderboardId != null && app.gpgsClient != null && app.gpgsClient.isSessionActive())
+            app.gpgsClient.submitToLeaderboard(leaderboardId, score.getScore(), Integer.toString(score
                     .getClearedLines()));
+
+        GaHelper.endGameEvent(app.gameAnalytics, this, success);
     }
 
     /**
@@ -524,7 +526,7 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     /**
-     *  beginnt Horizontalbewegung. Classicmode wie bei NES mit DAS. Sonst mit allgemeinem Inputfreeze-Delay
+     * beginnt Horizontalbewegung. Classicmode wie bei NES mit DAS. Sonst mit allgemeinem Inputfreeze-Delay
      */
     public void startMoveHorizontal(boolean isLeft) {
         if (isLeft)
@@ -672,20 +674,22 @@ public abstract class GameModel implements Json.Serializable {
     /**
      * GPGS sumbit event convencience - Check auf null
      */
-    protected void gpgsSubmitEvent(String eventId, int inc) {
-        if (gpgsClient != null)
-            gpgsClient.submitEvent(eventId, inc);
+    protected void submitEvent(String eventId, int inc) {
+        if (app.gpgsClient != null)
+            app.gpgsClient.submitEvent(eventId, inc);
+
+        GaHelper.submitGameModelEvent(app, eventId, inc, this);
     }
 
     protected void gpgsUpdateAchievement(String achievementId) {
-        if (gpgsClient != null && gpgsClient.isSessionActive()) {
-            gpgsClient.unlockAchievement(achievementId);
+        if (app.gpgsClient != null && app.gpgsClient.isSessionActive()) {
+            app.gpgsClient.unlockAchievement(achievementId);
         }
     }
 
     protected void gpgsUpdateAchievement(String achievementId, int incNum, float completionPercentage) {
-        if (gpgsClient != null && gpgsClient.isSessionActive()) {
-            gpgsClient.incrementAchievement(achievementId, incNum, completionPercentage);
+        if (app.gpgsClient != null && app.gpgsClient.isSessionActive()) {
+            app.gpgsClient.incrementAchievement(achievementId, incNum, completionPercentage);
         }
     }
 

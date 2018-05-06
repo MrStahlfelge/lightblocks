@@ -28,7 +28,9 @@ import com.badlogic.gdx.utils.Timer;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.menu.PauseDialog;
 import de.golfgl.lightblocks.menu.ScoreScreen;
@@ -265,6 +267,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             caller.app.controllerMappings.setInputProcessor(null);
             caller.app.setScreen(currentGame);
 
+            // Game Analysis
+            GaHelper.startGameEvent(caller.app, currentGame.gameModel, currentGame.inputAdapter);
+
             // GPGS Event
             if (caller.app.gpgsClient != null) {
                 // Unterschied machen wenn Multiplayer
@@ -365,7 +370,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameModel.totalScore = app.savegame.getTotalScore();
         //TODO das sollte ins GameModel
         gameModel.setBestScore(app.savegame.getBestScore(gameModel.getIdentifier()));
-        gameModel.gpgsClient = app.gpgsClient;
+        gameModel.app = app;
 
         // erst nach dem Laden setzen, damit das noch ohne Animation läuft
         levelNum.setEmphasizeTreshold(1, LightBlocksGame.EMPHASIZE_COLOR);

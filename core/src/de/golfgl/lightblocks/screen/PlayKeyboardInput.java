@@ -11,6 +11,8 @@ import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
 
 /**
+ * Nicht nur Tastatur, sondern auch Controller/TV Remote
+ *
  * Created by Benjamin Schulte on 17.01.2017.
  */
 
@@ -164,5 +166,10 @@ public class PlayKeyboardInput extends PlayScreenInput {
             useTvRemoteControl = false;
         }
 
+    }
+
+    @Override
+    public String getAnalyticsKey() {
+        return "keysButtons";
     }
 }

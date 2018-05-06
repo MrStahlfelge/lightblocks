@@ -104,4 +104,9 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
             return true;
         return super.touchDragged(screenX, screenY, pointer);
     }
+
+    @Override
+    public String getAnalyticsKey() {
+        return "keyOrTouch";
+    }
 }

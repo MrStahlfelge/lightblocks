@@ -253,7 +253,7 @@ public class MultiplayerModel extends GameModel {
                         totalScore.incMultiPlayerMatchesStarted();
                         setGameOverWon();
 
-                        gpgsSubmitEvent(GpgsHelper.EVENT_MULTIPLAYER_MATCH_WON, 1);
+                        submitEvent(GpgsHelper.EVENT_MULTIPLAYER_MATCH_WON, 1);
                         gpgsUpdateAchievement(GpgsHelper.ACH_MATCHMAKER, 1,
                                 (float) totalScore.getMultiPlayerMatchesWon() / 3);
                     }

@@ -154,4 +154,6 @@ public abstract class PlayScreenInput extends InputAdapter {
     public boolean isPaused() {
         return playScreen.isPaused() || isGameOver;
     }
+
+    public abstract String getAnalyticsKey();
 }

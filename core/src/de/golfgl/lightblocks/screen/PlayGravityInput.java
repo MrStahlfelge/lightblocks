@@ -174,4 +174,9 @@ public class PlayGravityInput extends PlayScreenInput {
     public Input.Orientation getRequestedScreenOrientation() {
         return Input.Orientation.Portrait;
     }
+
+    @Override
+    public String getAnalyticsKey() {
+        return "gravity";
+    }
 }
