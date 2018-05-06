@@ -170,6 +170,6 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public String getAnalyticsKey() {
-        return "keysButtons";
+        return isOnTvRemote() ? "tvremote" : isOnKeyboard() ? "keyboard" : "controller";
     }
 }
