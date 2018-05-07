@@ -232,6 +232,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
             } else {
                 initializeKryonetRoom();
                 app.multiRoom.openRoom(app.player);
+                app.gameAnalytics.submitDesignEvent("openroom:local");
             }
 
         } catch (VetoException e) {
@@ -518,6 +519,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
     @Override
     public void multiPlayerRoomEstablishingConnection() {
+        if (app.multiRoom != null)
+            app.gameAnalytics.submitDesignEvent("openroom:" + (app.multiRoom.isLocalGame() ? "local" : "internet"));
         showOverlay();
     }
 

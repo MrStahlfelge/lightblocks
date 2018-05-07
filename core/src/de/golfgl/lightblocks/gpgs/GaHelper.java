@@ -35,6 +35,7 @@ public class GaHelper {
                     success ? GameAnalytics.ProgressionStatus.Complete : GameAnalytics.ProgressionStatus.Fail,
                     gameModel.getIdentifier(), "", "", gameModel.getScore().getScore());
             gameAnalytics.submitDesignEvent("stats:blocks", gameModel.getScore().getDrawnTetrominos());
+            gameAnalytics.flushQueueImmediately();
         }
     }
 
