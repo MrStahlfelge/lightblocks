@@ -20,7 +20,7 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
 
     @Override
     public String getTutorialContinueText() {
-        return keyboard.getInputHelpText();
+        return keyboard.getTutorialContinueText();
     }
 
     @Override
