@@ -34,6 +34,7 @@ import de.golfgl.lightblocks.multiplayer.INsdHelper;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
 import de.golfgl.lightblocks.state.LocalPrefs;
@@ -126,7 +127,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     @Override
     public void create() {
-        Gdx.app.setLogLevel(Application.LOG_DEBUG);
         if (GAME_DEVMODE)
             fpsLogger = new FPSLogger();
         else {
@@ -168,7 +168,9 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         mainMenuScreen = new MainMenuScreen(this);
 
-        if (savegame.hasGameState() || !TutorialModel.tutorialAvailable())
+        // In Tutorial, wenn Spiel das erste Mal gestartet, Touchscreen und keine Tastatur/Controller vorhanden
+        if (savegame.hasGameState() || !TutorialModel.tutorialAvailable() ||
+                PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_KEYSORGAMEPAD))
             this.setScreen(mainMenuScreen);
         else {
             // beim ersten Mal ins Tutorial (nur für Touchinput)!
