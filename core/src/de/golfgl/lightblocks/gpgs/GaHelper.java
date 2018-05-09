@@ -34,7 +34,6 @@ public class GaHelper {
             gameAnalytics.submitProgressionEvent(
                     success ? GameAnalytics.ProgressionStatus.Complete : GameAnalytics.ProgressionStatus.Fail,
                     gameModel.getIdentifier(), "", "", gameModel.getScore().getScore());
-            gameAnalytics.submitDesignEvent("stats:blocks", gameModel.getScore().getDrawnTetrominos());
             gameAnalytics.flushQueueImmediately();
         }
     }
@@ -43,6 +42,8 @@ public class GaHelper {
         if (app.gameAnalytics != null) {
             if (eventId.equals(GpgsHelper.EVENT_LINES_CLEARED))
                 app.gameAnalytics.submitDesignEvent("stats:lines", inc);
+            else if (eventId.equals(GpgsHelper.EVENT_BLOCK_DROP))
+                app.gameAnalytics.submitDesignEvent("stats:blocks", inc);
         }
     }
 }

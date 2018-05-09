@@ -203,7 +203,7 @@ public abstract class GameModel implements Json.Serializable {
                     drawnTetrominos));
 
         // Alle 10 Tetros auch Ereignis an GPGS melden
-        if (app.gpgsClient != null && Math.floor(drawnTetrominos / 10) > Math.floor((drawnTetrominos - 1) / 10))
+        if (Math.floor(drawnTetrominos / 10) > Math.floor((drawnTetrominos - 1) / 10))
             submitEvent(GpgsHelper.EVENT_BLOCK_DROP, 10);
 
         // Highscores updaten
