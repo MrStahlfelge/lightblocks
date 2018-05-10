@@ -25,7 +25,7 @@ allprojects {
         aiVersion = '1.8.0'
         gamsvcsVersion = '0.2.3'
         cuversion = '0.1.1'
-        gaVersion = '0.1.0-SNAPSHOT'
+        gaVersion = '0.1.1-SNAPSHOT'
     }
 
     repositories {

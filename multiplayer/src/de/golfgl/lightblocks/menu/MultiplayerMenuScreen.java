@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Align;
 
 import java.util.HashMap;
 
+import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
@@ -27,6 +28,7 @@ import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
+import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.AbstractScreen;
@@ -528,16 +530,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
         if (waitForConnectionOverlay != null)
             return;
 
-        waitForConnectionOverlay = new Dialog("", app.skin);
-
-        Label messageLabel = new ScaledLabel(app.TEXTS.get("labelMultiplayerConnecting"), app.skin,
-                LightBlocksGame.SKIN_FONT_TITLE);
-        messageLabel.setWrap(true);
-        messageLabel.setAlignment(Align.center);
-
-        final Table contentTable = waitForConnectionOverlay.getContentTable();
-        contentTable.defaults().pad(15);
-        contentTable.add(messageLabel).width(.75f * getStage().getWidth());
+        waitForConnectionOverlay = new ConnectionWaitDialog();
 
         waitForConnectionOverlay.show(getStage());
     }
@@ -828,5 +821,36 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
             return gpgInviteButton;
         }
 
+    }
+
+    private class ConnectionWaitDialog extends ProgressDialog {
+        float waitTime;
+        boolean warning = false;
+
+        public ConnectionWaitDialog() {
+            super(app.TEXTS.get("labelMultiplayerConnecting"), app,
+                    .75f * MultiplayerMenuScreen.this.getStage().getWidth());
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+
+            waitTime += delta;
+
+            // GPGS Verbindungsaufbauprobleme... Hinweis und Meldung an Backend
+            if (waitTime > 10 && !warning) {
+                warning = true;
+                getContentTable().row();
+                ScaledLabel warnLabel = new ScaledLabel("If connection is not getting up, please swap invitee and " +
+                        "host and try again.", app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                warnLabel.setWrap(true);
+                warnLabel.setAlignment(Align.center);
+                getContentTable().add(warnLabel).fillX().pad(10);
+                animatedPack();
+                if (app.gameAnalytics != null)
+                    app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.error, "GPGS_NOT_CONNECTING");
+            }
+        }
     }
 }
