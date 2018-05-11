@@ -70,13 +70,6 @@ public class GpgsHelper {
 
     public static final String GJ_APP_ID = "259654";
     public static final String GJ_PRIVATE_KEY = "***REMOVED***";
-    public static final String GJ_WEBEVENT_PREFIX = "webEvent_";
-    public static final String GJ_MOBILEEVENT_PREFIX = "mobileEvent_";
-    public static final String GJ_ANDROIDEVENT_PREFIX = "androidEvent_";
-    public static final String GJ_EVENT_MISSION = "EVENT_MISSION_STARED";
-    public static final String GJ_EVENT_MARATHON = "EVENT_MARATHON_STARED";
-    public static final String GJ_EVENT_LINES_CLEARED = "EVENT_LINES_CLEARED";
-    public static final String GJ_EVENT_LOCAL_MULTIPLAYER = "EVENT_LMULTI_STARTED";
 
     public static String getLeaderBoardIdByModelId(String gameModelId) {
         if (gameModelId == null)
@@ -140,43 +133,6 @@ public class GpgsHelper {
             return EVENT_MISSION_15_TYPEB_1D;
 
         return null;
-    }
-
-    public static String mapGsEventToGjEvent(String independantId) {
-        if (independantId == null)
-            return null;
-
-        else if (independantId.equals(EVENT_GESTURE_MARATHON_STARTED)
-                || independantId.equals(EVENT_GRAVITY_MARATHON_STARTED)
-                || independantId.equals(EVENT_GAMEPAD_MARATHON_STARTED))
-            return GJ_EVENT_MARATHON;
-
-        else if (independantId.equals(EVENT_LINES_CLEARED))
-            return GJ_EVENT_LINES_CLEARED;
-
-        else if (independantId.equals(EVENT_MISSION_1_TYPEA_1A)
-                || independantId.equals(EVENT_MISSION_2_TYPEB_1A)
-                || independantId.equals(EVENT_MISSION_3_TYPEA_1B)
-                || independantId.equals(EVENT_MISSION_4_SPECIAL_1A)
-                || independantId.equals(EVENT_MISSION_5_TYPEA_1C)
-                || independantId.equals(EVENT_MISSION_6_SPECIAL_1B)
-                || independantId.equals(EVENT_MISSION_7_TYPEB_1B)
-                || independantId.equals(EVENT_MISSION_8_SPECIAL_1C)
-                || independantId.equals(EVENT_MISSION_9_GARBAGE_1A)
-                || independantId.equals(EVENT_MISSION_10_TYPEB_1C)
-                || independantId.equals(EVENT_MISSION_11_GRAVITYA_2A)
-                || independantId.equals(EVENT_MISSION_12_TYPEA_1D)
-                || independantId.equals(EVENT_MISSION_13_TYPEB_2A)
-                || independantId.equals(EVENT_MISSION_14_GARBAGE_1B)
-                || independantId.equals(EVENT_MISSION_2_TYPEB_1A)
-                || independantId.equals(EVENT_MISSION_15_TYPEB_1D))
-            return GJ_EVENT_MISSION;
-
-        else if (independantId.equals(EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED))
-            return GJ_EVENT_LOCAL_MULTIPLAYER;
-
-        else
-            return null;
     }
 
     public static class GamejoltScoreboardMapper implements IGameServiceIdMapper<Integer> {

@@ -43,25 +43,6 @@ public class MyGameCircleClient extends GameCircleClient {
     public static final String LEAD_MARATHON_GRAVITY = "LB_MARA_GRAV";
     public static final String LEAD_MARATHON_GAMEPAD = "LB_MARA_GPAD";
 
-    private final GameJoltClient gjEventClient;
-
-    public MyGameCircleClient() {
-        gjEventClient = new GameJoltClient();
-
-        gjEventClient.initialize(GpgsHelper.GJ_APP_ID, GpgsHelper.GJ_PRIVATE_KEY);
-        gjEventClient.setEventKeyPrefix(GpgsHelper.GJ_ANDROIDEVENT_PREFIX);
-    }
-
-    @Override
-    public boolean submitEvent(String eventId, int increment) {
-        String gjId = GpgsHelper.mapGsEventToGjEvent(eventId);
-
-        if (gjId != null)
-            return gjEventClient.submitEvent(gjId, increment);
-        else
-            return false;
-    }
-
     @Override
     public boolean incrementAchievement(String achievementId, int incNum, float completionPercentage) {
         String gcAch = mapAchievements(achievementId);

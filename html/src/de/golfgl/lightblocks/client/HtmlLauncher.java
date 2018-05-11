@@ -51,16 +51,6 @@ public class HtmlLauncher extends MyGwtApp {
             public String getGameServiceId() {
                 return isOnGamejolt ? super.getGameServiceId() : NoGameServiceClient.GAMESERVICE_ID;
             }
-
-            @Override
-            public boolean submitEvent(String eventId, int increment) {
-                String gjId = GpgsHelper.mapGsEventToGjEvent(eventId);
-
-                if (gjId != null)
-                    return super.submitEvent(gjId, increment);
-                else
-                    return false;
-            }
         };
         gjClient.initialize(GpgsHelper.GJ_APP_ID, GpgsHelper.GJ_PRIVATE_KEY);
         gjClient.setUserName(gjUsername)
@@ -68,9 +58,7 @@ public class HtmlLauncher extends MyGwtApp {
                         getParameter(GameJoltClient.GJ_USERTOKEN_PARAM))
                 .setGuestName("Guest user")
                 .setGjScoreTableMapper(new GpgsHelper.GamejoltScoreboardMapper())
-                .setGjTrophyMapper(new GpgsHelper.GamejoltTrophyMapper())
-                .setEventKeyPrefix(MyGwtApp.isMobileDevice() ?
-                        GpgsHelper.GJ_MOBILEEVENT_PREFIX : GpgsHelper.GJ_WEBEVENT_PREFIX);
+                .setGjTrophyMapper(new GpgsHelper.GamejoltTrophyMapper());
 
         lightBlocksGame.gpgsClient = gjClient;
         lightBlocksGame.gameAnalytics = new GwtGameAnalytics();
