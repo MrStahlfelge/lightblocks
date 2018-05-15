@@ -214,13 +214,22 @@ public class SettingsScreen extends AbstractMenuDialog {
     }
 
     private class GestureSettings extends Table implements ISettingsGroup {
-        private final Button touchPanelButton;
+        private final Button defaultFocusedButton;
         PlayGesturesInput pgi;
         Group touchPanel;
         private Slider touchPanelSizeSlider;
 
         public GestureSettings() {
-            touchPanelButton = new FaCheckbox(app.TEXTS.get("menuShowTouchPanel"), app.skin);
+            final Button onScreenControlsButton = new FaCheckbox(app.TEXTS.get("menuUseOnScreenControls"), app.skin);
+            onScreenControlsButton.setChecked(app.localPrefs.useOnScreenControlsInLandscape());
+            onScreenControlsButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.localPrefs.setUseOnScreenControlsInLandscape(onScreenControlsButton.isChecked());
+                }
+            });
+
+            final Button touchPanelButton = new FaCheckbox(app.TEXTS.get("menuShowTouchPanel"), app.skin);
             touchPanelButton.setChecked(app.localPrefs.getShowTouchPanel());
             touchPanelButton.addListener(new ChangeListener() {
                                              public void changed(ChangeEvent event, Actor actor) {
@@ -258,6 +267,9 @@ public class SettingsScreen extends AbstractMenuDialog {
                     .top().fill(false);
 
             row();
+            add(onScreenControlsButton);
+
+            row();
             add(touchPanelButton).bottom();
 
             Table touchPanelTable = new Table();
@@ -270,7 +282,8 @@ public class SettingsScreen extends AbstractMenuDialog {
             add(touchPanelTable).top();
 
             Table swipeUp = new Table();
-            ScaledLabel menuSwipeUpToLabel = new ScaledLabel(app.TEXTS.get("menuSwipeUpTo"), app.skin, app.SKIN_FONT_TITLE);
+            ScaledLabel menuSwipeUpToLabel = new ScaledLabel(app.TEXTS.get("menuSwipeUpTo"), app.skin, app
+                    .SKIN_FONT_TITLE);
             menuSwipeUpToLabel.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -283,9 +296,11 @@ public class SettingsScreen extends AbstractMenuDialog {
             row();
             add(swipeUp);
 
+            addFocusableActor(onScreenControlsButton);
             addFocusableActor(touchPanelButton);
             addFocusableActor(touchPanelSizeSlider);
             addFocusableActor(swipeUpButtons);
+            defaultFocusedButton = onScreenControlsButton;
         }
 
         protected void touchPanelSizeChanged() {
@@ -316,7 +331,7 @@ public class SettingsScreen extends AbstractMenuDialog {
 
         @Override
         public Actor getDefaultActor() {
-            return touchPanelButton;
+            return defaultFocusedButton;
         }
     }
 }

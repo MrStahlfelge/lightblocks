@@ -4,18 +4,28 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.model.GameModel;
+import de.golfgl.lightblocks.model.TutorialModel;
 
 /**
+ * Jegliche Touchscreen-Kontrollen verarbeiten
+ * <p>
  * Created by Benjamin Schulte on 25.01.2017.
  */
 public class PlayGesturesInput extends PlayScreenInput {
     public static final int SWIPEUP_DONOTHING = 0;
     public static final int SWIPEUP_PAUSE = 1;
     public static final int SWIPEUP_HARDDROP = 2;
+    private static final float TOUCHPAD_DEAD_RADIUS = .33f;
+    private static final float TOUCHPAD_DEAD_HARDDROP = .7f;
 
     private static final float SCREEN_BORDER_PERCENTAGE = 0.1f;
     // Flipped Mode: Tap löst horizontale Bewegung aus, Swipe rotiert
@@ -37,6 +47,11 @@ public class PlayGesturesInput extends PlayScreenInput {
     private Label toDrop;
     private Label rotationLabel;
     private boolean didDrop;
+    private Group onScreenControls;
+    private Touchpad touchpad;
+    private Button rotateRightButton;
+    private Button rotateLeftButton;
+    private boolean tutorialMode;
 
     @Override
     public String getInputHelpText() {
@@ -53,9 +68,20 @@ public class PlayGesturesInput extends PlayScreenInput {
         super.setPlayScreen(playScreen);
 
         dragThreshold = playScreen.app.localPrefs.getTouchPanelSize();
+        tutorialMode = playScreen.gameModel instanceof TutorialModel;
 
-        if (playScreen.app.localPrefs.getShowTouchPanel())
+        if (playScreen.app.localPrefs.getShowTouchPanel() || tutorialMode)
             initializeTouchPanel(playScreen, dragThreshold);
+
+        if (playScreen.app.localPrefs.useOnScreenControlsInLandscape() && !tutorialMode)
+            initializeOnScreenControls(playScreen);
+
+    }
+
+    @Override
+    public void doPoll(float delta) {
+        if (onScreenControls != null)
+            onScreenControls.setVisible(playScreen.isLandscape() && !isPaused());
     }
 
     @Override
@@ -67,7 +93,8 @@ public class PlayGesturesInput extends PlayScreenInput {
         } else if (pointer != 0 || button != Input.Buttons.LEFT)
             return false;
 
-        touchDownValid = screenY > Gdx.graphics.getHeight() * SCREEN_BORDER_PERCENTAGE * (isPaused() ? 2 : 1);
+        touchDownValid = screenY > Gdx.graphics.getHeight() * SCREEN_BORDER_PERCENTAGE * (isPaused() ? 2 : 1)
+                && !(onScreenControls != null && onScreenControls.isVisible());
 
         if (!touchDownValid)
             return false;
@@ -133,6 +160,46 @@ public class PlayGesturesInput extends PlayScreenInput {
         playScreen.stage.addActor(touchPanel);
 
         return touchPanel;
+    }
+
+    private void initializeOnScreenControls(final PlayScreen playScreen) {
+        if (onScreenControls == null) {
+            onScreenControls = new Group();
+
+            touchpad = new Touchpad(0, playScreen.app.skin);
+            touchpad.addListener(new TouchpadChangeListener());
+            onScreenControls.addActor(touchpad);
+
+            rotateRightButton = new ImageButton(playScreen.app.skin, "rotateright");
+            rotateRightButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    playScreen.gameModel.setRotate(true);
+                }
+            });
+            onScreenControls.addActor(rotateRightButton);
+
+            rotateLeftButton = new ImageButton(playScreen.app.skin, "rotateleft");
+            rotateLeftButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    playScreen.gameModel.setRotate(false);
+                }
+            });
+            onScreenControls.addActor(rotateLeftButton);
+
+            onScreenControls.setVisible(false);
+            playScreen.stage.addActor(onScreenControls);
+        }
+        float size = Math.min(playScreen.stage.getHeight() * .5f, playScreen.centerGroup.getX());
+        touchpad.setSize(size, size);
+        touchpad.setPosition(0, 0);
+        rotateRightButton.setSize(size * .4f, size * .4f);
+        rotateLeftButton.setSize(size * .4f, size * .4f);
+        rotateRightButton.setPosition(playScreen.stage.getWidth() - size * .5f, size - rotateRightButton.getHeight());
+        rotateLeftButton.setPosition(rotateRightButton.getX() - size * .45f, (rotateRightButton.getY() -
+                rotateRightButton.getHeight()) / 2);
+
     }
 
     public void setTouchPanel(int screenX, int screenY) {
@@ -255,5 +322,65 @@ public class PlayGesturesInput extends PlayScreenInput {
     @Override
     public String getAnalyticsKey() {
         return "gestures";
+    }
+
+    private class TouchpadChangeListener extends ChangeListener {
+        boolean upPressed;
+        boolean downPressed;
+        boolean rightPressed;
+        boolean leftPressed;
+
+        @Override
+        public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+            boolean upNowPressed = touchpad.getKnobPercentY() > TOUCHPAD_DEAD_HARDDROP;
+            boolean downNowPressed = touchpad.getKnobPercentY() < -TOUCHPAD_DEAD_RADIUS;
+            boolean rightNowPressed = touchpad.getKnobPercentX() > TOUCHPAD_DEAD_RADIUS;
+            boolean leftNowPressed = touchpad.getKnobPercentX() < -TOUCHPAD_DEAD_RADIUS;
+
+            // zwei Richtungen gleichzeitig: entscheiden welcher wichtiger ist
+            if ((upNowPressed || downNowPressed) && (leftNowPressed || rightNowPressed)) {
+                if (Math.abs(touchpad.getKnobPercentY()) >= Math.abs(touchpad.getKnobPercentX())) {
+                    rightNowPressed = false;
+                    leftNowPressed = false;
+                } else {
+                    upNowPressed = false;
+                    downNowPressed = false;
+                }
+
+            }
+
+            if (upPressed != upNowPressed) {
+                upPressed = upNowPressed;
+                if (upPressed)
+                    playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
+                else
+                    playScreen.gameModel.setSoftDropFactor(0);
+            }
+
+            if (downPressed != downNowPressed) {
+                downPressed = downNowPressed;
+                if (downPressed)
+                    playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
+                else
+                    playScreen.gameModel.setSoftDropFactor(0);
+            }
+
+            if (rightPressed != rightNowPressed) {
+                rightPressed = rightNowPressed;
+                if (rightPressed)
+                    playScreen.gameModel.startMoveHorizontal(false);
+                else
+                    playScreen.gameModel.endMoveHorizontal(false);
+            }
+
+            if (leftPressed != leftNowPressed) {
+                leftPressed = leftNowPressed;
+                if (leftPressed)
+                    playScreen.gameModel.startMoveHorizontal(true);
+                else
+                    playScreen.gameModel.endMoveHorizontal(true);
+            }
+
+        }
     }
 }

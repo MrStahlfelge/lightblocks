@@ -95,12 +95,30 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 		name: button_small_font
 		color: disabled
 	}
+	button_rotateright_pressed: {
+		name: button_rotateright
+		color: disabled
+	}
+	button_rotateleft_pressed: {
+		name: button_rotateleft
+		color: disabled
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 	round: {
 		up: button_small_font
 		down: button_small_font_filled
 		over: button_small_font_glow
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
+	rotateright: {
+		imageUp: button_rotateright
+		imageDown: button_rotateright_pressed
+	}
+	rotateleft: {
+		imageUp: button_rotateleft
+		imageDown: button_rotateleft_pressed
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
@@ -199,6 +217,12 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
 	default: {
 		label: default
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.Touchpad$TouchpadStyle: {
+	default: {
+		background: touchpad
+		knob: touchpad_knob
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {

@@ -22,6 +22,7 @@ public class LocalPrefs {
     private static final String KEY_SCREENSHOWNPREFIX = "versionShownScreen_";
     private static final String KEY_LASTSTARTEDVERSION = "lastStartedVersion";
     private static final String KEY_LASTSTARTTIME = "lastStartTime";
+    private static final String PREF_KEY_ONSCREENCONTROLS = "onScreenControls";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -33,6 +34,7 @@ public class LocalPrefs {
     private Float gridIntensity;
     private Integer lastUsedVersion;
     private Integer daysSinceLastStart;
+    private Boolean useOnScreenControls;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -169,6 +171,19 @@ public class LocalPrefs {
     public void setGridIntensity(float gridIntensity) {
         this.gridIntensity = gridIntensity;
         prefs.putFloat("gridIntensity", gridIntensity);
+        prefs.flush();
+    }
+
+    public boolean useOnScreenControlsInLandscape() {
+        if (useOnScreenControls == null)
+            useOnScreenControls = prefs.getBoolean(PREF_KEY_ONSCREENCONTROLS, false);
+
+        return useOnScreenControls;
+    }
+
+    public void setUseOnScreenControlsInLandscape(boolean useOnScreenControls) {
+        this.useOnScreenControls = useOnScreenControls;
+        prefs.putBoolean(PREF_KEY_ONSCREENCONTROLS, useOnScreenControls);
         prefs.flush();
     }
 

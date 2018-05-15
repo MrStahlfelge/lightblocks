@@ -21,6 +21,7 @@ public class GaHelper {
             if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
                 app.gameAnalytics.submitDesignEvent("swipeUpSetting:" + app.localPrefs.getSwipeUpType());
                 app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());
+                app.gameAnalytics.submitDesignEvent("showOnScreenControls:" + app.localPrefs.useOnScreenControlsInLandscape());
             }
 
             app.gameAnalytics.submitDesignEvent("blockColor:" + app.localPrefs.getBlockColorMode());

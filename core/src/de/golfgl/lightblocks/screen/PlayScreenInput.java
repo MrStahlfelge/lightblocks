@@ -134,6 +134,10 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     }
 
+    /**
+     * bei Init und bei jedem Resize des PlayScreens gefeuert
+     * @param playScreen
+     */
     public void setPlayScreen(PlayScreen playScreen) {
         this.playScreen = playScreen;
     }

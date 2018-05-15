@@ -28,7 +28,6 @@ import com.badlogic.gdx.utils.Timer;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
@@ -71,13 +70,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private static final int NINE_PATCH_BORDER_SIZE = 5;
     protected final Image imGarbageIndicator;
     protected final Button pauseButton;
+    protected final Group centerGroup;
     private final BlockGroup blockGroup;
     private final Group labelGroup;
     private final BlockActor[][] blockMatrix;
     private final BlockActor[] nextTetro;
     private final MotivationLabel motivatorLabel;
     private final ParticleEffectActor weldEffect;
-    private final Group centerGroup;
     private final Table scoreTable;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
@@ -1002,7 +1001,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         pauseButton.setX(Math.max(LightBlocksGame.nativeGameWidth / 2 - 5 + stage.getWidth() / 2,
                 stage.getWidth() - pauseButton.getY()), Align.right);
 
-        // GestureInput neues TouchPanel
+        // GestureInput neues TouchPanel und Resize On Screen Controls
         if (inputAdapter != null)
             inputAdapter.setPlayScreen(this);
     }

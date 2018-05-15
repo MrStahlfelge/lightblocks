@@ -33,7 +33,7 @@ public class TutorialModel extends GameModel {
     private void nextTutorialStep() {
         tutorialStep++;
 
-        if (tutorialStep <= 13)
+        if (tutorialStep <= 14)
             userInterface.showOverlayMessage("tutorialStep" + Integer.toString(tutorialStep), 0);
         else {
             // Eigentliches Spiel beginnen
@@ -82,6 +82,7 @@ public class TutorialModel extends GameModel {
             case 11:
             case 12:
             case 13:
+            case 14:
                 nextTutorialStep();
                 break;
             case 6:
@@ -103,7 +104,7 @@ public class TutorialModel extends GameModel {
 
     @Override
     public void startMoveHorizontal(boolean isLeft) {
-        if (tutorialStep == 9 || tutorialStep == 10 || tutorialStep > 13)
+        if (tutorialStep == 9 || tutorialStep == 10 || tutorialStep > 14)
             super.startMoveHorizontal(isLeft);
     }
 
@@ -118,7 +119,7 @@ public class TutorialModel extends GameModel {
 
     @Override
     public void setSoftDropFactor(float newVal) {
-        if (tutorialStep > 13)
+        if (tutorialStep > 14)
             super.setSoftDropFactor(newVal);
     }
 
@@ -176,7 +177,7 @@ public class TutorialModel extends GameModel {
 
     @Override
     public void setCurrentSpeed() {
-        if (tutorialStep <= 13)
+        if (tutorialStep <= 14)
             currentSpeed = 0;
         else
             super.setCurrentSpeed();

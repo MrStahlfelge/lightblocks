@@ -33,21 +33,35 @@ filter: Linear,Linear
 repeat: none
 block-deactivated
   rotate: false
-  xy: 1541, 1619
+  xy: 1541, 1571
   size: 72, 72
   orig: 72, 72
   offset: 0, 0
   index: -1
 block-light
   rotate: false
-  xy: 1, 77
+  xy: 1719, 1745
   size: 72, 72
   orig: 72, 72
   offset: 0, 0
   index: -1
+button_rotateleft
+  rotate: false
+  xy: 1, 103
+  size: 176, 172
+  orig: 176, 172
+  offset: 0, 0
+  index: -1
+button_rotateright
+  rotate: false
+  xy: 1541, 1645
+  size: 176, 172
+  orig: 176, 172
+  offset: 0, 0
+  index: -1
 button_round
   rotate: false
-  xy: 515, 1091
+  xy: 874, 1217
   size: 88, 86
   split: 43, 43, 42, 42
   pad: 16, 18, 8, 8
@@ -56,7 +70,7 @@ button_round
   index: -1
 button_small_font
   rotate: false
-  xy: 1615, 1641
+  xy: 678, 894
   size: 50, 50
   split: 24, 24, 24, 24
   pad: 21, 22, 8, 10
@@ -65,7 +79,7 @@ button_small_font
   index: -1
 button_small_font_filled
   rotate: false
-  xy: 75, 99
+  xy: 964, 1253
   size: 50, 50
   split: 24, 24, 24, 24
   pad: 21, 22, 8, 10
@@ -74,7 +88,7 @@ button_small_font_filled
   index: -1
 button_small_font_glow
   rotate: false
-  xy: 1, 25
+  xy: 874, 1165
   size: 50, 50
   split: 24, 24, 24, 24
   pad: 21, 22, 8, 10
@@ -83,21 +97,21 @@ button_small_font_glow
   index: -1
 fa-45
   rotate: false
-  xy: 1, 665
+  xy: 1, 791
   size: 512, 512
   orig: 512, 512
   offset: 0, 0
   index: -1
 lineglow
   rotate: false
-  xy: 1541, 1566
+  xy: 1, 32
   size: 11, 11
   orig: 11, 11
   offset: 0, 0
   index: -1
 list
   rotate: false
-  xy: 1541, 1579
+  xy: 515, 743
   size: 52, 38
   split: 18, 18, 16, 16
   pad: 18, 18, 12, 12
@@ -106,42 +120,42 @@ list
   index: -1
 qs-25-bold
   rotate: false
-  xy: 1027, 1179
+  xy: 1027, 1305
   size: 512, 512
   orig: 512, 512
   offset: 0, 0
   index: -1
 qs-25-reg
   rotate: false
-  xy: 1, 151
+  xy: 1, 277
   size: 512, 512
   orig: 512, 512
   offset: 0, 0
   index: -1
 qs-40-boldglow
   rotate: false
-  xy: 1, 1179
+  xy: 1, 1305
   size: 1024, 512
   orig: 1024, 512
   offset: 0, 0
   index: -1
 radio
   rotate: false
-  xy: 605, 1095
+  xy: 1719, 1719
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 radio-over
   rotate: false
-  xy: 663, 1153
+  xy: 1793, 1793
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 scroll-horizontal
   rotate: false
-  xy: 515, 1004
+  xy: 1541, 1542
   size: 44, 27
   split: 11, 11, 11, 11
   pad: 0, 0, 0, 0
@@ -150,7 +164,7 @@ scroll-horizontal
   index: -1
 scroll-vertical
   rotate: false
-  xy: 573, 1045
+  xy: 1615, 1599
   size: 27, 44
   split: 11, 11, 11, 11
   pad: 0, 0, 0, 0
@@ -159,7 +173,7 @@ scroll-vertical
   index: -1
 slider
   rotate: false
-  xy: 1667, 1669
+  xy: 237, 253
   size: 8, 22
   split: 2, 2, 10, 10
   pad: 0, 0, 0, 0
@@ -168,7 +182,7 @@ slider
   index: -1
 slider-before
   rotate: false
-  xy: 1, 1
+  xy: 515, 719
   size: 1, 22
   split: 0, 0, 9, 9
   pad: 0, 0, 0, 0
@@ -177,28 +191,42 @@ slider-before
   index: -1
 slider-knob
   rotate: false
-  xy: 1595, 1607
+  xy: 59, 91
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
 slider-knob-pressed
   rotate: false
-  xy: 1615, 1629
+  xy: 179, 207
   size: 10, 10
   orig: 10, 10
   offset: 0, 0
   index: -1
+touchpad
+  rotate: false
+  xy: 515, 946
+  size: 357, 357
+  orig: 357, 357
+  offset: 0, 0
+  index: -1
+touchpad_knob
+  rotate: false
+  xy: 515, 783
+  size: 161, 161
+  orig: 161, 161
+  offset: 0, 0
+  index: -1
 white
   rotate: false
-  xy: 53, 74
+  xy: 569, 780
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 window
   rotate: false
-  xy: 515, 1033
+  xy: 1, 45
   size: 56, 56
   split: 17, 16, 17, 17
   pad: 16, 15, 16, 16
@@ -207,7 +235,7 @@ window
   index: -1
 window-bl
   rotate: false
-  xy: 605, 1121
+  xy: 179, 219
   size: 56, 56
   split: 17, 16, 17, 17
   pad: 16, 15, 16, 16
