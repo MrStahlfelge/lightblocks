@@ -77,8 +77,8 @@ public class AndroidNetUtils extends NetUtils {
         try {
             Method method = wm.getClass().getDeclaredMethod("isWifiApEnabled");
             enabled = (Boolean) method.invoke(wm);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
         return enabled;
     }
