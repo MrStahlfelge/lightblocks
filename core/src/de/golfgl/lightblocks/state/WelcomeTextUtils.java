@@ -86,12 +86,18 @@ public class WelcomeTextUtils {
 
     protected static void listNewFeatures(Array<WelcomeButton.WelcomeText> welcomes,
                                           LightBlocksGame app, int listChangesSince) {
+        boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
+
         // Neue Features in 1819: Shades of Grey, Hard Drop
         if (listChangesSince < 1819) {
             welcomes.add(new WelcomeButton.WelcomeText("Lightblocks can now perform hard drops. " +
-                    (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN) ?
+                    (touchAvailable ?
                             "For gesture input, enable it on swipe up in the settings." : "Use the UP button or key.")
                     + "\nThere's also a new option for block shadings.", new ShowSettingsRunnable(app)));
+        }
+        if (listChangesSince < 1822 && touchAvailable) {
+            welcomes.add(new WelcomeButton.WelcomeText("There is a new option to play with On Screen Controls instead" +
+                    " of gestures in landscape mode.", new ShowSettingsRunnable(app)));
         }
     }
 
