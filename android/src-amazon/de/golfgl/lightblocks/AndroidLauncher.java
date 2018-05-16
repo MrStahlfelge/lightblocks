@@ -1,5 +1,7 @@
 package de.golfgl.lightblocks;
 
+import de.golfgl.gdxgameanalytics.AndroidGameAnalytics;
+
 /**
  * AMAZON
  */
@@ -13,6 +15,10 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
         gsClient.setAchievementsEnabled(true).setLeaderboardsEnabled(true).setWhisperSyncEnabled(true).intialize(this);
 
         game.gpgsClient = gsClient;
+
+        // Amazon unterstützt keine Crashreports, also Behelfsmaßnahmen
+        if (game.gameAnalytics != null && game.gameAnalytics instanceof AndroidGameAnalytics)
+            ((AndroidGameAnalytics) game.gameAnalytics).registerUncaughtExceptionHandler();
     }
 
 }
