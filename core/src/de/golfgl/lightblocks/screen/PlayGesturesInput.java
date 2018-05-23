@@ -25,7 +25,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     public static final int SWIPEUP_PAUSE = 1;
     public static final int SWIPEUP_HARDDROP = 2;
     private static final float TOUCHPAD_DEAD_RADIUS = .33f;
-    private static final float TOUCHPAD_DEAD_HARDDROP = .7f;
+    private static final float TOUCHPAD_DEAD_HARDDROP = .95f;
 
     private static final float SCREEN_BORDER_PERCENTAGE = 0.1f;
     // Flipped Mode: Tap löst horizontale Bewegung aus, Swipe rotiert
