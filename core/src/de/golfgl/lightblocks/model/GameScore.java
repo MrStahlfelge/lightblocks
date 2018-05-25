@@ -9,6 +9,9 @@ import de.golfgl.lightblocks.state.IRoundScore;
  */
 
 public class GameScore implements IRoundScore {
+    protected static final int TYPE_NORMAL = 0;
+    protected static final int TYPE_PRACTICE = 1;
+
     // der aktuelle Punktestand
     private int score;
     // die abgebauten Reihen
@@ -22,6 +25,8 @@ public class GameScore implements IRoundScore {
     private int rating;
     private boolean lastClearLinesWasSpecial = false;
 
+    private int scoringType = TYPE_NORMAL;
+
     @Override
     public int getRating() {
         return rating;
@@ -29,6 +34,24 @@ public class GameScore implements IRoundScore {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    public int getLeaderboardScore() {
+        switch (scoringType) {
+            case TYPE_PRACTICE:
+                return getDrawnTetrominos();
+            default:
+                return getScore();
+        }
+    }
+
+    public String getLeaderboardTag() {
+        switch (scoringType) {
+            case TYPE_PRACTICE:
+                return Integer.toString(getScore());
+            default:
+                return Integer.toString(getClearedLines());
+        }
     }
 
     @Override
@@ -71,7 +94,7 @@ public class GameScore implements IRoundScore {
                 removeScore = 0;
         }
 
-        removeScore = (getCurrentLevel() + 1) * removeScore;
+        removeScore = getCurrentScoreFactor() * removeScore;
 
         if (doubleSpecial)
             removeScore = removeScore * 1.5f;
@@ -85,11 +108,15 @@ public class GameScore implements IRoundScore {
         return doubleSpecial;
     }
 
+    protected int getCurrentScoreFactor() {
+        return scoringType != TYPE_PRACTICE ? getCurrentLevel() + 1 : 1;
+    }
+
     /**
      * returns current level depending on starting level and cleared lines
      */
     public int getCurrentLevel() {
-        return Math.max(startingLevel, clearedLines / 10);
+        return scoringType == TYPE_PRACTICE ? startingLevel : Math.max(startingLevel, clearedLines / 10);
     }
 
     public int getStartingLevel() {
@@ -101,7 +128,7 @@ public class GameScore implements IRoundScore {
     }
 
     public void addTSpinBonus() {
-        this.dropScore += (getCurrentLevel() + 1) * 150;
+        this.dropScore += getCurrentScoreFactor() * 150;
     }
 
     public void addBonusScore(int bonusScore) {
@@ -131,5 +158,13 @@ public class GameScore implements IRoundScore {
 
     public void incDrawnTetrominos() {
         this.drawnTetrominos += 1;
+    }
+
+    public int getScoringType() {
+        return scoringType;
+    }
+
+    protected void setScoringType(int scoringType) {
+        this.scoringType = scoringType;
     }
 }

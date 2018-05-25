@@ -498,9 +498,9 @@ public abstract class GameModel implements Json.Serializable {
         String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(getIdentifier());
 
         if (leaderboardId != null && app.gpgsClient != null && app.gpgsClient.isSessionActive())
-            app.gpgsClient.submitToLeaderboard(leaderboardId, score.getScore(), Integer.toString(score
-                    .getClearedLines()));
+            app.gpgsClient.submitToLeaderboard(leaderboardId, score.getLeaderboardScore(), score.getLeaderboardTag());
 
+        submitEvent(GpgsHelper.EVENT_BLOCK_DROP, score.getDrawnTetrominos() % 10);
         GaHelper.endGameEvent(app.gameAnalytics, this, success);
     }
 
@@ -561,8 +561,7 @@ public abstract class GameModel implements Json.Serializable {
      */
     public void startNewGame(InitGameParameters newGameParams) {
         gameboard = new Gameboard();
-        score = new GameScore();
-        score.setStartingLevel(newGameParams.getBeginningLevel());
+        initGameScore(newGameParams.getBeginningLevel());
         setCurrentSpeed();
         inputTypeKey = newGameParams.getInputKey();
 
@@ -571,6 +570,11 @@ public abstract class GameModel implements Json.Serializable {
 
         initializeActiveAndNextTetromino();
 
+    }
+
+    protected void initGameScore(int beginningLevel) {
+        score = new GameScore();
+        score.setStartingLevel(beginningLevel);
     }
 
     protected void initializeActiveAndNextTetromino() {
@@ -736,8 +740,7 @@ public abstract class GameModel implements Json.Serializable {
         // Score (if set)
         this.score = json.readValue("score", GameScore.class, jsonData);
         if (this.score == null) {
-            score = new GameScore();
-            score.setStartingLevel(jsonData.getInt("beginningLevel", 0));
+            initGameScore(jsonData.getInt("beginningLevel", 0));
         }
 
         // Input Type (if set)

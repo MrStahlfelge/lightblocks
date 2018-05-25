@@ -42,9 +42,7 @@ public class GaHelper {
 
     public static void submitGameModelEvent(LightBlocksGame app, String eventId, int inc, GameModel gameModel) {
         if (app.gameAnalytics != null) {
-            if (eventId.equals(GpgsHelper.EVENT_LINES_CLEARED))
-                app.gameAnalytics.submitDesignEvent("stats:lines", inc);
-            else if (eventId.equals(GpgsHelper.EVENT_BLOCK_DROP))
+            if (eventId.equals(GpgsHelper.EVENT_BLOCK_DROP))
                 app.gameAnalytics.submitDesignEvent("stats:blocks", inc);
         }
     }
