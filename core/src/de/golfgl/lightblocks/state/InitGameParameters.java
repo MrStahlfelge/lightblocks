@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.state;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.MultiplayerModel;
+import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
@@ -66,6 +67,8 @@ public class InitGameParameters {
 
     public GameModel newGameModelInstance() {
         switch (gameMode) {
+            case Practice:
+                return new PracticeModel();
             case Multiplayer:
                 return new MultiplayerModel();
             case Marathon:
@@ -76,5 +79,5 @@ public class InitGameParameters {
         throw new IllegalStateException("Unsupported game mode");
     }
 
-    public enum GameMode {Multiplayer, Marathon, Tutorial}
+    public enum GameMode {Multiplayer, Marathon, Tutorial, Practice}
 }

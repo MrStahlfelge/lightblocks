@@ -9,11 +9,13 @@ import com.badlogic.gdx.utils.Timer;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MarathonModel;
+import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -21,22 +23,24 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  * Created by Benjamin Schulte on 15.02.2018.
  */
 
-public class MarathonGroup extends Table implements SinglePlayerScreen.IGameModeGroup {
-    private final Cell choseInputCell;
-    private final ScaledLabel choseInputLabel;
-    private SinglePlayerScreen menuScreen;
-    private BeginningLevelChooser beginningLevelSlider;
-    private InputButtonTable inputButtons;
-    private Button playButton;
-    private ScoresGroup scoresGroup;
-    private LightBlocksGame app;
+public abstract class SimpleGameModeGroup extends Table implements SinglePlayerScreen.IGameModeGroup {
+    protected final ScaledLabel choseInputLabel;
+    protected final Table params;
+    protected Cell choseInputCell;
+    protected SinglePlayerScreen menuScreen;
+    protected BeginningLevelChooser beginningLevelSlider;
+    protected InputButtonTable inputButtons;
+    protected Button playButton;
+    protected ScoresGroup scoresGroup;
+    protected LightBlocksGame app;
 
-    public MarathonGroup(SinglePlayerScreen myParentScreen, LightBlocksGame app) {
+    public SimpleGameModeGroup(SinglePlayerScreen myParentScreen, LightBlocksGame app) {
         this.menuScreen = myParentScreen;
         this.app = app;
 
-        Table params = new Table();
-        beginningLevelSlider = new BeginningLevelChooser(app, app.localPrefs.getMarathonBeginningLevel(), 9) {
+        params = new Table();
+        beginningLevelSlider = new BeginningLevelChooser(app, app.localPrefs.getMarathonBeginningLevel(),
+                getMaxBeginningValue()) {
             @Override
             protected void onControllerDefaultKeyDown() {
                 ((MyStage) getStage()).setFocusedActor(playButton);
@@ -68,11 +72,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
         params.add(beginningLevelSlider);
         params.row().padTop(15);
         choseInputLabel = new ScaledLabel(app.TEXTS.get("menuInputControl"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        params.add(choseInputLabel).left();
-        params.row();
-        choseInputCell = params.add();
-        params.row();
-        params.add(inputButtons.getInputLabel()).center();
+        addInputButtonsToParams();
         playButton = new PlayButton(app);
         playButton.addListener(new ChangeListener() {
                                    public void changed(ChangeEvent event, Actor actor) {
@@ -80,7 +80,6 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
                                    }
                                }
         );
-        params.row();
         params.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top().fillX();
         menuScreen.addFocusableActor(playButton);
 
@@ -89,7 +88,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
         setInputButtonTableVisibility();
 
         row();
-        add(new ScaledLabel(app.TEXTS.get("labelMarathon"), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+        add(new ScaledLabel(getGameModeTitle(), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
         row();
         add(params).expandY();
 
@@ -100,6 +99,19 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
         // TODO erst auslösen wenn Seite erstmals angezeigt wird
         refreshScores(0);
     }
+
+    protected void addInputButtonsToParams() {
+        params.add(choseInputLabel).left();
+        params.row();
+        choseInputCell = params.add();
+        params.row();
+        params.add(inputButtons.getInputLabel()).center();
+        params.row();
+    }
+
+    protected abstract int getMaxBeginningValue();
+
+    protected abstract String getGameModeTitle();
 
     protected void setInputButtonTableVisibility() {
         boolean inputChoserVisible = inputButtons.getEnabledInputCount() != 1;
@@ -117,9 +129,7 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
             inputButtons.act(delta);
     }
 
-    public String getGameModelId() {
-        return MarathonModel.MODEL_MARATHON_ID + inputButtons.getSelectedInput();
-    }
+    public abstract String getGameModelId();
 
     protected void refreshScores(final int tryCount) {
         // es ist nötig dass alles schon korrekt angezeigt wird, damit die Animationen der ScoreGroup
@@ -140,13 +150,11 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
     }
 
     protected void beginNewGame() {
-        InitGameParameters initGameParametersParams = new InitGameParameters();
-        initGameParametersParams.setGameMode(InitGameParameters.GameMode.Marathon);
-        initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
-        initGameParametersParams.setInputKey(inputButtons.getSelectedInput());
+        InitGameParameters initGameParametersParams = getInitGameParameters();
 
         // Einstellungen speichern
-        app.localPrefs.saveMarathonLevelAndInput(initGameParametersParams.getBeginningLevel(), inputButtons.getSelectedInput());
+        app.localPrefs.saveMarathonLevelAndInput(initGameParametersParams.getBeginningLevel(), inputButtons
+                .getSelectedInput());
 
         try {
             PlayScreen.gotoPlayScreen((AbstractScreen) app.getScreen(), initGameParametersParams);
@@ -156,7 +164,81 @@ public class MarathonGroup extends Table implements SinglePlayerScreen.IGameMode
         }
     }
 
+    protected abstract InitGameParameters getInitGameParameters();
+
     public Actor getConfiguredDefaultActor() {
         return playButton;
+    }
+
+    public static class MarathonGroup extends SimpleGameModeGroup {
+
+        public MarathonGroup(SinglePlayerScreen myParentScreen, LightBlocksGame app) {
+            super(myParentScreen, app);
+        }
+
+        @Override
+        public String getGameModelId() {
+            return MarathonModel.MODEL_MARATHON_ID + inputButtons.getSelectedInput();
+        }
+
+        @Override
+        protected String getGameModeTitle() {
+            return app.TEXTS.get("labelMarathon");
+        }
+
+        @Override
+        protected int getMaxBeginningValue() {
+            return 9;
+        }
+
+        @Override
+        protected InitGameParameters getInitGameParameters() {
+            InitGameParameters initGameParametersParams = new InitGameParameters();
+            initGameParametersParams.setGameMode(InitGameParameters.GameMode.Marathon);
+            initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
+            initGameParametersParams.setInputKey(inputButtons.getSelectedInput());
+            return initGameParametersParams;
+        }
+    }
+
+    public static class PracticeModeGroup extends SimpleGameModeGroup {
+
+        public PracticeModeGroup(SinglePlayerScreen myParentScreen, LightBlocksGame app) {
+            super(myParentScreen, app);
+        }
+
+        @Override
+        public String getGameModelId() {
+            return PracticeModel.MODEL_PRACTICE_ID;
+        }
+
+        @Override
+        protected String getGameModeTitle() {
+            return app.TEXTS.get("labelModel_practice");
+        }
+
+        @Override
+        protected InitGameParameters getInitGameParameters() {
+            InitGameParameters initGameParametersParams = new InitGameParameters();
+            initGameParametersParams.setGameMode(InitGameParameters.GameMode.Practice);
+            initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
+            initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYORTOUCH);
+            return initGameParametersParams;
+        }
+
+        @Override
+        protected int getMaxBeginningValue() {
+            return 14;
+        }
+
+        @Override
+        protected void addInputButtonsToParams() {
+            // nichts tun
+        }
+
+        @Override
+        protected void setInputButtonTableVisibility() {
+            // nichts tun, es gibt keine
+        }
     }
 }

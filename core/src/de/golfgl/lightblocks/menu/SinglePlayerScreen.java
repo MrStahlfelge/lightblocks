@@ -25,6 +25,8 @@ import de.golfgl.lightblocks.screen.FontAwesome;
 
 public class SinglePlayerScreen extends AbstractMenuDialog {
     private static final int PAGEIDX_MISSION = 1;
+    private static final int PAGEIDX_MARATHON = 2;
+    private static final int PAGEIDX_PRACTICE = 3;
     private PagedScrollPane modePager;
     private Button leaderboardButton;
 
@@ -68,7 +70,8 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         modePager = new PagedScrollPane(app.skin, LightBlocksGame.SKIN_STYLE_PAGER);
         modePager.addPage(new IntroGroup());
         modePager.addPage(new MissionChooseGroup(this, app));
-        modePager.addPage(new MarathonGroup(this, app));
+        modePager.addPage(new SimpleGameModeGroup.MarathonGroup(this, app));
+        modePager.addPage(new SimpleGameModeGroup.PracticeModeGroup(this, app));
         modePager.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -145,27 +148,17 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
     private class IntroGroup extends Table implements IGameModeGroup {
         private final Button missionsButton;
         private final Button marathonButton;
+        private final Button practiceButton;
 
         public IntroGroup() {
-            missionsButton = new InfoButton(app.TEXTS.get("menuPlayMissionButton"),
-                    app.TEXTS.get("introModelMissions"), app.skin);
-            missionsButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    modePager.scrollToPage(1);
-                }
-            });
-            addFocusableActor(missionsButton);
-            marathonButton = new InfoButton(app.TEXTS.get("labelMarathon"),
-                    app.TEXTS.get("introModelMarathon") + " " + app.TEXTS.get("goalModelMarathon"),
-                    app.skin);
-            marathonButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    modePager.scrollToPage(2);
-                }
-            });
-            addFocusableActor(marathonButton);
+            missionsButton = addPageScrollInfoButton(app.TEXTS.get("menuPlayMissionButton"),
+                    app.TEXTS.get("introModelMissions"), PAGEIDX_MISSION);
+
+            marathonButton = addPageScrollInfoButton(app.TEXTS.get("labelMarathon"),
+                    app.TEXTS.get("introModelMarathon"), PAGEIDX_MARATHON);
+
+            practiceButton = addPageScrollInfoButton(app.TEXTS.get("labelModel_practice"),
+                    app.TEXTS.get("introModelPractice"), PAGEIDX_PRACTICE);
 
             pad(0, 20, 0, 20);
             row();
@@ -175,11 +168,26 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
             label1.setAlignment(Align.center);
             add(label1).fill().expandX();
 
-            row().padTop(30);
+            row().padTop(10);
             add(missionsButton).fill();
 
-            row().padTop(30);
+            row().padTop(10);
             add(marathonButton).fill();
+
+            row().padTop(10);
+            add(practiceButton).fill();
+        }
+
+        private InfoButton addPageScrollInfoButton(String title, String description, final int pageToScrollTo) {
+            InfoButton button = new InfoButton(title, description, app.skin);
+            button.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    modePager.scrollToPage(pageToScrollTo);
+                }
+            });
+            addFocusableActor(button);
+            return button;
         }
 
         @Override

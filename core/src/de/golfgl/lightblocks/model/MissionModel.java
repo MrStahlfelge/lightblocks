@@ -157,6 +157,6 @@ public abstract class MissionModel extends GameModel {
     @Override
     public void setBestScore(BestScore bestScore) {
         super.setBestScore(bestScore);
-        bestScore.setCompareByRating(true);
+        bestScore.setComparisonMethod(BestScore.ComparisonMethod.rating);
     }
 }

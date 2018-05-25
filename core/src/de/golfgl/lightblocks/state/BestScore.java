@@ -26,14 +26,15 @@ public class BestScore implements IRoundScore, Json.Serializable {
     private int drawnTetrominos;
     // ein (wie auch immer geartetes) Rating 1-7 (0 nicht gesetzt)
     private int rating;
-    private boolean compareByRating = false;
 
-    public boolean isCompareByRating() {
-        return compareByRating;
+    private ComparisonMethod comparisonMethod = ComparisonMethod.score;
+
+    public ComparisonMethod getComparisonMethod() {
+        return comparisonMethod;
     }
 
-    public void setCompareByRating(boolean compareByRating) {
-        this.compareByRating = compareByRating;
+    public void setComparisonMethod(ComparisonMethod comparisonMethod) {
+        this.comparisonMethod = comparisonMethod;
     }
 
     @Override
@@ -68,14 +69,14 @@ public class BestScore implements IRoundScore, Json.Serializable {
 
     /**
      * Setzt alle Scores. Dabei wird bei jedem einzeln verglichen, ob er höher ist als vorher.
-     * Abhängig von compareByBestRating werden alle Scores gemeinsam, wenn das Rating verbessert oder das Rating
+     * Abhängig von comparisonMethod werden alle Scores gemeinsam, wenn das Rating verbessert oder das Rating
      * gleich und der Score höher ist
      *
      * @param score
      * @return true genau dann wenn PUNKTESTAND erhöht wurde
      */
     public boolean setBestScores(GameScore score) {
-        if (compareByRating) {
+        if (comparisonMethod.equals(ComparisonMethod.rating)) {
             if (this.rating < score.getRating() || this.rating == score.getRating() && this.score < score.getScore()) {
                 this.clearedLines = score.getClearedLines();
                 this.rating = score.getRating();
@@ -86,9 +87,10 @@ public class BestScore implements IRoundScore, Json.Serializable {
             return false;
         } else {
             setClearedLines(score.getClearedLines());
-            setDrawnTetrominos(score.getDrawnTetrominos());
+            boolean blocksIncreased = setDrawnTetrominos(score.getDrawnTetrominos());
             setRating(score.getRating());
-            return setScore(score.getScore());
+            boolean scoreIncreased = setScore(score.getScore());
+            return (comparisonMethod.equals(ComparisonMethod.blocks)) ? blocksIncreased : scoreIncreased;
         }
     }
 
@@ -135,6 +137,8 @@ public class BestScore implements IRoundScore, Json.Serializable {
 
         return (this.rating == rating);
     }
+
+    public enum ComparisonMethod {score, rating, blocks}
 
     public static class BestScoreMap extends HashMap<String, BestScore> implements Json.Serializable {
 

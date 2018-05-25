@@ -28,6 +28,7 @@ public class BeginningLevelChooser extends Table {
             }
         };
 
+        initValue = Math.min(maxValue, initValue);
         setValue(initValue);
 
         final ChangeListener changeListener = new ChangeListener() {
