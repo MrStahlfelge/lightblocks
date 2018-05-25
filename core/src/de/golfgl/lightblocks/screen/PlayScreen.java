@@ -623,10 +623,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                         // ab 3 Zeilen alle zeilenweise zusammen schieben
                         block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(i)) *
                                 BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
-                    else if (y == i && linesToInsert == 0)
+                    // else if (y == i && linesToInsert == 0) - entfernt wegen anhaltendem Ärger!
                         // die untersten zusammenhängenden Zeilen rausschieben
-                        block.setMoveAction(Actions.moveBy(0, -2 * BlockActor.blockWidth, moveActorsTime),
-                                removeDelayTime);
+                        //block.setMoveAction(Actions.moveBy(0, -2 * BlockActor.blockWidth, moveActorsTime),
+                        //        removeDelayTime);
 
                     block.addAction(sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
                             Actions.removeActor()));
