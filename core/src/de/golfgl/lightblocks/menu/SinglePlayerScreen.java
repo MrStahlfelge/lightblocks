@@ -24,9 +24,9 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  */
 
 public class SinglePlayerScreen extends AbstractMenuDialog {
-    private static final int PAGEIDX_MISSION = 1;
-    private static final int PAGEIDX_MARATHON = 2;
-    private static final int PAGEIDX_PRACTICE = 3;
+    public static final int PAGEIDX_MISSION = 1;
+    public static final int PAGEIDX_MARATHON = 2;
+    public static final int PAGEIDX_PRACTICE = 3;
     private PagedScrollPane modePager;
     private Button leaderboardButton;
 
@@ -83,8 +83,8 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         menuTable.add(modePager).fill().expand();
     }
 
-    public void showMissionPage() {
-        modePager.scrollToPage(PAGEIDX_MISSION);
+    public void showPage(int idx) {
+        modePager.scrollToPage(idx);
     }
 
     /**

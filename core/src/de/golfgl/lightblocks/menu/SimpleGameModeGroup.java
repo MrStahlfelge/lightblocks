@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -24,8 +25,8 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  */
 
 public abstract class SimpleGameModeGroup extends Table implements SinglePlayerScreen.IGameModeGroup {
-    protected final ScaledLabel choseInputLabel;
-    protected final Table params;
+    protected ScaledLabel choseInputLabel;
+    protected Table params;
     protected Cell choseInputCell;
     protected SinglePlayerScreen menuScreen;
     protected BeginningLevelChooser beginningLevelSlider;
@@ -65,6 +66,23 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
             }
         });
 
+        row();
+        add(new ScaledLabel(getGameModeTitle(), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+
+        fillParamsTable(app);
+
+        row();
+        add(params).expandY();
+
+        row();
+        scoresGroup = new ScoresGroup(app);
+        add(scoresGroup).height(scoresGroup.getPrefHeight()).fill();
+
+        // TODO erst auslösen wenn Seite erstmals angezeigt wird
+        refreshScores(0);
+    }
+
+    protected void fillParamsTable(LightBlocksGame app) {
         params.row().padTop(15);
         params.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel"), app.skin, LightBlocksGame.SKIN_FONT_BIG))
                 .left();
@@ -86,18 +104,6 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         menuScreen.addFocusableActor(inputButtons);
         menuScreen.addFocusableActor(beginningLevelSlider.getSlider());
         setInputButtonTableVisibility();
-
-        row();
-        add(new ScaledLabel(getGameModeTitle(), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
-        row();
-        add(params).expandY();
-
-        row();
-        scoresGroup = new ScoresGroup(app);
-        add(scoresGroup).height(scoresGroup.getPrefHeight()).fill();
-
-        // TODO erst auslösen wenn Seite erstmals angezeigt wird
-        refreshScores(0);
     }
 
     protected void addInputButtonsToParams() {
@@ -215,6 +221,18 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         @Override
         protected String getGameModeTitle() {
             return app.TEXTS.get("labelModel_practice");
+        }
+
+        @Override
+        protected void fillParamsTable(LightBlocksGame app) {
+            row().pad(20, 20, 0, 20);
+            ScaledLabel introLabel = new ScaledLabel(app.TEXTS.get("introModelPractice"), app.skin,
+                    LightBlocksGame.SKIN_FONT_REG, .75f);
+            introLabel.setWrap(true);
+            introLabel.setAlignment(Align.center);
+            add(introLabel).bottom().fillX().expandX();
+
+            super.fillParamsTable(app);
         }
 
         @Override

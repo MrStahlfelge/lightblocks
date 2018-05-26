@@ -51,13 +51,8 @@ public class WelcomeTextUtils {
         // Unter 50 Reihen und tutorial verfügbar und nicht gemacht: anbieten
         if (clearedLines < 100 && TutorialModel.tutorialAvailable() &&
                 app.savegame.getBestScore(Mission.KEY_TUTORIAL).getRating() == 0)
-            welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeTutorial"), new Runnable() {
-                @Override
-                public void run() {
-                    SinglePlayerScreen sp = app.mainMenuScreen.showSinglePlayerScreen();
-                    sp.showMissionPage();
-                }
-            }));
+            welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeTutorial"),
+                    new ShowSinglePlayerPageRunnable(app, SinglePlayerScreen.PAGEIDX_MISSION)));
 
         // 3. BESONDERE TAGE ODER SOWAS (WEIHNACHTEN ETC)
 
@@ -88,6 +83,12 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        // 1823: Practice Mode
+        if (listChangesSince < 1823) {
+            welcomes.add(new WelcomeButton.WelcomeText("There's a new Game Mode: Practice. Have fun!",
+                    new ShowSinglePlayerPageRunnable(app, SinglePlayerScreen.PAGEIDX_PRACTICE)));
+        }
+
         // Neue Features in 1819: Shades of Grey, Hard Drop
         if (listChangesSince < 1819) {
             welcomes.add(new WelcomeButton.WelcomeText("Lightblocks can now perform hard drops. " +
@@ -98,6 +99,22 @@ public class WelcomeTextUtils {
         if (listChangesSince < 1822 && touchAvailable) {
             welcomes.add(new WelcomeButton.WelcomeText("There is a new option to play with On Screen Controls instead" +
                     " of gestures in landscape mode.", new ShowSettingsRunnable(app)));
+        }
+    }
+
+    private static class ShowSinglePlayerPageRunnable implements Runnable {
+        private final LightBlocksGame app;
+        private final int pageidx;
+
+        public ShowSinglePlayerPageRunnable(LightBlocksGame app, int pageIdx) {
+            this.app = app;
+            this.pageidx = pageIdx;
+        }
+
+        @Override
+        public void run() {
+            SinglePlayerScreen sp = app.mainMenuScreen.showSinglePlayerScreen();
+            sp.showPage(pageidx);
         }
     }
 
