@@ -73,7 +73,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
      * gleich und der Score höher ist
      *
      * @param score
-     * @return true genau dann wenn PUNKTESTAND erhöht wurde
+     * @return true genau dann wenn PUNKTESTAND erhöht wurde und das nicht trivial war
      */
     public boolean setBestScores(GameScore score) {
         if (comparisonMethod.equals(ComparisonMethod.rating)) {
@@ -82,7 +82,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
                 this.rating = score.getRating();
                 this.score = score.getScore();
                 this.drawnTetrominos = score.getDrawnTetrominos();
-                return true;
+                return score.getScore() > 10000;
             }
             return false;
         } else {
@@ -90,7 +90,9 @@ public class BestScore implements IRoundScore, Json.Serializable {
             boolean blocksIncreased = setDrawnTetrominos(score.getDrawnTetrominos());
             setRating(score.getRating());
             boolean scoreIncreased = setScore(score.getScore());
-            return (comparisonMethod.equals(ComparisonMethod.blocks)) ? blocksIncreased : scoreIncreased;
+            return (comparisonMethod.equals(ComparisonMethod.blocks)) ?
+                    blocksIncreased && score.getDrawnTetrominos() > 100 :
+                    scoreIncreased && score.getScore() > 10000;
         }
     }
 

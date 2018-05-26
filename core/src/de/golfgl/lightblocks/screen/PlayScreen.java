@@ -193,7 +193,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         initializeGameModel(initGameParametersParams);
 
         // Score Table vervollständigen
-        if (gameModel.getMaxBlocksToUse() > 0) {
+        if (gameModel.showBlocksScore()) {
             scoreTable.row();
             final Label labelBlocks = new ScaledLabel(app.TEXTS.get("labelBlocksScore").toUpperCase(), app.skin);
             scoreTable.add(labelBlocks).right().bottom().padBottom(-2).spaceRight(3);
@@ -885,8 +885,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         levelNum.setScore(score.getCurrentLevel());
         scoreNum.setScore(score.getScore());
 
-        if (gameModel.getMaxBlocksToUse() > 0)
-            blocksLeft.setScore(gameModel.getMaxBlocksToUse() - score.getDrawnTetrominos());
+        if (gameModel.showBlocksScore())
+            blocksLeft.setScore(gameModel.getMaxBlocksToUse() > 0 ?
+                    gameModel.getMaxBlocksToUse() - score.getDrawnTetrominos() : score.getDrawnTetrominos());
     }
 
     @Override

@@ -209,7 +209,7 @@ public abstract class GameModel implements Json.Serializable {
         // Highscores updaten
         if (bestScore.setBestScores(score)) {
             // nur einmal rausgeben - und auch nur wenn nicht trivial
-            if (!isBestScore && score.getScore() > 10000)
+            if (!isBestScore)
                 userInterface.showMotivation(IGameModelListener.MotivationTypes.newHighscore, null);
             isBestScore = true;
         }
@@ -775,6 +775,10 @@ public abstract class GameModel implements Json.Serializable {
 
     public int getMaxBlocksToUse() {
         return maxBlocksToUse;
+    }
+
+    public boolean showBlocksScore() {
+        return maxBlocksToUse > 0;
     }
 
     protected void setMaxBlocksToUse(int maxBlocksToUse) {

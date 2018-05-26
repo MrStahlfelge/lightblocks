@@ -47,6 +47,11 @@ public class PracticeModel extends GameModel {
     }
 
     @Override
+    public boolean showBlocksScore() {
+        return true;
+    }
+
+    @Override
     public void setBestScore(BestScore bestScore) {
         super.setBestScore(bestScore);
         // bei Practice sind die meisten abgelegten Blöcke maßgeblich
