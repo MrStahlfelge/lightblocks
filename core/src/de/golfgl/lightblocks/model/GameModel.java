@@ -133,6 +133,8 @@ public abstract class GameModel implements Json.Serializable {
             }
         }
 
+        score.incTime(delta);
+
         float speed = Math.max(SOFT_DROP_SPEED * softDropFactor, currentSpeed);
         distanceRemainder += delta * speed;
         if (distanceRemainder >= 1.0f)

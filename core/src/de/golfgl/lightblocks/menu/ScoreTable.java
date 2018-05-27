@@ -25,6 +25,24 @@ public class ScoreTable extends Table {
         defaults().space(15);
     }
 
+    public static String formatTimeString(int time, boolean appendMs) {
+        String ms = String.valueOf(time % 1000);
+        time = time / 1000;
+        String seconds = String.valueOf(time % 60);
+        int minutes = time / 60;
+
+        while (ms.length() < 3)
+            ms = "0" + ms;
+
+        while (seconds.length() < 2)
+            seconds = "0" + seconds;
+
+        String formattedString = String.valueOf(minutes) + ":" + seconds;
+        if (appendMs)
+            formattedString = formattedString + "." + ms;
+        return formattedString;
+    }
+
     public void setMaxCountingTime(float maxCountingTime) {
         this.maxCountingTime = maxCountingTime;
     }
@@ -55,6 +73,24 @@ public class ScoreTable extends Table {
             }
 
             add(scoreLabel).minWidth(prefLabelWidth);
+        }
+    }
+
+    protected void addTimesLine(String label, Array<Integer> time) {
+
+        row();
+        add(new ScaledLabel(app.TEXTS.get(label).toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE))
+                .left();
+
+        for (int i = 0; i < time.size; i++) {
+            ScaledLabel timeLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+
+            if (time.get(i) > 0)
+                timeLabel.setText(formatTimeString(time.get(i), false));
+
+            timeLabel.setAlignment(Align.right);
+
+            add(timeLabel);
         }
     }
 

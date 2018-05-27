@@ -11,4 +11,6 @@ public interface IRoundScore {
     int getDrawnTetrominos();
 
     int getRating();
+
+    int getTimeMs();
 }

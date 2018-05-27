@@ -19,11 +19,13 @@ public class ScoresGroup extends Group {
     private static final float SCALING = .75f;
     private final LightBlocksGame app;
     private String gameModelId;
+    private boolean showTime;
     private BestScore myBestScores;
     private MyBestScoreTable myScoresTable;
 
-    public ScoresGroup(LightBlocksGame app) {
+    public ScoresGroup(LightBlocksGame app, boolean showTime) {
         this.app = app;
+        this.showTime = showTime;
     }
 
     public void show(String gameModelId) {
@@ -62,13 +64,14 @@ public class ScoresGroup extends Group {
 
     public float getPrefHeight() {
         return (myScoresTable != null ? myScoresTable.getPrefHeight() :
-                new ScaledLabel("X", app.skin, SCALING).getPrefHeight() * 4);
+                new ScaledLabel("X", app.skin, SCALING).getPrefHeight() * (showTime ? 5 : 4));
     }
 
     private class MyBestScoreTable extends Table {
         private final ScaledLabel scoreLabel;
         private final ScaledLabel linesLabel;
         private final ScaledLabel drawnBlocksLabel;
+        private ScaledLabel timeLabel;
 
         public MyBestScoreTable() {
             row();
@@ -88,6 +91,12 @@ public class ScoresGroup extends Group {
             add(new ScaledLabel(app.TEXTS.get("labelBlocks").toUpperCase(), app.skin, SCALING)).left();
             drawnBlocksLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_BIG, SCALING);
             add(drawnBlocksLabel).right();
+            if (showTime) {
+                row();
+                add(new ScaledLabel(app.TEXTS.get("labelTime").toUpperCase(), app.skin, SCALING)).left();
+                timeLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_BIG, SCALING);
+                add(timeLabel).right();
+            }
 
             refreshLabels();
         }
@@ -96,6 +105,8 @@ public class ScoresGroup extends Group {
             scoreLabel.setText(String.valueOf(myBestScores.getScore()));
             linesLabel.setText(String.valueOf(myBestScores.getClearedLines()));
             drawnBlocksLabel.setText(String.valueOf(myBestScores.getDrawnTetrominos()));
+            if (timeLabel != null)
+                timeLabel.setText(ScoreTable.formatTimeString(myBestScores.getTimeMs(), false));
         }
     }
 }

@@ -23,6 +23,9 @@ public class GameScore implements IRoundScore {
     // Anzahl gezogene Blöcke
     private int drawnTetrominos;
     private int rating;
+    // vergangene Zeit
+    private int seconds;
+    private float secondFraction;
     private boolean lastClearLinesWasSpecial = false;
 
     private int scoringType = TYPE_NORMAL;
@@ -156,8 +159,20 @@ public class GameScore implements IRoundScore {
         return drawnTetrominos;
     }
 
+    public int getTimeMs() {
+        return seconds * 1000 + (int) (secondFraction * 1000f);
+    }
+
     public void incDrawnTetrominos() {
         this.drawnTetrominos += 1;
+    }
+
+    public void incTime(float secondFraction) {
+        this.secondFraction += secondFraction;
+        while (this.secondFraction > 1f) {
+            seconds++;
+            this.secondFraction = this.secondFraction - 1f;
+        }
     }
 
     public int getScoringType() {

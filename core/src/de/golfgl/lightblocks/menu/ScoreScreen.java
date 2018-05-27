@@ -185,8 +185,7 @@ public class ScoreScreen extends AbstractMenuScreen {
         for (int i = 0; i < scoresToShow.size; i++) {
             scores.add((long) scoresToShow.get(i).getScore());
 
-            if (best != null && scoresToShow.get(i).getScore() >= best.getScore() && best.getScore() > 1000
-                    && scoresToShow.get(i).getRating() >= best.getRating() && !scoreTable.isBestScore(i))
+            if (best != null && !scoreTable.isBestScore(i) && best.checkIsBestScore(gameModelId, scoresToShow.get(i)))
                 newHighscore = true;
         }
         scoreTable.addScoresLine("labelScore", 8, scores, (best != null ? best.getScore() : 0));
@@ -204,6 +203,13 @@ public class ScoreScreen extends AbstractMenuScreen {
             scores.add((long) scoresToShow.get(i).getDrawnTetrominos());
 
         scoreTable.addScoresLine("labelBlocks", 0, scores, (best != null ? best.getDrawnTetrominos() : 0));
+
+        // TIME
+        Array<Integer> times = new Array<Integer>();
+        for (int i = 0; i < scoresToShow.size; i++)
+            times.add(scoresToShow.get(i).getTimeMs());
+
+        scoreTable.addTimesLine("labelTime", times);
 
         menuTable.add(scoreTable);
     }

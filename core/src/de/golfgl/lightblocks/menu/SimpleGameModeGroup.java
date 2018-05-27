@@ -75,11 +75,15 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         add(params).expandY();
 
         row();
-        scoresGroup = new ScoresGroup(app);
+        scoresGroup = new ScoresGroup(app, isShowBestTime());
         add(scoresGroup).height(scoresGroup.getPrefHeight()).fill();
 
         // TODO erst auslösen wenn Seite erstmals angezeigt wird
         refreshScores(0);
+    }
+
+    protected boolean isShowBestTime() {
+        return false;
     }
 
     protected void fillParamsTable(LightBlocksGame app) {
@@ -221,6 +225,11 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         @Override
         protected String getGameModeTitle() {
             return app.TEXTS.get("labelModel_practice");
+        }
+
+        @Override
+        protected boolean isShowBestTime() {
+            return true;
         }
 
         @Override

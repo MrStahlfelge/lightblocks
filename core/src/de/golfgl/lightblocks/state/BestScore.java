@@ -10,6 +10,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Mission;
+import de.golfgl.lightblocks.model.PracticeModel;
 
 /**
  * Der best Score nimmt die besten erreichten Werte eines Spielers auf
@@ -24,6 +25,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
     private int clearedLines;
     // Anzahl gezogene Blöcke
     private int drawnTetrominos;
+    private int timeMs;
     // ein (wie auch immer geartetes) Rating 1-7 (0 nicht gesetzt)
     private int rating;
 
@@ -67,6 +69,11 @@ public class BestScore implements IRoundScore, Json.Serializable {
         return this.drawnTetrominos == drawnTetrominos;
     }
 
+    @Override
+    public int getTimeMs() {
+        return timeMs;
+    }
+
     /**
      * Setzt alle Scores. Dabei wird bei jedem einzeln verglichen, ob er höher ist als vorher.
      * Abhängig von comparisonMethod werden alle Scores gemeinsam, wenn das Rating verbessert oder das Rating
@@ -82,10 +89,12 @@ public class BestScore implements IRoundScore, Json.Serializable {
                 this.rating = score.getRating();
                 this.score = score.getScore();
                 this.drawnTetrominos = score.getDrawnTetrominos();
+                this.timeMs = score.getTimeMs();
                 return score.getScore() > 10000;
             }
             return false;
         } else {
+            this.timeMs = Math.max(score.getTimeMs(), this.timeMs);
             setClearedLines(score.getClearedLines());
             boolean blocksIncreased = setDrawnTetrominos(score.getDrawnTetrominos());
             setRating(score.getRating());
@@ -96,15 +105,41 @@ public class BestScore implements IRoundScore, Json.Serializable {
         }
     }
 
-    private void mergeWithOther(BestScore bs) {
-        if (this.rating > 0 && bs.rating > 0 && bs.rating > this.rating
-                || ((this.rating == 0 || bs.rating == 0) &&
-                (bs.score > this.score || bs.score == this.score && bs.clearedLines > this.clearedLines))) {
+    private void mergeWithOther(String key, BestScore bs) {
+        // wäre eigentlich abhängig von ComparisonMethod, aber die ist hier nicht bekannt :-/
+        // daher hier auf den key des gamemodels vergleichen
+        // TODO für Sprint auf Zeit vergleichen
+
+        boolean otherScoreIsBetter;
+
+        if (key.equals(PracticeModel.MODEL_PRACTICE_ID))
+            otherScoreIsBetter = bs.drawnTetrominos > this.drawnTetrominos;
+        else
+            otherScoreIsBetter = this.rating > 0 && bs.rating > 0 && bs.rating > this.rating
+                    || ((this.rating == 0 || bs.rating == 0) &&
+                    (bs.score > this.score || bs.score == this.score && bs.clearedLines > this.clearedLines));
+
+        if (otherScoreIsBetter) {
             this.score = bs.score;
             this.clearedLines = bs.clearedLines;
             this.drawnTetrominos = bs.drawnTetrominos;
             this.rating = bs.rating;
+            this.timeMs = bs.timeMs;
         }
+    }
+
+    /**
+     * @param key
+     * @param score der gegen den BestScore zu prüfende Score
+     * @return true wenn der übergebene Score dem BestScore entspricht und Mindestanforderungen erfüllt
+     */
+    public boolean checkIsBestScore(String key, IRoundScore score) {
+        boolean isSame;
+        if (key.equals(PracticeModel.MODEL_PRACTICE_ID))
+            isSame = score.getDrawnTetrominos() >= this.drawnTetrominos && this.drawnTetrominos > 50;
+        else
+            isSame = score.getScore() >= this.score && this.score > 1000 && score.getRating() >= this.rating;
+        return isSame;
     }
 
     @Override
@@ -113,6 +148,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
         json.writeValue("s", this.score);
         json.writeValue("c", this.clearedLines);
         json.writeValue("d", this.drawnTetrominos);
+        json.writeValue("t", this.timeMs);
 
         if (this.rating > 0)
             json.writeValue("r", this.rating);
@@ -124,6 +160,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
         this.score = json.readValue(int.class, jsonData.get("s"));
         this.clearedLines = json.readValue(int.class, jsonData.get("c"));
         this.drawnTetrominos = json.readValue(int.class, jsonData.get("d"));
+        this.timeMs = jsonData.getInt("t", 0);
 
         // Rating optional
         final JsonValue jsRating = jsonData.get("r");
@@ -163,7 +200,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
                 if (!this.containsKey(key))
                     this.put(key, bs);
                 else
-                    this.get(key).mergeWithOther(bs);
+                    this.get(key).mergeWithOther(key, bs);
             }
         }
 
