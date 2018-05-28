@@ -11,6 +11,7 @@ import de.golfgl.lightblocks.state.IRoundScore;
 public class GameScore implements IRoundScore {
     protected static final int TYPE_NORMAL = 0;
     protected static final int TYPE_PRACTICE = 1;
+    protected static final int TYPE_SPRINT = 2;
 
     // der aktuelle Punktestand
     private int score;
@@ -43,6 +44,8 @@ public class GameScore implements IRoundScore {
         switch (scoringType) {
             case TYPE_PRACTICE:
                 return getDrawnTetrominos();
+            case TYPE_SPRINT:
+                return getTimeMs();
             default:
                 return getScore();
         }
@@ -51,6 +54,7 @@ public class GameScore implements IRoundScore {
     public String getLeaderboardTag() {
         switch (scoringType) {
             case TYPE_PRACTICE:
+            case TYPE_SPRINT:
                 return Integer.toString(getScore());
             default:
                 return Integer.toString(getClearedLines());
@@ -112,14 +116,20 @@ public class GameScore implements IRoundScore {
     }
 
     protected int getCurrentScoreFactor() {
-        return scoringType != TYPE_PRACTICE ? getCurrentLevel() + 1 : 1;
+        if (scoringType == TYPE_PRACTICE || scoringType == TYPE_SPRINT)
+            return 1;
+        else
+            return getCurrentLevel() + 1;
     }
 
     /**
      * returns current level depending on starting level and cleared lines
      */
     public int getCurrentLevel() {
-        return scoringType == TYPE_PRACTICE ? startingLevel : Math.max(startingLevel, clearedLines / 10);
+        if (scoringType == TYPE_PRACTICE || scoringType == TYPE_SPRINT)
+            return startingLevel;
+        else
+            return Math.max(startingLevel, clearedLines / 10);
     }
 
     public int getStartingLevel() {

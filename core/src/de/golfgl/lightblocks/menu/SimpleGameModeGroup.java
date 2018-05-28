@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Timer;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.PracticeModel;
+import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
@@ -261,6 +262,64 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         @Override
         protected void addInputButtonsToParams() {
             // nichts tun
+        }
+
+        @Override
+        protected void setInputButtonTableVisibility() {
+            // nichts tun, es gibt keine
+        }
+    }
+
+    public static class SprintModeGroup extends SimpleGameModeGroup {
+
+        public SprintModeGroup(SinglePlayerScreen myParentScreen, LightBlocksGame app) {
+            super(myParentScreen, app);
+        }
+
+        @Override
+        public String getGameModelId() {
+            return SprintModel.MODEL_SPRINT_ID;
+        }
+
+        @Override
+        protected String getGameModeTitle() {
+            return app.TEXTS.get("labelModel_sprint40");
+        }
+
+        @Override
+        protected boolean isShowBestTime() {
+            return true;
+        }
+
+        @Override
+        protected void fillParamsTable(LightBlocksGame app) {
+            row().pad(40, 20, 0, 20);
+            ScaledLabel introLabel = new ScaledLabel(app.TEXTS.get("goalModelSprint"), app.skin,
+                    LightBlocksGame.SKIN_FONT_REG, .75f);
+            introLabel.setWrap(true);
+            introLabel.setAlignment(Align.center);
+            add(introLabel).bottom().fillX().expandX();
+
+            super.fillParamsTable(app);
+        }
+
+        @Override
+        protected InitGameParameters getInitGameParameters() {
+            InitGameParameters initGameParametersParams = new InitGameParameters();
+            initGameParametersParams.setGameMode(InitGameParameters.GameMode.Sprint);
+            initGameParametersParams.setBeginningLevel(0);
+            initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYORTOUCH);
+            return initGameParametersParams;
+        }
+
+        @Override
+        protected int getMaxBeginningValue() {
+            return 0;
+        }
+
+        @Override
+        protected void addInputButtonsToParams() {
+            params.clear();
         }
 
         @Override

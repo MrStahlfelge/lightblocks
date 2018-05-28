@@ -106,7 +106,7 @@ public class ScoresGroup extends Group {
             linesLabel.setText(String.valueOf(myBestScores.getClearedLines()));
             drawnBlocksLabel.setText(String.valueOf(myBestScores.getDrawnTetrominos()));
             if (timeLabel != null)
-                timeLabel.setText(ScoreTable.formatTimeString(myBestScores.getTimeMs(), false));
+                timeLabel.setText(ScoreTable.formatTimeString(myBestScores.getTimeMs(), BestScore.getTimeMsDigits(gameModelId)));
         }
     }
 }

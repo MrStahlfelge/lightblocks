@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.gpgs;
 import de.golfgl.gdxgamesvcs.IGameServiceIdMapper;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.PracticeModel;
+import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.model.TutorialModel;
 
 /**
@@ -45,6 +46,7 @@ public class GpgsHelper {
     public static final String LEAD_MARATHON_GRAVITY = "CgkI4vHs17ETEAIQCA";
     public static final String LEAD_MARATHON_GAMEPAD = "CgkI4vHs17ETEAIQCQ";
     public static final String LEAD_PRACTICE_MODE = "CgkI4vHs17ETEAIQPA";
+    public static final String LEAD_SPRINT_MODE = "CgkI4vHs17ETEAIQPQ";
     public static final String EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED = "CgkI4vHs17ETEAIQAg";
     public static final String EVENT_MULTIPLAYER_MATCH_WON = "CgkI4vHs17ETEAIQAQ";
     public static final String EVENT_GESTURE_MARATHON_STARTED = "CgkI4vHs17ETEAIQAw";
@@ -85,6 +87,8 @@ public class GpgsHelper {
             return LEAD_MARATHON_GAMEPAD;
         if (gameModelId.equalsIgnoreCase(PracticeModel.MODEL_PRACTICE_ID))
             return LEAD_PRACTICE_MODE;
+        if (gameModelId.equalsIgnoreCase(SprintModel.MODEL_SPRINT_ID))
+            return LEAD_SPRINT_MODE;
 
         return null;
     }

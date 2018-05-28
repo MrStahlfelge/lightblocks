@@ -209,7 +209,7 @@ public class ScoreScreen extends AbstractMenuScreen {
         for (int i = 0; i < scoresToShow.size; i++)
             times.add(scoresToShow.get(i).getTimeMs());
 
-        scoreTable.addTimesLine("labelTime", times);
+        scoreTable.addTimesLine("labelTime", times, BestScore.getTimeMsDigits(gameModelId));
 
         menuTable.add(scoreTable);
     }

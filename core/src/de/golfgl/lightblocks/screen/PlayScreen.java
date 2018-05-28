@@ -33,6 +33,7 @@ import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.menu.PauseDialog;
 import de.golfgl.lightblocks.menu.ScoreScreen;
+import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
@@ -86,12 +87,14 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private ScoreLabel levelNum;
     private ScoreLabel linesNum;
     private ScoreLabel blocksLeft;
+    private ScaledLabel timeLabel;
     private PauseDialog pauseDialog;
     private Dialog pauseMsgDialog;
     private boolean isPaused = true;
     private HashSet<GameBlocker> gameBlockers = new HashSet<GameBlocker>();
     private OverlayMessage overlayWindow;
     private boolean showScoresWhenGameOver = true;
+    private int currentShownTime;
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
@@ -198,6 +201,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             final Label labelBlocks = new ScaledLabel(app.TEXTS.get("labelBlocksScore").toUpperCase(), app.skin);
             scoreTable.add(labelBlocks).right().bottom().padBottom(-2).spaceRight(3);
             scoreTable.add(blocksLeft).left().colspan(3);
+        } else if (gameModel.showTime()) {
+            scoreTable.row();
+            final Label labelBlocks = new ScaledLabel(app.TEXTS.get("labelTime").toUpperCase(), app.skin);
+            scoreTable.add(labelBlocks).right().bottom().padBottom(-2).spaceRight(3);
+            timeLabel = new ScaledLabel(ScoreTable.formatTimeString(0, 1), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            scoreTable.add(timeLabel).left().colspan(3);
         }
         scoreTable.validate();
 
@@ -387,6 +396,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         if (!isPaused)
             gameModel.update(delta);
+
+        updateTimeLabel();
 
         super.render(delta);
 
@@ -624,9 +635,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                         block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(i)) *
                                 BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
                     // else if (y == i && linesToInsert == 0) - entfernt wegen anhaltendem Ärger!
-                        // die untersten zusammenhängenden Zeilen rausschieben
-                        //block.setMoveAction(Actions.moveBy(0, -2 * BlockActor.blockWidth, moveActorsTime),
-                        //        removeDelayTime);
+                    // die untersten zusammenhängenden Zeilen rausschieben
+                    //block.setMoveAction(Actions.moveBy(0, -2 * BlockActor.blockWidth, moveActorsTime),
+                    //        removeDelayTime);
 
                     block.addAction(sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
                             Actions.removeActor()));
@@ -888,6 +899,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (gameModel.showBlocksScore())
             blocksLeft.setScore(gameModel.getMaxBlocksToUse() > 0 ?
                     gameModel.getMaxBlocksToUse() - score.getDrawnTetrominos() : score.getDrawnTetrominos());
+    }
+
+    protected void updateTimeLabel() {
+        if (gameModel.showTime() && timeLabel != null) {
+            int timeMs = gameModel.getScore().getTimeMs();
+
+            if (timeMs - currentShownTime > 100) {
+                timeLabel.setText(ScoreTable.formatTimeString(timeMs, 1));
+                currentShownTime = timeMs;
+            }
+        }
     }
 
     @Override

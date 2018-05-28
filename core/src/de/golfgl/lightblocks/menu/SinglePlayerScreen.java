@@ -27,6 +27,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
     public static final int PAGEIDX_MISSION = 1;
     public static final int PAGEIDX_MARATHON = 2;
     public static final int PAGEIDX_PRACTICE = 3;
+    public static final int PAGEIDX_SPRINT = 4;
     private PagedScrollPane modePager;
     private Button leaderboardButton;
 
@@ -72,6 +73,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         modePager.addPage(new MissionChooseGroup(this, app));
         modePager.addPage(new SimpleGameModeGroup.MarathonGroup(this, app));
         modePager.addPage(new SimpleGameModeGroup.PracticeModeGroup(this, app));
+        modePager.addPage(new SimpleGameModeGroup.SprintModeGroup(this, app));
         modePager.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

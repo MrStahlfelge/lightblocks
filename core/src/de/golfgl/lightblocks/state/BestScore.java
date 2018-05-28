@@ -11,6 +11,7 @@ import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.PracticeModel;
+import de.golfgl.lightblocks.model.SprintModel;
 
 /**
  * Der best Score nimmt die besten erreichten Werte eines Spielers auf
@@ -30,6 +31,17 @@ public class BestScore implements IRoundScore, Json.Serializable {
     private int rating;
 
     private ComparisonMethod comparisonMethod = ComparisonMethod.score;
+
+    /**
+     * @param gameModelId
+     * @return Anzahl der anzuzeigenden Ms-Stellen bei der Zeit
+     */
+    public static int getTimeMsDigits(String gameModelId) {
+        if (gameModelId.equals(SprintModel.MODEL_SPRINT_ID))
+            return 1;
+        else
+            return 0;
+    }
 
     public ComparisonMethod getComparisonMethod() {
         return comparisonMethod;
@@ -93,6 +105,18 @@ public class BestScore implements IRoundScore, Json.Serializable {
                 return score.getScore() > 10000;
             }
             return false;
+        } else if (comparisonMethod.equals(ComparisonMethod.sprint)) {
+            if (score.getClearedLines() >= SprintModel.NUM_LINES_TO_CLEAR && score.getTimeMs() > 0 &&
+                    (score.getTimeMs() < this.timeMs || this.timeMs == 0)) {
+                boolean hadScore = this.timeMs > 0;
+                this.clearedLines = score.getClearedLines();
+                this.rating = score.getRating();
+                this.score = score.getScore();
+                this.drawnTetrominos = score.getDrawnTetrominos();
+                this.timeMs = score.getTimeMs();
+                return hadScore;
+            }
+            return false;
         } else {
             this.timeMs = Math.max(score.getTimeMs(), this.timeMs);
             setClearedLines(score.getClearedLines());
@@ -114,6 +138,9 @@ public class BestScore implements IRoundScore, Json.Serializable {
 
         if (key.equals(PracticeModel.MODEL_PRACTICE_ID))
             otherScoreIsBetter = bs.drawnTetrominos > this.drawnTetrominos;
+        else if (key.equals(SprintModel.MODEL_SPRINT_ID))
+            otherScoreIsBetter = bs.getClearedLines() >= SprintModel.NUM_LINES_TO_CLEAR && bs.getTimeMs() > 0
+                    && (bs.getTimeMs() < this.timeMs || this.timeMs == 0);
         else
             otherScoreIsBetter = this.rating > 0 && bs.rating > 0 && bs.rating > this.rating
                     || ((this.rating == 0 || bs.rating == 0) &&
@@ -137,6 +164,9 @@ public class BestScore implements IRoundScore, Json.Serializable {
         boolean isSame;
         if (key.equals(PracticeModel.MODEL_PRACTICE_ID))
             isSame = score.getDrawnTetrominos() >= this.drawnTetrominos && this.drawnTetrominos > 50;
+        else if (key.equals(SprintModel.MODEL_SPRINT_ID))
+            isSame = score.getClearedLines() >= SprintModel.NUM_LINES_TO_CLEAR && score.getTimeMs() > 0
+                    && this.timeMs > 0 && score.getTimeMs() < this.timeMs;
         else
             isSame = score.getScore() >= this.score && this.score > 1000 && score.getRating() >= this.rating;
         return isSame;
@@ -177,7 +207,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
         return (this.rating == rating);
     }
 
-    public enum ComparisonMethod {score, rating, blocks}
+    public enum ComparisonMethod {score, rating, sprint, blocks}
 
     public static class BestScoreMap extends HashMap<String, BestScore> implements Json.Serializable {
 

@@ -25,21 +25,23 @@ public class ScoreTable extends Table {
         defaults().space(15);
     }
 
-    public static String formatTimeString(int time, boolean appendMs) {
-        String ms = String.valueOf(time % 1000);
+    public static String formatTimeString(int time, int numOfMsDigits) {
+        String ms = numOfMsDigits > 0 ? String.valueOf(time % 1000) : null;
         time = time / 1000;
         String seconds = String.valueOf(time % 60);
         int minutes = time / 60;
-
-        while (ms.length() < 3)
-            ms = "0" + ms;
 
         while (seconds.length() < 2)
             seconds = "0" + seconds;
 
         String formattedString = String.valueOf(minutes) + ":" + seconds;
-        if (appendMs)
-            formattedString = formattedString + "." + ms;
+        if (numOfMsDigits > 0) {
+            while (ms.length() < 3)
+                ms = "0" + ms;
+
+            formattedString = formattedString + "." + ms.substring(0, numOfMsDigits);
+        }
+
         return formattedString;
     }
 
@@ -76,7 +78,7 @@ public class ScoreTable extends Table {
         }
     }
 
-    protected void addTimesLine(String label, Array<Integer> time) {
+    protected void addTimesLine(String label, Array<Integer> time, int msDigits) {
 
         row();
         add(new ScaledLabel(app.TEXTS.get(label).toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE))
@@ -86,7 +88,7 @@ public class ScoreTable extends Table {
             ScaledLabel timeLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
 
             if (time.get(i) > 0)
-                timeLabel.setText(formatTimeString(time.get(i), false));
+                timeLabel.setText(formatTimeString(time.get(i), msDigits));
 
             timeLabel.setAlignment(Align.right);
 

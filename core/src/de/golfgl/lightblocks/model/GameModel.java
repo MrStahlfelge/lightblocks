@@ -783,6 +783,10 @@ public abstract class GameModel implements Json.Serializable {
         return maxBlocksToUse > 0;
     }
 
+    public boolean showTime() {
+        return false;
+    }
+
     protected void setMaxBlocksToUse(int maxBlocksToUse) {
         this.maxBlocksToUse = maxBlocksToUse;
     }
