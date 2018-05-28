@@ -28,7 +28,9 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
             game.setOpenWeblinks(false);
     }
 
-    /** im Gegensatz zu LightBlocksGame.isOnAndroidTV() gibt diese hier nicht für FireTV true */
+    /**
+     * im Gegensatz zu LightBlocksGame.isOnAndroidTV() gibt diese hier nicht für FireTV true
+     */
     private boolean isOnGooglePlayAndroidTV() {
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK)
                 || getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK_ONLY); //NON-NLS
@@ -42,10 +44,10 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
 
         gpgsClient.onGpgsActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RC_SELECT_PLAYERS)
+        if (requestCode == RC_SELECT_PLAYERS && gpgsClient.getMultiPlayerRoom() != null)
             gpgsClient.getMultiPlayerRoom().selectPlayersResult(resultCode, data);
 
-        else if (requestCode == RC_INVITATION_INBOX)
+        else if (requestCode == RC_INVITATION_INBOX && gpgsClient.getMultiPlayerRoom() != null)
             gpgsClient.getMultiPlayerRoom().selectInvitationResult(resultCode, data);
 
     }
