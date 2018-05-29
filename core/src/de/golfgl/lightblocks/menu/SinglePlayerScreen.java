@@ -1,12 +1,15 @@
 package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
+import de.golfgl.gdx.controllers.ControllerScrollPane;
 import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -24,6 +27,7 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  */
 
 public class SinglePlayerScreen extends AbstractMenuDialog {
+    public static final int PAGEIDX_OVERVIEW = 0;
     public static final int PAGEIDX_MISSION = 1;
     public static final int PAGEIDX_MARATHON = 2;
     public static final int PAGEIDX_PRACTICE = 3;
@@ -147,45 +151,71 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         String getGameModelId();
     }
 
-    private class IntroGroup extends Table implements IGameModeGroup {
+    private class IntroGroup extends ControllerScrollPane implements IGameModeGroup {
         private final Button missionsButton;
         private final Button marathonButton;
-        private final Button practiceButton;
+        private Table table;
 
         public IntroGroup() {
+            super(null);
+            table = new Table();
+            setActor(table);
+            setScrollingDisabled(true, false);
+
             missionsButton = addPageScrollInfoButton(app.TEXTS.get("menuPlayMissionButton"),
                     app.TEXTS.get("introModelMissions"), PAGEIDX_MISSION);
 
             marathonButton = addPageScrollInfoButton(app.TEXTS.get("labelMarathon"),
                     app.TEXTS.get("introModelMarathon"), PAGEIDX_MARATHON);
 
-            practiceButton = addPageScrollInfoButton(app.TEXTS.get("labelModel_practice"),
+            Button practiceButton = addPageScrollInfoButton(app.TEXTS.get("labelModel_practice"),
                     app.TEXTS.get("introModelPractice"), PAGEIDX_PRACTICE);
 
-            pad(0, 20, 0, 20);
-            row();
+            Button sprintButton = addPageScrollInfoButton(app.TEXTS.get("labelModel_sprint40"),
+                    app.TEXTS.get("goalModelSprint"), PAGEIDX_SPRINT);
+
+            table.pad(0, 20, 0, 20);
+            table.row();
             Label label1 = new ScaledLabel(app.TEXTS.get("introGameModels"), app.skin,
                     app.SKIN_FONT_BIG, .85f);
             label1.setWrap(true);
             label1.setAlignment(Align.center);
-            add(label1).fill().expandX();
+            table.add(label1).fill().expandX();
 
-            row().padTop(10);
-            add(missionsButton).fill();
+            table.row().padTop(10);
+            table.add(missionsButton).fill();
 
-            row().padTop(10);
-            add(marathonButton).fill();
+            table.row().padTop(10);
+            table.add(marathonButton).fill();
 
-            row().padTop(10);
-            add(practiceButton).fill();
+            table.row().padTop(10);
+            table.add(practiceButton).fill();
+
+            table.row().padTop(10);
+            table.add(sprintButton).fill();
+        }
+
+        public void scrollToSelected() {
+            Actor focused = ((MyStage) getStage()).getFocusedActor();
+
+            if (focused != null && focused.isDescendantOf(this))
+                scrollTo(focused.getX(), focused.getY(), focused.getWidth(), focused.getHeight(), false, true);
         }
 
         private InfoButton addPageScrollInfoButton(String title, String description, final int pageToScrollTo) {
             InfoButton button = new InfoButton(title, description, app.skin);
+            button.getDescLabel().setAlignment(Align.center);
             button.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     modePager.scrollToPage(pageToScrollTo);
+                }
+            });
+            button.addListener(new InputListener() {
+                @Override
+                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                    if (pointer == -1)
+                        scrollToSelected();
                 }
             });
             addFocusableActor(button);
@@ -194,6 +224,8 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
 
         @Override
         public Actor getConfiguredDefaultActor() {
+            scrollTo(0, table.getPrefHeight(), 1, 1);
+            updateVisualScroll();
             return missionsButton;
         }
 

@@ -39,4 +39,8 @@ public class InfoButton extends RoundedTextButton {
     public void setDescription(String description) {
         descLabel.setText(description);
     }
+
+    public Label getDescLabel() {
+        return descLabel;
+    }
 }
