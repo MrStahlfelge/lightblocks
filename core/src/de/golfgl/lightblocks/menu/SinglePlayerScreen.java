@@ -1,8 +1,8 @@
 package de.golfgl.lightblocks.menu;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -155,6 +155,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         private final Button missionsButton;
         private final Button marathonButton;
         private Table table;
+        private Actor lastFocused;
 
         public IntroGroup() {
             super(null);
@@ -195,9 +196,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
             table.add(sprintButton).fill();
         }
 
-        public void scrollToSelected() {
-            Actor focused = ((MyStage) getStage()).getFocusedActor();
-
+        public void scrollToActor(Actor focused) {
             if (focused != null && focused.isDescendantOf(this))
                 scrollTo(focused.getX(), focused.getY(), focused.getWidth(), focused.getHeight(), false, true);
         }
@@ -211,27 +210,37 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
                     modePager.scrollToPage(pageToScrollTo);
                 }
             });
-            button.addListener(new InputListener() {
-                @Override
-                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                    if (pointer == -1)
-                        scrollToSelected();
-                }
-            });
             addFocusableActor(button);
             return button;
         }
 
         @Override
         public Actor getConfiguredDefaultActor() {
-            scrollTo(0, table.getPrefHeight(), 1, 1);
+            if (lastFocused == null)
+                lastFocused = missionsButton;
+
+            scrollToActor(lastFocused);
             updateVisualScroll();
-            return missionsButton;
+            return lastFocused;
         }
 
         @Override
         public String getGameModelId() {
             return null;
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+
+            if (getStage() != null && getStage() instanceof MyStage) {
+                Actor focusedActor = ((MyStage) getStage()).getFocusedActor();
+                if (focusedActor != null && lastFocused != focusedActor && focusedActor.isDescendantOf(this)
+                        && !Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                    lastFocused = focusedActor;
+                    scrollToActor(focusedActor);
+                }
+            }
         }
     }
 }

@@ -85,7 +85,7 @@ public class WelcomeTextUtils {
 
         // 1823: Practice Mode
         if (listChangesSince < 1823) {
-            welcomes.add(new WelcomeButton.WelcomeText("There are new game modes: Practice and Sprint 40L. Have fun!",
+            welcomes.add(new WelcomeButton.WelcomeText("There are new game modes:\nPractice and Sprint 40L. Have fun!",
                     new ShowSinglePlayerPageRunnable(app, SinglePlayerScreen.PAGEIDX_OVERVIEW)));
         }
 
