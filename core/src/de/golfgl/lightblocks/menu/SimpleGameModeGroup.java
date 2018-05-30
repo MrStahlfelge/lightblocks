@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
@@ -12,6 +13,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.SprintModel;
+import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
@@ -33,6 +35,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
     protected BeginningLevelChooser beginningLevelSlider;
     protected InputButtonTable inputButtons;
     protected Button playButton;
+    protected Cell playButtonCell;
     protected ScoresGroup scoresGroup;
     protected LightBlocksGame app;
 
@@ -73,7 +76,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         fillParamsTable(app);
 
         row();
-        add(params).expandY();
+        add(params).expandY().fillX().pad(0, 20, 0, 20);
 
         row();
         scoresGroup = new ScoresGroup(app, isShowBestTime());
@@ -103,7 +106,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
                                    }
                                }
         );
-        params.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top().fillX();
+        playButtonCell = params.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top().fillX();
         menuScreen.addFocusableActor(playButton);
 
         menuScreen.addFocusableActor(inputButtons);
@@ -271,6 +274,8 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
     }
 
     public static class SprintModeGroup extends SimpleGameModeGroup {
+        private boolean isLocked = false;
+        private TextButton lockMessage;
 
         public SprintModeGroup(SinglePlayerScreen myParentScreen, LightBlocksGame app) {
             super(myParentScreen, app);
@@ -301,6 +306,11 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
             add(introLabel).bottom().fillX().expandX();
 
             super.fillParamsTable(app);
+
+            lockMessage = new FaTextButton(app.TEXTS.get("lockModelSprint"), app.skin, "default");
+            lockMessage.getLabel().setWrap(true);
+            menuScreen.addFocusableActor(lockMessage);
+            switchLockedMode();
         }
 
         @Override
@@ -325,6 +335,27 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         @Override
         protected void setInputButtonTableVisibility() {
             // nichts tun, es gibt keine
+        }
+
+        @Override
+        public Actor getConfiguredDefaultActor() {
+            // diese Methode wird aufgerufen, wenn auf diese Seite gewechselt wird. Falls also die Mission
+            // freigeschaltet wurde, wird hier aktualisiert
+            switchLockedMode();
+
+            return isLocked ? lockMessage : playButton;
+        }
+
+        private void switchLockedMode() {
+            boolean isLocked = !SprintModel.isUnlocked(app);
+
+            if (isLocked == this.isLocked)
+                return;
+
+            this.isLocked = isLocked;
+
+            playButtonCell.setActor(isLocked ? lockMessage : playButton);
+            playButtonCell.expandX().fillX();
         }
     }
 }

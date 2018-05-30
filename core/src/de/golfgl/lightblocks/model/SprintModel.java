@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.model;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -10,6 +11,16 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 public class SprintModel extends GameModel {
     public static final String MODEL_SPRINT_ID = "sprint40";
     public static final int NUM_LINES_TO_CLEAR = 40;
+
+    public static boolean isUnlocked(LightBlocksGame app) {
+        return app.savegame.getBestScore(Mission.MISSION10ACHIEVEMENT).getRating() > 0
+                || app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_ID + "1")
+                .getClearedLines() >= NUM_LINES_TO_CLEAR
+                || app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_ID + "3")
+                .getClearedLines() >= NUM_LINES_TO_CLEAR
+                || app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_ID + "2")
+                .getClearedLines() >= NUM_LINES_TO_CLEAR;
+    }
 
     @Override
     public String getIdentifier() {
