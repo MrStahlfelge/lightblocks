@@ -69,6 +69,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     private static final int NINE_PATCH_BORDER_SIZE = 5;
+    private static final float GAMEOVER_TOUCHFREEZE = 1.5f;
     protected final Image imGarbageIndicator;
     protected final Button pauseButton;
     protected final Group centerGroup;
@@ -95,6 +96,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private OverlayMessage overlayWindow;
     private boolean showScoresWhenGameOver = true;
     private int currentShownTime;
+    private float timeSinceGameOver = 0;
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
@@ -397,6 +399,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (!isPaused)
             gameModel.update(delta);
 
+        if (gameModel.isGameOver() && timeSinceGameOver < GAMEOVER_TOUCHFREEZE)
+            timeSinceGameOver = timeSinceGameOver + delta;
+
         updateTimeLabel();
 
         super.render(delta);
@@ -465,10 +470,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     public void switchPause(boolean immediately) {
 
-        if (gameModel.isGameOver())
-            goBackToMenu();
-
-        else if (!isPaused || gameBlockers.isEmpty()) {
+        if (gameModel.isGameOver()) {
+            // bei Game Over auf beliebige Taste/Touch den Spielbildschirm verlassen, aber nicht ganz sofort
+            if (timeSinceGameOver >= GAMEOVER_TOUCHFREEZE)
+                goBackToMenu();
+        } else if (!isPaused || gameBlockers.isEmpty()) {
             isPaused = !isPaused;
 
             final float fadingInterval = immediately ? 0 : .2f;
