@@ -218,9 +218,6 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         public Actor getConfiguredDefaultActor() {
             if (lastFocused == null)
                 lastFocused = missionsButton;
-
-            scrollToActor(lastFocused);
-            updateVisualScroll();
             return lastFocused;
         }
 
