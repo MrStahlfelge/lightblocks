@@ -499,8 +499,11 @@ public abstract class GameModel implements Json.Serializable {
     protected void submitGameEnded(boolean success) {
         String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(getIdentifier());
 
-        if (leaderboardId != null && app.gpgsClient != null && app.gpgsClient.isSessionActive())
-            app.gpgsClient.submitToLeaderboard(leaderboardId, score.getLeaderboardScore(), score.getLeaderboardTag());
+        if (leaderboardId != null && app.gpgsClient != null && app.gpgsClient.isSessionActive()) {
+            int leaderboardScore = score.getLeaderboardScore();
+            if (leaderboardScore > 0)
+                app.gpgsClient.submitToLeaderboard(leaderboardId, leaderboardScore, score.getLeaderboardTag());
+        }
 
         submitEvent(GpgsHelper.EVENT_BLOCK_DROP, score.getDrawnTetrominos() % 10);
         GaHelper.endGameEvent(app.gameAnalytics, this, success);

@@ -40,12 +40,16 @@ public class GameScore implements IRoundScore {
         this.rating = rating;
     }
 
+    /**
+     * @return Wert der ins Leaderboard des Game Service eingetragen werden soll, oder -1 falls der Score nicht
+     * eingetragen werden soll
+     */
     public int getLeaderboardScore() {
         switch (scoringType) {
             case TYPE_PRACTICE:
                 return getDrawnTetrominos();
             case TYPE_SPRINT:
-                return getTimeMs();
+                return (getDrawnTetrominos() >= SprintModel.NUM_LINES_TO_CLEAR ? getTimeMs() : -1);
             default:
                 return getScore();
         }
