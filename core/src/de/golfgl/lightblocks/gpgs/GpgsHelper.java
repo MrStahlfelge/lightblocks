@@ -46,7 +46,7 @@ public class GpgsHelper {
     public static final String LEAD_MARATHON_GRAVITY = "CgkI4vHs17ETEAIQCA";
     public static final String LEAD_MARATHON_GAMEPAD = "CgkI4vHs17ETEAIQCQ";
     public static final String LEAD_PRACTICE_MODE = "CgkI4vHs17ETEAIQPA";
-    public static final String LEAD_SPRINT_MODE = "CgkI4vHs17ETEAIQPQ";
+    public static final String LEAD_SPRINT_MODE = "CgkI4vHs17ETEAIQPg";
     public static final String EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED = "CgkI4vHs17ETEAIQAg";
     public static final String EVENT_MULTIPLAYER_MATCH_WON = "CgkI4vHs17ETEAIQAQ";
     public static final String EVENT_GESTURE_MARATHON_STARTED = "CgkI4vHs17ETEAIQAw";
