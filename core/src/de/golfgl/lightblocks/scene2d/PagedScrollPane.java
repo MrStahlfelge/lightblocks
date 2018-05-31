@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -58,6 +59,19 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
         setScrollingDisabled(false, true);
         setOverscroll(true, false);
         setFlingTime(.5f);
+        removeMouseScrollListener();
+    }
+
+    /**
+     * entfernt den MousescrollListener - HACK
+     */
+    private void removeMouseScrollListener() {
+        for (EventListener e : getListeners()) {
+            if (e instanceof InputListener) {
+                removeListener(e);
+                break;
+            }
+        }
     }
 
     public void addPages(T... pages) {
