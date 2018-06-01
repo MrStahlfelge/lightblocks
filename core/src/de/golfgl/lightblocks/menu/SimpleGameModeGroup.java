@@ -44,7 +44,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         this.app = app;
 
         params = new Table();
-        beginningLevelSlider = new BeginningLevelChooser(app, app.localPrefs.getMarathonBeginningLevel(),
+        beginningLevelSlider = new BeginningLevelChooser(app, getPreselectedBeginningLevel(app),
                 getMaxBeginningValue()) {
             @Override
             protected void onControllerDefaultKeyDown() {
@@ -84,6 +84,10 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
 
         // TODO erst auslösen wenn Seite erstmals angezeigt wird
         refreshScores(0);
+    }
+
+    protected int getPreselectedBeginningLevel(LightBlocksGame app) {
+        return app.localPrefs.getMarathonBeginningLevel();
     }
 
     protected boolean isShowBestTime() {
@@ -166,9 +170,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
     protected void beginNewGame() {
         InitGameParameters initGameParametersParams = getInitGameParameters();
 
-        // Einstellungen speichern
-        app.localPrefs.saveMarathonLevelAndInput(initGameParametersParams.getBeginningLevel(), inputButtons
-                .getSelectedInput());
+        savePreselectionSettings(initGameParametersParams);
 
         try {
             PlayScreen.gotoPlayScreen((AbstractScreen) app.getScreen(), initGameParametersParams);
@@ -176,6 +178,12 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         } catch (VetoException e) {
             new VetoDialog(e.getMessage(), app.skin, menuScreen.getAvailableContentWidth() * .75f).show(getStage());
         }
+    }
+
+    protected void savePreselectionSettings(InitGameParameters initGameParametersParams) {
+        // Einstellungen speichern
+        app.localPrefs.saveMarathonLevelAndInput(initGameParametersParams.getBeginningLevel(), inputButtons
+                .getSelectedInput());
     }
 
     protected abstract InitGameParameters getInitGameParameters();
@@ -325,6 +333,11 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         @Override
         protected int getMaxBeginningValue() {
             return 0;
+        }
+
+        @Override
+        protected void savePreselectionSettings(InitGameParameters initGameParametersParams) {
+            // es gibt keine
         }
 
         @Override
