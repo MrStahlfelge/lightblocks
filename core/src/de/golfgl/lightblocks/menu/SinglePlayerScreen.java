@@ -58,7 +58,8 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
                 try {
                     app.gpgsClient.showLeaderboards(GpgsHelper.getLeaderBoardIdByModelId(getGameModelId()));
                 } catch (GameServiceException e) {
-                    new VetoDialog("Error showing leaderboard.", app.skin, getStage().getWidth()).show(getStage());
+                    new VetoDialog("Error showing leaderboard.", app.skin, getStage().getWidth() * .8f)
+                            .show(getStage());
                 }
             }
         });
