@@ -14,6 +14,8 @@ import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.Mission;
+import de.golfgl.lightblocks.model.PracticeModel;
+import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.AbstractMenuScreen;
@@ -157,8 +159,19 @@ public class ScoreScreen extends AbstractMenuScreen {
     }
 
     protected String getShareText() {
-        return app.TEXTS.format((newHighscore ? "shareBestText" :
-                "shareText"), scoresToShow.get(0).getScore(), LightBlocksGame.GAME_URL_SHORT, getSubtitle());
+        IRoundScore firstScore = scoresToShow.get(0);
+        if (gameModelId.equals(PracticeModel.MODEL_PRACTICE_ID))
+            return null;
+        else if (gameModelId.equals(SprintModel.MODEL_SPRINT_ID)) {
+            if (firstScore.getDrawnTetrominos() < SprintModel.NUM_LINES_TO_CLEAR)
+                return null;
+            else
+                return app.TEXTS.format("shareSprintText", ScoreTable.formatTimeString(firstScore.getTimeMs(),
+                        BestScore.getTimeMsDigits(gameModelId)), LightBlocksGame.GAME_URL_SHORT, getSubtitle());
+        } else
+            return app.TEXTS.format((newHighscore ? "shareBestText" :
+                    "shareText"), firstScore.getScore(), LightBlocksGame.GAME_URL_SHORT, getSubtitle());
+
     }
 
     protected void fillMenuTable(Table menuTable) {
@@ -216,9 +229,12 @@ public class ScoreScreen extends AbstractMenuScreen {
 
     protected void fillButtonTable(Table buttons) {
         // Share Button
-        Button share = new ShareButton(app, getShareText());
-        buttons.add(share);
-        stage.addFocusableActor(share);
+        String shareText = getShareText();
+        if (shareText != null) {
+            Button share = new ShareButton(app, shareText);
+            buttons.add(share);
+            stage.addFocusableActor(share);
+        }
 
         // Leader Board
         final String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(gameModelId);
