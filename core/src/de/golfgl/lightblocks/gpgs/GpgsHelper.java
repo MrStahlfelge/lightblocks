@@ -31,6 +31,7 @@ public class GpgsHelper {
     public static final String ACH_MARATHON_SUPER_CHECKER = "CgkI4vHs17ETEAIQGA";
     public static final String ACH_SCORE_MILLIONAIRE = "CgkI4vHs17ETEAIQGQ";
     public static final String ACH_GRAVITY_KING = "CgkI4vHs17ETEAIQGg";
+    public static final String ACH_SPRINTER = "CgkI4vHs17ETEAIQPw";
     public static final String ACH_MEGA_MULTI_PLAYER = "CgkI4vHs17ETEAIQGw";
     public static final String ACH_GAMEPAD_OWNER = "CgkI4vHs17ETEAIQHA";
     public static final String ACH_SPECIAL_CHAIN = "CgkI4vHs17ETEAIQHQ";

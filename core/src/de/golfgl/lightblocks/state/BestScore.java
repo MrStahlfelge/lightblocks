@@ -260,6 +260,11 @@ public class BestScore implements IRoundScore, Json.Serializable {
                 if (perfectDone)
                     gpgsClient.unlockAchievement(GpgsHelper.ACH_ALL_MISSIONS_PERFECT);
             }
+
+            // Sprint in weniger als 150 Sekunden geschafft?
+            BestScore sprintScore = this.get(SprintModel.MODEL_SPRINT_ID);
+            if (sprintScore != null && sprintScore.getClearedLines() >= SprintModel.NUM_LINES_TO_CLEAR && sprintScore.getTimeMs() <= 150000)
+                gpgsClient.unlockAchievement(GpgsHelper.ACH_SPRINTER);
         }
     }
 }
