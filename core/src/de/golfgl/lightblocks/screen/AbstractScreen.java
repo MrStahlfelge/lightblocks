@@ -158,6 +158,10 @@ public abstract class AbstractScreen implements Screen {
         return dialog;
     }
 
+    public Screen getBackScreen() {
+        return backScreen;
+    }
+
     public void setBackScreen(Screen backScreen) {
         this.backScreen = backScreen;
     }

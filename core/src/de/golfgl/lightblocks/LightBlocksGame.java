@@ -175,7 +175,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         else {
             // beim ersten Mal ins Tutorial (nur für Touchinput)!
             try {
-                PlayScreen ps = PlayScreen.gotoPlayScreen(mainMenuScreen, TutorialModel.getTutorialInitParams());
+                PlayScreen ps = PlayScreen.gotoPlayScreen(this, TutorialModel.getTutorialInitParams());
                 ps.setShowScoresWhenGameOver(false);
                 ps.setBackScreen(mainMenuScreen);
             } catch (VetoException e) {

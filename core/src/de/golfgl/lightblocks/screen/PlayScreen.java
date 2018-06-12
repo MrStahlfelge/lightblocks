@@ -222,6 +222,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         gameType.setText(modelIdLabel);
         pauseDialog.setTitle(modelIdLabel);
+        pauseDialog.addRetryButton(gameModel.getInitParameters());
         final String goalDescription = gameModel.getGoalDescription();
         if (goalDescription != null && !goalDescription.isEmpty()) {
             String[] goalParams = gameModel.getGoalParams();
@@ -258,51 +259,51 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
      * @param caller        the AbstractScreen that is calling.
      * @param newGameParams null if game should be resumed.
      */
-    public static PlayScreen gotoPlayScreen(AbstractScreen caller, InitGameParameters newGameParams) throws
+    public static PlayScreen gotoPlayScreen(LightBlocksGame app, InitGameParameters newGameParams) throws
             VetoException {
 
         boolean resumeGame = (newGameParams == null);
 
-        if (!resumeGame && caller.app.savegame.hasSavedGame())
-            caller.app.savegame.resetGame();
+        if (!resumeGame && app.savegame.hasSavedGame())
+            app.savegame.resetGame();
 
         try {
             final PlayScreen currentGame;
             if (!resumeGame && newGameParams.isMultiplayer())
-                currentGame = new MultiplayerPlayScreen(caller.app, newGameParams);
+                currentGame = new MultiplayerPlayScreen(app, newGameParams);
             else
-                currentGame = new PlayScreen(caller.app, newGameParams);
+                currentGame = new PlayScreen(app, newGameParams);
 
             Gdx.input.setInputProcessor(null);
-            caller.app.controllerMappings.setInputProcessor(null);
-            caller.app.setScreen(currentGame);
+            app.controllerMappings.setInputProcessor(null);
+            app.setScreen(currentGame);
 
             // Game Analysis
-            GaHelper.startGameEvent(caller.app, currentGame.gameModel, currentGame.inputAdapter);
+            GaHelper.startGameEvent(app, currentGame.gameModel, currentGame.inputAdapter);
 
             // GPGS Event
-            if (caller.app.gpgsClient != null) {
+            if (app.gpgsClient != null) {
                 // Unterschied machen wenn Multiplayer
                 String modelId = currentGame.gameModel.getIdentifier();
                 String eventId = null;
                 if (!modelId.equals(MultiplayerModel.MODEL_ID))
                     eventId = GpgsHelper.getNewGameEventByModelId(modelId);
-                else if (caller.app.multiRoom != null && caller.app.multiRoom.isLocalGame())
+                else if (app.multiRoom != null && app.multiRoom.isLocalGame())
                     eventId = GpgsHelper.EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED;
-                else if (caller.app.multiRoom != null && !caller.app.multiRoom.isLocalGame())
+                else if (app.multiRoom != null && !app.multiRoom.isLocalGame())
                     eventId = GpgsHelper.EVENT_INET_MULTIPLAYER_MATCH_STARTED;
 
                 if (eventId != null) {
                     Gdx.app.log("GPGS", "Submitting newly started game " + modelId);
-                    caller.app.gpgsClient.submitEvent(eventId, 1);
+                    app.gpgsClient.submitEvent(eventId, 1);
                 }
             }
 
             return currentGame;
 
         } catch (InputNotAvailableException inp) {
-            throw new VetoException(caller.app.TEXTS.format("errorInputNotAvail",
-                    caller.app.TEXTS.get(PlayScreenInput.getInputTypeName(inp.getInputKey()))));
+            throw new VetoException(app.TEXTS.format("errorInputNotAvail",
+                    app.TEXTS.get(PlayScreenInput.getInputTypeName(inp.getInputKey()))));
         }
     }
 

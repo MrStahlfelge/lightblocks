@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -91,7 +90,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
         resumeGameButton.addListener(new ChangeListener() {
                                          public void changed(ChangeEvent event, Actor actor) {
                                              try {
-                                                 PlayScreen.gotoPlayScreen(MainMenuScreen.this, null);
+                                                 PlayScreen.gotoPlayScreen(app, null);
                                              } catch (VetoException e) {
                                                  showDialog(e.getMessage());
                                              } catch (Throwable t) {

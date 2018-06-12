@@ -373,7 +373,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
         try {
             MultiplayerPlayScreen mps = (MultiplayerPlayScreen) PlayScreen.gotoPlayScreen(
-                    ((AbstractScreen) app.getScreen()), initGameParametersParams);
+                    app, initGameParametersParams);
             screenNotActive = true;
             ((MultiplayerModel) mps.gameModel).setMatchStats(matchStats);
 

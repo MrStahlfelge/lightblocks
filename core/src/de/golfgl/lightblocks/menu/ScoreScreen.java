@@ -288,7 +288,7 @@ public class ScoreScreen extends AbstractMenuScreen {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     try {
-                        PlayScreen ps = PlayScreen.gotoPlayScreen(ScoreScreen.this, newGameParams);
+                        PlayScreen ps = PlayScreen.gotoPlayScreen(app, newGameParams);
                         ps.setBackScreen(ScoreScreen.this.backScreen);
                         dispose();
                     } catch (VetoException e) {

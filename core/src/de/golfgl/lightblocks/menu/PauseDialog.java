@@ -18,6 +18,8 @@ import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.screen.VetoException;
+import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
  * Created by Benjamin Schulte on 21.03.2017.
@@ -33,6 +35,7 @@ public class PauseDialog extends ControllerMenuDialog {
     private final PlayButton resumeButton;
     private final Cell resumeCell;
     private final FaButton exitButton;
+    private final PlayScreen playScreen;
     private boolean emphasizeInputMsg;
     private boolean firstShow = true;
 
@@ -40,6 +43,7 @@ public class PauseDialog extends ControllerMenuDialog {
         super("", app.skin, LightBlocksGame.SKIN_WINDOW_OVERLAY);
 
         this.app = app;
+        this.playScreen = playScreen;
 
         resumeButton = new PlayButton(app);
         resumeButton.addListener(new ChangeListener() {
@@ -163,5 +167,25 @@ public class PauseDialog extends ControllerMenuDialog {
 
     public void setResumeLabel() {
         firstShow = false;
+    }
+
+    public void addRetryButton(final InitGameParameters retryParams) {
+        if (retryParams != null) {
+            FaButton retryButton = new FaButton(FontAwesome.ROTATE_RIGHT, app.skin);
+            button(retryButton, new Runnable() {
+                @Override
+                public void run() {
+                    // erst sauber verlassen!
+                    playScreen.goBackToMenu();
+                    if (retryParams != null && playScreen != app.getScreen())
+                        try {
+                            PlayScreen ps = PlayScreen.gotoPlayScreen(app, retryParams);
+                            ps.setBackScreen(playScreen.getBackScreen());
+                        } catch (VetoException e) {
+                            // nichts tun - eigentlich(tm) darf das eh nicht vorkommen
+                        }
+                }
+            });
+        }
     }
 }

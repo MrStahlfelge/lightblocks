@@ -17,7 +17,6 @@ import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
-import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -173,7 +172,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         savePreselectionSettings(initGameParametersParams);
 
         try {
-            PlayScreen.gotoPlayScreen((AbstractScreen) app.getScreen(), initGameParametersParams);
+            PlayScreen.gotoPlayScreen(app, initGameParametersParams);
             menuScreen.gameStarted(true);
         } catch (VetoException e) {
             new VetoDialog(e.getMessage(), app.skin, menuScreen.getAvailableContentWidth() * .75f).show(getStage());

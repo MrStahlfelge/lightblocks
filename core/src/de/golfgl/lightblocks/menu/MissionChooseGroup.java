@@ -24,7 +24,6 @@ import de.golfgl.lightblocks.scene2d.GlowLabel;
 import de.golfgl.lightblocks.scene2d.MyActions;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
-import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -91,12 +90,12 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
             PlayScreen ps;
             if (modelId.equals(TutorialModel.MODEL_ID)) {
-                ps = PlayScreen.gotoPlayScreen((AbstractScreen) app.getScreen(), TutorialModel.getTutorialInitParams());
+                ps = PlayScreen.gotoPlayScreen(app, TutorialModel.getTutorialInitParams());
                 ps.setShowScoresWhenGameOver(false);
             } else {
                 InitGameParameters igp = new InitGameParameters();
                 igp.setMissionId(modelId);
-                ps = PlayScreen.gotoPlayScreen((AbstractScreen) app.getScreen(), igp);
+                ps = PlayScreen.gotoPlayScreen(app, igp);
             }
 
             needsRefresh = true;
