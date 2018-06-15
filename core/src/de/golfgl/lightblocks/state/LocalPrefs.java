@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.state;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -23,6 +24,12 @@ public class LocalPrefs {
     private static final String KEY_LASTSTARTEDVERSION = "lastStartedVersion";
     private static final String KEY_LASTSTARTTIME = "lastStartTime";
     private static final String PREF_KEY_ONSCREENCONTROLS = "onScreenControls";
+    private static final String TVREMOTE_HARDDROP = "tvremote_harddrop";
+    private static final String TVREMOTE_SOFTDROP = "tvremote_softdrop";
+    private static final String TVREMOTE_LEFT = "tvremote_left";
+    private static final String TVREMOTE_RIGHT = "tvremote_right";
+    private static final String TVREMOTE_ROTATE_CW = "tvremote_rotateCw";
+    private static final String TVREMOTE_ROTATE_CC = "tvremote_rotateCc";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -35,6 +42,7 @@ public class LocalPrefs {
     private Integer lastUsedVersion;
     private Integer daysSinceLastStart;
     private Boolean useOnScreenControls;
+    private TvRemoteKeyConfig tvRemoteKeyConfig;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -265,5 +273,47 @@ public class LocalPrefs {
         }
 
         return daysSinceLastStart;
+    }
+
+    public TvRemoteKeyConfig getTvRemoteKeyConfig() {
+        if (tvRemoteKeyConfig == null) {
+            tvRemoteKeyConfig = new TvRemoteKeyConfig();
+
+            boolean isFireTv = LightBlocksGame.isOnFireTv();
+
+            tvRemoteKeyConfig.keyCodeHarddrop = prefs.getInteger(TVREMOTE_HARDDROP,
+                    isFireTv ? Input.Keys.UP : Input.Keys.UNKNOWN);
+            tvRemoteKeyConfig.keyCodeSoftDrop = prefs.getInteger(TVREMOTE_SOFTDROP, Input.Keys.DOWN);
+            tvRemoteKeyConfig.keyCodeLeft = prefs.getInteger(TVREMOTE_LEFT, Input.Keys.LEFT);
+            tvRemoteKeyConfig.keyCodeRight = prefs.getInteger(TVREMOTE_RIGHT, Input.Keys.RIGHT);
+            tvRemoteKeyConfig.keyCodeRotateClockwise = prefs.getInteger(TVREMOTE_ROTATE_CW,
+                    isFireTv ? Input.Keys.MENU : Input.Keys.CENTER);
+            tvRemoteKeyConfig.keyCodeRotateCounterclock = prefs.getInteger(TVREMOTE_ROTATE_CC,
+                    isFireTv ? Input.Keys.MEDIA_FAST_FORWARD : Input.Keys.UP);
+        }
+
+        return tvRemoteKeyConfig;
+    }
+
+    public void saveTvRemoteConfig() {
+        if (tvRemoteKeyConfig == null)
+            return;
+
+        prefs.putInteger(TVREMOTE_HARDDROP, tvRemoteKeyConfig.keyCodeHarddrop);
+        prefs.putInteger(TVREMOTE_SOFTDROP, tvRemoteKeyConfig.keyCodeSoftDrop);
+        prefs.putInteger(TVREMOTE_LEFT, tvRemoteKeyConfig.keyCodeLeft);
+        prefs.putInteger(TVREMOTE_RIGHT, tvRemoteKeyConfig.keyCodeRight);
+        prefs.putInteger(TVREMOTE_ROTATE_CW, tvRemoteKeyConfig.keyCodeRotateClockwise);
+        prefs.putInteger(TVREMOTE_ROTATE_CC, tvRemoteKeyConfig.keyCodeRotateCounterclock);
+        prefs.flush();
+    }
+
+    public static class TvRemoteKeyConfig {
+        public int keyCodeRight;
+        public int keyCodeLeft;
+        public int keyCodeSoftDrop;
+        public int keyCodeRotateClockwise;
+        public int keyCodeRotateCounterclock;
+        public int keyCodeHarddrop;
     }
 }

@@ -76,7 +76,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static Color COLOR_DISABLED;
     public static Color COLOR_UNSELECTED;
     public static Color COLOR_FOCUSSED_ACTOR;
-
+    // Android Modellname des Geräts
+    public static String modelNameRunningOn;
     public Skin skin;
     public AssetManager assetManager;
     public I18NBundle TEXTS;
@@ -98,8 +99,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public AbstractMultiplayerRoom multiRoom;
     public Player player;
     public IGameServiceClient gpgsClient;
-    // Android Modellname des Geräts
-    public String modelNameRunningOn;
     public MainMenuScreen mainMenuScreen;
     public INsdHelper nsdHelper;
     public MyControllerMapping controllerMappings;
@@ -123,6 +122,13 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static boolean isOnAndroidTV() {
         return Gdx.app.getType().equals(Application.ApplicationType.Android) &&
                 !Gdx.input.isPeripheralAvailable(Input.Peripheral.MultitouchScreen);
+    }
+
+    /**
+     * @return true wenn auf Amazon FireTV
+     */
+    public static boolean isOnFireTv() {
+        return isOnAndroidTV() && modelNameRunningOn != null && modelNameRunningOn.startsWith("AFT");
     }
 
     @Override

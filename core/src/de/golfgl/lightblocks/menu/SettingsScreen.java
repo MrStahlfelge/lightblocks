@@ -1,6 +1,10 @@
 package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
@@ -8,19 +12,23 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
+import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.FaCheckbox;
 import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
@@ -61,6 +69,9 @@ public class SettingsScreen extends AbstractMenuDialog {
         gesturesGroup = new GestureSettings();
         if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN))
             groupPager.addPage(gesturesGroup);
+        if (LightBlocksGame.isOnAndroidTV())
+            groupPager.addPage(new TvRemoteSettings());
+
         groupPager.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -334,4 +345,145 @@ public class SettingsScreen extends AbstractMenuDialog {
             return defaultFocusedButton;
         }
     }
+
+    private class TvRemoteSettings extends Table implements ISettingsGroup {
+        private final Button defaultFocusedButton;
+        private LocalPrefs.TvRemoteKeyConfig tvRemoteKeyConfig;
+        private int[] configKey;
+
+
+        public TvRemoteSettings() {
+            tvRemoteKeyConfig = app.localPrefs.getTvRemoteKeyConfig();
+            convertConfigToArray();
+
+            pad(0, 20, 0, 20);
+            defaults().expand().fillX();
+
+            row();
+            add(new ScaledLabel(app.TEXTS.get("menuSettingsTvRemote"), app.skin, app.SKIN_FONT_TITLE, .8f))
+                    .top().fill(false);
+
+            row();
+            ScaledLabel menuSettingsHelpTvRemote = new ScaledLabel(app.TEXTS.get("menuSettingsHelpTvRemote"), app
+                    .skin, LightBlocksGame.SKIN_FONT_REG);
+            menuSettingsHelpTvRemote.setAlignment(Align.center);
+            menuSettingsHelpTvRemote.setWrap(true);
+            add(menuSettingsHelpTvRemote).fillX().expand();
+
+            Table buttonConfig = new Table();
+            buttonConfig.defaults().pad(5, 10, 5, 10);
+            defaultFocusedButton = addButtonRow(buttonConfig, 0, "configTvRemoteRight");
+            addButtonRow(buttonConfig, 1, "configTvRemoteLeft");
+            addButtonRow(buttonConfig, 2, "configTvRemoteRotateCw");
+            addButtonRow(buttonConfig, 3, "configTvRemoteRotateCc");
+            addButtonRow(buttonConfig, 4, "configTvRemoteSoftDrop");
+            addButtonRow(buttonConfig, 5, "configTvRemoteHardDrop");
+
+            row();
+            add(buttonConfig).fillX().expand();
+        }
+
+        protected GlowLabelButton addButtonRow(Table buttonConfig, final int index, String description) {
+            buttonConfig.row();
+            final String descriptionText = app.TEXTS.get(description);
+            buttonConfig.add(new ScaledLabel(descriptionText, app.skin, LightBlocksGame.SKIN_FONT_TITLE)).right();
+            final GlowLabelButton changeButton = new GlowLabelButton(Input.Keys.toString(configKey[index]), app.skin,
+                    GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
+            changeButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    new ChangeButtonDialog(descriptionText, index, changeButton).show(getStage());
+                }
+            });
+            addFocusableActor(changeButton);
+            buttonConfig.add(changeButton);
+            return changeButton;
+        }
+
+        protected void convertConfigToArray() {
+            configKey = new int[6];
+            configKey[0] = tvRemoteKeyConfig.keyCodeRight;
+            configKey[1] = tvRemoteKeyConfig.keyCodeLeft;
+            configKey[2] = tvRemoteKeyConfig.keyCodeRotateClockwise;
+            configKey[3] = tvRemoteKeyConfig.keyCodeRotateCounterclock;
+            configKey[4] = tvRemoteKeyConfig.keyCodeSoftDrop;
+            configKey[5] = tvRemoteKeyConfig.keyCodeHarddrop;
+        }
+
+        protected void convertArrayToConfigAndSave() {
+            tvRemoteKeyConfig.keyCodeRight = configKey[0];
+            tvRemoteKeyConfig.keyCodeLeft = configKey[1];
+            tvRemoteKeyConfig.keyCodeRotateClockwise = configKey[2];
+            tvRemoteKeyConfig.keyCodeRotateCounterclock = configKey[3];
+            tvRemoteKeyConfig.keyCodeSoftDrop = configKey[4];
+            tvRemoteKeyConfig.keyCodeHarddrop = configKey[5];
+            app.localPrefs.saveTvRemoteConfig();
+        }
+
+        @Override
+        public Actor getDefaultActor() {
+            return defaultFocusedButton;
+        }
+
+        private class ChangeButtonDialog extends Dialog {
+
+            private final GlowLabelButton changeButton;
+            private final int index;
+            private InputProcessor oldInputProcessor;
+
+            public ChangeButtonDialog(String description, int index, GlowLabelButton changeButton) {
+                super("", app.skin);
+                Button cancelButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
+                button(cancelButton);
+
+                this.changeButton = changeButton;
+                this.index = index;
+
+                Table contentTable = getContentTable();
+
+                contentTable.row();
+                ScaledLabel helpLabel = new ScaledLabel(app.TEXTS.format("configTvRemoteRecord",
+                        description.toUpperCase()), getSkin(), LightBlocksGame.SKIN_FONT_TITLE);
+                helpLabel.setAlignment(Align.center);
+                contentTable.add(helpLabel).pad(20);
+            }
+
+            @Override
+            public Dialog show(Stage stage, Action action) {
+                oldInputProcessor = Gdx.input.getInputProcessor();
+
+                InputMultiplexer myMultiPlexer = new InputMultiplexer();
+                myMultiPlexer.addProcessor(new InputAdapter() {
+                    @Override
+                    public boolean keyDown(int keycode) {
+                        if (((MyStage) getStage()).isEscapeActionKeyCode(keycode))
+                            keycode = 0;
+
+                        configKey[index] = keycode;
+                        changeButton.setText(Input.Keys.toString(keycode));
+                        convertArrayToConfigAndSave();
+
+                        ChangeButtonDialog.this.hide();
+
+                        return true;
+                    }
+
+                    @Override
+                    public boolean keyUp(int keycode) {
+                        return true;
+                    }
+                });
+                myMultiPlexer.addProcessor(oldInputProcessor);
+                Gdx.input.setInputProcessor(myMultiPlexer);
+                return super.show(stage, action);
+            }
+
+            @Override
+            public void hide(Action action) {
+                Gdx.input.setInputProcessor(oldInputProcessor);
+                super.hide(action);
+            }
+        }
+    }
+
 }

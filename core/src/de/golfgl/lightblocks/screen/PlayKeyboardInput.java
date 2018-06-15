@@ -9,10 +9,11 @@ import com.badlogic.gdx.controllers.Controllers;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
+import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
  * Nicht nur Tastatur, sondern auch Controller/TV Remote
- *
+ * <p>
  * Created by Benjamin Schulte on 17.01.2017.
  */
 
@@ -20,6 +21,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     protected GameBlocker.NoGamepadGameBlocker gamepadInputBlocker = new GameBlocker.NoGamepadGameBlocker();
     private ControllerAdapter controllerAdapter = new MyControllerAdapter();
     private boolean useTvRemoteControl;
+    private LocalPrefs.TvRemoteKeyConfig tvRemoteKeyConfig;
 
     public PlayKeyboardInput() {
         this.useTvRemoteControl = LightBlocksGame.isOnAndroidTV() && Controllers.getControllers().size == 0;
@@ -28,9 +30,26 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public String getInputHelpText() {
-        //TODO
-        return playScreen.app.TEXTS.get(isOnTvRemote() ? "inputTvRemoteHelp" :
-                isOnKeyboard() ? "inputKeyboardHelp" : "inputGamepadHelp");
+        if (isOnTvRemote()) {
+            String helpText = playScreen.app.TEXTS.get("inputTvRemoteHelp") + "\n";
+
+            if (tvRemoteKeyConfig != null) {
+                helpText += playScreen.app.TEXTS.get("configTvRemoteRight") + ": "
+                        + Input.Keys.toString((int) tvRemoteKeyConfig.keyCodeRight);
+                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteLeft") + ": "
+                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeLeft);
+                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteRotateCw") + ": "
+                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeRotateClockwise);
+                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteRotateCc") + ": "
+                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeRotateCounterclock);
+                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteSoftDrop") + ": "
+                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeSoftDrop);
+                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteHardDrop") + ": "
+                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeHarddrop);
+            }
+            return helpText;
+        } else
+            return playScreen.app.TEXTS.get(isOnKeyboard() ? "inputKeyboardHelp" : "inputGamepadHelp");
     }
 
     @Override
@@ -41,6 +60,25 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     protected boolean isOnTvRemote() {
         return Controllers.getControllers().size == 0 && useTvRemoteControl;
+    }
+
+    private int mapTvRemoteKeys(int keycode) {
+        if (tvRemoteKeyConfig != null) {
+            if (keycode == tvRemoteKeyConfig.keyCodeHarddrop)
+                keycode = Input.Keys.UP;
+            else if (keycode == tvRemoteKeyConfig.keyCodeSoftDrop)
+                keycode = Input.Keys.DOWN;
+            else if (keycode == tvRemoteKeyConfig.keyCodeLeft)
+                keycode = Input.Keys.LEFT;
+            else if (keycode == tvRemoteKeyConfig.keyCodeRight)
+                keycode = Input.Keys.RIGHT;
+            else if (keycode == tvRemoteKeyConfig.keyCodeRotateClockwise)
+                keycode = Input.Keys.SPACE;
+            else if (keycode == tvRemoteKeyConfig.keyCodeRotateCounterclock)
+                keycode = Input.Keys.ALT_LEFT;
+        }
+
+        return keycode;
     }
 
     protected boolean isOnKeyboard() {
@@ -55,6 +93,9 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
         // Blocker falls kein Gamepad vorhanden sofort setzen
         controllerAdapter.disconnected(null);
+
+        if (useTvRemoteControl)
+            tvRemoteKeyConfig = playScreen.app.localPrefs.getTvRemoteKeyConfig();
     }
 
     @Override
@@ -76,19 +117,9 @@ public class PlayKeyboardInput extends PlayScreenInput {
     @Override
     public boolean keyDown(int keycode) {
 
-        // Spezialfall TV Remote
-        if (!isPaused() && isOnTvRemote()) {
-            switch (keycode) {
-                case Input.Keys.UP:
-                case Input.Keys.MENU:
-                    playScreen.gameModel.setRotate(false);
-                    return true;
-                case Input.Keys.DPAD_CENTER:
-                case Input.Keys.MEDIA_FAST_FORWARD:
-                    playScreen.gameModel.setRotate(true);
-                    return true;
-            }
-        }
+        // Spezialfall TV Remote: auf normale Tasten drehen
+        if (!isPaused() && isOnTvRemote())
+            keycode = mapTvRemoteKeys(keycode);
 
         switch (keycode) {
             case Input.Keys.DPAD_CENTER:
@@ -135,6 +166,10 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public boolean keyUp(int keycode) {
+        // Spezialfall TV Remote: auf normale Tasten drehen
+        if (!isPaused() && isOnTvRemote())
+            keycode = mapTvRemoteKeys(keycode);
+
         if (keycode == Input.Keys.DOWN || keycode == Input.Keys.UP) {
             playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
             return true;
@@ -153,6 +188,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
         return super.keyUp(keycode);
     }
 
+    @Override
+    public String getAnalyticsKey() {
+        return isOnTvRemote() ? "tvremote" : isOnKeyboard() ? "keyboard" : "controller";
+    }
+
     private class MyControllerAdapter extends ControllerAdapter {
         @Override
         public void disconnected(Controller controller) {
@@ -166,10 +206,5 @@ public class PlayKeyboardInput extends PlayScreenInput {
             useTvRemoteControl = false;
         }
 
-    }
-
-    @Override
-    public String getAnalyticsKey() {
-        return isOnTvRemote() ? "tvremote" : isOnKeyboard() ? "keyboard" : "controller";
     }
 }
