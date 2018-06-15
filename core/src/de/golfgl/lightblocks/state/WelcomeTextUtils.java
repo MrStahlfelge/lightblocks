@@ -87,6 +87,10 @@ public class WelcomeTextUtils {
         if (listChangesSince < 1823) {
             welcomes.add(new WelcomeButton.WelcomeText("There are new game modes:\nPractice and Sprint 40L. Have fun!",
                     new ShowSinglePlayerPageRunnable(app, SinglePlayerScreen.PAGEIDX_OVERVIEW)));
+            if (app.isOnAndroidTV())
+                welcomes.add(new WelcomeButton.WelcomeText("With this update, you can configure which buttons you " +
+                        "want to use on your remote control.", new ShowSettingsRunnable(app)));
+
         }
 
         // Neue Features in 1819: Shades of Grey, Hard Drop
