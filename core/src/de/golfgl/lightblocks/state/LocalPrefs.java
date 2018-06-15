@@ -43,6 +43,7 @@ public class LocalPrefs {
     private Integer daysSinceLastStart;
     private Boolean useOnScreenControls;
     private TvRemoteKeyConfig tvRemoteKeyConfig;
+    private boolean suppressSounds;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -82,7 +83,14 @@ public class LocalPrefs {
         if (playSounds == null)
             playSounds = prefs.getBoolean("soundPlayback", !LightBlocksGame.isWebAppOnMobileDevice());
 
-        return playSounds;
+        return playSounds && !suppressSounds;
+    }
+
+    /**
+     * @param suppressSounds Möglichkeit Sounds unabhängig von Usereinstellung zu unterdrücken
+     */
+    public void setSuppressSounds(boolean suppressSounds) {
+        this.suppressSounds = suppressSounds;
     }
 
     public void setPlaySounds(Boolean playSounds) {

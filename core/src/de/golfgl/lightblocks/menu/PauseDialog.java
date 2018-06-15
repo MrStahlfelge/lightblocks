@@ -179,10 +179,13 @@ public class PauseDialog extends ControllerMenuDialog {
                     playScreen.goBackToMenu();
                     if (retryParams != null && playScreen != app.getScreen())
                         try {
+                            app.localPrefs.setSuppressSounds(true);
                             PlayScreen ps = PlayScreen.gotoPlayScreen(app, retryParams);
                             ps.setBackScreen(playScreen.getBackScreen());
                         } catch (VetoException e) {
                             // nichts tun - eigentlich(tm) darf das eh nicht vorkommen
+                        } finally {
+                            app.localPrefs.setSuppressSounds(false);
                         }
                 }
             });
