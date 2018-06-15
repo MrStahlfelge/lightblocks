@@ -79,7 +79,7 @@ public class MarathonModel extends GameModel {
 
     @Override
     protected void submitGameEnded(boolean success) {
-        // der Marathon endet immer mit vollem Board. Also definieren wir success hier so, ob 100k Score geschafft wurde
-        super.submitGameEnded(getScore().getScore() >= 100000);
+        // der Marathon endet immer mit vollem Board. Also definieren wir success hier so, ob 20k Score geschafft wurde
+        super.submitGameEnded(getScore().getScore() >= 20000);
     }
 }
