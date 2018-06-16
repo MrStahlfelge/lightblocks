@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -17,6 +18,7 @@ import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.AbstractMenuScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
@@ -334,7 +336,6 @@ public class ScoreScreen extends AbstractMenuScreen {
                 new Runnable() {
                     @Override
                     public void run() {
-                        //TODO focusedactor kommt durcheinander da der neue Dialog erst hochkommt und dann der alte geht
                         askForRating();
                     }
                 }, new Runnable() {
@@ -346,18 +347,29 @@ public class ScoreScreen extends AbstractMenuScreen {
     }
 
     private void askForRating() {
-        showConfirmationDialog(app.TEXTS.get("labelAskForRating2"),
+        Dialog pleaseRate = showConfirmationDialog(app.TEXTS.get("labelAskForRating2"),
                 new Runnable() {
                     @Override
                     public void run() {
                         doRate();
                     }
                 }, null, app.TEXTS.get("buttonIRateNow"), app.TEXTS.get("buttonRemindMeLater"));
+
+        pleaseRate.button(new GlowLabelButton(app.TEXTS.get("buttonAlreadyRated"), app.skin,
+                GlowLabelButton.FONT_SCALE_SUBMENU, 1f), new Runnable() {
+            @Override
+            public void run() {
+                app.localPrefs.setDontAskForRating(true);
+            }
+        });
     }
 
     private void doRate() {
         app.localPrefs.setDontAskForRating(true);
-        if (LightBlocksGame.gameStoreUrl != null)
+
+        if (app.isOnFireTv()) {
+            showDialog(app.TEXTS.get("labelAskForRatingFire"));
+        } else if (LightBlocksGame.gameStoreUrl != null)
             Gdx.net.openURI(LightBlocksGame.gameStoreUrl);
     }
 }
