@@ -270,7 +270,13 @@ public class MainMenuScreen extends AbstractMenuScreen {
             mainGroup.addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
         }
 
-        welcomeButton.setTexts(WelcomeTextUtils.fillWelcomes(app));
+        try {
+            welcomeButton.setTexts(WelcomeTextUtils.fillWelcomes(app));
+        } catch (Throwable t) {
+            // alles beim alten lassen
+            // es gab Crashreports von Geräten mit Tasten??? über NPE in fillWelcomes. Einfach abfangen und dann eben
+            // nix anzeigen
+        }
 
     }
 

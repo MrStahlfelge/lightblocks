@@ -67,6 +67,9 @@ public class WelcomeButton extends FaTextButton {
     }
 
     protected void clicked() {
+        if (texts == null)
+            return;
+
         Runnable run = texts.get(currentPage).run;
         if (run != null)
             run.run();

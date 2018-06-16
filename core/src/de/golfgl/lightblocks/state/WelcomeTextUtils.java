@@ -83,12 +83,12 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
-        // 1823: Practice Mode
-        if (listChangesSince < 1823) {
+        // 1825
+        if (listChangesSince < 1825) {
             welcomes.add(new WelcomeButton.WelcomeText("There are new game modes:\nPractice and Sprint 40L. Have fun!",
                     new ShowSinglePlayerPageRunnable(app, SinglePlayerScreen.PAGEIDX_OVERVIEW)));
             if (app.isOnAndroidTV())
-                welcomes.add(new WelcomeButton.WelcomeText("With this update, you can configure which buttons you " +
+                welcomes.add(new WelcomeButton.WelcomeText("You can now configure which buttons you " +
                         "want to use on your remote control.", new ShowSettingsRunnable(app)));
 
         }
