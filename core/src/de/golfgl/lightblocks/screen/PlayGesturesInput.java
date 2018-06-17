@@ -239,7 +239,8 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (pointer != 0 || !touchDownValid)
             return false;
 
-        if (!beganSoftDrop) {
+        // Horizontale Bewegung  bemerken - aber nur wenn kein Soft Drop/Hard Drop eingeleitet!
+        if (!beganSoftDrop && !didDrop) {
             if (!flippedMode) {
                 if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > dragThreshold)) {
                     beganHorizontalMove = true;
@@ -275,7 +276,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (screenY - this.screenY < -swipeUpTresholdFactor * dragThreshold && swipeUpType != SWIPEUP_DONOTHING) {
             if (swipeUpType == SWIPEUP_PAUSE && !isPaused())
                 playScreen.switchPause(false);
-            else if (swipeUpType == SWIPEUP_HARDDROP && !didDrop) {
+            else if (swipeUpType == SWIPEUP_HARDDROP && !didDrop && !beganHorizontalMove) {
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
                 didDrop = true;
             }
