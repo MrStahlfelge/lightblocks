@@ -165,7 +165,7 @@ public class ScoreScreen extends AbstractMenuScreen {
         if (gameModelId.equals(PracticeModel.MODEL_PRACTICE_ID))
             return null;
         else if (gameModelId.equals(SprintModel.MODEL_SPRINT_ID)) {
-            if (firstScore.getDrawnTetrominos() < SprintModel.NUM_LINES_TO_CLEAR)
+            if (firstScore.getClearedLines() < SprintModel.NUM_LINES_TO_CLEAR)
                 return null;
             else
                 return app.TEXTS.format("shareSprintText", ScoreTable.formatTimeString(firstScore.getTimeMs(),

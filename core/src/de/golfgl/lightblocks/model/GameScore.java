@@ -49,7 +49,7 @@ public class GameScore implements IRoundScore {
             case TYPE_PRACTICE:
                 return getDrawnTetrominos();
             case TYPE_SPRINT:
-                return (getDrawnTetrominos() >= SprintModel.NUM_LINES_TO_CLEAR ? getTimeMs() : -1);
+                return (getClearedLines() >= SprintModel.NUM_LINES_TO_CLEAR ? getTimeMs() : -1);
             default:
                 return getScore();
         }
