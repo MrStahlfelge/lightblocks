@@ -759,6 +759,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (app.localPrefs.isPlaySounds())
             app.gameOverSound.play();
         inputAdapter.setGameOver();
+        // erzwingt die letzmalige Aktualisierung des Zeitlabels beim nächsten Render
+        currentShownTime = currentShownTime - 100;
         saveGameState();
         app.savegame.gpgsSaveGameState(null);
         pauseButton.setVisible(false);
@@ -912,7 +914,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (gameModel.showTime() && timeLabel != null) {
             int timeMs = gameModel.getScore().getTimeMs();
 
-            if (timeMs - currentShownTime > 100) {
+            if (timeMs - currentShownTime >= 100) {
                 timeLabel.setText(ScoreTable.formatTimeString(timeMs, 1));
                 currentShownTime = timeMs;
             }
