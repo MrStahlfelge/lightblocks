@@ -13,7 +13,7 @@ android {
         }
         amazon {
             java.srcDirs = ['src-amazon']
-            manifest.srcFile 'src/AndroidManifest-amazon.xml'
+            manifest.srcFile 'AndroidManifest-amazon.xml'
         }
         google {
             java.srcDirs = ['src-google']

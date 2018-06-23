@@ -3,33 +3,6 @@
 
     <application>
 
-        <!-- GameCircle -->
-        <activity android:name="com.amazon.ags.html5.overlay.GameCircleUserInterface"
-                  android:hardwareAccelerated="false" android:theme="@style/GCOverlay"/>
-        <activity
-            android:name="com.amazon.identity.auth.device.authorization.AuthorizationActivity"
-            android:allowTaskReparenting="true"
-            android:launchMode="singleTask"
-            android:theme="@android:style/Theme.NoDisplay">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:host="de.golfgl.lightblocks" android:scheme="amzn"/>
-            </intent-filter>
-        </activity>
-        <activity android:name="com.amazon.ags.html5.overlay.GameCircleAlertUserInterface"
-                  android:hardwareAccelerated="false" android:theme="@style/GCAlert"/>
-        <receiver
-            android:name="com.amazon.identity.auth.device.authorization.PackageIntentReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_INSTALL"/>
-                <action android:name="android.intent.action.PACKAGE_ADDED"/>
-                <data android:scheme="package"/>
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>
