@@ -37,6 +37,7 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
     private Button refreshButton;
     private RefreshListener controllerListener;
     private boolean runsOnChrome;
+    private Actor defaultActor;
 
     public GamepadSettingsDialog(LightBlocksGame app) {
         super("", app.skin);
@@ -74,6 +75,7 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
     private void fillContentTable() {
         Table contentTable = getContentTable();
         contentTable.clear();
+        defaultActor = null;
 
         Array<Controller> controllers = Controllers.getControllers();
 
@@ -99,6 +101,8 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
             });
             controllerList.add(configureButton);
             addFocusableActor(configureButton);
+            if (defaultActor == null)
+                defaultActor = configureButton;
             if (getStage() != null)
                 ((MyStage) getStage()).addFocusableActor(configureButton);
         }
@@ -165,6 +169,11 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
             }
         });
         super.hide(action);
+    }
+
+    @Override
+    protected Actor getConfiguredDefaultActor() {
+        return defaultActor != null ? defaultActor : super.getConfiguredDefaultActor();
     }
 
     private class RefreshListener extends ControllerAdapter {

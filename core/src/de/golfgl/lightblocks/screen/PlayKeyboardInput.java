@@ -65,7 +65,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     private int mapTvRemoteKeys(int keycode) {
         if (tvRemoteKeyConfig != null) {
             if (keycode == tvRemoteKeyConfig.keyCodeHarddrop)
-                keycode = Input.Keys.UP;
+                keycode = Input.Keys.CONTROL_RIGHT;
             else if (keycode == tvRemoteKeyConfig.keyCodeSoftDrop)
                 keycode = Input.Keys.DOWN;
             else if (keycode == tvRemoteKeyConfig.keyCodeLeft)
@@ -120,6 +120,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
         // Spezialfall TV Remote: auf normale Tasten drehen
         if (!isPaused() && isOnTvRemote())
             keycode = mapTvRemoteKeys(keycode);
+        else if (!isPaused() && isOnKeyboard() && keycode == Input.Keys.UP)
+            keycode = Input.Keys.CONTROL_RIGHT;
 
         switch (keycode) {
             case Input.Keys.DPAD_CENTER:
@@ -131,7 +133,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
                 return true;
 
-            case Input.Keys.UP:
+            case Input.Keys.CONTROL_RIGHT:
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
                 return true;
 
@@ -169,8 +171,10 @@ public class PlayKeyboardInput extends PlayScreenInput {
         // Spezialfall TV Remote: auf normale Tasten drehen
         if (!isPaused() && isOnTvRemote())
             keycode = mapTvRemoteKeys(keycode);
+        else if (!isPaused() && isOnKeyboard() && keycode == Input.Keys.UP)
+            keycode = Input.Keys.CONTROL_RIGHT;
 
-        if (keycode == Input.Keys.DOWN || keycode == Input.Keys.UP) {
+        if (keycode == Input.Keys.DOWN || keycode == Input.Keys.CONTROL_RIGHT) {
             playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
             return true;
         }

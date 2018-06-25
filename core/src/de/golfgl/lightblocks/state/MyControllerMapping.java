@@ -37,6 +37,7 @@ public class MyControllerMapping extends ControllerMappings {
         addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.button, BUTTON_CANCEL));
         addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.axisDigital, AXIS_VERTICAL));
         addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.axisDigital, AXIS_HORIZONTAL));
+        addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.button, BUTTON_HARDDROP));
 
         commitConfig();
         loadedSavedSettings = false;
@@ -58,6 +59,7 @@ public class MyControllerMapping extends ControllerMappings {
         controllerToInputAdapter.addButtonMapping(BUTTON_CANCEL, Input.Keys.ESCAPE);
         controllerToInputAdapter.addAxisMapping(AXIS_HORIZONTAL, Input.Keys.LEFT, Input.Keys.RIGHT);
         controllerToInputAdapter.addAxisMapping(AXIS_VERTICAL, Input.Keys.UP, Input.Keys.DOWN);
+        controllerToInputAdapter.addButtonMapping(BUTTON_HARDDROP, Input.Keys.CONTROL_RIGHT);
     }
 
     public void setInputProcessor(InputProcessor input) {
@@ -73,6 +75,7 @@ public class MyControllerMapping extends ControllerMappings {
         defaultMapping.putMapping(new MappedInput(AXIS_HORIZONTAL, new ControllerAxis(0)));
         defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_CLOCKWISE, new ControllerButton(onAndroid ? 96 : 0)));
         defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_COUNTERCLOCK, new ControllerButton(onAndroid ? 97 : 1)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_HARDDROP, new ControllerButton(onAndroid ? 98 : 2)));
         defaultMapping.putMapping(new MappedInput(BUTTON_START, new ControllerButton(onAndroid ? 108 : 9)));
         defaultMapping.putMapping(new MappedInput(BUTTON_CANCEL, new ControllerButton(onAndroid ? 4 : 8)));
 
