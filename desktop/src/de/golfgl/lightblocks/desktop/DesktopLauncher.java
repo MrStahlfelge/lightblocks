@@ -2,6 +2,10 @@ package de.golfgl.lightblocks.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.pay.Information;
+import com.badlogic.gdx.pay.PurchaseManager;
+import com.badlogic.gdx.pay.PurchaseManagerConfig;
+import com.badlogic.gdx.pay.PurchaseObserver;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
@@ -20,7 +24,46 @@ public class DesktopLauncher {
         config.height = LightBlocksGame.nativeGameHeight;
         LightBlocksGame game = new MultiplayerLightblocks();
         game.gpgsClient = new MyTestClient();
+        game.purchaseManager = new MyTestPurchaseManager();
         new LwjglApplication(game, config);
+    }
+
+    private static class MyTestPurchaseManager implements PurchaseManager {
+
+        @Override
+        public String storeName() {
+            return "TEST";
+        }
+
+        @Override
+        public void install(PurchaseObserver observer, PurchaseManagerConfig config, boolean autoFetchInformation) {
+            observer.handleInstall();
+        }
+
+        @Override
+        public boolean installed() {
+            return true;
+        }
+
+        @Override
+        public void dispose() {
+
+        }
+
+        @Override
+        public void purchase(String identifier) {
+
+        }
+
+        @Override
+        public void purchaseRestore() {
+
+        }
+
+        @Override
+        public Information getInformation(String identifier) {
+            return null;
+        }
     }
 
     private static class MyTestClient extends MockGameServiceClient implements IMultiplayerGsClient {

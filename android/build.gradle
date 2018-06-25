@@ -54,6 +54,7 @@ dependencies {
     googleCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamsvcsVersion"
     amazonCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-amazongc:$gamsvcsVersion"
     amazonCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core-gamejolt:$gamsvcsVersion"
+    amazonCompile "com.badlogicgames.gdxpay:gdx-pay-android-amazon:$gdxPayVersion"
 }
 
 // called every time gradle gets executed, takes the native dependencies of

@@ -12,6 +12,7 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.pay.PurchaseManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
@@ -103,6 +104,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public INsdHelper nsdHelper;
     public MyControllerMapping controllerMappings;
     public GameAnalytics gameAnalytics;
+    public PurchaseManager purchaseManager;
     private FPSLogger fpsLogger;
     private List<Mission> missionList;
     private HashMap<String, Mission> missionMap;

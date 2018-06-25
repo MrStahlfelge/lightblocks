@@ -14,7 +14,6 @@ import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.InfoButton;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
-import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
@@ -24,6 +23,7 @@ import de.golfgl.lightblocks.screen.FontAwesome;
 public class AboutScreen extends AbstractMenuDialog {
     public static final String TWITTER_URL = "https://twitter.com/MrStahlfelge";
     private Cell widthDefiningCell;
+    private Actor defaultActor;
 
     public AboutScreen(LightBlocksGame app, Actor toHide) {
         super(app, toHide);
@@ -56,6 +56,25 @@ public class AboutScreen extends AbstractMenuDialog {
         widthDefiningCell = menuTable.add(labelAbout1).fill().minWidth(getAvailableContentWidth());
         menuTable.row().padTop(20);
         menuTable.add(getWrapLabel(app.TEXTS.get("labelAbout2"))).fill();
+
+        if (app.purchaseManager != null) {
+            RoundedTextButton donateButton = new RoundedTextButton(app.TEXTS.get("buttonDonation"), app.skin);
+            donateButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    new DonationDialog(app).show(getStage());
+                }
+            });
+            addFocusableActor(donateButton);
+
+            menuTable.row().padTop(20);
+            menuTable.add(donateButton);
+
+            defaultActor = donateButton;
+        }
+
+        menuTable.row().padTop(20);
+        menuTable.add(getWrapLabel(app.TEXTS.get("labelAbout2b"))).fill();
 
         Button websiteButton = new RoundedTextButton(app.TEXTS.get("buttonWebsite"), app.skin);
         websiteButton.addListener(new ChangeListener() {
@@ -161,6 +180,11 @@ public class AboutScreen extends AbstractMenuDialog {
             widthDefiningCell.getTable().invalidate();
             //widthDefiningCell.getTable().validate();
         }
+    }
+
+    @Override
+    protected Actor getConfiguredDefaultActor() {
+        return defaultActor != null ? defaultActor : super.getConfiguredDefaultActor();
     }
 
     private class ThisInfoButton extends InfoButton {

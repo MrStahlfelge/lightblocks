@@ -1,5 +1,7 @@
 package de.golfgl.lightblocks;
 
+import com.badlogic.gdx.pay.android.amazon.PurchaseManagerAndroidAmazon;
+
 import de.golfgl.gdxgameanalytics.AndroidGameAnalytics;
 
 /**
@@ -19,6 +21,8 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
         // Amazon unterstützt keine Crashreports, also Behelfsmaßnahmen
         if (game.gameAnalytics != null && game.gameAnalytics instanceof AndroidGameAnalytics)
             ((AndroidGameAnalytics) game.gameAnalytics).registerUncaughtExceptionHandler();
+
+        game.purchaseManager = new PurchaseManagerAndroidAmazon(this, 0);
     }
 
 }

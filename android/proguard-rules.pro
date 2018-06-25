@@ -92,3 +92,8 @@
 -keep,allowshrinking class sun.nio.ch.** { *; }
 -dontwarn sun.nio.ch.**
 -dontwarn sun.misc.**
+
+#IAP
+-dontwarn com.amazon.**
+-keep class com.amazon.** {*;}
+-keepattributes *Annotation*
