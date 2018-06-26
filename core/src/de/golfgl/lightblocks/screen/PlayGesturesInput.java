@@ -25,7 +25,6 @@ public class PlayGesturesInput extends PlayScreenInput {
     public static final int SWIPEUP_PAUSE = 1;
     public static final int SWIPEUP_HARDDROP = 2;
     private static final float TOUCHPAD_DEAD_RADIUS = .33f;
-    private static final float TOUCHPAD_DEAD_HARDDROP = .95f;
 
     private static final float SCREEN_BORDER_PERCENTAGE = 0.1f;
     // Flipped Mode: Tap löst horizontale Bewegung aus, Swipe rotiert
@@ -47,10 +46,12 @@ public class PlayGesturesInput extends PlayScreenInput {
     private Label toDrop;
     private Label rotationLabel;
     private boolean didDrop;
+
     private Group onScreenControls;
     private Touchpad touchpad;
     private Button rotateRightButton;
     private Button rotateLeftButton;
+    private Button hardDropButton;
     private boolean tutorialMode;
 
     @Override
@@ -188,6 +189,15 @@ public class PlayGesturesInput extends PlayScreenInput {
             });
             onScreenControls.addActor(rotateLeftButton);
 
+            hardDropButton = new ImageButton(playScreen.app.skin, "harddrop");
+            hardDropButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
+                }
+            });
+            onScreenControls.addActor(hardDropButton);
+
             onScreenControls.setVisible(false);
             playScreen.stage.addActor(onScreenControls);
         }
@@ -196,10 +206,11 @@ public class PlayGesturesInput extends PlayScreenInput {
         touchpad.setPosition(0, 0);
         rotateRightButton.setSize(size * .4f, size * .4f);
         rotateLeftButton.setSize(size * .4f, size * .4f);
+        hardDropButton.setSize(size * .4f, size * .4f);
         rotateRightButton.setPosition(playScreen.stage.getWidth() - size * .5f, size - rotateRightButton.getHeight());
         rotateLeftButton.setPosition(rotateRightButton.getX() - size * .45f, (rotateRightButton.getY() -
                 rotateRightButton.getHeight()) / 2);
-
+        hardDropButton.setPosition(rotateRightButton.getX() - size * .55f, rotateRightButton.getY());
     }
 
     public void setTouchPanel(int screenX, int screenY) {
@@ -333,7 +344,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         @Override
         public void changed(ChangeListener.ChangeEvent event, Actor actor) {
-            boolean upNowPressed = touchpad.getKnobPercentY() > TOUCHPAD_DEAD_HARDDROP;
+            boolean upNowPressed = touchpad.getKnobPercentY() > TOUCHPAD_DEAD_RADIUS;
             boolean downNowPressed = touchpad.getKnobPercentY() < -TOUCHPAD_DEAD_RADIUS;
             boolean rightNowPressed = touchpad.getKnobPercentX() > TOUCHPAD_DEAD_RADIUS;
             boolean leftNowPressed = touchpad.getKnobPercentX() < -TOUCHPAD_DEAD_RADIUS;
@@ -352,10 +363,8 @@ public class PlayGesturesInput extends PlayScreenInput {
 
             if (upPressed != upNowPressed) {
                 upPressed = upNowPressed;
-                if (upPressed)
-                    playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
-                else
-                    playScreen.gameModel.setSoftDropFactor(0);
+
+                // nix zu tun
             }
 
             if (downPressed != downNowPressed) {
