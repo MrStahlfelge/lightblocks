@@ -745,7 +745,11 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
                 openWifiSettings.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
-                        ((MultiplayerLightblocks) app).netUtils.showAdvancedWifiSettings();
+                        boolean success = ((MultiplayerLightblocks) app).netUtils.showAdvancedWifiSettings();
+
+                        if (!success)
+                            showDialog("Could not open advanced Wifi settings for you. " +
+                                    "Please open them via your device's settings screen.");
                     }
                 });
 
