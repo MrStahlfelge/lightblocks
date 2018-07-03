@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.multiplayer;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -33,8 +34,13 @@ public class AndroidNetUtils extends NetUtils {
     }
 
     @Override
-    public void showAdvancedWifiSettings() {
-        context.startActivity(new Intent(android.provider.Settings.ACTION_WIFI_IP_SETTINGS));
+    public boolean showAdvancedWifiSettings() {
+        try {
+            context.startActivity(new Intent(android.provider.Settings.ACTION_WIFI_IP_SETTINGS));
+            return true;
+        } catch (ActivityNotFoundException e) {
+            return false;
+        }
     }
 
     @Override

@@ -18,8 +18,11 @@ public class NetUtils {
         return false;
     }
 
-    public void showAdvancedWifiSettings() {
-
+    /**
+     * @return true, wenn die Settings geöffnet werden konnten. Sonst false
+     */
+    public boolean showAdvancedWifiSettings() {
+        return false;
     }
 
     public static InetAddress intToInet(int value) {

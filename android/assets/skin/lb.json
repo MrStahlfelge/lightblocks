@@ -103,6 +103,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 		name: button_rotateleft
 		color: disabled
 	}
+	button_harddrop_pressed: {
+		name: button_harddrop
+		color: disabled
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 	round: {
@@ -119,6 +123,10 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
 	rotateleft: {
 		imageUp: button_rotateleft
 		imageDown: button_rotateleft_pressed
+	}
+	harddrop: {
+		imageUp: button_harddrop
+		imageDown: button_harddrop_pressed
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {

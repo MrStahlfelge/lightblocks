@@ -2,8 +2,6 @@ package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.ControllerAdapter;
 import com.badlogic.gdx.controllers.Controllers;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -19,9 +17,11 @@ import de.golfgl.lightblocks.state.LocalPrefs;
 
 public class PlayKeyboardInput extends PlayScreenInput {
     protected GameBlocker.NoGamepadGameBlocker gamepadInputBlocker = new GameBlocker.NoGamepadGameBlocker();
-    private ControllerAdapter controllerAdapter = new MyControllerAdapter();
     private boolean useTvRemoteControl;
     private LocalPrefs.TvRemoteKeyConfig tvRemoteKeyConfig;
+
+    private int connectedControllersOnLastCheck = 0;
+    private float timeSinceLastControllerCheck = 0f;
 
     public PlayKeyboardInput() {
         this.useTvRemoteControl = LightBlocksGame.isOnAndroidTV() && Controllers.getControllers().size == 0;
@@ -65,7 +65,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     private int mapTvRemoteKeys(int keycode) {
         if (tvRemoteKeyConfig != null) {
             if (keycode == tvRemoteKeyConfig.keyCodeHarddrop)
-                keycode = Input.Keys.UP;
+                keycode = Input.Keys.CONTROL_RIGHT;
             else if (keycode == tvRemoteKeyConfig.keyCodeSoftDrop)
                 keycode = Input.Keys.DOWN;
             else if (keycode == tvRemoteKeyConfig.keyCodeLeft)
@@ -87,12 +87,37 @@ public class PlayKeyboardInput extends PlayScreenInput {
     }
 
     @Override
+    public void doPoll(float delta) {
+        timeSinceLastControllerCheck = timeSinceLastControllerCheck + delta;
+
+        if (timeSinceLastControllerCheck > .2f) {
+            checkControllerConnections();
+            timeSinceLastControllerCheck = 0;
+        }
+    }
+
+    private void checkControllerConnections() {
+        int currentConnectedControllers = Controllers.getControllers().size;
+
+        if (currentConnectedControllers <= 0 && connectedControllersOnLastCheck > 0
+                && !isOnKeyboard() && !isOnTvRemote())
+            playScreen.addGameBlocker(gamepadInputBlocker);
+
+        if (currentConnectedControllers == 1 && connectedControllersOnLastCheck < 1) {
+            playScreen.removeGameBlocker(gamepadInputBlocker);
+            useTvRemoteControl = false;
+        }
+
+        connectedControllersOnLastCheck = currentConnectedControllers;
+    }
+
+    @Override
     public void setPlayScreen(PlayScreen playScreen) {
         super.setPlayScreen(playScreen);
-        Controllers.addListener(controllerAdapter);
 
         // Blocker falls kein Gamepad vorhanden sofort setzen
-        controllerAdapter.disconnected(null);
+        connectedControllersOnLastCheck = 1;
+        checkControllerConnections();
 
         if (useTvRemoteControl)
             tvRemoteKeyConfig = playScreen.app.localPrefs.getTvRemoteKeyConfig();
@@ -102,16 +127,6 @@ public class PlayKeyboardInput extends PlayScreenInput {
     public void dispose() {
         super.dispose();
         Gdx.input.setCatchMenuKey(false);
-
-        // removeListener darf erst im nächsten Call passieren, da es eine Exception gibt wenn diese Aktion
-        // aus einem Controller-Aufruf heraus passiert
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                Controllers.removeListener(controllerAdapter);
-                controllerAdapter = null;
-            }
-        });
     }
 
     @Override
@@ -120,6 +135,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
         // Spezialfall TV Remote: auf normale Tasten drehen
         if (!isPaused() && isOnTvRemote())
             keycode = mapTvRemoteKeys(keycode);
+        else if (!isPaused() && isOnKeyboard() && keycode == Input.Keys.UP)
+            keycode = Input.Keys.CONTROL_RIGHT;
 
         switch (keycode) {
             case Input.Keys.DPAD_CENTER:
@@ -131,7 +148,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
                 return true;
 
-            case Input.Keys.UP:
+            case Input.Keys.CONTROL_RIGHT:
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
                 return true;
 
@@ -169,8 +186,10 @@ public class PlayKeyboardInput extends PlayScreenInput {
         // Spezialfall TV Remote: auf normale Tasten drehen
         if (!isPaused() && isOnTvRemote())
             keycode = mapTvRemoteKeys(keycode);
+        else if (!isPaused() && isOnKeyboard() && keycode == Input.Keys.UP)
+            keycode = Input.Keys.CONTROL_RIGHT;
 
-        if (keycode == Input.Keys.DOWN || keycode == Input.Keys.UP) {
+        if (keycode == Input.Keys.DOWN || keycode == Input.Keys.CONTROL_RIGHT) {
             playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
             return true;
         }
@@ -191,20 +210,5 @@ public class PlayKeyboardInput extends PlayScreenInput {
     @Override
     public String getAnalyticsKey() {
         return isOnTvRemote() ? "tvremote" : isOnKeyboard() ? "keyboard" : "controller";
-    }
-
-    private class MyControllerAdapter extends ControllerAdapter {
-        @Override
-        public void disconnected(Controller controller) {
-            if (Controllers.getControllers().size <= 0 && !isOnKeyboard() && !isOnTvRemote())
-                playScreen.addGameBlocker(gamepadInputBlocker);
-        }
-
-        @Override
-        public void connected(Controller controller) {
-            playScreen.removeGameBlocker(gamepadInputBlocker);
-            useTvRemoteControl = false;
-        }
-
     }
 }
