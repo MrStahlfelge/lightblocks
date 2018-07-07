@@ -19,13 +19,7 @@ public class ProgressDialog extends VetoDialog {
     public ProgressDialog(String message, LightBlocksGame app, float prefWidth) {
         super(message, app.skin, prefWidth);
 
-        Image waitBlock = new Image(app.trBlock);
-        Group rotationGroup = new Group();
-        rotationGroup.addActor(waitBlock);
-        rotationGroup.setSize(waitBlock.getPrefWidth(), waitBlock.getPrefHeight());
-        rotationGroup.setTransform(true);
-        rotationGroup.setOrigin(Align.center);
-        rotationGroup.addAction(Actions.forever(Actions.rotateBy(-180f, 1f, Interpolation.fade)));
+        Group rotationGroup = new WaitRotationImage(app);
 
         okButtonCell = getButtonTable().getCell(getOkButton());
         okButtonCell.setActor(rotationGroup);
@@ -40,5 +34,17 @@ public class ProgressDialog extends VetoDialog {
 
     protected void animatedPack() {
         addAction(Actions.sizeTo(getPrefWidth(), getPrefHeight(), .3f, Interpolation.fade));
+    }
+
+    public static class WaitRotationImage extends Group {
+        public WaitRotationImage(LightBlocksGame app) {
+            Image waitBlock = new Image(app.trBlock);
+
+            addActor(waitBlock);
+            setSize(waitBlock.getPrefWidth(), waitBlock.getPrefHeight());
+            setTransform(true);
+            setOrigin(Align.center);
+            addAction(Actions.forever(Actions.rotateBy(-180f, 1f, Interpolation.fade)));
+        }
     }
 }
