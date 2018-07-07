@@ -7,8 +7,10 @@ import com.badlogic.gdx.pay.OfferType;
 import com.badlogic.gdx.pay.PurchaseManagerConfig;
 import com.badlogic.gdx.pay.PurchaseObserver;
 import com.badlogic.gdx.pay.Transaction;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
@@ -28,6 +30,7 @@ public class DonationDialog extends ControllerMenuDialog {
     private static final String LIGHTBLOCKS_SPONSOR = "lightblocks.sponsor";
     private static final String LIGHTBLOCKS_PATRON = "lightblocks.patron";
     private final LightBlocksGame app;
+    private final RoundedTextButton reclaimButton;
     private Cell mainDonationButtonsCell;
     private DonationButton donateSupporter;
     private Table donationButtonTable;
@@ -35,12 +38,24 @@ public class DonationDialog extends ControllerMenuDialog {
     private DonationButton donatePatron;
     private ScaledLabel doDonateLabel;
 
-    public DonationDialog(LightBlocksGame app) {
+    public DonationDialog(final LightBlocksGame app) {
         super("", app.skin);
         this.app = app;
 
         RoundedTextButton closeButton = new RoundedTextButton("No, thanks", app.skin);
         button(closeButton);
+
+        reclaimButton = new RoundedTextButton("Reclaim", app.skin);
+        reclaimButton.setDisabled(true);
+        reclaimButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                reclaimButton.setDisabled(true);
+                app.purchaseManager.purchaseRestore();
+            }
+        });
+        addFocusableActor(reclaimButton);
+        getButtonTable().add(reclaimButton);
 
         // GUI erstmal so aufbauen
         fillContent(app);
@@ -99,9 +114,6 @@ public class DonationDialog extends ControllerMenuDialog {
     }
 
     private void initPurchaseManager() {
-        if (app.purchaseManager == null)
-            return;
-
         // IAP
         PurchaseManagerConfig pmc = new PurchaseManagerConfig();
         pmc.addOffer(new Offer().setType(OfferType.ENTITLEMENT).setIdentifier(LIGHTBLOCKS_SUPPORTER));
@@ -118,6 +130,7 @@ public class DonationDialog extends ControllerMenuDialog {
         donatePatron.updateFromManager();
 
         // TODO: im aggressiven Modus frühestens 5 Sekunden nach Start...
+        reclaimButton.setDisabled(false);
         doDonateLabel.setVisible(true);
         mainDonationButtonsCell.setActor(donationButtonTable);
         mainDonationButtonsCell.fillX();
@@ -129,10 +142,25 @@ public class DonationDialog extends ControllerMenuDialog {
         public DonationButton(String sku) {
             // feste Werte damit die Breite und Höhe schonmal passt
             super("Supporter", "x,xxx", app.skin);
+            this.sku = sku;
             addFocusableActor(this);
             getDescLabel().setAlignment(Align.center);
 
-            this.sku = sku;
+            addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    buyItem();
+                }
+            });
+        }
+
+        private void buyItem() {
+            app.purchaseManager.purchase(sku);
+        }
+
+        public void setBought() {
+            setDisabled(true);
+            getDescLabel().setText("Thank you!");
         }
 
         public void updateFromManager() {
@@ -171,8 +199,10 @@ public class DonationDialog extends ControllerMenuDialog {
         }
 
         @Override
-        public void handleRestore(Transaction[] transactions) {
-
+        public void handleRestore(final Transaction[] transactions) {
+            for (Transaction t : transactions) {
+                handlePurchase(t);
+            }
         }
 
         @Override
@@ -181,8 +211,22 @@ public class DonationDialog extends ControllerMenuDialog {
         }
 
         @Override
-        public void handlePurchase(Transaction transaction) {
+        public void handlePurchase(final Transaction transaction) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    if (transaction.isPurchased()) {
+                        // TODO richtig persistieren
+                        if (transaction.getIdentifier().equals(LIGHTBLOCKS_SUPPORTER))
+                            donateSupporter.setBought();
+                        else if (transaction.getIdentifier().equals(LIGHTBLOCKS_SPONSOR))
+                            donateSponsor.setBought();
+                        else if (transaction.getIdentifier().equals(LIGHTBLOCKS_PATRON))
+                            donatePatron.setBought();
 
+                    }
+                }
+            });
         }
 
         @Override
