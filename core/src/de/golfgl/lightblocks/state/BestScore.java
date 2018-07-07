@@ -132,7 +132,6 @@ public class BestScore implements IRoundScore, Json.Serializable {
     private void mergeWithOther(String key, BestScore bs) {
         // wäre eigentlich abhängig von ComparisonMethod, aber die ist hier nicht bekannt :-/
         // daher hier auf den key des gamemodels vergleichen
-        // TODO für Sprint auf Zeit vergleichen
 
         boolean otherScoreIsBetter;
 

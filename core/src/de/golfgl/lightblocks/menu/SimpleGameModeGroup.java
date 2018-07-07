@@ -81,7 +81,6 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         scoresGroup = new ScoresGroup(app, isShowBestTime());
         add(scoresGroup).height(scoresGroup.getPrefHeight()).fill();
 
-        // TODO erst auslösen wenn Seite erstmals angezeigt wird
         refreshScores(0);
     }
 

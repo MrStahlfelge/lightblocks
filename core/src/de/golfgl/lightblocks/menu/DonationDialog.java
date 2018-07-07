@@ -167,7 +167,6 @@ public class DonationDialog extends ControllerMenuDialog {
             Information skuInfo = app.purchaseManager.getInformation(sku);
 
             if (skuInfo == null || skuInfo.equals(Information.UNAVAILABLE)) {
-                //TODO: auch disablen wenn schon gekauft
                 setDisabled(true);
                 setText("Not available");
                 getDescLabel().setText("n/a");
