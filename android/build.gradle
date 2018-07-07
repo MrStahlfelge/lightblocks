@@ -50,10 +50,14 @@ android {
     }
 }
 
+repositories {
+    maven { url "https://jcenter.bintray.com" }
+}
+
 dependencies {
     googleCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamsvcsVersion"
+    googleCompile "com.badlogicgames.gdxpay:gdx-pay-android-googlebilling:$gdxPayVersion"
     amazonCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-amazongc:$gamsvcsVersion"
-    amazonCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core-gamejolt:$gamsvcsVersion"
     amazonCompile "com.badlogicgames.gdxpay:gdx-pay-android-amazon:$gdxPayVersion"
 }
 

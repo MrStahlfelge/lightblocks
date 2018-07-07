@@ -3,6 +3,8 @@ package de.golfgl.lightblocks;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
+import com.badlogic.gdx.pay.android.googlebilling.PurchaseManagerGoogleBilling;
+
 import de.golfgl.lightblocks.gpgs.GpgsMultiPlayerClient;
 
 public class AndroidLauncher extends GeneralAndroidLauncher {
@@ -26,6 +28,8 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
         // on Google Play Android TV, don't even try to open web links :-(
         if (isOnGooglePlayAndroidTV())
             game.setOpenWeblinks(false);
+
+        game.purchaseManager = new PurchaseManagerGoogleBilling(this);
     }
 
     /**

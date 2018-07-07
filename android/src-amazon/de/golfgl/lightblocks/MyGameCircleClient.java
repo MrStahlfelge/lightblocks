@@ -1,7 +1,6 @@
 package de.golfgl.lightblocks;
 
 import de.golfgl.gdxgamesvcs.GameCircleClient;
-import de.golfgl.gdxgamesvcs.GameJoltClient;
 import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListener;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;

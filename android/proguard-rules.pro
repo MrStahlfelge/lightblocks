@@ -97,3 +97,4 @@
 -dontwarn com.amazon.**
 -keep class com.amazon.** {*;}
 -keepattributes *Annotation*
+-optimizations !code/allocation/variable

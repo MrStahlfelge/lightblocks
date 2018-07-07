@@ -168,10 +168,8 @@ public class DonationDialog extends ControllerMenuDialog {
 
             if (skuInfo == null || skuInfo.equals(Information.UNAVAILABLE)) {
                 setDisabled(true);
-                setText("Not available");
-                getDescLabel().setText("n/a");
+                getDescLabel().setText("Not available");
             } else {
-                setText(skuInfo.getLocalName());
                 getDescLabel().setText(skuInfo.getLocalPricing());
             }
         }
