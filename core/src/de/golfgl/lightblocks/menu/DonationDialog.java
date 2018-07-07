@@ -42,10 +42,10 @@ public class DonationDialog extends ControllerMenuDialog {
         super("", app.skin);
         this.app = app;
 
-        RoundedTextButton closeButton = new RoundedTextButton("No, thanks", app.skin);
+        RoundedTextButton closeButton = new RoundedTextButton(app.TEXTS.get("donationNoThanks"), app.skin);
         button(closeButton);
 
-        reclaimButton = new RoundedTextButton("Reclaim", app.skin);
+        reclaimButton = new RoundedTextButton(app.TEXTS.get("donationReclaim"), app.skin);
         reclaimButton.setDisabled(true);
         reclaimButton.addListener(new ChangeListener() {
             @Override
@@ -70,7 +70,8 @@ public class DonationDialog extends ControllerMenuDialog {
 
         long drawnTetrominos = app.savegame.getTotalScore().getDrawnTetrominos();
         if (drawnTetrominos > 5000) {
-            contentTable.add(new ScaledLabel("You stacked", app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+            contentTable.add(new ScaledLabel(app.TEXTS.get("donationYouStacked1"), app.skin,
+                    LightBlocksGame.SKIN_FONT_TITLE));
             ScoreLabel scoreLabel = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
             scoreLabel.setMaxCountingTime(2);
             scoreLabel.setCountingSpeed(2000);
@@ -78,18 +79,17 @@ public class DonationDialog extends ControllerMenuDialog {
             contentTable.row();
             contentTable.add(scoreLabel).height(scoreLabel.getPrefHeight() * .8f);
             contentTable.row();
-            contentTable.add(new ScaledLabel("blocks so far.", app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+            contentTable.add(new ScaledLabel(app.TEXTS.get("donationYouStacked2"), app.skin,
+                    LightBlocksGame.SKIN_FONT_TITLE));
             contentTable.row().padTop(10);
         }
 
-        ScaledLabel textLabel = new ScaledLabel("It is great to see people having fun with this game. That's why " +
-                "Lightblocks is free and will stay free.\n\n" +
-                "However, if you want, you can support me in my efforts with a voluntary donation.", app.skin);
+        ScaledLabel textLabel = new ScaledLabel(app.TEXTS.get("donationText"), app.skin);
         textLabel.setWrap(true);
         textLabel.setAlignment(Align.center);
         contentTable.add(textLabel).fillX().minWidth(LightBlocksGame.nativeGameWidth * .8f);
         contentTable.row().padTop(20);
-        doDonateLabel = new ScaledLabel("Donate and become a", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+        doDonateLabel = new ScaledLabel(app.TEXTS.get("donationIntro"), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         doDonateLabel.setVisible(false);
         contentTable.add(doDonateLabel);
         contentTable.row();
@@ -105,7 +105,7 @@ public class DonationDialog extends ControllerMenuDialog {
         donationButtonTable.row();
         donatePatron = new DonationButton(LIGHTBLOCKS_PATRON);
         donationButtonTable.add(donatePatron);
-        ScaledLabel hintLabel = new ScaledLabel("Pick the amount you are willing to give or combine them.", app.skin);
+        ScaledLabel hintLabel = new ScaledLabel(app.TEXTS.get("donationHelp"), app.skin);
         hintLabel.setWrap(true);
         hintLabel.setAlignment(Align.center);
         donationButtonTable.add(hintLabel).fill();
@@ -141,7 +141,7 @@ public class DonationDialog extends ControllerMenuDialog {
 
         public DonationButton(String sku) {
             // feste Werte damit die Breite und Höhe schonmal passt
-            super("Supporter", "x,xxx", app.skin);
+            super(app.TEXTS.get("donationType_" + sku), "x,xxx", app.skin);
             this.sku = sku;
             addFocusableActor(this);
             getDescLabel().setAlignment(Align.center);
@@ -160,7 +160,7 @@ public class DonationDialog extends ControllerMenuDialog {
 
         public void setBought() {
             setDisabled(true);
-            getDescLabel().setText("Thank you!");
+            getDescLabel().setText(app.TEXTS.get("donationThankYou"));
         }
 
         public void updateFromManager() {
