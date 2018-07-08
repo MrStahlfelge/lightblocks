@@ -94,6 +94,7 @@
 -dontwarn sun.misc.**
 
 #IAP
+-keep class com.android.vending.billing.**
 -dontwarn com.amazon.**
 -keep class com.amazon.** {*;}
 -keepattributes *Annotation*

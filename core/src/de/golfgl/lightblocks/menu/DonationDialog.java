@@ -20,6 +20,7 @@ import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
 
 /**
  * Created by Benjamin Schulte on 24.06.2018.
@@ -31,6 +32,7 @@ public class DonationDialog extends ControllerMenuDialog {
     private static final String LIGHTBLOCKS_PATRON = "lightblocks.patron";
     private final LightBlocksGame app;
     private final RoundedTextButton reclaimButton;
+    private final RoundedTextButton closeButton;
     private Cell mainDonationButtonsCell;
     private DonationButton donateSupporter;
     private Table donationButtonTable;
@@ -42,7 +44,8 @@ public class DonationDialog extends ControllerMenuDialog {
         super("", app.skin);
         this.app = app;
 
-        RoundedTextButton closeButton = new RoundedTextButton(app.TEXTS.get("donationNoThanks"), app.skin);
+        // TODO: im aggressiven Modus frühestens 5 Sekunden nach Start aktivieren
+        closeButton = new RoundedTextButton(app.TEXTS.get("donationNoThanks"), app.skin);
         button(closeButton);
 
         reclaimButton = new RoundedTextButton(app.TEXTS.get("donationReclaim"), app.skin);
@@ -123,17 +126,32 @@ public class DonationDialog extends ControllerMenuDialog {
         app.purchaseManager.install(new LbPurchaseObserver(), pmc, true);
     }
 
-    private void updateGuiWhenPurchaseManInstalled() {
-        // einfüllen der Infos
-        donateSupporter.updateFromManager();
-        donateSponsor.updateFromManager();
-        donatePatron.updateFromManager();
+    private void updateGuiWhenPurchaseManInstalled(String errorMessage) {
+        if (app.purchaseManager.installed() && errorMessage == null) {
+            // einfüllen der Infos
+            donateSupporter.updateFromManager();
+            donateSponsor.updateFromManager();
+            donatePatron.updateFromManager();
 
-        // TODO: im aggressiven Modus frühestens 5 Sekunden nach Start...
-        reclaimButton.setDisabled(false);
-        doDonateLabel.setVisible(true);
-        mainDonationButtonsCell.setActor(donationButtonTable);
-        mainDonationButtonsCell.fillX();
+            reclaimButton.setDisabled(false);
+            doDonateLabel.setVisible(true);
+            mainDonationButtonsCell.setActor(donationButtonTable);
+            mainDonationButtonsCell.fillX();
+        } else {
+            errorMessage = "Error instantiating the donation system:"
+                    + (errorMessage == null ? "" : "\n" + errorMessage);
+            ScaledLabel errorLabel = new ScaledLabel(errorMessage, app.skin,
+                    LightBlocksGame.SKIN_FONT_BIG);
+            errorLabel.setWrap(true);
+            errorLabel.setAlignment(Align.center);
+            mainDonationButtonsCell.setActor(errorLabel);
+            mainDonationButtonsCell.fillX();
+        }
+    }
+
+    @Override
+    protected Actor getConfiguredEscapeActor() {
+        return closeButton;
     }
 
     private class DonationButton extends InfoButton {
@@ -161,6 +179,7 @@ public class DonationDialog extends ControllerMenuDialog {
         public void setBought() {
             setDisabled(true);
             getDescLabel().setText(app.TEXTS.get("donationThankYou"));
+            closeButton.setText(app.TEXTS.get("donationButtonClose"));
         }
 
         public void updateFromManager() {
@@ -184,15 +203,22 @@ public class DonationDialog extends ControllerMenuDialog {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    updateGuiWhenPurchaseManInstalled();
+                    updateGuiWhenPurchaseManInstalled(null);
                 }
             });
         }
 
         @Override
-        public void handleInstallError(Throwable e) {
+        public void handleInstallError(final Throwable e) {
             Gdx.app.error("LB-IAP", "Error when trying to install PurchaseManager", e);
-            handleInstall();
+            //TODO GA-Meldung
+
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    updateGuiWhenPurchaseManInstalled(e.getMessage());
+                }
+            });
         }
 
         @Override
@@ -204,7 +230,7 @@ public class DonationDialog extends ControllerMenuDialog {
 
         @Override
         public void handleRestoreError(Throwable e) {
-
+            showErrorOnMainThread("Error reclaiming donations: " + e.getMessage());
         }
 
         @Override
@@ -213,6 +239,7 @@ public class DonationDialog extends ControllerMenuDialog {
                 @Override
                 public void run() {
                     if (transaction.isPurchased()) {
+                        //TODO GA-Meldung (aber nicht bei reclaim)
                         // TODO richtig persistieren
                         if (transaction.getIdentifier().equals(LIGHTBLOCKS_SUPPORTER))
                             donateSupporter.setBought();
@@ -228,12 +255,21 @@ public class DonationDialog extends ControllerMenuDialog {
 
         @Override
         public void handlePurchaseError(Throwable e) {
-
+            showErrorOnMainThread("Error making donation:\n" + e.getMessage());
         }
 
         @Override
         public void handlePurchaseCanceled() {
 
+        }
+
+        private void showErrorOnMainThread(final String message) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    new VetoDialog(message, getSkin(), getWidth()).show(getStage());
+                }
+            });
         }
     }
 }
