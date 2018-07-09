@@ -18,6 +18,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.AboutScreen;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.AnimatedLightblocksLogo;
+import de.golfgl.lightblocks.menu.DonationDialog;
 import de.golfgl.lightblocks.menu.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.menu.SettingsScreen;
 import de.golfgl.lightblocks.menu.SinglePlayerScreen;
@@ -334,5 +335,10 @@ public class MainMenuScreen extends AbstractMenuScreen {
         SettingsScreen settingsScreen = new SettingsScreen(app, mainGroup);
         settingsScreen.show(stage);
         return settingsScreen;
+    }
+
+    public void showDonationDialog() {
+        if (app.canDonate())
+            new DonationDialog(app).show(stage);
     }
 }

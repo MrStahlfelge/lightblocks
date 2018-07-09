@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
+import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.InfoButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
@@ -185,6 +186,7 @@ public class DonationDialog extends ControllerMenuDialog {
             setDisabled(true);
             getDescLabel().setText(app.TEXTS.get("donationThankYou"));
             closeButton.setText(app.TEXTS.get("donationButtonClose"));
+            closeButton.setDisabled(false);
             app.localPrefs.addSupportLevel(sku);
         }
 
@@ -217,7 +219,8 @@ public class DonationDialog extends ControllerMenuDialog {
         @Override
         public void handleInstallError(final Throwable e) {
             Gdx.app.error("LB-IAP", "Error when trying to install PurchaseManager", e);
-            //TODO GA-Meldung
+            if (app.gameAnalytics != null)
+                app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.error, e.getMessage());
 
             Gdx.app.postRunnable(new Runnable() {
                 @Override
@@ -231,7 +234,7 @@ public class DonationDialog extends ControllerMenuDialog {
         public void handleRestore(final Transaction[] transactions) {
             if (transactions != null && transactions.length > 0)
                 for (Transaction t : transactions) {
-                    handlePurchase(t);
+                    handlePurchase(t, true);
                 }
             else if (reclaimPressed)
                 showErrorOnMainThread("donationNoReclaim", true);
@@ -245,12 +248,18 @@ public class DonationDialog extends ControllerMenuDialog {
 
         @Override
         public void handlePurchase(final Transaction transaction) {
+            handlePurchase(transaction, false);
+        }
+
+        protected void handlePurchase(final Transaction transaction, final boolean fromRestore) {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
                     if (transaction.isPurchased()) {
-                        //TODO GA-Meldung (aber nicht bei reclaim)
-                        // TODO richtig persistieren
+                        if (!fromRestore && app.gameAnalytics != null)
+                            app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.info,
+                                    "PURCHASE_" + transaction.getIdentifier());
+
                         if (transaction.getIdentifier().equals(LIGHTBLOCKS_SUPPORTER))
                             donateSupporter.setBought();
                         else if (transaction.getIdentifier().equals(LIGHTBLOCKS_SPONSOR))

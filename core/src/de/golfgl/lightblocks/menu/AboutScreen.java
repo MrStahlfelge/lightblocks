@@ -57,7 +57,7 @@ public class AboutScreen extends AbstractMenuDialog {
         menuTable.row().padTop(20);
         menuTable.add(getWrapLabel(app.TEXTS.get("labelAbout2"))).fill();
 
-        if (app.purchaseManager != null) {
+        if (app.canDonate()) {
             RoundedTextButton donateButton = new RoundedTextButton(app.TEXTS.get("buttonDonation"), app.skin);
             donateButton.addListener(new ChangeListener() {
                 @Override

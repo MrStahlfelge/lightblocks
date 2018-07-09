@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.menu.DonationDialog;
 import de.golfgl.lightblocks.menu.SinglePlayerScreen;
 import de.golfgl.lightblocks.menu.WelcomeButton;
 import de.golfgl.lightblocks.model.Mission;
@@ -69,6 +70,16 @@ public class WelcomeTextUtils {
             if (isLongTimePlayer && MathUtils.randomBoolean(.05f))
                 welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeOtherPlatforms"),
                         new OpenWebsiteRunnable(app)));
+            
+            if (isLongTimePlayer && app.localPrefs.getSupportLevel() == 0 && app.canDonate() &&
+                    MathUtils.randomBoolean(.05f))
+                welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeDonations"),
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                app.mainMenuScreen.showDonationDialog();
+                            }
+                        }));
         }
 
         // ENDE
@@ -82,6 +93,8 @@ public class WelcomeTextUtils {
     protected static void listNewFeatures(Array<WelcomeButton.WelcomeText> welcomes,
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
+
+        // TODO: Settings können mit getScreenLastShownVersion extra abgefragt werden!
 
         // 1825
         if (listChangesSince < 1825) {

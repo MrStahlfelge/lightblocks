@@ -384,6 +384,10 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         this.openWeblinks = openWeblinks;
     }
 
+    public boolean canDonate() {
+        return purchaseManager != null;
+    }
+
     public AbstractMenuDialog getNewMultiplayerMenu(Actor actorToHide) {
         return new CompetitionMenuScreen(this, actorToHide);
     }
