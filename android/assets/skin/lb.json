@@ -246,5 +246,9 @@ com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
 	frameless: {
 		titleFont: qs-25-bold
 	}
+	fullsize: {
+		titleFont: qs-25-bold
+		stageBackground: black
+	}
 }
 }

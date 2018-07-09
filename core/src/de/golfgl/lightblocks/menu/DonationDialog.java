@@ -27,9 +27,9 @@ import de.golfgl.lightblocks.scene2d.VetoDialog;
  */
 
 public class DonationDialog extends ControllerMenuDialog {
-    private static final String LIGHTBLOCKS_SUPPORTER = "lightblocks.supporter";
-    private static final String LIGHTBLOCKS_SPONSOR = "lightblocks.sponsor";
-    private static final String LIGHTBLOCKS_PATRON = "lightblocks.patron";
+    public static final String LIGHTBLOCKS_SUPPORTER = "lightblocks.supporter";
+    public static final String LIGHTBLOCKS_SPONSOR = "lightblocks.sponsor";
+    public static final String LIGHTBLOCKS_PATRON = "lightblocks.patron";
     private final LightBlocksGame app;
     private final RoundedTextButton reclaimButton;
     private final RoundedTextButton closeButton;
@@ -39,9 +39,10 @@ public class DonationDialog extends ControllerMenuDialog {
     private DonationButton donateSponsor;
     private DonationButton donatePatron;
     private ScaledLabel doDonateLabel;
+    private boolean reclaimPressed;
 
     public DonationDialog(final LightBlocksGame app) {
-        super("", app.skin);
+        super("", app.skin, LightBlocksGame.SKIN_WINDOW_ALLBLACK);
         this.app = app;
 
         // TODO: im aggressiven Modus frühestens 5 Sekunden nach Start aktivieren
@@ -53,6 +54,7 @@ public class DonationDialog extends ControllerMenuDialog {
         reclaimButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                reclaimPressed = true;
                 reclaimButton.setDisabled(true);
                 app.purchaseManager.purchaseRestore();
             }
@@ -90,7 +92,7 @@ public class DonationDialog extends ControllerMenuDialog {
         ScaledLabel textLabel = new ScaledLabel(app.TEXTS.get("donationText"), app.skin);
         textLabel.setWrap(true);
         textLabel.setAlignment(Align.center);
-        contentTable.add(textLabel).fillX().minWidth(LightBlocksGame.nativeGameWidth * .8f);
+        contentTable.add(textLabel).fillX().minWidth(LightBlocksGame.nativeGameWidth * .9f);
         contentTable.row().padTop(20);
         doDonateLabel = new ScaledLabel(app.TEXTS.get("donationIntro"), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         doDonateLabel.setVisible(false);
@@ -137,6 +139,9 @@ public class DonationDialog extends ControllerMenuDialog {
             doDonateLabel.setVisible(true);
             mainDonationButtonsCell.setActor(donationButtonTable);
             mainDonationButtonsCell.fillX();
+
+            if (app.localPrefs.getSupportLevel() > 0)
+                app.purchaseManager.purchaseRestore();
         } else {
             errorMessage = "Error instantiating the donation system:"
                     + (errorMessage == null ? "" : "\n" + errorMessage);
@@ -180,6 +185,7 @@ public class DonationDialog extends ControllerMenuDialog {
             setDisabled(true);
             getDescLabel().setText(app.TEXTS.get("donationThankYou"));
             closeButton.setText(app.TEXTS.get("donationButtonClose"));
+            app.localPrefs.addSupportLevel(sku);
         }
 
         public void updateFromManager() {
@@ -223,14 +229,18 @@ public class DonationDialog extends ControllerMenuDialog {
 
         @Override
         public void handleRestore(final Transaction[] transactions) {
-            for (Transaction t : transactions) {
-                handlePurchase(t);
-            }
+            if (transactions != null && transactions.length > 0)
+                for (Transaction t : transactions) {
+                    handlePurchase(t);
+                }
+            else if (reclaimPressed)
+                showErrorOnMainThread("donationNoReclaim", true);
         }
 
         @Override
         public void handleRestoreError(Throwable e) {
-            showErrorOnMainThread("Error reclaiming donations: " + e.getMessage());
+            if (reclaimPressed)
+                showErrorOnMainThread("Error reclaiming donations: " + e.getMessage(), false);
         }
 
         @Override
@@ -255,7 +265,7 @@ public class DonationDialog extends ControllerMenuDialog {
 
         @Override
         public void handlePurchaseError(Throwable e) {
-            showErrorOnMainThread("Error making donation:\n" + e.getMessage());
+            showErrorOnMainThread("Error making donation:\n" + e.getMessage(), false);
         }
 
         @Override
@@ -263,11 +273,12 @@ public class DonationDialog extends ControllerMenuDialog {
 
         }
 
-        private void showErrorOnMainThread(final String message) {
+        private void showErrorOnMainThread(final String message, final boolean loadFromTexts) {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    new VetoDialog(message, getSkin(), getWidth()).show(getStage());
+                    new VetoDialog(loadFromTexts ? app.TEXTS.get(message) : message, getSkin(),
+                            getWidth() * .8f).show(getStage());
                 }
             });
         }

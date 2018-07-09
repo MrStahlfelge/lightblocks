@@ -6,6 +6,7 @@ import com.badlogic.gdx.pay.Information;
 import com.badlogic.gdx.pay.PurchaseManager;
 import com.badlogic.gdx.pay.PurchaseManagerConfig;
 import com.badlogic.gdx.pay.PurchaseObserver;
+import com.badlogic.gdx.pay.Transaction;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
@@ -29,6 +30,7 @@ public class DesktopLauncher {
     }
 
     private static class MyTestPurchaseManager implements PurchaseManager {
+        PurchaseObserver observer;
 
         @Override
         public String storeName() {
@@ -37,6 +39,7 @@ public class DesktopLauncher {
 
         @Override
         public void install(PurchaseObserver observer, PurchaseManagerConfig config, boolean autoFetchInformation) {
+            this.observer = observer;
             observer.handleInstall();
         }
 
@@ -52,7 +55,9 @@ public class DesktopLauncher {
 
         @Override
         public void purchase(String identifier) {
-
+            Transaction transaction = new Transaction();
+            transaction.setIdentifier(identifier);
+            observer.handlePurchase(transaction);
         }
 
         @Override

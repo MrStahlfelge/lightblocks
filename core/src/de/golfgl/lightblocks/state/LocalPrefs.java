@@ -5,6 +5,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.menu.DonationDialog;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
 
@@ -16,6 +17,7 @@ import de.golfgl.lightblocks.screen.PlayGesturesInput;
 
 public class LocalPrefs {
     public static final String KEY_SETTINGS_SCREEN = "settings";
+    private static final String CRYPTOKEY = "***REMOVED***";
     private static final String PREF_KEY_INPUT = "inputType";
     private static final String PREF_KEY_LEVEL = "beginningLevel";
     private static final String PREF_KEY_SPACTIVEPAGE = "singlePlayerPage";
@@ -30,6 +32,7 @@ public class LocalPrefs {
     private static final String TVREMOTE_RIGHT = "tvremote_right";
     private static final String TVREMOTE_ROTATE_CW = "tvremote_rotateCw";
     private static final String TVREMOTE_ROTATE_CC = "tvremote_rotateCc";
+    private static final String SUPPORTLEVEL = "supportlevel";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -44,6 +47,7 @@ public class LocalPrefs {
     private Boolean useOnScreenControls;
     private TvRemoteKeyConfig tvRemoteKeyConfig;
     private boolean suppressSounds;
+    private Integer supportLevel;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -314,6 +318,51 @@ public class LocalPrefs {
         prefs.putInteger(TVREMOTE_ROTATE_CW, tvRemoteKeyConfig.keyCodeRotateClockwise);
         prefs.putInteger(TVREMOTE_ROTATE_CC, tvRemoteKeyConfig.keyCodeRotateCounterclock);
         prefs.flush();
+    }
+
+    public int getSupportLevel() {
+        if (supportLevel == null) {
+            supportLevel = new Integer(0);
+
+            String cryptedSupportLevel = prefs.getString(SUPPORTLEVEL);
+            if (cryptedSupportLevel != null)
+                try {
+                    String decryptedLevel = GameStateHandler.decode(cryptedSupportLevel, CRYPTOKEY);
+
+                    if (decryptedLevel.contains(DonationDialog.LIGHTBLOCKS_SUPPORTER))
+                        supportLevel = supportLevel + 1;
+
+                    if (decryptedLevel.contains(DonationDialog.LIGHTBLOCKS_SPONSOR))
+                        supportLevel = supportLevel + 2;
+
+                    if (decryptedLevel.contains(DonationDialog.LIGHTBLOCKS_PATRON)) {
+                        supportLevel = supportLevel + 3;
+                    }
+                } catch (Throwable t) {
+                    //nix
+                }
+        }
+
+        return supportLevel;
+    }
+
+    public void addSupportLevel(String sku) {
+        String cryptedSupportLevel = prefs.getString(SUPPORTLEVEL);
+        String decryptedLevel = "";
+        if (cryptedSupportLevel != null)
+            try {
+                decryptedLevel = GameStateHandler.decode(cryptedSupportLevel, CRYPTOKEY);
+            } catch (Throwable t) {
+                //nix
+            }
+
+        if (!decryptedLevel.contains(sku))
+            decryptedLevel = decryptedLevel + "|" + sku;
+
+        prefs.putString(SUPPORTLEVEL, GameStateHandler.encode(decryptedLevel, CRYPTOKEY));
+        prefs.flush();
+        // Neuauswertung auslösen
+        supportLevel = null;
     }
 
     public static class TvRemoteKeyConfig {
