@@ -31,6 +31,9 @@ public class DonationDialog extends ControllerMenuDialog {
     public static final String LIGHTBLOCKS_SUPPORTER = "lightblocks.supporter";
     public static final String LIGHTBLOCKS_SPONSOR = "lightblocks.sponsor";
     public static final String LIGHTBLOCKS_PATRON = "lightblocks.patron";
+    public static final int TETROCOUNT_FIRST_REMINDER = 5000;
+    public static final int TETROCOUNT_NEXT_REMINDER = 2500;
+    private static final float MAX_WAIT_TIME_FORCEDMODE = 8f;
     private final LightBlocksGame app;
     private final RoundedTextButton reclaimButton;
     private final RoundedTextButton closeButton;
@@ -41,12 +44,13 @@ public class DonationDialog extends ControllerMenuDialog {
     private DonationButton donatePatron;
     private ScaledLabel doDonateLabel;
     private boolean reclaimPressed;
+    private boolean forcedMode = false;
+    private float waitTimeseconds;
 
     public DonationDialog(final LightBlocksGame app) {
         super("", app.skin, LightBlocksGame.SKIN_WINDOW_ALLBLACK);
         this.app = app;
 
-        // TODO: im aggressiven Modus frühestens 5 Sekunden nach Start aktivieren
         closeButton = new RoundedTextButton(app.TEXTS.get("donationNoThanks"), app.skin);
         button(closeButton);
 
@@ -129,6 +133,41 @@ public class DonationDialog extends ControllerMenuDialog {
         app.purchaseManager.install(new LbPurchaseObserver(), pmc, true);
     }
 
+    public DonationDialog setForcedMode() {
+        if (app.localPrefs.getSupportLevel() == 0) {
+            forcedMode = true;
+            closeButton.setDisabled(true);
+            waitTimeseconds = 0;
+            closeButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.localPrefs.setNextDonationReminder(app.savegame.getTotalScore().getDrawnTetrominos() +
+                            TETROCOUNT_NEXT_REMINDER);
+                }
+            });
+        }
+        return this;
+    }
+
+    @Override
+    public void act(float delta) {
+        if (forcedMode) {
+            waitTimeseconds += delta;
+
+            if (waitTimeseconds > MAX_WAIT_TIME_FORCEDMODE)
+                disarmForcedMode();
+        }
+
+        super.act(delta);
+    }
+
+    protected void disarmForcedMode() {
+        if (forcedMode) {
+            closeButton.setDisabled(false);
+            forcedMode = false;
+        }
+    }
+
     private void updateGuiWhenPurchaseManInstalled(String errorMessage) {
         if (app.purchaseManager.installed() && errorMessage == null) {
             // einfüllen der Infos
@@ -186,8 +225,8 @@ public class DonationDialog extends ControllerMenuDialog {
             setDisabled(true);
             getDescLabel().setText(app.TEXTS.get("donationThankYou"));
             closeButton.setText(app.TEXTS.get("donationButtonClose"));
-            closeButton.setDisabled(false);
             app.localPrefs.addSupportLevel(sku);
+            disarmForcedMode();
         }
 
         public void updateFromManager() {

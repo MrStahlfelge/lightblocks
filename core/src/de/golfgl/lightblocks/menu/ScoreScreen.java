@@ -37,6 +37,7 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 public class ScoreScreen extends AbstractMenuScreen {
 
     private static final int MAX_COUNTING_TIME = 2;
+    private static final int TETRO_COUNT_RATINGREMINDER = 1000;
     private Array<IRoundScore> scoresToShow;
     private Array<String> scoresToShowLabels;
     private BestScore best;
@@ -319,16 +320,22 @@ public class ScoreScreen extends AbstractMenuScreen {
 
         swoshIn();
 
-        // Wenn bereits 1000 Blöcke abgelegt sind und die Frage noch nicht verneint wurde bitten wir um ein Rating
-        // das ganze zeitlich verzögert, damit der Bildschirm sauber aufgebaut ist
-        if (!app.localPrefs.getDontAskForRating() && scoresToShow.size > 1 &&
-                app.savegame.getTotalScore().getDrawnTetrominos() >= 1000)
-            stage.getRoot().addAction(Actions.after(Actions.sequence(Actions.delay(.3f, Actions.run(new Runnable() {
-                @Override
-                public void run() {
-                    askIfEnjoyingTheGame();
-                }
-            })))));
+        if (scoresToShow.size > 1) {
+            // Wenn bereits 1000 Blöcke abgelegt sind und die Frage noch nicht verneint wurde bitten wir um ein Rating
+            // das ganze zeitlich verzögert, damit der Bildschirm sauber aufgebaut ist
+            if (!app.localPrefs.getDontAskForRating() &&
+                    app.savegame.getTotalScore().getDrawnTetrominos() >= TETRO_COUNT_RATINGREMINDER)
+                stage.getRoot().addAction(Actions.after(Actions.sequence(Actions.delay(.3f, Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        askIfEnjoyingTheGame();
+                    }
+                })))));
+            else if (app.canDonate() && app.localPrefs.getSupportLevel() == 0
+                    && app.savegame.getTotalScore().getDrawnTetrominos() >= app.localPrefs.getNextDonationReminder()) {
+                new DonationDialog(app).setForcedMode().show(stage);
+            }
+        }
     }
 
     private void askIfEnjoyingTheGame() {

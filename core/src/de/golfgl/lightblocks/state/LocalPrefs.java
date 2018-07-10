@@ -33,6 +33,7 @@ public class LocalPrefs {
     private static final String TVREMOTE_ROTATE_CW = "tvremote_rotateCw";
     private static final String TVREMOTE_ROTATE_CC = "tvremote_rotateCc";
     private static final String SUPPORTLEVEL = "supportlevel";
+    private static final String PREF_KEY_DONATIONREMINDER = "blocksNextReminder";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -48,6 +49,7 @@ public class LocalPrefs {
     private TvRemoteKeyConfig tvRemoteKeyConfig;
     private boolean suppressSounds;
     private Integer supportLevel;
+    private Long nextDonationReminder;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -363,6 +365,20 @@ public class LocalPrefs {
         prefs.flush();
         // Neuauswertung auslösen
         supportLevel = null;
+    }
+
+    public long getNextDonationReminder() {
+        if (nextDonationReminder == null)
+            nextDonationReminder = prefs.getLong(PREF_KEY_DONATIONREMINDER, DonationDialog.TETROCOUNT_FIRST_REMINDER);
+
+        return nextDonationReminder;
+    }
+
+    public void setNextDonationReminder(Long nextDonationReminder) {
+        this.nextDonationReminder = nextDonationReminder;
+
+        prefs.putLong(PREF_KEY_DONATIONREMINDER, nextDonationReminder);
+        prefs.flush();
     }
 
     public static class TvRemoteKeyConfig {
