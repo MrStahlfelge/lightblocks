@@ -6,41 +6,45 @@ import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListene
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 
 /**
+ * GameCircle Client mit Mapping
+ *
  * Created by Benjamin Schulte on 10.04.2018.
  */
 
 public class MyGameCircleClient extends GameCircleClient {
-    public static final String ACH_FOUR_LINES = "ACH_FOURLINES";
-    public static final String ACH_DOUBLE_SPECIAL = "ACH_DOUBLE";
-    public static final String ACH_TSPIN = "ACH_TSPIN";
-    public static final String ACH_CLEAN_COMPLETE = "ACH_CLEAN_COMPLETE";
-    public static final String ACH_MATCHMAKER = "ACH_MATCHMAKER";
-    public static final String ACH_LONGCLEANER = "ACH_LONGCLEAN";
-    public static final String ACH_ADDICTION_LEVEL_1 = "ACH_ADDICTION1";
-    public static final String ACH_ADDICTION_LEVEL_2 = "ACH_ADDICTION2";
-    public static final String ACH_HIGH_LEVEL_ADDICTION = "ACH_HIGH_LEVEL_ADDICTION";
-    public static final String ACH_MARATHON_SCORE_75000 = "ACH_SCORE075K";
-    public static final String ACH_MARATHON_SCORE_100000 = "ACH_SCORE100K";
-    public static final String ACH_MARATHON_SCORE_150000 = "ACH_SCORE150K";
-    public static final String ACH_MARATHON_SCORE_200000 = "ACH_SCORE200K";
-    public static final String ACH_MARATHON_SCORE_250000 = "ACH_SCORE250K";
-    public static final String ACH_MARATHON_SUPER_CHECKER = "ACH_SCORE300K";
-    public static final String ACH_SCORE_MILLIONAIRE = "ACH_MILLIONAIRE";
-    public static final String ACH_GRAVITY_KING = "ACH_GRAVITY_KING";
-    public static final String ACH_MEGA_MULTI_PLAYER = "ACH_MEGAMULTIPLAYER";
-    public static final String ACH_GAMEPAD_OWNER = "ACH_GAMEPADOWNER";
-    public static final String ACH_SPECIAL_CHAIN = "ACH_SPCHAIN";
-    public static final String ACH_100_FOUR_LINES = "ACH_100FOURS";
-    public static final String ACH_10_TSPINS = "ACH_10_TSPINS";
-    public static final String ACH_FRIENDLY_MULTIPLAYER = "ACH_FRIENDLYMULTIPLAYER";
-    public static final String ACH_COMPLETE_TURNAROUND = "ACH_COMPLETETURNAROUND";
-    public static final String ACH_PLUMBOUS_TETROMINOS = "ACH_PLUMBOUSTETROMINOS";
-    public static final String ACH_MISSION_10_ACCOMPLISHED = "ACH_MISSION10";
-    public static final String ACH_MISSION_15_ACCOMPLISHED = "ACH_MISSION15";
-    public static final String ACH_ALL_MISSIONS_PERFECT = "ACH_MISSIONS_PERFECT";
-    public static final String LEAD_MARATHON_GESTURES = "LB_MARA_GEST";
-    public static final String LEAD_MARATHON_GRAVITY = "LB_MARA_GRAV";
-    public static final String LEAD_MARATHON_GAMEPAD = "LB_MARA_GPAD";
+    private static final String ACH_FOUR_LINES = "ACH_FOURLINES";
+    private static final String ACH_DOUBLE_SPECIAL = "ACH_DOUBLE";
+    private static final String ACH_TSPIN = "ACH_TSPIN";
+    private static final String ACH_CLEAN_COMPLETE = "ACH_CLEAN_COMPLETE";
+    private static final String ACH_MATCHMAKER = "ACH_MATCHMAKER";
+    private static final String ACH_LONGCLEANER = "ACH_LONGCLEAN";
+    private static final String ACH_ADDICTION_LEVEL_1 = "ACH_ADDICTION1";
+    private static final String ACH_ADDICTION_LEVEL_2 = "ACH_ADDICTION2";
+    private static final String ACH_HIGH_LEVEL_ADDICTION = "ACH_HIGH_LEVEL_ADDICTION";
+    private static final String ACH_MARATHON_SCORE_75000 = "ACH_SCORE075K";
+    private static final String ACH_MARATHON_SCORE_100000 = "ACH_SCORE100K";
+    private static final String ACH_MARATHON_SCORE_150000 = "ACH_SCORE150K";
+    private static final String ACH_MARATHON_SCORE_200000 = "ACH_SCORE200K";
+    private static final String ACH_MARATHON_SCORE_250000 = "ACH_SCORE250K";
+    private static final String ACH_MARATHON_SUPER_CHECKER = "ACH_SCORE300K";
+    private static final String ACH_SCORE_MILLIONAIRE = "ACH_MILLIONAIRE";
+    private static final String ACH_GRAVITY_KING = "ACH_GRAVITY_KING";
+    private static final String ACH_MEGA_MULTI_PLAYER = "ACH_MEGAMULTIPLAYER";
+    private static final String ACH_GAMEPAD_OWNER = "ACH_GAMEPADOWNER";
+    private static final String ACH_SPECIAL_CHAIN = "ACH_SPCHAIN";
+    private static final String ACH_100_FOUR_LINES = "ACH_100FOURS";
+    private static final String ACH_10_TSPINS = "ACH_10_TSPINS";
+    private static final String ACH_FRIENDLY_MULTIPLAYER = "ACH_FRIENDLYMULTIPLAYER";
+    private static final String ACH_COMPLETE_TURNAROUND = "ACH_COMPLETETURNAROUND";
+    private static final String ACH_PLUMBOUS_TETROMINOS = "ACH_PLUMBOUSTETROMINOS";
+    private static final String ACH_MISSION_10_ACCOMPLISHED = "ACH_MISSION10";
+    private static final String ACH_MISSION_15_ACCOMPLISHED = "ACH_MISSION15";
+    private static final String ACH_ALL_MISSIONS_PERFECT = "ACH_MISSIONS_PERFECT";
+    private static final String LEAD_MARATHON_GESTURES = "LB_MARA_GEST";
+    private static final String LEAD_MARATHON_GRAVITY = "LB_MARA_GRAV";
+    private static final String LEAD_MARATHON_GAMEPAD = "LB_MARA_GPAD";
+    private static final String LEAD_PRACTICE = "LB_PRACTICE";
+    private static final String LEAD_SPRINT = "LB_SPRINT";
 
     @Override
     public boolean incrementAchievement(String achievementId, int incNum, float completionPercentage) {
@@ -91,7 +95,7 @@ public class MyGameCircleClient extends GameCircleClient {
             super.showLeaderboards(gcLeader);
     }
 
-    public String mapAchievements(String independantId) {
+    private String mapAchievements(String independantId) {
         if (independantId == null)
             return null;
         else if (independantId.equals(GpgsHelper.ACH_FOUR_LINES))
@@ -154,7 +158,7 @@ public class MyGameCircleClient extends GameCircleClient {
         return null;
     }
 
-    public String mapLeaderboards(String independantId) {
+    private String mapLeaderboards(String independantId) {
         if (independantId == null)
             return null;
         else if (independantId.equals(GpgsHelper.LEAD_MARATHON_GESTURES))
@@ -163,6 +167,10 @@ public class MyGameCircleClient extends GameCircleClient {
             return LEAD_MARATHON_GRAVITY;
         else if (independantId.equals(GpgsHelper.LEAD_MARATHON_GAMEPAD))
             return LEAD_MARATHON_GAMEPAD;
+        else if (independantId.equals(GpgsHelper.LEAD_PRACTICE_MODE))
+            return LEAD_PRACTICE;
+        else if (independantId.equals(GpgsHelper.LEAD_SPRINT_MODE))
+            return LEAD_SPRINT;
 
         return null;
     }
