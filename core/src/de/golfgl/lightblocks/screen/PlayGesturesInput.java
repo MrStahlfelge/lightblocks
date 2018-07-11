@@ -25,6 +25,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     public static final int SWIPEUP_PAUSE = 1;
     public static final int SWIPEUP_HARDDROP = 2;
     private static final float TOUCHPAD_DEAD_RADIUS = .33f;
+    private static final float MAX_SOFTDROPBEGINNING_INTERVAL = .3f;
 
     private static final float SCREEN_BORDER_PERCENTAGE = 0.1f;
     // Flipped Mode: Tap löst horizontale Bewegung aus, Swipe rotiert
@@ -32,20 +33,21 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     public Color rotateRightColor = new Color(.1f, 1, .3f, .8f);
     public Color rotateLeftColor = new Color(.2f, .8f, 1, .8f);
-    int screenX;
-    int screenY;
     boolean touchDownValid = false;
     boolean beganHorizontalMove;
     boolean beganSoftDrop;
     boolean didSomething;
     Group touchPanel;
     Vector2 touchCoordinates;
+    private int screenX;
+    private int screenY;
+    private float timeSinceTouchDown;
     private int dragThreshold;
     private Label toTheRight;
     private Label toTheLeft;
     private Label toDrop;
     private Label rotationLabel;
-    private boolean didDrop;
+    private boolean didHardDrop;
 
     private Group onScreenControls;
     private Touchpad touchpad;
@@ -83,6 +85,12 @@ public class PlayGesturesInput extends PlayScreenInput {
     public void doPoll(float delta) {
         if (onScreenControls != null)
             onScreenControls.setVisible(playScreen.isLandscape() && !isPaused());
+
+        if (touchDownValid)
+            timeSinceTouchDown += delta;
+
+        if (toDrop != null)
+            toDrop.setVisible(beganSoftDrop || timeSinceTouchDown <= MAX_SOFTDROPBEGINNING_INTERVAL);
     }
 
     @Override
@@ -102,7 +110,8 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         this.screenX = screenX;
         this.screenY = screenY;
-        didDrop = false;
+        this.timeSinceTouchDown = 0;
+        didHardDrop = false;
 
         if (isPaused()) {
             playScreen.switchPause(false);
@@ -250,8 +259,8 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (pointer != 0 || !touchDownValid)
             return false;
 
-        // Horizontale Bewegung  bemerken - aber nur wenn kein Soft Drop/Hard Drop eingeleitet!
-        if (!beganSoftDrop && !didDrop) {
+        // Horizontale Bewegung  bemerken - aber nur wenn kein Hard Drop eingeleitet!
+        if (!didHardDrop) {
             if (!flippedMode) {
                 if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > dragThreshold)) {
                     beganHorizontalMove = true;
@@ -271,15 +280,15 @@ public class PlayGesturesInput extends PlayScreenInput {
             }
         }
 
-        if (!beganHorizontalMove) {
-            if (screenY - this.screenY > dragThreshold && !beganSoftDrop) {
-                beganSoftDrop = true;
-                playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
-            }
-            if (screenY - this.screenY < dragThreshold && beganSoftDrop) {
-                beganSoftDrop = false;
-                playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
-            }
+        if (!beganHorizontalMove && screenY - this.screenY > dragThreshold && !beganSoftDrop
+                && timeSinceTouchDown <= MAX_SOFTDROPBEGINNING_INTERVAL) {
+            beganSoftDrop = true;
+            playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
+        }
+        // Soft Drop sofort beenden, wenn horizontal bewegt oder wieder hochgezogen
+        if ((beganHorizontalMove || screenY - this.screenY < dragThreshold) && beganSoftDrop) {
+            beganSoftDrop = false;
+            playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
         }
 
         int swipeUpType = playScreen.app.localPrefs.getSwipeUpType();
@@ -287,9 +296,9 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (screenY - this.screenY < -swipeUpTresholdFactor * dragThreshold && swipeUpType != SWIPEUP_DONOTHING) {
             if (swipeUpType == SWIPEUP_PAUSE && !isPaused())
                 playScreen.switchPause(false);
-            else if (swipeUpType == SWIPEUP_HARDDROP && !didDrop && !beganHorizontalMove) {
+            else if (swipeUpType == SWIPEUP_HARDDROP && !didHardDrop && !beganHorizontalMove) {
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
-                didDrop = true;
+                didHardDrop = true;
             }
         }
 
