@@ -63,7 +63,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     @Override
     public String getTutorialContinueText() {
-        return playScreen.app.TEXTS.get("tutorialContinueGestures");
+        return playScreen.app.TEXTS.get(isUsingOnScreenButtons() ? "tutorialContinueGamepad" : "tutorialContinueGestures");
     }
 
     @Override
@@ -103,7 +103,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             return false;
 
         touchDownValid = screenY > Gdx.graphics.getHeight() * SCREEN_BORDER_PERCENTAGE * (isPaused() ? 2 : 1)
-                && !(onScreenControls != null && onScreenControls.isVisible());
+                && !isUsingOnScreenButtons();
 
         if (!touchDownValid)
             return false;
@@ -125,6 +125,10 @@ public class PlayGesturesInput extends PlayScreenInput {
         }
 
         return true;
+    }
+
+    protected boolean isUsingOnScreenButtons() {
+        return onScreenControls != null && onScreenControls.isVisible();
     }
 
     public Group initializeTouchPanel(AbstractScreen playScreen, int dragTrashold) {

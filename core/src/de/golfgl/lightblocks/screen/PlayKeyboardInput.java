@@ -54,8 +54,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public String getTutorialContinueText() {
-        return playScreen.app.TEXTS.get(isOnTvRemote() ? "tutorialContinueTv" :
-                isOnKeyboard() ? "tutorialContinueKeyboard" : "tutorialContinueGamepad");
+        if (isOnTvRemote())
+            return playScreen.app.TEXTS.format("tutorialContinueTv",
+                    Input.Keys.toString(tvRemoteKeyConfig.keyCodeRotateClockwise));
+        else
+            return playScreen.app.TEXTS.get(isOnKeyboard() ? "tutorialContinueKeyboard" : "tutorialContinueGamepad");
     }
 
     protected boolean isOnTvRemote() {
