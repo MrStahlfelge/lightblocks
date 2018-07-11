@@ -108,12 +108,12 @@ public class DonationDialog extends ControllerMenuDialog {
 
         donationButtonTable = new Table();
         donationButtonTable.defaults().fillX().uniform().expandX();
-        donateSupporter = new DonationButton(LIGHTBLOCKS_SUPPORTER);
+        donateSupporter = new DonationButton(LIGHTBLOCKS_SUPPORTER, 179);
         donationButtonTable.add(donateSupporter);
-        donateSponsor = new DonationButton(LIGHTBLOCKS_SPONSOR);
+        donateSponsor = new DonationButton(LIGHTBLOCKS_SPONSOR, 349);
         donationButtonTable.add(donateSponsor);
         donationButtonTable.row();
-        donatePatron = new DonationButton(LIGHTBLOCKS_PATRON);
+        donatePatron = new DonationButton(LIGHTBLOCKS_PATRON, 529);
         donationButtonTable.add(donatePatron);
         ScaledLabel hintLabel = new ScaledLabel(app.TEXTS.get("donationHelp"), app.skin);
         hintLabel.setWrap(true);
@@ -201,11 +201,13 @@ public class DonationDialog extends ControllerMenuDialog {
 
     private class DonationButton extends InfoButton {
         private final String sku;
+        private final int usdCents;
 
-        public DonationButton(String sku) {
+        public DonationButton(String sku, int usdCents) {
             // feste Werte damit die Breite und Höhe schonmal passt
             super(app.TEXTS.get("donationType_" + sku), "x,xxx", app.skin);
             this.sku = sku;
+            this.usdCents = usdCents;
             addFocusableActor(this);
             getDescLabel().setAlignment(Align.center);
 
@@ -221,11 +223,13 @@ public class DonationDialog extends ControllerMenuDialog {
             app.purchaseManager.purchase(sku);
         }
 
-        public void setBought() {
+        public void setBought(boolean fromRestore) {
             setDisabled(true);
             getDescLabel().setText(app.TEXTS.get("donationThankYou"));
             closeButton.setText(app.TEXTS.get("donationButtonClose"));
             app.localPrefs.addSupportLevel(sku);
+            if (!fromRestore && app.gameAnalytics != null)
+                app.gameAnalytics.submitBusinessEvent("donation", sku, usdCents, "USD");
             disarmForcedMode();
         }
 
@@ -295,16 +299,12 @@ public class DonationDialog extends ControllerMenuDialog {
                 @Override
                 public void run() {
                     if (transaction.isPurchased()) {
-                        if (!fromRestore && app.gameAnalytics != null)
-                            app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.info,
-                                    "PURCHASE_" + transaction.getIdentifier());
-
                         if (transaction.getIdentifier().equals(LIGHTBLOCKS_SUPPORTER))
-                            donateSupporter.setBought();
+                            donateSupporter.setBought(fromRestore);
                         else if (transaction.getIdentifier().equals(LIGHTBLOCKS_SPONSOR))
-                            donateSponsor.setBought();
+                            donateSponsor.setBought(fromRestore);
                         else if (transaction.getIdentifier().equals(LIGHTBLOCKS_PATRON))
-                            donatePatron.setBought();
+                            donatePatron.setBought(fromRestore);
 
                     }
                 }
