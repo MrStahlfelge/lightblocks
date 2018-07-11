@@ -33,7 +33,7 @@ public class DonationDialog extends ControllerMenuDialog {
     public static final String LIGHTBLOCKS_PATRON = "lightblocks.patron";
     public static final int TETROCOUNT_FIRST_REMINDER = 5000;
     public static final int TETROCOUNT_NEXT_REMINDER = 2500;
-    private static final float MAX_WAIT_TIME_FORCEDMODE = 8f;
+    private static final float MAX_WAIT_TIME_FORCEDMODE = 5f;
     private final LightBlocksGame app;
     private final RoundedTextButton reclaimButton;
     private final RoundedTextButton closeButton;
