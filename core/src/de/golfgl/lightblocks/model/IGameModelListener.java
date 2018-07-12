@@ -12,9 +12,9 @@ public interface IGameModelListener {
 
     void insertNewBlock(int x, int y, int blockType);
 
-    void moveTetro(Integer[][] v, int dx, int dy);
+    void moveTetro(Integer[][] v, int dx, int dy, int ghostPieceDistance);
 
-    void rotateTetro(Integer[][] vOld, Integer[][] vNew);
+    void rotateTetro(Integer[][] vOld, Integer[][] vNew, int ghostPieceDistance);
 
     /**
      * entfernt die im Array angegebenen Zeilen mit Effekt
@@ -31,7 +31,7 @@ public interface IGameModelListener {
 
     void showNextTetro(Integer[][] relativeBlockPositions, int blockType);
 
-    void activateNextTetro(Integer[][] boardBlockPositions, int blockType);
+    void activateNextTetro(Integer[][] boardBlockPositions, int blockType, int ghostPieceDistance);
 
     void pinTetromino(Integer[][] currentBlockPositions);
 

@@ -40,6 +40,18 @@ public class Gameboard implements Json.Serializable {
         return gameboardSquare;
     }
 
+    public int getGhostPieceDistance(Tetromino activeTetromino, int horizontalMove) {
+        int i;
+        for (i = 1; i <= GAMEBOARD_ALLROWS; i++) {
+            tempPos.set(activeTetromino.getPosition().x + horizontalMove,
+                    activeTetromino.getPosition().y - i);
+            if (!isValidPosition(activeTetromino, tempPos, activeTetromino.getCurrentRotation())) {
+                break;
+            }
+        }
+        return i - 1;
+    }
+
     /**
      * Bewegt den Tetromino maximal die übergebene Distanz.
      *

@@ -256,7 +256,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     /**
      * Constructs a new game and sets the screen to it.
      *
-     * @param caller        the AbstractScreen that is calling.
      * @param newGameParams null if game should be resumed.
      */
     public static PlayScreen gotoPlayScreen(LightBlocksGame app, InitGameParameters newGameParams) throws
@@ -546,7 +545,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void moveTetro(Integer[][] v, int dx, int dy) {
+    public void moveTetro(Integer[][] v, int dx, int dy, int ghostPieceDistance) {
         if (dx != 0 || dy != 0) {
             // erst alle vom Spielbrett einsammeln...
             Array<BlockActor> blocks = removeBlockActorsFromMatrix(v);
@@ -559,6 +558,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 block.setMoveAction(Actions.moveTo((x + dx) * BlockActor.blockWidth, (y + dy) * BlockActor
                         .blockWidth, 1 / 30f));
                 blockMatrix[x + dx][y + dy] = block;
+                blockGroup.setGhostPiecePosition(i, x + dx, y - ghostPieceDistance);
             }
         }
     }
@@ -577,7 +577,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void rotateTetro(Integer[][] vOld, Integer[][] vNew) {
+    public void rotateTetro(Integer[][] vOld, Integer[][] vNew, int ghostPieceDistance) {
         if (app.localPrefs.isPlaySounds())
             app.rotateSound.play();
 
@@ -592,6 +592,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             block.setMoveAction(Actions.moveTo((newx) * BlockActor.blockWidth, (newy) * BlockActor.blockWidth, 1 /
                     20f));
             blockMatrix[newx][newy] = block;
+            blockGroup.setGhostPiecePosition(i, newx, newy - ghostPieceDistance);
         }
 
 
@@ -791,7 +792,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void activateNextTetro(Integer[][] boardBlockPositions, int blockType) {
+    public void activateNextTetro(Integer[][] boardBlockPositions, int blockType, int ghostPieceDistance) {
 
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
             // den bereits in nextTetro instantiierten Block ins Spielfeld an die gewünschte Stelle bringen
@@ -813,6 +814,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                         Interpolation.fade));
             }
             block.setEnlightened(true);
+
+            blockGroup.setGhostPiecePosition(i, x, y - ghostPieceDistance);
         }
     }
 

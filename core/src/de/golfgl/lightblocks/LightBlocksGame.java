@@ -87,6 +87,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public GameStateHandler savegame;
     // these resources are used in the whole game... so we are loading them here
     public TextureRegion trBlock;
+    public TextureRegion trGhostBlock;
     public TextureRegion trBlockEnlightened;
     public TextureRegion trGlowingLine;
     public Sound dropSound;
@@ -230,6 +231,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         skin = assetManager.get("skin/lb.json", Skin.class);
         TEXTS = assetManager.get("i18n/strings", I18NBundle.class);
         trBlock = skin.getRegion("block-deactivated");
+        trGhostBlock = skin.getRegion("block-ghost");
         trBlockEnlightened = skin.getRegion("block-light");
         trGlowingLine = skin.getRegion("lineglow");
         dropSound = assetManager.get("sound/switchon.ogg", Sound.class);

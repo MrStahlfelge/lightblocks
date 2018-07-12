@@ -157,6 +157,15 @@ public class SettingsScreen extends AbstractMenuDialog {
                                        }
             );
 
+            final Button showGhostpiece = new FaCheckbox(app.TEXTS.get("menuGhostpiece"), app.skin);
+            showGhostpiece.setChecked(app.localPrefs.getShowGhostpiece());
+            showGhostpiece.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.localPrefs.setShowGhostpiece(showGhostpiece.isChecked());
+                }
+            });
+
             Button gamePadButton = new GlowLabelButton(FontAwesome.DEVICE_GAMEPAD, app.TEXTS.get
                     ("menuGamepadConfig"), app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
             gamePadButton.addListener(new ChangeListener() {
@@ -199,6 +208,9 @@ public class SettingsScreen extends AbstractMenuDialog {
             add(gridIntensity);
 
             row();
+            add(showGhostpiece);
+
+            row();
             add(colorModeCheck);
 
             row();
@@ -207,6 +219,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             addFocusableActor(menuMusicButton);
             addFocusableActor(gridIntensitySlider);
             addFocusableActor(colorModeCheck);
+            addFocusableActor(showGhostpiece);
             addFocusableActor(gamePadButton);
         }
 

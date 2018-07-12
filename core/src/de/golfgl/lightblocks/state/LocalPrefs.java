@@ -34,6 +34,7 @@ public class LocalPrefs {
     private static final String TVREMOTE_ROTATE_CC = "tvremote_rotateCc";
     private static final String SUPPORTLEVEL = "supportlevel";
     private static final String PREF_KEY_DONATIONREMINDER = "blocksNextReminder";
+    private static final String KEY_SHOW_GHOSTPIECE = "showGhostpiece";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -50,6 +51,7 @@ public class LocalPrefs {
     private boolean suppressSounds;
     private Integer supportLevel;
     private Long nextDonationReminder;
+    private Boolean showGhostpiece;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -120,6 +122,21 @@ public class LocalPrefs {
             prefs.putInteger("blockColorMode", blockColorMode);
             prefs.flush();
             BlockActor.initColor(blockColorMode);
+        }
+    }
+
+    public boolean getShowGhostpiece() {
+        if (this.showGhostpiece == null)
+            showGhostpiece = prefs.getBoolean(KEY_SHOW_GHOSTPIECE, false);
+
+        return showGhostpiece;
+    }
+
+    public void setShowGhostpiece(boolean showGhostpiece) {
+        if (this.showGhostpiece != showGhostpiece) {
+            this.showGhostpiece = showGhostpiece;
+            prefs.putBoolean(KEY_SHOW_GHOSTPIECE, showGhostpiece);
+            prefs.flush();
         }
     }
 

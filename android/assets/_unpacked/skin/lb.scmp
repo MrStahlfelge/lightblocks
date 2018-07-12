@@ -532,6 +532,19 @@ atlasData: {
 			tintName: disabled
 			name: button_harddrop_pressed
 		}
+		{
+			file: ../block-ghost.png
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			visible: true
+			tint: null
+			tintName: null
+			name: block-ghost
+		}
 	]
 }
 jsonData: {

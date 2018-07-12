@@ -145,7 +145,9 @@ public abstract class GameModel implements Json.Serializable {
         int maxDistance = (-1) * gameboard.checkPossibleMoveDistance(false, -distance, activeTetromino);
 
         if (maxDistance > 0) {
-            userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), 0, -maxDistance);
+            int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
+            userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), 0, -maxDistance,
+                    ghostPieceDistance);
             activeTetromino.getPosition().y -= maxDistance;
             activeTetromino.setLastMovementType(0);
         }
@@ -390,7 +392,9 @@ public abstract class GameModel implements Json.Serializable {
         int maxDistance = gameboard.checkPossibleMoveDistance(true, distance, activeTetromino);
 
         if (maxDistance != 0) {
-            userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), maxDistance, 0);
+            int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, maxDistance);
+            userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), maxDistance, 0,
+                    ghostPieceDistance);
             activeTetromino.getPosition().x += maxDistance;
             activeTetromino.setLastMovementType(0);
         }
@@ -424,7 +428,9 @@ public abstract class GameModel implements Json.Serializable {
 
             activeTetromino.setRotation(newRotation);
 
-            userInterface.rotateTetro(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions());
+            int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
+            userInterface.rotateTetro(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions(),
+                    ghostPieceDistance);
         }
     }
 
@@ -513,7 +519,9 @@ public abstract class GameModel implements Json.Serializable {
      * die Methode aktiviert den bisherigen "Next" Tetromino im UI und zeichnet den nächsten next-Tetromino
      */
     protected void fireUserInterfaceTetrominoSwap() {
-        userInterface.activateNextTetro(activeTetromino.getCurrentBlockPositions(), activeTetromino.getIndex());
+        int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
+        userInterface.activateNextTetro(activeTetromino.getCurrentBlockPositions(), activeTetromino.getIndex(),
+                ghostPieceDistance);
         userInterface.showNextTetro(nextTetromino.getBlockPositions(new Vector2(0, 0), 0),
                 nextTetromino.getIndex());
     }
