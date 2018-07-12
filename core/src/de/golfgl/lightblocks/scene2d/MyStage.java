@@ -22,6 +22,8 @@ public class MyStage extends ControllerMenuStage {
     public MyStage(Viewport viewport) {
         super(viewport);
 
+        setDirectionEmphFactor(2.5f);
+
         // Falls unter Android keine Touchscreen-Eingabe vorhanden, dann TouchAction sofort aktivieren
         if (LightBlocksGame.isOnAndroidTV())
             touchActionActivated = true;
