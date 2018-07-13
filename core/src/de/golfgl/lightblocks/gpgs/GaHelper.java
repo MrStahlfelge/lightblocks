@@ -28,6 +28,7 @@ public class GaHelper {
             app.gameAnalytics.submitDesignEvent("blockColor:" + app.localPrefs.getBlockColorMode());
             app.gameAnalytics.submitDesignEvent("sounds:" + (app.localPrefs.isPlayMusic() ?
                     "music" : app.localPrefs.isPlaySounds() ? "sounds" : "none"));
+            app.gameAnalytics.submitDesignEvent("ghostpiece:" + (app.localPrefs.getShowGhostpiece() ? "yes" : "no"));
         }
     }
 
