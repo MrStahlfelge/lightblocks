@@ -285,7 +285,10 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
     private boolean checkNewGpgsConnPreConditions() {
         if (app.gpgsClient == null || !app.gpgsClient.isSessionActive()) {
-            showDialog(app.TEXTS.get("labelFirstSignIn"));
+            if (app.gpgsClient != null)
+                app.gpgsClient.logIn();
+            else
+                showDialog(app.TEXTS.get("labelFirstSignIn"));
             return true;
         }
 
