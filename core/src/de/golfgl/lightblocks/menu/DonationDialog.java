@@ -34,6 +34,7 @@ public class DonationDialog extends ControllerMenuDialog {
     public static final int TETROCOUNT_FIRST_REMINDER = 5000;
     public static final int TETROCOUNT_NEXT_REMINDER = 2500;
     private static final float MAX_WAIT_TIME_FORCEDMODE = 5f;
+    private static final float MIN_WAIT_TIME_FORCEDMODE = 3f;
     private final LightBlocksGame app;
     private final RoundedTextButton reclaimButton;
     private final RoundedTextButton closeButton;
@@ -46,6 +47,7 @@ public class DonationDialog extends ControllerMenuDialog {
     private boolean reclaimPressed;
     private boolean forcedMode = false;
     private float waitTimeseconds;
+    private boolean canShowTable;
 
     public DonationDialog(final LightBlocksGame app) {
         super("", app.skin, LightBlocksGame.SKIN_WINDOW_ALLBLACK);
@@ -154,11 +156,20 @@ public class DonationDialog extends ControllerMenuDialog {
         if (forcedMode) {
             waitTimeseconds += delta;
 
+            if (waitTimeseconds > MIN_WAIT_TIME_FORCEDMODE)
+                showTableIfPossible();
+
             if (waitTimeseconds > MAX_WAIT_TIME_FORCEDMODE)
                 disarmForcedMode();
-        }
+        } else
+            showTableIfPossible();
 
         super.act(delta);
+    }
+
+    private void showTableIfPossible() {
+        if (canShowTable && !donationButtonTable.hasParent())
+            mainDonationButtonsCell.setActor(donationButtonTable);
     }
 
     protected void disarmForcedMode() {
@@ -177,7 +188,7 @@ public class DonationDialog extends ControllerMenuDialog {
 
             reclaimButton.setDisabled(false);
             doDonateLabel.setVisible(true);
-            mainDonationButtonsCell.setActor(donationButtonTable);
+            canShowTable = true;
             mainDonationButtonsCell.fillX();
 
             if (app.localPrefs.getSupportLevel() > 0)
