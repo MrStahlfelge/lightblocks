@@ -324,6 +324,8 @@ public class DonationDialog extends ControllerMenuDialog {
 
         @Override
         public void handlePurchaseError(Throwable e) {
+            if (app.gameAnalytics != null)
+                app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.error, e.getMessage());
             showErrorOnMainThread("Error making donation:\n" + e.getMessage(), false);
         }
 
