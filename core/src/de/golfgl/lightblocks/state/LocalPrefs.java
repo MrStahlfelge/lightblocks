@@ -2,7 +2,10 @@ package de.golfgl.lightblocks.state;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+
+import javax.annotation.Nonnull;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.DonationDialog;
@@ -343,26 +346,44 @@ public class LocalPrefs {
         if (supportLevel == null) {
             supportLevel = new Integer(0);
 
-            String cryptedSupportLevel = prefs.getString(SUPPORTLEVEL);
-            if (cryptedSupportLevel != null)
-                try {
-                    String decryptedLevel = GameStateHandler.decode(cryptedSupportLevel, CRYPTOKEY);
+            Array<String> levels = getSupportLevels();
 
-                    if (decryptedLevel.contains(DonationDialog.LIGHTBLOCKS_SUPPORTER))
-                        supportLevel = supportLevel + 1;
+            if (levels.contains(DonationDialog.LIGHTBLOCKS_SUPPORTER, false))
+                supportLevel = supportLevel + 1;
 
-                    if (decryptedLevel.contains(DonationDialog.LIGHTBLOCKS_SPONSOR))
-                        supportLevel = supportLevel + 2;
+            if (levels.contains(DonationDialog.LIGHTBLOCKS_SPONSOR, false))
+                supportLevel = supportLevel + 2;
 
-                    if (decryptedLevel.contains(DonationDialog.LIGHTBLOCKS_PATRON)) {
-                        supportLevel = supportLevel + 3;
-                    }
-                } catch (Throwable t) {
-                    //nix
-                }
+            if (levels.contains(DonationDialog.LIGHTBLOCKS_PATRON, false)) {
+                supportLevel = supportLevel + 3;
+            }
         }
 
         return supportLevel;
+    }
+
+    @Nonnull
+    public Array<String> getSupportLevels() {
+        String cryptedSupportLevel = prefs.getString(SUPPORTLEVEL);
+        Array<String> items = new Array<String>();
+        if (cryptedSupportLevel != null)
+            try {
+                String decryptedLevel = GameStateHandler.decode(cryptedSupportLevel, CRYPTOKEY);
+
+                if (decryptedLevel.contains(DonationDialog.LIGHTBLOCKS_SUPPORTER))
+                    items.add(DonationDialog.LIGHTBLOCKS_SUPPORTER);
+
+                if (decryptedLevel.contains(DonationDialog.LIGHTBLOCKS_SPONSOR))
+                    items.add(DonationDialog.LIGHTBLOCKS_SPONSOR);
+
+                if (decryptedLevel.contains(DonationDialog.LIGHTBLOCKS_PATRON)) {
+                    items.add(DonationDialog.LIGHTBLOCKS_PATRON);
+                }
+            } catch (Throwable t) {
+                //nix
+            }
+
+        return items;
     }
 
     public void addSupportLevel(String sku) {

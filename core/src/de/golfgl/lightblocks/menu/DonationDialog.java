@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdxgameanalytics.GameAnalytics;
@@ -194,8 +195,18 @@ public class DonationDialog extends ControllerMenuDialog {
             canShowTable = true;
             mainDonationButtonsCell.fillX();
 
-            if (app.localPrefs.getSupportLevel() > 0)
-                app.purchaseManager.purchaseRestore();
+            Array<String> levels = app.localPrefs.getSupportLevels();
+
+            if (levels.contains(DonationDialog.LIGHTBLOCKS_SUPPORTER, false))
+                donateSupporter.setBought(true);
+
+            if (levels.contains(DonationDialog.LIGHTBLOCKS_SPONSOR, false))
+                donateSponsor.setBought(true);
+
+            if (levels.contains(DonationDialog.LIGHTBLOCKS_PATRON, false)) {
+                donatePatron.setBought(true);
+
+            }
         } else {
             errorMessage = "Error instantiating the donation system:"
                     + (errorMessage == null ? "" : "\n" + errorMessage);
