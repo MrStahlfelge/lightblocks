@@ -133,6 +133,9 @@ public class DonationDialog extends ControllerMenuDialog {
         pmc.addOffer(new Offer().setType(OfferType.ENTITLEMENT).setIdentifier(LIGHTBLOCKS_PATRON));
 
         app.purchaseManager.install(new LbPurchaseObserver(), pmc, true);
+
+        //TODO Es muss bei entfernen des Dialogs dispose aufgerufen werden, damit observer und damit dieser Dialog
+        // nicht geleakt wird. Da es sich aber um einen einmaligen Leak handelt, nicht ganz so schlimm...
     }
 
     public DonationDialog setForcedMode() {

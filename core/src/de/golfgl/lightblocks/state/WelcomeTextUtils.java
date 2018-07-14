@@ -31,10 +31,6 @@ public class WelcomeTextUtils {
         int daysSinceLastStart = app.localPrefs.getDaysSinceLastStart();
         boolean isLongTimePlayer = app.savegame.getTotalScore().getDrawnTetrominos() >= 1000;
 
-        // bis einschl 1818 wurde Version nicht gespeichert
-        if (lastUsedVersion == 0 && isLongTimePlayer)
-            lastUsedVersion = 1818;
-
         // AB HIER DIE EINBLENDUNGEN
 
         // 1. UPDATE HINWEISE
