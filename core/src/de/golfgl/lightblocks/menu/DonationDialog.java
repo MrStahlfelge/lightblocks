@@ -172,8 +172,11 @@ public class DonationDialog extends ControllerMenuDialog {
     }
 
     private void showTableIfPossible() {
-        if (canShowTable && !donationButtonTable.hasParent())
+        if (canShowTable && !donationButtonTable.hasParent()) {
             mainDonationButtonsCell.setActor(donationButtonTable);
+            doDonateLabel.setVisible(true);
+            mainDonationButtonsCell.fillX();
+        }
     }
 
     protected void disarmForcedMode() {
@@ -184,39 +187,36 @@ public class DonationDialog extends ControllerMenuDialog {
     }
 
     private void updateGuiWhenPurchaseManInstalled(String errorMessage) {
+        // einfüllen der Infos
+        donateSupporter.updateFromManager();
+        donateSponsor.updateFromManager();
+        donatePatron.updateFromManager();
+        canShowTable = true;
+
         if (app.purchaseManager.installed() && errorMessage == null) {
-            // einfüllen der Infos
-            donateSupporter.updateFromManager();
-            donateSponsor.updateFromManager();
-            donatePatron.updateFromManager();
-
             reclaimButton.setDisabled(false);
-            doDonateLabel.setVisible(true);
-            canShowTable = true;
-            mainDonationButtonsCell.fillX();
-
-            Array<String> levels = app.localPrefs.getSupportLevels();
-
-            if (levels.contains(DonationDialog.LIGHTBLOCKS_SUPPORTER, false))
-                donateSupporter.setBought(true);
-
-            if (levels.contains(DonationDialog.LIGHTBLOCKS_SPONSOR, false))
-                donateSponsor.setBought(true);
-
-            if (levels.contains(DonationDialog.LIGHTBLOCKS_PATRON, false)) {
-                donatePatron.setBought(true);
-
-            }
         } else {
-            errorMessage = "Error instantiating the donation system:"
-                    + (errorMessage == null ? "" : "\n" + errorMessage);
+            errorMessage = (errorMessage == null ? "Error instantiating the donation system" : errorMessage);
             ScaledLabel errorLabel = new ScaledLabel(errorMessage, app.skin,
                     LightBlocksGame.SKIN_FONT_BIG);
             errorLabel.setWrap(true);
             errorLabel.setAlignment(Align.center);
-            mainDonationButtonsCell.setActor(errorLabel);
-            mainDonationButtonsCell.fillX();
+            Cell donationLabelCell = getContentTable().getCell(doDonateLabel);
+            if (donationLabelCell != null)
+                donationLabelCell.setActor(errorLabel).fillX();
         }
+
+        Array<String> levels = app.localPrefs.getSupportLevels();
+
+        if (levels.contains(DonationDialog.LIGHTBLOCKS_SUPPORTER, false))
+            donateSupporter.setBought(true);
+
+        if (levels.contains(DonationDialog.LIGHTBLOCKS_SPONSOR, false))
+            donateSponsor.setBought(true);
+
+        if (levels.contains(DonationDialog.LIGHTBLOCKS_PATRON, false))
+            donatePatron.setBought(true);
+
     }
 
     @Override
