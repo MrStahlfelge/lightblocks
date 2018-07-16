@@ -89,6 +89,10 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        if (listChangesSince < 1830 && touchAvailable)
+            welcomes.add(new WelcomeButton.WelcomeText("There is a new option to play with On Screen Controls instead" +
+                    " of gestures in landscape and portrait mode.", new ShowSettingsRunnable(app)));
+
         if (listChangesSince < 1828)
             welcomes.add(new WelcomeButton.WelcomeText("There is a new option to show a ghost piece in game.",
                     new ShowSettingsRunnable(app)));
@@ -109,10 +113,6 @@ public class WelcomeTextUtils {
                     (touchAvailable ?
                             "For gesture input, enable it on swipe up in the settings." : "Use the UP button or key.")
                     + "\nThere's also a new option for block shadings.", new ShowSettingsRunnable(app)));
-        }
-        if (listChangesSince < 1822 && touchAvailable) {
-            welcomes.add(new WelcomeButton.WelcomeText("There is a new option to play with On Screen Controls instead" +
-                    " of gestures in landscape mode.", new ShowSettingsRunnable(app)));
         }
     }
 
