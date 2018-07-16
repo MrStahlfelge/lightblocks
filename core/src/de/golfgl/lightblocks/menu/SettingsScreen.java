@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
@@ -52,7 +53,7 @@ public class SettingsScreen extends AbstractMenuDialog {
 
     private PagedScrollPane groupPager;
     private GeneralSettings generalGroup;
-    private GestureSettings gesturesGroup;
+    private TouchInputSettings gesturesGroup;
 
     public SettingsScreen(final LightBlocksGame app, Actor toHide) {
         super(app, toHide);
@@ -66,7 +67,7 @@ public class SettingsScreen extends AbstractMenuDialog {
 
         groupPager = new PagedScrollPane(app.skin, LightBlocksGame.SKIN_STYLE_PAGER);
         groupPager.addPage(generalGroup);
-        gesturesGroup = new GestureSettings();
+        gesturesGroup = new TouchInputSettings();
         if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN))
             groupPager.addPage(gesturesGroup);
         if (LightBlocksGame.isOnAndroidTV())
@@ -237,19 +238,26 @@ public class SettingsScreen extends AbstractMenuDialog {
         }
     }
 
-    private class GestureSettings extends Table implements ISettingsGroup {
+    private class TouchInputSettings extends Table implements ISettingsGroup {
         private final Button defaultFocusedButton;
+        private final Cell settingsTableCell;
         PlayGesturesInput pgi;
         Group touchPanel;
         private Slider touchPanelSizeSlider;
+        private Table gestureSettings;
+        private Table onScreenButtonSettings;
 
-        public GestureSettings() {
-            final Button onScreenControlsButton = new FaCheckbox(app.TEXTS.get("menuUseOnScreenControls"), app.skin);
-            onScreenControlsButton.setChecked(app.localPrefs.useOnScreenControlsInLandscape());
+        public TouchInputSettings() {
+            final FaRadioButton<Boolean> onScreenControlsButton = new FaRadioButton<Boolean>(app.skin,
+                    GlowLabelButton.FONT_SCALE_SUBMENU * 1.1f);
+            onScreenControlsButton.addEntry(false, "", app.TEXTS.get("menuUseGestureControls"));
+            onScreenControlsButton.addEntry(true, "", app.TEXTS.get("menuUseOnScreenControls"));
+            onScreenControlsButton.setValue(app.localPrefs.useOnScreenControlsInLandscape());
             onScreenControlsButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    app.localPrefs.setUseOnScreenControlsInLandscape(onScreenControlsButton.isChecked());
+                    app.localPrefs.setUseOnScreenControlsInLandscape(onScreenControlsButton.getValue());
+                    setSettingsTableActor();
                 }
             });
 
@@ -291,10 +299,23 @@ public class SettingsScreen extends AbstractMenuDialog {
                     .top().fill(false);
 
             row();
-            add(onScreenControlsButton);
+            Table touchControlTypeTable = new Table();
+            ScaledLabel menuControlTypeLabel = new ScaledLabel(app.TEXTS.get("menuTouchControlType"), app.skin,
+                    app.SKIN_FONT_TITLE);
+            menuControlTypeLabel.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    onScreenControlsButton.changeValue();
+                }
+            });
+            touchControlTypeTable.add(menuControlTypeLabel);
+            touchControlTypeTable.row().padTop(-10);
+            ;
+            touchControlTypeTable.add(onScreenControlsButton);
+            add(touchControlTypeTable);
 
-            row();
-            add(touchPanelButton).bottom();
+            gestureSettings = new Table();
+            gestureSettings.add(touchPanelButton).bottom();
 
             Table touchPanelTable = new Table();
             touchPanelTable.add(new ScaledLabel(app.TEXTS.get("menuSizeOfTouchPanel"), app.skin, app.SKIN_FONT_REG,
@@ -302,8 +323,8 @@ public class SettingsScreen extends AbstractMenuDialog {
             touchPanelTable.row();
             touchPanelTable.add(touchPanelSizeSlider).minHeight(40).fill();
 
-            row().padTop(20);
-            add(touchPanelTable).top();
+            gestureSettings.row().padTop(20);
+            gestureSettings.add(touchPanelTable).top();
 
             Table swipeUp = new Table();
             ScaledLabel menuSwipeUpToLabel = new ScaledLabel(app.TEXTS.get("menuSwipeUpTo"), app.skin, app
@@ -317,14 +338,30 @@ public class SettingsScreen extends AbstractMenuDialog {
             swipeUp.add(menuSwipeUpToLabel);
             swipeUp.row().padTop(-10);
             swipeUp.add(swipeUpButtons);
+            gestureSettings.row();
+            gestureSettings.add(swipeUp);
+
+            onScreenButtonSettings = new Table();
+            ScaledLabel onScreenButtonHelp = new ScaledLabel(app.TEXTS.get("inputOnScreenButtonHelp"), app.skin,
+                    LightBlocksGame.SKIN_FONT_BIG);
+            onScreenButtonHelp.setWrap(true);
+            onScreenButtonHelp.setAlignment(Align.center);
+            onScreenButtonSettings.add(onScreenButtonHelp).fillX().expandX();
+
             row();
-            add(swipeUp);
+            settingsTableCell = add().minHeight(gestureSettings.getPrefHeight()).fillX();
+            setSettingsTableActor();
 
             addFocusableActor(onScreenControlsButton);
             addFocusableActor(touchPanelButton);
             addFocusableActor(touchPanelSizeSlider);
             addFocusableActor(swipeUpButtons);
             defaultFocusedButton = onScreenControlsButton;
+        }
+
+        protected void setSettingsTableActor() {
+            settingsTableCell.setActor(app.localPrefs.useOnScreenControlsInLandscape() ? onScreenButtonSettings :
+                    gestureSettings);
         }
 
         protected void touchPanelSizeChanged() {

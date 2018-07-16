@@ -22,7 +22,10 @@ public class FaRadioButton<T> extends GlowLabelButton {
     private boolean changing;
 
     public FaRadioButton(Skin skin) {
-        super(" ", " ", skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
+        this(skin, GlowLabelButton.FONT_SCALE_SUBMENU);
+    }
+    public FaRadioButton(Skin skin, float fontScale) {
+        super(" ", " ", skin, fontScale, 1f);
         this.skin = skin;
 
         listener = new ChangeListener() {
