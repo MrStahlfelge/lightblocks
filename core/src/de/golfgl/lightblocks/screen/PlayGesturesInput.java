@@ -24,7 +24,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     public static final int SWIPEUP_DONOTHING = 0;
     public static final int SWIPEUP_PAUSE = 1;
     public static final int SWIPEUP_HARDDROP = 2;
-    private static final float TOUCHPAD_DEAD_RADIUS = .33f;
+    private static final float TOUCHPAD_DEAD_RADIUS = .5f;
     private static final float MAX_SOFTDROPBEGINNING_INTERVAL = .3f;
 
     private static final float SCREEN_BORDER_PERCENTAGE = 0.1f;
