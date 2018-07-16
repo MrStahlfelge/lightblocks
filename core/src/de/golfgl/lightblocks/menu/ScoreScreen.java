@@ -325,12 +325,12 @@ public class ScoreScreen extends AbstractMenuScreen {
             // das ganze zeitlich verzögert, damit der Bildschirm sauber aufgebaut ist
             if (!app.localPrefs.getDontAskForRating() &&
                     app.savegame.getTotalScore().getDrawnTetrominos() >= TETRO_COUNT_RATINGREMINDER)
-                stage.getRoot().addAction(Actions.after(Actions.sequence(Actions.delay(.3f, Actions.run(new Runnable() {
+                stage.getRoot().addAction(Actions.delay(.3f, Actions.run(new Runnable() {
                     @Override
                     public void run() {
                         askIfEnjoyingTheGame();
                     }
-                })))));
+                })));
             else if (app.canDonate() && app.localPrefs.getSupportLevel() == 0
                     && app.savegame.getTotalScore().getDrawnTetrominos() >= app.localPrefs.getNextDonationReminder()) {
                 new DonationDialog(app).setForcedMode().show(stage);

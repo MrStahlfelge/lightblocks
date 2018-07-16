@@ -8,6 +8,7 @@ import com.badlogic.gdx.pay.PurchaseManagerConfig;
 import com.badlogic.gdx.pay.PurchaseObserver;
 import com.badlogic.gdx.pay.Transaction;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -253,8 +254,17 @@ public class DonationDialog extends ControllerMenuDialog {
             getDescLabel().setText(app.TEXTS.get("donationThankYou"));
             closeButton.setText(app.TEXTS.get("donationButtonClose"));
             app.localPrefs.addSupportLevel(sku);
+            // Die Meldung an GA wird etwas verzögert, damit vorher eine neue Verbindung aufgebaut werden kann.
+            // Ansonsten wurde das Event oft nicht gemeldet. getStage(), damit auch beim schnellen Ende des Dialogs
+            // gesendet wird
             if (!fromRestore && app.gameAnalytics != null)
-                app.gameAnalytics.submitBusinessEvent("donation", sku, usdCents, "USD");
+                getStage().getRoot().addAction(Actions.delay(1f,
+                        Actions.run(new Runnable() {
+                            @Override
+                            public void run() {
+                                app.gameAnalytics.submitBusinessEvent("donation", sku, usdCents, "USD");
+                            }
+                        })));
             disarmForcedMode();
         }
 
