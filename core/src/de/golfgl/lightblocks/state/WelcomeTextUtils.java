@@ -62,7 +62,7 @@ public class WelcomeTextUtils {
         // 5. WERBUNG UND ÄHNLICHES, DASS NACH ZUFALLSPRINZIP EINGEBLENDET WIRD
         // wird aufgrund von 4. nur für wiederkehrende Nutzer angezeigt
         if (welcomes.size == 0) {
-            if (isLongTimePlayer && MathUtils.randomBoolean(.05f))
+            if (isLongTimePlayer && MathUtils.randomBoolean(.01f))
                 welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeOtherPlatforms"),
                         new OpenWebsiteRunnable(app)));
 
