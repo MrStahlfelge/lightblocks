@@ -145,6 +145,7 @@ public class DonationDialog extends ControllerMenuDialog {
             forcedMode = true;
             closeButton.setDisabled(true);
             waitTimeseconds = 0;
+            
             closeButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -152,6 +153,9 @@ public class DonationDialog extends ControllerMenuDialog {
                             TETROCOUNT_NEXT_REMINDER);
                 }
             });
+
+            if (app.gameAnalytics != null)
+                app.gameAnalytics.submitDesignEvent("donationscreen:forced");
         }
         return this;
     }
