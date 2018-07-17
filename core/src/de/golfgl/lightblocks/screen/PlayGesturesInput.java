@@ -443,8 +443,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     }
 
     private class PortraitOnScreenButtons extends Group {
-
-        private static final int PADDING = 10;
+        private static final int PADDING = 8;
         private final Button rotateRight;
         private final Button rotateLeft;
         private final Button moveRight;
