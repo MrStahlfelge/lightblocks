@@ -1029,7 +1029,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // und dann auch langsam herunterschieben aber maximal zwei Zeilen
         scoreTable.validate();
         scoreTable.setX(Math.max(10 - centerGroup.getX() + scoreTable.getPrefWidth() / 2, -centerGroup.getX() / 2));
-        scoreTable.setY(LightBlocksGame.nativeGameHeight
+        scoreTable.setY(stage.getHeight() - centerGroup.getY() * 1.2f
                 - MathUtils.clamp(centerGroup.getX() / 2 - scoreTable.getPrefWidth() / 2,
                 scoreTable.getPrefHeight() / 2 + 5, levelNum.getPrefHeight() * 2 + scoreTable.getPrefHeight() / 2));
 

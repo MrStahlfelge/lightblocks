@@ -534,7 +534,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
 
             rotateRight.setPosition(playScreen.stage.getWidth() / 2 + gameboardWidth / 2 + 2 * PADDING,
-                    PADDING * 3);
+                    PADDING * 3 + playScreen.centerGroup.getY());
             rotateRight.setSize(playScreen.stage.getWidth() - rotateRight.getX() - PADDING,
                     playScreen.stage.getHeight() * .4f - rotateRight.getY() - PADDING);
 

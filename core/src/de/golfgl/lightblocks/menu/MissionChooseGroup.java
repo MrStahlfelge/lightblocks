@@ -75,7 +75,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
                                }
         );
         row();
-        add(playButton).minHeight(playButton.getPrefHeight() * 2f).top().fillX();
+        add(playButton).minHeight(playButton.getPrefHeight() * 2f).top().fillX().expand();
         menuScreen.addFocusableActor(playButton);
         row();
         scoresGroup = new ScoresGroup(app, false);
