@@ -73,7 +73,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     public void setPlayScreen(PlayScreen playScreen) {
         super.setPlayScreen(playScreen);
 
-        dragThreshold = playScreen.app.localPrefs.getTouchPanelSize();
+        dragThreshold = playScreen.app.localPrefs.getTouchPanelSize(playScreen.app.getDisplayDensityRatio());
         tutorialMode = playScreen.gameModel instanceof TutorialModel;
 
         if (playScreen.app.localPrefs.getShowTouchPanel() || tutorialMode)

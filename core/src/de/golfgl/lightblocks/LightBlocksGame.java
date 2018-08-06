@@ -409,4 +409,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
             ((AbstractScreen) getScreen()).showDialog(TEXTS.format("errorOpenUri", uri));
         }
     }
+
+    public float getDisplayDensityRatio() {
+        return 1f;
+    }
 }

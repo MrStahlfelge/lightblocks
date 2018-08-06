@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -49,6 +50,18 @@ public class GeneralAndroidLauncher extends AndroidApplication {
             @Override
             public void unlockOrientation() {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+            }
+
+            @Override
+            public float getDisplayDensityRatio() {
+                try {
+                    DisplayMetrics dm = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(dm);
+                    // Die Bezugsgröße war das Moto G mit 320 dpi
+                    return dm.xdpi / 320f;
+                } catch (Throwable t) {
+                    return 1f;
+                }
             }
         };
 

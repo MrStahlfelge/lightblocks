@@ -159,8 +159,8 @@ public class LocalPrefs {
         }
     }
 
-    public int getTouchPanelSize() {
-        return prefs.getInteger("touchPanelSize", 50);
+    public int getTouchPanelSize(float displayScale) {
+        return prefs.getInteger("touchPanelSize", (int) (50 * displayScale));
     }
 
     public void setTouchPanelSize(int touchPanelSize) {

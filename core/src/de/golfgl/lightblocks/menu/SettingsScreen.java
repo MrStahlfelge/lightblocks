@@ -269,8 +269,9 @@ public class SettingsScreen extends AbstractMenuDialog {
                                              }
                                          }
             );
-            touchPanelSizeSlider = new TouchableSlider(25, Gdx.graphics.getWidth() * .33f, 1, false, app.skin);
-            touchPanelSizeSlider.setValue(app.localPrefs.getTouchPanelSize());
+            int screenWidth = Math.min(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            touchPanelSizeSlider = new TouchableSlider(25, screenWidth * .33f, 1, false, app.skin);
+            touchPanelSizeSlider.setValue(app.localPrefs.getTouchPanelSize(app.getDisplayDensityRatio()));
             touchPanelSizeSlider.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
