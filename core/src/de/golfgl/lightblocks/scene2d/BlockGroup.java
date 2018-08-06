@@ -91,4 +91,11 @@ public class BlockGroup extends Group {
                     Interpolation.fade));
         }
     }
+
+    public void setGhostPieceVisibility(boolean visible) {
+        if (ghostpiece != null) {
+            for (int i = 0; i < ghostpiece.length; i++)
+                ghostpiece[i].setVisible(visible);
+        }
+    }
 }

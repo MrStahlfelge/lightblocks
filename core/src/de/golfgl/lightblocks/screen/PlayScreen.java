@@ -760,6 +760,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (app.localPrefs.isPlaySounds())
             app.gameOverSound.play();
         inputAdapter.setGameOver();
+        blockGroup.setGhostPieceVisibility(false);
         // erzwingt die letzmalige Aktualisierung des Zeitlabels beim nächsten Render
         currentShownTime = currentShownTime - 100;
         saveGameState();
