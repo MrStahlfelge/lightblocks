@@ -50,6 +50,7 @@ import de.golfgl.lightblocks.state.LocalPrefs;
  */
 
 public class SettingsScreen extends AbstractMenuDialog {
+    public static final int TOUCHPANELSIZE_MIN = 25;
 
     private PagedScrollPane groupPager;
     private GeneralSettings generalGroup;
@@ -270,7 +271,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                                          }
             );
             int screenWidth = Math.min(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            touchPanelSizeSlider = new TouchableSlider(25, screenWidth * .33f, 1, false, app.skin);
+            touchPanelSizeSlider = new TouchableSlider(TOUCHPANELSIZE_MIN, screenWidth * .33f, 1, false, app.skin);
             touchPanelSizeSlider.setValue(app.localPrefs.getTouchPanelSize(app.getDisplayDensityRatio()));
             touchPanelSizeSlider.addListener(new ChangeListener() {
                 @Override

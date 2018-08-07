@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.DonationDialog;
+import de.golfgl.lightblocks.menu.SettingsScreen;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
 
@@ -160,7 +161,8 @@ public class LocalPrefs {
     }
 
     public int getTouchPanelSize(float displayScale) {
-        return prefs.getInteger("touchPanelSize", (int) (50 * displayScale));
+        return prefs.getInteger("touchPanelSize",
+                Math.max(SettingsScreen.TOUCHPANELSIZE_MIN, (int) (50 * displayScale)));
     }
 
     public void setTouchPanelSize(int touchPanelSize) {
