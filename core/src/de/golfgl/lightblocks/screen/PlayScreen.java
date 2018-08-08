@@ -77,6 +77,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final Group labelGroup;
     private final BlockActor[][] blockMatrix;
     private final BlockActor[] nextTetro;
+    private final BlockActor[] holdTetro;
     private final MotivationLabel motivatorLabel;
     private final ParticleEffectActor weldEffect;
     private final Table scoreTable;
@@ -114,6 +115,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ALLROWS];
         nextTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
+        holdTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
 
         // Die Blockgroup nimmt die Steinanimation auf
         blockGroup = new BlockGroup(app);
@@ -818,6 +820,53 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
             blockGroup.setGhostPiecePosition(i, x, y - ghostPieceDistance);
         }
+    }
+
+    @Override
+    public void swapHoldAndActivePiece(Integer[][] newHoldPiecePositions, Integer[][] oldActivePiecePositions,
+                                       Integer[][] newActivePiecePositions, int ghostPieceDistance, int holdBlockType) {
+        // TODO weiter nach rechts!
+        final float offsetX = LightBlocksGame.nativeGameWidth - blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT -
+                .3f) * BlockActor.blockWidth + Math.min(centerGroup.getX() / 2, BlockActor.blockWidth * 2.5f);
+        final float offsetY = (Gameboard.GAMEBOARD_NORMALROWS - 5 + .3f) * BlockActor.blockWidth;
+
+        final BlockActor[] oldHoldTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
+
+        // aktiven Block nach Hold schieben
+        for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
+            oldHoldTetro[i] = holdTetro[i];
+
+            if (oldActivePiecePositions != null) {
+                final int oldX = oldActivePiecePositions[i][0];
+                final int oldY = oldActivePiecePositions[i][1];
+
+                holdTetro[i] = blockMatrix[oldX][oldY];
+                blockMatrix[oldX][oldY] = null;
+            } else {
+                holdTetro[i] = new BlockActor(app, holdBlockType);
+                blockGroup.addActor(holdTetro[i]);
+            }
+
+            holdTetro[i].setMoveAction(Actions.moveTo(offsetX + newHoldPiecePositions[i][0] * BlockActor.blockWidth,
+                    offsetY + newHoldPiecePositions[i][1] * BlockActor.blockWidth, .1f, Interpolation.fade));
+            holdTetro[i].addAction(Actions.alpha(.5f, .5f, Interpolation.fade));
+            holdTetro[i].setEnlightened(false);
+        }
+
+        // und den Hold Block rausholen
+        for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
+            if (newActivePiecePositions != null) {
+                final int newX = newActivePiecePositions[i][0];
+                final int newY = newActivePiecePositions[i][1];
+                blockMatrix[newX][newY] = oldHoldTetro[i];
+                oldHoldTetro[i].addAction(Actions.fadeIn(.1f));
+                oldHoldTetro[i].setMoveAction(Actions.moveTo(newX * BlockActor.blockWidth, newY * BlockActor.blockWidth,
+                        .1f, Interpolation.fade));
+
+                blockGroup.setGhostPiecePosition(i, newX, newY - ghostPieceDistance);
+            }
+        }
+
     }
 
     @Override

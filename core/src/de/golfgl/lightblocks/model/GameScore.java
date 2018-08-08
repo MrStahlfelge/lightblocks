@@ -196,4 +196,13 @@ public class GameScore implements IRoundScore {
     protected void setScoringType(int scoringType) {
         this.scoringType = scoringType;
     }
+
+    /**
+     * zurücksetzen aller Boni bei Hold
+     */
+    public void redrawOnHold() {
+        lastClearLinesWasSpecial = false;
+        dropScore = 0;
+        //TODO Combo Score, dieser wird dann aber zugerechnet
+    }
 }

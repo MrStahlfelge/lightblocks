@@ -45,6 +45,8 @@ public abstract class GameModel implements Json.Serializable {
     private boolean isBestScore = false;
     private Tetromino activeTetromino;
     private Tetromino nextTetromino;
+    private int onHoldTetromino = -1;
+    private boolean noDropSinceHoldMove;
     private Gameboard gameboard;
     private float distanceRemainder;
     //nach remove Lines oder drop kurze Zeit warten
@@ -166,6 +168,7 @@ public abstract class GameModel implements Json.Serializable {
 
         gameboard.pinTetromino(activeTetromino);
         userInterface.pinTetromino(activeTetromino.getCurrentBlockPositions());
+        noDropSinceHoldMove = false;
 
         // T-Spin? 1. T, 2. letzte Bewegung ist Drehung, 3. drei Felder um Rotationszentrum sind belegt
         boolean tSpin = (activeTetromino.isT() && activeTetromino.getLastMovementType() == 1);
@@ -240,6 +243,11 @@ public abstract class GameModel implements Json.Serializable {
 
             // Game Over kann hier erfolgt sein!
         }
+    }
+
+    protected boolean isHoldMoveAllowed() {
+        // Normalfall: Hold darf gemacht werden, solange nicht bereits einmal Hold durchgeführt wurde
+        return !noDropSinceHoldMove;
     }
 
     protected void achievementsScore(int gainedScore) {
@@ -419,12 +427,7 @@ public abstract class GameModel implements Json.Serializable {
 
             // Die Position und auch die Einzelteile darin muss geclonet werden, um nicht
             // durch die Rotation verloren zu gehen
-            Integer[][] oldBlockPositionsReference = activeTetromino.getCurrentBlockPositions();
-            Integer[][] oldBlockPositionsNewArray = new Integer[oldBlockPositionsReference.length][2];
-            for (int i = 0; i < oldBlockPositionsReference.length; i++) {
-                oldBlockPositionsNewArray[i][0] = new Integer(oldBlockPositionsReference[i][0]);
-                oldBlockPositionsNewArray[i][1] = new Integer(oldBlockPositionsReference[i][1]);
-            }
+            Integer[][] oldBlockPositionsNewArray = cloneDoubleIntegerArray(activeTetromino.getCurrentBlockPositions());
 
             activeTetromino.setRotation(newRotation);
 
@@ -432,6 +435,15 @@ public abstract class GameModel implements Json.Serializable {
             userInterface.rotateTetro(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions(),
                     ghostPieceDistance);
         }
+    }
+
+    private Integer[][] cloneDoubleIntegerArray(Integer[][] arrayToClone) {
+        Integer[][] clonedArray = new Integer[arrayToClone.length][2];
+        for (int i = 0; i < arrayToClone.length; i++) {
+            clonedArray[i][0] = new Integer(arrayToClone[i][0]);
+            clonedArray[i][1] = new Integer(arrayToClone[i][1]);
+        }
+        return clonedArray;
     }
 
     /**
@@ -448,16 +460,44 @@ public abstract class GameModel implements Json.Serializable {
         inputFreezeCountdown = time;
     }
 
+    public boolean holdActiveTetromino() {
+        if (!isHoldMoveAllowed() || isGameOver)
+            return false;
+
+        Integer[][] newHoldPositions = cloneDoubleIntegerArray(activeTetromino.getRelativeBlockPositions());
+        Integer[][] oldActivePositions = cloneDoubleIntegerArray(activeTetromino.getCurrentBlockPositions());
+
+        if (onHoldTetromino < 0) {
+            // Der erste durchgeführte Hold
+            onHoldTetromino = activeTetromino.getTetrominoType();
+            userInterface.swapHoldAndActivePiece(newHoldPositions, oldActivePositions, null, 0,
+                    onHoldTetromino);
+
+            activateNextTetromino();
+            // resetMovements... nicht nötig, ist bereits in activateNextTetro enthalten
+        } else {
+            Tetromino tmp = activeTetromino;
+            activeTetromino = new Tetromino(onHoldTetromino);
+            onHoldTetromino = tmp.getTetrominoType();
+            int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
+            userInterface.swapHoldAndActivePiece(newHoldPositions, oldActivePositions,
+                    activeTetromino.getCurrentBlockPositions(), ghostPieceDistance, onHoldTetromino);
+
+            resetMovementsAndCheckActiveTetroPos();
+        }
+
+        noDropSinceHoldMove = true;
+        score.redrawOnHold();
+        userInterface.updateScore(score, 0);
+
+        return true;
+    }
+
     private void activateNextTetromino() {
         if (maxBlocksToUse > 0 && maxBlocksToUse == score.getDrawnTetrominos()) {
             setGameOverBoardFull();
             return;
         }
-
-        softDropFactor = 0;
-
-        endMoveHorizontal(true);
-        endMoveHorizontal(false);
 
         activeTetromino = nextTetromino;
         nextTetromino = drawyer.getNextTetromino();
@@ -466,16 +506,28 @@ public abstract class GameModel implements Json.Serializable {
         if (userInterface != null)
             fireUserInterfaceTetrominoSwap();
 
+        resetMovementsAndCheckActiveTetroPos();
+
+        if (!isGameOver) {
+            score.incDrawnTetrominos();
+            if (userInterface != null)
+                userInterface.updateScore(score, 0);
+        }
+    }
+
+    private void resetMovementsAndCheckActiveTetroPos() {
+        // Die Eingaben zurücksetzen
+        softDropFactor = 0;
+
+        endMoveHorizontal(true);
+        endMoveHorizontal(false);
+
         distanceRemainder = 0.0f;
 
         // Wenn der neu eingefügte Tetromino keinen Platz mehr hat, ist das Spiel zu Ende
         if (!gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
                 activeTetromino.getCurrentRotation())) {
             setGameOverBoardFull();
-        } else {
-            score.incDrawnTetrominos();
-            if (userInterface != null)
-                userInterface.updateScore(score, 0);
         }
     }
 
@@ -520,10 +572,9 @@ public abstract class GameModel implements Json.Serializable {
      */
     protected void fireUserInterfaceTetrominoSwap() {
         int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
-        userInterface.activateNextTetro(activeTetromino.getCurrentBlockPositions(), activeTetromino.getIndex(),
+        userInterface.activateNextTetro(activeTetromino.getCurrentBlockPositions(), activeTetromino.getTetrominoType(),
                 ghostPieceDistance);
-        userInterface.showNextTetro(nextTetromino.getBlockPositions(new Vector2(0, 0), 0),
-                nextTetromino.getIndex());
+        userInterface.showNextTetro(nextTetromino.getRelativeBlockPositions(), nextTetromino.getTetrominoType());
     }
 
     public boolean isGameOver() {
@@ -615,6 +666,9 @@ public abstract class GameModel implements Json.Serializable {
 
         // und auch die aktiven Tetrominos
         fireUserInterfaceTetrominoSwap();
+        if (this.onHoldTetromino >= 0)
+            userInterface.swapHoldAndActivePiece(new Tetromino(onHoldTetromino).getRelativeBlockPositions(),
+                    null, null, 0, onHoldTetromino);
 
         // Score
         userInterface.updateScore(score, 0);
@@ -731,7 +785,9 @@ public abstract class GameModel implements Json.Serializable {
         json.writeValue("board", gameboard);
         json.writeValue("drawyer", drawyer);
         json.writeValue("active", activeTetromino);
-        json.writeValue("next", nextTetromino.getIndex());
+        json.writeValue("next", nextTetromino.getTetrominoType());
+        json.writeValue("hold", onHoldTetromino);
+        json.writeValue("noDropSinceHold", noDropSinceHoldMove);
         json.writeValue("score", score);
         json.writeValue("inputType", inputTypeKey);
     }
@@ -774,6 +830,8 @@ public abstract class GameModel implements Json.Serializable {
             activeTetromino = null;
             initializeActiveAndNextTetromino();
         }
+        this.onHoldTetromino = jsonData.getInt("hold", -1);
+        this.noDropSinceHoldMove = jsonData.getBoolean("noDropSinceHold");
 
         setCurrentSpeed();
     }
@@ -790,16 +848,16 @@ public abstract class GameModel implements Json.Serializable {
         return maxBlocksToUse;
     }
 
+    protected void setMaxBlocksToUse(int maxBlocksToUse) {
+        this.maxBlocksToUse = maxBlocksToUse;
+    }
+
     public boolean showBlocksScore() {
         return maxBlocksToUse > 0;
     }
 
     public boolean showTime() {
         return false;
-    }
-
-    protected void setMaxBlocksToUse(int maxBlocksToUse) {
-        this.maxBlocksToUse = maxBlocksToUse;
     }
 
     public BestScore getBestScore() {

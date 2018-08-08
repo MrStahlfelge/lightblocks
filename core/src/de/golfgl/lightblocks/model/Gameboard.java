@@ -122,7 +122,7 @@ public class Gameboard implements Json.Serializable {
         for (Vector2 coord : activeTetromino.getRotationVectors(activeTetromino.getCurrentRotation())) {
             int x = (int) activeTetromino.getPosition().x + (int) coord.x;
             int y = (int) activeTetromino.getPosition().y + (int) coord.y;
-            gameboardSquare[y][x] = activeTetromino.getIndex();
+            gameboardSquare[y][x] = activeTetromino.getTetrominoType();
         }
 
     }

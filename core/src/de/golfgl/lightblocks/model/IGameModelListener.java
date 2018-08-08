@@ -33,6 +33,10 @@ public interface IGameModelListener {
 
     void activateNextTetro(Integer[][] boardBlockPositions, int blockType, int ghostPieceDistance);
 
+    void swapHoldAndActivePiece(Integer[][] newHoldPiecePositions, Integer[][] oldActivePiecePositions,
+                                Integer[][] newActivePiecePositions, int ghostPieceDistance,
+                                int holdBlockType);
+
     void pinTetromino(Integer[][] currentBlockPositions);
 
     void updateScore(GameScore score, int gainedScore);

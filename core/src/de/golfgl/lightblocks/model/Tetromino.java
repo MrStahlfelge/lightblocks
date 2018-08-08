@@ -102,7 +102,7 @@ public class Tetromino {
         return position;
     }
 
-    public int getIndex() {
+    public int getTetrominoType() {
         return tetrominoIndex;
     }
 
@@ -114,7 +114,11 @@ public class Tetromino {
         return getBlockPositions(position, currentRotation);
     }
 
-    public Integer[][] getBlockPositions(Vector2 position, int rotation) {
+    public Integer[][] getRelativeBlockPositions() {
+        return getBlockPositions(new Vector2(0, 0), 0);
+    }
+
+    protected Integer[][] getBlockPositions(Vector2 position, int rotation) {
         int i = 0;
         for (Vector2 v : getRotationVectors(rotation)) {
             blockPosition[i][0] = ((int) v.x + (int) position.x);

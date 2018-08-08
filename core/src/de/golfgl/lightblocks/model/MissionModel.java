@@ -159,4 +159,9 @@ public abstract class MissionModel extends GameModel {
         super.setBestScore(bestScore);
         bestScore.setComparisonMethod(BestScore.ComparisonMethod.rating);
     }
+
+    @Override
+    protected boolean isHoldMoveAllowed() {
+        return false;
+    }
 }
