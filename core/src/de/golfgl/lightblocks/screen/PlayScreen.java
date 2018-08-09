@@ -73,7 +73,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     protected final Image imGarbageIndicator;
     protected final Button pauseButton;
     protected final Group centerGroup;
-    private final BlockGroup blockGroup;
+    protected final BlockGroup blockGroup;
     private final Group labelGroup;
     private final BlockActor[][] blockMatrix;
     private final BlockActor[] nextTetro;
@@ -161,7 +161,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameTypeLabels.setPosition(imLine.getX(), blockGroup.getY());
         gameTypeLabels.addActor(gameType);
         gameTypeLabels.setRotation(90);
-        //gameTypeLabels.addAction(Actions.rotateBy(90, 10f));
 
         centerGroup.addActor(gameTypeLabels);
 
@@ -776,9 +775,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Er wird der Blockgroup ganz unten hinzugefügt, damit er wenn er einfliegt keine Steine auf dem
         // Spielfeld überlagert
 
-        final float offsetX = LightBlocksGame.nativeGameWidth - blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT -
-                .3f) * BlockActor.blockWidth + Math.min(centerGroup.getX() / 2, BlockActor.blockWidth * 2.5f);
-        final float offsetY = (Gameboard.GAMEBOARD_NORMALROWS + .3f) * BlockActor.blockWidth;
+        final float offsetX = getNextPieceXPos();
+        final float offsetY = getNextPieceYPos();
 
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
             nextTetro[i] = new BlockActor(app, blockType);
@@ -792,6 +790,15 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
             blockGroup.addBlockAtBottom(nextTetro[i]);
         }
+    }
+
+    protected float getNextPieceYPos() {
+        return (Gameboard.GAMEBOARD_NORMALROWS + .3f) * BlockActor.blockWidth;
+    }
+
+    protected float getNextPieceXPos() {
+        return LightBlocksGame.nativeGameWidth - blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT -
+                .3f) * BlockActor.blockWidth + Math.min(centerGroup.getX() / 2, BlockActor.blockWidth * 2.5f);
     }
 
     @Override
@@ -825,10 +832,16 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     @Override
     public void swapHoldAndActivePiece(Integer[][] newHoldPiecePositions, Integer[][] oldActivePiecePositions,
                                        Integer[][] newActivePiecePositions, int ghostPieceDistance, int holdBlockType) {
-        // TODO weiter nach rechts!
-        final float offsetX = LightBlocksGame.nativeGameWidth - blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT -
-                .3f) * BlockActor.blockWidth + Math.min(centerGroup.getX() / 2, BlockActor.blockWidth * 2.5f);
-        final float offsetY = (Gameboard.GAMEBOARD_NORMALROWS - 5 + .3f) * BlockActor.blockWidth;
+        float offsetX = getNextPieceXPos();
+        float offsetY;
+
+        // Wenn das Next Piece schon rechts vom Gameboard dargestellt wird, dann Hold-Piece auch. Sonst mittig
+        if (isLandscape())
+            offsetY = (Gameboard.GAMEBOARD_NORMALROWS - 3) * BlockActor.blockWidth;
+        else {
+            offsetX = offsetX - (Tetromino.TETROMINO_BLOCKCOUNT + .5f) * BlockActor.blockWidth;
+            offsetY = getNextPieceYPos();
+        }
 
         final BlockActor[] oldHoldTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
 
@@ -843,6 +856,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 holdTetro[i] = blockMatrix[oldX][oldY];
                 blockMatrix[oldX][oldY] = null;
             } else {
+                // Beim Spielstand laden hinzufügen
                 holdTetro[i] = new BlockActor(app, holdBlockType);
                 blockGroup.addActor(holdTetro[i]);
             }

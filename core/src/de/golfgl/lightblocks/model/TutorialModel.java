@@ -176,6 +176,11 @@ public class TutorialModel extends GameModel {
     }
 
     @Override
+    public boolean isHoldMoveAllowedByModel() {
+        return false;
+    }
+
+    @Override
     public void setCurrentSpeed() {
         if (tutorialStep <= 14)
             currentSpeed = 0;

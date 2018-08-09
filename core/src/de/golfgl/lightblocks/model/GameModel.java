@@ -245,9 +245,9 @@ public abstract class GameModel implements Json.Serializable {
         }
     }
 
-    protected boolean isHoldMoveAllowed() {
-        // Normalfall: Hold darf gemacht werden, solange nicht bereits einmal Hold durchgeführt wurde
-        return !noDropSinceHoldMove;
+    public boolean isHoldMoveAllowedByModel() {
+        // Normalfall: Hold darf gemacht werden
+        return true;
     }
 
     protected void achievementsScore(int gainedScore) {
@@ -461,7 +461,7 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     public boolean holdActiveTetromino() {
-        if (!isHoldMoveAllowed() || isGameOver)
+        if (!isHoldMoveAllowedByModel() || noDropSinceHoldMove || isGameOver)
             return false;
 
         Integer[][] newHoldPositions = cloneDoubleIntegerArray(activeTetromino.getRelativeBlockPositions());
@@ -831,7 +831,7 @@ public abstract class GameModel implements Json.Serializable {
             initializeActiveAndNextTetromino();
         }
         this.onHoldTetromino = jsonData.getInt("hold", -1);
-        this.noDropSinceHoldMove = jsonData.getBoolean("noDropSinceHold");
+        this.noDropSinceHoldMove = jsonData.getBoolean("noDropSinceHold", false);
 
         setCurrentSpeed();
     }

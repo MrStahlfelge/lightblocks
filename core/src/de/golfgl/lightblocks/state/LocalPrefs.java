@@ -218,14 +218,14 @@ public class LocalPrefs {
         prefs.flush();
     }
 
-    public boolean useOnScreenControlsInLandscape() {
+    public boolean useOnScreenControls() {
         if (useOnScreenControls == null)
             useOnScreenControls = prefs.getBoolean(PREF_KEY_ONSCREENCONTROLS, false);
 
         return useOnScreenControls;
     }
 
-    public void setUseOnScreenControlsInLandscape(boolean useOnScreenControls) {
+    public void setUseOnScreenControls(boolean useOnScreenControls) {
         this.useOnScreenControls = useOnScreenControls;
         prefs.putBoolean(PREF_KEY_ONSCREENCONTROLS, useOnScreenControls);
         prefs.flush();
@@ -419,6 +419,11 @@ public class LocalPrefs {
 
         prefs.putLong(PREF_KEY_DONATIONREMINDER, nextDonationReminder);
         prefs.flush();
+    }
+
+    public boolean isShowTouchHoldButton() {
+        // TODO
+        return true;
     }
 
     public static class TvRemoteKeyConfig {

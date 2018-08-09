@@ -161,7 +161,7 @@ public abstract class MissionModel extends GameModel {
     }
 
     @Override
-    protected boolean isHoldMoveAllowed() {
+    public boolean isHoldMoveAllowedByModel() {
         return false;
     }
 }

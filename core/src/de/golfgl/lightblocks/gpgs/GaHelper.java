@@ -22,7 +22,7 @@ public class GaHelper {
                 app.gameAnalytics.submitDesignEvent("swipeUpSetting:" + app.localPrefs.getSwipeUpType());
                 app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());
                 app.gameAnalytics.submitDesignEvent("showOnScreenControls:" +
-                        app.localPrefs.useOnScreenControlsInLandscape());
+                        app.localPrefs.useOnScreenControls());
             }
 
             app.gameAnalytics.submitDesignEvent("blockColor:" + app.localPrefs.getBlockColorMode());

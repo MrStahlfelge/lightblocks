@@ -253,11 +253,11 @@ public class SettingsScreen extends AbstractMenuDialog {
                     GlowLabelButton.FONT_SCALE_SUBMENU * 1.1f);
             onScreenControlsButton.addEntry(false, "", app.TEXTS.get("menuUseGestureControls"));
             onScreenControlsButton.addEntry(true, "", app.TEXTS.get("menuUseOnScreenControls"));
-            onScreenControlsButton.setValue(app.localPrefs.useOnScreenControlsInLandscape());
+            onScreenControlsButton.setValue(app.localPrefs.useOnScreenControls());
             onScreenControlsButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    app.localPrefs.setUseOnScreenControlsInLandscape(onScreenControlsButton.getValue());
+                    app.localPrefs.setUseOnScreenControls(onScreenControlsButton.getValue());
                     setSettingsTableActor();
                 }
             });
@@ -362,7 +362,7 @@ public class SettingsScreen extends AbstractMenuDialog {
         }
 
         protected void setSettingsTableActor() {
-            settingsTableCell.setActor(app.localPrefs.useOnScreenControlsInLandscape() ? onScreenButtonSettings :
+            settingsTableCell.setActor(app.localPrefs.useOnScreenControls() ? onScreenButtonSettings :
                     gestureSettings);
         }
 

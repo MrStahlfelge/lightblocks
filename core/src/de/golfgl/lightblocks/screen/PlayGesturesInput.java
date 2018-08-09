@@ -15,8 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.Gameboard;
+import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 
@@ -57,6 +59,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     private LandscapeOnScreenButtons landscapeOnScreenControls;
     private PortraitOnScreenButtons portraitOnScreenControls;
     private boolean tutorialMode;
+    private GestureOnScreenButtons gestureOnScreenControls;
 
     @Override
     public String getInputHelpText() {
@@ -82,6 +85,8 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (isUsingOnScreenButtons()) {
             initLandscapeOnScreenControls();
             initPortraitOnScreenControls();
+        } else {
+            initGestureOnScreenControls();
         }
 
     }
@@ -91,6 +96,8 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (isUsingOnScreenButtons()) {
             landscapeOnScreenControls.setVisible(playScreen.isLandscape() && !isPaused());
             portraitOnScreenControls.setVisible(!playScreen.isLandscape() && !isPaused());
+        } else {
+            gestureOnScreenControls.setVisible(!isPaused());
         }
 
         if (touchDownValid)
@@ -135,7 +142,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     }
 
     protected boolean isUsingOnScreenButtons() {
-        return playScreen.app.localPrefs.useOnScreenControlsInLandscape() && !tutorialMode;
+        return playScreen.app.localPrefs.useOnScreenControls() && !tutorialMode;
     }
 
     public Group initializeTouchPanel(AbstractScreen playScreen, int dragTrashold) {
@@ -181,6 +188,16 @@ public class PlayGesturesInput extends PlayScreenInput {
         playScreen.stage.addActor(touchPanel);
 
         return touchPanel;
+    }
+
+
+    private void initGestureOnScreenControls() {
+        if (gestureOnScreenControls == null) {
+            gestureOnScreenControls = new GestureOnScreenButtons();
+            gestureOnScreenControls.setVisible(false);
+            playScreen.stage.addActor(gestureOnScreenControls);
+        }
+        gestureOnScreenControls.resize();
     }
 
     private void initPortraitOnScreenControls() {
@@ -392,6 +409,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         private final Button rotateRightButton;
         private final Button rotateLeftButton;
         private final Button hardDropButton;
+        private final HoldButton holdButton;
 
         public LandscapeOnScreenButtons() {
             touchpad = new Touchpad(0, playScreen.app.skin);
@@ -425,6 +443,8 @@ public class PlayGesturesInput extends PlayScreenInput {
             });
             addActor(hardDropButton);
 
+            holdButton = new HoldButton();
+            addActor(holdButton);
         }
 
         public void resize() {
@@ -439,6 +459,8 @@ public class PlayGesturesInput extends PlayScreenInput {
             rotateLeftButton.setPosition(rotateRightButton.getX() - size * .45f, (rotateRightButton.getY() -
                     rotateRightButton.getHeight()) / 2);
             hardDropButton.setPosition(rotateRightButton.getX() - size * .55f, rotateRightButton.getY());
+
+            holdButton.resize(20);
         }
     }
 
@@ -448,6 +470,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         private final Button rotateLeft;
         private final Button moveRight;
         private final Button moveLeft;
+        private final HoldButton holdButton;
         private boolean rightPressed = false;
         private boolean leftPressed = false;
         private boolean didSoftDrop = false;
@@ -521,6 +544,8 @@ public class PlayGesturesInput extends PlayScreenInput {
             });
             addActor(moveLeft);
 
+            holdButton = new HoldButton();
+            addActor(holdButton);
         }
 
         private void checkSoftDrop() {
@@ -532,6 +557,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         public void resize() {
             float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
+            holdButton.resize(PADDING);
 
             rotateRight.setPosition(playScreen.stage.getWidth() / 2 + gameboardWidth / 2 + 2 * PADDING,
                     PADDING * 3 + playScreen.centerGroup.getY());
@@ -542,10 +568,12 @@ public class PlayGesturesInput extends PlayScreenInput {
             rotateLeft.setSize(rotateRight.getWidth(), rotateRight.getHeight());
 
             moveRight.setPosition(rotateRight.getX(), rotateRight.getY() + rotateRight.getHeight() + PADDING);
-            moveRight.setSize(rotateRight.getWidth(), rotateRight.getHeight());
+            moveRight.setSize(rotateRight.getWidth(),
+                    holdButton.getY() - holdButton.getWidth() - moveRight.getY() - PADDING);
 
             moveLeft.setPosition(rotateLeft.getX(), moveRight.getY());
             moveLeft.setSize(moveRight.getWidth(), moveRight.getHeight());
+
         }
 
         private class PortraitButton extends Button {
@@ -557,5 +585,55 @@ public class PlayGesturesInput extends PlayScreenInput {
                 add(buttonLabel).fill().expand();
             }
         }
+    }
+
+    private class GestureOnScreenButtons extends Group {
+        private static final int PADDING = 8;
+        private final HoldButton holdButton;
+
+        public GestureOnScreenButtons() {
+            holdButton = new HoldButton();
+            addActor(holdButton);
+        }
+
+        public void resize() {
+            holdButton.resize(PADDING);
+        }
+
+    }
+
+    private class HoldButton extends Button {
+        public HoldButton() {
+            super(playScreen.app.skin, "smoke");
+            Label buttonLabel = new Label("HOLD", playScreen.app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            buttonLabel.setAlignment(Align.top);
+            buttonLabel.setFontScale(.8f);
+            add(buttonLabel).fill().expand();
+
+            setRotation(270);
+            setTransform(true);
+
+            setVisible(playScreen.gameModel.isHoldMoveAllowedByModel() && playScreen.app.localPrefs.isShowTouchHoldButton());
+            addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    if (!isPaused())
+                        playScreen.gameModel.holdActiveTetromino();
+                }
+            });
+
+        }
+
+        public void resize(float padding) {
+            float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
+
+            setX(playScreen.stage.getWidth() / 2 + gameboardWidth / 2 + 15);
+            setY(playScreen.centerGroup.getY() + playScreen.blockGroup.getY() +
+                    Gameboard.GAMEBOARD_NORMALROWS * BlockActor.blockWidth);
+            setHeight(playScreen.stage.getWidth() - padding - getX());
+            setWidth(BlockActor.blockWidth * Tetromino.TETROMINO_BLOCKCOUNT);
+
+        }
+
     }
 }

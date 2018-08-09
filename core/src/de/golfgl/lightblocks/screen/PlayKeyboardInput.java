@@ -163,6 +163,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
                 playScreen.gameModel.startMoveHorizontal(false);
                 return true;
 
+            case Input.Keys.H:
+                if (!isPaused())
+                    playScreen.gameModel.holdActiveTetromino();
+                return true;
+
             case Input.Keys.CONTROL_LEFT:
             case Input.Keys.ALT_LEFT:
                 if (isPaused())
