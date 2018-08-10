@@ -21,6 +21,7 @@ public class MyControllerMapping extends ControllerMappings {
     public static final int BUTTON_ROTATE_CLOCKWISE = 0;
     public static final int BUTTON_ROTATE_COUNTERCLOCK = 1;
     public static final int BUTTON_HARDDROP = 6;
+    public static final int BUTTON_HOLD = 7;
     public static final int AXIS_VERTICAL = 2;
     public static final int AXIS_HORIZONTAL = 3;
     public static final int BUTTON_START = 4;
@@ -38,6 +39,7 @@ public class MyControllerMapping extends ControllerMappings {
         addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.axisDigital, AXIS_VERTICAL));
         addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.axisDigital, AXIS_HORIZONTAL));
         addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.button, BUTTON_HARDDROP));
+        addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.button, BUTTON_HOLD));
 
         commitConfig();
         loadedSavedSettings = false;
@@ -60,6 +62,7 @@ public class MyControllerMapping extends ControllerMappings {
         controllerToInputAdapter.addAxisMapping(AXIS_HORIZONTAL, Input.Keys.LEFT, Input.Keys.RIGHT);
         controllerToInputAdapter.addAxisMapping(AXIS_VERTICAL, Input.Keys.UP, Input.Keys.DOWN);
         controllerToInputAdapter.addButtonMapping(BUTTON_HARDDROP, Input.Keys.CONTROL_RIGHT);
+        controllerToInputAdapter.addButtonMapping(BUTTON_HOLD, Input.Keys.H);
     }
 
     public void setInputProcessor(InputProcessor input) {
@@ -76,6 +79,7 @@ public class MyControllerMapping extends ControllerMappings {
         defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_CLOCKWISE, new ControllerButton(onAndroid ? 96 : 0)));
         defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_COUNTERCLOCK, new ControllerButton(onAndroid ? 97 : 1)));
         defaultMapping.putMapping(new MappedInput(BUTTON_HARDDROP, new ControllerButton(onAndroid ? 98 : 2)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_HOLD, new ControllerButton(onAndroid ? 99 : 3)));
         defaultMapping.putMapping(new MappedInput(BUTTON_START, new ControllerButton(onAndroid ? 108 : 9)));
         defaultMapping.putMapping(new MappedInput(BUTTON_CANCEL, new ControllerButton(onAndroid ? 4 : 8)));
 

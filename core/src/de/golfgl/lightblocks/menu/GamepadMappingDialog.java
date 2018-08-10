@@ -20,7 +20,6 @@ import de.golfgl.lightblocks.state.MyControllerMapping;
  */
 
 public class GamepadMappingDialog extends ControllerMenuDialog {
-    private static final int NUM_STEPS = (5 + 1) * 2;
     private final LightBlocksGame app;
     private final ControllerMappings mappings;
     private final Controller controller;
@@ -149,11 +148,16 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
                 break;
             case 10:
             case 11:
-                instructionLabel.setText(instructionIntro + app.TEXTS.get("configGamepadStep8"));
-                inputToRecord = MyControllerMapping.BUTTON_START;
+                instructionLabel.setText(instructionIntro + app.TEXTS.get("configGamepadStep7b"));
+                inputToRecord = MyControllerMapping.BUTTON_HOLD;
                 break;
             case 12:
             case 13:
+                instructionLabel.setText(instructionIntro + app.TEXTS.get("configGamepadStep8"));
+                inputToRecord = MyControllerMapping.BUTTON_START;
+                break;
+            case 14:
+            case 15:
                 instructionLabel.setText(instructionIntro + app.TEXTS.get("configGamepadStep10"));
                 inputToRecord = MyControllerMapping.BUTTON_CANCEL;
                 break;
