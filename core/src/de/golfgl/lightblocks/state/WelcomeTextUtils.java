@@ -89,6 +89,10 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        if (listChangesSince < 1831)
+            welcomes.add(new WelcomeButton.WelcomeText("Long-awaited, now supported: HOLD pieces in most game modes!",
+                    null));
+
         if (listChangesSince < 1830 && touchAvailable)
             welcomes.add(new WelcomeButton.WelcomeText("There is a new option to play with On Screen Controls instead" +
                     " of gestures in landscape and portrait mode.", new ShowSettingsRunnable(app)));
