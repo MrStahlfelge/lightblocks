@@ -314,7 +314,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             });
             touchControlTypeTable.add(menuControlTypeLabel);
             touchControlTypeTable.row().padTop(-10);
-            ;
+
             touchControlTypeTable.add(onScreenControlsButton);
             add(touchControlTypeTable);
 
@@ -359,10 +359,22 @@ public class SettingsScreen extends AbstractMenuDialog {
             settingsTableCell = add().height(gestureSettings.getPrefHeight()).fillX();
             setSettingsTableActor();
 
+            row();
+            final Button hideHoldCheckbox = new FaCheckbox(app.TEXTS.get("menuHideHoldButton"), app.skin);
+            hideHoldCheckbox.setChecked(!app.localPrefs.isShowTouchHoldButton());
+            hideHoldCheckbox.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.localPrefs.setShowTouchHoldButton(!hideHoldCheckbox.isChecked());
+                }
+            });
+            add(hideHoldCheckbox);
+
             addFocusableActor(onScreenControlsButton);
             addFocusableActor(touchPanelButton);
             addFocusableActor(touchPanelSizeSlider);
             addFocusableActor(swipeUpButtons);
+            addFocusableActor(hideHoldCheckbox);
             defaultFocusedButton = onScreenControlsButton;
         }
 

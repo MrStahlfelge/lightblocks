@@ -39,6 +39,7 @@ public class LocalPrefs {
     private static final String SUPPORTLEVEL = "supportlevel";
     private static final String PREF_KEY_DONATIONREMINDER = "blocksNextReminder";
     private static final String KEY_SHOW_GHOSTPIECE = "showGhostpiece";
+    private static final String PREF_KEY_SHOW_TOUCH_HOLD = "showTouchHold";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -56,6 +57,7 @@ public class LocalPrefs {
     private Integer supportLevel;
     private Long nextDonationReminder;
     private Boolean showGhostpiece;
+    private Boolean showTouchHoldButton;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -422,8 +424,18 @@ public class LocalPrefs {
     }
 
     public boolean isShowTouchHoldButton() {
-        // TODO
-        return true;
+        if (showTouchHoldButton == null) {
+            showTouchHoldButton = prefs.getBoolean(PREF_KEY_SHOW_TOUCH_HOLD, true);
+        }
+
+        return showTouchHoldButton;
+    }
+
+    public void setShowTouchHoldButton(boolean showTouchHoldButton) {
+        this.showTouchHoldButton = showTouchHoldButton;
+
+        prefs.putBoolean(PREF_KEY_SHOW_TOUCH_HOLD, showTouchHoldButton);
+        prefs.flush();
     }
 
     public static class TvRemoteKeyConfig {
