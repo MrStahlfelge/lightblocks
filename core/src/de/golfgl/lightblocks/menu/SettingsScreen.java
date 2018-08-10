@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -35,6 +36,7 @@ import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
+import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.TouchableSlider;
 import de.golfgl.lightblocks.screen.AbstractScreen;
@@ -348,10 +350,13 @@ public class SettingsScreen extends AbstractMenuDialog {
                     LightBlocksGame.SKIN_FONT_BIG);
             onScreenButtonHelp.setWrap(true);
             onScreenButtonHelp.setAlignment(Align.center);
-            onScreenButtonSettings.add(onScreenButtonHelp).fillX().expandX();
+            ScrollPane helpScrollPane = new ScrollPane(onScreenButtonHelp, app.skin);
+            helpScrollPane.setScrollingDisabled(true, false);
+            helpScrollPane.setFadeScrollBars(false);
+            onScreenButtonSettings.add(helpScrollPane).fillX().expandX();
 
             row();
-            settingsTableCell = add().minHeight(gestureSettings.getPrefHeight()).fillX();
+            settingsTableCell = add().height(gestureSettings.getPrefHeight()).fillX();
             setSettingsTableActor();
 
             addFocusableActor(onScreenControlsButton);
