@@ -31,6 +31,7 @@ public class LocalPrefs {
     private static final String KEY_LASTSTARTTIME = "lastStartTime";
     private static final String PREF_KEY_ONSCREENCONTROLS = "onScreenControls";
     private static final String TVREMOTE_HARDDROP = "tvremote_harddrop";
+    private static final String TVREMOTE_HOLD = "tvremote_hold";
     private static final String TVREMOTE_SOFTDROP = "tvremote_softdrop";
     private static final String TVREMOTE_LEFT = "tvremote_left";
     private static final String TVREMOTE_RIGHT = "tvremote_right";
@@ -328,6 +329,7 @@ public class LocalPrefs {
                     isFireTv ? Input.Keys.MENU : Input.Keys.CENTER);
             tvRemoteKeyConfig.keyCodeRotateCounterclock = prefs.getInteger(TVREMOTE_ROTATE_CC,
                     isFireTv ? Input.Keys.MEDIA_FAST_FORWARD : Input.Keys.UP);
+            tvRemoteKeyConfig.keyCodeHold = prefs.getInteger(TVREMOTE_HOLD, Input.Keys.UNKNOWN);
         }
 
         return tvRemoteKeyConfig;
@@ -343,6 +345,7 @@ public class LocalPrefs {
         prefs.putInteger(TVREMOTE_RIGHT, tvRemoteKeyConfig.keyCodeRight);
         prefs.putInteger(TVREMOTE_ROTATE_CW, tvRemoteKeyConfig.keyCodeRotateClockwise);
         prefs.putInteger(TVREMOTE_ROTATE_CC, tvRemoteKeyConfig.keyCodeRotateCounterclock);
+        prefs.putInteger(TVREMOTE_HOLD, tvRemoteKeyConfig.keyCodeHold);
         prefs.flush();
     }
 
@@ -445,5 +448,6 @@ public class LocalPrefs {
         public int keyCodeRotateClockwise;
         public int keyCodeRotateCounterclock;
         public int keyCodeHarddrop;
+        public int keyCodeHold;
     }
 }

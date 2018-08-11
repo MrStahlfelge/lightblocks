@@ -79,6 +79,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
                 keycode = Input.Keys.SPACE;
             else if (keycode == tvRemoteKeyConfig.keyCodeRotateCounterclock)
                 keycode = Input.Keys.ALT_LEFT;
+            else if (keycode == tvRemoteKeyConfig.keyCodeHold)
+                keycode = Input.Keys.H;
         }
 
         return keycode;

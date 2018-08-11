@@ -447,6 +447,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             addButtonRow(buttonConfig, 3, "configTvRemoteRotateCc");
             addButtonRow(buttonConfig, 4, "configTvRemoteSoftDrop");
             addButtonRow(buttonConfig, 5, "configTvRemoteHardDrop");
+            addButtonRow(buttonConfig, 6, "configTvRemoteHold");
 
             row();
             add(buttonConfig).fillX().expand();
@@ -470,13 +471,14 @@ public class SettingsScreen extends AbstractMenuDialog {
         }
 
         protected void convertConfigToArray() {
-            configKey = new int[6];
+            configKey = new int[7];
             configKey[0] = tvRemoteKeyConfig.keyCodeRight;
             configKey[1] = tvRemoteKeyConfig.keyCodeLeft;
             configKey[2] = tvRemoteKeyConfig.keyCodeRotateClockwise;
             configKey[3] = tvRemoteKeyConfig.keyCodeRotateCounterclock;
             configKey[4] = tvRemoteKeyConfig.keyCodeSoftDrop;
             configKey[5] = tvRemoteKeyConfig.keyCodeHarddrop;
+            configKey[6] = tvRemoteKeyConfig.keyCodeHold;
         }
 
         protected void convertArrayToConfigAndSave() {
@@ -486,6 +488,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             tvRemoteKeyConfig.keyCodeRotateCounterclock = configKey[3];
             tvRemoteKeyConfig.keyCodeSoftDrop = configKey[4];
             tvRemoteKeyConfig.keyCodeHarddrop = configKey[5];
+            tvRemoteKeyConfig.keyCodeHold = configKey[6];
             app.localPrefs.saveTvRemoteConfig();
         }
 
