@@ -181,6 +181,11 @@ public class TutorialModel extends GameModel {
     }
 
     @Override
+    public boolean isComboScoreAllowedByModel() {
+        return false;
+    }
+
+    @Override
     public void setCurrentSpeed() {
         if (tutorialStep <= 14)
             currentSpeed = 0;

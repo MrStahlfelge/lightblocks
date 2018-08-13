@@ -192,6 +192,15 @@ public abstract class GameModel implements Json.Serializable {
 
         removedLines = removeFullAndInsertLines(tSpin);
 
+        if (isComboScoreAllowedByModel()) {
+            int comboHeight = score.setComboCounter(removedLines > 0);
+            userInterface.showComboHeight(comboHeight);
+            boolean newMaxCombo = totalScore.setMaxComboCount(comboHeight);
+            if (newMaxCombo)
+                userInterface.showMotivation(IGameModelListener.MotivationTypes.comboCount,
+                        String.valueOf(comboHeight));
+        }
+
         int gainedScore = score.flushScore();
 
         // Auswertung Achievements für GPGS und UI
@@ -250,6 +259,10 @@ public abstract class GameModel implements Json.Serializable {
         return true;
     }
 
+    public boolean isComboScoreAllowedByModel() {
+        return true;
+    }
+
     protected void achievementsScore(int gainedScore) {
         // Momentan nichts hier, das kann sich aber ändern
         // wird aber in Unterklassen übersteuert
@@ -284,6 +297,8 @@ public abstract class GameModel implements Json.Serializable {
         gpgsUpdateAchievement(GpgsHelper.ACH_ADDICTION_LEVEL_1, removedLines, fTotalClearedLines / 500);
         gpgsUpdateAchievement(GpgsHelper.ACH_ADDICTION_LEVEL_2, removedLines, fTotalClearedLines / 5000);
         gpgsUpdateAchievement(GpgsHelper.ACH_HIGH_LEVEL_ADDICTION, removedLines, fTotalClearedLines / 10000);
+
+        // TODO hier ein Achievement für ComboCount auswerten
     }
 
     protected void achievementTSpin() {

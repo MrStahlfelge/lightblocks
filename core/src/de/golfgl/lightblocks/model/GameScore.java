@@ -3,7 +3,7 @@ package de.golfgl.lightblocks.model;
 import de.golfgl.lightblocks.state.IRoundScore;
 
 /**
- * Diese Klasse verwaltet alle Punktstände eines Spiels oder der Gesamtspiele
+ * Diese Klasse verwaltet alle Punktstände eines Spiels oder der Gesamtspiele. Save/Load über Reflection :-/
  * <p>
  * Created by Benjamin Schulte on 29.01.2017.
  */
@@ -13,6 +13,8 @@ public class GameScore implements IRoundScore {
     protected static final int TYPE_PRACTICE = 1;
     protected static final int TYPE_SPRINT = 2;
 
+    private static final int COMBO_COUNT_RESET = -1;
+
     // der aktuelle Punktestand
     private int score;
     // die abgebauten Reihen
@@ -21,9 +23,12 @@ public class GameScore implements IRoundScore {
     private int startingLevel;
     // der noch nicht dem Gesamtscore zugerechnete aufgelaufene Score
     private float dropScore;
+    // gerade aktiver Combocounter
+    private int comboCounter = COMBO_COUNT_RESET;
     // Anzahl gezogene Blöcke
     private int drawnTetrominos;
     private int rating;
+    // TODO Stats: max Combo Counter, dreier, Zweier, Single etc
     // vergangene Zeit
     private int seconds;
     private float secondFraction;
@@ -203,6 +208,21 @@ public class GameScore implements IRoundScore {
     public void redrawOnHold() {
         lastClearLinesWasSpecial = false;
         dropScore = 0;
-        //TODO Combo Score, dieser wird dann aber zugerechnet
+        setComboCounter(false);
+    }
+
+    /**
+     * Setzt den Combocounter in Abhängigkeit ob Zeilen entfernt wurden
+     * @return den aktuellen Combocounter
+     */
+    public int setComboCounter(boolean linesCleared) {
+        if (linesCleared) {
+            comboCounter++;
+            dropScore += getCurrentScoreFactor() * 50 * comboCounter;
+        } else {
+            comboCounter = COMBO_COUNT_RESET;
+        }
+
+        return comboCounter;
     }
 }

@@ -13,6 +13,7 @@ import de.golfgl.lightblocks.gpgs.GpgsHelper;
  */
 
 public class TotalScore implements Json.Serializable {
+    private static final String KEY_MAX_COMBO_COUNT = "maxComboCount";
     // der aktuelle Punktestand
     private long score;
     // die abgebauten Reihen
@@ -27,6 +28,8 @@ public class TotalScore implements Json.Serializable {
 
     private long multiPlayerMatchesWon;
     private long multiPlayerMatchesStarted;
+
+    private int maxComboCount;
 
     public void addScore(long score) {
         this.score += score;
@@ -92,6 +95,18 @@ public class TotalScore implements Json.Serializable {
         this.multiPlayerMatchesStarted += 1;
     }
 
+    public int getMaxComboCount() {
+        return maxComboCount;
+    }
+
+    public boolean setMaxComboCount(int maxComboCount) {
+        if (maxComboCount > this.maxComboCount) {
+            this.maxComboCount = maxComboCount;
+            return true;
+        }
+        return false;
+    }
+
     protected void mergeWithOther(TotalScore totalScore) {
         if (totalScore.getScore() > score)
             score = totalScore.getScore();
@@ -116,6 +131,8 @@ public class TotalScore implements Json.Serializable {
 
         if (multiPlayerMatchesWon < totalScore.getMultiPlayerMatchesWon())
             multiPlayerMatchesWon = totalScore.getMultiPlayerMatchesWon();
+
+        setMaxComboCount(totalScore.getMaxComboCount());
     }
 
     public void checkAchievements(IGameServiceClient gpgsClient) {
@@ -140,6 +157,7 @@ public class TotalScore implements Json.Serializable {
         json.writeValue("doubles", doubles);
         json.writeValue("multiPlayerMatchesWon", multiPlayerMatchesWon);
         json.writeValue("multiPlayerMatchesStarted", multiPlayerMatchesStarted);
+        json.writeValue(KEY_MAX_COMBO_COUNT, maxComboCount);
     }
 
     @Override
@@ -152,5 +170,6 @@ public class TotalScore implements Json.Serializable {
         doubles = jsonData.getLong("doubles", 0);
         multiPlayerMatchesWon = jsonData.getLong("multiPlayerMatchesWon", 0);
         multiPlayerMatchesStarted = jsonData.getLong("multiPlayerMatchesStarted", 0);
+        maxComboCount = jsonData.getInt(KEY_MAX_COMBO_COUNT, 0);
     }
 }
