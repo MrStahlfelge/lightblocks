@@ -43,6 +43,7 @@ public class GpgsHelper {
     public static final String ACH_MISSION_10_ACCOMPLISHED = "CgkI4vHs17ETEAIQKw";
     public static final String ACH_MISSION_15_ACCOMPLISHED = "CgkI4vHs17ETEAIQOg";
     public static final String ACH_ALL_MISSIONS_PERFECT = "CgkI4vHs17ETEAIQOw";
+    public static final String ACH_COMBINATOR = "CgkI4vHs17ETEAIQQQ";
     public static final String LEAD_MARATHON_GESTURES = "CgkI4vHs17ETEAIQAA";
     public static final String LEAD_MARATHON_GRAVITY = "CgkI4vHs17ETEAIQCA";
     public static final String LEAD_MARATHON_GAMEPAD = "CgkI4vHs17ETEAIQCQ";

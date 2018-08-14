@@ -145,6 +145,9 @@ public class TotalScore implements Json.Serializable {
 
         if (score >= 1000000)
             gpgsClient.unlockAchievement(GpgsHelper.ACH_SCORE_MILLIONAIRE);
+
+        if (maxComboCount >= 7)
+            gpgsClient.unlockAchievement(GpgsHelper.ACH_COMBINATOR);
     }
 
     @Override

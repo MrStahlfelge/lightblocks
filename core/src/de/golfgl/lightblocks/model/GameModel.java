@@ -199,6 +199,8 @@ public abstract class GameModel implements Json.Serializable {
             if (newMaxCombo && comboHeight >= 3 || comboHeight >= 5)
                 userInterface.showMotivation(IGameModelListener.MotivationTypes.comboCount,
                         String.valueOf(comboHeight));
+            if (newMaxCombo)
+                totalScore.checkAchievements(app.gpgsClient);
         }
 
         int gainedScore = score.flushScore();
@@ -298,7 +300,6 @@ public abstract class GameModel implements Json.Serializable {
         gpgsUpdateAchievement(GpgsHelper.ACH_ADDICTION_LEVEL_2, removedLines, fTotalClearedLines / 5000);
         gpgsUpdateAchievement(GpgsHelper.ACH_HIGH_LEVEL_ADDICTION, removedLines, fTotalClearedLines / 10000);
 
-        // TODO hier ein Achievement für ComboCount auswerten
     }
 
     protected void achievementTSpin() {
