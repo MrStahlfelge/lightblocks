@@ -196,7 +196,7 @@ public abstract class GameModel implements Json.Serializable {
             int comboHeight = score.setComboCounter(removedLines > 0);
             userInterface.showComboHeight(comboHeight);
             boolean newMaxCombo = totalScore.setMaxComboCount(comboHeight);
-            if (newMaxCombo)
+            if (newMaxCombo && comboHeight >= 3 || comboHeight >= 5)
                 userInterface.showMotivation(IGameModelListener.MotivationTypes.comboCount,
                         String.valueOf(comboHeight));
         }
@@ -502,7 +502,8 @@ public abstract class GameModel implements Json.Serializable {
         }
 
         noDropSinceHoldMove = true;
-        score.redrawOnHold();
+        int comboHeight = score.redrawOnHold();
+        userInterface.showComboHeight(comboHeight);
         userInterface.updateScore(score, 0);
 
         return true;

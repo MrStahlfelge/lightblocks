@@ -48,6 +48,7 @@ public class TotalScoreScreen extends AbstractMenuDialog {
         scoreTable.addScoresLine("labelBlocks", 0, total.getDrawnTetrominos());
         scoreTable.addScoresLine("labelFourLines", 0, total.getFourLineCount());
         scoreTable.addScoresLine("labelTSpin", 0, total.getTSpins());
+        scoreTable.addScoresLine("labelMaxCombo", 0, total.getMaxComboCount());
         scoreTable.addScoresLine("labelMultiPlayerWon", 0, total.getMultiPlayerMatchesWon());
 
         menuTable.add(scoreTable);

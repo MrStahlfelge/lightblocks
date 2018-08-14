@@ -51,9 +51,11 @@ public interface IGameModelListener {
 
     void showGarbageAmount(int lines);
 
+    void showComboHeight(int comboHeight);
+
     enum MotivationTypes {
         newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
         boardCleared, newHighscore, gameOver, gameWon, gameSuccess, playerOver,
-        bonusScore
+        bonusScore, comboCount
     }
 }

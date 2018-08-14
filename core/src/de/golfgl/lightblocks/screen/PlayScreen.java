@@ -74,6 +74,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     protected final Button pauseButton;
     protected final Group centerGroup;
     protected final BlockGroup blockGroup;
+    private final Image imComboIndicator;
     private final Group labelGroup;
     private final BlockActor[][] blockMatrix;
     private final BlockActor[] nextTetro;
@@ -152,6 +153,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 2 * NINE_PATCH_BORDER_SIZE, 1f, Interpolation.circleOut));
         imLine.setColor(.8f, .8f, .8f, 1);
         centerGroup.addActor(imLine);
+
+        imComboIndicator = new Image(line);
+        imComboIndicator.setPosition(imLine.getX(), imLine.getY());
+        imComboIndicator.setColor(new Color(LightBlocksGame.EMPHASIZE_COLOR));
+        imComboIndicator.getColor().a = 0;
+        centerGroup.addActor(imComboIndicator);
+        showComboHeight(0);
 
         // Anzeige des Levelnamens - muss in Group, Rotation funktioniert direkt auf Label nicht
         Group gameTypeLabels = new Group();
@@ -946,8 +954,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 break;
             case bonusScore:
                 text = app.TEXTS.format("motivationBonusScore", extraMsg);
-                playSound = true;
                 duration = 3;
+                break;
+            case comboCount:
+                text = app.TEXTS.format("motivationComboCount", extraMsg);
+                duration = .5f;
                 break;
         }
 
@@ -964,6 +975,18 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         imGarbageIndicator.clearActions();
         imGarbageIndicator.addAction(Actions.sizeTo(imGarbageIndicator.getWidth(),
                 BlockActor.blockWidth * lines + NINE_PATCH_BORDER_SIZE * 2, .2f, Interpolation.fade));
+    }
+
+    @Override
+    public void showComboHeight(int comboHeight) {
+        comboHeight = Math.max(0, comboHeight);
+        // TODO wie imGarbageIndicator
+
+        imComboIndicator.clearActions();
+        imComboIndicator.addAction(Actions.sizeTo(imGarbageIndicator.getWidth(),
+                BlockActor.blockWidth * comboHeight + NINE_PATCH_BORDER_SIZE * 2, .2f, Interpolation.fade));
+        imComboIndicator.addAction(comboHeight > 0 ? Actions.fadeIn(.1f, Interpolation.fade)
+                : Actions.fadeOut(.2f, Interpolation.fade));
     }
 
     @Override

@@ -204,11 +204,13 @@ public class GameScore implements IRoundScore {
 
     /**
      * zurücksetzen aller Boni bei Hold
+     *
+     * @return den aktuellen Combocounter
      */
-    public void redrawOnHold() {
+    public int redrawOnHold() {
         lastClearLinesWasSpecial = false;
         dropScore = 0;
-        setComboCounter(false);
+        return setComboCounter(false);
     }
 
     /**
