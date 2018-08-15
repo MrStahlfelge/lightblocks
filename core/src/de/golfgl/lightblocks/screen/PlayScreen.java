@@ -156,7 +156,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         imComboIndicator = new Image(line);
         imComboIndicator.setPosition(imLine.getX(), imLine.getY());
-        imComboIndicator.setColor(new Color(LightBlocksGame.EMPHASIZE_COLOR));
+        imComboIndicator.setColor(new Color(LightBlocksGame.COLOR_FOCUSSED_ACTOR));
         imComboIndicator.getColor().a = 0;
         centerGroup.addActor(imComboIndicator);
         showComboHeight(0);
