@@ -827,6 +827,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             } else {
                 nextTetro[i] = null;
                 blockMatrix[x][y] = block;
+                block.clearActions();
                 block.addAction(Actions.fadeIn(.1f));
                 block.setMoveAction(Actions.moveTo(x * BlockActor.blockWidth, y * BlockActor.blockWidth, .1f,
                         Interpolation.fade));
