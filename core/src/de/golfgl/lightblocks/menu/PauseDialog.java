@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
+import de.golfgl.gdx.controllers.ControllerMenuStage;
+import de.golfgl.gdx.controllers.IControllerScrollable;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
@@ -38,6 +40,7 @@ public class PauseDialog extends ControllerMenuDialog {
     private final PlayScreen playScreen;
     private boolean emphasizeInputMsg;
     private boolean firstShow = true;
+    private FaButton retryButton;
 
     public PauseDialog(LightBlocksGame app, final PlayScreen playScreen) {
         super("", app.skin, LightBlocksGame.SKIN_WINDOW_OVERLAY);
@@ -45,7 +48,7 @@ public class PauseDialog extends ControllerMenuDialog {
         this.app = app;
         this.playScreen = playScreen;
 
-        resumeButton = new PlayButton(app);
+        resumeButton = new ThisPlayButton(app);
         resumeButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -171,7 +174,7 @@ public class PauseDialog extends ControllerMenuDialog {
 
     public void addRetryButton(final InitGameParameters retryParams) {
         if (retryParams != null) {
-            FaButton retryButton = new FaButton(FontAwesome.ROTATE_RIGHT, app.skin);
+            retryButton = new FaButton(FontAwesome.ROTATE_RIGHT, app.skin);
             button(retryButton, new Runnable() {
                 @Override
                 public void run() {
@@ -189,6 +192,29 @@ public class PauseDialog extends ControllerMenuDialog {
                         }
                 }
             });
+        }
+    }
+
+    private class ThisPlayButton extends PlayButton implements IControllerScrollable {
+        public ThisPlayButton(LightBlocksGame app) {
+            super(app);
+        }
+
+        @Override
+        public boolean onControllerScroll(ControllerMenuStage.MoveFocusDirection direction) {
+            Actor buttonToFocus = null;
+            switch (direction) {
+                case east:
+                    buttonToFocus = retryButton;
+                    break;
+                case west:
+                    buttonToFocus = exitButton;
+                    break;
+            }
+            if (buttonToFocus != null)
+                return ((ControllerMenuStage) getStage()).setFocusedActor(buttonToFocus);
+
+            return false;
         }
     }
 }
