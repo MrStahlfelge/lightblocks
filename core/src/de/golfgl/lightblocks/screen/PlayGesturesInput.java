@@ -258,11 +258,12 @@ public class PlayGesturesInput extends PlayScreenInput {
         // Horizontale Bewegung  bemerken - aber nur wenn kein Hard Drop eingeleitet!
         if (!didHardDrop) {
             if (!flippedMode) {
-                if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > dragThreshold)) {
+                int currentHorizontalTreshold = (beganSoftDrop ? 2 * dragThreshold : dragThreshold);
+                if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > currentHorizontalTreshold)) {
                     beganHorizontalMove = true;
                     playScreen.gameModel.startMoveHorizontal(screenX - this.screenX < 0);
                 }
-                if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < dragThreshold)) {
+                if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < currentHorizontalTreshold)) {
                     playScreen.gameModel.endMoveHorizontal(true);
                     playScreen.gameModel.endMoveHorizontal(false);
                     beganHorizontalMove = false;
