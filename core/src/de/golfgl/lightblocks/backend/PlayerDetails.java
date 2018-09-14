@@ -15,7 +15,9 @@ public class PlayerDetails {
     PlayerDetails(JsonValue fromJson) {
         uuid = fromJson.getString("id");
         nickName = fromJson.getString("nickName");
-        lastActivity = fromJson.getLong("lastActivity");
-        memberSince = fromJson.getLong("memberSince");
+
+        // diese in Übersichtsliste nicht enthalten und daher mit Defaults vorzubelegen
+        lastActivity = fromJson.getLong("lastActivity", 0);
+        memberSince = fromJson.getLong("memberSince", 0);
     }
 }

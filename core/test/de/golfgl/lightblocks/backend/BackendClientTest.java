@@ -12,6 +12,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.util.List;
+
 /**
  * Created by Benjamin Schulte on 12.09.2018.
  */
@@ -83,6 +85,14 @@ public class BackendClientTest {
         backendClient.fetchPlayerDetails(createdResponse.retrievedData.userId, fetchDetailResponse);
         waitWhileRequesting();
         Assert.assertTrue(fetchDetailResponse.retrievedData.nickName.startsWith("mummelmann"));
+
+        WaitForResponseListener<List<PlayerDetails>> listPlayerResponse = new WaitForResponseListener<List
+                <PlayerDetails>>();
+        backendClient.fetchPlayerByNicknamePrefixList("user", listPlayerResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(listPlayerResponse.retrievedData);
+        Assert.assertFalse(listPlayerResponse.retrievedData.isEmpty());
+        Assert.assertTrue(listPlayerResponse.retrievedData.get(0).nickName.startsWith("user"));
 
         //TODO ein Delete auch noch
     }
