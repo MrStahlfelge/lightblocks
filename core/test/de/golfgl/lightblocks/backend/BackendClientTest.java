@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 public class BackendClientTest {
     boolean requesting = false;
     private String lastCreatedUserId;
+    private PlayerDetails lastFetchedPlayerDetails;
 
     @BeforeClass
     public static void init() {
@@ -56,18 +57,32 @@ public class BackendClientTest {
     }
 
     @Test
-    public void createPlayer() throws Exception {
-        new BackendClient().createPlayer("123", new CreationListener());
+    public void createAndFetchPlayer() throws Exception {
+        BackendClient backendClient = new BackendClient();
+
+        backendClient.createPlayer("123", new CreationListener());
         waitWhileRequesting();
         Assert.assertNull(lastCreatedUserId);
 
-        new BackendClient().createPlayer("user", new CreationListener());
+        backendClient.createPlayer("user", new CreationListener());
         waitWhileRequesting();
         Assert.assertNotNull(lastCreatedUserId);
 
-        new BackendClient().createPlayer("mümmelmann", new CreationListener());
+        WaitForResponseListener<PlayerDetails> fetchDetailResponse = new WaitForResponseListener<PlayerDetails>();
+        backendClient.fetchPlayerDetails(lastCreatedUserId, fetchDetailResponse);
+        waitWhileRequesting();
+        Assert.assertTrue(fetchDetailResponse.retrievedData.nickName.startsWith("user"));
+
+        backendClient.createPlayer("mümmelmann", new CreationListener());
         waitWhileRequesting();
         Assert.assertNotNull(lastCreatedUserId);
+
+        fetchDetailResponse = new WaitForResponseListener<PlayerDetails>();
+        backendClient.fetchPlayerDetails(lastCreatedUserId, fetchDetailResponse);
+        waitWhileRequesting();
+        Assert.assertTrue(fetchDetailResponse.retrievedData.nickName.startsWith("mummelmann"));
+
+        //TODO ein Delete auch noch
     }
 
     @After
@@ -92,6 +107,26 @@ public class BackendClientTest {
         public void onCreated(String userId, String userKey) {
             requesting = false;
             lastCreatedUserId = userId;
+        }
+    }
+
+    private class WaitForResponseListener<T> implements BackendClient.IBackendResponse<T> {
+        T retrievedData;
+
+        WaitForResponseListener() {
+            requesting = true;
+        }
+
+        @Override
+        public void onFail(String errorMsg) {
+            requesting = false;
+            lastFetchedPlayerDetails = null;
+        }
+
+        @Override
+        public void onSuccess(T retrievedData) {
+            requesting = false;
+            this.retrievedData = retrievedData;
         }
     }
 }
