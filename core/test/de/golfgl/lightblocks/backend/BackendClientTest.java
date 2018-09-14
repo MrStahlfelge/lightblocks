@@ -17,8 +17,6 @@ import org.mockito.Mockito;
  */
 public class BackendClientTest {
     boolean requesting = false;
-    private String lastCreatedUserId;
-    private PlayerDetails lastFetchedPlayerDetails;
 
     @BeforeClass
     public static void init() {
@@ -60,25 +58,29 @@ public class BackendClientTest {
     public void createAndFetchPlayer() throws Exception {
         BackendClient backendClient = new BackendClient();
 
-        backendClient.createPlayer("123", new CreationListener());
+        WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
+                = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
+        backendClient.createPlayer("123", createdResponse);
         waitWhileRequesting();
-        Assert.assertNull(lastCreatedUserId);
+        Assert.assertNull(createdResponse.retrievedData);
 
-        backendClient.createPlayer("user", new CreationListener());
+        createdResponse = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
+        backendClient.createPlayer("user", createdResponse);
         waitWhileRequesting();
-        Assert.assertNotNull(lastCreatedUserId);
+        Assert.assertNotNull(createdResponse.retrievedData.userId);
 
         WaitForResponseListener<PlayerDetails> fetchDetailResponse = new WaitForResponseListener<PlayerDetails>();
-        backendClient.fetchPlayerDetails(lastCreatedUserId, fetchDetailResponse);
+        backendClient.fetchPlayerDetails(createdResponse.retrievedData.userId, fetchDetailResponse);
         waitWhileRequesting();
         Assert.assertTrue(fetchDetailResponse.retrievedData.nickName.startsWith("user"));
 
-        backendClient.createPlayer("mümmelmann", new CreationListener());
+        createdResponse = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
+        backendClient.createPlayer("mümmelmann", createdResponse);
         waitWhileRequesting();
-        Assert.assertNotNull(lastCreatedUserId);
+        Assert.assertNotNull(createdResponse.retrievedData.userId);
 
         fetchDetailResponse = new WaitForResponseListener<PlayerDetails>();
-        backendClient.fetchPlayerDetails(lastCreatedUserId, fetchDetailResponse);
+        backendClient.fetchPlayerDetails(createdResponse.retrievedData.userId, fetchDetailResponse);
         waitWhileRequesting();
         Assert.assertTrue(fetchDetailResponse.retrievedData.nickName.startsWith("mummelmann"));
 
@@ -92,24 +94,6 @@ public class BackendClientTest {
         }
     }
 
-    private class CreationListener implements BackendClient.ICreatePlayerResponse {
-        public CreationListener() {
-            requesting = true;
-        }
-
-        @Override
-        public void onFail(String errorMsg) {
-            requesting = false;
-            lastCreatedUserId = null;
-        }
-
-        @Override
-        public void onCreated(String userId, String userKey) {
-            requesting = false;
-            lastCreatedUserId = userId;
-        }
-    }
-
     private class WaitForResponseListener<T> implements BackendClient.IBackendResponse<T> {
         T retrievedData;
 
@@ -120,7 +104,6 @@ public class BackendClientTest {
         @Override
         public void onFail(String errorMsg) {
             requesting = false;
-            lastFetchedPlayerDetails = null;
         }
 
         @Override
