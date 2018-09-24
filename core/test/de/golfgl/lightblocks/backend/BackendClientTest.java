@@ -5,6 +5,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.MathUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -95,6 +96,27 @@ public class BackendClientTest {
         Assert.assertTrue(listPlayerResponse.retrievedData.get(0).nickName.startsWith("user"));
 
         //TODO ein Delete auch noch
+    }
+
+    @Test
+    public void testPostScore() throws InterruptedException {
+        BackendClient backendClient = new BackendClient();
+
+        WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
+                = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
+        backendClient.createPlayer("12345", createdResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(createdResponse.retrievedData);
+
+        backendClient.setUserId(createdResponse.retrievedData.userId);
+        backendClient.setUserPass(createdResponse.retrievedData.userKey);
+
+        backendClient.postScore(MathUtils.random(1, 200000), "testmode", "android", 0, "params", "replay",
+                MathUtils.random(20, 1000));
+
+        Thread.sleep(1000);
+
+        // TODO delete player
     }
 
     @After
