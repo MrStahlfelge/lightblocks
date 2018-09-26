@@ -71,21 +71,13 @@ public class BackendClientTest {
         backendClient.createPlayer("user", createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData.userId);
-
-        WaitForResponseListener<PlayerDetails> fetchDetailResponse = new WaitForResponseListener<PlayerDetails>();
-        backendClient.fetchPlayerDetails(createdResponse.retrievedData.userId, fetchDetailResponse);
-        waitWhileRequesting();
-        Assert.assertTrue(fetchDetailResponse.retrievedData.nickName.startsWith("user"));
+        Assert.assertTrue(createdResponse.retrievedData.nickName.startsWith("user"));
 
         createdResponse = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
         backendClient.createPlayer("mümmelmann", createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData.userId);
-
-        fetchDetailResponse = new WaitForResponseListener<PlayerDetails>();
-        backendClient.fetchPlayerDetails(createdResponse.retrievedData.userId, fetchDetailResponse);
-        waitWhileRequesting();
-        Assert.assertTrue(fetchDetailResponse.retrievedData.nickName.startsWith("mummelmann"));
+        Assert.assertTrue(createdResponse.retrievedData.nickName.startsWith("mummelmann"));
 
         WaitForResponseListener<List<PlayerDetails>> listPlayerResponse = new WaitForResponseListener<List
                 <PlayerDetails>>();
@@ -95,7 +87,16 @@ public class BackendClientTest {
         Assert.assertFalse(listPlayerResponse.retrievedData.isEmpty());
         Assert.assertTrue(listPlayerResponse.retrievedData.get(0).nickName.startsWith("user"));
 
-        //TODO ein Delete auch noch
+        createdResponse = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
+        backendClient.createPlayer("gpgsuser", "gpgs", createdResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(createdResponse.retrievedData.userId);
+        Assert.assertTrue(createdResponse.retrievedData.nickName.startsWith("gpgsuser"));
+        Assert.assertTrue(createdResponse.retrievedData.nickName.indexOf("@gpgs") > 0);
+
+        backendClient.setUserInformation(createdResponse.retrievedData);
+        backendClient.deletePlayer(new WaitForResponseListener<Void>());
+        waitWhileRequesting();
     }
 
     @Test
@@ -108,15 +109,17 @@ public class BackendClientTest {
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData);
 
-        backendClient.setUserId(createdResponse.retrievedData.userId);
-        backendClient.setUserPass(createdResponse.retrievedData.userKey);
+        backendClient.setUserInformation(createdResponse.retrievedData);
 
         backendClient.postScore(MathUtils.random(1, 200000), "testmode", "android", 0, "params", "replay",
                 MathUtils.random(20, 1000));
 
         Thread.sleep(1000);
 
-        // TODO delete player
+        // TODO mehrere rein, fetch scores und gucken ob auch richtige reihenfolge
+
+        backendClient.deletePlayer(new WaitForResponseListener<Void>());
+        waitWhileRequesting();
     }
 
     @After
@@ -128,6 +131,7 @@ public class BackendClientTest {
 
     private class WaitForResponseListener<T> implements BackendClient.IBackendResponse<T> {
         T retrievedData;
+        boolean successful;
 
         WaitForResponseListener() {
             requesting = true;
@@ -136,12 +140,14 @@ public class BackendClientTest {
         @Override
         public void onFail(String errorMsg) {
             requesting = false;
+            successful = false;
         }
 
         @Override
         public void onSuccess(T retrievedData) {
             requesting = false;
             this.retrievedData = retrievedData;
+            successful = true;
         }
     }
 }
