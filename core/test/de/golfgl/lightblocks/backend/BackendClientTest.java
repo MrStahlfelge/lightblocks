@@ -19,6 +19,7 @@ import java.util.List;
  * Created by Benjamin Schulte on 12.09.2018.
  */
 public class BackendClientTest {
+    private static final String KEY_GAMEMODE1 = "testmode1";
     boolean requesting = false;
 
     @BeforeClass
@@ -94,31 +95,126 @@ public class BackendClientTest {
         Assert.assertTrue(createdResponse.retrievedData.nickName.startsWith("gpgsuser"));
         Assert.assertTrue(createdResponse.retrievedData.nickName.indexOf("@gpgs") > 0);
 
-        backendClient.setUserInformation(createdResponse.retrievedData);
         backendClient.deletePlayer(new WaitForResponseListener<Void>());
         waitWhileRequesting();
     }
 
     @Test
     public void testPostScore() throws InterruptedException {
-        BackendClient backendClient = new BackendClient();
+        BackendClient backendClientPlayer1 = new BackendClient();
+        BackendClient backendClientPlayer2 = new BackendClient();
 
         WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
                 = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
-        backendClient.createPlayer("12345", createdResponse);
+        backendClientPlayer1.createPlayer("player1", createdResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(createdResponse.retrievedData);
+        backendClientPlayer2.createPlayer("player2", createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData);
 
-        backendClient.setUserInformation(createdResponse.retrievedData);
+        int mode1Player1Best = 0;
+        int mode2Player1Best = 0;
+        int mode1Player2Best = 0;
+        int mode2Player2Best = 0;
+        int blocksPlayer1 = 0;
+        int blocksPlayer2 = 0;
 
-        backendClient.postScore(MathUtils.random(1, 200000), "testmode", "android", 0, "params", "replay",
-                MathUtils.random(20, 1000));
+        for (int i = 0; i < 1000; i++) {
+            Thread.sleep(50);
+            int player1Mode1 = MathUtils.random(1, 200000);
+            int player1Mode2 = MathUtils.random(1, 200000);
+            int player2Mode1 = MathUtils.random(1, 200000);
+            int player2Mode2 = MathUtils.random(1, 200000);
 
-        Thread.sleep(1000);
+            int blocksNowPlayer = MathUtils.random(20, 1000);
+            backendClientPlayer1.postScore(player1Mode1, KEY_GAMEMODE1, "android", 0, "params", "replay",
+                    blocksNowPlayer);
+            blocksPlayer1 += blocksNowPlayer;
 
-        // TODO mehrere rein, fetch scores und gucken ob auch richtige reihenfolge
+            blocksNowPlayer = MathUtils.random(20, 1000);
+            backendClientPlayer1.postScore(player1Mode2, "testmode2", "android", 0, "params", "replay",
+                    blocksNowPlayer);
+            blocksPlayer1 += blocksNowPlayer;
 
-        backendClient.deletePlayer(new WaitForResponseListener<Void>());
+            blocksNowPlayer = MathUtils.random(20, 1000);
+            backendClientPlayer2.postScore(player2Mode1, KEY_GAMEMODE1, "android", 0, "params", "replay",
+                    blocksNowPlayer);
+            blocksPlayer2 += blocksNowPlayer;
+
+            blocksNowPlayer = MathUtils.random(20, 1000);
+            backendClientPlayer2.postScore(player2Mode2, "testmode2", "android", 0, "params", "replay",
+                    blocksNowPlayer);
+            blocksPlayer2 += blocksNowPlayer;
+
+            mode1Player1Best = Math.max(mode1Player1Best, player1Mode1);
+            mode2Player1Best = Math.max(mode2Player1Best, player1Mode2);
+            mode1Player2Best = Math.max(mode1Player2Best, player2Mode1);
+            mode2Player2Best = Math.max(mode2Player2Best, player2Mode2);
+        }
+
+        WaitForResponseListener<List<ScoreListEntry>> scoreListResponse = new
+                WaitForResponseListener<List<ScoreListEntry>>();
+        backendClientPlayer1.fetchBestScores(KEY_GAMEMODE1, scoreListResponse);
+        waitWhileRequesting();
+
+        // gucken, ob die Scores passen und durchgehen
+        long lastScore = Long.MAX_VALUE;
+        boolean player1Found = false;
+        boolean player2Found = false;
+        for (ScoreListEntry score : scoreListResponse.retrievedData) {
+            Assert.assertTrue(lastScore >= score.scoreValue);
+            lastScore = score.scoreValue;
+
+            if (score.userId.equals(backendClientPlayer1.getUserId())) {
+                // jeder nur einmal da
+                Assert.assertFalse(player1Found);
+                Assert.assertEquals(mode1Player1Best, score.scoreValue);
+                player1Found = true;
+            }
+            if (score.userId.equals(backendClientPlayer2.getUserId())) {
+                // jeder nur einmal da
+                Assert.assertFalse(player2Found);
+                Assert.assertEquals(mode1Player2Best, score.scoreValue);
+                player2Found = true;
+            }
+        }
+
+        scoreListResponse = new WaitForResponseListener<List<ScoreListEntry>>();
+        backendClientPlayer1.fetchLatestScores(KEY_GAMEMODE1, scoreListResponse);
+        waitWhileRequesting();
+
+        // gucken, ob die Scores passen und durchgehen
+        lastScore = Long.MAX_VALUE;
+        player1Found = false;
+        player2Found = false;
+        for (ScoreListEntry score : scoreListResponse.retrievedData) {
+            Assert.assertTrue(lastScore >= score.scoreValue);
+            lastScore = score.scoreValue;
+
+            if (score.userId.equals(backendClientPlayer1.getUserId()) && !player1Found) {
+                // jeder nur einmal da
+                Assert.assertEquals(mode1Player1Best, score.scoreValue);
+                player1Found = true;
+            }
+            if (score.userId.equals(backendClientPlayer2.getUserId()) && !player2Found) {
+                // jeder nur einmal da
+                Assert.assertEquals(mode1Player2Best, score.scoreValue);
+                player2Found = true;
+            }
+        }
+        Assert.assertTrue(player1Found);
+        Assert.assertTrue(player2Found);
+
+        // Playerdetails abholen und gesamte Blocks prüfen
+        WaitForResponseListener<PlayerDetails> playerDetailsResponse = new WaitForResponseListener<PlayerDetails>();
+        backendClientPlayer1.fetchPlayerDetails(backendClientPlayer2.getUserId(), playerDetailsResponse);
+        waitWhileRequesting();
+        Assert.assertEquals(blocksPlayer2, playerDetailsResponse.retrievedData.countTotalBlocks);
+
+        backendClientPlayer1.deletePlayer(new WaitForResponseListener<Void>());
+        waitWhileRequesting();
+        backendClientPlayer2.deletePlayer(new WaitForResponseListener<Void>());
         waitWhileRequesting();
     }
 
