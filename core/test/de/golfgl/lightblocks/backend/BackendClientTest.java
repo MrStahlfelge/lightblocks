@@ -15,6 +15,8 @@ import org.mockito.Mockito;
 
 import java.util.List;
 
+import de.golfgl.lightblocks.LightBlocksGame;
+
 /**
  * Created by Benjamin Schulte on 12.09.2018.
  */
@@ -218,6 +220,40 @@ public class BackendClientTest {
         waitWhileRequesting();
     }
 
+    @Test
+    public void testFetchNewMessages() throws InterruptedException {
+        BackendClient backendClientNoAuth = new BackendClient();
+
+        WaitForResponseListener<BackendClient.NewMessagesResponse> newMessagesResponse = new
+                WaitForResponseListener<BackendClient.NewMessagesResponse>();
+        backendClientNoAuth.fetchNewMessages(0, LightBlocksGame.GAME_VERSIONNUMBER, 1023,
+                newMessagesResponse);
+        waitWhileRequesting();
+
+        Assert.assertNotNull(newMessagesResponse.retrievedData);
+        Assert.assertFalse(newMessagesResponse.retrievedData.authenticated);
+        Assert.assertTrue(newMessagesResponse.retrievedData.responseTime > 0);
+
+        BackendClient backendClientPlayer = new BackendClient();
+
+        WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
+                = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
+        backendClientPlayer.createPlayer("player", createdResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(createdResponse.retrievedData);
+
+        newMessagesResponse = new WaitForResponseListener<BackendClient.NewMessagesResponse>();
+        backendClientPlayer.fetchNewMessages(0, LightBlocksGame.GAME_VERSIONNUMBER, 1024, newMessagesResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(newMessagesResponse.retrievedData);
+        Assert.assertTrue(newMessagesResponse.retrievedData.authenticated);
+        Assert.assertTrue(newMessagesResponse.retrievedData.responseTime > 0);
+
+
+        backendClientPlayer.deletePlayer(new WaitForResponseListener<Void>());
+        waitWhileRequesting();
+    }
+
     @After
     public void waitWhileRequesting() throws InterruptedException {
         while (requesting) {
@@ -234,7 +270,7 @@ public class BackendClientTest {
         }
 
         @Override
-        public void onFail(String errorMsg) {
+        public void onFail(int statusCode, String errorMsg) {
             requesting = false;
             successful = false;
         }
