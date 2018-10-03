@@ -211,7 +211,7 @@ public class PauseDialog extends ControllerMenuDialog {
                     buttonToFocus = exitButton;
                     break;
             }
-            if (buttonToFocus != null)
+            if (buttonToFocus != null && getStage() != null)
                 return ((ControllerMenuStage) getStage()).setFocusedActor(buttonToFocus);
 
             return false;
