@@ -224,18 +224,31 @@ public class BackendClientTest {
     public void testFetchNewMessages() throws InterruptedException {
         BackendClient backendClientNoAuth = new BackendClient();
 
+        // anonyme Anfrage
         WaitForResponseListener<BackendClient.NewMessagesResponse> newMessagesResponse = new
                 WaitForResponseListener<BackendClient.NewMessagesResponse>();
-        backendClientNoAuth.fetchNewMessages(0, LightBlocksGame.GAME_VERSIONNUMBER, 1023,
+        backendClientNoAuth.fetchNewMessages(0, LightBlocksGame.GAME_VERSIONNUMBER, 1023, 1,
                 newMessagesResponse);
         waitWhileRequesting();
 
         Assert.assertNotNull(newMessagesResponse.retrievedData);
         Assert.assertFalse(newMessagesResponse.retrievedData.authenticated);
         Assert.assertTrue(newMessagesResponse.retrievedData.responseTime > 0);
+        Assert.assertNull(newMessagesResponse.retrievedData.warningMsg);
 
+        // veraltete Clientversion
+        newMessagesResponse = new WaitForResponseListener<BackendClient.NewMessagesResponse>();
+        backendClientNoAuth.fetchNewMessages(0, 1, 1023, 1,
+                newMessagesResponse);
+        waitWhileRequesting();
+
+        Assert.assertNotNull(newMessagesResponse.retrievedData);
+        Assert.assertFalse(newMessagesResponse.retrievedData.authenticated);
+        Assert.assertTrue(newMessagesResponse.retrievedData.responseTime > 0);
+        Assert.assertNotNull(newMessagesResponse.retrievedData.warningMsg);
+
+        // Anfrage mit Spieler
         BackendClient backendClientPlayer = new BackendClient();
-
         WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
                 = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
         backendClientPlayer.createPlayer("player", createdResponse);
@@ -243,11 +256,23 @@ public class BackendClientTest {
         Assert.assertNotNull(createdResponse.retrievedData);
 
         newMessagesResponse = new WaitForResponseListener<BackendClient.NewMessagesResponse>();
-        backendClientPlayer.fetchNewMessages(0, LightBlocksGame.GAME_VERSIONNUMBER, 1024, newMessagesResponse);
+        backendClientPlayer.fetchNewMessages(0, LightBlocksGame.GAME_VERSIONNUMBER, 1024, 1, newMessagesResponse);
         waitWhileRequesting();
         Assert.assertNotNull(newMessagesResponse.retrievedData);
         Assert.assertTrue(newMessagesResponse.retrievedData.authenticated);
         Assert.assertTrue(newMessagesResponse.retrievedData.responseTime > 0);
+        Assert.assertNull(newMessagesResponse.retrievedData.warningMsg);
+
+        // Anfrage mit falscher Authentifizierung
+        newMessagesResponse = new WaitForResponseListener<BackendClient.NewMessagesResponse>();
+        BackendClient noAuthPlayer = new BackendClient();
+        noAuthPlayer.setUserId("----");
+        noAuthPlayer.fetchNewMessages(0, LightBlocksGame.GAME_VERSIONNUMBER, 1024, 1, newMessagesResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(newMessagesResponse.retrievedData);
+        Assert.assertFalse(newMessagesResponse.retrievedData.authenticated);
+        Assert.assertTrue(newMessagesResponse.retrievedData.responseTime > 0);
+        Assert.assertNotNull(newMessagesResponse.retrievedData.warningMsg);
 
 
         backendClientPlayer.deletePlayer(new WaitForResponseListener<Void>());
