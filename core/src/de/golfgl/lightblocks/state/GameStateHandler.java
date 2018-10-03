@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
 import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
@@ -22,6 +24,8 @@ public class GameStateHandler {
     private static final String FILENAME_BESTSCORES = "data/score_best.json";
     private static final String FILENAME_PREFIX_MISSIONS = "missions/";
     private static final String SAVEGAMEKEY = "***REMOVED***";
+    private static final String KEY_FU_BACKEND_USER = "backendUserId";
+    private static final String KEY_FU_BACKEND_PASS = "backendPassKey";
 
     private final LightBlocksGame app;
     private TotalScore totalScore;
@@ -184,6 +188,8 @@ public class GameStateHandler {
                 totalScore.checkAchievements(app.gpgsClient);
                 bestScores.checkAchievements(app.gpgsClient, app);
 
+                saveInformationToFutureCloudSave();
+
                 CloudGameState cgs = new CloudGameState();
                 cgs.version = LightBlocksGame.GAME_VERSIONSTRING;
                 cgs.totalScore = totalScore;
@@ -240,6 +246,57 @@ public class GameStateHandler {
             bestScores.checkAchievements(app.gpgsClient, app);
         }
 
+        loadInformationFromFutureCloudSave();
+
+    }
+
+    protected void loadInformationFromFutureCloudSave() {
+        if (futureUseFromCloudSaveGame != null && !futureUseFromCloudSaveGame.isEmpty())
+            try {
+                JsonValue futureUse = new JsonReader().parse(futureUseFromCloudSaveGame);
+                String backendUserId = futureUse.getString(KEY_FU_BACKEND_USER, null);
+                String backendUserKey = futureUse.getString(KEY_FU_BACKEND_PASS, null);
+
+                if (backendUserId != null && backendUserKey != null && !backendUserId.equals(app.backendManager
+                        .getUserId())) {
+                    app.localPrefs.saveBackendUser(backendUserId, backendUserKey);
+                    app.backendManager.setUserId(backendUserId);
+                    app.backendManager.setUserPass(backendUserKey);
+                }
+            } catch (Throwable t) {
+                // kein backendUser gefunden
+            }
+    }
+
+    private void saveInformationToFutureCloudSave() {
+        if (app.backendManager.getUserId() != null)
+            try {
+
+                // haben wir schon was drin? dann mal parsen
+                JsonValue futureUse = null;
+                try {
+                    futureUse = new JsonReader().parse(futureUseFromCloudSaveGame);
+                } catch (Throwable t) {
+                    // konnte nicht geparset werden
+                    futureUse = new JsonValue(JsonValue.ValueType.object);
+                }
+
+                saveStringToFutureUse(futureUse, KEY_FU_BACKEND_USER, app.backendManager.getUserId());
+                saveStringToFutureUse(futureUse, KEY_FU_BACKEND_PASS, app.backendManager.getUserPass());
+
+                futureUseFromCloudSaveGame = futureUse.toJson(JsonWriter.OutputType.minimal);
+            } catch (Throwable t) {
+                Gdx.app.error("GameState", "Error saving backend info to cloud.", t);
+            }
+
+    }
+
+    private void saveStringToFutureUse(JsonValue parent, String jsonKey, String value) {
+        JsonValue jsonValue = parent.get(jsonKey);
+        if (jsonValue != null)
+            jsonValue.set(value);
+        else
+            parent.addChild(jsonKey, new JsonValue(value));
     }
 
     /**

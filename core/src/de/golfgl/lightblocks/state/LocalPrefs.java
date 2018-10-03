@@ -41,6 +41,8 @@ public class LocalPrefs {
     private static final String PREF_KEY_DONATIONREMINDER = "blocksNextReminder";
     private static final String KEY_SHOW_GHOSTPIECE = "showGhostpiece";
     private static final String PREF_KEY_SHOW_TOUCH_HOLD = "showTouchHold";
+    private static final String PREF_KEY_BACKEND_USERID = "backendUserId";
+    private static final String PREF_KEY_BACKEND_PASS = "backendPassKey";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -438,6 +440,20 @@ public class LocalPrefs {
         this.showTouchHoldButton = showTouchHoldButton;
 
         prefs.putBoolean(PREF_KEY_SHOW_TOUCH_HOLD, showTouchHoldButton);
+        prefs.flush();
+    }
+
+    public String getBackendUserId() {
+        return prefs.getString(PREF_KEY_BACKEND_USERID, null);
+    }
+
+    public String getBackendUserPassKey() {
+        return prefs.getString(PREF_KEY_BACKEND_PASS, null);
+    }
+
+    public void saveBackendUser(String userId, String passKey) {
+        prefs.putString(PREF_KEY_BACKEND_USERID, userId);
+        prefs.putString(PREF_KEY_BACKEND_PASS, passKey);
         prefs.flush();
     }
 

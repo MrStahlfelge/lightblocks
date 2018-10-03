@@ -24,6 +24,7 @@ import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.gamestate.ILoadGameStateResponseListener;
+import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
@@ -85,6 +86,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public I18NBundle TEXTS;
     public LocalPrefs localPrefs;
     public GameStateHandler savegame;
+    public BackendManager backendManager;
     // these resources are used in the whole game... so we are loading them here
     public TextureRegion trBlock;
     public TextureRegion trGhostBlock;
@@ -146,12 +148,14 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         Preferences lbPrefs = app.getPreferences("lightblocks");
         localPrefs = new LocalPrefs(lbPrefs);
 
+        // bevor gpgs angemeldet wird (wegen Cloud save)
+        backendManager = new BackendManager(localPrefs);
+
         if (share == null)
             share = new ShareHandler();
 
         initGameAnalytics(lbPrefs);
 
-        // GPGS: Wenn beim letzten Mal angemeldet, dann wieder anmelden
         if (player == null) {
             player = new Player();
             player.setGamerId(modelNameRunningOn);
@@ -159,6 +163,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         savegame = new GameStateHandler(this, lbPrefs);
 
+        // GPGS: Wenn beim letzten Mal angemeldet, dann wieder anmelden
         if (gpgsClient != null) {
             gpgsClient.setListener(this);
             if (localPrefs.getGpgsAutoLogin())
