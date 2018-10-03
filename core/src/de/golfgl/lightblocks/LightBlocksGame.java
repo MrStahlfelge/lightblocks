@@ -54,7 +54,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String GAME_URL = "https://www.golfgl.de/lightblocks/";
     public static final String CONTROLLER_RECOMMENDATION_URL = "https://www.golfgl.de/lightblocks/#controller";
     // An den gleichen Eintrag im AndroidManifest denken!!!
-    public static final int GAME_VERSIONNUMBER = 1833;
+    public static final int GAME_VERSIONNUMBER = 1834;
     public static final String GAME_VERSIONSTRING = "1.2." + GAME_VERSIONNUMBER;
     // Abstand für Git
     // auch dran denken das data-Verzeichnis beim release wegzunehmen!
