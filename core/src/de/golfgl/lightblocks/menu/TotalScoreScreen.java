@@ -51,7 +51,7 @@ public class TotalScoreScreen extends AbstractMenuDialog {
         scoreTable.addScoresLine("labelMaxCombo", 0, total.getMaxComboCount());
         scoreTable.addScoresLine("labelMultiPlayerWon", 0, total.getMultiPlayerMatchesWon());
 
-        menuTable.add(scoreTable);
+        menuTable.add(scoreTable).fill().expandY();
     }
 
     @Override

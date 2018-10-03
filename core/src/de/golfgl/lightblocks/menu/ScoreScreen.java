@@ -189,7 +189,7 @@ public class ScoreScreen extends AbstractMenuScreen {
 
         // Die Reihe mit den Labels
         if (scoresToShowLabels.size > 1) {
-            scoreTable.add();
+            scoreTable.add().expandY();
 
             for (int i = 0; i < scoresToShowLabels.size; i++)
                 scoreTable.add(new ScaledLabel(scoresToShowLabels.get(i).toUpperCase(), app.skin, LightBlocksGame
@@ -227,7 +227,9 @@ public class ScoreScreen extends AbstractMenuScreen {
 
         scoreTable.addTimesLine("labelTime", times, BestScore.getTimeMsDigits(gameModelId));
 
-        menuTable.add(scoreTable);
+        scoreTable.validate();
+
+        menuTable.add(scoreTable).fill().minHeight(scoreTable.getMinHeight() * 1.4f);
     }
 
     protected void fillButtonTable(Table buttons) {

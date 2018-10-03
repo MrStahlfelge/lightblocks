@@ -22,7 +22,7 @@ public class ScoreTable extends Table {
         this.app = app;
 
         defaults().right();
-        defaults().space(15);
+        defaults().spaceLeft(15).spaceRight(15);
     }
 
     public static String formatTimeString(int time, int numOfMsDigits) {
@@ -59,7 +59,7 @@ public class ScoreTable extends Table {
 
         row();
         add(new ScaledLabel(app.TEXTS.get(label).toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE))
-                .left();
+                .left().expandY();
 
         for (int i = 0; i < score.size; i++) {
             ScoreLabel scoreLabel = new ScoreLabel(0, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
@@ -82,7 +82,7 @@ public class ScoreTable extends Table {
 
         row();
         add(new ScaledLabel(app.TEXTS.get(label).toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE))
-                .left();
+                .left().expandY();
 
         for (int i = 0; i < time.size; i++) {
             ScaledLabel timeLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
