@@ -13,6 +13,7 @@ public class PlayerDetails {
     public final long memberSince;
     public final long countTotalBlocks;
     public final int experience;
+    public final String publicContact;
 
     PlayerDetails(JsonValue fromJson) {
         uuid = fromJson.getString("id");
@@ -23,6 +24,7 @@ public class PlayerDetails {
         memberSince = fromJson.getLong("memberSince", 0);
         countTotalBlocks = fromJson.getLong("countTotalBlocks", 0);
         experience = fromJson.getInt("experience", 0);
+        publicContact = fromJson.getString("publicContact", null);
 
         // TODO Highscores
     }

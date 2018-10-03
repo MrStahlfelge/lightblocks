@@ -14,6 +14,7 @@ public class ScoreListEntry {
     public final String platform;
     public final String inputType;
     public final String params;
+    public final String decoration;
     public final int drawnBlocks;
     public final long scoreGainedTime;
 
@@ -27,6 +28,7 @@ public class ScoreListEntry {
         params = fromJson.getString("params", "");
         drawnBlocks = fromJson.getInt("drawnBlocks");
         scoreGainedTime = fromJson.getLong("scoreGainedTime");
+        decoration = fromJson.getString("decoration", null);
     }
 }
 

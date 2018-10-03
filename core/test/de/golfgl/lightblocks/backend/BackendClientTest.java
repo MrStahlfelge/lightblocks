@@ -279,6 +279,38 @@ public class BackendClientTest {
         waitWhileRequesting();
     }
 
+    @Test
+    public void testChangePlayerInfo() throws InterruptedException {
+        BackendClient backendClientPlayer = new BackendClient();
+        WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
+                = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
+        backendClientPlayer.createPlayer("player", createdResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(createdResponse.retrievedData);
+
+        WaitForResponseListener<Void> callback = new WaitForResponseListener<Void>();
+        backendClientPlayer.changePlayerDetails("newnick", "bs@golfgl.de", 1, null, null,
+                callback);
+        waitWhileRequesting();
+        Assert.assertTrue(callback.successful);
+
+        callback = new WaitForResponseListener<Void>();
+        backendClientPlayer.changePlayerDetails("1", null, 1, null, null,
+                callback);
+        waitWhileRequesting();
+        Assert.assertFalse(callback.successful);
+
+        callback = new WaitForResponseListener<Void>();
+        backendClientPlayer.changePlayerDetails(null, "bbs", 1, null, null,
+                callback);
+        waitWhileRequesting();
+        Assert.assertFalse(callback.successful);
+
+        backendClientPlayer.deletePlayer(new WaitForResponseListener<Void>());
+        waitWhileRequesting();
+
+    }
+
     @After
     public void waitWhileRequesting() throws InterruptedException {
         while (requesting) {
@@ -289,6 +321,7 @@ public class BackendClientTest {
     private class WaitForResponseListener<T> implements BackendClient.IBackendResponse<T> {
         T retrievedData;
         boolean successful;
+        int lastCode;
 
         WaitForResponseListener() {
             requesting = true;
@@ -298,6 +331,7 @@ public class BackendClientTest {
         public void onFail(int statusCode, String errorMsg) {
             requesting = false;
             successful = false;
+            lastCode = statusCode;
         }
 
         @Override
@@ -305,6 +339,7 @@ public class BackendClientTest {
             requesting = false;
             this.retrievedData = retrievedData;
             successful = true;
+            lastCode = 0;
         }
     }
 }
