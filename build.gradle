@@ -26,7 +26,7 @@ allprojects {
         gamsvcsVersion = '0.2.4-SNAPSHOT'
         cuversion = '0.1.2-SNAPSHOT'
         gaVersion = '0.1.2-SNAPSHOT'
-        gdxPayVersion = '0.11.3-SNAPSHOT'
+        gdxPayVersion = '0.11.4-SNAPSHOT'
     }
 
     repositories {

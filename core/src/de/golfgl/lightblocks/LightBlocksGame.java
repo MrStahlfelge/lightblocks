@@ -295,6 +295,10 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         mainMenuScreen.dispose();
         skin.dispose();
+
+        if (purchaseManager != null) {
+            purchaseManager.dispose();
+        }
     }
 
     @Override
