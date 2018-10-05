@@ -257,19 +257,15 @@ public class GameStateHandler {
                 String backendUserId = futureUse.getString(KEY_FU_BACKEND_USER, null);
                 String backendUserKey = futureUse.getString(KEY_FU_BACKEND_PASS, null);
 
-                if (backendUserId != null && backendUserKey != null && !backendUserId.equals(app.backendManager
-                        .getUserId())) {
-                    app.localPrefs.saveBackendUser(backendUserId, backendUserKey);
-                    app.backendManager.setUserId(backendUserId);
-                    app.backendManager.setUserPass(backendUserKey);
-                }
+                if (backendUserId != null && backendUserKey != null)
+                    app.backendManager.setCredentials(backendUserId, backendUserKey);
             } catch (Throwable t) {
                 // kein backendUser gefunden
             }
     }
 
     private void saveInformationToFutureCloudSave() {
-        if (app.backendManager.getUserId() != null)
+        if (app.backendManager.hasUserId())
             try {
 
                 // haben wir schon was drin? dann mal parsen
@@ -281,8 +277,10 @@ public class GameStateHandler {
                     futureUse = new JsonValue(JsonValue.ValueType.object);
                 }
 
-                saveStringToFutureUse(futureUse, KEY_FU_BACKEND_USER, app.backendManager.getUserId());
-                saveStringToFutureUse(futureUse, KEY_FU_BACKEND_PASS, app.backendManager.getUserPass());
+                saveStringToFutureUse(futureUse, KEY_FU_BACKEND_USER, app.backendManager.
+                        getBackendClient().getUserId());
+                saveStringToFutureUse(futureUse, KEY_FU_BACKEND_PASS, app.backendManager.
+                        getBackendClient().getUserPass());
 
                 futureUseFromCloudSaveGame = futureUse.toJson(JsonWriter.OutputType.minimal);
             } catch (Throwable t) {

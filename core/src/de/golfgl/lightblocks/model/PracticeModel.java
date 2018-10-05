@@ -1,5 +1,8 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
+
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -56,5 +59,12 @@ public class PracticeModel extends GameModel {
         super.setBestScore(bestScore);
         // bei Practice sind die meisten abgelegten Blöcke maßgeblich
         bestScore.setComparisonMethod(BestScore.ComparisonMethod.blocks);
+    }
+
+    @Override
+    public String getScoreboardParameters() {
+        JsonValue root = new JsonValue(JsonValue.ValueType.object);
+        root.addChild("startLevel", new JsonValue(getScore().getStartingLevel()));
+        return root.toJson(JsonWriter.OutputType.json);
     }
 }

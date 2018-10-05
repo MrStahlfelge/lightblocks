@@ -668,6 +668,9 @@ public abstract class GameModel implements Json.Serializable {
      */
     public abstract InitGameParameters getInitParameters();
 
+    public String getScoreboardParameters() {
+        return null;
+    }
     public void setUserInterface(IGameModelListener userInterface) {
         this.userInterface = userInterface;
 

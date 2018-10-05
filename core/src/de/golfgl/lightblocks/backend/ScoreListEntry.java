@@ -17,11 +17,16 @@ public class ScoreListEntry {
     public final String decoration;
     public final int drawnBlocks;
     public final long scoreGainedTime;
+    public final int score;
+    public final int lines;
+    public final int timePlayedMs;
+    public final int rank;
+    public final String gameMode;
 
     public ScoreListEntry(JsonValue fromJson) {
-        scoreValue = fromJson.getLong("scoreValue");
-        userId = fromJson.getString("userId");
-        nickName = fromJson.getString("nickName");
+        scoreValue = fromJson.getLong("sortValue");
+        userId = fromJson.getString("userId", "");
+        nickName = fromJson.getString("nickName", "");
         country = fromJson.getString("country", "");
         platform = fromJson.getString("platform", "");
         inputType = fromJson.getString("inputType", "");
@@ -29,6 +34,11 @@ public class ScoreListEntry {
         drawnBlocks = fromJson.getInt("drawnBlocks");
         scoreGainedTime = fromJson.getLong("scoreGainedTime");
         decoration = fromJson.getString("decoration", null);
+        score = fromJson.getInt("score");
+        lines = fromJson.getInt("lines");
+        timePlayedMs = fromJson.getInt("timePlayedMs");
+        this.rank = fromJson.getInt("rank");
+        gameMode = fromJson.getString("gameMode", null);
     }
 }
 

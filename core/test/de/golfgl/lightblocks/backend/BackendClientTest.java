@@ -130,23 +130,23 @@ public class BackendClientTest {
             int player2Mode2 = MathUtils.random(1, 200000);
 
             int blocksNowPlayer = MathUtils.random(20, 1000);
-            backendClientPlayer1.postScore(player1Mode1, KEY_GAMEMODE1, "android", 0, "params", "replay",
-                    blocksNowPlayer);
+            backendClientPlayer1.postScore(new BackendScore(player1Mode1, KEY_GAMEMODE1, "android", "", "params",
+                    "replay", blocksNowPlayer, 0, 0,0), null);
             blocksPlayer1 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
-            backendClientPlayer1.postScore(player1Mode2, "testmode2", "android", 0, "params", "replay",
-                    blocksNowPlayer);
+            backendClientPlayer1.postScore(new BackendScore(player1Mode2, "testmode2", "android", "", "params", "replay",
+                    blocksNowPlayer, 0, 0, 0), null);
             blocksPlayer1 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
-            backendClientPlayer2.postScore(player2Mode1, KEY_GAMEMODE1, "android", 0, "params", "replay",
-                    blocksNowPlayer);
+            backendClientPlayer2.postScore(new BackendScore(player2Mode1, KEY_GAMEMODE1, "android", "", "params",
+                    "replay", blocksNowPlayer, 0, 0, 0), null);
             blocksPlayer2 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
-            backendClientPlayer2.postScore(player2Mode2, "testmode2", "android", 0, "params", "replay",
-                    blocksNowPlayer);
+            backendClientPlayer2.postScore(new BackendScore(player2Mode2, "testmode2", "android", "", "params", "replay",
+                    blocksNowPlayer, 0, 0, 0), null);
             blocksPlayer2 += blocksNowPlayer;
 
             mode1Player1Best = Math.max(mode1Player1Best, player1Mode1);

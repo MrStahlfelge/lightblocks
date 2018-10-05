@@ -2,6 +2,9 @@ package de.golfgl.lightblocks.backend;
 
 import com.badlogic.gdx.utils.JsonValue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Detailinformationen zu einem Spieler
  */
@@ -14,6 +17,7 @@ public class PlayerDetails {
     public final long countTotalBlocks;
     public final int experience;
     public final String publicContact;
+    public final List<ScoreListEntry> highscores;
 
     PlayerDetails(JsonValue fromJson) {
         uuid = fromJson.getString("id");
@@ -27,5 +31,6 @@ public class PlayerDetails {
         publicContact = fromJson.getString("publicContact", null);
 
         // TODO Highscores
+        highscores = new ArrayList<ScoreListEntry>();
     }
 }

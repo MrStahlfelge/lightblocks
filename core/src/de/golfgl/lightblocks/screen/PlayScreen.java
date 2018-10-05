@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.backend.BackendScore;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.menu.PauseDialog;
@@ -775,6 +776,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         saveGameState();
         app.savegame.gpgsSaveGameState(null);
         pauseButton.setVisible(false);
+
+        app.backendManager.enqueueAndSendScore(new BackendScore(gameModel.getScore(), gameModel.getIdentifier(),
+                app.backendManager.getPlatformString(), inputAdapter.getAnalyticsKey(),
+                gameModel.getScoreboardParameters(), null));
     }
 
     @Override
