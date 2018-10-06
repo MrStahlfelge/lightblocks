@@ -77,7 +77,7 @@ public class BackendManager {
 
         CachedScoreboard scoreboard = (latest ? latestScores.get(gameMode) : bestScores.get(gameMode));
         if (scoreboard == null) {
-            scoreboard = new CachedScoreboard(gameMode, false);
+            scoreboard = new CachedScoreboard(gameMode, latest);
             if (latest)
                 latestScores.put(gameMode, scoreboard);
             else
@@ -205,6 +205,10 @@ public class BackendManager {
         public CachedScoreboard(String gameMode, boolean isLatest) {
             this.gameMode = gameMode;
             this.isLatest = isLatest;
+        }
+
+        public String getGameMode() {
+            return gameMode;
         }
 
         /**

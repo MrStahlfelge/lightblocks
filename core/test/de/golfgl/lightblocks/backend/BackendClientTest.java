@@ -21,7 +21,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
  * Created by Benjamin Schulte on 12.09.2018.
  */
 public class BackendClientTest {
-    private static final String KEY_GAMEMODE1 = "testmode1";
+    private static final String KEY_GAMEMODE1 = "practice";
     boolean requesting = false;
 
     @BeforeClass
@@ -131,22 +131,22 @@ public class BackendClientTest {
 
             int blocksNowPlayer = MathUtils.random(20, 1000);
             backendClientPlayer1.postScore(new BackendScore(player1Mode1, KEY_GAMEMODE1, "android", "", "params",
-                    "replay", blocksNowPlayer, 0, 0,0), null);
+                    "replay", blocksNowPlayer, 0, player1Mode1,0), null);
             blocksPlayer1 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
             backendClientPlayer1.postScore(new BackendScore(player1Mode2, "testmode2", "android", "", "params", "replay",
-                    blocksNowPlayer, 0, 0, 0), null);
+                    blocksNowPlayer, 0, player1Mode2, 0), null);
             blocksPlayer1 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
             backendClientPlayer2.postScore(new BackendScore(player2Mode1, KEY_GAMEMODE1, "android", "", "params",
-                    "replay", blocksNowPlayer, 0, 0, 0), null);
+                    "replay", blocksNowPlayer, 0, player2Mode1, 0), null);
             blocksPlayer2 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
             backendClientPlayer2.postScore(new BackendScore(player2Mode2, "testmode2", "android", "", "params", "replay",
-                    blocksNowPlayer, 0, 0, 0), null);
+                    blocksNowPlayer, 0, player2Mode2, 0), null);
             blocksPlayer2 += blocksNowPlayer;
 
             mode1Player1Best = Math.max(mode1Player1Best, player1Mode1);
@@ -214,9 +214,9 @@ public class BackendClientTest {
         waitWhileRequesting();
         Assert.assertEquals(blocksPlayer2, playerDetailsResponse.retrievedData.countTotalBlocks);
 
-        backendClientPlayer1.deletePlayer(new WaitForResponseListener<Void>());
+        //backendClientPlayer1.deletePlayer(new WaitForResponseListener<Void>());
         waitWhileRequesting();
-        backendClientPlayer2.deletePlayer(new WaitForResponseListener<Void>());
+        //backendClientPlayer2.deletePlayer(new WaitForResponseListener<Void>());
         waitWhileRequesting();
     }
 

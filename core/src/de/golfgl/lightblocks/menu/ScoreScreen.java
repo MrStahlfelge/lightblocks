@@ -131,7 +131,7 @@ public class ScoreScreen extends AbstractMenuScreen {
             mainTable.add(labelLatest).minHeight(labelLatest.getPrefHeight() * 1.5f);
 
             mainTable.row().expandY();
-            mainTable.add(new BackendScoreTable(app, latestScores));
+            mainTable.add(new BackendScoreTable(app, latestScores)).width(LightBlocksGame.nativeGameWidth - 40).fill();
 
             if (retryOrNext != null)
                 buttons.add(retryOrNext);
