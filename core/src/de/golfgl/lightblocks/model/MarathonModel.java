@@ -14,12 +14,15 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class MarathonModel extends GameModel {
 
-    public static final String MODEL_MARATHON_ID = "marathon";
+    public static final String MODEL_MARATHON_PREFIX_ID = "marathon";
+    public static final String MODEL_MARATHON_TOUCH_ID = "marathon1";
+    public static final String MODEL_MARATHON_GRAVITY_ID = "marathon2";
+    public static final String MODEL_MARATHON_GAMEPAD_ID = "marathon3";
     private boolean gamepadMarathonAchievementPosted = false;
 
     @Override
     public String getIdentifier() {
-        return MODEL_MARATHON_ID + inputTypeKey;
+        return MODEL_MARATHON_PREFIX_ID + inputTypeKey;
     }
 
     @Override

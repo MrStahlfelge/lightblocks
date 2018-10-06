@@ -198,7 +198,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
 
         @Override
         public String getGameModelId() {
-            return MarathonModel.MODEL_MARATHON_ID + inputButtons.getSelectedInput();
+            return MarathonModel.MODEL_MARATHON_PREFIX_ID + inputButtons.getSelectedInput();
         }
 
         @Override

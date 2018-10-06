@@ -81,11 +81,11 @@ public class GpgsHelper {
         if (gameModelId == null)
             return null;
 
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "1"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_TOUCH_ID))
             return LEAD_MARATHON_GESTURES;
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "2"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GRAVITY_ID))
             return LEAD_MARATHON_GRAVITY;
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "3"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GAMEPAD_ID))
             return LEAD_MARATHON_GAMEPAD;
         if (gameModelId.equalsIgnoreCase(PracticeModel.MODEL_PRACTICE_ID))
             return LEAD_PRACTICE_MODE;
@@ -98,11 +98,11 @@ public class GpgsHelper {
     public static String getNewGameEventByModelId(String gameModelId) {
         String retVal;
 
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "1"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_TOUCH_ID))
             return EVENT_GESTURE_MARATHON_STARTED;
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "2"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GRAVITY_ID))
             return EVENT_GRAVITY_MARATHON_STARTED;
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "3"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GAMEPAD_ID))
             return EVENT_GAMEPAD_MARATHON_STARTED;
 
         if (gameModelId.equalsIgnoreCase(TutorialModel.MODEL_ID))

@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import java.util.HashMap;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import de.golfgl.lightblocks.model.MarathonModel;
@@ -21,6 +24,8 @@ public class BackendManager {
     private final Queue<BackendScore> enqueuedScores = new Queue<BackendScore>();
     private final String platformString;
     private final BackendClient backendClient;
+    private final HashMap<String, CachedScoreboard> latestScores = new HashMap<String, CachedScoreboard>();
+    private final HashMap<String, CachedScoreboard> bestScores = new HashMap<String, CachedScoreboard>();
     private boolean authenticated;
     private BackendScore currentlySendingScore;
 
@@ -62,6 +67,25 @@ public class BackendManager {
     }
 
     /**
+     * gibt ein CachedScoreboard zurück
+     * @return null gdw das Modell gar kein BackendScoreboard hat, sonst garantiert ungleich null
+     */
+    public CachedScoreboard getCachedScoreboard(String gameMode, boolean isLatest) {
+        if (!hasGamemodeScoreboard(gameMode))
+            return null;
+
+        CachedScoreboard scoreboard = (isLatest ? latestScores.get(gameMode) : bestScores.get(gameMode));
+        if (scoreboard == null) {
+            scoreboard = new CachedScoreboard(gameMode, false);
+            if (isLatest)
+                latestScores.put(gameMode, scoreboard);
+            else
+                bestScores.put(gameMode, scoreboard);
+        }
+        return scoreboard;
+    }
+
+    /**
      * reiht den übergebenen Score in die Absendequeue ein, sofern er für ein Absenden ans Backend in Frage kommt.
      * Prüfungen werden hier durchgeführt
      *
@@ -73,17 +97,19 @@ public class BackendManager {
 
         synchronized (enqueuedScores) {
             enqueuedScores.addLast(score);
+            getCachedScoreboard(score.gameMode, true).setExpired();
+            getCachedScoreboard(score.gameMode, false).setExpired();
             score.scoreGainedMillis = TimeUtils.millis();
         }
         sendEnqueuedScores();
     }
 
     public boolean hasGamemodeScoreboard(String gameModelId) {
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "1"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_TOUCH_ID))
             return true;
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "2"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GRAVITY_ID))
             return true;
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_ID + "3"))
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GAMEPAD_ID))
             return true;
         if (gameModelId.equalsIgnoreCase(PracticeModel.MODEL_PRACTICE_ID))
             return true;
@@ -133,9 +159,91 @@ public class BackendManager {
         }
     }
 
-    // TODO Fetch der Scores auch nur, wenn nicht gerade Score gesendet wird - sonst Anfrage zurückstellen
+    // TODO Fetch der Scores auch nur, wenn nicht gerade Score gesendet wird oder in Schlange steht (falls
+    // authentifiziert)
+    // - sonst Anfrage zurückstellen
 
     public String getPlatformString() {
         return platformString;
+    }
+
+    public class CachedScoreboard {
+        private static final int EXPIRATION_SECONDS_SUCCESS = 60 * 5;
+        private static final int EXPIRATION_SECONDS_NO_CONNECTION = 10;
+        private final String gameMode;
+        private final boolean isLatest;
+        public long expirationTimeMs;
+        public boolean isFetching;
+        public String lastErrorMsg;
+        private List<ScoreListEntry> scoreboard;
+
+        public CachedScoreboard(String gameMode, boolean isLatest) {
+            this.gameMode = gameMode;
+            this.isLatest = isLatest;
+        }
+
+        public List<ScoreListEntry> getScoreboard() {
+            if (isExpired())
+                return scoreboard;
+
+            return null;
+        }
+
+        protected boolean isExpired() {
+            return expirationTimeMs < TimeUtils.millis();
+        }
+
+        public void fetchIfExpired() {
+            if ((isExpired() || scoreboard == null) && !isFetching) {
+                isFetching = true;
+                lastErrorMsg = null;
+                BackendClient.IBackendResponse<List<ScoreListEntry>> callback = new BackendClient
+                        .IBackendResponse<List<ScoreListEntry>>() {
+                    @Override
+                    public void onFail(int statusCode, String errorMsg) {
+                        lastErrorMsg = (errorMsg != null ? errorMsg : "HTTP" + String.valueOf(statusCode));
+                        isFetching = false;
+                        scoreboard = null;
+                        expirationTimeMs = TimeUtils.millis() + (1000 *
+                                (statusCode != BackendClient.SC_NO_CONNECTION ? EXPIRATION_SECONDS_SUCCESS :
+                                        EXPIRATION_SECONDS_NO_CONNECTION));
+                    }
+
+                    @Override
+                    public void onSuccess(List<ScoreListEntry> retrievedData) {
+                        isFetching = false;
+                        scoreboard = retrievedData;
+                        expirationTimeMs = TimeUtils.millis() + (1000 * EXPIRATION_SECONDS_SUCCESS);
+
+                    }
+                };
+
+                if (isLatest)
+                    backendClient.fetchLatestScores(gameMode, callback);
+                else
+                    backendClient.fetchBestScores(gameMode, callback);
+            }
+        }
+
+        public void fetchForced() {
+            setExpired();
+            fetchIfExpired();
+        }
+
+        public void setExpired() {
+            expirationTimeMs = 0;
+        }
+
+        public boolean isFetching() {
+            return isFetching;
+        }
+
+        public String getLastErrorMsg() {
+            return lastErrorMsg;
+        }
+
+        public boolean hasError() {
+            return lastErrorMsg != null;
+        }
     }
 }
