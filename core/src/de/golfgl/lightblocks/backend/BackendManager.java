@@ -68,21 +68,45 @@ public class BackendManager {
 
     /**
      * gibt ein CachedScoreboard zurück
+     *
      * @return null gdw das Modell gar kein BackendScoreboard hat, sonst garantiert ungleich null
      */
-    public CachedScoreboard getCachedScoreboard(String gameMode, boolean isLatest) {
+    public CachedScoreboard getCachedScoreboard(String gameMode, boolean latest) {
         if (!hasGamemodeScoreboard(gameMode))
             return null;
 
-        CachedScoreboard scoreboard = (isLatest ? latestScores.get(gameMode) : bestScores.get(gameMode));
+        CachedScoreboard scoreboard = (latest ? latestScores.get(gameMode) : bestScores.get(gameMode));
         if (scoreboard == null) {
             scoreboard = new CachedScoreboard(gameMode, false);
-            if (isLatest)
+            if (latest)
                 latestScores.put(gameMode, scoreboard);
             else
                 bestScores.put(gameMode, scoreboard);
         }
         return scoreboard;
+    }
+
+    public boolean isSendingScore() {
+        synchronized (enqueuedScores) {
+            return currentlySendingScore != null;
+        }
+    }
+
+    /**
+     * @return true, wenn ein Score zum gameMode noch in der Queue steht oder gerade gesendet wird
+     */
+    public boolean hasScoreEnqueued(String gameMode) {
+        synchronized (enqueuedScores) {
+            if (currentlySendingScore != null && currentlySendingScore.gameMode.equals(gameMode))
+                return true;
+
+            for (BackendScore score : enqueuedScores) {
+                if (score.gameMode.equals(gameMode))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -97,8 +121,6 @@ public class BackendManager {
 
         synchronized (enqueuedScores) {
             enqueuedScores.addLast(score);
-            getCachedScoreboard(score.gameMode, true).setExpired();
-            getCachedScoreboard(score.gameMode, false).setExpired();
             score.scoreGainedMillis = TimeUtils.millis();
         }
         sendEnqueuedScores();
@@ -149,6 +171,9 @@ public class BackendManager {
                         Gdx.app.postRunnable(new Runnable() {
                             @Override
                             public void run() {
+                                // invalidate eines caches
+                                getCachedScoreboard(currentlySendingScore.gameMode, true).setExpired();
+                                getCachedScoreboard(currentlySendingScore.gameMode, false).setExpired();
                                 currentlySendingScore = null;
                                 sendEnqueuedScores();
                             }
@@ -182,8 +207,11 @@ public class BackendManager {
             this.isLatest = isLatest;
         }
 
+        /**
+         * @return das Scoreboard wenn vorhanden. Null wenn es expired ist, oder
+         */
         public List<ScoreListEntry> getScoreboard() {
-            if (isExpired())
+            if (!isExpired())
                 return scoreboard;
 
             return null;
@@ -193,8 +221,8 @@ public class BackendManager {
             return expirationTimeMs < TimeUtils.millis();
         }
 
-        public void fetchIfExpired() {
-            if ((isExpired() || scoreboard == null) && !isFetching) {
+        public boolean fetchIfExpired() {
+            if (isExpired() && !isFetching && !isSendingScore()) {
                 isFetching = true;
                 lastErrorMsg = null;
                 BackendClient.IBackendResponse<List<ScoreListEntry>> callback = new BackendClient
@@ -222,16 +250,21 @@ public class BackendManager {
                     backendClient.fetchLatestScores(gameMode, callback);
                 else
                     backendClient.fetchBestScores(gameMode, callback);
+
+                return true;
             }
+
+            return false;
         }
 
-        public void fetchForced() {
+        public boolean fetchForced() {
             setExpired();
-            fetchIfExpired();
+            return fetchIfExpired();
         }
 
         public void setExpired() {
             expirationTimeMs = 0;
+            scoreboard = null;
         }
 
         public boolean isFetching() {

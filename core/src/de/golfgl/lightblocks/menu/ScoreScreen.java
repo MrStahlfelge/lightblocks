@@ -1,22 +1,24 @@
 package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.Mission;
-import de.golfgl.lightblocks.model.PracticeModel;
-import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -42,11 +44,15 @@ public class ScoreScreen extends AbstractMenuScreen {
     private Array<String> scoresToShowLabels;
     private BestScore best;
     private String gameModelId;
+    private BackendManager.CachedScoreboard latestScores;
     private InitGameParameters newGameParams;
     private Button leaveButton;
     private Actor defaultActor;
 
     private boolean newHighscore;
+    private Label titleIcon;
+    private Cell<Label> titleIconCell;
+    private Cell<Table> scoreTableCell;
 
     public ScoreScreen(LightBlocksGame app) {
         super(app);
@@ -75,8 +81,7 @@ public class ScoreScreen extends AbstractMenuScreen {
 
     public void initializeUI() {
 
-        Table menuTable = new Table();
-        fillMenuTable(menuTable);
+        Table scoreTable = fillScoreTable();
 
         //Titel
         // Der Titel wird nach der Menütabelle gefüllt, eventuell wird dort etwas gesetzt (=> Scores)
@@ -94,27 +99,55 @@ public class ScoreScreen extends AbstractMenuScreen {
         stage.addFocusableActor(leaveButton);
         stage.setEscapeActor(leaveButton);
         defaultActor = leaveButton;
-        fillButtonTable(buttons);
 
         // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
         final Table mainTable = new Table();
         mainTable.setFillParent(true);
         mainTable.row().padTop(20);
-        mainTable.add(new Label(getTitleIcon(), app.skin, FontAwesome.SKIN_FONT_FA));
+        titleIcon = new Label(getTitleIcon(), app.skin, FontAwesome.SKIN_FONT_FA);
+        titleIconCell = mainTable.add(titleIcon);
         mainTable.row();
         mainTable.add(title);
-        mainTable.row().expandY().top();
-        if (subtitle != null)
-            mainTable.add(new ScaledLabel(subtitle, app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+
+        if (latestScores == null)
+            // Die oberste Zelle richtig ausfahren, damit die Scoretabelle ungefähr mittig herauskommt
+            mainTable.row().expandY().top();
+        else
+            mainTable.row().top();
+
+        if (subtitle != null) {
+            ScaledLabel subTitleLabel = new ScaledLabel(subtitle, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            mainTable.add(subTitleLabel).minHeight(subTitleLabel.getPrefHeight() * 1.5f);
+        }
+
         mainTable.row();
-        mainTable.add(menuTable).width(LightBlocksGame.nativeGameWidth).pad(20);
+        scoreTableCell = mainTable.add(scoreTable).width(LightBlocksGame.nativeGameWidth).pad(20);
         Button retryOrNext = addRetryOrNextButton();
-        if (retryOrNext != null) {
+
+        if (latestScores != null) {
+            mainTable.row().bottom();
+            ScaledLabel labelLatest = new ScaledLabel(app.TEXTS.get("labelLatestScoreboard"), app.skin,
+                    LightBlocksGame.SKIN_FONT_TITLE);
+            mainTable.add(labelLatest).minHeight(labelLatest.getPrefHeight() * 1.5f);
+
+            mainTable.row().expandY();
+            mainTable.add(new BackendScoreTable(app, latestScores));
+
+            if (retryOrNext != null)
+                buttons.add(retryOrNext);
+
+        } else {
+            scoreTableCell.height(scoreTable.getPrefHeight() * 1.25f);
             mainTable.row().expandY();
             mainTable.add(retryOrNext);
         }
+
         mainTable.row();
         mainTable.add(buttons).pad(20, 0, 20, 0).fillX();
+
+        fillButtonTable(buttons);
+
+        mainTable.validate();
 
         stage.addActor(mainTable);
     }
@@ -142,6 +175,7 @@ public class ScoreScreen extends AbstractMenuScreen {
 
     public void setGameModelId(String gameModelId) {
         this.gameModelId = gameModelId;
+        this.latestScores = app.backendManager.getCachedScoreboard(gameModelId, true);
     }
 
     protected String getSubtitle() {
@@ -161,25 +195,9 @@ public class ScoreScreen extends AbstractMenuScreen {
             return app.TEXTS.get("labelScores");
     }
 
-    protected String getShareText() {
-        IRoundScore firstScore = scoresToShow.get(0);
-        if (gameModelId.equals(PracticeModel.MODEL_PRACTICE_ID))
-            return null;
-        else if (gameModelId.equals(SprintModel.MODEL_SPRINT_ID)) {
-            if (firstScore.getClearedLines() < SprintModel.NUM_LINES_TO_CLEAR)
-                return null;
-            else
-                return app.TEXTS.format("shareSprintText", ScoreTable.formatTimeString(firstScore.getTimeMs(),
-                        BestScore.getTimeMsDigits(gameModelId)), LightBlocksGame.GAME_URL_SHORT, getSubtitle());
-        } else
-            return app.TEXTS.format((newHighscore ? "shareBestText" :
-                    "shareText"), firstScore.getScore(), LightBlocksGame.GAME_URL_SHORT, getSubtitle());
+    protected ScoreTable fillScoreTable() {
 
-    }
-
-    protected void fillMenuTable(Table menuTable) {
-
-        ScoreTable scoreTable = new ScoreTable(app) {
+        final ScoreTable scoreTable = new ScoreTable(app) {
             @Override
             protected boolean isBestScore(int i) {
                 return (scoresToShow.get(i) instanceof BestScore);
@@ -229,18 +247,10 @@ public class ScoreScreen extends AbstractMenuScreen {
 
         scoreTable.validate();
 
-        menuTable.add(scoreTable).fill().minHeight(scoreTable.getMinHeight() * 1.4f);
+        return scoreTable;
     }
 
     protected void fillButtonTable(Table buttons) {
-        // Share Button
-        String shareText = getShareText();
-        if (shareText != null) {
-            Button share = new ShareButton(app, shareText);
-            buttons.add(share);
-            stage.addFocusableActor(share);
-        }
-
         // Leader Board
         final String leaderboardId = GpgsHelper.getLeaderBoardIdByModelId(gameModelId);
         if (leaderboardId != null) {
@@ -266,7 +276,7 @@ public class ScoreScreen extends AbstractMenuScreen {
     }
 
     private Button addRetryOrNextButton() {
-        PlayButton retryOrNext = null;
+        Button retryOrNext = null;
         // Retry button
         if (newGameParams != null) {
             String retryOrNextIcon = FontAwesome.ROTATE_RIGHT;
@@ -286,9 +296,15 @@ public class ScoreScreen extends AbstractMenuScreen {
                 }
             }
 
-            retryOrNext = new PlayButton(app);
-            retryOrNext.setText(app.TEXTS.get(retryOrNextLabel));
-            retryOrNext.setFaText(retryOrNextIcon);
+            // Wenn es ein Scoreboard gibt, dann nur einen kleinen Button ohne Text
+            if (latestScores == null) {
+                PlayButton playButton = new PlayButton(app);
+                playButton.setText(app.TEXTS.get(retryOrNextLabel));
+                playButton.setFaText(retryOrNextIcon);
+                retryOrNext = playButton;
+            } else {
+                retryOrNext = new FaButton(retryOrNextIcon, app.skin);
+            }
             retryOrNext.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -380,5 +396,23 @@ public class ScoreScreen extends AbstractMenuScreen {
             showDialog(app.TEXTS.get("labelAskForRatingFire"));
         } else if (LightBlocksGame.gameStoreUrl != null)
             Gdx.net.openURI(LightBlocksGame.gameStoreUrl);
+    }
+
+    @Override
+    protected void onOrientationChanged() {
+        super.onOrientationChanged();
+
+        boolean saveScreenSpace = isLandscape() && latestScores != null;
+        titleIconCell.setActor(saveScreenSpace ? null : titleIcon);
+        scoreTableCell.pad(saveScreenSpace ? 0 : 20);
+
+        float scaleXY = saveScreenSpace ? .8f : 1;
+
+        Table scoreTable = scoreTableCell.getActor();
+        if (!MathUtils.isEqual(scoreTable.getScaleY(), scaleXY)) {
+            scoreTable.setOrigin(Align.center);
+            scoreTable.setScale(scaleXY);
+            scoreTable.setTransform(scaleXY != 1f);
+        }
     }
 }
