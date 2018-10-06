@@ -71,7 +71,7 @@ public class BackendScoreTable extends Table {
 
     @Override
     public void act(float delta) {
-        if (!isFilled) {
+        if (!isFilled && !app.backendManager.isSendingScore()) {
             List<ScoreListEntry> scoreboard = cachedScoreboard.getScoreboard();
 
             if (scoreboard != null) {
@@ -105,6 +105,8 @@ public class BackendScoreTable extends Table {
         //TODO wenn nicht angemeldet, dann Werbung für Anmeldung machen
 
         //TODO wenn Scores nicht submitted sind, Hinweis
+
+        //TODO sortierwert einfärben
 
         row();
         add();

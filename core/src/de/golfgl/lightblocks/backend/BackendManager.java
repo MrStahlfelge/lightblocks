@@ -93,20 +93,12 @@ public class BackendManager {
     }
 
     /**
-     * @return true, wenn ein Score zum gameMode noch in der Queue steht oder gerade gesendet wird
+     * @return true, wenn ein Score noch in der Queue steht oder gerade gesendet wird
      */
-    public boolean hasScoreEnqueued(String gameMode) {
+    public boolean hasScoreEnqueued() {
         synchronized (enqueuedScores) {
-            if (currentlySendingScore != null && currentlySendingScore.gameMode.equals(gameMode))
-                return true;
-
-            for (BackendScore score : enqueuedScores) {
-                if (score.gameMode.equals(gameMode))
-                    return true;
-            }
+            return  (currentlySendingScore != null || enqueuedScores.size > 0);
         }
-
-        return false;
     }
 
     /**
@@ -171,9 +163,7 @@ public class BackendManager {
                         Gdx.app.postRunnable(new Runnable() {
                             @Override
                             public void run() {
-                                // invalidate eines caches
-                                getCachedScoreboard(currentlySendingScore.gameMode, true).setExpired();
-                                getCachedScoreboard(currentlySendingScore.gameMode, false).setExpired();
+                                invalidateScoreboardCache(currentlySendingScore.gameMode);
                                 currentlySendingScore = null;
                                 sendEnqueuedScores();
                             }
@@ -182,6 +172,12 @@ public class BackendManager {
                 });
             }
         }
+    }
+
+    protected void invalidateScoreboardCache(String gameMode) {
+        // invalidate eines caches
+        getCachedScoreboard(gameMode, true).setExpired();
+        getCachedScoreboard(gameMode, false).setExpired();
     }
 
     // TODO Fetch der Scores auch nur, wenn nicht gerade Score gesendet wird oder in Schlange steht (falls
