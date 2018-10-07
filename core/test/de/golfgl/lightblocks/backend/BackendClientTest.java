@@ -22,6 +22,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
  */
 public class BackendClientTest {
     private static final String KEY_GAMEMODE1 = "practice";
+    private static final String KEY_GAMEMODE2 = "marathon3";
     boolean requesting = false;
 
     @BeforeClass
@@ -108,10 +109,10 @@ public class BackendClientTest {
 
         WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
                 = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
-        backendClientPlayer1.createPlayer("player1", createdResponse);
+        backendClientPlayer1.createPlayer("player1player1player1neu", createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData);
-        backendClientPlayer2.createPlayer("player2", createdResponse);
+        backendClientPlayer2.createPlayer("player2player1player1neu", "gpgs", createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData);
 
@@ -124,18 +125,19 @@ public class BackendClientTest {
 
         for (int i = 0; i < 1000; i++) {
             Thread.sleep(50);
-            int player1Mode1 = MathUtils.random(1, 200000);
-            int player1Mode2 = MathUtils.random(1, 200000);
-            int player2Mode1 = MathUtils.random(1, 200000);
-            int player2Mode2 = MathUtils.random(1, 200000);
+            int player1Mode1 = MathUtils.random(1, 9200000);
+            int player1Mode2 = MathUtils.random(1, 1200000);
+            int player2Mode1 = MathUtils.random(1, 1200000);
+            int player2Mode2 = MathUtils.random(1, 1200000);
 
             int blocksNowPlayer = MathUtils.random(20, 1000);
             backendClientPlayer1.postScore(new BackendScore(player1Mode1, KEY_GAMEMODE1, "android", "", "params",
-                    "replay", blocksNowPlayer, 0, player1Mode1,0), null);
+                    "replay", blocksNowPlayer, 0, player1Mode1, 0), null);
             blocksPlayer1 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
-            backendClientPlayer1.postScore(new BackendScore(player1Mode2, "testmode2", "android", "", "params", "replay",
+            backendClientPlayer1.postScore(new BackendScore(player1Mode2, KEY_GAMEMODE2, "android", "", "params",
+                    "replay",
                     blocksNowPlayer, 0, player1Mode2, 0), null);
             blocksPlayer1 += blocksNowPlayer;
 
@@ -145,7 +147,8 @@ public class BackendClientTest {
             blocksPlayer2 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
-            backendClientPlayer2.postScore(new BackendScore(player2Mode2, "testmode2", "android", "", "params", "replay",
+            backendClientPlayer2.postScore(new BackendScore(player2Mode2, KEY_GAMEMODE2, "android", "", "params",
+                    "replay",
                     blocksNowPlayer, 0, player2Mode2, 0), null);
             blocksPlayer2 += blocksNowPlayer;
 
@@ -214,9 +217,9 @@ public class BackendClientTest {
         waitWhileRequesting();
         Assert.assertEquals(blocksPlayer2, playerDetailsResponse.retrievedData.countTotalBlocks);
 
-        //backendClientPlayer1.deletePlayer(new WaitForResponseListener<Void>());
+        backendClientPlayer1.deletePlayer(new WaitForResponseListener<Void>());
         waitWhileRequesting();
-        //backendClientPlayer2.deletePlayer(new WaitForResponseListener<Void>());
+        backendClientPlayer2.deletePlayer(new WaitForResponseListener<Void>());
         waitWhileRequesting();
     }
 

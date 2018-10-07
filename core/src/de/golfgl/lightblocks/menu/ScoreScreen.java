@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.menu;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -19,6 +20,9 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.Mission;
+import de.golfgl.lightblocks.model.PracticeModel;
+import de.golfgl.lightblocks.model.SprintModel;
+import de.golfgl.lightblocks.scene2d.BetterScrollPane;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -102,44 +106,67 @@ public class ScoreScreen extends AbstractMenuScreen {
 
         // Create a mainTable that fills the screen. Everything else will go inside this mainTable.
         final Table mainTable = new Table();
+        final Table mainView = new Table();
         mainTable.setFillParent(true);
-        mainTable.row().padTop(20);
+        mainView.row().padTop(20);
         titleIcon = new Label(getTitleIcon(), app.skin, FontAwesome.SKIN_FONT_FA);
-        titleIconCell = mainTable.add(titleIcon);
-        mainTable.row();
-        mainTable.add(title);
+        titleIconCell = mainView.add(titleIcon);
+        mainView.row();
+        mainView.add(title);
 
         if (latestScores == null)
             // Die oberste Zelle richtig ausfahren, damit die Scoretabelle ungefähr mittig herauskommt
-            mainTable.row().expandY().top();
+            mainView.row().expandY().top();
         else
-            mainTable.row().top();
+            mainView.row().top();
 
         if (subtitle != null) {
             ScaledLabel subTitleLabel = new ScaledLabel(subtitle, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-            mainTable.add(subTitleLabel).minHeight(subTitleLabel.getPrefHeight() * 1.5f);
+            mainView.add(subTitleLabel).minHeight(subTitleLabel.getPrefHeight() * 1.5f);
         }
 
-        mainTable.row();
-        scoreTableCell = mainTable.add(scoreTable).width(LightBlocksGame.nativeGameWidth).pad(20);
+        mainView.row();
+        scoreTableCell = mainView.add(scoreTable).width(LightBlocksGame.nativeGameWidth).pad(20);
         Button retryOrNext = addRetryOrNextButton();
 
         if (latestScores != null) {
-            mainTable.row().bottom();
+            mainView.row().bottom();
             ScaledLabel labelLatest = new ScaledLabel(app.TEXTS.get("labelLatestScoreboard"), app.skin,
                     LightBlocksGame.SKIN_FONT_TITLE);
-            mainTable.add(labelLatest).minHeight(labelLatest.getPrefHeight() * 1.5f);
+            mainView.add(labelLatest).minHeight(labelLatest.getPrefHeight() * 1.5f);
 
-            mainTable.row().expandY();
-            mainTable.add(new BackendScoreTable(app, latestScores)).width(LightBlocksGame.nativeGameWidth - 40).fill();
+            mainView.row().expandY();
+            BackendScoreTable backendScoreTable = new BackendScoreTable(app, latestScores);
+            backendScoreTable.setMaxNicknameWidth(130);
 
-            if (retryOrNext != null)
+            if (gameModelId.equals(PracticeModel.MODEL_PRACTICE_ID)) {
+                backendScoreTable.setShowScore(false);
+                backendScoreTable.setShowTitle(true);
+                backendScoreTable.setShowBlocks(true);
+            } else if (gameModelId.equals(SprintModel.MODEL_SPRINT_ID)) {
+                backendScoreTable.setShowScore(false);
+                backendScoreTable.setShowTime(true);
+                backendScoreTable.setShowTitle(true);
+            }
+
+            mainView.add(backendScoreTable).width(LightBlocksGame.nativeGameWidth - 40).fill();
+
+            BetterScrollPane scrollPane = new BetterScrollPane(mainView, app.skin);
+            InputListener goDownListener = new AbstractMenuDialog.ScrollOnKeyDownListener(scrollPane);
+            scrollPane.setScrollingDisabled(true, false);
+            mainTable.add(scrollPane).expand().fill();
+            leaveButton.addListener(goDownListener);
+
+            if (retryOrNext != null) {
                 buttons.add(retryOrNext);
+                retryOrNext.addListener(goDownListener);
+            }
 
         } else {
             scoreTableCell.height(scoreTable.getPrefHeight() * 1.25f);
-            mainTable.row().expandY();
-            mainTable.add(retryOrNext);
+            mainView.row().expandY();
+            mainView.add(retryOrNext);
+            mainTable.add(mainView).expand().fill();
         }
 
         mainTable.row();

@@ -62,16 +62,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
             }
         }
 
-        scrollOnKeyDownListener = new InputListener() {
-            @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-                if (scrollPane != null && getStage() instanceof MyStage
-                        && ((MyStage) getStage()).isGoDownKeyCode(keycode)) {
-                    return scrollPane.onControllerScroll(ControllerMenuStage.MoveFocusDirection.south);
-                }
-                return false;
-            }
-        };
+        scrollOnKeyDownListener = new ScrollOnKeyDownListener(scrollPane);
 
         content.row();
 
@@ -230,5 +221,22 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
 
     public Button getLeaveButton() {
         return leaveButton;
+    }
+
+    public static class ScrollOnKeyDownListener extends InputListener {
+        private final ControllerScrollPane scrollPane;
+
+        public ScrollOnKeyDownListener(ControllerScrollPane scrollPane) {
+            this.scrollPane = scrollPane;
+        }
+
+        @Override
+        public boolean keyDown(InputEvent event, int keycode) {
+            if (scrollPane != null && scrollPane.getStage() != null && scrollPane.getStage() instanceof MyStage
+                    && ((MyStage) scrollPane.getStage()).isGoDownKeyCode(keycode)) {
+                return scrollPane.onControllerScroll(ControllerMenuStage.MoveFocusDirection.south);
+            }
+            return false;
+        }
     }
 }

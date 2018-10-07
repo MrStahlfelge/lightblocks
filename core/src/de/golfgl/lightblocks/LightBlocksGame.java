@@ -282,6 +282,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         if (gameAnalytics != null)
             gameAnalytics.startSession();
+
+        backendManager.sendEnqueuedScores();
     }
 
     @Override

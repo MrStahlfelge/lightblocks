@@ -9,6 +9,8 @@ import java.util.List;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
+import de.golfgl.lightblocks.scene2d.BackendUserButton;
+import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.state.BestScore;
@@ -18,16 +20,20 @@ import de.golfgl.lightblocks.state.BestScore;
  */
 
 public class BackendScoreTable extends Table {
+    private static final float FONT_SCALE = .5f;
     private final LightBlocksGame app;
     private final BackendManager.CachedScoreboard cachedScoreboard;
     private final List<String> shownParams = new ArrayList<String>();
     private boolean didFetchAttempt;
     private boolean isFilled;
+    private boolean showTitle = false;
     private boolean showScore = true;
-    private boolean showLines = true;
+    private boolean showLines = false;
     private boolean showTime = false;
-    private boolean showBlocks = true;
+    private boolean showBlocks = false;
     private boolean showTimePassed = true;
+    private boolean showDetailsButton = true;
+    private float maxNicknameWidth = 0;
 
     public BackendScoreTable(LightBlocksGame app, BackendManager.CachedScoreboard cachedScoreboard) {
         this.app = app;
@@ -36,20 +42,19 @@ public class BackendScoreTable extends Table {
         add(new ProgressDialog.WaitRotationImage(app));
     }
 
-    public static String formatTimePassedString(long scoreGainedTime) {
-        //TODO in Lokalisierung
+    public static String formatTimePassedString(LightBlocksGame app, long scoreGainedTime) {
         long hoursPassed = TimeUtils.timeSinceMillis(scoreGainedTime) / (1000 * 60 * 60);
 
         if (hoursPassed < 12) {
-            return "recently";
+            return app.TEXTS.get("timeRecently");
         }
 
         int daysPassed = (int) (hoursPassed / 24);
 
         if (daysPassed <= 1)
-            return "a day ago";
+            return app.TEXTS.get("time1Day");
         else if (daysPassed < 7) {
-            return daysPassed + " days ago";
+            return app.TEXTS.format("timeXDays", daysPassed);
         }
 
         int weeksPassed = daysPassed / 7;
@@ -57,15 +62,15 @@ public class BackendScoreTable extends Table {
 
         if (yearsPassed <= 0) {
             if (weeksPassed <= 1)
-                return "a week ago";
+                return app.TEXTS.get("time1Week");
             else
-                return weeksPassed + " weeks ago";
+                return app.TEXTS.format("timeXWeeks", weeksPassed);
         }
 
         if (yearsPassed <= 1)
-            return "a year ago";
+            return app.TEXTS.get("time1Year");
         else
-            return yearsPassed + " years ago";
+            return app.TEXTS.format("timeXYears", yearsPassed);
 
     }
 
@@ -98,48 +103,69 @@ public class BackendScoreTable extends Table {
     private void fillTable(List<ScoreListEntry> scoreboard) {
         clear();
 
-        defaults().right().pad(2, 8, 2, 8);
+        defaults().right().pad(2, 5, 2, 5);
 
+        String buttonDetailsLabel = app.TEXTS.get("buttonDetails").toUpperCase();
         int timeMsDigits = BestScore.getTimeMsDigits(cachedScoreboard.getGameMode());
 
         //TODO wenn nicht angemeldet, dann Werbung für Anmeldung machen
 
         //TODO wenn Scores nicht submitted sind, Hinweis
 
-        //TODO sortierwert einfärben
-
-        row();
-        add();
-        add();
-        if (isShowScore())
-            add(new ScaledLabel(app.TEXTS.get("labelScore").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_REG));
-        if (isShowLines())
-            add(new ScaledLabel(app.TEXTS.get("labelLines").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_REG));
-        if (isShowBlocks())
-            add(new ScaledLabel(app.TEXTS.get("labelBlocks").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_REG));
-        if (isShowTime())
-            add(new ScaledLabel(app.TEXTS.get("labelTime").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_REG));
-        if (isShowTimePassed())
+        if (isShowTitle()) {
+            row();
             add();
+            add();
+            if (isShowScore())
+                add(new ScaledLabel(app.TEXTS.get("labelScore").toUpperCase(), app.skin, LightBlocksGame
+                        .SKIN_FONT_BIG));
+
+            if (isShowLines())
+                add(new ScaledLabel(app.TEXTS.get("labelLines").toUpperCase(), app.skin, LightBlocksGame
+                        .SKIN_FONT_BIG));
+            if (isShowBlocks())
+                add(new ScaledLabel(app.TEXTS.get("labelBlocksScore").toUpperCase(), app.skin, LightBlocksGame
+                        .SKIN_FONT_BIG));
+            if (isShowTime())
+                add(new ScaledLabel(app.TEXTS.get("labelTime").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_BIG));
+            if (isShowTimePassed())
+                add();
+            if (isShowDetailsButton())
+                add();
+        }
 
         for (ScoreListEntry score : scoreboard) {
             //TODO eigene Zeile einfärben
             row();
             add(new ScaledLabel("#" + score.rank, app.skin, LightBlocksGame.SKIN_FONT_REG)).right();
-            // TODO maximale breite, Button auf Spielerprofil
-            add(new ScaledLabel(score.nickName, app.skin, LightBlocksGame.SKIN_FONT_BIG)).left().expandX();
+            // TODO
+            BackendUserButton userButton = new BackendUserButton(score.nickName, score.userId, score.decoration, app,
+                    "default");
+            userButton.getLabel().setFontScale(FONT_SCALE);
+            userButton.setMaxLabelWidth(maxNicknameWidth);
+            add(userButton).left().expandX();
             if (isShowScore())
-                add(new ScaledLabel(String.valueOf(score.score), app.skin, LightBlocksGame.SKIN_FONT_REG));
+                add(new ScaledLabel(String.valueOf(score.score), app.skin, LightBlocksGame.SKIN_FONT_TITLE,
+                        FONT_SCALE));
             if (isShowLines())
-                add(new ScaledLabel(String.valueOf(score.lines), app.skin, LightBlocksGame.SKIN_FONT_REG));
+                add(new ScaledLabel(String.valueOf(score.lines), app.skin, LightBlocksGame.SKIN_FONT_TITLE,
+                        FONT_SCALE));
             if (isShowBlocks())
-                add(new ScaledLabel(String.valueOf(score.drawnBlocks), app.skin, LightBlocksGame.SKIN_FONT_REG));
+                add(new ScaledLabel(String.valueOf(score.drawnBlocks), app.skin, LightBlocksGame.SKIN_FONT_TITLE,
+                        FONT_SCALE));
             if (isShowTime())
                 add(new ScaledLabel(String.valueOf(ScoreTable.formatTimeString(score.timePlayedMs, timeMsDigits)),
-                        app.skin, LightBlocksGame.SKIN_FONT_REG));
+                        app.skin, LightBlocksGame.SKIN_FONT_TITLE, FONT_SCALE));
             if (isShowTimePassed()) {
-                add(new ScaledLabel(String.valueOf(formatTimePassedString(score.scoreGainedTime)),
+                add(new ScaledLabel(String.valueOf(formatTimePassedString(app, score.scoreGainedTime)),
                         app.skin, LightBlocksGame.SKIN_FONT_REG));
+            }
+
+            if (isShowDetailsButton()) {
+                FaTextButton detailsButton = new FaTextButton(buttonDetailsLabel, app.skin,
+                        LightBlocksGame.SKIN_FONT_BIG);
+                //TODO
+                add(detailsButton);
             }
         }
     }
@@ -186,5 +212,29 @@ public class BackendScoreTable extends Table {
 
     public void setShowTimePassed(boolean showTimePassed) {
         this.showTimePassed = showTimePassed;
+    }
+
+    public float getMaxNicknameWidth() {
+        return maxNicknameWidth;
+    }
+
+    public void setMaxNicknameWidth(float maxNicknameWidth) {
+        this.maxNicknameWidth = maxNicknameWidth;
+    }
+
+    public boolean isShowTitle() {
+        return showTitle;
+    }
+
+    public void setShowTitle(boolean showTitle) {
+        this.showTitle = showTitle;
+    }
+
+    public boolean isShowDetailsButton() {
+        return showDetailsButton;
+    }
+
+    public void setShowDetailsButton(boolean showDetailsButton) {
+        this.showDetailsButton = showDetailsButton;
     }
 }

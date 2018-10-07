@@ -134,6 +134,8 @@ public class BackendManager {
     }
 
     public void sendEnqueuedScores() {
+        //TODO nach allen erfolgreichen Netzwerkaktionen aufrufen (aber nur im Main thread)
+
         synchronized (enqueuedScores) {
             // ältere als 4 Stunden nicht absenden, sondern aussortieren
             while (enqueuedScores.size >= 1 && TimeUtils.timeSinceMillis(enqueuedScores.first()

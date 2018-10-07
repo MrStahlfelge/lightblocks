@@ -23,7 +23,7 @@ public class ScoreListEntry {
     public final int rank;
     public final String gameMode;
 
-    public ScoreListEntry(JsonValue fromJson) {
+    public ScoreListEntry(JsonValue fromJson, String gameMode) {
         scoreValue = fromJson.getLong("sortValue");
         userId = fromJson.getString("userId", "");
         nickName = fromJson.getString("nickName", "");
@@ -38,7 +38,7 @@ public class ScoreListEntry {
         lines = fromJson.getInt("lines");
         timePlayedMs = fromJson.getInt("timePlayedMs");
         this.rank = fromJson.getInt("rank");
-        gameMode = fromJson.getString("gameMode", null);
+        this.gameMode = fromJson.getString("gameMode", gameMode);
     }
 }
 
