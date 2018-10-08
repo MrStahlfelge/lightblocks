@@ -15,6 +15,8 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.menu.ScoreTable;
+import de.golfgl.lightblocks.model.PracticeModel;
+import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -39,13 +41,15 @@ public class BackendScoreTable extends Table {
     private boolean showBlocks = false;
     private boolean showTimePassed = true;
     private boolean showDetailsButton = true;
-    private float maxNicknameWidth = 0;
+    private float maxNicknameWidth = 130;
 
     public BackendScoreTable(LightBlocksGame app, BackendManager.CachedScoreboard cachedScoreboard) {
         this.app = app;
         this.cachedScoreboard = cachedScoreboard;
 
         add(new ProgressDialog.WaitRotationImage(app));
+
+        setDefaults();
     }
 
     public static String formatTimePassedString(LightBlocksGame app, long scoreGainedTime) {
@@ -78,6 +82,19 @@ public class BackendScoreTable extends Table {
         else
             return app.TEXTS.format("timeXYears", yearsPassed);
 
+    }
+
+    private void setDefaults() {
+        String gameModelId = cachedScoreboard.getGameMode();
+        if (gameModelId.equals(PracticeModel.MODEL_PRACTICE_ID)) {
+            setShowScore(false);
+            setShowTitle(true);
+            setShowBlocks(true);
+        } else if (gameModelId.equals(SprintModel.MODEL_SPRINT_ID)) {
+            setShowScore(false);
+            setShowTime(true);
+            setShowTitle(true);
+        }
     }
 
     @Override
@@ -138,7 +155,7 @@ public class BackendScoreTable extends Table {
         //TODO wenn Scores nicht submitted sind, Hinweis
 
         if (scoreboard.isEmpty())
-            add(new ScaledLabel("No scores yet", app.skin, LightBlocksGame.SKIN_FONT_BIG));
+            add(new ScaledLabel("No scores yet", app.skin, LightBlocksGame.SKIN_FONT_BIG)).center();
         else if (isShowTitle()) {
             row();
             add();

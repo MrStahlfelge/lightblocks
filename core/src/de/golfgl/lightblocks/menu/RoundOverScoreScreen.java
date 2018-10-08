@@ -21,8 +21,6 @@ import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.menu.backend.BackendScoreTable;
 import de.golfgl.lightblocks.model.Mission;
-import de.golfgl.lightblocks.model.PracticeModel;
-import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.scene2d.BetterScrollPane;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
@@ -138,18 +136,6 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
 
             mainView.row().expandY();
             BackendScoreTable backendScoreTable = new BackendScoreTable(app, latestScores);
-            backendScoreTable.setMaxNicknameWidth(130);
-
-            if (gameModelId.equals(PracticeModel.MODEL_PRACTICE_ID)) {
-                backendScoreTable.setShowScore(false);
-                backendScoreTable.setShowTitle(true);
-                backendScoreTable.setShowBlocks(true);
-            } else if (gameModelId.equals(SprintModel.MODEL_SPRINT_ID)) {
-                backendScoreTable.setShowScore(false);
-                backendScoreTable.setShowTime(true);
-                backendScoreTable.setShowTitle(true);
-            }
-
             mainView.add(backendScoreTable).width(LightBlocksGame.nativeGameWidth - 40).fillX().top();
 
             BetterScrollPane scrollPane = new BetterScrollPane(mainView, app.skin);

@@ -222,7 +222,7 @@ public class BackendManager {
             return null;
         }
 
-        protected boolean isExpired() {
+        public boolean isExpired() {
             return expirationTimeMs < TimeUtils.millis();
         }
 

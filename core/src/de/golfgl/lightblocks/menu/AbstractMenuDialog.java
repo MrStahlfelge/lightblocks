@@ -26,6 +26,7 @@ import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
+ * Menü"dialog" im Hauptmenü
  * Created by Benjamin Schulte on 20.01.2018.
  */
 
@@ -35,7 +36,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     private static final Interpolation INTERPOLATION = Interpolation.circle;
     private static final int SCROLLBAR_WIDTH = 30;
     protected final LightBlocksGame app;
-    protected final InputListener scrollOnKeyDownListener;
+    protected final ScrollOnKeyDownListener scrollOnKeyDownListener;
     protected Group actorToHide;
     private boolean wasCatchBackKey;
     private Button leaveButton;
@@ -77,6 +78,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
             scrollPane = new BetterScrollPane(content, getSkin());
             scrollPane.setFadeScrollBars(false);
             mainContentCell = getContentTable().add(scrollPane).padLeft(scollBarWidth);
+            scrollOnKeyDownListener.setScrollPane(scrollPane);
         }
         mainContentCell.width(actorToHide.getWidth() - scollBarWidth).expandY().fill();
 
@@ -227,7 +229,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     }
 
     public static class ScrollOnKeyDownListener extends InputListener {
-        private final ControllerScrollPane scrollPane;
+        private ControllerScrollPane scrollPane;
 
         public ScrollOnKeyDownListener(ControllerScrollPane scrollPane) {
             this.scrollPane = scrollPane;
@@ -240,6 +242,10 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
                 return scrollPane.onControllerScroll(ControllerMenuStage.MoveFocusDirection.south);
             }
             return false;
+        }
+
+        public void setScrollPane(ControllerScrollPane scrollPane) {
+            this.scrollPane = scrollPane;
         }
     }
 }

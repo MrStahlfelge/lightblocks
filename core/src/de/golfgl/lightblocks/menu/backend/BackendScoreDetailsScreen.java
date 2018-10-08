@@ -22,10 +22,6 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
         super(app);
         this.score = score;
 
-        getButtonTable().defaults().pad(20, 40, 20, 40);
-        closeButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
-        button(closeButton);
-
         // Fill Content
         Table contentTable = getContentTable();
         contentTable.row();
