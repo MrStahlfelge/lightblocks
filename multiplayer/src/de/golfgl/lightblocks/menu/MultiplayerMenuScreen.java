@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -61,7 +62,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
     private PagedScrollPane modePager;
     private PagedScrollPane.PageIndicator pageIndicator;
 
-    public MultiplayerMenuScreen(MultiplayerLightblocks app, Actor actorToHide) {
+    public MultiplayerMenuScreen(MultiplayerLightblocks app, Group actorToHide) {
         super(app, actorToHide);
     }
 

@@ -58,7 +58,7 @@ public class SettingsScreen extends AbstractMenuDialog {
     private GeneralSettings generalGroup;
     private TouchInputSettings gesturesGroup;
 
-    public SettingsScreen(final LightBlocksGame app, Actor toHide) {
+    public SettingsScreen(final LightBlocksGame app, Group toHide) {
         super(app, toHide);
 
         app.localPrefs.setScreenShownInThisVersion(LocalPrefs.KEY_SETTINGS_SCREEN);

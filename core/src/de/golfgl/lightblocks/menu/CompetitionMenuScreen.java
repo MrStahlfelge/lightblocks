@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -21,7 +22,7 @@ public class CompetitionMenuScreen extends AbstractMenuDialog {
 
     private Button websiteButton;
 
-    public CompetitionMenuScreen(LightBlocksGame app, Actor actorToHide) {
+    public CompetitionMenuScreen(LightBlocksGame app, Group actorToHide) {
         super(app, actorToHide);
     }
 

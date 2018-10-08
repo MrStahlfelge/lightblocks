@@ -3,9 +3,9 @@ package de.golfgl.lightblocks.menu.backend;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 
-import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
+import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -15,14 +15,11 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  * Created by Benjamin Schulte on 08.10.2018.
  */
 
-public class BackendScoreDetailsScreen extends ControllerMenuDialog {
-    final FaButton closeButton;
-    private final LightBlocksGame app;
+public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
     private final ScoreListEntry score;
 
     public BackendScoreDetailsScreen(final LightBlocksGame app, ScoreListEntry score) {
-        super("", app.skin, LightBlocksGame.SKIN_WINDOW_ALLBLACK);
-        this.app = app;
+        super(app);
         this.score = score;
 
         getButtonTable().defaults().pad(20, 40, 20, 40);
@@ -70,4 +67,6 @@ public class BackendScoreDetailsScreen extends ControllerMenuDialog {
 
         return scoreTable;
     }
+
+
 }

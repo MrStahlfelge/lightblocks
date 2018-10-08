@@ -72,7 +72,7 @@ public class BackendManager {
      * @return null gdw das Modell gar kein BackendScoreboard hat, sonst garantiert ungleich null
      */
     public CachedScoreboard getCachedScoreboard(String gameMode, boolean latest) {
-        if (!hasGamemodeScoreboard(gameMode))
+        if (!hasGameModeScoreboard(gameMode))
             return null;
 
         CachedScoreboard scoreboard = (latest ? latestScores.get(gameMode) : bestScores.get(gameMode));
@@ -108,7 +108,7 @@ public class BackendManager {
      * @param score
      */
     public void enqueueAndSendScore(BackendScore score) {
-        if (!hasGamemodeScoreboard(score.gameMode) || score.sortValue <= 0)
+        if (!hasGameModeScoreboard(score.gameMode) || score.sortValue <= 0)
             return;
 
         synchronized (enqueuedScores) {
@@ -118,7 +118,10 @@ public class BackendManager {
         sendEnqueuedScores();
     }
 
-    public boolean hasGamemodeScoreboard(String gameModelId) {
+    public boolean hasGameModeScoreboard(String gameModelId) {
+        if (gameModelId == null)
+            return false;
+
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_TOUCH_ID))
             return true;
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GRAVITY_ID))

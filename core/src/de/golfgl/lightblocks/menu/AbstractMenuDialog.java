@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -35,14 +36,14 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
     private static final int SCROLLBAR_WIDTH = 30;
     protected final LightBlocksGame app;
     protected final InputListener scrollOnKeyDownListener;
-    protected Actor actorToHide;
+    protected Group actorToHide;
     private boolean wasCatchBackKey;
     private Button leaveButton;
     private ControllerScrollPane scrollPane;
     private Cell mainContentCell;
     private boolean isShown;
 
-    public AbstractMenuDialog(LightBlocksGame app, Actor actorToHide) {
+    public AbstractMenuDialog(LightBlocksGame app, Group actorToHide) {
         super("", app.skin, LightBlocksGame.SKIN_WINDOW_FRAMELESS);
 
         this.app = app;
@@ -143,6 +144,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
                         }));
 
         // das muss vor dem show stattfinden, damit Doppelaufruf nicht möglich ist
+        actorToHide.setTransform(true);
         actorToHide.addAction(Actions.sequence(Actions.scaleTo(0, 1, TIME_SWOSHIN, INTERPOLATION),
                 Actions.hide()));
 
@@ -180,6 +182,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         if (app.localPrefs.isPlaySounds())
             app.swoshSound.play();
         hide(hideAction);
+        actorToHide.setTransform(true);
         actorToHide.setScale(0, 1);
         actorToHide.addAction(Actions.sequence(Actions.visible(true),
                 Actions.scaleTo(1, 1, TIME_SWOSHOUT, INTERPOLATION)));

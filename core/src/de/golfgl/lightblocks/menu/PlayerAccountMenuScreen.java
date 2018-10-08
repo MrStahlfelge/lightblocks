@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -30,7 +31,7 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
     private Button leaderboardButton;
     private Button achievementsButton;
 
-    public PlayerAccountMenuScreen(LightBlocksGame app, Actor actorToHide) {
+    public PlayerAccountMenuScreen(LightBlocksGame app, Group actorToHide) {
         super(app, actorToHide);
 
         refreshAccountChanged();

@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.multiplayer;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.minlog.Log;
 
@@ -26,7 +27,7 @@ public class MultiplayerLightblocks extends LightBlocksGame {
     }
 
     @Override
-    public AbstractMenuDialog getNewMultiplayerMenu(Actor actorToHide) {
+    public AbstractMenuDialog getNewMultiplayerMenu(Group actorToHide) {
         if (netUtils == null)
             netUtils = new NetUtils();
 

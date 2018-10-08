@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.menu;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -10,16 +11,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerScrollPane;
-import de.golfgl.gdxgamesvcs.GameServiceException;
-import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.menu.backend.GameModeScoreScreen;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.InfoButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
-import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
@@ -35,14 +33,8 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
     private PagedScrollPane modePager;
     private Button leaderboardButton;
 
-    public SinglePlayerScreen(final LightBlocksGame app, Actor actorToHide) {
+    public SinglePlayerScreen(final LightBlocksGame app, Group actorToHide) {
         super(app, actorToHide);
-    }
-
-    @Override
-    public void act(float delta) {
-        super.act(delta);
-        leaderboardButton.setDisabled(app.gpgsClient == null || !app.gpgsClient.isSessionActive());
     }
 
     @Override
@@ -55,12 +47,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         leaderboardButton = new FaButton(FontAwesome.GPGS_LEADERBOARD, app.skin);
         leaderboardButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
-                try {
-                    app.gpgsClient.showLeaderboards(GpgsHelper.getLeaderBoardIdByModelId(getGameModelId()));
-                } catch (GameServiceException e) {
-                    new VetoDialog("Error showing leaderboard.", app.skin, getStage().getWidth() * .8f)
-                            .show(getStage());
-                }
+                new GameModeScoreScreen(app, getGameModelId(), SinglePlayerScreen.this).show(getStage());
             }
         });
         addFocusableActor(leaderboardButton);
@@ -105,9 +92,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
     }
 
     protected void onGameModelIdChanged() {
-        leaderboardButton.setVisible(GpgsHelper.getLeaderBoardIdByModelId(getGameModelId()) != null
-                && app.gpgsClient != null &&
-                app.gpgsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.ShowLeaderboardUI));
+        leaderboardButton.setVisible(app.backendManager.hasGameModeScoreboard(getGameModelId()));
     }
 
     private String getGameModelId() {

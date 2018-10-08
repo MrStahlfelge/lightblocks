@@ -41,7 +41,7 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  * Created by Benjamin Schulte on 08.02.2017.
  */
 
-public class ScoreScreen extends AbstractMenuScreen {
+public class RoundOverScoreScreen extends AbstractMenuScreen {
 
     private static final int MAX_COUNTING_TIME = 2;
     private static final int TETRO_COUNT_RATINGREMINDER = 1000;
@@ -59,7 +59,7 @@ public class ScoreScreen extends AbstractMenuScreen {
     private Cell<Label> titleIconCell;
     private Cell<Table> scoreTableCell;
 
-    public ScoreScreen(LightBlocksGame app) {
+    public RoundOverScoreScreen(LightBlocksGame app) {
         super(app);
 
         scoresToShow = new Array<IRoundScore>();
@@ -338,7 +338,7 @@ public class ScoreScreen extends AbstractMenuScreen {
                 public void changed(ChangeEvent event, Actor actor) {
                     try {
                         PlayScreen ps = PlayScreen.gotoPlayScreen(app, newGameParams);
-                        ps.setBackScreen(ScoreScreen.this.backScreen);
+                        ps.setBackScreen(RoundOverScoreScreen.this.backScreen);
                         dispose();
                     } catch (VetoException e) {
                         showDialog(e.getMessage());

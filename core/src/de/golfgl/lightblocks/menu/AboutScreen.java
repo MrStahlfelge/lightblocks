@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -25,7 +26,7 @@ public class AboutScreen extends AbstractMenuDialog {
     private Cell widthDefiningCell;
     private Actor defaultActor;
 
-    public AboutScreen(LightBlocksGame app, Actor toHide) {
+    public AboutScreen(LightBlocksGame app, Group toHide) {
         super(app, toHide);
     }
 

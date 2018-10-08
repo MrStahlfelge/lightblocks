@@ -214,7 +214,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
                 String scoreLabelString;
                 if (rating >= 1) {
-                    scoreLabelString = ScoreScreen.getFARatingString(rating);
+                    scoreLabelString = RoundOverScoreScreen.getFARatingString(rating);
                 } else
                     scoreLabelString = "";
 

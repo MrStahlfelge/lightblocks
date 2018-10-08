@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.pay.PurchaseManager;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 
@@ -401,7 +402,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         return purchaseManager != null;
     }
 
-    public AbstractMenuDialog getNewMultiplayerMenu(Actor actorToHide) {
+    public AbstractMenuDialog getNewMultiplayerMenu(Group actorToHide) {
         return new CompetitionMenuScreen(this, actorToHide);
     }
 

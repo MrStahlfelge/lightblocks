@@ -33,7 +33,7 @@ import de.golfgl.lightblocks.backend.BackendScore;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.menu.PauseDialog;
-import de.golfgl.lightblocks.menu.ScoreScreen;
+import de.golfgl.lightblocks.menu.RoundOverScoreScreen;
 import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
@@ -528,7 +528,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     private void goToHighscores() {
 
-        ScoreScreen scoreScreen = new ScoreScreen(app);
+        RoundOverScoreScreen scoreScreen = new RoundOverScoreScreen(app);
         scoreScreen.setGameModelId(gameModel.getIdentifier());
         scoreScreen.addScoreToShow(gameModel.getScore(), app.TEXTS.get("labelRoundScore"));
         scoreScreen.setBest(gameModel.getBestScore());

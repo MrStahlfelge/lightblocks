@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -18,7 +19,7 @@ public class TotalScoreScreen extends AbstractMenuDialog {
     private static final int MAX_COUNTING_TIME = 1;
     private TotalScore total;
 
-    public TotalScoreScreen(LightBlocksGame app, Actor actorToHide) {
+    public TotalScoreScreen(LightBlocksGame app, Group actorToHide) {
         super(app, actorToHide);
     }
 
