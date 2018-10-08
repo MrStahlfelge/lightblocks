@@ -9,7 +9,7 @@ import java.util.List;
  * Detailinformationen zu einem Spieler
  */
 
-public class PlayerDetails {
+public class PlayerDetails implements IPlayerInfo {
     public final String uuid;
     public final String nickName;
     public final long lastActivity;
@@ -32,5 +32,21 @@ public class PlayerDetails {
 
         // TODO Highscores
         highscores = new ArrayList<ScoreListEntry>();
+    }
+
+    @Override
+    public String getUserId() {
+        return uuid;
+    }
+
+    @Override
+    public String getUserNickName() {
+        return nickName;
+    }
+
+    @Override
+    public String getUserDecoration() {
+        //TODO
+        return null;
     }
 }

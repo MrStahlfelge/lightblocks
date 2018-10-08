@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.backend;
 import de.golfgl.lightblocks.model.GameScore;
 
 /**
+ * Score zum Senden an das Backend
  * Created by Benjamin Schulte on 04.10.2018.
  */
 

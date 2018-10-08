@@ -3,10 +3,11 @@ package de.golfgl.lightblocks.backend;
 import com.badlogic.gdx.utils.JsonValue;
 
 /**
+ * Score der vom Backend kam
  * Created by Benjamin Schulte on 28.09.2018.
  */
 
-public class ScoreListEntry {
+public class ScoreListEntry implements IPlayerInfo {
     public final long scoreValue;
     public final String userId;
     public final String nickName;
@@ -22,8 +23,9 @@ public class ScoreListEntry {
     public final int timePlayedMs;
     public final int rank;
     public final String gameMode;
+    public final ScoreType scoreType;
 
-    public ScoreListEntry(JsonValue fromJson, String gameMode) {
+    public ScoreListEntry(JsonValue fromJson, String gameMode, ScoreType scoreType) {
         scoreValue = fromJson.getLong("sortValue");
         userId = fromJson.getString("userId", "");
         nickName = fromJson.getString("nickName", "");
@@ -39,6 +41,24 @@ public class ScoreListEntry {
         timePlayedMs = fromJson.getInt("timePlayedMs");
         this.rank = fromJson.getInt("rank");
         this.gameMode = fromJson.getString("gameMode", gameMode);
+        this.scoreType = scoreType;
     }
+
+    @Override
+    public String getUserId() {
+        return userId;
+    }
+
+    @Override
+    public String getUserNickName() {
+        return nickName;
+    }
+
+    @Override
+    public String getUserDecoration() {
+        return decoration;
+    }
+
+    public enum ScoreType {latest, best}
 }
 

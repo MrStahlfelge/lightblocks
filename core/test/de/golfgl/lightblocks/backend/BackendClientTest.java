@@ -127,7 +127,7 @@ public class BackendClientTest {
             Thread.sleep(50);
             int player1Mode1 = MathUtils.random(1, 9200000);
             int player1Mode2 = MathUtils.random(1, 1200000);
-            int player2Mode1 = MathUtils.random(1, 1200000);
+            int player2Mode1 = MathUtils.random(1, 9200000);
             int player2Mode2 = MathUtils.random(1, 1200000);
 
             int blocksNowPlayer = MathUtils.random(20, 1000);

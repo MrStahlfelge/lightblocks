@@ -1,15 +1,20 @@
-package de.golfgl.lightblocks.menu;
+package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
-import de.golfgl.lightblocks.scene2d.BackendUserButton;
+import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -24,6 +29,7 @@ public class BackendScoreTable extends Table {
     private final LightBlocksGame app;
     private final BackendManager.CachedScoreboard cachedScoreboard;
     private final List<String> shownParams = new ArrayList<String>();
+    private final Array<Actor> focusableActors = new Array<Actor>();
     private boolean didFetchAttempt;
     private boolean isFilled;
     private boolean showTitle = false;
@@ -100,10 +106,29 @@ public class BackendScoreTable extends Table {
         super.act(delta);
     }
 
+    @Override
+    public void clear() {
+        if (getStage() != null && getStage() instanceof ControllerMenuStage)
+            ((ControllerMenuStage) getStage()).removeFocusableActors(focusableActors);
+
+        if (focusableActors.size > 0)
+            focusableActors.clear();
+
+        super.clear();
+    }
+
+    @Override
+    protected void setStage(Stage stage) {
+        if (stage == null && getStage() != null && getStage() instanceof ControllerMenuStage)
+            ((ControllerMenuStage) getStage()).removeFocusableActors(focusableActors);
+
+        super.setStage(stage);
+    }
+
     private void fillTable(List<ScoreListEntry> scoreboard) {
         clear();
 
-        defaults().right().pad(2, 5, 2, 5);
+        defaults().right().pad(2, 5, 2, 5).expandX();
 
         String buttonDetailsLabel = app.TEXTS.get("buttonDetails").toUpperCase();
         int timeMsDigits = BestScore.getTimeMsDigits(cachedScoreboard.getGameMode());
@@ -112,7 +137,9 @@ public class BackendScoreTable extends Table {
 
         //TODO wenn Scores nicht submitted sind, Hinweis
 
-        if (isShowTitle()) {
+        if (scoreboard.isEmpty())
+            add(new ScaledLabel("No scores yet", app.skin, LightBlocksGame.SKIN_FONT_BIG));
+        else if (isShowTitle()) {
             row();
             add();
             add();
@@ -134,16 +161,15 @@ public class BackendScoreTable extends Table {
                 add();
         }
 
-        for (ScoreListEntry score : scoreboard) {
+        for (final ScoreListEntry score : scoreboard) {
             //TODO eigene Zeile einfärben
             row();
             add(new ScaledLabel("#" + score.rank, app.skin, LightBlocksGame.SKIN_FONT_REG)).right();
             // TODO
-            BackendUserButton userButton = new BackendUserButton(score.nickName, score.userId, score.decoration, app,
-                    "default");
+            BackendUserLabel userButton = new BackendUserLabel(score, app, "default");
             userButton.getLabel().setFontScale(FONT_SCALE);
-            userButton.setMaxLabelWidth(maxNicknameWidth);
-            add(userButton).left().expandX();
+            userButton.setToLabelMode().setMaxLabelWidth(maxNicknameWidth);
+            add(userButton).left();
             if (isShowScore())
                 add(new ScaledLabel(String.valueOf(score.score), app.skin, LightBlocksGame.SKIN_FONT_TITLE,
                         FONT_SCALE));
@@ -164,10 +190,20 @@ public class BackendScoreTable extends Table {
             if (isShowDetailsButton()) {
                 FaTextButton detailsButton = new FaTextButton(buttonDetailsLabel, app.skin,
                         LightBlocksGame.SKIN_FONT_BIG);
-                //TODO
+                detailsButton.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        new BackendScoreDetailsScreen(app, score).show(getStage());
+                    }
+                });
                 add(detailsButton);
+
+                focusableActors.add(detailsButton);
             }
         }
+
+        if (getStage() instanceof ControllerMenuStage)
+            ((ControllerMenuStage) getStage()).addFocusableActors(focusableActors);
     }
 
     public boolean isShowScore() {

@@ -1,21 +1,25 @@
-package de.golfgl.lightblocks.scene2d;
+package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.backend.IPlayerInfo;
+import de.golfgl.lightblocks.scene2d.FaTextButton;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
 
 /**
  * Created by Benjamin Schulte on 06.10.2018.
  */
 
-public class BackendUserButton extends FaTextButton {
+public class BackendUserLabel extends FaTextButton {
     private final String nickName;
     private final String gameService;
     private final String decoration;
     private final Cell<ScaledLabel> decorationCell;
 
-    public BackendUserButton(String nickName, String userId, String decoration, LightBlocksGame app, String styleName) {
+    public BackendUserLabel(String nickName, String userId, String decoration, LightBlocksGame app, String styleName) {
         super("", app.skin, styleName);
 
         int atSignIdx = nickName.indexOf('@');
@@ -28,6 +32,19 @@ public class BackendUserButton extends FaTextButton {
 
         ScaledLabel actor = new ScaledLabel("@", app.skin, LightBlocksGame.SKIN_FONT_REG);
         decorationCell = add(gameService != null ? actor : null).left().expandX();
+    }
+
+    public BackendUserLabel(IPlayerInfo playerInfo, LightBlocksGame app, String styleName) {
+        this(playerInfo.getUserNickName(), playerInfo.getUserId(), playerInfo.getUserDecoration(), app, styleName);
+    }
+
+    /**
+     * schaltet das Buttonverhalten ab
+     */
+    public BackendUserLabel setToLabelMode() {
+        setTouchable(Touchable.childrenOnly);
+        getListeners().clear();
+        return this;
     }
 
     public void setMaxLabelWidth(float maxWidth) {

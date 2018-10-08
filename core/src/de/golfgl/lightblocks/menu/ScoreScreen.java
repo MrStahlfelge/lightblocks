@@ -19,6 +19,7 @@ import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.menu.backend.BackendScoreTable;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.SprintModel;
@@ -149,7 +150,7 @@ public class ScoreScreen extends AbstractMenuScreen {
                 backendScoreTable.setShowTitle(true);
             }
 
-            mainView.add(backendScoreTable).width(LightBlocksGame.nativeGameWidth - 40).fill();
+            mainView.add(backendScoreTable).width(LightBlocksGame.nativeGameWidth - 40).fillX().top();
 
             BetterScrollPane scrollPane = new BetterScrollPane(mainView, app.skin);
             InputListener goDownListener = new AbstractMenuDialog.ScrollOnKeyDownListener(scrollPane);
