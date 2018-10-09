@@ -15,6 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
+import javax.annotation.Nullable;
+
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.gdx.controllers.ControllerScrollPane;
@@ -74,9 +76,10 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
         if (!isScrolling()) {
             mainContentCell = content.add(scrolled);
         } else {
-            content.add(scrolled);
+            content.add(scrolled).expandY().fill();
             scrollPane = new BetterScrollPane(content, getSkin());
             scrollPane.setFadeScrollBars(false);
+            scrollPane.setScrollingDisabled(true, false);
             mainContentCell = getContentTable().add(scrollPane).padLeft(scollBarWidth);
             scrollOnKeyDownListener.setScrollPane(scrollPane);
         }
@@ -226,6 +229,11 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
 
     public Button getLeaveButton() {
         return leaveButton;
+    }
+
+    @Nullable
+    protected ControllerScrollPane getScrollPane() {
+        return scrollPane;
     }
 
     public static class ScrollOnKeyDownListener extends InputListener {

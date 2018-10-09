@@ -67,6 +67,11 @@ public class ScoresGroup extends Group {
                 new ScaledLabel("X", app.skin, SCALING).getPrefHeight() * (showTime ? 5 : 4));
     }
 
+    public void layout() {
+        if (myScoresTable != null && !myScoresTable.hasActions())
+            myScoresTable.setPosition(getWidth() / 2, getHeight() / 2, Align.center);
+    }
+
     private class MyBestScoreTable extends Table {
         private final ScaledLabel scoreLabel;
         private final ScaledLabel linesLabel;

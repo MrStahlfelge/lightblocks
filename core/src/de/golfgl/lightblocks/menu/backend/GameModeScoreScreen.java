@@ -18,8 +18,6 @@ import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.menu.ScoresGroup;
 import de.golfgl.lightblocks.scene2d.FaButton;
-import de.golfgl.lightblocks.scene2d.FaTextButton;
-import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
@@ -34,6 +32,7 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
     private final String gameMode;
     private FaButton leaderboardButton;
     private Table menuTable;
+    private Cell<ScoresGroup> widthDefiningCell;
 
     public GameModeScoreScreen(final LightBlocksGame app, final String gameMode, Group actorToHide) {
         super(app, actorToHide);
@@ -48,7 +47,8 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
 
         menuTable.row();
         ScoresGroup ownScores = new ScoresGroup(app, true);
-        menuTable.add(ownScores).height(ownScores.getPrefHeight()).width(getAvailableContentWidth()).fill();
+        widthDefiningCell = menuTable.add(ownScores).height(ownScores.getPrefHeight()).width(getAvailableContentWidth
+                ()).fill();
 
         final BackendManager.CachedScoreboard latestScores = app.backendManager.getCachedScoreboard(gameMode, true);
         final BackendManager.CachedScoreboard bestScores = app.backendManager.getCachedScoreboard(gameMode, false);
@@ -63,22 +63,21 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
             menuTable.row();
             BackendScoreTable backendScoreTable = new BackendScoreTable(app, latestScores);
             backendScoreTable.setMaxNicknameWidth(130);
-            menuTable.add(backendScoreTable).fillX().top();
+            menuTable.add(backendScoreTable).fillX().expandY().top();
         }
 
         // Best
         if (bestScores != null) {
-            menuTable.row().padTop(20);;
+            menuTable.row().padTop(20);
             ScaledLabel labelBest = new ScaledLabel(app.TEXTS.get("labelBestScoreboard"), app.skin,
                     LightBlocksGame.SKIN_FONT_TITLE);
             menuTable.add(labelBest);
             menuTable.row();
             final BackendScoreTable backendScoreTable = new BackendScoreTable(app, bestScores);
             if (bestScores.isExpired()) {
-                //TODO i18n, default
-                TextButton showBest = new RoundedTextButton("LOAD", app.skin);
+                TextButton showBest = new RoundedTextButton(app.TEXTS.get("buttonLoad").toUpperCase(), app.skin);
                 addFocusableActor(showBest);
-                final Cell<TextButton> bestScoresCell = menuTable.add(showBest);
+                final Cell<TextButton> bestScoresCell = menuTable.add(showBest).expandY().top();
                 showBest.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
@@ -87,7 +86,7 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
                     }
                 });
             } else {
-                menuTable.add(backendScoreTable).fillX();
+                menuTable.add(backendScoreTable).expandY().fillX().top();
             }
         }
 
@@ -155,6 +154,16 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
             buttons.add(leaderboardButton);
             addFocusableActor(leaderboardButton);
         }
+    }
 
+    @Override
+    protected void sizeChanged() {
+        super.sizeChanged();
+        if (widthDefiningCell != null) {
+            widthDefiningCell.width(getAvailableContentWidth());
+            widthDefiningCell.getTable().invalidate();
+            widthDefiningCell.getTable().validate();
+            widthDefiningCell.getActor().layout();
+        }
     }
 }

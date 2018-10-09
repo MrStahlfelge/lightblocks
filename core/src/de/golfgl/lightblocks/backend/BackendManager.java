@@ -200,7 +200,8 @@ public class BackendManager {
         private final boolean isLatest;
         public long expirationTimeMs;
         public boolean isFetching;
-        public String lastErrorMsg;
+        private boolean lastErrorIsConnectionProblem;
+        private String lastErrorMsg;
         private List<ScoreListEntry> scoreboard;
 
         public CachedScoreboard(String gameMode, boolean isLatest) {
@@ -235,6 +236,7 @@ public class BackendManager {
                     @Override
                     public void onFail(int statusCode, String errorMsg) {
                         lastErrorMsg = (errorMsg != null ? errorMsg : "HTTP" + String.valueOf(statusCode));
+                        lastErrorIsConnectionProblem = statusCode == BackendClient.SC_NO_CONNECTION;
                         isFetching = false;
                         scoreboard = null;
                         expirationTimeMs = TimeUtils.millis() + (1000 *
@@ -282,6 +284,10 @@ public class BackendManager {
 
         public boolean hasError() {
             return lastErrorMsg != null;
+        }
+
+        public boolean isLastErrorConnectionProblem() {
+            return lastErrorIsConnectionProblem;
         }
     }
 }

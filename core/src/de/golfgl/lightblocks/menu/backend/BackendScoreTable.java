@@ -17,9 +17,11 @@ import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.SprintModel;
+import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.state.BestScore;
 
 /**
@@ -112,8 +114,25 @@ public class BackendScoreTable extends Table {
                 clear();
                 String errorMessage = "Could not fetch scores";
                 if (cachedScoreboard.hasError())
-                    errorMessage = errorMessage + "\n" + cachedScoreboard.getLastErrorMsg();
-                add(new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_BIG));
+                    errorMessage = errorMessage + "\n" + (cachedScoreboard.isLastErrorConnectionProblem() ?
+                            "No internet connection" : cachedScoreboard.getLastErrorMsg());
+
+                ScaledLabel errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f);
+
+                if (cachedScoreboard.isLastErrorConnectionProblem()) {
+                    FaButton retry = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
+                    add(retry).pad(10);
+                    focusableActors.add(retry);
+                    retry.addListener(new ChangeListener() {
+                        @Override
+                        public void changed(ChangeEvent event, Actor actor) {
+                            reload();
+                        }
+                    });
+                    addFocusableActorsToStage();
+                }
+
                 isFilled = true;
             }
 
@@ -121,6 +140,13 @@ public class BackendScoreTable extends Table {
         }
 
         super.act(delta);
+    }
+
+    protected void reload() {
+        clear();
+        add(new ProgressDialog.WaitRotationImage(app));
+        cachedScoreboard.fetchForced();
+        isFilled = false;
     }
 
     @Override
@@ -150,9 +176,9 @@ public class BackendScoreTable extends Table {
         String buttonDetailsLabel = app.TEXTS.get("buttonDetails").toUpperCase();
         int timeMsDigits = BestScore.getTimeMsDigits(cachedScoreboard.getGameMode());
 
-        //TODO wenn nicht angemeldet, dann Werbung für Anmeldung machen
+        //TODO -- wenn nicht angemeldet, dann Werbung für Anmeldung machen
 
-        //TODO wenn Scores nicht submitted sind, Hinweis
+        //TODO -- wenn Scores nicht submitted sind, Hinweis
 
         if (scoreboard.isEmpty())
             add(new ScaledLabel("No scores yet", app.skin, LightBlocksGame.SKIN_FONT_BIG)).center();
@@ -219,6 +245,10 @@ public class BackendScoreTable extends Table {
             }
         }
 
+        addFocusableActorsToStage();
+    }
+
+    private void addFocusableActorsToStage() {
         if (getStage() instanceof ControllerMenuStage)
             ((ControllerMenuStage) getStage()).addFocusableActors(focusableActors);
     }
