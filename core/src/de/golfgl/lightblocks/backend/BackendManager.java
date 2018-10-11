@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.SprintModel;
@@ -39,10 +40,13 @@ public class BackendManager {
 
         switch (Gdx.app.getType()) {
             case Android:
-                platformString = "android";
+                platformString = LightBlocksGame.isOnAndroidTV() ? "androidtv" : "android";
+                break;
+            case iOS:
+                platformString = "ios";
                 break;
             case WebGL:
-                platformString = "web";
+                platformString = LightBlocksGame.isWebAppOnMobileDevice() ? "html5-mobile" : "html5-desktop";
                 break;
             default:
                 platformString = "desktop";

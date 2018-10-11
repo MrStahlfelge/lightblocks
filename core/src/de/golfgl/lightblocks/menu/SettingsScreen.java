@@ -304,7 +304,7 @@ public class SettingsScreen extends AbstractMenuDialog {
 
             row();
             Table touchControlTypeTable = new Table();
-            ScaledLabel menuControlTypeLabel = new ScaledLabel(app.TEXTS.get("menuTouchControlType"), app.skin,
+            ScaledLabel menuControlTypeLabel = new ScaledLabel(app.TEXTS.get("menuTouchControlType") + ":", app.skin,
                     app.SKIN_FONT_TITLE);
             menuControlTypeLabel.addListener(new ClickListener() {
                 @Override
