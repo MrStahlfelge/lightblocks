@@ -34,6 +34,7 @@ public class BackendScoreTable extends Table {
     private final BackendManager.CachedScoreboard cachedScoreboard;
     private final List<String> shownParams = new ArrayList<String>();
     private final Array<Actor> focusableActors = new Array<Actor>();
+    private final ProgressDialog.WaitRotationImage waitRotationImage;
     private boolean didFetchAttempt;
     private boolean isFilled;
     private boolean showTitle = false;
@@ -49,7 +50,8 @@ public class BackendScoreTable extends Table {
         this.app = app;
         this.cachedScoreboard = cachedScoreboard;
 
-        add(new ProgressDialog.WaitRotationImage(app));
+        waitRotationImage = new ProgressDialog.WaitRotationImage(app);
+        add(waitRotationImage);
 
         setDefaults();
     }
@@ -112,10 +114,10 @@ public class BackendScoreTable extends Table {
             } else if (!cachedScoreboard.isFetching()) {
                 // Fehler vorhanden
                 clear();
-                String errorMessage = "Could not fetch scores";
+                String errorMessage = app.TEXTS.get("errorFetchingScores");
                 if (cachedScoreboard.hasError())
                     errorMessage = errorMessage + "\n" + (cachedScoreboard.isLastErrorConnectionProblem() ?
-                            "No internet connection" : cachedScoreboard.getLastErrorMsg());
+                            app.TEXTS.get("errorNoInternetConnection") : cachedScoreboard.getLastErrorMsg());
 
                 ScaledLabel errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_BIG);
                 add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f);
@@ -144,7 +146,7 @@ public class BackendScoreTable extends Table {
 
     protected void reload() {
         clear();
-        add(new ProgressDialog.WaitRotationImage(app));
+        add(waitRotationImage);
         cachedScoreboard.fetchForced();
         isFilled = false;
     }
@@ -176,9 +178,9 @@ public class BackendScoreTable extends Table {
         String buttonDetailsLabel = app.TEXTS.get("buttonDetails").toUpperCase();
         int timeMsDigits = BestScore.getTimeMsDigits(cachedScoreboard.getGameMode());
 
-        //TODO -- wenn nicht angemeldet, dann Werbung für Anmeldung machen
+        //TODO wenn nicht angemeldet, dann Werbung für Anmeldung machen
 
-        //TODO -- wenn Scores nicht submitted sind, Hinweis
+        //TODO wenn Scores nicht submitted sind, Hinweis
 
         if (scoreboard.isEmpty())
             add(new ScaledLabel("No scores yet", app.skin, LightBlocksGame.SKIN_FONT_BIG)).center();
@@ -239,7 +241,7 @@ public class BackendScoreTable extends Table {
                         new BackendScoreDetailsScreen(app, score).show(getStage());
                     }
                 });
-                add(detailsButton);
+                add(detailsButton).fill();
 
                 focusableActors.add(detailsButton);
             }
@@ -319,5 +321,10 @@ public class BackendScoreTable extends Table {
 
     public void setShowDetailsButton(boolean showDetailsButton) {
         this.showDetailsButton = showDetailsButton;
+    }
+
+    @Override
+    public float getMinHeight() {
+        return waitRotationImage.getHeight() * 1.25f;
     }
 }

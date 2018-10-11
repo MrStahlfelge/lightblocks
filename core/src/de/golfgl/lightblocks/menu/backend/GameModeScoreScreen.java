@@ -76,8 +76,11 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
             final BackendScoreTable backendScoreTable = new BackendScoreTable(app, bestScores);
             if (bestScores.isExpired()) {
                 TextButton showBest = new RoundedTextButton(app.TEXTS.get("buttonLoad").toUpperCase(), app.skin);
+                Table showBestTab = new Table();
+                showBestTab.add(showBest);
                 addFocusableActor(showBest);
-                final Cell<TextButton> bestScoresCell = menuTable.add(showBest).expandY().top();
+                final Cell bestScoresCell = menuTable.add(showBestTab).expandY().top()
+                        .minHeight(backendScoreTable.getMinHeight());
                 showBest.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {

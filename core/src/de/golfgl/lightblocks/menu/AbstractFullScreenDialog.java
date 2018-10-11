@@ -23,6 +23,8 @@ public class AbstractFullScreenDialog extends ControllerMenuDialog {
         closeButton = new FaButton(FontAwesome.MISC_CROSS, app.skin);
         button(closeButton);
 
+        getContentTable().padTop(20);
+
         setFillParent(true);
     }
 
