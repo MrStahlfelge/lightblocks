@@ -292,10 +292,21 @@ public class BackendClientTest {
         Assert.assertNotNull(createdResponse.retrievedData);
 
         WaitForResponseListener<Void> callback = new WaitForResponseListener<Void>();
-        backendClientPlayer.changePlayerDetails("newnick", "bs@golfgl.de", 1, null, null,
+        String newMailAddress = "bs@golfgl.de";
+        backendClientPlayer.changePlayerDetails("newnick", newMailAddress, 1, null, null,
                 callback);
         waitWhileRequesting();
         Assert.assertTrue(callback.successful);
+
+        WaitForResponseListener<PlayerDetails> playerDetails = new WaitForResponseListener<PlayerDetails>();
+        backendClientPlayer.fetchPlayerDetails(backendClientPlayer.getUserId(), playerDetails);
+        waitWhileRequesting();
+        Assert.assertEquals(newMailAddress, playerDetails.retrievedData.passwordEmail);
+
+        playerDetails = new WaitForResponseListener<PlayerDetails>();
+        new BackendClient().fetchPlayerDetails(backendClientPlayer.getUserId(), playerDetails);
+        waitWhileRequesting();
+        Assert.assertNull(playerDetails.retrievedData.passwordEmail);
 
         callback = new WaitForResponseListener<Void>();
         backendClientPlayer.changePlayerDetails("1", null, 1, null, null,
