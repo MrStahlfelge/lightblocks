@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.menu;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
+import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.screen.FontAwesome;
@@ -20,7 +21,7 @@ public class AbstractFullScreenDialog extends ControllerMenuDialog {
         this.app = app;
 
         getButtonTable().defaults().pad(20, 40, 20, 40);
-        closeButton = new FaButton(FontAwesome.MISC_CROSS, app.skin);
+        closeButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
         button(closeButton);
 
         getContentTable().padTop(20);
@@ -31,5 +32,9 @@ public class AbstractFullScreenDialog extends ControllerMenuDialog {
     @Override
     protected Actor getConfiguredEscapeActor() {
         return closeButton;
+    }
+
+    protected boolean hasScrollPane() {
+        return false;
     }
 }

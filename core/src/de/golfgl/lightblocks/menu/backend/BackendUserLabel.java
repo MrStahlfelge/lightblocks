@@ -1,7 +1,9 @@
 package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -19,7 +21,8 @@ public class BackendUserLabel extends FaTextButton {
     private final String decoration;
     private final Cell<ScaledLabel> decorationCell;
 
-    public BackendUserLabel(String nickName, String userId, String decoration, LightBlocksGame app, String styleName) {
+    public BackendUserLabel(String nickName, final String userId, String decoration, final LightBlocksGame app,
+                            String styleName) {
         super("", app.skin, styleName);
 
         int atSignIdx = nickName.indexOf('@');
@@ -32,6 +35,14 @@ public class BackendUserLabel extends FaTextButton {
 
         ScaledLabel actor = new ScaledLabel("@", app.skin, LightBlocksGame.SKIN_FONT_REG);
         decorationCell = add(gameService != null ? actor : null).left().expandX();
+
+        ChangeListener listener = new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                new BackendUserDetails(app, userId).show(getStage());
+            }
+        };
+        addListener(listener);
     }
 
     public BackendUserLabel(IPlayerInfo playerInfo, LightBlocksGame app, String styleName) {

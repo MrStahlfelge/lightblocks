@@ -2,14 +2,17 @@ package de.golfgl.lightblocks.menu.backend;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.backend.IPlayerInfo;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
 import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
  * Created by Benjamin Schulte on 08.10.2018.
@@ -19,11 +22,18 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
     private final ScoreListEntry score;
 
     public BackendScoreDetailsScreen(final LightBlocksGame app, ScoreListEntry score) {
+        this(app, score, null);
+    }
+
+    public BackendScoreDetailsScreen(final LightBlocksGame app, ScoreListEntry score, IPlayerInfo playerInfo) {
         super(app);
         this.score = score;
-//TODO!!!
+
         // Fill Content
         Table contentTable = getContentTable();
+
+        contentTable.row();
+        contentTable.add(new Label(FontAwesome.COMMENT_STAR_TROPHY, app.skin, FontAwesome.SKIN_FONT_FA));
 
         contentTable.row();
         String gameModeLabel;
@@ -35,7 +45,13 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
                 .SKIN_FONT_TITLE, .5f));
 
         contentTable.row();
-        contentTable.add(new BackendUserLabel(score, app, "default"));
+        BackendUserLabel userLabel = new BackendUserLabel(playerInfo != null ? playerInfo : score, app, "default");
+        contentTable.add(userLabel);
+        // Wenn man schon aus dem User kommt, nicht nochmal hin
+        if (playerInfo != null)
+            userLabel.setToLabelMode();
+        else
+            addFocusableActor(userLabel);
 
         contentTable.row();
         contentTable.add(new ScaledLabel(String.valueOf(BackendScoreTable.formatTimePassedString(app, score
@@ -48,16 +64,25 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
         contentTable.add(new ScoreDetailsTable());
     }
 
-    protected String getI18NIfExistant(String key, String prefix) {
+    protected static String findI18NIfExistant(I18NBundle texts, String key, String prefix) {
         String retVal;
         if (key == null)
             key = "";
         try {
-            retVal = app.TEXTS.get(prefix + key);
+            retVal = texts.get(prefix + key);
         } catch (Throwable t) {
             retVal = key;
         }
         return retVal;
+    }
+
+    protected String getI18NIfExistant(String key, String prefix) {
+        return findI18NIfExistant(app.TEXTS, key, prefix);
+    }
+
+    @Override
+    protected boolean hasScrollPane() {
+        return true;
     }
 
     private class ScoreDetailsTable extends Table {
@@ -100,7 +125,7 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
         private void addLine(String label, String value, String style, float padTop) {
             row().padTop(padTop);
             add(new ScaledLabel(app.TEXTS.get(label).toUpperCase(), app.skin, style)).left().padRight(30);
-            ScaledLabel scoreLabel = new ScaledLabel(String.valueOf(value), app.skin, style);
+            ScaledLabel scoreLabel = new ScaledLabel(value, app.skin, style);
             add(scoreLabel).right();
         }
     }

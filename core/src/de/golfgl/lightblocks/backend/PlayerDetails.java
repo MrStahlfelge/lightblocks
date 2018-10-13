@@ -34,6 +34,11 @@ public class PlayerDetails implements IPlayerInfo {
 
         // TODO Highscores
         highscores = new ArrayList<ScoreListEntry>();
+        JsonValue highscorejson = fromJson.get("highscores");
+        for (JsonValue score = highscorejson.child; score != null; score = score.next) {
+            highscores.add(new ScoreListEntry(score, null, ScoreListEntry.ScoreType.best));
+        }
+
     }
 
     @Override

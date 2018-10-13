@@ -25,7 +25,7 @@ public class ScoreListEntry implements IPlayerInfo {
     public final String gameMode;
     public final ScoreType scoreType;
 
-    public ScoreListEntry(JsonValue fromJson, String gameMode, ScoreType scoreType) {
+    public ScoreListEntry(JsonValue fromJson, String defaultGameMode, ScoreType scoreType) {
         scoreValue = fromJson.getLong("sortValue");
         userId = fromJson.getString("userId", "");
         nickName = fromJson.getString("nickName", "");
@@ -39,8 +39,8 @@ public class ScoreListEntry implements IPlayerInfo {
         score = fromJson.getInt("score");
         lines = fromJson.getInt("lines");
         timePlayedMs = fromJson.getInt("timePlayedMs");
-        this.rank = fromJson.getInt("rank");
-        this.gameMode = fromJson.getString("gameMode", gameMode);
+        this.rank = fromJson.getInt("rank", 0);
+        this.gameMode = fromJson.getString("gameMode", defaultGameMode);
         this.scoreType = scoreType;
     }
 
