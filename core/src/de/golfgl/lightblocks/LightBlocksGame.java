@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.pay.PurchaseManager;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
@@ -157,10 +156,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         initGameAnalytics(lbPrefs);
 
-        if (player == null) {
-            player = new Player();
-            player.setGamerId(modelNameRunningOn);
-        }
+        player = new MyOwnPlayer();
 
         savegame = new GameStateHandler(this, lbPrefs);
 
@@ -306,7 +302,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     @Override
     public void gsOnSessionActive() {
-        player.setGamerId(gpgsClient.getPlayerDisplayName());
         localPrefs.setGpgsAutoLogin(true);
         handleAccountChanged();
     }
@@ -334,7 +329,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     @Override
     public void gsOnSessionInactive() {
-        player.setGamerId(modelNameRunningOn);
         handleAccountChanged();
     }
 
@@ -424,5 +418,17 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public float getDisplayDensityRatio() {
         return 1f;
+    }
+
+    private class MyOwnPlayer extends Player {
+        @Override
+        public String getGamerId() {
+            if (backendManager.hasUserId() && localPrefs.getBackendNickname() != null)
+                return localPrefs.getBackendNickname();
+            else if (gpgsClient != null && gpgsClient.getPlayerDisplayName() != null)
+                return gpgsClient.getPlayerDisplayName();
+            else
+                return modelNameRunningOn;
+        }
     }
 }

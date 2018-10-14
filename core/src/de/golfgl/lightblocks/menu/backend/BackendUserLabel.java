@@ -39,7 +39,7 @@ public class BackendUserLabel extends FaTextButton {
         ChangeListener listener = new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                new BackendUserDetails(app, userId).show(getStage());
+                new BackendUserDetailsScreen(app, userId).show(getStage());
             }
         };
         addListener(listener);

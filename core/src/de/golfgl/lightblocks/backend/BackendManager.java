@@ -62,12 +62,14 @@ public class BackendManager {
         return backendClient.hasUserId();
     }
 
+    public String ownUserId() {
+        return backendClient.getUserId();
+    }
+
     public void setCredentials(String backendUserId, String backendUserKey) {
-        if (!backendClient.getUserId().equals(backendClient.getUserId())) {
-            prefs.saveBackendUser(backendUserId, backendUserKey);
-            backendClient.setUserId(backendUserId);
-            backendClient.setUserPass(backendUserKey);
-        }
+        prefs.saveBackendUser(backendUserId, backendUserKey);
+        backendClient.setUserId(backendUserId);
+        backendClient.setUserPass(backendUserKey);
     }
 
     /**
@@ -101,7 +103,7 @@ public class BackendManager {
      */
     public boolean hasScoreEnqueued() {
         synchronized (enqueuedScores) {
-            return  (currentlySendingScore != null || enqueuedScores.size > 0);
+            return (currentlySendingScore != null || enqueuedScores.size > 0);
         }
     }
 

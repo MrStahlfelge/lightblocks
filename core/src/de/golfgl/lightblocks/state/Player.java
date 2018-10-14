@@ -13,10 +13,10 @@ public class Player {
     private String gamerId;
 
     public String getName() {
-        if (gamerId == null || gamerId.isEmpty())
+        if (getGamerId() == null || getGamerId().isEmpty())
             return "John";
         else
-            return gamerId;
+            return getGamerId();
     }
 
     public String getGamerId() {

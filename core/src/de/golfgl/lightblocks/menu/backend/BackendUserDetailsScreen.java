@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -21,13 +22,13 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  * Created by Benjamin Schulte on 12.10.2018.
  */
 
-public class BackendUserDetails extends AbstractFullScreenDialog {
+public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
 
     private final ProgressDialog.WaitRotationImage waitRotationImage;
     private final Cell contentCell;
     private final String userId;
 
-    public BackendUserDetails(final LightBlocksGame app, String userId) {
+    public BackendUserDetailsScreen(final LightBlocksGame app, String userId) {
         super(app);
         this.userId = userId;
 
@@ -39,7 +40,7 @@ public class BackendUserDetails extends AbstractFullScreenDialog {
 
         contentTable.row();
         waitRotationImage = new ProgressDialog.WaitRotationImage(app);
-        contentCell = contentTable.add().expand();
+        contentCell = contentTable.add();
 
         reload();
     }
@@ -50,47 +51,85 @@ public class BackendUserDetails extends AbstractFullScreenDialog {
                 .IBackendResponse<PlayerDetails>() {
 
             @Override
-            public void onFail(int statusCode, String errorMsg) {
-                boolean isConnectionProblem = statusCode == BackendClient.SC_NO_CONNECTION;
-                String errorMessage = (isConnectionProblem ? app.TEXTS.get("errorNoInternetConnection") : errorMsg);
+            public void onFail(final int statusCode, final String errorMsg) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        boolean isConnectionProblem = statusCode == BackendClient.SC_NO_CONNECTION;
+                        String errorMessage = (isConnectionProblem ? app.TEXTS.get("errorNoInternetConnection") :
+                                errorMsg);
 
-                Table errorTable = new Table();
-                Label errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-                errorTable.add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f);
+                        Table errorTable = new Table();
+                        Label errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                        errorTable.add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f);
 
-                if (isConnectionProblem) {
-                    FaButton retry = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
-                    errorTable.add(retry).pad(10);
-                    addFocusableActor(retry);
-                    retry.addListener(new ChangeListener() {
-                        @Override
-                        public void changed(ChangeEvent event, Actor actor) {
-                            reload();
+                        if (isConnectionProblem) {
+                            FaButton retry = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
+                            errorTable.add(retry).pad(10);
+                            addFocusableActor(retry);
+                            retry.addListener(new ChangeListener() {
+                                @Override
+                                public void changed(ChangeEvent event, Actor actor) {
+                                    reload();
+                                }
+                            });
                         }
-                    });
-                }
 
-                contentCell.setActor(errorTable);
+                        contentCell.setActor(errorTable);
+                    }
+                });
             }
 
             @Override
-            public void onSuccess(PlayerDetails retrievedData) {
-                Table mainTable = new Table();
+            public void onSuccess(final PlayerDetails retrievedData) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        Table mainTable = new Table();
+                        mainTable.add(new BackendUserLabel(retrievedData, app, "default"));
 
-                mainTable.add(new BackendUserLabel(retrievedData, app, "default"));
-                //TODO (This is you), Button change Nickname, change decoration
+                        if (retrievedData.donator > 0) {
+                            mainTable.row().padTop(5).padBottom(5);
+                            mainTable.add(new ScaledLabel(getDonatorLabelString(retrievedData.donator), app.skin,
+                                    LightBlocksGame.SKIN_FONT_TITLE, .5f));
+                        }
 
-                mainTable.row();
-                mainTable.add(new PlayerDetailsTable(retrievedData)).expand();
-                mainTable.row().padTop(20);
-                mainTable.add(new ScaledLabel("Best scores", app.skin, LightBlocksGame.SKIN_FONT_TITLE));
-                mainTable.row();
-                mainTable.add(new HighscoresTable(retrievedData)).expand().top();
+                        if (app.backendManager.hasUserId() && app.backendManager.ownUserId().equals(retrievedData
+                                .getUserId())) {
+                            app.localPrefs.setBackendNickname(retrievedData.nickName);
 
-                // ScrollPane hier
-                contentCell.setActor(mainTable).fill();
+                            mainTable.row().padTop(5).padBottom(5);
+                            mainTable.add(new ScaledLabel(app.TEXTS.get("profileItIsYouLabel"), app.skin,
+                                    LightBlocksGame.SKIN_FONT_REG));
+                            //TODO Button change Nickname, change decoration, Delete Account
+                            // TODO möglichkeit wenn account nicht mehr gültig ist einzugreifen
+                        }
+
+                        mainTable.row().padTop(20);
+                        mainTable.add(new PlayerDetailsTable(retrievedData)).expand();
+                        mainTable.row().padTop(30);
+                        mainTable.add(new ScaledLabel("Best scores", app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+                        mainTable.row().padTop(10);
+                        mainTable.add(new HighscoresTable(retrievedData)).top().expand();
+
+                        // ScrollPane hier
+                        contentCell.setActor(mainTable).fill();
+                    }
+                });
             }
         });
+    }
+
+    private String getDonatorLabelString(int supportLevel) {
+
+        if (supportLevel >= 3)
+            return app.TEXTS.get("donationType_lightblocks.patron");
+        else if (supportLevel >= 2)
+            return app.TEXTS.get("donationType_lightblocks.sponsor");
+        else if (supportLevel >= 1)
+            return app.TEXTS.get("donationType_lightblocks.supporter");
+        else
+            return "";
     }
 
     @Override
@@ -106,6 +145,10 @@ public class BackendUserDetails extends AbstractFullScreenDialog {
             // TODO hier noch Hinweis das nur die serverseitigen gezählt sind
 
             // TODO Passwort E-Mail
+
+            if (details.country != null && !details.country.isEmpty())
+                addLine("profileCountryLabel", details.country,
+                        LightBlocksGame.SKIN_FONT_REG);
 
             if (details.memberSince > 0)
                 addLine("profileJoinedLabel", BackendScoreTable.formatTimePassedString(app, details.memberSince),
@@ -152,6 +195,11 @@ public class BackendUserDetails extends AbstractFullScreenDialog {
                 });
                 add(detailsButton);
                 addFocusableActor(detailsButton);
+            }
+
+            if (playerDetails.highscores.isEmpty()) {
+                add(new ScaledLabel(app.TEXTS.get("profileNoScores"), app.skin, LightBlocksGame.SKIN_FONT_BIG))
+                        .center();
             }
         }
     }

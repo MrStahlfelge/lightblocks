@@ -43,6 +43,7 @@ public class LocalPrefs {
     private static final String PREF_KEY_SHOW_TOUCH_HOLD = "showTouchHold";
     private static final String PREF_KEY_BACKEND_USERID = "backendUserId";
     private static final String PREF_KEY_BACKEND_PASS = "backendPassKey";
+    private static final String PREF_KEY_BACKEND_NICK = "backendNickname";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -61,6 +62,7 @@ public class LocalPrefs {
     private Long nextDonationReminder;
     private Boolean showGhostpiece;
     private Boolean showTouchHoldButton;
+    private String nickName;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -455,6 +457,22 @@ public class LocalPrefs {
         prefs.putString(PREF_KEY_BACKEND_USERID, userId);
         prefs.putString(PREF_KEY_BACKEND_PASS, passKey);
         prefs.flush();
+    }
+
+    public String getBackendNickname() {
+        if (nickName == null) {
+            nickName = prefs.getString(PREF_KEY_BACKEND_NICK, "");
+        }
+
+        return nickName == null || nickName.isEmpty() ? null : nickName;
+    }
+
+    public void setBackendNickname(String nickName) {
+        if (this.nickName == null || !this.nickName.equals(nickName)) {
+            prefs.putString(PREF_KEY_BACKEND_NICK, nickName);
+            this.nickName = nickName;
+            prefs.flush();
+        }
     }
 
     public static class TvRemoteKeyConfig {

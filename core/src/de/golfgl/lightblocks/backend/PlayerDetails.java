@@ -19,6 +19,8 @@ public class PlayerDetails implements IPlayerInfo {
     public final String publicContact;
     public final List<ScoreListEntry> highscores;
     public final String passwordEmail;
+    public final int donator;
+    public final String country;
 
     PlayerDetails(JsonValue fromJson) {
         uuid = fromJson.getString("id");
@@ -31,6 +33,9 @@ public class PlayerDetails implements IPlayerInfo {
         experience = fromJson.getInt("experience", 0);
         publicContact = fromJson.getString("publicContact", null);
         passwordEmail = fromJson.getString("passwordEmail", null);
+        donator = fromJson.getInt("donator", 0);
+        country = fromJson.getString("donator", null);
+
 
         // TODO Highscores
         highscores = new ArrayList<ScoreListEntry>();

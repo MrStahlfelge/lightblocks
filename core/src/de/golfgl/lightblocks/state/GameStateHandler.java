@@ -257,7 +257,7 @@ public class GameStateHandler {
                 String backendUserId = futureUse.getString(KEY_FU_BACKEND_USER, null);
                 String backendUserKey = futureUse.getString(KEY_FU_BACKEND_PASS, null);
 
-                if (backendUserId != null && backendUserKey != null)
+                if (backendUserId != null && backendUserKey != null && !app.backendManager.hasUserId())
                     app.backendManager.setCredentials(backendUserId, backendUserKey);
             } catch (Throwable t) {
                 // kein backendUser gefunden

@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
 
+import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 
 /**
@@ -29,6 +30,8 @@ public class ProgressDialog extends VetoDialog {
         if (!getOkButton().hasParent()) {
             okButtonCell.setActor(getOkButton());
             animatedPack();
+            if (getStage() != null && getStage() instanceof ControllerMenuStage)
+                ((ControllerMenuStage) getStage()).setFocusedActor(getOkButton());
         }
     }
 

@@ -183,7 +183,7 @@ public class BackendScoreTable extends Table {
         //TODO wenn Scores nicht submitted sind, Hinweis
 
         if (scoreboard.isEmpty())
-            add(new ScaledLabel("No scores yet", app.skin, LightBlocksGame.SKIN_FONT_BIG)).center();
+            add(new ScaledLabel(app.TEXTS.get("profileNoScores"), app.skin, LightBlocksGame.SKIN_FONT_BIG)).center();
         else if (isShowTitle()) {
             row();
             add();
