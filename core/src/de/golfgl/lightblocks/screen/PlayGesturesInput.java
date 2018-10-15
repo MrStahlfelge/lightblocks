@@ -28,6 +28,7 @@ import de.golfgl.lightblocks.scene2d.BlockActor;
  * Created by Benjamin Schulte on 25.01.2017.
  */
 public class PlayGesturesInput extends PlayScreenInput {
+    public static final String INPUT_KEY_GESTURES = "gestures";
     public static final int SWIPEUP_DONOTHING = 0;
     public static final int SWIPEUP_PAUSE = 1;
     public static final int SWIPEUP_HARDDROP = 2;
@@ -339,7 +340,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     @Override
     public String getAnalyticsKey() {
-        return "gestures";
+        return INPUT_KEY_GESTURES;
     }
 
     private class TouchpadChangeListener extends ChangeListener {

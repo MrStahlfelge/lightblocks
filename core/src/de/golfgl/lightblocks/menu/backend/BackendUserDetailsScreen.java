@@ -6,12 +6,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendClient;
 import de.golfgl.lightblocks.backend.PlayerDetails;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
+import de.golfgl.lightblocks.menu.ScoreTable;
+import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
@@ -86,7 +89,10 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                     @Override
                     public void run() {
                         Table mainTable = new Table();
-                        mainTable.add(new BackendUserLabel(retrievedData, app, "default"));
+                        BackendUserLabel userLabel = new BackendUserLabel(retrievedData, app, "default");
+                        userLabel.getLabel().setFontScale(1f);
+                        userLabel.setMaxLabelWidth(LightBlocksGame.nativeGameWidth - 50);
+                        mainTable.add(userLabel);
 
                         if (retrievedData.donator > 0) {
                             mainTable.row().padTop(5).padBottom(5);
@@ -113,7 +119,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                         mainTable.add(new HighscoresTable(retrievedData)).top().expand();
 
                         // ScrollPane hier
-                        contentCell.setActor(mainTable).fill();
+                        contentCell.setActor(mainTable).fill().maxWidth(LightBlocksGame.nativeGameWidth - 50);
                     }
                 });
             }
@@ -178,13 +184,18 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
     private class HighscoresTable extends Table {
         public HighscoresTable(final PlayerDetails playerDetails) {
             String buttonDetailsLabel = app.TEXTS.get("buttonDetails").toUpperCase();
-            defaults().pad(5);
+            defaults().pad(5, 10, 5, 10);
 
             for (final ScoreListEntry score : playerDetails.highscores) {
                 row();
                 add(new ScaledLabel(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS, score.gameMode,
                         "labelModel_").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_BIG)).left();
-                add(new ScaledLabel(String.valueOf(score.score), app.skin, LightBlocksGame.SKIN_FONT_BIG));
+                String scoreValue = SprintModel.MODEL_SPRINT_ID.equals(score.gameMode) ?
+                        ScoreTable.formatTimeString(score.timePlayedMs, 2) :
+                        String.valueOf(score.scoreValue);
+                ScaledLabel valueLabel = new ScaledLabel(scoreValue, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                valueLabel.setAlignment(Align.right);
+                add(valueLabel).minWidth(100).right();
                 FaTextButton detailsButton = new FaTextButton(buttonDetailsLabel, app.skin,
                         LightBlocksGame.SKIN_FONT_BIG);
                 detailsButton.addListener(new ChangeListener() {

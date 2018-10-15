@@ -21,6 +21,9 @@ import de.golfgl.lightblocks.state.LocalPrefs;
 
 public class BackendManager {
 
+    public static final String PLATFORM_TV = "smarttv";
+    public static final String PLATFORM_MOBILE = "mobile";
+    public static final String PLATFORM_DESKTOP = "desktop";
     private final LocalPrefs prefs;
     private final Queue<BackendScore> enqueuedScores = new Queue<BackendScore>();
     private final String platformString;
@@ -40,16 +43,16 @@ public class BackendManager {
 
         switch (Gdx.app.getType()) {
             case Android:
-                platformString = LightBlocksGame.isOnAndroidTV() ? "androidtv" : "android";
+                platformString = LightBlocksGame.isOnAndroidTV() ? PLATFORM_TV : PLATFORM_MOBILE;
                 break;
             case iOS:
-                platformString = "ios";
+                platformString = PLATFORM_MOBILE;
                 break;
             case WebGL:
-                platformString = LightBlocksGame.isWebAppOnMobileDevice() ? "html5-mobile" : "html5-desktop";
+                platformString = LightBlocksGame.isWebAppOnMobileDevice() ? PLATFORM_MOBILE : PLATFORM_DESKTOP;
                 break;
             default:
-                platformString = "desktop";
+                platformString = PLATFORM_DESKTOP;
         }
     }
 

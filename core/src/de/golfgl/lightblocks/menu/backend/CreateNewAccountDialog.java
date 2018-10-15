@@ -7,11 +7,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendClient;
+import de.golfgl.lightblocks.scene2d.EditableLabel;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
@@ -43,32 +45,20 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
         Table contentTable = getContentTable();
         contentTable.pad(10);
         contentTable.row();
-        contentTable.add(new ScaledLabel(app.TEXTS.get("createProfileNickNameLabel"), app.skin, LightBlocksGame
-                .SKIN_FONT_TITLE)).fill().width(LightBlocksGame.nativeGameWidth - 80);
+        final String createProfileNickNameLabel = app.TEXTS.get("createProfileNickNameLabel");
+        contentTable.add(new ScaledLabel(createProfileNickNameLabel, app.skin, LightBlocksGame
+                .SKIN_FONT_TITLE)).width(LightBlocksGame.nativeGameWidth - 80);
 
         nickNameLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         FaButton editNicknameButton = new FaButton(FontAwesome.SETTING_PENCIL, app.skin);
-        editNicknameButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.input.getTextInput(new Input.TextInputListener() {
-                    @Override
-                    public void input(String text) {
-                        setNewNickname(text);
-                        ((MyStage) getStage()).setFocusedActor(getConfiguredDefaultActor());
-                    }
-
-                    @Override
-                    public void canceled() {
-
-                    }
-                }, app.TEXTS.get("createProfileNickNameLabel"), nickNameLabel.getText().toString(), "");
-            }
-        });
         addFocusableActor(editNicknameButton);
-        Table nickNameEditTable = new Table();
-        nickNameEditTable.add(nickNameLabel).fill().expandX();
-        nickNameEditTable.add(editNicknameButton);
+        Table nickNameEditTable = new EditableLabel(nickNameLabel, editNicknameButton, createProfileNickNameLabel) {
+            @Override
+            protected void onNewTextSet(String newText) {
+                setNewNickname(newText);
+                ((MyStage) getStage()).setFocusedActor(getConfiguredDefaultActor());
+            }
+        };
 
         contentTable.row();
         contentTable.add(nickNameEditTable).fill();
@@ -76,6 +66,7 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
         ScaledLabel legalText = new ScaledLabel(app.TEXTS.get("createProfileLegalInfo"), app.skin, LightBlocksGame
                 .SKIN_FONT_REG);
         legalText.setWrap(true);
+        legalText.setAlignment(Align.center);
         contentTable.row().padTop(10);
         contentTable.add(legalText).fill();
 

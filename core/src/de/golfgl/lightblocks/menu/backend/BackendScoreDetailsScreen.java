@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.I18NBundle;
@@ -7,12 +8,15 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.backend.IPlayerInfo;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
 import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.PlayGesturesInput;
+import de.golfgl.lightblocks.screen.PlayKeyboardInput;
 
 /**
  * Created by Benjamin Schulte on 08.10.2018.
@@ -94,39 +98,81 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
             addLine("labelTime", ScoreTable.formatTimeString(score.timePlayedMs, 2),
                     LightBlocksGame.SKIN_FONT_TITLE);
 
-            addLine("platformLabel", getI18NIfExistant(score.platform, "labelPlatform_"), LightBlocksGame
-                    .SKIN_FONT_BIG, 20);
-            addLine("menuTouchControlType", getI18NIfExistant(score.inputType, "labelInputType_"), LightBlocksGame
-                    .SKIN_FONT_BIG, 5);
+            allPlatformLine();
+            addInputTypeLine();
 
             if (score.params != null && !score.params.isEmpty())
-                try {
-                    JsonValue params = new JsonReader().parse(score.params);
-                    JsonValue current = params.child;
-                    while (current != null) {
-                        try {
-                            addLine(getI18NIfExistant(current.name, "labelGameScoreParam_"), current.asString(),
-                                    LightBlocksGame.SKIN_FONT_BIG, 5);
+                addScoreParamsLines();
+        }
 
-                        } catch (Throwable t) {
+        protected void addScoreParamsLines() {
+            try {
+                JsonValue params = new JsonReader().parse(score.params);
+                JsonValue current = params.child;
+                while (current != null) {
+                    try {
+                        addRawLabelLine(getI18NIfExistant(current.name, "labelGameScoreParam_"), current.asString(),
+                                LightBlocksGame.SKIN_FONT_BIG, 5);
 
-                        }
-                        current = current.next;
+                    } catch (Throwable t) {
+
                     }
-                } catch (Throwable t) {
-
+                    current = current.next;
                 }
+            } catch (Throwable t) {
+
+            }
         }
 
-        private void addLine(String label, String value, String style) {
-            addLine(label, value, style, 0);
+        protected void addInputTypeLine() {
+            Cell inputTypeCell = addLine("menuTouchControlType", getI18NIfExistant(score.inputType, "labelInputType_"),
+                    LightBlocksGame.SKIN_FONT_BIG, 5);
+
+            String faInputLabel = "";
+            if (PlayKeyboardInput.INPUT_KEY_CONTROLLER.equalsIgnoreCase(score.inputType))
+                faInputLabel = FontAwesome.DEVICE_GAMEPAD;
+            else if (PlayKeyboardInput.INPUT_KEY_KEYBOARD.equalsIgnoreCase(score.inputType))
+                faInputLabel = FontAwesome.DEVICE_KEYBOARD;
+            else if (PlayGesturesInput.INPUT_KEY_GESTURES.equalsIgnoreCase(score.inputType))
+                faInputLabel = FontAwesome.DEVICE_GESTURE2;
+
+            if (!faInputLabel.isEmpty()) {
+                Label faLabel = new Label(faInputLabel, app.skin, FontAwesome.SKIN_FONT_FA);
+                faLabel.setFontScale(.5f);
+                inputTypeCell.setActor(faLabel);
+            }
         }
 
-        private void addLine(String label, String value, String style, float padTop) {
+        protected void allPlatformLine() {
+            Cell platformCell = addLine("platformLabel", getI18NIfExistant(score.platform, "labelPlatform_"), LightBlocksGame
+                    .SKIN_FONT_BIG, 20);
+
+            String faPlatformLabel = "";
+            if (BackendManager.PLATFORM_DESKTOP.equalsIgnoreCase(score.platform))
+                faPlatformLabel = FontAwesome.DEVICE_LAPTOP;
+            else if (BackendManager.PLATFORM_MOBILE.equalsIgnoreCase(score.platform))
+                faPlatformLabel = FontAwesome.DEVICE_MOBILEPHONE;
+
+            if (!faPlatformLabel.isEmpty()) {
+                Label faLabel = new Label(faPlatformLabel, app.skin, FontAwesome.SKIN_FONT_FA);
+                faLabel.setFontScale(.5f);
+                platformCell.setActor(faLabel);
+            }
+        }
+
+        private Cell addLine(String label, String value, String style) {
+            return addLine(label, value, style, 0);
+        }
+
+        private Cell addLine(String label, String value, String style, float padTop) {
+            return addRawLabelLine(app.TEXTS.get(label), value, style, padTop);
+        }
+
+        private Cell addRawLabelLine(String label, String value, String style, float padTop) {
             row().padTop(padTop);
-            add(new ScaledLabel(app.TEXTS.get(label).toUpperCase(), app.skin, style)).left().padRight(30);
+            add(new ScaledLabel(label.toUpperCase(), app.skin, style)).left().padRight(30);
             ScaledLabel scoreLabel = new ScaledLabel(value, app.skin, style);
-            add(scoreLabel).right();
+            return add(scoreLabel).right();
         }
     }
 }

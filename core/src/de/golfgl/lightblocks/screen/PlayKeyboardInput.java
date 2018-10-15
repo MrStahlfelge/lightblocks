@@ -16,6 +16,9 @@ import de.golfgl.lightblocks.state.LocalPrefs;
  */
 
 public class PlayKeyboardInput extends PlayScreenInput {
+    public static final String INPUT_KEY_TVREMOTE = "tvremote";
+    public static final String INPUT_KEY_KEYBOARD = "keyboard";
+    public static final String INPUT_KEY_CONTROLLER = "controller";
     protected GameBlocker.NoGamepadGameBlocker gamepadInputBlocker = new GameBlocker.NoGamepadGameBlocker();
     private boolean useTvRemoteControl;
     private LocalPrefs.TvRemoteKeyConfig tvRemoteKeyConfig;
@@ -219,6 +222,6 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public String getAnalyticsKey() {
-        return isOnTvRemote() ? "tvremote" : isOnKeyboard() ? "keyboard" : "controller";
+        return isOnTvRemote() ? INPUT_KEY_TVREMOTE : isOnKeyboard() ? INPUT_KEY_KEYBOARD : INPUT_KEY_CONTROLLER;
     }
 }
