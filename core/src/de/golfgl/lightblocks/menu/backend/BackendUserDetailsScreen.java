@@ -21,6 +21,7 @@ import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
@@ -246,13 +247,59 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
             profileItIsYouLabel.setFontScale(.65f);
             add(profileItIsYouLabel);
 
-            //TODO change decoration
+            //TODO change decoration, i18n
             FaTextButton changeNickname = new FaTextButton("Change nickname", app.skin, LightBlocksGame
                     .SKIN_BUTTON_CHECKBOX);
             changeNickname.getLabel().setFontScale(.55f);
+            changeNickname.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Gdx.input.getTextInput(new Input.TextInputListener() {
+                        @Override
+                        public void input(final String text) {
+                            if (playerDetails.passwordEmail == null || !playerDetails.passwordEmail.equals(text)) {
+                                app.backendManager.getBackendClient().changePlayerDetails(text, null,
+                                        app.localPrefs.getSupportLevel(), null, null,
+                                        new WaitForResponse() {
+                                            @Override
+                                            protected void onSuccess() {
+                                                reload();
+                                            }
+                                        });
+                            }
+                        }
+
+                        @Override
+                        public void canceled() {
+
+                        }
+                    }, "Change nickname", playerDetails.nickName, "");
+                }
+            });
+
             FaTextButton deleteAccount = new FaTextButton("Delete profile", app.skin, LightBlocksGame
                     .SKIN_BUTTON_CHECKBOX);
             deleteAccount.getLabel().setFontScale(.55f);
+            deleteAccount.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    ((AbstractScreen) app.getScreen()).showConfirmationDialog("Are you sure you want to erase your " +
+                                    "public profile and all its data?",
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    app.backendManager.getBackendClient().deletePlayer(new WaitForResponse() {
+                                        @Override
+                                        protected void onSuccess() {
+                                            BackendUserDetailsScreen.this.hide();
+                                            app.backendManager.setCredentials(null, null);
+                                        }
+                                    });
+                                }
+                            });
+                }
+            });
+
             FaTextButton emailaddress = new FaTextButton("Set recovery e-mail", app.skin, LightBlocksGame
                     .SKIN_BUTTON_CHECKBOX);
             myEmailAddress = playerDetails.passwordEmail != null ? playerDetails.passwordEmail : "";
@@ -263,32 +310,12 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                         @Override
                         public void input(final String text) {
                             if (playerDetails.passwordEmail == null || !playerDetails.passwordEmail.equals(text)) {
-                                final ProgressDialog progressDialog = new ProgressDialog(app.TEXTS.get
-                                        ("pleaseWaitLabel"), app, getWidth() * .8f);
-                                progressDialog.show(getStage());
                                 app.backendManager.getBackendClient().changePlayerDetails(null, text,
                                         app.localPrefs.getSupportLevel(), null, null,
-                                        new BackendClient.IBackendResponse<Void>() {
+                                        new WaitForResponse() {
                                             @Override
-                                            public void onFail(int statusCode, final String errorMsg) {
-                                                Gdx.app.postRunnable(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        progressDialog.getLabel().setText(errorMsg);
-                                                        progressDialog.showOkButton();
-                                                    }
-                                                });
-                                            }
-
-                                            @Override
-                                            public void onSuccess(Void retrievedData) {
-                                                Gdx.app.postRunnable(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        progressDialog.hide();
-                                                        myEmailAddress = text;
-                                                    }
-                                                });
+                                            protected void onSuccess() {
+                                                myEmailAddress = text;
                                             }
                                         });
                             }
@@ -307,7 +334,9 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
             optionsMenu.setBackground("window-bl");
             optionsMenu.pad(20);
 
-            row().defaults().pad(5, 10, 5, 10);
+            optionsMenu.defaults().pad(5, 10, 5, 10);
+
+            row();
             add(optionsMenu);
 
             optionsMenu.row();
@@ -328,6 +357,42 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
             profileThisIsPublic.setWrap(true);
             profileThisIsPublic.setAlignment(Align.center);
             add(profileThisIsPublic).fill();
+        }
+    }
+
+    private class WaitForResponse implements BackendClient.IBackendResponse<Void> {
+        private ProgressDialog progressDialog;
+
+        public WaitForResponse() {
+            progressDialog = new ProgressDialog(app.TEXTS.get
+                    ("pleaseWaitLabel"), app, LightBlocksGame.nativeGameWidth * .8f);
+            progressDialog.show(getStage());
+        }
+
+        @Override
+        public void onFail(int statusCode, final String errorMsg) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog.getLabel().setText(errorMsg);
+                    progressDialog.showOkButton();
+                }
+            });
+        }
+
+        @Override
+        public void onSuccess(Void retrievedData) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog.hide();
+                    onSuccess();
+                }
+            });
+        }
+
+        protected void onSuccess() {
+
         }
     }
 }

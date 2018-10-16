@@ -46,8 +46,10 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
         contentTable.pad(10);
         contentTable.row();
         final String createProfileNickNameLabel = app.TEXTS.get("createProfileNickNameLabel");
-        contentTable.add(new ScaledLabel(createProfileNickNameLabel, app.skin, LightBlocksGame
-                .SKIN_FONT_TITLE)).width(LightBlocksGame.nativeGameWidth - 80);
+        ScaledLabel createProfileTitleLabel = new ScaledLabel(createProfileNickNameLabel, app.skin, LightBlocksGame
+                .SKIN_FONT_TITLE);
+        createProfileTitleLabel.setAlignment(Align.center);
+        contentTable.add(createProfileTitleLabel).width(LightBlocksGame.nativeGameWidth - 80).fill();
 
         nickNameLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_EDIT_BIG);
         nickNameLabel.setEllipsis(true);
@@ -93,7 +95,7 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
 
     private void createProfile(String nickname) {
         createProfileButton.setDisabled(true);
-        final ProgressDialog progressDialog = new ProgressDialog("Please wait", app, getWidth() * .8f);
+        final ProgressDialog progressDialog = new ProgressDialog(app.TEXTS.get("pleaseWaitLabel"), app, getWidth() * .8f);
         progressDialog.show(getStage());
 
         app.backendManager.getBackendClient().createPlayer(nickname, new BackendClient.IBackendResponse<BackendClient
@@ -116,13 +118,7 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
                     @Override
                     public void run() {
                         progressDialog.hide(null);
-                        Stage stage = getStage();
                         hide();
-                        // Funktioniert leider nicht von selbst wegen des doppelten Dialogs
-                        if (stage instanceof ControllerMenuStage) {
-                            ((ControllerMenuStage) stage).setFocusedActor(previousFocusedActor);
-                            ((ControllerMenuStage) stage).setEscapeActor(previousEscapeActor);
-                        }
                         // muss nach dem Hide kommen, damit focus im TotalScoreScreen sauber übergeht
                         app.backendManager.setCredentials(retrievedData.userId, retrievedData.userKey);
                         app.localPrefs.setBackendNickname(retrievedData.nickName);
