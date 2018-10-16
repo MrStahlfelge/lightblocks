@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.menu.backend;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -44,7 +45,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
 
         contentTable.row();
         waitRotationImage = new ProgressDialog.WaitRotationImage(app);
-        contentCell = contentTable.add();
+        contentCell = contentTable.add().minHeight(waitRotationImage.getHeight() * 3);
 
         reload();
     }
@@ -59,41 +60,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        boolean isConnectionProblem = statusCode == BackendClient.SC_NO_CONNECTION;
-                        String errorMessage = (isConnectionProblem ? app.TEXTS.get("errorNoInternetConnection") :
-                                errorMsg);
-
-                        Table errorTable = new Table();
-                        Label errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-                        errorTable.add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f);
-
-                        if (isConnectionProblem) {
-                            FaButton retry = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
-                            errorTable.add(retry).pad(10);
-                            addFocusableActor(retry);
-                            retry.addListener(new ChangeListener() {
-                                @Override
-                                public void changed(ChangeEvent event, Actor actor) {
-                                    reload();
-                                }
-                            });
-                        } else if (statusCode == 404 && app.backendManager.hasUserId() &&
-                                userId.equalsIgnoreCase(app.backendManager.ownUserId())) {
-                            // der eigene Spieler wurde nicht gefunden => löschen anbieten damit man neu anlegen kann
-                            RoundedTextButton deleteUserEntry = new RoundedTextButton("Reset stored user id", app.skin);
-                            errorTable.row();
-                            errorTable.add(deleteUserEntry).pad(10);
-                            addFocusableActor(deleteUserEntry);
-                            deleteUserEntry.addListener(new ChangeListener() {
-                                @Override
-                                public void changed(ChangeEvent event, Actor actor) {
-                                    app.backendManager.setCredentials(null, null);
-                                    hide();
-                                }
-                            });
-                        }
-
-                        contentCell.setActor(errorTable);
+                        fillErrorScreen(statusCode, errorMsg);
                     }
                 });
             }
@@ -103,42 +70,81 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        Table mainTable = new Table();
-                        BackendUserLabel userLabel = new BackendUserLabel(retrievedData, app, "default");
-                        userLabel.getLabel().setFontScale(1f);
-                        userLabel.setMaxLabelWidth(LightBlocksGame.nativeGameWidth - 50);
-                        mainTable.add(userLabel);
-
-                        if (retrievedData.donator > 0) {
-                            mainTable.row().padTop(5).padBottom(5);
-                            mainTable.add(new ScaledLabel(getDonatorLabelString(retrievedData.donator), app.skin,
-                                    LightBlocksGame.SKIN_FONT_TITLE, .5f));
-                        }
-
-                        if (app.backendManager.hasUserId() && app.backendManager.ownUserId().equals(retrievedData
-                                .getUserId())) {
-                            app.localPrefs.setBackendNickname(retrievedData.nickName);
-
-                            mainTable.row().padTop(5).padBottom(5);
-                            mainTable.add(new ScaledLabel(app.TEXTS.get("profileItIsYouLabel"), app.skin,
-                                    LightBlocksGame.SKIN_FONT_REG));
-                            //TODO Button change Nickname, change decoration, Delete Account
-                            // TODO möglichkeit wenn account nicht mehr gültig ist einzugreifen
-                        }
-
-                        mainTable.row().padTop(20);
-                        mainTable.add(new PlayerDetailsTable(retrievedData)).expand();
-                        mainTable.row().padTop(30);
-                        mainTable.add(new ScaledLabel("Best scores", app.skin, LightBlocksGame.SKIN_FONT_TITLE));
-                        mainTable.row().padTop(10);
-                        mainTable.add(new HighscoresTable(retrievedData)).top().expand();
-
-                        // ScrollPane hier
-                        contentCell.setActor(mainTable).fill().maxWidth(LightBlocksGame.nativeGameWidth - 50);
+                        fillUserDetails(retrievedData);
                     }
                 });
             }
         });
+    }
+
+    protected void fillUserDetails(PlayerDetails retrievedData) {
+        Table mainTable = new Table();
+        BackendUserLabel userLabel = new BackendUserLabel(retrievedData, app, "default");
+        userLabel.getLabel().setFontScale(1f);
+        userLabel.setMaxLabelWidth(LightBlocksGame.nativeGameWidth - 50);
+        mainTable.add(userLabel);
+
+        if (retrievedData.donator > 0) {
+            mainTable.row().padTop(5).padBottom(5);
+            mainTable.add(new ScaledLabel(getDonatorLabelString(retrievedData.donator), app.skin,
+                    LightBlocksGame.SKIN_FONT_TITLE, .5f));
+        }
+
+        if (app.backendManager.hasUserId() && app.backendManager.ownUserId().equals(retrievedData
+                .getUserId())) {
+            app.localPrefs.setBackendNickname(retrievedData.nickName);
+
+            mainTable.row().padTop(5).padBottom(5);
+            mainTable.add(new OwnDetailsOptions(retrievedData));
+        }
+
+        mainTable.row().padTop(20);
+        mainTable.add(new PlayerDetailsTable(retrievedData)).expand();
+        mainTable.row().padTop(30);
+        mainTable.add(new ScaledLabel("Best scores", app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+        mainTable.row().padTop(10);
+        mainTable.add(new HighscoresTable(retrievedData)).top().expand();
+
+        // ScrollPane hier
+        contentCell.setActor(mainTable).fill().maxWidth(LightBlocksGame.nativeGameWidth - 50);
+    }
+
+    protected void fillErrorScreen(int statusCode, String errorMsg) {
+        boolean isConnectionProblem = statusCode == BackendClient.SC_NO_CONNECTION;
+        String errorMessage = (isConnectionProblem ? app.TEXTS.get("errorNoInternetConnection") :
+                errorMsg);
+
+        Table errorTable = new Table();
+        Label errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+        errorTable.add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f);
+
+        if (isConnectionProblem) {
+            FaButton retry = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
+            errorTable.add(retry).pad(10);
+            addFocusableActor(retry);
+            retry.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    reload();
+                }
+            });
+        } else if (statusCode == 404 && app.backendManager.hasUserId() &&
+                userId.equalsIgnoreCase(app.backendManager.ownUserId())) {
+            // der eigene Spieler wurde nicht gefunden => löschen anbieten damit man neu anlegen kann
+            RoundedTextButton deleteUserEntry = new RoundedTextButton("Reset stored user id", app.skin);
+            errorTable.row();
+            errorTable.add(deleteUserEntry).pad(10);
+            addFocusableActor(deleteUserEntry);
+            deleteUserEntry.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.backendManager.setCredentials(null, null);
+                    hide();
+                }
+            });
+        }
+
+        contentCell.setActor(errorTable);
     }
 
     private String getDonatorLabelString(int supportLevel) {
@@ -227,6 +233,101 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                 add(new ScaledLabel(app.TEXTS.get("profileNoScores"), app.skin, LightBlocksGame.SKIN_FONT_BIG))
                         .center();
             }
+        }
+    }
+
+    private class OwnDetailsOptions extends Table {
+        String myEmailAddress;
+
+        public OwnDetailsOptions(final PlayerDetails playerDetails) {
+            row();
+            ScaledLabel profileItIsYouLabel = new ScaledLabel(app.TEXTS.get("profileItIsYouLabel"), app.skin,
+                    LightBlocksGame.SKIN_FONT_TITLE);
+            profileItIsYouLabel.setFontScale(.65f);
+            add(profileItIsYouLabel);
+
+            //TODO change decoration
+            FaTextButton changeNickname = new FaTextButton("Change nickname", app.skin, LightBlocksGame
+                    .SKIN_BUTTON_CHECKBOX);
+            changeNickname.getLabel().setFontScale(.55f);
+            FaTextButton deleteAccount = new FaTextButton("Delete profile", app.skin, LightBlocksGame
+                    .SKIN_BUTTON_CHECKBOX);
+            deleteAccount.getLabel().setFontScale(.55f);
+            FaTextButton emailaddress = new FaTextButton("Set recovery e-mail", app.skin, LightBlocksGame
+                    .SKIN_BUTTON_CHECKBOX);
+            myEmailAddress = playerDetails.passwordEmail != null ? playerDetails.passwordEmail : "";
+            emailaddress.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Gdx.input.getTextInput(new Input.TextInputListener() {
+                        @Override
+                        public void input(final String text) {
+                            if (playerDetails.passwordEmail == null || !playerDetails.passwordEmail.equals(text)) {
+                                final ProgressDialog progressDialog = new ProgressDialog(app.TEXTS.get
+                                        ("pleaseWaitLabel"), app, getWidth() * .8f);
+                                progressDialog.show(getStage());
+                                app.backendManager.getBackendClient().changePlayerDetails(null, text,
+                                        app.localPrefs.getSupportLevel(), null, null,
+                                        new BackendClient.IBackendResponse<Void>() {
+                                            @Override
+                                            public void onFail(int statusCode, final String errorMsg) {
+                                                Gdx.app.postRunnable(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        progressDialog.getLabel().setText(errorMsg);
+                                                        progressDialog.showOkButton();
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onSuccess(Void retrievedData) {
+                                                Gdx.app.postRunnable(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        progressDialog.hide();
+                                                        myEmailAddress = text;
+                                                    }
+                                                });
+                                            }
+                                        });
+                            }
+                        }
+
+                        @Override
+                        public void canceled() {
+
+                        }
+                    }, "Set recovery e-mail", myEmailAddress, "");
+                }
+            });
+            emailaddress.getLabel().setFontScale(.55f);
+
+            Table optionsMenu = new Table(app.skin);
+            optionsMenu.setBackground("window-bl");
+            optionsMenu.pad(20);
+
+            row().defaults().pad(5, 10, 5, 10);
+            add(optionsMenu);
+
+            optionsMenu.row();
+            optionsMenu.add(changeNickname);
+            addFocusableActor(changeNickname);
+
+            optionsMenu.row();
+            optionsMenu.add(emailaddress);
+            addFocusableActor(emailaddress);
+
+            optionsMenu.row();
+            optionsMenu.add(deleteAccount);
+            addFocusableActor(deleteAccount);
+
+            row().padTop(20);
+            ScaledLabel profileThisIsPublic = new ScaledLabel(app.TEXTS.get("profileThisIsPublic"), app.skin,
+                    LightBlocksGame.SKIN_FONT_BIG);
+            profileThisIsPublic.setWrap(true);
+            profileThisIsPublic.setAlignment(Align.center);
+            add(profileThisIsPublic).fill();
         }
     }
 }

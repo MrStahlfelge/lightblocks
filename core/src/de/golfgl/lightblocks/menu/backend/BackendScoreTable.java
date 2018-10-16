@@ -207,10 +207,11 @@ public class BackendScoreTable extends Table {
         }
 
         for (final ScoreListEntry score : scoreboard) {
-            //TODO eigene Zeile einfärben
             row();
-            add(new ScaledLabel("#" + score.rank, app.skin, LightBlocksGame.SKIN_FONT_REG)).right();
-            // TODO
+            ScaledLabel rankLabel = new ScaledLabel("#" + score.rank, app.skin, LightBlocksGame.SKIN_FONT_REG);
+            if (app.backendManager.hasUserId() && score.getUserId().equalsIgnoreCase(app.backendManager.ownUserId()))
+                rankLabel.setColor(LightBlocksGame.COLOR_FOCUSSED_ACTOR);
+            add(rankLabel).right();
             BackendUserLabel userButton = new BackendUserLabel(score, app, "default");
             userButton.getLabel().setFontScale(FONT_SCALE);
             userButton.setToLabelMode().setMaxLabelWidth(maxNicknameWidth);
