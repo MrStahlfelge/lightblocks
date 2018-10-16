@@ -454,8 +454,13 @@ public class LocalPrefs {
     }
 
     public void saveBackendUser(String userId, String passKey) {
-        prefs.putString(PREF_KEY_BACKEND_USERID, userId);
-        prefs.putString(PREF_KEY_BACKEND_PASS, passKey);
+        if (userId == null && passKey == null) {
+            prefs.remove(PREF_KEY_BACKEND_USERID);
+            prefs.remove(PREF_KEY_BACKEND_PASS);
+        } else {
+            prefs.putString(PREF_KEY_BACKEND_USERID, userId);
+            prefs.putString(PREF_KEY_BACKEND_PASS, passKey);
+        }
         prefs.flush();
     }
 

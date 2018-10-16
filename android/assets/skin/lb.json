@@ -166,6 +166,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	qs25: {
 		font: qs-25-reg
 	}
+	editbig: {
+		font: qs-40-bold
+		background: window-bl
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
 	default: {

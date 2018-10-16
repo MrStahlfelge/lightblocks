@@ -72,13 +72,13 @@ public class BackendClientTest {
         Assert.assertNull(createdResponse.retrievedData);
 
         createdResponse = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
-        backendClient.createPlayer("user", createdResponse);
+        backendClient.createPlayer("user" + String.valueOf(MathUtils.random(100, 999)), createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData.userId);
         Assert.assertTrue(createdResponse.retrievedData.nickName.startsWith("user"));
 
         createdResponse = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
-        backendClient.createPlayer("mümmelmann", createdResponse);
+        backendClient.createPlayer("mümmelmann" + String.valueOf(MathUtils.random(100, 999)), createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData.userId);
         Assert.assertTrue(createdResponse.retrievedData.nickName.startsWith("mummelmann"));
@@ -92,7 +92,7 @@ public class BackendClientTest {
         Assert.assertTrue(listPlayerResponse.retrievedData.get(0).nickName.startsWith("user"));
 
         createdResponse = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
-        backendClient.createPlayer("gpgsuser", "gpgs", createdResponse);
+        backendClient.createPlayer("gpgsuser" + String.valueOf(MathUtils.random(100, 999)), "gpgs", createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData.userId);
         Assert.assertTrue(createdResponse.retrievedData.nickName.startsWith("gpgsuser"));

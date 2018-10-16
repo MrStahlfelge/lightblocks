@@ -49,7 +49,8 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
         contentTable.add(new ScaledLabel(createProfileNickNameLabel, app.skin, LightBlocksGame
                 .SKIN_FONT_TITLE)).width(LightBlocksGame.nativeGameWidth - 80);
 
-        nickNameLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+        nickNameLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_EDIT_BIG);
+        nickNameLabel.setEllipsis(true);
         FaButton editNicknameButton = new FaButton(FontAwesome.SETTING_PENCIL, app.skin);
         addFocusableActor(editNicknameButton);
         Table nickNameEditTable = new EditableLabel(nickNameLabel, editNicknameButton, createProfileNickNameLabel) {
@@ -59,9 +60,10 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
                 ((MyStage) getStage()).setFocusedActor(getConfiguredDefaultActor());
             }
         };
+        nickNameEditTable.setWidth(LightBlocksGame.nativeGameWidth - 100);
 
         contentTable.row();
-        contentTable.add(nickNameEditTable).fill();
+        contentTable.add(nickNameEditTable);
 
         ScaledLabel legalText = new ScaledLabel(app.TEXTS.get("createProfileLegalInfo"), app.skin, LightBlocksGame
                 .SKIN_FONT_REG);

@@ -18,6 +18,7 @@ import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
+import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
@@ -74,6 +75,20 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                                 @Override
                                 public void changed(ChangeEvent event, Actor actor) {
                                     reload();
+                                }
+                            });
+                        } else if (statusCode == 404 && app.backendManager.hasUserId() &&
+                                userId.equalsIgnoreCase(app.backendManager.ownUserId())) {
+                            // der eigene Spieler wurde nicht gefunden => löschen anbieten damit man neu anlegen kann
+                            RoundedTextButton deleteUserEntry = new RoundedTextButton("Reset stored user id", app.skin);
+                            errorTable.row();
+                            errorTable.add(deleteUserEntry).pad(10);
+                            addFocusableActor(deleteUserEntry);
+                            deleteUserEntry.addListener(new ChangeListener() {
+                                @Override
+                                public void changed(ChangeEvent event, Actor actor) {
+                                    app.backendManager.setCredentials(null, null);
+                                    hide();
                                 }
                             });
                         }

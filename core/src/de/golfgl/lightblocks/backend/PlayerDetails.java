@@ -36,13 +36,12 @@ public class PlayerDetails implements IPlayerInfo {
         donator = fromJson.getInt("donator", 0);
         country = fromJson.getString("donator", null);
 
-
-        // TODO Highscores
         highscores = new ArrayList<ScoreListEntry>();
         JsonValue highscorejson = fromJson.get("highscores");
-        for (JsonValue score = highscorejson.child; score != null; score = score.next) {
-            highscores.add(new ScoreListEntry(score, null, ScoreListEntry.ScoreType.best));
-        }
+        if (highscorejson != null)
+            for (JsonValue score = highscorejson.child; score != null; score = score.next) {
+                highscores.add(new ScoreListEntry(score, null, ScoreListEntry.ScoreType.best));
+            }
 
     }
 

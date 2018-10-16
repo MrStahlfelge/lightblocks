@@ -62,6 +62,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final boolean GAME_DEVMODE = true;
 
     public static final String SKIN_FONT_TITLE = "bigbigoutline";
+    public static final String SKIN_EDIT_BIG = "editbig";
     public static final String SKIN_FONT_BIG = "big";
     public static final String SKIN_FONT_REG = "qs25";
     public static final String SKIN_WINDOW_FRAMELESS = "frameless";

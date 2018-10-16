@@ -73,4 +73,10 @@ public class EditableLabel extends Table {
     protected void onEditCancel() {
 
     }
+
+    @Override
+    public void setWidth(float width) {
+        super.setWidth(width);
+        getCell(label).expand(false, false).width(width - editButton.getPrefWidth());
+    }
 }
