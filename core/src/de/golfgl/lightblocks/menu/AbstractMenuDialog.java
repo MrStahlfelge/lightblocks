@@ -33,7 +33,7 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  */
 
 public abstract class AbstractMenuDialog extends ControllerMenuDialog {
-    private static final float TIME_SWOSHIN = .15f;
+    public static final float TIME_SWOSHIN = .15f;
     private static final float TIME_SWOSHOUT = .2f;
     private static final Interpolation INTERPOLATION = Interpolation.circle;
     private static final int SCROLLBAR_WIDTH = 30;

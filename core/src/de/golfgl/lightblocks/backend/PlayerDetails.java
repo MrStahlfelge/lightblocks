@@ -34,7 +34,7 @@ public class PlayerDetails implements IPlayerInfo {
         publicContact = fromJson.getString("publicContact", null);
         passwordEmail = fromJson.getString("passwordEmail", null);
         donator = fromJson.getInt("donator", 0);
-        country = fromJson.getString("donator", null);
+        country = fromJson.getString("country", null);
 
         highscores = new ArrayList<ScoreListEntry>();
         JsonValue highscorejson = fromJson.get("highscores");
