@@ -4,9 +4,11 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 import java.util.HashMap;
+import java.util.List;
 
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Mission;
@@ -233,6 +235,21 @@ public class BestScore implements IRoundScore, Json.Serializable {
             }
         }
 
+        public void mergeWithPlayerScores(List<ScoreListEntry> highscores) {
+            for (ScoreListEntry score : highscores) {
+                BestScore bs = new BestScore();
+                bs.score = score.score;
+                bs.timeMs = score.timePlayedMs;
+                bs.drawnTetrominos = score.drawnBlocks;
+                bs.clearedLines = score.lines;
+
+                if (!this.containsKey(score.gameMode))
+                    this.put(score.gameMode, bs);
+                else
+                    this.get(score.gameMode).mergeWithOther(score.gameMode, bs);
+            }
+        }
+
         public void checkAchievements(IGameServiceClient gpgsClient, LightBlocksGame app) {
             if (gpgsClient == null || !gpgsClient.isSessionActive())
                 return;
@@ -262,8 +279,10 @@ public class BestScore implements IRoundScore, Json.Serializable {
 
             // Sprint in weniger als 150 Sekunden geschafft?
             BestScore sprintScore = this.get(SprintModel.MODEL_SPRINT_ID);
-            if (sprintScore != null && sprintScore.getClearedLines() >= SprintModel.NUM_LINES_TO_CLEAR && sprintScore.getTimeMs() <= 150000)
+            if (sprintScore != null && sprintScore.getClearedLines() >= SprintModel.NUM_LINES_TO_CLEAR && sprintScore
+                    .getTimeMs() <= 150000)
                 gpgsClient.unlockAchievement(GpgsHelper.ACH_SPRINTER);
         }
+
     }
 }

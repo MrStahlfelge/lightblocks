@@ -321,7 +321,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
                             new ILoadGameStateResponseListener() {
                                 @Override
                                 public void gsGameStateLoaded(byte[] gameState) {
-                                    savegame.gpgsLoadGameState(gameState);
+                                    savegame.mergeGameServiceSaveData(gameState);
                                 }
                             });
             }

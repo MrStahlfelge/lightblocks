@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.JsonWriter;
 
 import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.backend.PlayerDetails;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 
 /**
@@ -211,7 +212,7 @@ public class GameStateHandler {
         }
     }
 
-    public void gpgsLoadGameState(byte[] gameState) {
+    public void mergeGameServiceSaveData(byte[] gameState) {
 
         // Übergabe von null: beim Laden ist ein Fehler aufgetreten
         if (gameState == null)
@@ -248,6 +249,15 @@ public class GameStateHandler {
 
         loadInformationFromFutureCloudSave();
 
+    }
+
+    public void mergeBackendPlayerDetails(PlayerDetails playerDetails) {
+        app.localPrefs.setBackendNickname(playerDetails.nickName);
+
+        synchronized (gameStateMonitor) {
+            totalScore.mergeWithPlayerDetails(playerDetails);
+            bestScores.mergeWithPlayerScores(playerDetails.highscores);
+        }
     }
 
     protected void loadInformationFromFutureCloudSave() {

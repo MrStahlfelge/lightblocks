@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendClient;
+import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.backend.PlayerDetails;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
@@ -53,27 +54,17 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
 
     protected void reload() {
         contentCell.setActor(waitRotationImage);
-        app.backendManager.getBackendClient().fetchPlayerDetails(userId, new BackendClient
-                .IBackendResponse<PlayerDetails>() {
+        app.backendManager.getBackendClient().fetchPlayerDetails(userId, new BackendManager
+                .AbstractQueuedBackendResponse<PlayerDetails>(app) {
 
             @Override
-            public void onFail(final int statusCode, final String errorMsg) {
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        fillErrorScreen(statusCode, errorMsg);
-                    }
-                });
+            public void onRequestFailed(final int statusCode, final String errorMsg) {
+                fillErrorScreen(statusCode, errorMsg);
             }
 
             @Override
-            public void onSuccess(final PlayerDetails retrievedData) {
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        fillUserDetails(retrievedData);
-                    }
-                });
+            public void onRequestSuccess(final PlayerDetails retrievedData) {
+                fillUserDetails(retrievedData);
             }
         });
     }
@@ -93,7 +84,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
 
         if (app.backendManager.hasUserId() && app.backendManager.ownUserId().equals(retrievedData
                 .getUserId())) {
-            app.localPrefs.setBackendNickname(retrievedData.nickName);
+            app.savegame.mergeBackendPlayerDetails(retrievedData);
 
             mainTable.row().padTop(5).padBottom(5);
             mainTable.add(new OwnDetailsOptions(retrievedData));
@@ -360,35 +351,26 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
         }
     }
 
-    private class WaitForResponse implements BackendClient.IBackendResponse<Void> {
+    private class WaitForResponse extends BackendManager.AbstractQueuedBackendResponse<Void> {
         private ProgressDialog progressDialog;
 
         public WaitForResponse() {
+            super(app);
             progressDialog = new ProgressDialog(app.TEXTS.get
                     ("pleaseWaitLabel"), app, LightBlocksGame.nativeGameWidth * .8f);
             progressDialog.show(getStage());
         }
 
         @Override
-        public void onFail(int statusCode, final String errorMsg) {
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    progressDialog.getLabel().setText(errorMsg);
-                    progressDialog.showOkButton();
-                }
-            });
+        public void onRequestFailed(int statusCode, final String errorMsg) {
+            progressDialog.getLabel().setText(errorMsg);
+            progressDialog.showOkButton();
         }
 
         @Override
-        public void onSuccess(Void retrievedData) {
-            Gdx.app.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    progressDialog.hide();
-                    onSuccess();
-                }
-            });
+        public void onRequestSuccess(Void retrievedData) {
+            progressDialog.hide();
+            onSuccess();
         }
 
         protected void onSuccess() {

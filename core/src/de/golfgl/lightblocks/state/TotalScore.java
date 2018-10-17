@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
+import de.golfgl.lightblocks.backend.PlayerDetails;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 
 /**
@@ -133,6 +134,12 @@ public class TotalScore implements Json.Serializable {
             multiPlayerMatchesWon = totalScore.getMultiPlayerMatchesWon();
 
         setMaxComboCount(totalScore.getMaxComboCount());
+    }
+
+
+    public void mergeWithPlayerDetails(PlayerDetails playerDetails) {
+        if (playerDetails.countTotalBlocks > drawnTetrominos)
+            drawnTetrominos = playerDetails.countTotalBlocks;
     }
 
     public void checkAchievements(IGameServiceClient gpgsClient) {

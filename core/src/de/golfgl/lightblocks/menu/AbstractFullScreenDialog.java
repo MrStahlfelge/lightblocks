@@ -29,7 +29,7 @@ public class AbstractFullScreenDialog extends ControllerMenuDialog {
         super("", app.skin, LightBlocksGame.SKIN_WINDOW_ALLBLACK);
         this.app = app;
 
-        getButtonTable().defaults().pad(20, 40, 20, 40);
+        getButtonTable().defaults().pad(0, 40, 20, 40);
         closeButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
         button(closeButton);
 

@@ -86,8 +86,6 @@ public class TotalScoreScreen extends AbstractMenuDialog {
     private void fillPublicProfileButtonCell() {
         if (app.backendManager.hasUserId() && showPublicProfileButton.getParent() == null) {
             publicProfileButtonCell.setActor(showPublicProfileButton).fill(false);
-            if (getStage() != null && getStage() instanceof ControllerMenuStage)
-                ((ControllerMenuStage) getStage()).setFocusedActor(showPublicProfileButton);
         }
 
         if (!app.backendManager.hasUserId() && createPublicProfileButton.getParent() == null) {

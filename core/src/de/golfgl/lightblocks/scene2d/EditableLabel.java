@@ -11,11 +11,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import de.golfgl.gdx.controllers.IControllerActable;
+import de.golfgl.lightblocks.menu.ITouchActionButton;
+
 /**
  * Created by Benjamin Schulte on 15.10.2018.
  */
 
-public class EditableLabel extends Table {
+public class EditableLabel extends Table implements ITouchActionButton, IControllerActable {
 
     private Label label;
     private Button editButton;
@@ -74,9 +77,32 @@ public class EditableLabel extends Table {
 
     }
 
+    public String getText() {
+        return label.getText().toString();
+    }
+
     @Override
     public void setWidth(float width) {
         super.setWidth(width);
         getCell(label).expand(false, false).width(width - editButton.getPrefWidth());
+    }
+
+    @Override
+    public void touchAction() {
+        if (editButton instanceof ITouchActionButton)
+            ((ITouchActionButton) editButton).touchAction();
+        else if (label instanceof ITouchActionButton)
+            ((ITouchActionButton) label).touchAction();
+    }
+
+    @Override
+    public boolean onControllerDefaultKeyDown() {
+        return false;
+    }
+
+    @Override
+    public boolean onControllerDefaultKeyUp() {
+        doEdit();
+        return true;
     }
 }

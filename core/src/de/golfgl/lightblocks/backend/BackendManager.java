@@ -145,9 +145,10 @@ public class BackendManager {
         return false;
     }
 
+    /**
+     * Nur im Main Thread!
+     */
     public void sendEnqueuedScores() {
-        //TODO nach allen erfolgreichen Netzwerkaktionen aufrufen (aber nur im Main thread)
-
         synchronized (enqueuedScores) {
             // ältere als 4 Stunden nicht absenden, sondern aussortieren
             while (enqueuedScores.size >= 1 && TimeUtils.timeSinceMillis(enqueuedScores.first()
@@ -200,6 +201,39 @@ public class BackendManager {
 
     public String getPlatformString() {
         return platformString;
+    }
+
+    public abstract static class AbstractQueuedBackendResponse<T> implements BackendClient.IBackendResponse<T> {
+        private final LightBlocksGame app;
+
+        public AbstractQueuedBackendResponse(LightBlocksGame app) {
+            this.app = app;
+        }
+
+        @Override
+        public void onFail(final int statusCode, final String errorMsg) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    onRequestFailed(statusCode, errorMsg);
+                }
+            });
+        }
+
+        @Override
+        public void onSuccess(final T retrievedData) {
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    app.backendManager.sendEnqueuedScores();
+                    onRequestSuccess(retrievedData);
+                }
+            });
+        }
+
+        protected abstract void onRequestSuccess(T retrievedData);
+
+        protected abstract void onRequestFailed(int statusCode, String errorMsg);
     }
 
     public class CachedScoreboard {
