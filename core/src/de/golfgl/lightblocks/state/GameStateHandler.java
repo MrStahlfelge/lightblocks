@@ -255,6 +255,8 @@ public class GameStateHandler {
         app.localPrefs.setBackendNickname(playerDetails.nickName);
 
         synchronized (gameStateMonitor) {
+            getTotalScore(); // sicherstellen dass er geladen ist
+            loadBestScores(); // hier ebenso
             totalScore.mergeWithPlayerDetails(playerDetails);
             bestScores.mergeWithPlayerScores(playerDetails.highscores);
         }

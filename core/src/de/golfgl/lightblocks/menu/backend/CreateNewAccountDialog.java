@@ -241,6 +241,13 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
 
             row();
             requestCode = new RoundedTextButton("Request activation code", app.skin);
+            requestCode.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.backendManager.getBackendClient().requestActivationCode(nicknameEditable.getText(),
+                            mailEditable.getText(), new WaitForResponse(app, getStage()));
+                }
+            });
             add(requestCode);
             addFocusableActor(requestCode);
 

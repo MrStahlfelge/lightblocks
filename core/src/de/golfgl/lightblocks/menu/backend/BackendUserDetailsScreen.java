@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.menu.backend;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -251,7 +252,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                             if (playerDetails.passwordEmail == null || !playerDetails.passwordEmail.equals(text)) {
                                 app.backendManager.getBackendClient().changePlayerDetails(text, null,
                                         app.localPrefs.getSupportLevel(), null, null,
-                                        new WaitForResponse() {
+                                        new WaitForResponse(app, getStage()) {
                                             @Override
                                             protected void onSuccess() {
                                                 reload();
@@ -279,7 +280,8 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    app.backendManager.getBackendClient().deletePlayer(new WaitForResponse() {
+                                    app.backendManager.getBackendClient().deletePlayer(new WaitForResponse(app,
+                                            getStage()) {
                                         @Override
                                         protected void onSuccess() {
                                             BackendUserDetailsScreen.this.hide();
@@ -303,7 +305,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                             if (playerDetails.passwordEmail == null || !playerDetails.passwordEmail.equals(text)) {
                                 app.backendManager.getBackendClient().changePlayerDetails(null, text,
                                         app.localPrefs.getSupportLevel(), null, null,
-                                        new WaitForResponse() {
+                                        new WaitForResponse(app, getStage()) {
                                             @Override
                                             protected void onSuccess() {
                                                 myEmailAddress = text;
@@ -348,33 +350,6 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
             profileThisIsPublic.setWrap(true);
             profileThisIsPublic.setAlignment(Align.center);
             add(profileThisIsPublic).fill();
-        }
-    }
-
-    private class WaitForResponse extends BackendManager.AbstractQueuedBackendResponse<Void> {
-        private ProgressDialog progressDialog;
-
-        public WaitForResponse() {
-            super(app);
-            progressDialog = new ProgressDialog(app.TEXTS.get
-                    ("pleaseWaitLabel"), app, LightBlocksGame.nativeGameWidth * .8f);
-            progressDialog.show(getStage());
-        }
-
-        @Override
-        public void onRequestFailed(int statusCode, final String errorMsg) {
-            progressDialog.getLabel().setText(errorMsg);
-            progressDialog.showOkButton();
-        }
-
-        @Override
-        public void onRequestSuccess(Void retrievedData) {
-            progressDialog.hide();
-            onSuccess();
-        }
-
-        protected void onSuccess() {
-
         }
     }
 }
