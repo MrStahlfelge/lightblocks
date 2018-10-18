@@ -20,6 +20,8 @@ import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
@@ -144,31 +146,7 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
 
     private void createProfile(String nickname) {
         createProfileButton.setDisabled(true);
-        final ProgressDialog progressDialog = new ProgressDialog(app.TEXTS.get("pleaseWaitLabel"), app, getWidth() *
-                .8f);
-        progressDialog.show(getStage());
-
-        app.backendManager.getBackendClient().createPlayer(nickname, new BackendManager
-                .AbstractQueuedBackendResponse<BackendClient.PlayerCreatedInfo>(app) {
-            @Override
-            public void onRequestFailed(int statusCode, final String errorMsg) {
-                progressDialog.getLabel().setText(errorMsg);
-                progressDialog.showOkButton();
-                createProfileButton.setDisabled(false);
-            }
-
-            @Override
-            public void onRequestSuccess(final BackendClient.PlayerCreatedInfo retrievedData) {
-                progressDialog.hide(null);
-                Stage stage = getStage();
-                hide();
-                // muss nach dem Hide kommen, damit focus im TotalScoreScreen sauber übergeht
-                app.backendManager.setCredentials(retrievedData.userId, retrievedData.userKey);
-                app.localPrefs.setBackendNickname(retrievedData.nickName);
-
-                new BackendUserDetailsScreen(app, retrievedData.userId).show(getStage());
-            }
-        });
+        app.backendManager.getBackendClient().createPlayer(nickname, new PlayerCreatedHandler());
     }
 
     private void setNewNickname(String nickname) {
@@ -266,6 +244,18 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
             row();
             connectProfileButton = new RoundedTextButton(titleLabel.getText().toString(), app.skin);
             addFocusableActor(connectProfileButton);
+            connectProfileButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    try {
+                        Integer activationCode = Integer.valueOf(activationEditable.getText());
+                        app.backendManager.getBackendClient().linkProfile(nicknameEditable.getText(),
+                                activationCode, new PlayerCreatedHandler());
+                    } catch (Throwable t) {
+                        ((AbstractScreen) app.getScreen()).showDialog("Enter a valid activation code.");
+                    }
+                }
+            });
             add(connectProfileButton);
         }
 
@@ -275,6 +265,38 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
             requestCode.setDisabled(nicknameEditable.getText().isEmpty() || mailEditable.getText().isEmpty());
             connectProfileButton.setDisabled(nicknameEditable.getText().isEmpty() || activationEditable.getText()
                     .isEmpty());
+        }
+    }
+
+    private class PlayerCreatedHandler extends BackendManager.AbstractQueuedBackendResponse<BackendClient
+            .PlayerCreatedInfo> {
+
+        private final ProgressDialog progressDialog;
+
+        public PlayerCreatedHandler() {
+            super(app);
+            progressDialog = new ProgressDialog(app.TEXTS.get("pleaseWaitLabel"), app, getWidth() *
+                    .8f);
+            progressDialog.show(getStage());
+        }
+
+        @Override
+        public void onRequestFailed(int statusCode, final String errorMsg) {
+            progressDialog.getLabel().setText(errorMsg);
+            progressDialog.showOkButton();
+            createProfileButton.setDisabled(false);
+        }
+
+        @Override
+        public void onRequestSuccess(final BackendClient.PlayerCreatedInfo retrievedData) {
+            progressDialog.hide(null);
+            Stage stage = getStage();
+            hide();
+            // muss nach dem Hide kommen, damit focus im TotalScoreScreen sauber übergeht
+            app.backendManager.setCredentials(retrievedData.userId, retrievedData.userKey);
+            app.localPrefs.setBackendNickname(retrievedData.nickName);
+
+            new BackendUserDetailsScreen(app, retrievedData.userId).show(getStage());
         }
     }
 }
