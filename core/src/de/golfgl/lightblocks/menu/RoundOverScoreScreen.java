@@ -134,6 +134,16 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
                     LightBlocksGame.SKIN_FONT_TITLE);
             mainView.add(labelLatest).minHeight(labelLatest.getPrefHeight() * 1.5f);
 
+            if (!app.backendManager.hasUserId()) {
+                mainView.row();
+                TotalScoreScreen.CreatePublicProfileButton createProfileButton = new TotalScoreScreen
+                        .CreatePublicProfileButton(app);
+                createProfileButton.setText(app.TEXTS.get("createPublicProfileLabel2"));
+                createProfileButton.getDescLabel().setText(app.TEXTS.get("publicProfileIntro2"));
+                mainView.add(createProfileButton).fill().width(LightBlocksGame.nativeGameWidth - 50);
+                stage.addFocusableActor(createProfileButton);
+            }
+
             mainView.row().expandY();
             BackendScoreTable backendScoreTable = new BackendScoreTable(app, latestScores);
             mainView.add(backendScoreTable).width(LightBlocksGame.nativeGameWidth - 40).fillX().top();

@@ -54,7 +54,6 @@ public class AbstractFullScreenDialog extends ControllerMenuDialog {
         return closeButton;
     }
 
-    //TODO
     protected boolean hasScrollPane() {
         return false;
     }

@@ -37,6 +37,7 @@ public class BackendScoreTable extends Table {
     private final ProgressDialog.WaitRotationImage waitRotationImage;
     private boolean didFetchAttempt;
     private boolean isFilled;
+    private boolean wasFilledWithoutUserAndEnqueuedScores;
     private boolean showTitle = false;
     private boolean showScore = true;
     private boolean showLines = false;
@@ -109,8 +110,12 @@ public class BackendScoreTable extends Table {
             if (scoreboard != null) {
                 fillTable(scoreboard);
                 isFilled = true;
+                wasFilledWithoutUserAndEnqueuedScores = !app.backendManager.hasUserId() &&
+                        app.backendManager.hasScoreEnqueued();
+
             } else if (!didFetchAttempt && !cachedScoreboard.isFetching()) {
                 didFetchAttempt = cachedScoreboard.fetchIfExpired();
+
             } else if (!cachedScoreboard.isFetching()) {
                 // Fehler vorhanden
                 clear();
@@ -140,6 +145,11 @@ public class BackendScoreTable extends Table {
 
             // sonst abwarten
         }
+
+        // Für den Fall dass neu angemeldet wurde reload
+        if (isFilled && wasFilledWithoutUserAndEnqueuedScores && app.backendManager.hasUserId() &&
+                !app.backendManager.hasScoreEnqueued())
+            reload();
 
         super.act(delta);
     }
@@ -177,10 +187,6 @@ public class BackendScoreTable extends Table {
 
         String buttonDetailsLabel = app.TEXTS.get("buttonDetails").toUpperCase();
         int timeMsDigits = BestScore.getTimeMsDigits(cachedScoreboard.getGameMode());
-
-        //TODO wenn nicht angemeldet, dann Werbung für Anmeldung machen
-
-        //TODO wenn Scores nicht submitted sind, Hinweis
 
         if (scoreboard.isEmpty())
             add(new ScaledLabel(app.TEXTS.get("profileNoScores"), app.skin, LightBlocksGame.SKIN_FONT_BIG)).center();

@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
@@ -111,8 +112,11 @@ public class TotalScoreScreen extends AbstractMenuDialog {
     }
 
     public static class CreatePublicProfileButton extends InfoButton {
+        private final LightBlocksGame app;
+
         public CreatePublicProfileButton(final LightBlocksGame app) {
             super(app.TEXTS.get("createPublicProfileLabel"), app.TEXTS.get("publicProfileIntro"), app.skin);
+            this.app = app;
             getLabel().setFontScale(.5f);
             getDescLabel().setAlignment(Align.center);
 
@@ -122,6 +126,21 @@ public class TotalScoreScreen extends AbstractMenuDialog {
                     new CreateNewAccountDialog(app).show(getStage());
                 }
             });
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+
+            setVisible(!app.backendManager.hasUserId());
+
+            if (hasParent() && getParent() instanceof WidgetGroup)
+                ((WidgetGroup) getParent()).invalidate();
+        }
+
+        @Override
+        public float getPrefHeight() {
+            return app != null && app.backendManager.hasUserId() ? 0 : super.getPrefHeight();
         }
     }
 }
