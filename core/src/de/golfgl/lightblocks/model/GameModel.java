@@ -261,6 +261,11 @@ public abstract class GameModel implements Json.Serializable {
         return true;
     }
 
+    public boolean isGhostPieceAllowedByGameModel() {
+        // Normalfall: Ghost Piece darf gezeigt werden
+        return true;
+    }
+
     public boolean isComboScoreAllowedByModel() {
         return true;
     }
@@ -647,10 +652,14 @@ public abstract class GameModel implements Json.Serializable {
         inputTypeKey = newGameParams.getInputKey();
 
         activeTetromino = null;
-        drawyer = new TetrominoDrawyer();
+        initDrawyer();
 
         initializeActiveAndNextTetromino();
 
+    }
+
+    protected void initDrawyer() {
+        drawyer = new TetrominoDrawyer();
     }
 
     protected void initGameScore(int beginningLevel) {
@@ -671,6 +680,7 @@ public abstract class GameModel implements Json.Serializable {
     public String getScoreboardParameters() {
         return null;
     }
+
     public void setUserInterface(IGameModelListener userInterface) {
         this.userInterface = userInterface;
 
@@ -821,7 +831,7 @@ public abstract class GameModel implements Json.Serializable {
             this.gameboard.read(json, board);
 
         // Drawyer (if set)
-        this.drawyer = new TetrominoDrawyer();
+        initDrawyer();
         final JsonValue drawyer = jsonData.get("drawyer");
         if (drawyer != null)
             this.drawyer.read(json, drawyer);
@@ -887,5 +897,4 @@ public abstract class GameModel implements Json.Serializable {
     public void setBestScore(BestScore bestScore) {
         this.bestScore = bestScore;
     }
-
 }

@@ -16,6 +16,8 @@ public class SprintModel extends GameModel {
         return app.savegame.getBestScore(Mission.MISSION10ACHIEVEMENT).getRating() > 0
                 || app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_NORMAL_ID)
                 .getClearedLines() >= NUM_LINES_TO_CLEAR
+                || app.savegame.getBestScore(RetroMarathonModel.MODEL_MARATHON_RETRO89)
+                .getClearedLines() >= NUM_LINES_TO_CLEAR
                 || app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_GRAVITY_ID)
                 .getClearedLines() >= NUM_LINES_TO_CLEAR;
     }

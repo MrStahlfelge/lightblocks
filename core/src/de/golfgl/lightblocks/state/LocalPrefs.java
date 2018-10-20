@@ -22,7 +22,7 @@ import de.golfgl.lightblocks.screen.PlayGesturesInput;
 public class LocalPrefs {
     public static final String KEY_SETTINGS_SCREEN = "settings";
     private static final String CRYPTOKEY = "***REMOVED***";
-    private static final String PREF_KEY_INPUT = "inputType";
+    private static final String PREF_KEY_MARATHON_TYPE = "marathonType";
     private static final String PREF_KEY_LEVEL = "beginningLevel";
     private static final String PREF_KEY_SPACTIVEPAGE = "singlePlayerPage";
     private static final String PREF_KEY_MPACTIVEPAGE = "multiplayerPage";
@@ -242,12 +242,17 @@ public class LocalPrefs {
         return prefs.getInteger(PREF_KEY_LEVEL, 0);
     }
 
-    public int getMarathonLastUsedInput() {
-        return prefs.getInteger(PREF_KEY_INPUT, 0);
+    public int getMarathonLastUsedType() {
+        return prefs.getInteger(PREF_KEY_MARATHON_TYPE, 0);
     }
 
-    public void saveMarathonLevelAndInput(int beginningLevel, int selectedInput) {
-        prefs.putInteger(PREF_KEY_INPUT, selectedInput);
+    public void saveMarathonLevelAndType(int beginningLevel, int selectedType) {
+        prefs.putInteger(PREF_KEY_MARATHON_TYPE, selectedType);
+        prefs.putInteger(PREF_KEY_LEVEL, beginningLevel);
+        prefs.flush();
+    }
+
+    public void saveMarathonLevel(int beginningLevel) {
         prefs.putInteger(PREF_KEY_LEVEL, beginningLevel);
         prefs.flush();
     }

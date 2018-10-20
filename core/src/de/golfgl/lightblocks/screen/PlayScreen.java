@@ -396,6 +396,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         levelNum.setEmphasizeTreshold(1, LightBlocksGame.EMPHASIZE_COLOR);
         scoreNum.setEmphasizeTreshold(1000, LightBlocksGame.EMPHASIZE_COLOR);
 
+        // ist Ghost erlaubt?
+        if (!gameModel.isGhostPieceAllowedByGameModel())
+            blockGroup.setGhostPieceVisibility(false);
     }
 
     @Override

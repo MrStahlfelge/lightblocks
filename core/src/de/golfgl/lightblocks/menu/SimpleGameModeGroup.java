@@ -1,22 +1,27 @@
 package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.PracticeModel;
+import de.golfgl.lightblocks.model.RetroMarathonModel;
 import de.golfgl.lightblocks.model.SprintModel;
+import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
+import de.golfgl.lightblocks.screen.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -32,7 +37,6 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
     protected Cell choseInputCell;
     protected SinglePlayerScreen menuScreen;
     protected BeginningLevelChooser beginningLevelSlider;
-    protected InputButtonTable inputButtons;
     protected Button playButton;
     protected Cell playButtonCell;
     protected ScoresGroup scoresGroup;
@@ -50,24 +54,6 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
                 ((MyStage) getStage()).setFocusedActor(playButton);
             }
         };
-
-        // die möglichen Inputs aufzählen
-        inputButtons = new InputButtonTable(app, app.localPrefs.getMarathonLastUsedInput()) {
-            @Override
-            public boolean onControllerDefaultKeyDown() {
-                ((MyStage) getStage()).setFocusedActor(playButton);
-                return super.onControllerDefaultKeyDown();
-            }
-        };
-        inputButtons.setExternalChangeListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                refreshScores(0);
-                menuScreen.onGameModelIdChanged();
-
-                setInputButtonTableVisibility();
-            }
-        });
 
         row();
         add(new ScaledLabel(getGameModeTitle(), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
@@ -98,9 +84,8 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
                 .left();
         params.row();
         params.add(beginningLevelSlider);
-        params.row().padTop(15);
+        params.row();
         choseInputLabel = new ScaledLabel(app.TEXTS.get("menuInputControl"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        addInputButtonsToParams();
         playButton = new PlayButton(app);
         playButton.addListener(new ChangeListener() {
                                    public void changed(ChangeEvent event, Actor actor) {
@@ -111,39 +96,12 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         playButtonCell = params.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top().fillX();
         menuScreen.addFocusableActor(playButton);
 
-        menuScreen.addFocusableActor(inputButtons);
         menuScreen.addFocusableActor(beginningLevelSlider.getSlider());
-        setInputButtonTableVisibility();
-    }
-
-    protected void addInputButtonsToParams() {
-        params.add(choseInputLabel).left();
-        params.row();
-        choseInputCell = params.add();
-        params.row();
-        params.add(inputButtons.getInputLabel()).center();
-        params.row();
     }
 
     protected abstract int getMaxBeginningValue();
 
     protected abstract String getGameModeTitle();
-
-    protected void setInputButtonTableVisibility() {
-        boolean inputChoserVisible = inputButtons.getEnabledInputCount() != 1;
-        choseInputCell.setActor(inputChoserVisible ? inputButtons : null);
-        choseInputLabel.setVisible(inputChoserVisible);
-        inputButtons.getInputLabel().setVisible(inputChoserVisible);
-    }
-
-    @Override
-    public void act(float delta) {
-        super.act(delta);
-
-        // die InputButtons trotzdem ihren Kram machen lassen - sonst erscheinen sie nicht :-)
-        if (!inputButtons.hasParent())
-            inputButtons.act(delta);
-    }
 
     public abstract String getGameModelId();
 
@@ -168,7 +126,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
     protected void beginNewGame() {
         InitGameParameters initGameParametersParams = getInitGameParameters();
 
-        savePreselectionSettings(initGameParametersParams);
+        savePreselectionSettings();
 
         try {
             PlayScreen.gotoPlayScreen(app, initGameParametersParams);
@@ -178,10 +136,9 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         }
     }
 
-    protected void savePreselectionSettings(InitGameParameters initGameParametersParams) {
+    protected void savePreselectionSettings() {
         // Einstellungen speichern
-        app.localPrefs.saveMarathonLevelAndInput(initGameParametersParams.getBeginningLevel(), inputButtons
-                .getSelectedInput());
+        app.localPrefs.saveMarathonLevel(beginningLevelSlider.getValue());
     }
 
     protected abstract InitGameParameters getInitGameParameters();
@@ -192,14 +149,28 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
 
     public static class MarathonGroup extends SimpleGameModeGroup {
 
+        private static final int MARATHON_NORMAL = 1;
+        private static final int MARATHON_GRAVITY = 2;
+        private static final int MARATHON_RETRO = 3;
+        private FaRadioButton<Integer> marathonType;
+        private ScaledLabel marathonTypeDescription;
+
         public MarathonGroup(SinglePlayerScreen myParentScreen, LightBlocksGame app) {
             super(myParentScreen, app);
         }
 
         @Override
         public String getGameModelId() {
-            return inputButtons.getSelectedInput() == 2 ? MarathonModel.MODEL_MARATHON_GRAVITY_ID : MarathonModel
-                    .MODEL_MARATHON_NORMAL_ID;
+            switch (marathonType.getValue()) {
+                case MARATHON_NORMAL:
+                    return MarathonModel.MODEL_MARATHON_NORMAL_ID;
+                case MARATHON_GRAVITY:
+                    return MarathonModel.MODEL_MARATHON_GRAVITY_ID;
+                case MARATHON_RETRO:
+                    return RetroMarathonModel.MODEL_MARATHON_RETRO89;
+            }
+
+            return null;
         }
 
         @Override
@@ -215,10 +186,70 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         @Override
         protected InitGameParameters getInitGameParameters() {
             InitGameParameters initGameParametersParams = new InitGameParameters();
-            initGameParametersParams.setGameMode(InitGameParameters.GameMode.Marathon);
+            int intType = marathonType.getValue();
+            initGameParametersParams.setGameMode(intType == MARATHON_RETRO ?
+                    InitGameParameters.GameMode.MarathonRetro89 : InitGameParameters.GameMode.Marathon);
             initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
-            initGameParametersParams.setInputKey(inputButtons.getSelectedInput());
+            initGameParametersParams.setInputKey(intType == MARATHON_GRAVITY ?
+                    PlayScreenInput.KEY_ACCELEROMETER : PlayScreenInput.KEY_KEYORTOUCH);
             return initGameParametersParams;
+        }
+
+        @Override
+        protected void fillParamsTable(LightBlocksGame app) {
+            row().pad(10, 20, 10, 20);
+
+            marathonType = new FaRadioButton<Integer>(app.skin);
+            marathonType.addEntry(MARATHON_NORMAL, "",
+                    app.TEXTS.get("marathonChooseTypeTitle" + String.valueOf(MARATHON_NORMAL)));
+            marathonType.addEntry(MARATHON_RETRO, "",
+                    app.TEXTS.get("marathonChooseTypeTitle" + String.valueOf(MARATHON_RETRO)));
+            if (PlayGesturesInput.isInputTypeAvailable(PlayScreenInput.KEY_ACCELEROMETER))
+                marathonType.addEntry(MARATHON_GRAVITY, "",
+                        app.TEXTS.get("marathonChooseTypeTitle" + String.valueOf(MARATHON_GRAVITY)));
+            marathonType.setValue(app.localPrefs.getMarathonLastUsedType());
+            marathonType.addListener(new ChangeListener() {
+                                         public void changed(ChangeEvent event, Actor actor) {
+                                             refreshScores(0);
+                                             changeDescription();
+                                             menuScreen.onGameModelIdChanged();
+                                         }
+                                     }
+            );
+
+            Table marathonTypeTabel = new Table();
+            ScaledLabel marathonTypeLabel = new ScaledLabel(app.TEXTS.get("marathonChooseTypeLabel"),
+                    app.skin, app.SKIN_FONT_BIG);
+            marathonTypeLabel.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    marathonType.changeValue();
+                }
+            });
+            marathonTypeTabel.add(marathonTypeLabel);
+            marathonTypeTabel.row();
+            marathonTypeTabel.add(marathonType);
+            marathonTypeTabel.row();
+            marathonTypeDescription = new ScaledLabel("\n", app.skin, LightBlocksGame.SKIN_FONT_REG);
+            marathonTypeDescription.setWrap(true);
+            marathonTypeDescription.setAlignment(Align.top);
+            marathonTypeTabel.add(marathonTypeDescription).fill().expandX().height(marathonTypeDescription.getPrefHeight());
+
+            add(marathonTypeTabel).expandX().fill();
+            menuScreen.addFocusableActor(marathonType);
+
+            changeDescription();
+
+            super.fillParamsTable(app);
+        }
+
+        private void changeDescription() {
+            marathonTypeDescription.setText(app.TEXTS.get("marathonChooseTypeDesc" + String.valueOf(marathonType.getValue())));
+        }
+
+        @Override
+        protected void savePreselectionSettings() {
+            app.localPrefs.saveMarathonLevelAndType(beginningLevelSlider.getValue(), marathonType.getValue());
         }
     }
 
@@ -269,15 +300,6 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
             return 14;
         }
 
-        @Override
-        protected void addInputButtonsToParams() {
-            // nichts tun
-        }
-
-        @Override
-        protected void setInputButtonTableVisibility() {
-            // nichts tun, es gibt keine
-        }
     }
 
     public static class SprintModeGroup extends SimpleGameModeGroup {
@@ -335,18 +357,8 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         }
 
         @Override
-        protected void savePreselectionSettings(InitGameParameters initGameParametersParams) {
+        protected void savePreselectionSettings() {
             // es gibt keine
-        }
-
-        @Override
-        protected void addInputButtonsToParams() {
-            params.clear();
-        }
-
-        @Override
-        protected void setInputButtonTableVisibility() {
-            // nichts tun, es gibt keine
         }
 
         @Override

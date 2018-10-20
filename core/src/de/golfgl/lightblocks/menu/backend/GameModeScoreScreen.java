@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.gdxgamesvcs.GameServiceException;
@@ -42,8 +43,11 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
         if (leaderboardButton != null)
             leaderboardButton.setVisible(GpgsHelper.getLeaderBoardIdByModelId(gameMode) != null);
 
-        menuTable.add(new Label(app.TEXTS.get("labelModel_" + gameMode) + " " + app.TEXTS.get("labelScores"),
-                app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+        Label labelScores = new Label(app.TEXTS.get("labelModel_" + gameMode) + " " + app.TEXTS.get("labelScores"),
+                app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+        labelScores.setWrap(true);
+        labelScores.setAlignment(Align.center);
+        menuTable.add(labelScores).fillX();
 
         menuTable.row();
         ScoresGroup ownScores = new ScoresGroup(app, true);

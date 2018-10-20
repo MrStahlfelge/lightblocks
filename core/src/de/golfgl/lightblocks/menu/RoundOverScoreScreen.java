@@ -167,7 +167,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
         }
 
         mainTable.row();
-        mainTable.add(buttons).pad(20, 0, 20, 0).fillX();
+        mainTable.add(buttons).pad(20, 0, 20, 0).width(LightBlocksGame.nativeGameWidth);
 
         fillButtonTable(buttons);
 

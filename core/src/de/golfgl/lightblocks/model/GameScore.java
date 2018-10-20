@@ -12,6 +12,7 @@ public class GameScore implements IRoundScore {
     protected static final int TYPE_NORMAL = 0;
     protected static final int TYPE_PRACTICE = 1;
     protected static final int TYPE_SPRINT = 2;
+    protected static final int TYPE_RETRO89 = 3;
 
     private static final int COMBO_COUNT_RESET = -1;
 
@@ -90,6 +91,12 @@ public class GameScore implements IRoundScore {
     public boolean incClearedLines(int clearedLines, boolean specialMove, boolean isTSpin) {
         // wiki/Scoring
 
+        // im Retro-Modus interessiert uns das nicht
+        if (scoringType == TYPE_RETRO89) {
+            specialMove = false;
+            isTSpin = false;
+        }
+
         float removeScore;
         boolean doubleSpecial = specialMove && lastClearLinesWasSpecial;
 
@@ -150,7 +157,8 @@ public class GameScore implements IRoundScore {
     }
 
     public void addTSpinBonus() {
-        this.dropScore += getCurrentScoreFactor() * 150;
+        if (scoringType != TYPE_RETRO89)
+            this.dropScore += getCurrentScoreFactor() * 150;
     }
 
     public void addBonusScore(int bonusScore) {
@@ -215,10 +223,11 @@ public class GameScore implements IRoundScore {
 
     /**
      * Setzt den Combocounter in Abhängigkeit ob Zeilen entfernt wurden
+     *
      * @return den aktuellen Combocounter
      */
     public int setComboCounter(boolean linesCleared) {
-        if (linesCleared) {
+        if (linesCleared && scoringType != TYPE_RETRO89) {
             comboCounter++;
             dropScore += getCurrentScoreFactor() * 50 * comboCounter;
         } else {
