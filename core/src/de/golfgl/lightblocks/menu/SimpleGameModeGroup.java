@@ -32,7 +32,6 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  */
 
 public abstract class SimpleGameModeGroup extends Table implements SinglePlayerScreen.IGameModeGroup {
-    protected ScaledLabel choseInputLabel;
     protected Table params;
     protected Cell choseInputCell;
     protected SinglePlayerScreen menuScreen;
@@ -61,7 +60,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         fillParamsTable(app);
 
         row();
-        add(params).expandY().fillX().pad(0, 20, 0, 20);
+        add(params).expandY().fill().pad(0, 20, 0, 20);
 
         row();
         scoresGroup = new ScoresGroup(app, isShowBestTime());
@@ -79,13 +78,16 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
     }
 
     protected void fillParamsTable(LightBlocksGame app) {
+        Table levelSliderTable = new Table();
+
         params.row().padTop(15);
-        params.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel"), app.skin, LightBlocksGame.SKIN_FONT_BIG))
+        levelSliderTable.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel"), app.skin, LightBlocksGame.SKIN_FONT_BIG))
                 .left();
+        levelSliderTable.row();
+        levelSliderTable.add(beginningLevelSlider);
+        params.add(levelSliderTable).expand().fill();
+
         params.row();
-        params.add(beginningLevelSlider);
-        params.row();
-        choseInputLabel = new ScaledLabel(app.TEXTS.get("menuInputControl"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
         playButton = new PlayButton(app);
         playButton.addListener(new ChangeListener() {
                                    public void changed(ChangeEvent event, Actor actor) {
@@ -93,7 +95,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
                                    }
                                }
         );
-        playButtonCell = params.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top().fillX();
+        playButtonCell = params.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top().fillX().expandY();
         menuScreen.addFocusableActor(playButton);
 
         menuScreen.addFocusableActor(beginningLevelSlider.getSlider());
