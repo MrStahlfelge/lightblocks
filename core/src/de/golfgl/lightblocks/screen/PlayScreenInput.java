@@ -160,4 +160,8 @@ public abstract class PlayScreenInput extends InputAdapter {
     }
 
     public abstract String getAnalyticsKey();
+
+    public String getScoreboardKey() {
+        return getAnalyticsKey();
+    }
 }

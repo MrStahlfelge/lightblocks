@@ -1,5 +1,7 @@
 package de.golfgl.lightblocks.screen;
 
+import com.badlogic.gdx.Input;
+
 /**
  * Created by Benjamin Schulte on 19.03.2018.
  */
@@ -7,6 +9,7 @@ package de.golfgl.lightblocks.screen;
 public class PlayKeyOrTouchInput extends PlayScreenInput {
     private final PlayKeyboardInput keyboard;
     private final PlayGesturesInput touch;
+    private boolean hadKeyStroke;
 
     public PlayKeyOrTouchInput() {
         touch = new PlayGesturesInput();
@@ -32,6 +35,9 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
 
     @Override
     public boolean keyDown(int keycode) {
+        if (!hadKeyStroke && keycode != Input.Keys.BACK && keycode != Input.Keys.MENU)
+            hadKeyStroke = true;
+
         if (keyboard.keyDown(keycode))
             return true;
         if (touch.keyDown(keycode))
@@ -108,5 +114,15 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     @Override
     public String getAnalyticsKey() {
         return "keyOrTouch";
+    }
+
+    @Override
+    public String getScoreboardKey() {
+        // in Ermangelung einer besseren Variante schicken wir Controller/Keyboard Bedienung, wenn eine Taste
+        // gedrückt wurde. Sonst Touch (falls nur ein Controller verbunden war)
+        if (hadKeyStroke)
+            return keyboard.getScoreboardKey();
+        else
+            return touch.getScoreboardKey();
     }
 }

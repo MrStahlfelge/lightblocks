@@ -781,7 +781,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         pauseButton.setVisible(false);
 
         app.backendManager.enqueueAndSendScore(new BackendScore(gameModel.getScore(), gameModel.getIdentifier(),
-                app.backendManager.getPlatformString(), inputAdapter.getAnalyticsKey(),
+                app.backendManager.getPlatformString(), inputAdapter.getScoreboardKey(),
                 gameModel.getScoreboardParameters(), null));
     }
 
