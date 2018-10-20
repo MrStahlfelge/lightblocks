@@ -3,12 +3,12 @@ package de.golfgl.lightblocks.scene2d;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.ITouchActionButton;
-import de.golfgl.lightblocks.screen.PlayScreenInput;
 
 /**
  * Created by Benjamin Schulte on 14.01.2018.
@@ -60,6 +60,9 @@ public class MyStage extends ControllerMenuStage {
 
     @Override
     public boolean keyDown(int keyCode) {
+        if (keyCode == Input.Keys.BACKSPACE && getFocusedActor() != null && (getFocusedActor() instanceof TextField))
+            return false;
+
         boolean handled = super.keyDown(keyCode);
 
         if (handled && keyCode != Input.Keys.BACK &&
@@ -67,6 +70,14 @@ public class MyStage extends ControllerMenuStage {
             touchActionActivated = true;
 
         return handled;
+    }
+
+    @Override
+    public boolean keyUp(int keyCode) {
+        if (keyCode == Input.Keys.BACKSPACE && getFocusedActor() != null && (getFocusedActor() instanceof TextField))
+            return false;
+
+        return super.keyUp(keyCode);
     }
 
     @Override

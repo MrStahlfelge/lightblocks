@@ -116,6 +116,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 			a: 0.19607843
 		}
 	}
+	focused-window-bl: {
+		name: window-bl
+		color: lightselection
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 	round: {
@@ -241,6 +245,19 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		font: qs-25-bold
 		downFontColor: emphasize
 		disabledFontColor: disabled
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
+	default: {
+		font: qs-40-bold
+		fontColor: white
+		disabledFontColor: unselected
+		background: window
+		focusedBackground: focused-window-bl
+		cursor: white
+		selection: whitesmoke
+		messageFont: qs-40-boldglow
+		messageFontColor: emphasize
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {

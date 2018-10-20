@@ -134,7 +134,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
                     LightBlocksGame.SKIN_FONT_TITLE);
             mainView.add(labelLatest).minHeight(labelLatest.getPrefHeight() * 1.5f);
 
-            if (!app.backendManager.hasUserId()) {
+            if (!app.backendManager.hasUserId() && app.backendManager.hasScoreEnqueued()) {
                 mainView.row();
                 TotalScoreScreen.CreatePublicProfileButton createProfileButton = new TotalScoreScreen
                         .CreatePublicProfileButton(app);

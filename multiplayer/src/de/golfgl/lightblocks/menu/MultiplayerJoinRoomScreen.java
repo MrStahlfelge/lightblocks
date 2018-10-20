@@ -31,6 +31,7 @@ import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.TextInputDialog;
 import de.golfgl.lightblocks.scene2d.TouchableList;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
@@ -168,7 +169,7 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
                     proposal = ((KryonetRoomLocation) lastSelectedRoom).address.getHostAddress();
                 }
 
-                Gdx.input.getTextInput(new Input.TextInputListener() {
+                TextInputDialog.getTextInput(new Input.TextInputListener() {
                     @Override
                     public void input(String text) {
                         try {
@@ -185,7 +186,7 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
                     public void canceled() {
                         //nix
                     }
-                }, app.TEXTS.get("gameTitle"), proposal, app.TEXTS.get("multiplayerJoinManually"));
+                }, app.TEXTS.get("multiplayerJoinManually"), proposal, app.skin, getStage());
             }
         });
 

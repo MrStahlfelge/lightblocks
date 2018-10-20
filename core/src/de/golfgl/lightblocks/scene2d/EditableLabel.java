@@ -1,6 +1,5 @@
 package de.golfgl.lightblocks.scene2d;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -20,14 +19,16 @@ import de.golfgl.lightblocks.menu.ITouchActionButton;
 
 public class EditableLabel extends Table implements ITouchActionButton, IControllerActable {
 
-    private Label label;
-    private Button editButton;
+    private final Label label;
+    private final Button editButton;
+    private final Skin skin;
     private String inputBoxTitle;
 
-    public EditableLabel(final Label label, Button editButton, String inputBoxTitle) {
+    public EditableLabel(final Label label, Button editButton, Skin skin, String inputBoxTitle) {
         super();
         this.label = label;
         this.editButton = editButton;
+        this.skin = skin;
         this.inputBoxTitle = inputBoxTitle;
         add(label).fill().expandX();
         add(editButton);
@@ -48,7 +49,7 @@ public class EditableLabel extends Table implements ITouchActionButton, IControl
     }
 
     protected void doEdit() {
-        Gdx.input.getTextInput(new Input.TextInputListener() {
+        TextInputDialog.getTextInput(new Input.TextInputListener() {
             @Override
             public void input(String text) {
                 onNewTextSet(text);
@@ -58,7 +59,7 @@ public class EditableLabel extends Table implements ITouchActionButton, IControl
             public void canceled() {
                 onEditCancel();
             }
-        }, inputBoxTitle, label.getText().toString(), "");
+        }, inputBoxTitle, label.getText().toString(), skin, getStage());
     }
 
     public Label getLabel() {

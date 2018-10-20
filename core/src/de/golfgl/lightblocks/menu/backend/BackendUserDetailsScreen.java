@@ -1,9 +1,7 @@
 package de.golfgl.lightblocks.menu.backend;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -23,6 +21,7 @@ import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.TextInputDialog;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
@@ -246,7 +245,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
             changeNickname.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    Gdx.input.getTextInput(new Input.TextInputListener() {
+                    TextInputDialog.getTextInput(new Input.TextInputListener() {
                         @Override
                         public void input(final String text) {
                             if (playerDetails.passwordEmail == null || !playerDetails.passwordEmail.equals(text)) {
@@ -265,7 +264,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                         public void canceled() {
 
                         }
-                    }, "Change nickname", playerDetails.nickName, "");
+                    }, "Change nickname", playerDetails.nickName, app.skin, getStage());
                 }
             });
 
@@ -299,7 +298,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
             emailaddress.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    Gdx.input.getTextInput(new Input.TextInputListener() {
+                    TextInputDialog.getTextInput(new Input.TextInputListener() {
                         @Override
                         public void input(final String text) {
                             if (playerDetails.passwordEmail == null || !playerDetails.passwordEmail.equals(text)) {
@@ -318,10 +317,12 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                         public void canceled() {
 
                         }
-                    }, "Set recovery e-mail", myEmailAddress, "");
+                    }, "Set recovery e-mail", myEmailAddress, app.skin, getStage());
                 }
             });
             emailaddress.getLabel().setFontScale(.55f);
+            if (myEmailAddress.isEmpty())
+                emailaddress.setColor(LightBlocksGame.EMPHASIZE_COLOR);
 
             Table optionsMenu = new Table(app.skin);
             optionsMenu.setBackground("window-bl");

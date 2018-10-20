@@ -563,6 +563,19 @@ atlasData: {
 			tintName: null
 			name: whitesmoke
 		}
+		{
+			file: ../window-bl.9.png
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			visible: true
+			tint: null
+			tintName: lightselection
+			name: focused-window-bl
+		}
 	]
 }
 jsonData: {
@@ -3557,14 +3570,14 @@ jsonData: {
 						type: com.badlogic.gdx.graphics.g2d.BitmapFont
 						name: font
 						optional: false
-						value: null
+						value: qs-40-bold
 					}
 					fontColor: {
 						class: com.ray3k.skincomposer.data.StyleProperty
 						type: com.badlogic.gdx.graphics.Color
 						name: fontColor
 						optional: false
-						value: null
+						value: white
 					}
 					focusedFontColor: {
 						class: com.ray3k.skincomposer.data.StyleProperty
@@ -3578,21 +3591,21 @@ jsonData: {
 						type: com.badlogic.gdx.graphics.Color
 						name: disabledFontColor
 						optional: true
-						value: null
+						value: unselected
 					}
 					background: {
 						class: com.ray3k.skincomposer.data.StyleProperty
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: background
 						optional: true
-						value: null
+						value: window
 					}
 					focusedBackground: {
 						class: com.ray3k.skincomposer.data.StyleProperty
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: focusedBackground
 						optional: true
-						value: null
+						value: focused-window-bl
 					}
 					disabledBackground: {
 						class: com.ray3k.skincomposer.data.StyleProperty
@@ -3606,28 +3619,28 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: cursor
 						optional: true
-						value: null
+						value: white
 					}
 					selection: {
 						class: com.ray3k.skincomposer.data.StyleProperty
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: selection
 						optional: true
-						value: null
+						value: whitesmoke
 					}
 					messageFont: {
 						class: com.ray3k.skincomposer.data.StyleProperty
 						type: com.badlogic.gdx.graphics.g2d.BitmapFont
 						name: messageFont
 						optional: true
-						value: null
+						value: qs-40-boldglow
 					}
 					messageFontColor: {
 						class: com.ray3k.skincomposer.data.StyleProperty
 						type: com.badlogic.gdx.graphics.Color
 						name: messageFontColor
 						optional: true
-						value: null
+						value: emphasize
 					}
 				}
 				deletable: false
