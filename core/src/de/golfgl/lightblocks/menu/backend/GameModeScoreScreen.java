@@ -43,16 +43,23 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
         if (leaderboardButton != null)
             leaderboardButton.setVisible(GpgsHelper.getLeaderBoardIdByModelId(gameMode) != null);
 
-        Label labelScores = new Label(app.TEXTS.get("labelModel_" + gameMode) + " " + app.TEXTS.get("labelScores"),
+        Label labelScores = new Label(app.TEXTS.get("labelModel_" + gameMode) + "" + app.TEXTS.get("labelScores"),
                 app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         labelScores.setWrap(true);
         labelScores.setAlignment(Align.center);
         menuTable.add(labelScores).fillX();
 
+        // eigene Scores hinzufügen, wenn es welche gibt
         menuTable.row();
-        ScoresGroup ownScores = new ScoresGroup(app, true);
-        widthDefiningCell = menuTable.add(ownScores).height(ownScores.getPrefHeight()).width(getAvailableContentWidth
-                ()).fill();
+        ScoresGroup ownScores;
+        if (app.savegame.getBestScore(gameMode).getScore() > 0) {
+            ownScores = new ScoresGroup(app, true);
+            widthDefiningCell = menuTable.add(ownScores).height(ownScores.getPrefHeight());
+        } else {
+            ownScores = null;
+            widthDefiningCell = menuTable.add();
+        }
+        widthDefiningCell.width(getAvailableContentWidth()).fill();
 
         final BackendManager.CachedScoreboard latestScores = app.backendManager.getCachedScoreboard(gameMode, true);
         final BackendManager.CachedScoreboard bestScores = app.backendManager.getCachedScoreboard(gameMode, false);
@@ -100,7 +107,8 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
         menuTable.validate();
 
         // Nach dem Validate, damit die Animationen funktionieren
-        ownScores.show(gameMode);
+        if (ownScores != null)
+            ownScores.show(gameMode);
     }
 
     @Override
@@ -170,7 +178,8 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
             widthDefiningCell.width(getAvailableContentWidth());
             widthDefiningCell.getTable().invalidate();
             widthDefiningCell.getTable().validate();
-            widthDefiningCell.getActor().layout();
+            if (widthDefiningCell.getActor() != null)
+                widthDefiningCell.getActor().layout();
         }
     }
 }
