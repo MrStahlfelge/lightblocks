@@ -11,6 +11,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.model.GameScore;
+import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.SprintModel;
@@ -227,12 +228,15 @@ public class BestScore implements IRoundScore, Json.Serializable {
         public void mergeWithOther(BestScoreMap bestScores) {
             for (String key : bestScores.keySet()) {
                 BestScore bs = bestScores.get(key);
-
-                if (!this.containsKey(key))
-                    this.put(key, bs);
-                else
-                    this.get(key).mergeWithOther(key, bs);
+                addOrMergeBestScore(key, bs);
             }
+        }
+
+        private void addOrMergeBestScore(String gameMode, BestScore newScoreToMerge) {
+            if (!this.containsKey(gameMode))
+                this.put(gameMode, newScoreToMerge);
+            else
+                this.get(gameMode).mergeWithOther(gameMode, newScoreToMerge);
         }
 
         public void mergeWithPlayerScores(List<ScoreListEntry> highscores) {
@@ -243,10 +247,7 @@ public class BestScore implements IRoundScore, Json.Serializable {
                 bs.drawnTetrominos = score.drawnBlocks;
                 bs.clearedLines = score.lines;
 
-                if (!this.containsKey(score.gameMode))
-                    this.put(score.gameMode, bs);
-                else
-                    this.get(score.gameMode).mergeWithOther(score.gameMode, bs);
+                addOrMergeBestScore(score.gameMode, bs);
             }
         }
 
@@ -284,5 +285,11 @@ public class BestScore implements IRoundScore, Json.Serializable {
                 gpgsClient.unlockAchievement(GpgsHelper.ACH_SPRINTER);
         }
 
+        public void deleteDeprecatedGameModels() {
+            if (this.containsKey(MarathonModel.DEPRECATED_MODEL_MARATHON_GAMEPAD_ID)) {
+                BestScore marathonGamepadScore = this.remove(MarathonModel.DEPRECATED_MODEL_MARATHON_GAMEPAD_ID);
+                addOrMergeBestScore(MarathonModel.MODEL_MARATHON_NORMAL_ID, marathonGamepadScore);
+            }
+        }
     }
 }

@@ -238,6 +238,7 @@ public class GameStateHandler {
                 // Stand zusammenmergen
                 totalScore.mergeWithOther(cgs.totalScore);
                 bestScores.mergeWithOther(cgs.bestScores);
+                bestScores.deleteDeprecatedGameModels();
 
             } catch (Throwable t) {
                 Gdx.app.error("GameState", "Error reading saved gamestate. Ignored.", t);
@@ -348,6 +349,8 @@ public class GameStateHandler {
                 if (bestScores == null)
                     bestScores = new BestScore.BestScoreMap();
             }
+
+            bestScores.deleteDeprecatedGameModels();
         }
     }
 

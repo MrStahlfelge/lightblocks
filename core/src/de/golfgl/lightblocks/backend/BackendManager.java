@@ -131,11 +131,10 @@ public class BackendManager {
         if (gameModelId == null)
             return false;
 
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_TOUCH_ID))
+        //TODO
+        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_NORMAL_ID))
             return true;
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GRAVITY_ID))
-            return true;
-        if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GAMEPAD_ID))
             return true;
         if (gameModelId.equalsIgnoreCase(PracticeModel.MODEL_PRACTICE_ID))
             return true;

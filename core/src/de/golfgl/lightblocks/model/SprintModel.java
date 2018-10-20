@@ -14,9 +14,7 @@ public class SprintModel extends GameModel {
 
     public static boolean isUnlocked(LightBlocksGame app) {
         return app.savegame.getBestScore(Mission.MISSION10ACHIEVEMENT).getRating() > 0
-                || app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_TOUCH_ID)
-                .getClearedLines() >= NUM_LINES_TO_CLEAR
-                || app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_GAMEPAD_ID)
+                || app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_NORMAL_ID)
                 .getClearedLines() >= NUM_LINES_TO_CLEAR
                 || app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_GRAVITY_ID)
                 .getClearedLines() >= NUM_LINES_TO_CLEAR;

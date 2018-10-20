@@ -73,4 +73,14 @@ public class AbstractFullScreenDialog extends ControllerMenuDialog {
 
         return this;
     }
+
+    @Override
+    public void hide() {
+        setOrigin(getWidth() / 2, getHeight() / 2);
+        hide(parallel(Actions.scaleTo(1, 0, AbstractMenuDialog.TIME_SWOSHIN, Interpolation.circleIn),
+                Actions.fadeOut(AbstractMenuDialog.TIME_SWOSHIN, Interpolation.fade)));
+        if (app.localPrefs.isPlaySounds())
+            app.swoshSound.play();
+
+    }
 }

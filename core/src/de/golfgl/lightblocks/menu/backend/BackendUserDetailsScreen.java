@@ -72,6 +72,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
     protected void fillUserDetails(PlayerDetails retrievedData) {
         Table mainTable = new Table();
         BackendUserLabel userLabel = new BackendUserLabel(retrievedData, app, "default");
+        userLabel.setToLabelMode();
         userLabel.getLabel().setFontScale(1f);
         userLabel.setMaxLabelWidth(LightBlocksGame.nativeGameWidth - 50);
         mainTable.add(userLabel);

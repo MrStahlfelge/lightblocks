@@ -40,6 +40,7 @@ public class TextInputDialog extends ControllerMenuDialog {
         okButton = new FaButton(FontAwesome.CIRCLE_CHECK, skin);
         cancelButton = new FaButton(FontAwesome.CIRCLE_CROSS, skin);
 
+        getButtonTable().defaults().pad(0, 40, 0, 40);
         buttonTable.add(okButton);
         buttonTable.add(cancelButton);
 
@@ -62,6 +63,8 @@ public class TextInputDialog extends ControllerMenuDialog {
                 textInputListener.canceled();
             }
         });
+
+        //TODO für mobile muss hier noch eine virtuelle Tastatur eingeblendet werden
     }
 
     public static void getTextInput(Input.TextInputListener textInputListener, String inputBoxTitle, String
