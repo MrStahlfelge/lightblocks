@@ -43,7 +43,7 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
         if (leaderboardButton != null)
             leaderboardButton.setVisible(GpgsHelper.getLeaderBoardIdByModelId(gameMode) != null);
 
-        Label labelScores = new Label(app.TEXTS.get("labelModel_" + gameMode) + "" + app.TEXTS.get("labelScores"),
+        Label labelScores = new Label(app.TEXTS.get("labelModel_" + gameMode) + " " + app.TEXTS.get("labelScores"),
                 app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         labelScores.setWrap(true);
         labelScores.setAlignment(Align.center);

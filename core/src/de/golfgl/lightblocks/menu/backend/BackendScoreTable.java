@@ -124,7 +124,8 @@ public class BackendScoreTable extends Table {
                     errorMessage = errorMessage + "\n" + (cachedScoreboard.isLastErrorConnectionProblem() ?
                             app.TEXTS.get("errorNoInternetConnection") : cachedScoreboard.getLastErrorMsg());
 
-                ScaledLabel errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                ScaledLabel errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_TITLE,
+                        FONT_SCALE);
                 add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f);
 
                 if (cachedScoreboard.isLastErrorConnectionProblem()) {
@@ -189,7 +190,8 @@ public class BackendScoreTable extends Table {
         int timeMsDigits = BestScore.getTimeMsDigits(cachedScoreboard.getGameMode());
 
         if (scoreboard.isEmpty())
-            add(new ScaledLabel(app.TEXTS.get("profileNoScores"), app.skin, LightBlocksGame.SKIN_FONT_BIG)).center();
+            add(new ScaledLabel(app.TEXTS.get("profileNoScores"), app.skin, LightBlocksGame.SKIN_FONT_TITLE,
+                    FONT_SCALE)).center();
         else if (isShowTitle()) {
             row();
             add();

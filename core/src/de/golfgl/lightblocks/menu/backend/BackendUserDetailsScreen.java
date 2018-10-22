@@ -108,8 +108,10 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                 errorMsg);
 
         Table errorTable = new Table();
-        Label errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_BIG);
-        errorTable.add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f);
+        Label errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+        errorMsgLabel.setWrap(true);
+        errorMsgLabel.setAlignment(Align.center);
+        errorTable.add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f).fill();
 
         if (isConnectionProblem) {
             FaButton retry = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
