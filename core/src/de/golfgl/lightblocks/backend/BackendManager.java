@@ -217,7 +217,8 @@ public class BackendManager {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    onRequestFailed(statusCode, errorMsg);
+                    onRequestFailed(statusCode, statusCode < 500 ? errorMsg :
+                            "Error on Lightblocks' backend server: " + statusCode);
                 }
             });
         }
