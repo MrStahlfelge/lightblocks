@@ -222,8 +222,8 @@ public class BackendScoreTable extends Table {
             add(rankLabel).right().expand(false, false);
             BackendUserLabel userButton = new BackendUserLabel(score, app, "default");
             userButton.getLabel().setFontScale(FONT_SCALE);
-            userButton.setToLabelMode().setMaxLabelWidth(maxNicknameWidth);
-            add(userButton).left();
+            userButton.setMaxLabelWidth(maxNicknameWidth);
+            add(userButton).left().fillY();
             if (isShowScore())
                 add(new ScaledLabel(String.valueOf(score.score), app.skin, LightBlocksGame.SKIN_FONT_TITLE,
                         FONT_SCALE));
