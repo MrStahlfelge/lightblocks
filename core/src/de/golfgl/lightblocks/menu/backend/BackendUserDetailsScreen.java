@@ -109,13 +109,16 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
 
         Table errorTable = new Table();
         Label errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+        float noWrapHeight = errorMsgLabel.getPrefHeight();
         errorMsgLabel.setWrap(true);
         errorMsgLabel.setAlignment(Align.center);
-        errorTable.add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f).fill();
+        errorTable.add(errorMsgLabel).minHeight(noWrapHeight * 1.5f).fill()
+                .minWidth(LightBlocksGame.nativeGameWidth - 50);
 
         if (isConnectionProblem) {
             FaButton retry = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
-            errorTable.add(retry).pad(10);
+            errorTable.row();
+            errorTable.add(retry);
             addFocusableActor(retry);
             retry.addListener(new ChangeListener() {
                 @Override
@@ -139,7 +142,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
             });
         }
 
-        contentCell.setActor(errorTable);
+        contentCell.setActor(errorTable).fillX();
     }
 
     private String getDonatorLabelString(int supportLevel) {
