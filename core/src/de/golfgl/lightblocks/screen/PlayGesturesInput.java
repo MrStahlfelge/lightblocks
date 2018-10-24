@@ -419,28 +419,36 @@ public class PlayGesturesInput extends PlayScreenInput {
             addActor(touchpad);
 
             rotateRightButton = new ImageButton(playScreen.app.skin, "rotateright");
-            rotateRightButton.addListener(new ChangeListener() {
+            rotateRightButton.addListener(new InputListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     playScreen.gameModel.setRotate(true);
+                    return true;
                 }
             });
             addActor(rotateRightButton);
 
             rotateLeftButton = new ImageButton(playScreen.app.skin, "rotateleft");
-            rotateLeftButton.addListener(new ChangeListener() {
+            rotateLeftButton.addListener(new InputListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     playScreen.gameModel.setRotate(false);
+                    return true;
                 }
             });
             addActor(rotateLeftButton);
 
             hardDropButton = new ImageButton(playScreen.app.skin, "harddrop");
-            hardDropButton.addListener(new ChangeListener() {
+            hardDropButton.addListener(new InputListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
+                    return true;
+                }
+
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
                 }
             });
             addActor(hardDropButton);
