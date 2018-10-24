@@ -78,14 +78,17 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
     }
 
     protected void fillParamsTable(LightBlocksGame app) {
-        Table levelSliderTable = new Table();
+        if (getMaxBeginningValue() > 0) {
+            Table levelSliderTable = new Table();
 
-        params.row().padTop(15);
-        levelSliderTable.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel"), app.skin, LightBlocksGame.SKIN_FONT_BIG))
-                .left();
-        levelSliderTable.row();
-        levelSliderTable.add(beginningLevelSlider);
-        params.add(levelSliderTable).expand().fill();
+            params.row().padTop(15);
+            levelSliderTable.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel"), app.skin, LightBlocksGame.SKIN_FONT_BIG))
+
+                    .left();
+            levelSliderTable.row();
+            levelSliderTable.add(beginningLevelSlider);
+            params.add(levelSliderTable).expand().fill();
+        }
 
         params.row();
         playButton = new PlayButton(app);
@@ -95,7 +98,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
                                    }
                                }
         );
-        playButtonCell = params.add(playButton).minHeight(playButton.getPrefHeight() * 2f).top().fillX().expandY();
+        playButtonCell = params.add(playButton).minHeight(playButton.getPrefHeight() * 2f).center().fillX().expandY();
         menuScreen.addFocusableActor(playButton);
 
         menuScreen.addFocusableActor(beginningLevelSlider.getSlider());
