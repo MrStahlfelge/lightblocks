@@ -29,6 +29,7 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  */
 
 public class GameModeScoreScreen extends AbstractMenuDialog {
+    private static final boolean LOAD_BEST_SCORES_IMMEDIATELY = true;
 
     private final String gameMode;
     private FaButton leaderboardButton;
@@ -85,7 +86,8 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
             menuTable.add(labelBest);
             menuTable.row();
             final BackendScoreTable backendScoreTable = new BackendScoreTable(app, bestScores);
-            if (bestScores.isExpired()) {
+            backendScoreTable.setMaxNicknameWidth(130);
+            if (!LOAD_BEST_SCORES_IMMEDIATELY && bestScores.isExpired()) {
                 TextButton showBest = new RoundedTextButton(app.TEXTS.get("buttonLoad").toUpperCase(), app.skin);
                 Table showBestTab = new Table();
                 showBestTab.add(showBest);
