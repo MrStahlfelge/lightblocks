@@ -238,7 +238,7 @@ public class BackendScoreTable extends Table {
                         app.skin, LightBlocksGame.SKIN_FONT_TITLE, FONT_SCALE));
             if (isShowTimePassed()) {
                 add(new ScaledLabel(String.valueOf(formatTimePassedString(app, score.scoreGainedTime)),
-                        app.skin, LightBlocksGame.SKIN_FONT_REG));
+                        app.skin, LightBlocksGame.SKIN_FONT_REG)).left();
             }
 
             if (isShowDetailsButton()) {
