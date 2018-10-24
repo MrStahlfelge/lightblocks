@@ -22,7 +22,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
  */
 public class BackendClientTest {
     private static final String KEY_GAMEMODE1 = "practice";
-    private static final String KEY_GAMEMODE2 = "marathon3";
+    private static final String KEY_GAMEMODE2 = "marathon2";
     boolean requesting = false;
 
     @BeforeClass
@@ -107,12 +107,14 @@ public class BackendClientTest {
         BackendClient backendClientPlayer1 = new BackendClient();
         BackendClient backendClientPlayer2 = new BackendClient();
 
+        int random = MathUtils.random(1000, 2000);
+
         WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
                 = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
-        backendClientPlayer1.createPlayer("player1player1player1neu", createdResponse);
+        backendClientPlayer1.createPlayer("player1player1player1neu" + random, createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData);
-        backendClientPlayer2.createPlayer("player2player1player1neu", "gpgs", createdResponse);
+        backendClientPlayer2.createPlayer("player2player1player1neu" + random, "gpgs", createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData);
 
