@@ -231,7 +231,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
                     marathonType.changeValue();
                 }
             });
-            marathonTypeTabel.add(marathonTypeLabel);
+            marathonTypeTabel.add(marathonTypeLabel).padBottom(-10);
             marathonTypeTabel.row();
             marathonTypeTabel.add(marathonType);
             marathonTypeTabel.row();

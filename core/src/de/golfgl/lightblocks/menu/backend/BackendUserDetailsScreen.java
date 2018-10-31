@@ -203,7 +203,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
     private class HighscoresTable extends Table {
         public HighscoresTable(final PlayerDetails playerDetails) {
             String buttonDetailsLabel = app.TEXTS.get("buttonDetails").toUpperCase();
-            defaults().pad(5, 10, 5, 10);
+            defaults().pad(0, 10, 0, 10);
 
             for (final ScoreListEntry score : playerDetails.highscores) {
                 row();
@@ -223,7 +223,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                         new BackendScoreDetailsScreen(app, score, playerDetails).show(getStage());
                     }
                 });
-                add(detailsButton);
+                add(detailsButton).fillY().minHeight(detailsButton.getPrefHeight() + 10);
                 addFocusableActor(detailsButton);
             }
 
