@@ -19,8 +19,7 @@ public class Gameboard implements Json.Serializable {
     public static final int SQUARE_EMPTY = -1;
     public static final int SQUARE_GARBAGE = 9;
 
-    // Der Tetromino-Index an dieser Position (wird bei lightblocks derzeit nur  zur Unterscheidung
-    // leer/nicht leer genutzt)
+    // Der Tetromino-Index an dieser Position (y/x)
     private final int[][] gameboardSquare;
     Vector2 tempPos;
 
@@ -34,6 +33,20 @@ public class Gameboard implements Json.Serializable {
 
         tempPos = new Vector2();
 
+    }
+
+    public static char gameboardSquareToChar(int gameboardSquare) {
+        if (gameboardSquare == SQUARE_EMPTY)
+            return ' ';
+        else
+            return (char) (65 + (gameboardSquare));
+    }
+
+    public static int gameboardCharToSquare(char block) {
+        if (block == ' ')
+            return SQUARE_EMPTY;
+        else
+            return ((int) block) - 65;
     }
 
     public int[][] getGameboardSquares() {
@@ -190,10 +203,7 @@ public class Gameboard implements Json.Serializable {
         String jsonString = "";
         for (int y = 0; y < GAMEBOARD_ALLROWS; y++) {
             for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
-                if (gameboardSquare[y][x] == SQUARE_EMPTY)
-                    jsonString += ' ';
-                else
-                    jsonString += (char) (65 + (gameboardSquare[y][x]));
+                jsonString += gameboardSquareToChar(gameboardSquare[y][x]);
             }
         }
         json.writeValue("fields", jsonString);
@@ -204,11 +214,7 @@ public class Gameboard implements Json.Serializable {
         String jsonString = jsonData.getString("fields");
         for (int y = 0; y < GAMEBOARD_ALLROWS; y++) {
             for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
-                char block = jsonString.charAt(y * GAMEBOARD_COLUMNS + x);
-                if (block == ' ')
-                    gameboardSquare[y][x] = SQUARE_EMPTY;
-                else
-                    gameboardSquare[y][x] = ((int) block) - 65;
+                gameboardSquare[y][x] = gameboardCharToSquare(jsonString.charAt(y * GAMEBOARD_COLUMNS + x));
             }
         }
 

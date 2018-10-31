@@ -11,6 +11,7 @@ import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
+import de.golfgl.lightblocks.state.Replay;
 import de.golfgl.lightblocks.state.TotalScore;
 
 /**
@@ -41,6 +42,7 @@ public abstract class GameModel implements Json.Serializable {
     protected float currentSpeed;
     protected IGameModelListener userInterface;
     protected TetrominoDrawyer drawyer;
+    private Replay replay;
     private GameScore score;
     private boolean isBestScore = false;
     private Tetromino activeTetromino;
@@ -76,6 +78,7 @@ public abstract class GameModel implements Json.Serializable {
         linesToRemove = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
         isGameOver = false;
 
+        replay = new Replay();
     }
 
     protected Tetromino getActiveTetromino() {
@@ -160,11 +163,15 @@ public abstract class GameModel implements Json.Serializable {
         // wenn nicht bewegen konnte, dann festnageln und nächsten aktivieren
         if (maxDistance < distance)
             dropActiveTetromino();
-        else
+        else {
             distanceRemainder -= distance;
+            replay.addMovePieceStep(score.getTimeMs(), false, (byte) maxDistance);
+        }
     }
 
     private void dropActiveTetromino() {
+
+        Replay.ReplayDropPieceStep replayStep = replay.addDropStep(score.getTimeMs(), activeTetromino);
 
         gameboard.pinTetromino(activeTetromino);
         userInterface.pinTetromino(activeTetromino.getCurrentBlockPositions());
@@ -204,6 +211,7 @@ public abstract class GameModel implements Json.Serializable {
         }
 
         int gainedScore = score.flushScore();
+        replayStep.score = score.getScore();
 
         // Auswertung Achievements für GPGS und UI
 
@@ -426,6 +434,7 @@ public abstract class GameModel implements Json.Serializable {
                     ghostPieceDistance);
             activeTetromino.getPosition().x += maxDistance;
             activeTetromino.setLastMovementType(0);
+            replay.addMovePieceStep(score.getTimeMs(), true, (byte) maxDistance);
         }
 
         if (maxDistance != distance) {
@@ -455,6 +464,7 @@ public abstract class GameModel implements Json.Serializable {
             int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
             userInterface.rotateTetro(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions(),
                     ghostPieceDistance);
+            replay.addRotatePieceStep(score.getTimeMs(), activeTetromino);
         }
     }
 
@@ -534,6 +544,7 @@ public abstract class GameModel implements Json.Serializable {
             score.incDrawnTetrominos();
             if (userInterface != null)
                 userInterface.updateScore(score, 0);
+            replay.addNextPieceStep(score.getTimeMs(), gameboard, activeTetromino);
         }
     }
 
@@ -820,6 +831,7 @@ public abstract class GameModel implements Json.Serializable {
         json.writeValue("noDropSinceHold", noDropSinceHoldMove);
         json.writeValue("score", score);
         json.writeValue("inputType", inputTypeKey);
+        json.writeValue("replay", replay.toString());
     }
 
     @Override
@@ -864,6 +876,8 @@ public abstract class GameModel implements Json.Serializable {
         this.noDropSinceHoldMove = jsonData.getBoolean("noDropSinceHold", false);
 
         setCurrentSpeed();
+
+        replay.fromString(jsonData.getString("replay", null));
     }
 
     public boolean beginPaused() {

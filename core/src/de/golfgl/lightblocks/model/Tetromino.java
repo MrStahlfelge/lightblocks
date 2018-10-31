@@ -110,6 +110,9 @@ public class Tetromino {
         return getRotationVectors(getCurrentRotation());
     }
 
+    /**
+     * @return 4x2 Array. Erste Dimension sind die 4 Blöcke, zweite Dimension ist die x/y-Position
+     */
     public Integer[][] getCurrentBlockPositions() {
         return getBlockPositions(position, currentRotation);
     }
