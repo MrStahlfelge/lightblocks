@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.pay.PurchaseManager;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 
@@ -250,6 +251,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         COLOR_FOCUSSED_ACTOR = skin.getColor("lightselection");
         COLOR_UNSELECTED = skin.getColor("unselected");
         EMPHASIZE_COLOR = skin.getColor("emphasize");
+
+        skin.get(SKIN_FONT_TITLE, Label.LabelStyle.class).font.setFixedWidthGlyphs("0123456789-+X");
     }
 
     @Override

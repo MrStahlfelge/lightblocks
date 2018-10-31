@@ -46,8 +46,6 @@ public class ScoreLabel extends Label {
         super("0", skin, styleName);
         setFontScale(LightBlocksGame.LABEL_SCALING);
 
-        getBitmapFontCache().getFont().setFixedWidthGlyphs("0123456789-+X");
-
         this.digits = digits;
         this.score = score - 1;
         setScore(score);
