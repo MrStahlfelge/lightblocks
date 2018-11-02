@@ -16,16 +16,18 @@ import de.golfgl.lightblocks.model.Tetromino;
 
 public class BlockGroup extends Group {
     public static final float GRIDINTENSITYFACTOR = .2f;
-
+    protected final LightBlocksGame app;
     private final Group grid;
     private Image[] ghostpiece;
 
     public BlockGroup() {
         // no grid - AnimatedLightblocksLogo
         grid = new Group();
+        app = null;
     }
 
     public BlockGroup(LightBlocksGame app) {
+        this.app = app;
         // Grid und Ghost
         grid = new Group();
 

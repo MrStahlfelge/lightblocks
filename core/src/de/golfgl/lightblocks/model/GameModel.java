@@ -911,4 +911,8 @@ public abstract class GameModel implements Json.Serializable {
     public void setBestScore(BestScore bestScore) {
         this.bestScore = bestScore;
     }
+
+    public Replay getReplay() {
+        return (replay.isValid() ? replay : null);
+    }
 }

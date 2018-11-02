@@ -24,6 +24,7 @@ import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.scene2d.BetterScrollPane;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
+import de.golfgl.lightblocks.scene2d.ReplayGameboard;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.AbstractMenuScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
@@ -32,6 +33,7 @@ import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.IRoundScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
+import de.golfgl.lightblocks.state.Replay;
 
 /**
  * Anzeige von Runden und Highscore
@@ -56,6 +58,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
     private Label titleIcon;
     private Cell<Label> titleIconCell;
     private Cell<Table> scoreTableCell;
+    private Replay replay;
 
     public RoundOverScoreScreen(LightBlocksGame app) {
         super(app);
@@ -297,6 +300,23 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
 
         }
 
+        if (replay != null) {
+            Button showReplay = new FaButton(FontAwesome.CIRCLE_PLAY, app.skin);
+            showReplay.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    AbstractFullScreenDialog dialog = new AbstractFullScreenDialog(app);
+                    ReplayGameboard replayGameboard = new ReplayGameboard(app);
+                    replayGameboard.setReplay(replay);
+                    dialog.getContentTable().add(replayGameboard);
+                    dialog.show(stage);
+                    replayGameboard.playReplay();
+                }
+            });
+            buttons.add(showReplay);
+            stage.addFocusableActor(showReplay);
+        }
+
     }
 
     private Button addRetryOrNextButton() {
@@ -438,5 +458,10 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
             scoreTable.setScale(scaleXY);
             scoreTable.setTransform(scaleXY != 1f);
         }
+    }
+
+    public void setReplay(Replay replay) {
+        if (replay.isValid())
+            this.replay = replay;
     }
 }

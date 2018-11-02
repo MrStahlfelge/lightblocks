@@ -538,6 +538,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         scoreScreen.addScoreToShow(gameModel.getBestScore(), app.TEXTS.get("labelBestScore"));
         scoreScreen.setNewGameParams(gameModel.getInitParameters());
         scoreScreen.setBackScreen(this.backScreen);
+        scoreScreen.setReplay(gameModel.getReplay());
         scoreScreen.initializeUI();
         app.setScreen(scoreScreen);
 

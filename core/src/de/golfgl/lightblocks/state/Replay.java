@@ -1,7 +1,9 @@
 package de.golfgl.lightblocks.state;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.Tetromino;
@@ -19,11 +21,14 @@ public class Replay {
     private static final char SEP_DEFAULT = ':';
     private static final char SEP_MAJOR = '#';
     private static final String KEY_VERSION = "1";
-    private Array<ReplayStep> replaySteps;
+    private LinkedList<ReplayStep> replaySteps;
+    private ArrayList<ReplayStep> arraySteps;
     private boolean isValid;
+    private int currentReplayStepIdx;
+    private int lastGameboardStepIdx;
 
     public Replay() {
-        this.replaySteps = new Array<ReplayStep>(500);
+        this.replaySteps = new LinkedList<ReplayStep>();
         isValid = true;
     }
 
@@ -36,8 +41,78 @@ public class Replay {
         return lastChar;
     }
 
-    public Array<ReplayStep> getReplaySteps() {
-        return replaySteps;
+    /**
+     * verlässt den Replay-Mode
+     */
+    private void setChanged() {
+        arraySteps = null;
+    }
+
+    /**
+     * setzt den Replay-Mode: Umkopieren in Array, setzen der aktuellen Position
+     */
+    private void setReplayMode() {
+        if (arraySteps == null) {
+            arraySteps = new ArrayList<ReplayStep>(replaySteps);
+
+            if (!isValid())
+                arraySteps.clear();
+
+            currentReplayStepIdx = -1;
+            lastGameboardStepIdx = -1;
+        }
+    }
+
+    public ReplayStep getFirstStep() {
+        setReplayMode();
+
+        currentReplayStepIdx = -1;
+        return getNextStep();
+    }
+
+    public ReplayStep getPreviousStep() {
+        setReplayMode();
+
+        currentReplayStepIdx = Math.max(currentReplayStepIdx - 1, arraySteps.size());
+
+        return getCurrentStep();
+    }
+
+    public ReplayStep getNextStep() {
+        setReplayMode();
+
+        currentReplayStepIdx = Math.min(currentReplayStepIdx + 1, arraySteps.size());
+
+        return getCurrentStep();
+    }
+
+    public ReplayStep getCurrentStep() {
+        setReplayMode();
+
+        if (currentReplayStepIdx >= 0 && currentReplayStepIdx < arraySteps.size()) {
+            ReplayStep replayStep = arraySteps.get(currentReplayStepIdx);
+            if (replayStep instanceof ReplayGameboardStep)
+                lastGameboardStepIdx = currentReplayStepIdx;
+            else if (lastGameboardStepIdx > currentReplayStepIdx) {
+                lastGameboardStepIdx = currentReplayStepIdx;
+                while (lastGameboardStepIdx >= 0 && !(arraySteps.get(lastGameboardStepIdx) instanceof
+                        ReplayGameboardStep)) {
+                    lastGameboardStepIdx--;
+                }
+            }
+
+            return replayStep;
+        } else
+            return null;
+    }
+
+    public ReplayGameboardStep getCurrentGameboardStep() {
+        setReplayMode();
+
+        if (lastGameboardStepIdx >= 0 && lastGameboardStepIdx < arraySteps.size())
+            return (ReplayGameboardStep) arraySteps.get(lastGameboardStepIdx);
+        else
+            return null;
     }
 
     public boolean isValid() {
@@ -52,6 +127,7 @@ public class Replay {
         currStep.saveActivePiecePos(activeTetromino);
 
         replaySteps.add(currStep);
+        setChanged();
 
         return currStep;
     }
@@ -62,6 +138,7 @@ public class Replay {
         currStep.saveGameboard(gameboard);
         currStep.saveActivePiecePos(activeTetromino);
         replaySteps.add(currStep);
+        setChanged();
     }
 
     public void addRotatePieceStep(int timeMs, Tetromino activeTetroMino) {
@@ -69,6 +146,7 @@ public class Replay {
         currStep.timeMs = timeMs;
         currStep.saveActivePiecePos(activeTetroMino);
         replaySteps.add(currStep);
+        setChanged();
     }
 
     public void addMovePieceStep(int timeMs, boolean horizontal, byte distance) {
@@ -80,6 +158,7 @@ public class Replay {
         currStep.timeMs = timeMs;
         currStep.moveDistance = distance;
         replaySteps.add(currStep);
+        setChanged();
     }
 
     @Override
@@ -102,6 +181,7 @@ public class Replay {
     public boolean fromString(String toParse) {
         replaySteps.clear();
         isValid = false;
+        setChanged();
 
         if (toParse == null || toParse.length() < 2)
             return false;
@@ -332,6 +412,9 @@ public class Replay {
             moveDistance = Integer.parseInt(toParse.substring(currentPos, maxPos));
             return maxPos;
         }
+
+        public abstract int getMoveX();
+        public abstract int getMoveY();
     }
 
     public static class HorizontalMovePieceStep extends MovePieceStep {
@@ -340,6 +423,16 @@ public class Replay {
             stringBuilder.append(KEY_HORIZONTAL_MOVE);
             super.appendTo(stringBuilder, lastTimeStamp);
         }
+
+        @Override
+        public int getMoveX() {
+            return moveDistance;
+        }
+
+        @Override
+        public int getMoveY() {
+            return 0;
+        }
     }
 
     public static class VerticalMovePieceStep extends MovePieceStep {
@@ -347,6 +440,16 @@ public class Replay {
         public void appendTo(StringBuilder stringBuilder, int lastTimeStamp) {
             stringBuilder.append(KEY_VERTICAL_MOVE);
             super.appendTo(stringBuilder, lastTimeStamp);
+        }
+
+        @Override
+        public int getMoveX() {
+            return 0;
+        }
+
+        @Override
+        public int getMoveY() {
+            return moveDistance;
         }
     }
 }
