@@ -69,6 +69,8 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
+    public static final float DURATION_TETRO_MOVE = 1 / 30f;
+    public static final float DURATION_REMOVE_DELAY = .15f;
     private static final int NINE_PATCH_BORDER_SIZE = 5;
     private static final float GAMEOVER_TOUCHFREEZE = 1.5f;
     protected final Image imGarbageIndicator;
@@ -570,7 +572,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 int x = v[i][0];
                 int y = v[i][1];
                 block.setMoveAction(Actions.moveTo((x + dx) * BlockActor.blockWidth, (y + dy) * BlockActor
-                        .blockWidth, 1 / 30f));
+                        .blockWidth, DURATION_TETRO_MOVE));
                 blockMatrix[x + dx][y + dy] = block;
                 blockGroup.setGhostPiecePosition(i, x + dx, y - ghostPieceDistance);
             }
@@ -615,7 +617,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     @Override
     public void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition) {
 
-        final float removeDelayTime = .15f;
+        final float removeDelayTime = DURATION_REMOVE_DELAY;
         final float removeFadeOutTime = .2f;
         final float moveActorsTime = .1f;
 

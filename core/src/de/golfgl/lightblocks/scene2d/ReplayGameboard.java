@@ -1,8 +1,11 @@
 package de.golfgl.lightblocks.scene2d;
 
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.Tetromino;
+import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.Replay;
 
 /**
@@ -17,17 +20,19 @@ public class ReplayGameboard extends BlockGroup {
     private Replay.ReplayStep nextStep;
     private float waitTime;
     private BlockActor[] currentShownBlocks;
-    private BlockActor[] activePiece;
+    private BlockActor[] activePieceBlock;
+    private int[] activePiecePos;
 
     public ReplayGameboard(LightBlocksGame app) {
         super(app);
         setGhostPieceVisibility(false);
 
         currentShownBlocks = new BlockActor[Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_ALLROWS];
-        activePiece = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
-        for (int i = 0; i < activePiece.length; i++) {
-            activePiece[i] = new BlockActor(app, Tetromino.TETRO_IDX_L);
-            activePiece[i].setEnlightened(true, true);
+        activePieceBlock = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
+        activePiecePos = new int[Tetromino.TETROMINO_BLOCKCOUNT];
+        for (int i = 0; i < activePieceBlock.length; i++) {
+            activePieceBlock[i] = new BlockActor(app, Tetromino.TETRO_IDX_L);
+            activePieceBlock[i].setEnlightened(true, true);
         }
     }
 
@@ -45,7 +50,12 @@ public class ReplayGameboard extends BlockGroup {
 
                 transitionToStep(shownStep);
 
-                // TODO wait time bei Drop/Line Clear etwas erhöhen
+                if (shownStep instanceof Replay.ReplayDropPieceStep) {
+                    // TODO Score anzeigen
+
+                    // falls Clear oder Insert: DURATION_REMOVE_DELAY dazu
+                    waitTime = waitTime + .2f / playSpeed;
+                }
             }
         }
 
@@ -55,16 +65,21 @@ public class ReplayGameboard extends BlockGroup {
     private void transitionToStep(Replay.ReplayStep shownStep) {
         if (shownStep instanceof Replay.ReplayActivePieceStep) {
             int[] activePiecePosition = ((Replay.ReplayActivePieceStep) shownStep).activePiecePosition;
-            for (int i = 0; i < activePiece.length; i++)
-                setBlockActorToPosition(activePiece[i], activePiecePosition[i]);
+            for (int i = 0; i < activePieceBlock.length; i++) {
+                activePiecePos[i] = activePiecePosition[i];
+                setBlockActorToPosition(activePieceBlock[i], activePiecePosition[i],
+                        shownStep instanceof Replay.ReplayNextPieceStep);
+            }
         } else if (shownStep instanceof Replay.MovePieceStep) {
-            int moveX = ((Replay.MovePieceStep) shownStep).getMoveX() * BlockActor.blockWidth;
-            int moveY = ((Replay.MovePieceStep) shownStep).getMoveY() * BlockActor.blockWidth;
-            for (int i = 0; i < activePiece.length; i++) {
-                activePiece[i].setX(activePiece[i].getX() + moveX);
-                activePiece[i].setY(activePiece[i].getY() - moveY);
+            int move = ((Replay.MovePieceStep) shownStep).getMoveX()
+                    - Gameboard.GAMEBOARD_COLUMNS * ((Replay.MovePieceStep) shownStep).getMoveY();
+            for (int i = 0; i < activePieceBlock.length; i++) {
+                activePiecePos[i] = activePiecePos[i] + move;
+                setBlockActorToPosition(activePieceBlock[i], activePiecePos[i], false);
             }
         }
+
+        // TODO bei Drop ganze Zeilen highlighten und bei NewPieceStep "abbauen"
     }
 
     private void transitionGameboard(Replay.ReplayGameboardStep gameboardStep) {
@@ -80,18 +95,23 @@ public class ReplayGameboard extends BlockGroup {
                     currentShownBlocks[i] = null;
                 } else if (currentShownBlocks[i] == null && shouldHaveActor) {
                     currentShownBlocks[i] = new BlockActor(app, Tetromino.TETRO_IDX_L);
-                    setBlockActorToPosition(currentShownBlocks[i], i);
+                    currentShownBlocks[i].setEnlightened(true, true);
+                    setBlockActorToPosition(currentShownBlocks[i], i, true);
+                    currentShownBlocks[i].addAction(Actions.delay(.05f,
+                            Actions.run(currentShownBlocks[i].getDislightenAction())));
                 }
             }
-
-            //TODO volle Reihen highlighten
         }
     }
 
-    private void setBlockActorToPosition(BlockActor actor, int newXY) {
+    private void setBlockActorToPosition(BlockActor actor, int newXY, boolean immediately) {
         addActor(actor);
-        actor.setPosition(newXY % Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth,
-                (int) newXY / Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth);
+        int posX = newXY % Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth;
+        int posY = (int) newXY / Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth;
+        if (immediately)
+            actor.setPosition(posX, posY);
+        else
+            actor.setMoveAction(Actions.moveTo(posX, posY, PlayScreen.DURATION_TETRO_MOVE / playSpeed));
     }
 
     public void setReplay(Replay replay) {
