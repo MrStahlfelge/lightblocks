@@ -106,13 +106,25 @@ public class Replay {
             return null;
     }
 
-    public ReplayGameboardStep getCurrentGameboardStep() {
+    public byte[] getCurrentGameboard() {
         setReplayMode();
 
         if (lastGameboardStepIdx >= 0 && lastGameboardStepIdx < arraySteps.size())
-            return (ReplayGameboardStep) arraySteps.get(lastGameboardStepIdx);
+            return ((ReplayGameboardStep) arraySteps.get(lastGameboardStepIdx)).gameboard;
         else
             return null;
+    }
+
+    public int getCurrentScore() {
+        setReplayMode();
+        while (currentReplayStepIdx > 0 && currentReplayStepIdx < arraySteps.size()) {
+            ReplayStep replayStep = arraySteps.get(currentReplayStepIdx);
+            if (replayStep.isDropStep())
+                return ((ReplayDropPieceStep) replayStep).score;
+            currentReplayStepIdx--;
+        }
+
+        return 0;
     }
 
     public boolean isValid() {
@@ -252,12 +264,44 @@ public class Replay {
             currentPos = timeSeperator + 1;
             return currentPos;
         }
+
+        public int getMoveX() {
+            return 0;
+        }
+
+        public int getMoveY() {
+            return 0;
+        }
+
+        public boolean isMovementStep() {
+            return getMoveX() != 0 || getMoveY() != 0;
+        }
+
+        public boolean hasActivePiecePosition() {
+            return getActivePiecePosition() != null;
+        }
+
+        public int[] getActivePiecePosition() {
+            return null;
+        }
+
+        public boolean isDropStep() {
+            return false;
+        }
+
+        public boolean isNextPieceStep() {
+            return false;
+        }
+
+        public void setScore(int Score) {
+            throw new UnsupportedOperationException("setScore called on wrong replay step");
+        }
     }
 
     /**
      * Step mit Positionierung aktiver Block
      */
-    public abstract static class ReplayActivePieceStep extends ReplayStep {
+    private abstract static class ReplayActivePieceStep extends ReplayStep {
         public int[] activePiecePosition;
 
         public void saveActivePiecePos(Tetromino activeTetromino) {
@@ -290,12 +334,17 @@ public class Replay {
             }
             return currentPos;
         }
+
+        @Override
+        public int[] getActivePiecePosition() {
+            return activePiecePosition;
+        }
     }
 
     /**
      * Step mit Positionierung aktiver Block und vollem Spielfeld
      */
-    public abstract static class ReplayGameboardStep extends ReplayActivePieceStep {
+    private abstract static class ReplayGameboardStep extends ReplayActivePieceStep {
         public byte[] gameboard;
 
         public void saveGameboard(Gameboard gameboard) {
@@ -350,18 +399,23 @@ public class Replay {
     /**
      * Nächstes Tetromino gezogen
      */
-    public static class ReplayNextPieceStep extends ReplayGameboardStep {
+    private static class ReplayNextPieceStep extends ReplayGameboardStep {
         @Override
         public void appendTo(StringBuilder stringBuilder, int lastTimeStamp) {
             stringBuilder.append(KEY_NEXT_PIECE);
             super.appendTo(stringBuilder, lastTimeStamp);
+        }
+
+        @Override
+        public boolean isNextPieceStep() {
+            return true;
         }
     }
 
     /**
      * Tetromino abgelegt, neuer Score ermittelt
      */
-    public static class ReplayDropPieceStep extends ReplayActivePieceStep {
+    private static class ReplayDropPieceStep extends ReplayActivePieceStep {
         public int score;
 
         @Override
@@ -381,12 +435,22 @@ public class Replay {
             score = Integer.parseInt(toParse.substring(currentPos, endSeperator), 16);
             return currentPos;
         }
+
+        @Override
+        public boolean isDropStep() {
+            return true;
+        }
+
+        @Override
+        public void setScore(int score) {
+            this.score = score;
+        }
     }
 
     /**
      * Tetromino gedreht
      */
-    public static class RotateActivePieceStep extends ReplayActivePieceStep {
+    private static class RotateActivePieceStep extends ReplayActivePieceStep {
         @Override
         public void appendTo(StringBuilder stringBuilder, int lastTimeStamp) {
             stringBuilder.append(KEY_ROTATE_PIECE);
@@ -397,7 +461,7 @@ public class Replay {
     /**
      * Bewegung ohne Drehung
      */
-    public abstract static class MovePieceStep extends ReplayStep {
+    private abstract static class MovePieceStep extends ReplayStep {
         public int moveDistance;
 
         @Override
@@ -412,12 +476,9 @@ public class Replay {
             moveDistance = Integer.parseInt(toParse.substring(currentPos, maxPos));
             return maxPos;
         }
-
-        public abstract int getMoveX();
-        public abstract int getMoveY();
     }
 
-    public static class HorizontalMovePieceStep extends MovePieceStep {
+    private static class HorizontalMovePieceStep extends MovePieceStep {
         @Override
         public void appendTo(StringBuilder stringBuilder, int lastTimeStamp) {
             stringBuilder.append(KEY_HORIZONTAL_MOVE);
@@ -428,23 +489,13 @@ public class Replay {
         public int getMoveX() {
             return moveDistance;
         }
-
-        @Override
-        public int getMoveY() {
-            return 0;
-        }
     }
 
-    public static class VerticalMovePieceStep extends MovePieceStep {
+    private static class VerticalMovePieceStep extends MovePieceStep {
         @Override
         public void appendTo(StringBuilder stringBuilder, int lastTimeStamp) {
             stringBuilder.append(KEY_VERTICAL_MOVE);
             super.appendTo(stringBuilder, lastTimeStamp);
-        }
-
-        @Override
-        public int getMoveX() {
-            return 0;
         }
 
         @Override

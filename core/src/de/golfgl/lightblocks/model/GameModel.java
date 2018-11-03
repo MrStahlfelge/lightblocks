@@ -171,7 +171,7 @@ public abstract class GameModel implements Json.Serializable {
 
     private void dropActiveTetromino() {
 
-        Replay.ReplayDropPieceStep replayStep = replay.addDropStep(score.getTimeMs(), activeTetromino);
+        Replay.ReplayStep replayStep = replay.addDropStep(score.getTimeMs(), activeTetromino);
 
         gameboard.pinTetromino(activeTetromino);
         userInterface.pinTetromino(activeTetromino.getCurrentBlockPositions());
@@ -211,7 +211,7 @@ public abstract class GameModel implements Json.Serializable {
         }
 
         int gainedScore = score.flushScore();
-        replayStep.score = score.getScore();
+        replayStep.setScore(score.getScore());
 
         // Auswertung Achievements für GPGS und UI
 
