@@ -169,6 +169,7 @@ public class MultiplayerModel extends GameModel {
     protected void activeTetrominoDropped() {
         // den Meister über den Stand der Dinge informieren
         sendPlayerInGameStats();
+        sendPlayersGameboard();
     }
 
     private void sendPlayerInGameStats() {
@@ -195,6 +196,36 @@ public class MultiplayerModel extends GameModel {
 
 
         playerRoom.sendToReferee(meInGame);
+    }
+
+    private void sendPlayersGameboard() {
+        MultiPlayerObjects.ChatMessage myGameboardMessage = new MultiPlayerObjects.ChatMessage();
+        myGameboardMessage.playerId = playerRoom.getMyPlayerId();
+
+        int[][] gameboardSquares = getGameboard().getGameboardSquares();
+        char[] gameboardChars = new char[Gameboard.GAMEBOARD_ALLROWS * Gameboard.GAMEBOARD_COLUMNS];
+        int lastChar = 0;
+        for (byte row = 0; row < Gameboard.GAMEBOARD_ALLROWS; row++) {
+            for (byte column = 0; column < Gameboard.GAMEBOARD_COLUMNS; column++) {
+                int pos = row * Gameboard.GAMEBOARD_COLUMNS + column;
+                gameboardChars[pos] = Gameboard.gameboardSquareToChar
+                        (gameboardSquares[row][column]);
+                if (gameboardSquares[row][column] != Gameboard.SQUARE_EMPTY)
+                    lastChar = pos;
+            }
+        }
+        Integer[][] currentBlockPositions = getActiveTetromino().getCurrentBlockPositions();
+        if (currentBlockPositions != null)
+            for (int blockNum = 0; blockNum < currentBlockPositions.length; blockNum++) {
+                int pos = currentBlockPositions[blockNum][0] +
+                        Gameboard.GAMEBOARD_COLUMNS * currentBlockPositions[blockNum][1];
+                gameboardChars[pos] = '_';
+                lastChar = Math.max(lastChar, pos);
+            }
+        myGameboardMessage.message = new String(gameboardChars);
+        if (lastChar < myGameboardMessage.message.length())
+            myGameboardMessage.message = myGameboardMessage.message.substring(0, lastChar + 1);
+        playerRoom.sendToReferee(myGameboardMessage);
     }
 
     @Override
@@ -264,6 +295,8 @@ public class MultiplayerModel extends GameModel {
         if (o instanceof MultiPlayerObjects.PlayerInGame)
             handlePlayerInGameChanged((MultiPlayerObjects.PlayerInGame) o);
 
+        if (o instanceof MultiPlayerObjects.ChatMessage)
+            handlePlayerGameboard((MultiPlayerObjects.ChatMessage) o);
 
         if (o instanceof MultiPlayerObjects.NextTetrosDrawn) {
             if (playerRoom.isOwner())
@@ -428,8 +461,15 @@ public class MultiplayerModel extends GameModel {
 
             }
         }
+    }
 
-
+    private void handlePlayerGameboard(MultiPlayerObjects.ChatMessage gameboardInfo) {
+        if (playerRoom.isOwner()) {
+            playerRoom.sendToAllPlayersExcept(gameboardInfo.playerId, gameboardInfo);
+        }
+        if (!gameboardInfo.playerId.equals(playerRoom.getMyPlayerId())) {
+            //TODO Gdx.app.postRunnable(UI)
+        }
     }
 
     private void handleBonusScore(final int score) {
