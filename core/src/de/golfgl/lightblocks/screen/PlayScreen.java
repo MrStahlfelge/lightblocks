@@ -71,6 +71,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     public static final float DURATION_TETRO_MOVE = 1 / 30f;
     public static final float DURATION_REMOVE_DELAY = .15f;
+    public static final float DURATION_REMOVE_FADEOUT = .2f;
     private static final int NINE_PATCH_BORDER_SIZE = 5;
     private static final float GAMEOVER_TOUCHFREEZE = 1.5f;
     protected final Image imGarbageIndicator;
@@ -618,7 +619,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition) {
 
         final float removeDelayTime = DURATION_REMOVE_DELAY;
-        final float removeFadeOutTime = .2f;
+        final float removeFadeOutTime = DURATION_REMOVE_FADEOUT;
         final float moveActorsTime = .1f;
 
         int linesToInsert = (garbageHolePosition == null ? 0 : garbageHolePosition.length);

@@ -460,7 +460,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
     }
 
     public void setReplay(Replay replay) {
-        if (replay.isValid())
+        if (replay != null && replay.isValid())
             this.replay = replay;
     }
 }
