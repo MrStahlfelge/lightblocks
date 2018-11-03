@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.JsonValue;
 
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
+import de.golfgl.lightblocks.state.Replay;
 
 /**
  * Abstrakte Klasse für Missionen
@@ -168,5 +169,16 @@ public abstract class MissionModel extends GameModel {
     @Override
     public boolean isComboScoreAllowedByModel() {
         return false;
+    }
+
+    /**
+     * für Missionen die das Replay aktivieren wollen
+     */
+    protected void setReplayValidOnFirstStart() {
+        //Replay gültig setzen
+        if (!replay.isValid() && getScore().getTimeMs() == 0 && getScore().getScore() == 0) {
+            replay = new Replay();
+            replay.addNextPieceStep(0, getGameboard(), getActiveTetromino());
+        }
     }
 }

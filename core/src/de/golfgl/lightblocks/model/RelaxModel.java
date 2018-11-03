@@ -3,6 +3,8 @@ package de.golfgl.lightblocks.model;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
+import de.golfgl.lightblocks.state.Replay;
+
 /**
  * Type A "Relax" Modell mit Ziel eine bestimmte Anzahl Reihen oder Score mit begrenzten Blöcken zu machen
  * <p>
@@ -37,6 +39,8 @@ public class RelaxModel extends MissionModel {
     public void read(Json json, JsonValue jsonData) {
         super.read(json, jsonData);
         this.linesToClear = jsonData.getInt("linesToClear", 0);
+
+        setReplayValidOnFirstStart();
     }
 
     @Override

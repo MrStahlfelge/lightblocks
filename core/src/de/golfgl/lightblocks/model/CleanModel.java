@@ -59,5 +59,7 @@ public class CleanModel extends MissionModel {
         // wieder einzufügen
         int insertGarbage = jsonData.getInt("initialGarbage", 0);
         getGameboard().initGarbage(insertGarbage);
+
+        setReplayValidOnFirstStart();
     }
 }

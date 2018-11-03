@@ -42,7 +42,7 @@ public abstract class GameModel implements Json.Serializable {
     protected float currentSpeed;
     protected IGameModelListener userInterface;
     protected TetrominoDrawyer drawyer;
-    private Replay replay;
+    protected Replay replay;
     private GameScore score;
     private boolean isBestScore = false;
     private Tetromino activeTetromino;
