@@ -257,7 +257,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                             if (playerDetails.passwordEmail == null || !playerDetails.passwordEmail.equals(text)) {
                                 app.backendManager.getBackendClient().changePlayerDetails(text, null,
                                         app.localPrefs.getSupportLevel(), null, null,
-                                        new WaitForResponse(app, getStage()) {
+                                        new WaitForResponse<Void>(app, getStage()) {
                                             @Override
                                             protected void onSuccess() {
                                                 reload();
@@ -285,7 +285,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    app.backendManager.getBackendClient().deletePlayer(new WaitForResponse(app,
+                                    app.backendManager.getBackendClient().deletePlayer(new WaitForResponse<Void>(app,
                                             getStage()) {
                                         @Override
                                         protected void onSuccess() {
@@ -310,7 +310,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                             if (playerDetails.passwordEmail == null || !playerDetails.passwordEmail.equals(text)) {
                                 app.backendManager.getBackendClient().changePlayerDetails(null, text,
                                         app.localPrefs.getSupportLevel(), null, null,
-                                        new WaitForResponse(app, getStage()) {
+                                        new WaitForResponse<Void>(app, getStage()) {
                                             @Override
                                             protected void onSuccess() {
                                                 myEmailAddress = text;

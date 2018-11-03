@@ -12,7 +12,7 @@ import de.golfgl.lightblocks.scene2d.ProgressDialog;
  * Created by Benjamin Schulte on 18.10.2018.
  */
 
-public class WaitForResponse extends BackendManager.AbstractQueuedBackendResponse<Void> {
+public class WaitForResponse<T> extends BackendManager.AbstractQueuedBackendResponse<T> {
     private ProgressDialog progressDialog;
 
     public WaitForResponse(LightBlocksGame app, Stage stage) {
@@ -29,7 +29,7 @@ public class WaitForResponse extends BackendManager.AbstractQueuedBackendRespons
     }
 
     @Override
-    public void onRequestSuccess(Void retrievedData) {
+    public void onRequestSuccess(T retrievedData) {
         progressDialog.hide();
         onSuccess();
     }

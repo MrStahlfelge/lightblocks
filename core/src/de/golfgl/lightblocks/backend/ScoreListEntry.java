@@ -24,6 +24,7 @@ public class ScoreListEntry implements IPlayerInfo {
     public final int rank;
     public final String gameMode;
     public final ScoreType scoreType;
+    public final String replayUri;
 
     public ScoreListEntry(JsonValue fromJson, String defaultGameMode, ScoreType scoreType) {
         scoreValue = fromJson.getLong("sortValue");
@@ -42,6 +43,7 @@ public class ScoreListEntry implements IPlayerInfo {
         this.rank = fromJson.getInt("rank", 0);
         this.gameMode = fromJson.getString("gameMode", defaultGameMode);
         this.scoreType = scoreType;
+        this.replayUri = fromJson.getString("replay", null);
     }
 
     @Override

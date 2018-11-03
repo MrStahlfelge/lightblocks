@@ -786,7 +786,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         app.backendManager.enqueueAndSendScore(new BackendScore(gameModel.getScore(), gameModel.getIdentifier(),
                 app.backendManager.getPlatformString(), inputAdapter.getScoreboardKey(),
-                gameModel.getScoreboardParameters(), null));
+                gameModel.getScoreboardParameters(), gameModel.getReplay()));
     }
 
     @Override

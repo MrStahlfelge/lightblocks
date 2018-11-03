@@ -222,7 +222,7 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     app.backendManager.getBackendClient().requestActivationCode(nicknameEditable.getText(),
-                            mailEditable.getText(), new WaitForResponse(app, getStage()));
+                            mailEditable.getText(), new WaitForResponse<Void>(app, getStage()));
                 }
             });
             add(requestCode);

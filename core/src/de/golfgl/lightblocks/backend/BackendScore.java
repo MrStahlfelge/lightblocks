@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.backend;
 
 import de.golfgl.lightblocks.model.GameScore;
+import de.golfgl.lightblocks.state.Replay;
 
 /**
  * Score zum Senden an das Backend
@@ -21,19 +22,19 @@ public class BackendScore {
     public long scoreGainedMillis;
 
     public BackendScore(GameScore gameScore, String gameMode, String platform, String inputType, String params,
-                        String replay) {
+                        Replay replay) {
         this(gameScore.getLeaderboardScore(), gameMode, platform, inputType, params, replay, gameScore
                 .getDrawnTetrominos(), gameScore.getClearedLines(), gameScore.getScore(), gameScore.getTimeMs());
     }
 
-    public BackendScore(long sortValue, String gameMode, String platform, String inputType, String params, String
+    public BackendScore(long sortValue, String gameMode, String platform, String inputType, String params, Replay
             replay, int drawnBlocks, int lines, int score, int timePlayedMs) {
         this.sortValue = sortValue;
         this.gameMode = gameMode;
         this.platform = platform;
         this.inputType = inputType;
         this.params = params;
-        this.replay = replay;
+        this.replay = (replay != null && replay.isValid() ? replay.toString() : null);
         this.drawnBlocks = drawnBlocks;
         this.lines = lines;
         this.score = score;

@@ -1,8 +1,10 @@
 package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
@@ -13,10 +15,13 @@ import de.golfgl.lightblocks.backend.IPlayerInfo;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
 import de.golfgl.lightblocks.menu.ScoreTable;
+import de.golfgl.lightblocks.scene2d.FaTextButton;
+import de.golfgl.lightblocks.scene2d.ReplayGameboard;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayKeyboardInput;
+import de.golfgl.lightblocks.state.Replay;
 
 /**
  * Created by Benjamin Schulte on 08.10.2018.
@@ -29,7 +34,7 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
         this(app, score, null);
     }
 
-    public BackendScoreDetailsScreen(final LightBlocksGame app, ScoreListEntry score, IPlayerInfo playerInfo) {
+    public BackendScoreDetailsScreen(final LightBlocksGame app, final ScoreListEntry score, IPlayerInfo playerInfo) {
         super(app);
         this.score = score;
 
@@ -66,6 +71,39 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
 
         contentTable.row();
         contentTable.add(new ScoreDetailsTable());
+
+        if (score.replayUri != null) {
+            contentTable.row().pad(20);
+            FaTextButton showReplayButton = new FaTextButton(FontAwesome.CIRCLE_PLAY, "Watch replay", app.skin,
+                    "default");
+            contentTable.add(showReplayButton);
+            addFocusableActor(showReplayButton);
+            showReplayButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+
+                    app.backendManager.getBackendClient().fetchReplay(score.replayUri, new WaitForResponse<String>
+                            (app, getStage()) {
+                        @Override
+                        public void onRequestSuccess(String retrievedData) {
+                            Replay replay = new Replay();
+                            replay.fromString(retrievedData);
+
+                            if (!replay.isValid()) {
+                                onRequestFailed(500, "Replay is corrupt");
+                            } else {
+                                super.onRequestSuccess(retrievedData);
+                                AbstractFullScreenDialog dialog = new AbstractFullScreenDialog(app);
+                                ReplayGameboard replayGameboard = new ReplayGameboard(app, replay);
+                                dialog.getContentTable().add(replayGameboard);
+                                dialog.show(getStage());
+                                replayGameboard.playReplay();
+                            }
+                        }
+                    });
+                }
+            });
+        }
     }
 
     protected static String findI18NIfExistant(I18NBundle texts, String key, String prefix) {
@@ -144,8 +182,9 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
         }
 
         protected void allPlatformLine() {
-            Cell platformCell = addLine("platformLabel", getI18NIfExistant(score.platform, "labelPlatform_"), LightBlocksGame
-                    .SKIN_FONT_BIG, 20);
+            Cell platformCell = addLine("platformLabel", getI18NIfExistant(score.platform, "labelPlatform_"),
+                    LightBlocksGame
+                            .SKIN_FONT_BIG, 20);
 
             String faPlatformLabel = "";
             if (BackendManager.PLATFORM_DESKTOP.equalsIgnoreCase(score.platform))
