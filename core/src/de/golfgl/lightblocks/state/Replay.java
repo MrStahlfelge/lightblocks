@@ -73,7 +73,7 @@ public class Replay {
     public ReplayStep getPreviousStep() {
         setReplayMode();
 
-        currentReplayStepIdx = Math.max(currentReplayStepIdx - 1, arraySteps.size());
+        currentReplayStepIdx = Math.max(currentReplayStepIdx - 1, 0);
 
         return getCurrentStep();
     }
@@ -117,11 +117,12 @@ public class Replay {
 
     public int getCurrentScore() {
         setReplayMode();
-        while (currentReplayStepIdx > 0 && currentReplayStepIdx < arraySteps.size()) {
-            ReplayStep replayStep = arraySteps.get(currentReplayStepIdx);
+        int scoreStep = currentReplayStepIdx;
+        while (scoreStep > 0 && scoreStep < arraySteps.size()) {
+            ReplayStep replayStep = arraySteps.get(scoreStep);
             if (replayStep.isDropStep())
                 return ((ReplayDropPieceStep) replayStep).score;
-            currentReplayStepIdx--;
+            scoreStep--;
         }
 
         return 0;

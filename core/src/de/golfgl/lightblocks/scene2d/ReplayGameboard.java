@@ -30,7 +30,6 @@ public class ReplayGameboard extends BlockGroup {
         setGhostPieceVisibility(false);
 
         this.replay = replay;
-        nextStep = replay.getFirstStep();
 
         currentShownBlocks = new BlockActor[Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_ALLROWS];
         activePieceBlock = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
@@ -40,6 +39,8 @@ public class ReplayGameboard extends BlockGroup {
             activePieceBlock[i] = new BlockActor(app, Tetromino.TETRO_IDX_L);
             activePieceBlock[i].setEnlightened(true, true);
         }
+
+        windToFirstStep();
     }
 
     @Override
@@ -52,7 +53,7 @@ public class ReplayGameboard extends BlockGroup {
             }
         }
 
-        super.act(delta * playSpeed);
+        super.act(delta * Math.max(1, playSpeed));
     }
 
     private void transitionToNextStep() {
@@ -206,9 +207,57 @@ public class ReplayGameboard extends BlockGroup {
         return newXY % Gameboard.GAMEBOARD_COLUMNS;
     }
 
+    public void windToFirstStep() {
+        nextStep = replay.getFirstStep();
+        transitionToNextStep();
+    }
+
     public void playReplay() {
         playSpeed = 1f;
-        waitTime = 0;
+    }
+
+    public boolean isPlaying() {
+        return playSpeed > 0f;
+    }
+
+    public void pauseReplay() {
+        playSpeed = 0f;
+    }
+
+    public void playFast() {
+        playSpeed = 2f;
+    }
+
+    public void windToNextDrop() {
+        pauseReplay();
+        while (nextStep != null && !nextStep.isDropStep() && replay.getNextStep() != null) {
+            if (replay.getCurrentStep() != null)
+                nextStep = replay.getCurrentStep();
+        }
+
+        transitionToNextStep();
+    }
+
+    public void windToPreviousNextPiece() {
+        pauseReplay();
+        // einmal extra zurück, da die Oberfläche immer schon einen vorher geholt hat
+        replay.getPreviousStep();
+        Replay.ReplayStep previousNextStep = replay.getPreviousStep();
+        while ((previousNextStep == null || !previousNextStep.isNextPieceStep() || previousNextStep == shownStep)
+                && replay.getCurrentStep() != null) {
+            Replay.ReplayStep previousStep = replay.getPreviousStep();
+            if (previousStep != null && previousStep == previousNextStep)
+                break;
+            else if (previousStep != null)
+                previousNextStep = previousStep;
+        }
+
+        if (previousNextStep == null)
+            previousNextStep = replay.getFirstStep();
+
+        nextStep = previousNextStep;
+
+        transitionToNextStep();
     }
 
     protected void onTimeChange(int timeMs) {
@@ -217,5 +266,15 @@ public class ReplayGameboard extends BlockGroup {
 
     protected void onScoreChange(int score) {
 
+    }
+
+    @Override
+    public float getWidth() {
+        return (BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS) * getScaleX();
+    }
+
+    @Override
+    public float getHeight() {
+        return ((BlockActor.blockWidth * Gameboard.GAMEBOARD_ALLROWS) * getScaleY());
     }
 }

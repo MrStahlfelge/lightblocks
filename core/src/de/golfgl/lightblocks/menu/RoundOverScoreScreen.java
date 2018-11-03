@@ -20,11 +20,11 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.menu.backend.BackendScoreTable;
+import de.golfgl.lightblocks.menu.backend.ReplayDialog;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.scene2d.BetterScrollPane;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
-import de.golfgl.lightblocks.scene2d.ReplayGameboard;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.AbstractMenuScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
@@ -305,11 +305,9 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
             showReplay.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    AbstractFullScreenDialog dialog = new AbstractFullScreenDialog(app);
-                    ReplayGameboard replayGameboard = new ReplayGameboard(app, replay);
-                    dialog.getContentTable().add(replayGameboard);
+                    ReplayDialog dialog = new ReplayDialog(app);
+                    dialog.addReplay(replay);
                     dialog.show(stage);
-                    replayGameboard.playReplay();
                 }
             });
             buttons.add(showReplay);

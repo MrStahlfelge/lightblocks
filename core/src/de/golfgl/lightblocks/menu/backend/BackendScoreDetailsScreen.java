@@ -93,11 +93,9 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
                                 onRequestFailed(500, "Replay is corrupt");
                             } else {
                                 super.onRequestSuccess(retrievedData);
-                                AbstractFullScreenDialog dialog = new AbstractFullScreenDialog(app);
-                                ReplayGameboard replayGameboard = new ReplayGameboard(app, replay);
-                                dialog.getContentTable().add(replayGameboard);
+                                ReplayDialog dialog = new ReplayDialog(app);
+                                dialog.addReplay(replay);
                                 dialog.show(getStage());
-                                replayGameboard.playReplay();
                             }
                         }
                     });
