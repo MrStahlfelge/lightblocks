@@ -293,10 +293,15 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
                 }
             });
             leaderboard.setDisabled(app.gpgsClient == null || !app.gpgsClient.isSessionActive());
-            leaderboard.setVisible(app.gpgsClient != null
-                    && app.gpgsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.ShowLeaderboardUI));
-            buttons.add(leaderboard);
-            stage.addFocusableActor(leaderboard);
+            boolean showLeaderboardButton = app.gpgsClient != null
+                    && app.gpgsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.ShowLeaderboardUI);
+            // wenn es kein Leaderboard und kein Replay gibt, wird der hier unsichtbar hinzugefügt, damit  der
+            // Retry-Button mittig ist
+            if (showLeaderboardButton || replay == null) {
+                leaderboard.setVisible(showLeaderboardButton);
+                buttons.add(leaderboard);
+                stage.addFocusableActor(leaderboard);
+            }
 
         }
 

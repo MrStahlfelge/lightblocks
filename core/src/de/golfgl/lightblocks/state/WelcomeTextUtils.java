@@ -89,6 +89,11 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        if (listChangesSince < 1837) {
+            welcomes.add(new WelcomeButton.WelcomeText("New: REPLAYS! You can watch your and all other players' " +
+                    "best performances! Check the score details to see if a replay is available.", null));
+        }
+
         if (listChangesSince < 1836) {
             welcomes.add(new WelcomeButton.WelcomeText("The new Full Retro Marathon type brings you back to the year " +
                     "1989!", new ShowSinglePlayerPageRunnable(app, SinglePlayerScreen.PAGEIDX_MARATHON)));
