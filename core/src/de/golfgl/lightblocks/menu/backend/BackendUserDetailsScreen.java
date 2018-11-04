@@ -167,9 +167,6 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
             addLine("profileXpLabel", String.valueOf(details.experience), LightBlocksGame.SKIN_FONT_TITLE, 0);
 
             addLine("labelBlocks", String.valueOf(details.countTotalBlocks), LightBlocksGame.SKIN_FONT_TITLE, 0);
-            // TODO hier noch Hinweis das nur die serverseitigen gezählt sind
-
-            // TODO Passwort E-Mail
 
             if (details.country != null && !details.country.isEmpty())
                 addLine("profileCountryLabel", details.country,
@@ -194,7 +191,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
             add(new ScaledLabel(app.TEXTS.get(label).toUpperCase(), app.skin, style)).right().padRight(30);
             ScaledLabel scoreLabel = new ScaledLabel(value, app.skin, style);
             add(scoreLabel).left();
-            // TODO dritter ist für Change button oder Infos
+            // dritter war gedacht für Change button oder Infos, kann raus
             add();
         }
 

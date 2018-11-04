@@ -132,7 +132,6 @@ public class BackendManager {
         if (gameModelId == null)
             return false;
 
-        //TODO
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_NORMAL_ID))
             return true;
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GRAVITY_ID))
