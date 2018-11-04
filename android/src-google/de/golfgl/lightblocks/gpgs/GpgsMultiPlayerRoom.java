@@ -121,7 +121,7 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
 
         roomCreationPending = true;
 
-        myPlayerId = player.getName();
+        myPlayerId = gpgsClient.getPlayerDisplayName();
 
         Intent intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(
                 gpgsClient.getGoogleApiClient(), 1, MAX_PLAYERS_GPGS - 1, AUTOMATCHING_ENABLED);
