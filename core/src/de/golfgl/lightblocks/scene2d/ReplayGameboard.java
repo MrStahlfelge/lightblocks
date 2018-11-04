@@ -67,7 +67,7 @@ public class ReplayGameboard extends BlockGroup {
         // Gameboard umbauen
         shownStep = nextStep;
         transitionGameboard(replay.getCurrentGameboard());
-        nextStep = replay.getNextStep();
+        nextStep = replay.seekToNextStep();
         if (nextStep != null)
             waitTime = (float) (nextStep.timeMs - shownStep.timeMs) / 1000;
 
@@ -208,7 +208,7 @@ public class ReplayGameboard extends BlockGroup {
     }
 
     public void windToFirstStep() {
-        nextStep = replay.getFirstStep();
+        nextStep = replay.seekToFirstStep();
         transitionToNextStep();
     }
 
@@ -233,22 +233,33 @@ public class ReplayGameboard extends BlockGroup {
 
     public void windToNextDrop() {
         pauseReplay();
-        while (nextStep != null && !nextStep.isDropStep() && replay.getNextStep() != null) {
+        while (nextStep != null && !nextStep.isDropStep() && replay.seekToNextStep() != null) {
             if (replay.getCurrentStep() != null)
                 nextStep = replay.getCurrentStep();
         }
 
+        if (nextStep == null)
+            nextStep = replay.seekToLastStep();
+
+        transitionToNextStep();
+    }
+
+    public void windToTimePos(int timeMs) {
+        pauseReplay();
+        nextStep = replay.seekToTimePos(timeMs);
+        if (nextStep == null)
+            nextStep = replay.seekToFirstStep();
         transitionToNextStep();
     }
 
     public void windToPreviousNextPiece() {
         pauseReplay();
         // einmal extra zurück, da die Oberfläche immer schon einen vorher geholt hat
-        replay.getPreviousStep();
-        Replay.ReplayStep previousNextStep = replay.getPreviousStep();
+        replay.seekToPreviousStep();
+        Replay.ReplayStep previousNextStep = replay.seekToPreviousStep();
         while ((previousNextStep == null || !previousNextStep.isNextPieceStep() || previousNextStep == shownStep)
                 && replay.getCurrentStep() != null) {
-            Replay.ReplayStep previousStep = replay.getPreviousStep();
+            Replay.ReplayStep previousStep = replay.seekToPreviousStep();
             if (previousStep != null && previousStep == previousNextStep)
                 break;
             else if (previousStep != null)
@@ -256,7 +267,7 @@ public class ReplayGameboard extends BlockGroup {
         }
 
         if (previousNextStep == null)
-            previousNextStep = replay.getFirstStep();
+            previousNextStep = replay.seekToFirstStep();
 
         nextStep = previousNextStep;
 

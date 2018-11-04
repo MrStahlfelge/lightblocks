@@ -63,14 +63,20 @@ public class Replay {
         }
     }
 
-    public ReplayStep getFirstStep() {
+    public ReplayStep seekToFirstStep() {
         setReplayMode();
 
         currentReplayStepIdx = -1;
-        return getNextStep();
+        return seekToNextStep();
     }
 
-    public ReplayStep getPreviousStep() {
+    public ReplayStep seekToLastStep() {
+        setReplayMode();
+        currentReplayStepIdx = arraySteps.size() - 1;
+        return getCurrentStep();
+    }
+
+    public ReplayStep seekToPreviousStep() {
         setReplayMode();
 
         currentReplayStepIdx = Math.max(currentReplayStepIdx - 1, 0);
@@ -78,12 +84,51 @@ public class Replay {
         return getCurrentStep();
     }
 
-    public ReplayStep getNextStep() {
+    public ReplayStep seekToNextStep() {
         setReplayMode();
 
         currentReplayStepIdx = Math.min(currentReplayStepIdx + 1, arraySteps.size());
 
         return getCurrentStep();
+    }
+
+    public ReplayStep seekToTimePos(int timeMs) {
+        setReplayMode();
+
+        if (getCurrentStep() == null)
+            seekToFirstStep();
+
+        if (timeMs < 0 || getLastStep() == null || timeMs > getLastStep().timeMs)
+            return getCurrentStep();
+
+        if (timeMs < getCurrentStep().timeMs)
+            return seekBackwardToTimePos(timeMs);
+        else if (timeMs > getCurrentStep().timeMs)
+            return seekForwardToTimePos(timeMs);
+        else
+            return getCurrentStep();
+    }
+
+    private ReplayStep seekForwardToTimePos(int timeMs) {
+        while (getCurrentStep() != null && (getCurrentStep().timeMs < timeMs || !getCurrentStep()
+                .hasActivePiecePosition()))
+            seekToNextStep();
+        return getCurrentStep();
+    }
+
+    private ReplayStep seekBackwardToTimePos(int timeMs) {
+        while (getCurrentStep() != null && (getCurrentStep().timeMs > timeMs || !getCurrentStep()
+                .hasActivePiecePosition()))
+            seekToPreviousStep();
+        return getCurrentStep();
+    }
+
+    public ReplayStep getLastStep() {
+        setReplayMode();
+        if (arraySteps.size() > 0)
+            return arraySteps.get(arraySteps.size() - 1);
+        else
+            return null;
     }
 
     public ReplayStep getCurrentStep() {
