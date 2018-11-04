@@ -70,6 +70,8 @@ public class ReplayGameboard extends BlockGroup {
         nextStep = replay.seekToNextStep();
         if (nextStep != null)
             waitTime = (float) (nextStep.timeMs - shownStep.timeMs) / 1000;
+        else
+            playSpeed = 0;
 
         // Aktiven Block verschieben
         transitionActivePiece(shownStep);
@@ -214,6 +216,8 @@ public class ReplayGameboard extends BlockGroup {
 
     public void playReplay() {
         playSpeed = 1f;
+        if (nextStep == null)
+            windToFirstStep();
     }
 
     public boolean isPlaying() {
@@ -250,6 +254,8 @@ public class ReplayGameboard extends BlockGroup {
         if (nextStep == null)
             nextStep = replay.seekToFirstStep();
         transitionToNextStep();
+
+        onScoreChange(replay.getCurrentScore());
     }
 
     public void windToPreviousNextPiece() {
@@ -272,6 +278,8 @@ public class ReplayGameboard extends BlockGroup {
         nextStep = previousNextStep;
 
         transitionToNextStep();
+
+        onScoreChange(replay.getCurrentScore());
     }
 
     protected void onTimeChange(int timeMs) {

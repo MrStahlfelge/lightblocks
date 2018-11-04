@@ -162,8 +162,8 @@ public class Replay {
 
     public int getCurrentScore() {
         setReplayMode();
-        int scoreStep = currentReplayStepIdx;
-        while (scoreStep > 0 && scoreStep < arraySteps.size()) {
+        int scoreStep = Math.min(currentReplayStepIdx, arraySteps.size() - 1);
+        while (scoreStep > 0) {
             ReplayStep replayStep = arraySteps.get(scoreStep);
             if (replayStep.isDropStep())
                 return ((ReplayDropPieceStep) replayStep).score;

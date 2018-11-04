@@ -2,18 +2,22 @@ package de.golfgl.lightblocks.menu.backend;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
 import de.golfgl.lightblocks.menu.ScoreTable;
+import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.MyActions;
 import de.golfgl.lightblocks.scene2d.ReplayGameboard;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.scene2d.TouchableSlider;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.state.Replay;
@@ -31,7 +35,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
     private boolean isPlaying;
     private boolean programmaticChange;
 
-    public ReplayDialog(LightBlocksGame app, Replay replay) {
+    public ReplayDialog(LightBlocksGame app, Replay replay, String gameModeLabel, String performerLabel) {
         super(app);
 
         TextButton rewind = new FaTextButton(FontAwesome.BIG_FASTBW, app.skin, FontAwesome.SKIN_FONT_FA);
@@ -58,7 +62,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         playPause.setTransform(true);
         playPause.getLabel().setFontScale(.7f);
 
-        fastOrStopPlay = new FaTextButton(FontAwesome.BIG_FORWARD, app.skin, FontAwesome.SKIN_FONT_FA);
+        fastOrStopPlay = new FaTextButton(FontAwesome.ROTATE_RIGHT, app.skin, FontAwesome.SKIN_FONT_FA);
         fastOrStopPlay.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -100,6 +104,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                 }
             }
         });
+        final ExtraInfoGroup extraInfo = new ExtraInfoGroup(gameModeLabel, performerLabel);
         replayGameboard = new ReplayGameboard(app, replay) {
             @Override
             protected void onTimeChange(int timeMs) {
@@ -108,20 +113,25 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                 seekSlider.setValue(timeMs / 100);
                 programmaticChange = false;
             }
+
+            @Override
+            protected void onScoreChange(int score) {
+                extraInfo.setScore(score);
+            }
         };
         replayGameboard.setScale(.7f);
 
         Table contentTable = getContentTable();
-        contentTable.add().expandX();
+        contentTable.add(extraInfo).uniformX().fill();
         replaysCell = contentTable.add(replayGameboard).size(replayGameboard.getWidth() * replayGameboard
                 .getScaleX(), replayGameboard.getHeight() * replayGameboard.getScaleY());
-        contentTable.add().expandX();
+        contentTable.add().uniformX();
 
         contentTable.row();
-        contentTable.add(currentTimeLabel).right();
+        contentTable.add(currentTimeLabel).uniformX().right();
         contentTable.add(seekSlider).fillX();
-        contentTable.add(new ScaledLabel(ScoreTable.formatTimeString(lastStepTimeMs, 0), app.skin,
-                LightBlocksGame.SKIN_FONT_TITLE, .5f)).left();
+        contentTable.add(new ScaledLabel(ScoreTable.formatTimeString(lastStepTimeMs, 1), app.skin,
+                LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniformX().left();
         addFocusableActor(seekSlider);
 
         Table buttonsLeft = new Table();
@@ -143,7 +153,6 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         boolean isNowPlaying = replayGameboard != null && replayGameboard.isPlaying();
         if (isNowPlaying != isPlaying) {
             isPlaying = isNowPlaying;
-            playPause.clearActions();
             playPause.setOrigin(Align.center);
             playPause.addAction(MyActions.getChangeSequence(new Runnable() {
                 @Override
@@ -151,7 +160,6 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                     playPause.setText(isPlaying ? FontAwesome.BIG_PAUSE : FontAwesome.BIG_PLAY);
                 }
             }));
-            fastOrStopPlay.clearActions();
             fastOrStopPlay.setOrigin(Align.center);
             fastOrStopPlay.addAction(MyActions.getChangeSequence(new Runnable() {
                 @Override
@@ -165,5 +173,65 @@ public class ReplayDialog extends AbstractFullScreenDialog {
     @Override
     protected Actor getConfiguredDefaultActor() {
         return playPause;
+    }
+
+    private class ExtraInfoGroup extends WidgetGroup {
+        private final ScoreLabel scoreNum;
+        private final Table scoreTable;
+        private final Table gameTypeLabels;
+
+        public ExtraInfoGroup(String gameModeLabel, String performerLabel) {
+            scoreTable = new Table();
+            scoreTable.defaults().height(BlockActor.blockWidth * .8f);
+            scoreTable.row();
+            Label scoreLabel = new ScaledLabel(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
+            scoreTable.add(scoreLabel).right().bottom().padBottom(-2).spaceRight(3);
+
+            scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            scoreNum.setMaxCountingTime(.3f);
+            scoreNum.setCountingSpeed(2000);
+            scoreTable.add(scoreNum).left().colspan(3);
+
+            addActor(scoreTable);
+
+            gameTypeLabels = new Table();
+            Label gameType = new ScaledLabel("REPLAY", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            gameTypeLabels.add(gameType).right().padTop(-5);
+
+            if (gameModeLabel != null) {
+                gameTypeLabels.row();
+                gameTypeLabels.add(new ScaledLabel(gameModeLabel, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f))
+                        .right().pad(-5, 0, -3, 0);
+            }
+            if (performerLabel != null) {
+                gameTypeLabels.row();
+                gameTypeLabels.add(new ScaledLabel(performerLabel, app.skin, LightBlocksGame.SKIN_FONT_REG)).right()
+                        .pad(-3, 0, -3, 0);
+            }
+            gameTypeLabels.setRotation(90);
+            gameTypeLabels.setTransform(true);
+
+            addActor(gameTypeLabels);
+        }
+
+        @Override
+        protected void sizeChanged() {
+            super.sizeChanged();
+            scoreTable.pack();
+            scoreTable.setPosition(0, getHeight() - scoreTable.getHeight() - 10);
+
+            gameTypeLabels.pack();
+            gameTypeLabels.setPosition(gameTypeLabels.getHeight(),
+                    scoreTable.getY() - gameTypeLabels.getMinWidth() - 10);
+        }
+
+        public void setScore(int score) {
+            scoreNum.setScore(score);
+        }
+
+        @Override
+        public float getPrefWidth() {
+            return Math.max(super.getPrefWidth(), gameTypeLabels.getHeight());
+        }
     }
 }

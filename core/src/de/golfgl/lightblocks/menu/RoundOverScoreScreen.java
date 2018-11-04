@@ -305,7 +305,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
             showReplay.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    ReplayDialog dialog = new ReplayDialog(app, replay);
+                    ReplayDialog dialog = new ReplayDialog(app, replay, getSubtitle(), null);
                     dialog.show(stage);
                 }
             });

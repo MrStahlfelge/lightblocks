@@ -85,14 +85,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final BlockActor[] holdTetro;
     private final MotivationLabel motivatorLabel;
     private final ParticleEffectActor weldEffect;
-    private final Table scoreTable;
+    private final PlayScoreTable scoreTable;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
     Music music;
-    float lastAccX = 0;
-    private ScoreLabel scoreNum;
-    private ScoreLabel levelNum;
-    private ScoreLabel linesNum;
     private ScoreLabel blocksLeft;
     private ScaledLabel timeLabel;
     private PauseDialog pauseDialog;
@@ -177,8 +173,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         centerGroup.addActor(gameTypeLabels);
 
         // Score Labels
-        scoreTable = new Table();
-        scoreTable.defaults().height(BlockActor.blockWidth * .8f);
+        scoreTable = new PlayScoreTable(app);
         populateScoreTable(scoreTable);
         // hinzufügen erst weiter unten (weil eventuell noch etwas dazu kommt)
 
@@ -320,24 +315,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     protected void populateScoreTable(Table scoreTable) {
-        scoreTable.row();
-        Label levelLabel = new ScaledLabel(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
-        scoreTable.add(levelLabel).right().bottom().padBottom(-2).spaceRight(3);
-        levelNum = new ScoreLabel(2, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        scoreTable.add(levelNum).left();
-        Label linesLabel = new ScaledLabel(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
-        scoreTable.add(linesLabel).right().bottom().padBottom(-2).spaceLeft(10).spaceRight(3);
-        linesNum = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        linesNum.setCountingSpeed(100);
-        scoreTable.add(linesNum).left();
-        scoreTable.row();
-        Label scoreLabel = new ScaledLabel(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
-        scoreTable.add(scoreLabel).right().bottom().padBottom(-2).spaceRight(3);
-        scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        scoreNum.setCountingSpeed(2000);
-        scoreNum.setMaxCountingTime(1);
-        scoreTable.add(scoreNum).left().colspan(3);
-
         // in jedem Fall initialisieren, damit der beim ersten updateScore gefüllt wird
         blocksLeft = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
     }
@@ -396,8 +373,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameModel.app = app;
 
         // erst nach dem Laden setzen, damit das noch ohne Animation läuft
-        levelNum.setEmphasizeTreshold(1, LightBlocksGame.EMPHASIZE_COLOR);
-        scoreNum.setEmphasizeTreshold(1000, LightBlocksGame.EMPHASIZE_COLOR);
+        scoreTable.setEmphasizeTresholds();
 
         // ist Ghost erlaubt?
         if (!gameModel.isGhostPieceAllowedByGameModel())
@@ -1004,9 +980,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     @Override
     public void updateScore(GameScore score, int gainedScore) {
-        linesNum.setScore(score.getClearedLines());
-        levelNum.setScore(score.getCurrentLevel());
-        scoreNum.setScore(score.getScore());
+        scoreTable.setClearedLines(score.getClearedLines());
+        scoreTable.setCurrentLevel(score.getCurrentLevel());
+        scoreTable.setScore(score.getScore());
 
         if (gameModel.showBlocksScore())
             blocksLeft.setScore(gameModel.getMaxBlocksToUse() > 0 ?
@@ -1018,7 +994,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             int timeMs = gameModel.getScore().getTimeMs();
 
             if (timeMs - currentShownTime >= 100) {
-                timeLabel.setText(ScoreTable.formatTimeString(timeMs, 1));
+                timeLabel.setText(de.golfgl.lightblocks.menu.ScoreTable.formatTimeString(timeMs, 1));
                 currentShownTime = timeMs;
             }
         }
@@ -1131,7 +1107,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         scoreTable.setX(Math.max(10 - centerGroup.getX() + scoreTable.getPrefWidth() / 2, -centerGroup.getX() / 2));
         scoreTable.setY(stage.getHeight() - centerGroup.getY() * 1.2f
                 - MathUtils.clamp(centerGroup.getX() / 2 - scoreTable.getPrefWidth() / 2,
-                scoreTable.getPrefHeight() / 2 + 5, levelNum.getPrefHeight() * 2 + scoreTable.getPrefHeight() / 2));
+                scoreTable.getPrefHeight() / 2 + 5, scoreTable.getLinePrefHeight() * 2 + scoreTable.getPrefHeight() /
+                        2));
 
         pauseButton.setX(Math.max(LightBlocksGame.nativeGameWidth / 2 - 5 + stage.getWidth() / 2,
                 stage.getWidth() - pauseButton.getY()), Align.right);
@@ -1139,5 +1116,56 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // GestureInput neues TouchPanel und Resize On Screen Controls
         if (inputAdapter != null)
             inputAdapter.setPlayScreen(this);
+    }
+
+    public static class PlayScoreTable extends Table {
+        private final LightBlocksGame app;
+        private ScoreLabel scoreNum;
+        private ScoreLabel levelNum;
+        private ScoreLabel linesNum;
+        private ScoreLabel blocksLeft;
+
+        public PlayScoreTable(LightBlocksGame app) {
+            this.app = app;
+            defaults().height(BlockActor.blockWidth * .8f);
+            row();
+            Label levelLabel = new ScaledLabel(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
+            add(levelLabel).right().bottom().padBottom(-2).spaceRight(3);
+            levelNum = new ScoreLabel(2, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            add(levelNum).left();
+            Label linesLabel = new ScaledLabel(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
+            add(linesLabel).right().bottom().padBottom(-2).spaceLeft(10).spaceRight(3);
+            linesNum = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            linesNum.setCountingSpeed(100);
+            add(linesNum).left();
+            row();
+            Label scoreLabel = new ScaledLabel(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
+            add(scoreLabel).right().bottom().padBottom(-2).spaceRight(3);
+            scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            scoreNum.setCountingSpeed(2000);
+            scoreNum.setMaxCountingTime(1);
+            add(scoreNum).left().colspan(3);
+        }
+
+        public void setEmphasizeTresholds() {
+            levelNum.setEmphasizeTreshold(1, LightBlocksGame.EMPHASIZE_COLOR);
+            scoreNum.setEmphasizeTreshold(1000, LightBlocksGame.EMPHASIZE_COLOR);
+        }
+
+        public float getLinePrefHeight() {
+            return levelNum.getPrefHeight();
+        }
+
+        public void setClearedLines(int clearedLines) {
+            linesNum.setScore(clearedLines);
+        }
+
+        public void setCurrentLevel(int currentLevel) {
+            levelNum.setScore(currentLevel);
+        }
+
+        public void setScore(int score) {
+            scoreNum.setScore(score);
+        }
     }
 }

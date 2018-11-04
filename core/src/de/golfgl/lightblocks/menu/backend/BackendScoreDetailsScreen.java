@@ -45,7 +45,7 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
         contentTable.add(new Label(FontAwesome.COMMENT_STAR_TROPHY, app.skin, FontAwesome.SKIN_FONT_FA));
 
         contentTable.row();
-        String gameModeLabel;
+        final String gameModeLabel;
         gameModeLabel = getI18NIfExistant(score.gameMode, "labelModel_");
         contentTable.add(new Label(gameModeLabel, app.skin, LightBlocksGame.SKIN_FONT_TITLE));
 
@@ -54,7 +54,7 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
                 .SKIN_FONT_TITLE, .5f));
 
         contentTable.row();
-        BackendUserLabel userLabel = new BackendUserLabel(playerInfo != null ? playerInfo : score, app, "default");
+        final BackendUserLabel userLabel = new BackendUserLabel(playerInfo != null ? playerInfo : score, app, "default");
         contentTable.add(userLabel);
         // Wenn man schon aus dem User kommt, nicht nochmal hin
         if (playerInfo != null)
@@ -93,7 +93,7 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
                                 onRequestFailed(500, "Replay is corrupt");
                             } else {
                                 super.onRequestSuccess(retrievedData);
-                                ReplayDialog dialog = new ReplayDialog(app, replay);
+                                ReplayDialog dialog = new ReplayDialog(app, replay, gameModeLabel, userLabel.getNickName());
                                 dialog.show(getStage());
                             }
                         }

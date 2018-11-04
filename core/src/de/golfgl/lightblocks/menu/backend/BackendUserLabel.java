@@ -64,4 +64,8 @@ public class BackendUserLabel extends FaTextButton {
             getLabelCell().width(maxWidth - decorationCell.getPrefWidth());
         }
     }
+
+    public String getNickName() {
+        return nickName;
+    }
 }
