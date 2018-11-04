@@ -552,8 +552,9 @@ public abstract class GameModel implements Json.Serializable {
         // Die Eingaben zurücksetzen
         softDropFactor = 0;
 
-        endMoveHorizontal(true);
-        endMoveHorizontal(false);
+        // 4.11.18 rausgenommen, da bei On Screen Controls und Keyboard verwirrend. Mit Gestures prüfen
+        //endMoveHorizontal(true);
+        //endMoveHorizontal(false);
 
         distanceRemainder = 0.0f;
 
