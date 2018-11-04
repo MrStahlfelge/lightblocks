@@ -225,7 +225,10 @@ public class ReplayGameboard extends BlockGroup {
     }
 
     public void playFast() {
-        playSpeed = 2f;
+        if (playSpeed < 2f)
+            playSpeed = 2f;
+        else
+            playSpeed = 1f;
     }
 
     public void windToNextDrop() {
@@ -266,15 +269,5 @@ public class ReplayGameboard extends BlockGroup {
 
     protected void onScoreChange(int score) {
 
-    }
-
-    @Override
-    public float getWidth() {
-        return (BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS) * getScaleX();
-    }
-
-    @Override
-    public float getHeight() {
-        return ((BlockActor.blockWidth * Gameboard.GAMEBOARD_ALLROWS) * getScaleY());
     }
 }
