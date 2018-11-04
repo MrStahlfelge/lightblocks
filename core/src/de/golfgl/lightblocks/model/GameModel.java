@@ -505,7 +505,7 @@ public abstract class GameModel implements Json.Serializable {
                     onHoldTetromino);
 
             activateNextTetromino();
-            // resetMovements... nicht nötig, ist bereits in activateNextTetro enthalten
+            // resetMovements und replay.add... nicht nötig, ist bereits in activateNextTetro enthalten
         } else {
             Tetromino tmp = activeTetromino;
             activeTetromino = new Tetromino(onHoldTetromino);
@@ -515,6 +515,10 @@ public abstract class GameModel implements Json.Serializable {
                     activeTetromino.getCurrentBlockPositions(), ghostPieceDistance, onHoldTetromino);
 
             resetMovementsAndCheckActiveTetroPos();
+
+            // rotate ist natürlich nicht ganz richtig, aber dadurch wird der jetzt geänderte Tetromino komplett
+            // gespeichert
+            replay.addRotatePieceStep(score.getTimeMs(), activeTetromino);
         }
 
         noDropSinceHoldMove = true;
