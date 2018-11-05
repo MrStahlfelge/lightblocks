@@ -145,6 +145,8 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                 .padLeft(0).padRight(0);
         // mittige Ausrichtung erzwingen
         getButtonTable().add().width(closeButton.getPrefWidth());
+
+        replayGameboard.playReplay();
     }
 
     @Override

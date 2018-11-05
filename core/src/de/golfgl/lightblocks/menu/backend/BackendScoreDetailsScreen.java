@@ -16,7 +16,6 @@ import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
 import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
-import de.golfgl.lightblocks.scene2d.ReplayGameboard;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
@@ -29,6 +28,7 @@ import de.golfgl.lightblocks.state.Replay;
 
 public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
     private final ScoreListEntry score;
+    private Replay replay;
 
     public BackendScoreDetailsScreen(final LightBlocksGame app, ScoreListEntry score) {
         this(app, score, null);
@@ -54,7 +54,8 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
                 .SKIN_FONT_TITLE, .5f));
 
         contentTable.row();
-        final BackendUserLabel userLabel = new BackendUserLabel(playerInfo != null ? playerInfo : score, app, "default");
+        final BackendUserLabel userLabel = new BackendUserLabel(playerInfo != null ? playerInfo : score, app,
+                "default");
         contentTable.add(userLabel);
         // Wenn man schon aus dem User kommt, nicht nochmal hin
         if (playerInfo != null)
@@ -72,7 +73,7 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
         contentTable.row();
         contentTable.add(new ScoreDetailsTable());
 
-        if (score.replayUri != null) {
+        if (score.replayUri != null || replay != null) {
             contentTable.row().pad(20);
             FaTextButton showReplayButton = new FaTextButton(FontAwesome.CIRCLE_PLAY, "Watch replay", app.skin,
                     "default");
@@ -82,22 +83,25 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
 
-                    app.backendManager.getBackendClient().fetchReplay(score.replayUri, new WaitForResponse<String>
-                            (app, getStage()) {
-                        @Override
-                        public void onRequestSuccess(String retrievedData) {
-                            Replay replay = new Replay();
-                            replay.fromString(retrievedData);
+                    if (replay != null)
+                        showReplayDialog(gameModeLabel, userLabel);
+                    else
+                        app.backendManager.getBackendClient().fetchReplay(score.replayUri, new WaitForResponse<String>
+                                (app, getStage()) {
+                            @Override
+                            public void onRequestSuccess(String retrievedData) {
+                                Replay replay = new Replay();
+                                replay.fromString(retrievedData);
 
-                            if (!replay.isValid()) {
-                                onRequestFailed(500, "Replay is corrupt");
-                            } else {
-                                super.onRequestSuccess(retrievedData);
-                                ReplayDialog dialog = new ReplayDialog(app, replay, gameModeLabel, userLabel.getNickName());
-                                dialog.show(getStage());
+                                if (!replay.isValid()) {
+                                    onRequestFailed(500, "Replay is corrupt");
+                                } else {
+                                    super.onRequestSuccess(retrievedData);
+                                    BackendScoreDetailsScreen.this.replay = replay;
+                                    showReplayDialog(gameModeLabel, userLabel);
+                                }
                             }
-                        }
-                    });
+                        });
                 }
             });
         }
@@ -113,6 +117,18 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
             retVal = key;
         }
         return retVal;
+    }
+
+    public void setReplay(Replay replay) {
+        if (replay.isValid())
+            this.replay = replay;
+    }
+
+    public void showReplayDialog(String gameModeLabel, BackendUserLabel userLabel) {
+        if (replay != null && replay.isValid()) {
+            ReplayDialog dialog = new ReplayDialog(app, replay, gameModeLabel, userLabel.getNickName());
+            dialog.show(getStage());
+        }
     }
 
     protected String getI18NIfExistant(String key, String prefix) {
