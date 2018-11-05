@@ -104,7 +104,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                 }
             }
         });
-        final ExtraInfoGroup extraInfo = new ExtraInfoGroup(gameModeLabel, performerLabel);
+        final LeftInfoGroup extraInfo = new LeftInfoGroup(gameModeLabel, performerLabel);
         replayGameboard = new ReplayGameboard(app, replay) {
             @Override
             protected void onTimeChange(int timeMs) {
@@ -125,7 +125,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         contentTable.add(extraInfo).uniformX().fill();
         replaysCell = contentTable.add(replayGameboard).size(replayGameboard.getWidth() * replayGameboard
                 .getScaleX(), replayGameboard.getHeight() * replayGameboard.getScaleY());
-        contentTable.add().uniformX();
+        contentTable.add(new RightInfoGroup()).uniformX().fill();
 
         contentTable.row();
         contentTable.add(currentTimeLabel).uniformX().right();
@@ -177,12 +177,30 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         return playPause;
     }
 
-    private class ExtraInfoGroup extends WidgetGroup {
+    private class RightInfoGroup extends WidgetGroup {
+        private final Label gameType;
+
+        public RightInfoGroup() {
+            gameType = new ScaledLabel("REPLAY", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            addActor(gameType);
+        }
+
+        @Override
+        protected void sizeChanged() {
+            super.sizeChanged();
+            gameType.pack();
+            gameType.setPosition(getWidth() - gameType.getPrefWidth(),
+                    getHeight() - 10 - gameType.getPrefHeight()
+                            - (BlockActor.blockWidth * .8f - gameType.getPrefHeight()) / 2);
+        }
+    }
+
+    private class LeftInfoGroup extends WidgetGroup {
         private final ScoreLabel scoreNum;
         private final Table scoreTable;
-        private final Table gameTypeLabels;
+        private final Table gameInfoLabels;
 
-        public ExtraInfoGroup(String gameModeLabel, String performerLabel) {
+        public LeftInfoGroup(String gameModeLabel, String performerLabel) {
             scoreTable = new Table();
             scoreTable.defaults().height(BlockActor.blockWidth * .8f);
             scoreTable.row();
@@ -196,24 +214,22 @@ public class ReplayDialog extends AbstractFullScreenDialog {
 
             addActor(scoreTable);
 
-            gameTypeLabels = new Table();
-            Label gameType = new ScaledLabel("REPLAY", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-            gameTypeLabels.add(gameType).right().padTop(-5);
+            gameInfoLabels = new Table();
 
             if (gameModeLabel != null) {
-                gameTypeLabels.row();
-                gameTypeLabels.add(new ScaledLabel(gameModeLabel, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f))
-                        .right().pad(-5, 0, -3, 0);
+                gameInfoLabels.row();
+                gameInfoLabels.add(new ScaledLabel(gameModeLabel, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f))
+                        .left().pad(-5, 0, -3, 0);
             }
             if (performerLabel != null) {
-                gameTypeLabels.row();
-                gameTypeLabels.add(new ScaledLabel(performerLabel, app.skin, LightBlocksGame.SKIN_FONT_REG)).right()
+                gameInfoLabels.row();
+                gameInfoLabels.add(new ScaledLabel(performerLabel, app.skin, LightBlocksGame.SKIN_FONT_REG)).left()
                         .pad(-3, 0, -3, 0);
             }
-            gameTypeLabels.setRotation(90);
-            gameTypeLabels.setTransform(true);
+            gameInfoLabels.setRotation(90);
+            gameInfoLabels.setTransform(true);
 
-            addActor(gameTypeLabels);
+            addActor(gameInfoLabels);
         }
 
         @Override
@@ -222,9 +238,8 @@ public class ReplayDialog extends AbstractFullScreenDialog {
             scoreTable.pack();
             scoreTable.setPosition(0, getHeight() - scoreTable.getHeight() - 10);
 
-            gameTypeLabels.pack();
-            gameTypeLabels.setPosition(gameTypeLabels.getHeight(),
-                    scoreTable.getY() - gameTypeLabels.getMinWidth() - 10);
+            gameInfoLabels.pack();
+            gameInfoLabels.setPosition(gameInfoLabels.getHeight(), 0);
         }
 
         public void setScore(int score) {
@@ -233,7 +248,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
 
         @Override
         public float getPrefWidth() {
-            return Math.max(super.getPrefWidth(), gameTypeLabels.getHeight());
+            return Math.max(super.getPrefWidth(), gameInfoLabels.getHeight());
         }
     }
 }
