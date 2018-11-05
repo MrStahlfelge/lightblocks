@@ -111,5 +111,15 @@ public class DesktopLauncher {
         public String getGameServiceId() {
             return IGameServiceClient.GS_GOOGLEPLAYGAMES_ID;
         }
+
+        @Override
+        public boolean hasPendingInvitation() {
+            return false;
+        }
+
+        @Override
+        public void acceptPendingInvitation() {
+
+        }
     }
 }

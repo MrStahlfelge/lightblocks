@@ -20,6 +20,7 @@ import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 public class GpgsMultiPlayerClient extends de.golfgl.gdxgamesvcs.GpgsClient implements IMultiplayerGsClient {
 
     private GpgsMultiPlayerRoom gpgsMPRoom;
+    private Invitation invitationOnConnect;
 
     public GoogleApiClient getGoogleApiClient() {
         return mGoogleApiClient;
@@ -27,18 +28,30 @@ public class GpgsMultiPlayerClient extends de.golfgl.gdxgamesvcs.GpgsClient impl
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        super.onConnected(bundle);
-
-        // TODO Erhaltene Einladungen... gleich in Multiplayer gehen
+        // Erhaltene Einladungen speichern, um gleich in Multiplayer zu gehen
+        invitationOnConnect = null;
         if (bundle != null) {
-            Invitation inv =
-                    bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
+            invitationOnConnect = bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
 
-            if (inv != null)
-                Log.i(GAMESERVICE_ID, "Multiplayer Invitation: " + inv.getInvitationId() + " from "
-                        + inv.getInviter().getParticipantId());
+            if (invitationOnConnect != null)
+                Log.i(GAMESERVICE_ID, "Multiplayer Invitation: " + invitationOnConnect.getInvitationId() + " from "
+                        + invitationOnConnect.getInviter().getParticipantId());
         }
 
+        super.onConnected(bundle);
+    }
+
+    @Override
+    public boolean hasPendingInvitation() {
+        return invitationOnConnect != null && (gpgsMPRoom == null || !gpgsMPRoom.isConnected());
+    }
+
+    @Override
+    public void acceptPendingInvitation() {
+        if (gpgsMPRoom != null && hasPendingInvitation()) {
+            gpgsMPRoom.acceptInvitation(invitationOnConnect);
+            invitationOnConnect = null;
+        }
     }
 
     @Override

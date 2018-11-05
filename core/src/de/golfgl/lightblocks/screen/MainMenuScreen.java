@@ -120,10 +120,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
         playMultiplayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                AbstractMenuDialog multiplayerMenu = app.getNewMultiplayerMenu(mainGroup);
-
-                if (multiplayerMenu != null)
-                    multiplayerMenu.show(stage);
+                showMultiplayerScreen();
             }
         });
 
@@ -245,7 +242,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
     public void show() {
         Gdx.input.setInputProcessor(stage);
         app.controllerMappings.setInputProcessor(stage);
-        Gdx.input.setCatchBackKey(!mainGroup.isVisible());
+        Gdx.input.setCatchBackKey(!isOnMainLevel());
         resumeGameCell.setActor(app.savegame.hasSavedGame() ? resumeGameButton : null);
         resumeGameCell.expand(true, resumeGameCell.hasActor());
         if (stage.getFocusedActor() == null || !stage.getFocusedActor().hasParent())
@@ -257,7 +254,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
             mainGroup.addAction(Actions.sequence(
                     Actions.delay(blockGroup.getAnimationDuration() + MOVELOGODURATION),
                     Actions.scaleTo(1, 1, .5f, Interpolation.swingOut)));
-        } else if (!mainGroup.isVisible() || !isLandscape()) {
+        } else if (!isOnMainLevel() || !isLandscape()) {
             // es wird gerade ein Dialog angezeigt und nicht das Main menu
             stage.getRoot().setScale(0, 1);
             if (app.localPrefs.isPlaySounds())
@@ -279,6 +276,21 @@ public class MainMenuScreen extends AbstractMenuScreen {
             // nix anzeigen
         }
 
+    }
+
+    /**
+     * @return true wenn wir auf der Hauptebene sind (aber eventuell noch nicht eingabebereit, siehe
+     * isOnMainLevelAndWaitingForUserInput)
+     */
+    public boolean isOnMainLevel() {
+        return mainGroup.isVisible();
+    }
+
+    /**
+     * @return true wenn wir auf der Hauptebene sind und auf Userinput warten
+     */
+    public boolean isOnMainLevelAndWaitingForUserInput() {
+        return isOnMainLevel() && !mainGroup.hasActions() && blockGroup.isAnimationDone();
     }
 
     @Override
@@ -331,6 +343,15 @@ public class MainMenuScreen extends AbstractMenuScreen {
         return singlePlayerScreen;
     }
 
+    public AbstractMenuDialog showMultiplayerScreen() {
+        AbstractMenuDialog multiplayerMenu = app.getNewMultiplayerMenu(mainGroup);
+
+        if (multiplayerMenu != null)
+            multiplayerMenu.show(stage);
+
+        return multiplayerMenu;
+    }
+
     public SettingsScreen showSettings() {
         SettingsScreen settingsScreen = new SettingsScreen(app, mainGroup);
         settingsScreen.show(stage);
@@ -338,6 +359,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
     }
 
     public void showDonationDialog() {
+        //TODO hier muss catchBackKey gesetzt werden, aber eben bei zurück auch wieder zurückgesetzt werden
         if (app.canDonate())
             new DonationDialog(app).show(stage);
     }

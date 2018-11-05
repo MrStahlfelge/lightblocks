@@ -16,4 +16,7 @@ public interface IMultiplayerGsClient extends de.golfgl.gdxgamesvcs.IGameService
 
     AbstractMultiplayerRoom createMultiPlayerRoom();
 
+    boolean hasPendingInvitation();
+
+    void acceptPendingInvitation();
 }

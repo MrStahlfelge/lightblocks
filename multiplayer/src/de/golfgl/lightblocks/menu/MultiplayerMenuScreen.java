@@ -108,6 +108,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
     public void act(float delta) {
         super.act(delta);
 
+        checkPendingInvitations();
+
         //den folgenden Code nur ausführen, wenn wir aus dem PlayScreen zurück kommen
         if (!screenNotActive)
             return;
@@ -312,6 +314,17 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
             app.multiRoom.startRoomDiscovery();
         } catch (VetoException e) {
             showDialog(e.getMessage());
+        }
+    }
+
+    /**
+     * Prüft, ob es von außerhalb angenommene Einladungen gibt und tritt diesen bei, sofern möglich
+     */
+    protected void checkPendingInvitations() {
+        if (getApp().hasPendingInvitation()) {
+            app.multiRoom = ((IMultiplayerGsClient) app.gpgsClient).createMultiPlayerRoom();
+            app.multiRoom.addListener(this);
+            ((IMultiplayerGsClient) app.gpgsClient).acceptPendingInvitation();
         }
     }
 

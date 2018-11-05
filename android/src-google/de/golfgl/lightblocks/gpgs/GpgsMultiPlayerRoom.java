@@ -314,18 +314,22 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
             Invitation invitation =
                     extras.getParcelable(Multiplayer.EXTRA_INVITATION);
 
-            GpgsRoomLocation roomLoc = new GpgsRoomLocation(invitation.getInvitationId(),
-                    invitation.getInviter().getParticipantId());
+            acceptInvitation(invitation);
+        }
+    }
 
-            Player player = new Player();
-            myPlayerId = gpgsClient.getPlayerDisplayName();
-            player.setGamerId(myPlayerId);
+    public void acceptInvitation(Invitation invitation) {
+        GpgsRoomLocation roomLoc = new GpgsRoomLocation(invitation.getInvitationId(),
+                invitation.getInviter().getParticipantId());
 
-            try {
-                joinRoom(roomLoc, player);
-            } catch (VetoException e) {
-                // tritt nicht auf
-            }
+        Player player = new Player();
+        myPlayerId = gpgsClient.getPlayerDisplayName();
+        player.setGamerId(myPlayerId);
+
+        try {
+            joinRoom(roomLoc, player);
+        } catch (VetoException e) {
+            // tritt nicht auf
         }
     }
 

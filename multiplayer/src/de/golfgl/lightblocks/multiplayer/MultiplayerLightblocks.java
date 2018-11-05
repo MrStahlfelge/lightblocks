@@ -1,13 +1,15 @@
 package de.golfgl.lightblocks.multiplayer;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.utils.Timer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.minlog.Log;
 
 import java.util.ArrayList;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 
@@ -17,22 +19,6 @@ import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 
 public class MultiplayerLightblocks extends LightBlocksGame {
     public NetUtils netUtils;
-
-    @Override
-    public void create() {
-        if (!GAME_DEVMODE)
-            Log.set(Log.LEVEL_WARN);
-
-        super.create();
-    }
-
-    @Override
-    public AbstractMenuDialog getNewMultiplayerMenu(Group actorToHide) {
-        if (netUtils == null)
-            netUtils = new NetUtils();
-
-        return new MultiplayerMenuScreen(this, actorToHide);
-    }
 
     // This registers objects that are going to be sent over the network.
     public static void register(Kryo kryo) {
@@ -73,5 +59,63 @@ public class MultiplayerLightblocks extends LightBlocksGame {
         kryo.register(MultiPlayerObjects.WatchPlayActivateNextTetro.class);
         kryo.register(MultiPlayerObjects.WatchPlayPinTetromino.class);
         kryo.register(MultiPlayerObjects.WatchPlayMarkConflict.class);
+    }
+
+    @Override
+    public void create() {
+        if (!GAME_DEVMODE)
+            Log.set(Log.LEVEL_WARN);
+
+        super.create();
+    }
+
+    @Override
+    public AbstractMenuDialog getNewMultiplayerMenu(Group actorToHide) {
+        if (netUtils == null)
+            netUtils = new NetUtils();
+
+        return new MultiplayerMenuScreen(this, actorToHide);
+    }
+
+    @Override
+    public void gsOnSessionActive() {
+        super.gsOnSessionActive();
+
+        // bei GPGS angemeldet => dann prüfen ob eventuell eine Multiplayer-Einladung angenommen wurde
+        if (hasPendingInvitation())
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    switchToMultiplayerScreen();
+                }
+            });
+    }
+
+    /**
+     * @return true wenn eine Einladung via GPGS akzeptiert wurde und noch keine anderen Verbindungen offen sind
+     */
+    public boolean hasPendingInvitation() {
+        return gpgsClient != null && (gpgsClient instanceof IMultiplayerGsClient)
+                && ((IMultiplayerGsClient) gpgsClient).hasPendingInvitation();
+    }
+
+    private void switchToMultiplayerScreen() {
+        // Wechselt zum Multiplayerscreen, wenn wir uns auf dem Hauptlevel des Menüs befinden (oder auf dem Weg sind)
+
+        if (getScreen() == mainMenuScreen && mainMenuScreen.isOnMainLevel()) {
+
+            if (mainMenuScreen.isOnMainLevelAndWaitingForUserInput())
+                // Multiplayerscreen öffnen, den Rest macht dieser dann selbst
+                mainMenuScreen.showMultiplayerScreen();
+            else
+                // die Anfangsanimation spielt wahrscheinlich noch ab => abwarten
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        switchToMultiplayerScreen();
+                    }
+                }, .5f);
+
+        }
     }
 }
