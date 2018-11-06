@@ -476,21 +476,26 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     private class PortraitOnScreenButtons extends Group {
         private static final int PADDING = 8;
-        private final Button rotateRight;
-        private final Button rotateLeft;
-        private final Button moveRight;
-        private final Button moveLeft;
+        private final PortraitButton rotateRight;
+        private final PortraitButton rotateLeft;
+        private final PortraitButton moveRight;
+        private final PortraitButton moveLeft;
         private final HoldButton holdButton;
+        private final Actor rotateRightArea;
+        private final Actor rotateLeftArea;
+        private final Actor moveRightArea;
+        private final Actor moveLeftArea;
         private boolean rightPressed = false;
         private boolean leftPressed = false;
         private boolean didSoftDrop = false;
 
         public PortraitOnScreenButtons() {
             rotateRight = new PortraitButton(FontAwesome.ROTATE_RIGHT, Align.top);
-            rotateRight.addListener(new InputListener() {
+            InputListener rotateRightListener = new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     rightPressed = true;
+                    rotateRight.isPressed = true;
                     checkSoftDrop();
                     return true;
                 }
@@ -498,18 +503,24 @@ public class PlayGesturesInput extends PlayScreenInput {
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                     rightPressed = false;
+                    rotateRight.isPressed = false;
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
                     if (!didSoftDrop)
                         playScreen.gameModel.setRotate(true);
                 }
-            });
+            };
+            rotateRight.addListener(rotateRightListener);
+            rotateRightArea = new Actor();
+            rotateRightArea.addListener(rotateRightListener);
+            addActor(rotateRightArea);
             addActor(rotateRight);
 
             rotateLeft = new PortraitButton(FontAwesome.ROTATE_LEFT, Align.top);
-            rotateLeft.addListener(new InputListener() {
+            InputListener rotateLeftListener = new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     leftPressed = true;
+                    rotateLeft.isPressed = true;
                     checkSoftDrop();
                     return true;
                 }
@@ -517,42 +528,59 @@ public class PlayGesturesInput extends PlayScreenInput {
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                     leftPressed = false;
+                    rotateLeft.isPressed = false;
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
                     if (!didSoftDrop)
                         playScreen.gameModel.setRotate(false);
                 }
-            });
+            };
+            rotateLeft.addListener(rotateLeftListener);
             addActor(rotateLeft);
+            rotateLeftArea = new Actor();
+            rotateLeftArea.addListener(rotateLeftListener);
+            addActor(rotateLeftArea);
 
             moveRight = new PortraitButton(FontAwesome.RIGHT_CHEVRON, Align.bottom);
-            moveRight.addListener(new InputListener() {
+            InputListener moveRightListener = new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    moveRight.isPressed = true;
                     playScreen.gameModel.startMoveHorizontal(false);
                     return true;
                 }
 
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    moveRight.isPressed = false;
                     playScreen.gameModel.endMoveHorizontal(false);
                 }
-            });
+            };
+            moveRight.addListener(moveRightListener);
             addActor(moveRight);
+            moveRightArea = new Actor();
+            moveRightArea.addListener(moveRightListener);
+            addActor(moveRightArea);
 
             moveLeft = new PortraitButton(FontAwesome.LEFT_CHEVRON, Align.bottom);
-            moveLeft.addListener(new InputListener() {
+            InputListener moveLeftListener = new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    moveLeft.isPressed = true;
                     playScreen.gameModel.startMoveHorizontal(true);
                     return true;
                 }
 
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    moveLeft.isPressed = false;
                     playScreen.gameModel.endMoveHorizontal(true);
                 }
-            });
+            };
+            moveLeft.addListener(moveLeftListener);
             addActor(moveLeft);
+            moveLeftArea = new Actor();
+            moveLeftArea.addListener(moveLeftListener);
+            addActor(moveLeftArea);
 
             holdButton = new HoldButton();
             addActor(holdButton);
@@ -573,26 +601,41 @@ public class PlayGesturesInput extends PlayScreenInput {
                     PADDING * 3 + playScreen.centerGroup.getY());
             rotateRight.setSize(playScreen.stage.getWidth() - rotateRight.getX() - PADDING,
                     playScreen.stage.getHeight() * .4f - rotateRight.getY() - PADDING);
+            rotateRightArea.setPosition(playScreen.stage.getWidth() / 2, rotateRight.getY());
+            rotateRightArea.setSize(playScreen.stage.getWidth() / 2, rotateRight.getHeight());
 
             rotateLeft.setPosition(PADDING, rotateRight.getY());
             rotateLeft.setSize(rotateRight.getWidth(), rotateRight.getHeight());
+            rotateLeftArea.setPosition(0, rotateLeft.getY());
+            rotateLeftArea.setSize(rotateRightArea.getX(), rotateLeft.getHeight());
 
             moveRight.setPosition(rotateRight.getX(), rotateRight.getY() + rotateRight.getHeight() + PADDING);
             moveRight.setSize(rotateRight.getWidth(),
                     holdButton.getY() - holdButton.getWidth() - moveRight.getY() - PADDING);
+            moveRightArea.setPosition(rotateRightArea.getX(), moveRight.getY());
+            moveRightArea.setSize(rotateRightArea.getWidth(), moveRight.getHeight());
 
             moveLeft.setPosition(rotateLeft.getX(), moveRight.getY());
             moveLeft.setSize(moveRight.getWidth(), moveRight.getHeight());
+            moveLeftArea.setPosition(rotateLeftArea.getX(), moveLeft.getY());
+            moveLeftArea.setSize(rotateLeftArea.getWidth(), moveLeft.getHeight());
 
         }
 
         private class PortraitButton extends Button {
+            boolean isPressed;
+
             public PortraitButton(String label, int alignment) {
                 super(playScreen.app.skin, "smoke");
                 Label buttonLabel = new Label(label, playScreen.app.skin, FontAwesome.SKIN_FONT_FA);
                 buttonLabel.setAlignment(alignment);
                 buttonLabel.setFontScale(.8f);
                 add(buttonLabel).fill().expand();
+            }
+
+            @Override
+            public boolean isPressed() {
+                return isPressed || super.isPressed();
             }
         }
     }
@@ -623,7 +666,8 @@ public class PlayGesturesInput extends PlayScreenInput {
             setRotation(270);
             setTransform(true);
 
-            setVisible(playScreen.gameModel.isHoldMoveAllowedByModel() && playScreen.app.localPrefs.isShowTouchHoldButton());
+            setVisible(playScreen.gameModel.isHoldMoveAllowedByModel() && playScreen.app.localPrefs
+                    .isShowTouchHoldButton());
             addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
