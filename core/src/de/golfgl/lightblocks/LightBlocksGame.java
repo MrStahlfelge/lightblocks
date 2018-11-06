@@ -182,6 +182,10 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         mainMenuScreen = new MainMenuScreen(this);
 
+        // Replay-Modus wurde gestartet => hier dann nix weiter tun
+        if (shouldGoToReplay())
+            return;
+
         // In Tutorial, wenn Spiel das erste Mal gestartet, Touchscreen und keine Tastatur/Controller vorhanden
         if (savegame.hasGameState() || !TutorialModel.tutorialAvailable() ||
                 PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_KEYSORGAMEPAD))
@@ -197,6 +201,10 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
             }
 
         }
+    }
+
+    protected boolean shouldGoToReplay() {
+        return false;
     }
 
     protected void initGameAnalytics(Preferences lbPrefs) {

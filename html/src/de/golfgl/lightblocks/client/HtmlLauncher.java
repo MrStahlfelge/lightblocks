@@ -17,6 +17,7 @@ import de.golfgl.gdxgamesvcs.GameJoltClient;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.menu.backend.OnlyReplayScreen;
 
 public class HtmlLauncher extends MyGwtApp {
 
@@ -38,7 +39,19 @@ public class HtmlLauncher extends MyGwtApp {
 
     @Override
     public ApplicationListener createApplicationListener() {
-        LightBlocksGame lightBlocksGame = new LightBlocksGame();
+        LightBlocksGame lightBlocksGame = new LightBlocksGame() {
+            @Override
+            protected boolean shouldGoToReplay() {
+                final String replayNickname = Window.Location.getParameter(OnlyReplayScreen.PARAM_NICKNAME);
+                final String replayMode = Window.Location.getParameter(OnlyReplayScreen.PARAM_GAMEMODE);
+
+                if (replayNickname != null && !replayNickname.isEmpty()) {
+                    this.setScreen(new OnlyReplayScreen(this, replayNickname, replayMode));
+                    return true;
+                } else
+                    return false;
+            }
+        };
 
         String hostName = Window.Location.getHostName();
         final String gjUsername = Window.Location.
