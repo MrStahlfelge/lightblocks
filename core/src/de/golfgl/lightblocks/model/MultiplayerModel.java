@@ -463,12 +463,17 @@ public class MultiplayerModel extends GameModel {
         }
     }
 
-    private void handlePlayerGameboard(MultiPlayerObjects.ChatMessage gameboardInfo) {
+    private void handlePlayerGameboard(final MultiPlayerObjects.ChatMessage gameboardInfo) {
         if (playerRoom.isOwner()) {
             playerRoom.sendToAllPlayersExcept(gameboardInfo.playerId, gameboardInfo);
         }
         if (!gameboardInfo.playerId.equals(playerRoom.getMyPlayerId())) {
-            //TODO Gdx.app.postRunnable(UI)
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    userInterface.playersGameboardChanged(gameboardInfo);
+                }
+            });
         }
     }
 

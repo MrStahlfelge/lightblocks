@@ -1005,6 +1005,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Das passiert nur beim Multiplayer daher hier nichts
     }
 
+    @Override
+    public void playersGameboardChanged(MultiPlayerObjects.ChatMessage gameboardInfo) {
+        // Das passiert nur beim Multiplayer daher hier nichts
+    }
+
     public void setMusic(boolean playMusic) {
         if (playMusic && music == null) {
             music = Gdx.audio.newMusic(Gdx.files.internal("sound/dd.ogg"));

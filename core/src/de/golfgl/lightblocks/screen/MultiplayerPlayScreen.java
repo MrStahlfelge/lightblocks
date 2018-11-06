@@ -125,6 +125,11 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     }
 
     @Override
+    public void playersGameboardChanged(MultiPlayerObjects.ChatMessage gameboardInfo) {
+        //OtherPlayerGameboard nutzen
+    }
+
+    @Override
     public void switchPause(boolean immediately) {
 
         if (gameModel.isGameOver() && ((MultiplayerModel) gameModel).isCompletelyOver())

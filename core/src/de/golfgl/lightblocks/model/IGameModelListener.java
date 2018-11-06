@@ -43,6 +43,8 @@ public interface IGameModelListener {
 
     void playersInGameChanged(MultiPlayerObjects.PlayerInGame pig);
 
+    void playersGameboardChanged(MultiPlayerObjects.ChatMessage gameboardInfo);
+
     void markConflict(int x, int y);
 
     void showMotivation(MotivationTypes achievement, String extra);
