@@ -46,6 +46,7 @@ public class BackendScoreTable extends Table {
     private boolean showTimePassed = true;
     private boolean showDetailsButton = true;
     private float maxNicknameWidth = 130;
+    private float maxPassedTimeWidth;
 
     public BackendScoreTable(LightBlocksGame app, BackendManager.CachedScoreboard cachedScoreboard) {
         this.app = app;
@@ -95,10 +96,14 @@ public class BackendScoreTable extends Table {
             setShowScore(false);
             setShowTitle(true);
             setShowBlocks(true);
+            maxPassedTimeWidth = 88;
         } else if (gameModelId.equals(SprintModel.MODEL_SPRINT_ID)) {
             setShowScore(false);
             setShowTime(true);
             setShowTitle(true);
+            maxPassedTimeWidth = 88;
+        } else {
+            maxPassedTimeWidth = 82;
         }
     }
 
@@ -194,7 +199,7 @@ public class BackendScoreTable extends Table {
                     FONT_SCALE)).center();
         else if (isShowTitle()) {
             row();
-            add();
+            add().padLeft(0);
             add();
             if (isShowScore())
                 add(new ScaledLabel(app.TEXTS.get("labelScore").toUpperCase(), app.skin, LightBlocksGame
@@ -209,7 +214,7 @@ public class BackendScoreTable extends Table {
             if (isShowTime())
                 add(new ScaledLabel(app.TEXTS.get("labelTime").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_BIG));
             if (isShowTimePassed())
-                add();
+                add().padRight(3);
             if (isShowDetailsButton())
                 add();
         }
@@ -219,7 +224,7 @@ public class BackendScoreTable extends Table {
             ScaledLabel rankLabel = new ScaledLabel("#" + score.rank, app.skin, LightBlocksGame.SKIN_FONT_REG);
             if (app.backendManager.hasUserId() && score.getUserId().equalsIgnoreCase(app.backendManager.ownUserId()))
                 rankLabel.setColor(LightBlocksGame.COLOR_FOCUSSED_ACTOR);
-            add(rankLabel).right().expand(false, false);
+            add(rankLabel).right().expand(false, false).padLeft(0);
             BackendUserLabel userButton = new BackendUserLabel(score, app, "default");
             userButton.getLabel().setFontScale(FONT_SCALE);
             userButton.setMaxLabelWidth(maxNicknameWidth);
@@ -237,8 +242,14 @@ public class BackendScoreTable extends Table {
                 add(new ScaledLabel(String.valueOf(ScoreTable.formatTimeString(score.timePlayedMs, timeMsDigits)),
                         app.skin, LightBlocksGame.SKIN_FONT_TITLE, FONT_SCALE));
             if (isShowTimePassed()) {
-                add(new ScaledLabel(String.valueOf(formatTimePassedString(app, score.scoreGainedTime)),
-                        app.skin, LightBlocksGame.SKIN_FONT_REG)).left();
+                ScaledLabel passedTimeLabel = new ScaledLabel(String.valueOf(formatTimePassedString(app, score.scoreGainedTime)),
+                        app.skin, LightBlocksGame.SKIN_FONT_REG);
+                if (maxPassedTimeWidth <= 0)
+                    add(passedTimeLabel).left();
+                else {
+                    passedTimeLabel.setEllipsis(true);
+                    add(passedTimeLabel).left().width(maxPassedTimeWidth).expand(false, false).padRight(3);
+                }
             }
 
             if (isShowDetailsButton()) {
@@ -314,6 +325,10 @@ public class BackendScoreTable extends Table {
 
     public void setMaxNicknameWidth(float maxNicknameWidth) {
         this.maxNicknameWidth = maxNicknameWidth;
+    }
+
+    public void setMaxPassedTimeWidth(float maxPassedTimeWidth) {
+        this.maxPassedTimeWidth = maxPassedTimeWidth;
     }
 
     public boolean isShowTitle() {
