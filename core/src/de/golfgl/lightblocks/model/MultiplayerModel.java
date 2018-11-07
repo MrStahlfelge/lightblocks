@@ -29,7 +29,7 @@ public class MultiplayerModel extends GameModel {
     public static final String MODEL_ID = "multiplayer";
     public static final float SCORE_BONUS_PLAYEROVER = .33f;
     public static final int GARBAGEGAP_CHANGECOUNT = 9;
-
+    public static final char GAMEBOARD_CHAR_ACTIVE_PIECE = '_';
     // Referee - aber auch die anderen pflegen die Werte, falls Übergabe erfolgt
     private static final byte DRAWYER_PACKAGESIZE = 3;
     private final Object waitingGarbageLinesLock = new Object();
@@ -219,7 +219,7 @@ public class MultiplayerModel extends GameModel {
             for (int blockNum = 0; blockNum < currentBlockPositions.length; blockNum++) {
                 int pos = currentBlockPositions[blockNum][0] +
                         Gameboard.GAMEBOARD_COLUMNS * currentBlockPositions[blockNum][1];
-                gameboardChars[pos] = '_';
+                gameboardChars[pos] = GAMEBOARD_CHAR_ACTIVE_PIECE;
                 lastChar = Math.max(lastChar, pos);
             }
         myGameboardMessage.message = new String(gameboardChars);

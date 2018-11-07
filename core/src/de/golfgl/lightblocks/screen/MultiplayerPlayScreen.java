@@ -1,6 +1,10 @@
 package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
@@ -13,6 +17,7 @@ import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.multiplayer.IRoomListener;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
+import de.golfgl.lightblocks.scene2d.OtherPlayerGameboard;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
@@ -26,6 +31,7 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
     private HashMap<String, ScoreLabel> playerLabels;
+    private HashMap<String, OtherPlayerGameboard> playerGameboard;
     private HashMap<String, GameBlocker.OtherPlayerPausedGameBlocker> playerBlockers = new HashMap<String,
             GameBlocker.OtherPlayerPausedGameBlocker>();
     private GameBlocker initializeBlocker = new GameBlocker.WaitForOthersInitializedBlocker();
@@ -55,6 +61,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
         // noch eine Tabelle für die Spieler
         Table fillingTable = new Table();
         playerLabels = new HashMap<String, ScoreLabel>(app.multiRoom.getNumberOfPlayers());
+        playerGameboard = new HashMap<>(app.multiRoom.getNumberOfPlayers());
 
         for (String playerId : app.multiRoom.getPlayers()) {
             fillingTable.add(new ScaledLabel(playerId.substring(0, 1), app.skin)).top().padTop(2);
@@ -63,6 +70,27 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
             fillingTable.add(lblFilling);
             playerLabels.put(playerId, lblFilling);
             fillingTable.add(new ScaledLabel("%", app.skin)).padRight(10).bottom().padBottom(4);
+
+            if (!playerId.equals(app.multiRoom.getMyPlayerId())) {
+                final OtherPlayerGameboard gameboard = new OtherPlayerGameboard(app);
+                playerGameboard.put(playerId, gameboard);
+                stage.addActor(gameboard);
+                lblFilling.addListener(new InputListener() {
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        gameboard.addAction(Actions.fadeIn(.15f, Interpolation.fade));
+                        return true;
+                    }
+
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        if (!isLandscape()) {
+                            gameboard.clearActions();
+                            gameboard.addAction(Actions.fadeOut(.2f, Interpolation.fade));
+                        }
+                    }
+                });
+            }
         }
 
         scoreTable.add(fillingTable).colspan(3).align(Align.left);
@@ -126,7 +154,10 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
     @Override
     public void playersGameboardChanged(MultiPlayerObjects.ChatMessage gameboardInfo) {
-        //OtherPlayerGameboard nutzen
+        if (playerGameboard.containsKey(gameboardInfo.playerId)) {
+            OtherPlayerGameboard gameboard = playerGameboard.get(gameboardInfo.playerId);
+            gameboard.setGameboardInfo(gameboardInfo.message);
+        }
     }
 
     @Override
@@ -273,5 +304,23 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     @Override
     public void multiPlayerRoomEstablishingConnection() {
         // kann hier nicht auftreten
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+
+        for (OtherPlayerGameboard playerGameboard : playerGameboard.values()) {
+            if (isLandscape()) {
+                playerGameboard.getColor().a = 1;
+                //TODO bei On Screen Buttons höher
+                playerGameboard.setX(stage.getWidth() - playerGameboard.getWidth() - (centerGroup.getX() +
+                        centerGroup.getWidth()) / 2);
+            } else {
+                playerGameboard.getColor().a = 0;
+                playerGameboard.setX(stage.getWidth() / 2 - playerGameboard.getWidth() / 2);
+                playerGameboard.setY(stage.getHeight() / 2 - playerGameboard.getHeight() / 2);
+            }
+        }
     }
 }
