@@ -22,19 +22,21 @@ public abstract class PlayScreenInput extends InputAdapter {
     protected boolean isGameOver;
     PlayScreen playScreen;
 
-    public static PlayScreenInput getPlayInput(int key) throws InputNotAvailableException {
+    public static PlayScreenInput getPlayInput(int key, LightBlocksGame app) throws InputNotAvailableException {
 
         if (!isInputTypeAvailable(key))
             throw new InputNotAvailableException(key);
 
         switch (key) {
             case KEY_KEYORTOUCH:
+                if (Controllers.getControllers().size > 0 && app.localPrefs.useOnScreenControls())
+                    return getPlayInput(KEY_KEYSORGAMEPAD, app);
                 if (isInputTypeAvailable(KEY_TOUCHSCREEN) && isInputTypeAvailable(KEY_KEYSORGAMEPAD))
                     return new PlayKeyOrTouchInput();
                 else if (isInputTypeAvailable(KEY_TOUCHSCREEN))
-                    return getPlayInput(KEY_TOUCHSCREEN);
+                    return getPlayInput(KEY_TOUCHSCREEN, app);
                 else
-                    return getPlayInput(KEY_KEYSORGAMEPAD);
+                    return getPlayInput(KEY_KEYSORGAMEPAD, app);
             case KEY_TOUCHSCREEN:
                 return new PlayGesturesInput();
             case KEY_ACCELEROMETER:
@@ -136,6 +138,7 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     /**
      * bei Init und bei jedem Resize des PlayScreens gefeuert
+     *
      * @param playScreen
      */
     public void setPlayScreen(PlayScreen playScreen) {

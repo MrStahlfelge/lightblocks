@@ -361,7 +361,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameModel.setUserInterface(this);
 
         // input initialisieren
-        inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey);
+        inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey, app);
         inputAdapter.setPlayScreen(this);
         if (inputAdapter.getRequestedScreenOrientation() != null)
             app.lockOrientation(inputAdapter.getRequestedScreenOrientation());
