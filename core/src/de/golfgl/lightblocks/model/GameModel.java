@@ -172,7 +172,7 @@ public abstract class GameModel implements Json.Serializable {
     private void dropActiveTetromino() {
 
         Replay.ReplayStep replayStep = replay.addDropStep(score.getTimeMs(), activeTetromino);
-
+        activeTetrominoWillDrop();
         gameboard.pinTetromino(activeTetromino);
         userInterface.pinTetromino(activeTetromino.getCurrentBlockPositions());
         noDropSinceHoldMove = false;
@@ -325,6 +325,13 @@ public abstract class GameModel implements Json.Serializable {
         totalScore.incFourLineCount();
         gpgsUpdateAchievement(GpgsHelper.ACH_FOUR_LINES);
         gpgsUpdateAchievement(GpgsHelper.ACH_100_FOUR_LINES, 1, (float) totalScore.getFourLineCount() / 100);
+    }
+
+    /**
+     * Reihen wurden noch nicht abgebaut
+     */
+    protected void activeTetrominoWillDrop() {
+
     }
 
     /**

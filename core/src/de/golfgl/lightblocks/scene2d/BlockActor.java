@@ -65,7 +65,7 @@ public class BlockActor extends Actor {
         imBlock = new Image(app.trBlock);
         imBlockEnlightened = new Image(app.trBlockEnlightened);
 
-        Color blockTypeColor = getBlockTypeColor();
+        Color blockTypeColor = getBlockTypeColor(blockType);
         imBlockEnlightened.setColor(blockTypeColor.r, blockTypeColor.g, blockTypeColor.b, dislighentedAlpha);
         imBlock.setColor(blockTypeColor);
     }
@@ -94,7 +94,7 @@ public class BlockActor extends Actor {
         }
     }
 
-    private Color getBlockTypeColor() {
+    public static Color getBlockTypeColor(int blockType) {
         switch (blockType) {
             case Tetromino.TETRO_IDX_L:
                 return COLOR_L;

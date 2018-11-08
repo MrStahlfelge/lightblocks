@@ -84,7 +84,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
                     @Override
                     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        if (!isLandscape()) {
+                        if (!isLandscape() || gameboard.getX() < stage.getWidth() / 2) {
                             gameboard.clearActions();
                             gameboard.addAction(Actions.fadeOut(.2f, Interpolation.fade));
                         }
@@ -310,17 +310,30 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
     public void resize(int width, int height) {
         super.resize(width, height);
 
+        // Die sind für Landscape Hilfen
+        int currNum = 0;
+        int numAllToShow = Math.min(2, playerGameboard.size());
+        float leftx = (stage.getWidth() + blockGroup.getX() + blockGroup.getWidth()) / 2;
+        boolean showsOnScreenControls = app.localPrefs.useOnScreenControls() &&
+                inputAdapter.getAnalyticsKey().equals(PlayGesturesInput.INPUT_KEY_GESTURES);
+
         for (OtherPlayerGameboard playerGameboard : playerGameboard.values()) {
-            if (isLandscape()) {
+            playerGameboard.setScale(1);
+            // Landscape nur für 2 Gameboards und auch nicht, falls on Screen Controls aktiv
+            if (isLandscape() && currNum < numAllToShow && !showsOnScreenControls) {
                 playerGameboard.getColor().a = 1;
-                //TODO bei On Screen Buttons höher
-                playerGameboard.setX(stage.getWidth() - playerGameboard.getWidth() - (centerGroup.getX() +
-                        centerGroup.getWidth()) / 2);
+                float scale = (stage.getWidth() - leftx - 20) / (playerGameboard.getWidth() * numAllToShow);
+                playerGameboard.setScale(Math.min(scale, .8f));
+
+                playerGameboard.setX((stage.getWidth() - leftx) / 2 + leftx
+                        - playerGameboard.getWidth() * ((float) numAllToShow / 2 - currNum));
+                playerGameboard.setY(blockGroup.getY());
             } else {
                 playerGameboard.getColor().a = 0;
                 playerGameboard.setX(stage.getWidth() / 2 - playerGameboard.getWidth() / 2);
                 playerGameboard.setY(stage.getHeight() / 2 - playerGameboard.getHeight() / 2);
             }
+            currNum++;
         }
     }
 }

@@ -166,10 +166,14 @@ public class MultiplayerModel extends GameModel {
     }
 
     @Override
+    protected void activeTetrominoWillDrop() {
+        sendPlayersGameboard();
+    }
+
+    @Override
     protected void activeTetrominoDropped() {
         // den Meister über den Stand der Dinge informieren
         sendPlayerInGameStats();
-        sendPlayersGameboard();
     }
 
     private void sendPlayerInGameStats() {
