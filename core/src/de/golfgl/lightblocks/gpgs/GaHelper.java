@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.gpgs;
 import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
 
 /**
@@ -21,8 +22,9 @@ public class GaHelper {
             if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
                 app.gameAnalytics.submitDesignEvent("swipeUpSetting:" + app.localPrefs.getSwipeUpType());
                 app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());
-                app.gameAnalytics.submitDesignEvent("showOnScreenControls:" +
-                        app.localPrefs.useOnScreenControls());
+                app.gameAnalytics.submitDesignEvent("showOnScreenControls:" + (app.localPrefs.useOnScreenControls()
+                        ? (((AbstractScreen) app.getScreen()).isLandscape() ? "landscape" : "portrait")
+                        : "false"));
             }
 
             app.gameAnalytics.submitDesignEvent("blockColor:" + app.localPrefs.getBlockColorMode());
