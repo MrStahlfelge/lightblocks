@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.menu.backend;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -126,10 +127,10 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                     reload();
                 }
             });
-        } else if (statusCode == 404 && app.backendManager.hasUserId() &&
+        } else if (statusCode == HttpStatus.SC_NOT_FOUND && app.backendManager.hasUserId() &&
                 userId.equalsIgnoreCase(app.backendManager.ownUserId())) {
             // der eigene Spieler wurde nicht gefunden => löschen anbieten damit man neu anlegen kann
-            RoundedTextButton deleteUserEntry = new RoundedTextButton("Reset stored user id", app.skin);
+            RoundedTextButton deleteUserEntry = new RoundedTextButton("Unlink this device from user", app.skin);
             errorTable.row();
             errorTable.add(deleteUserEntry).pad(10);
             addFocusableActor(deleteUserEntry);

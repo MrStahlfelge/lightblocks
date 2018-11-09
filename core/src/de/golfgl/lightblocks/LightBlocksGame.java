@@ -261,6 +261,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         EMPHASIZE_COLOR = skin.getColor("emphasize");
 
         skin.get(SKIN_FONT_TITLE, Label.LabelStyle.class).font.setFixedWidthGlyphs("0123456789-+X");
+        skin.get(SKIN_FONT_TITLE, Label.LabelStyle.class).font.setUseIntegerPositions(false);
     }
 
     @Override

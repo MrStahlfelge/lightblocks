@@ -1,7 +1,9 @@
 package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
@@ -30,6 +32,7 @@ import de.golfgl.lightblocks.state.BestScore;
 
 public class BackendScoreTable extends Table {
     private static final float FONT_SCALE = .5f;
+    private static final float TOTAL_TIME_ENLARGE = .2f;
     private final LightBlocksGame app;
     private final BackendManager.CachedScoreboard cachedScoreboard;
     private final List<String> shownParams = new ArrayList<String>();
@@ -47,6 +50,7 @@ public class BackendScoreTable extends Table {
     private boolean showDetailsButton = true;
     private float maxNicknameWidth = 130;
     private float maxPassedTimeWidth;
+    private float enlargeTime;
 
     public BackendScoreTable(LightBlocksGame app, BackendManager.CachedScoreboard cachedScoreboard) {
         this.app = app;
@@ -157,11 +161,26 @@ public class BackendScoreTable extends Table {
                 !app.backendManager.hasScoreEnqueued())
             reload();
 
+        if (!isFilled)
+            enlargeTime = TOTAL_TIME_ENLARGE;
+
         super.act(delta);
+
+        // Animation wenn gefüllt wurde:
+        if (isFilled && enlargeTime > 0) {
+            // 1. Vergrößern
+            getColor().a = 0;
+            enlargeTime = enlargeTime - delta;
+            invalidateHierarchy();
+        } else if (enlargeTime <= 0 && getColor().a == 0 && !hasActions()) {
+            // 2. Einblenden
+            addAction(Actions.fadeIn(TOTAL_TIME_ENLARGE, Interpolation.fade));
+        }
     }
 
     protected void reload() {
         clear();
+        enlargeTime = 0;
         add(waitRotationImage);
         cachedScoreboard.fetchForced();
         isFilled = false;
@@ -189,7 +208,7 @@ public class BackendScoreTable extends Table {
     private void fillTable(List<ScoreListEntry> scoreboard) {
         clear();
 
-        defaults().right().pad(2, 5, 2, 5).expandX();
+        defaults().right().pad(2, 7, 2, 7);
 
         String buttonDetailsLabel = app.TEXTS.get("buttonDetails").toUpperCase();
         int timeMsDigits = BestScore.getTimeMsDigits(cachedScoreboard.getGameMode());
@@ -224,7 +243,7 @@ public class BackendScoreTable extends Table {
             ScaledLabel rankLabel = new ScaledLabel("#" + score.rank, app.skin, LightBlocksGame.SKIN_FONT_REG);
             if (app.backendManager.hasUserId() && score.getUserId().equalsIgnoreCase(app.backendManager.ownUserId()))
                 rankLabel.setColor(LightBlocksGame.COLOR_FOCUSSED_ACTOR);
-            add(rankLabel).right().expand(false, false).padLeft(0);
+            add(rankLabel).right().padLeft(0);
             BackendUserLabel userButton = new BackendUserLabel(score, app, "default");
             userButton.getLabel().setFontScale(FONT_SCALE);
             userButton.setMaxLabelWidth(maxNicknameWidth);
@@ -242,13 +261,14 @@ public class BackendScoreTable extends Table {
                 add(new ScaledLabel(String.valueOf(ScoreTable.formatTimeString(score.timePlayedMs, timeMsDigits)),
                         app.skin, LightBlocksGame.SKIN_FONT_TITLE, FONT_SCALE));
             if (isShowTimePassed()) {
-                ScaledLabel passedTimeLabel = new ScaledLabel(String.valueOf(formatTimePassedString(app, score.scoreGainedTime)),
+                ScaledLabel passedTimeLabel = new ScaledLabel(String.valueOf(formatTimePassedString(app, score
+                        .scoreGainedTime)),
                         app.skin, LightBlocksGame.SKIN_FONT_REG);
                 if (maxPassedTimeWidth <= 0)
                     add(passedTimeLabel).left();
                 else {
                     passedTimeLabel.setEllipsis(true);
-                    add(passedTimeLabel).left().width(maxPassedTimeWidth).expand(false, false).padRight(3);
+                    add(passedTimeLabel).left().width(maxPassedTimeWidth).padRight(3);
                 }
             }
 
@@ -350,5 +370,10 @@ public class BackendScoreTable extends Table {
     @Override
     public float getMinHeight() {
         return waitRotationImage.getHeight() * 1.25f;
+    }
+
+    @Override
+    public float getPrefHeight() {
+        return super.getPrefHeight() * Interpolation.fade.apply(Math.max(0, (TOTAL_TIME_ENLARGE - enlargeTime) / TOTAL_TIME_ENLARGE));
     }
 }
