@@ -40,7 +40,7 @@ public class MyGameCircleClient extends GameCircleClient {
     private static final String ACH_MISSION_10_ACCOMPLISHED = "ACH_MISSION10";
     private static final String ACH_MISSION_15_ACCOMPLISHED = "ACH_MISSION15";
     private static final String ACH_ALL_MISSIONS_PERFECT = "ACH_MISSIONS_PERFECT";
-    private static final String LEAD_MARATHON_GESTURES = "LB_MARA_GEST";
+    private static final String LEAD_MARATHON = "LB_MARA_GEST";
     private static final String LEAD_MARATHON_GRAVITY = "LB_MARA_GRAV";
     private static final String LEAD_MARATHON_GAMEPAD = "LB_MARA_GPAD";
     private static final String LEAD_PRACTICE = "LB_PRACTICE";
@@ -161,12 +161,10 @@ public class MyGameCircleClient extends GameCircleClient {
     private String mapLeaderboards(String independantId) {
         if (independantId == null)
             return null;
-        else if (independantId.equals(GpgsHelper.LEAD_MARATHON_GESTURES))
-            return LEAD_MARATHON_GESTURES;
+        else if (independantId.equals(GpgsHelper.LEAD_MARATHON))
+            return LEAD_MARATHON;
         else if (independantId.equals(GpgsHelper.LEAD_MARATHON_GRAVITY))
             return LEAD_MARATHON_GRAVITY;
-        else if (independantId.equals(GpgsHelper.LEAD_MARATHON_GAMEPAD))
-            return LEAD_MARATHON_GAMEPAD;
         else if (independantId.equals(GpgsHelper.LEAD_PRACTICE_MODE))
             return LEAD_PRACTICE;
         else if (independantId.equals(GpgsHelper.LEAD_SPRINT_MODE))

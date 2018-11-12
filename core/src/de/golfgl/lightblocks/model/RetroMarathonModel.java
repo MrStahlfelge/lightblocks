@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.model;
 
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
@@ -39,6 +40,17 @@ public class RetroMarathonModel extends MarathonModel {
         // Hard Drop nicht zulässig
         // Testen!
         super.setSoftDropFactor(Math.min(newVal, FACTOR_SOFT_DROP));
+    }
+
+    @Override
+    protected void achievementsScore(int gainedScore) {
+        super.achievementsScore(gainedScore);
+
+        final int currentScore = getScore().getScore();
+        final int oldScore = currentScore - gainedScore;
+
+        if (currentScore >= 120000 && oldScore < 120000)
+            gpgsUpdateAchievement(GpgsHelper.ACH_MARATHON_FLYING_BASILICA);
     }
 
     @Override

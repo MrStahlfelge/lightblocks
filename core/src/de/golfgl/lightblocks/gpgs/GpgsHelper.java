@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.gpgs;
 import de.golfgl.gdxgamesvcs.IGameServiceIdMapper;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.PracticeModel;
+import de.golfgl.lightblocks.model.RetroMarathonModel;
 import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.model.TutorialModel;
 
@@ -31,6 +32,7 @@ public class GpgsHelper {
     public static final String ACH_MARATHON_SUPER_CHECKER = "CgkI4vHs17ETEAIQGA";
     public static final String ACH_SCORE_MILLIONAIRE = "CgkI4vHs17ETEAIQGQ";
     public static final String ACH_GRAVITY_KING = "CgkI4vHs17ETEAIQGg";
+    public static final String ACH_MARATHON_FLYING_BASILICA = "CgkI4vHs17ETEAIQQw";
     public static final String ACH_SPRINTER = "CgkI4vHs17ETEAIQPw";
     public static final String ACH_MEGA_MULTI_PLAYER = "CgkI4vHs17ETEAIQGw";
     public static final String ACH_GAMEPAD_OWNER = "CgkI4vHs17ETEAIQHA";
@@ -44,14 +46,15 @@ public class GpgsHelper {
     public static final String ACH_MISSION_15_ACCOMPLISHED = "CgkI4vHs17ETEAIQOg";
     public static final String ACH_ALL_MISSIONS_PERFECT = "CgkI4vHs17ETEAIQOw";
     public static final String ACH_COMBINATOR = "CgkI4vHs17ETEAIQQQ";
-    public static final String LEAD_MARATHON_GESTURES = "CgkI4vHs17ETEAIQAA";
+    public static final String LEAD_MARATHON = "CgkI4vHs17ETEAIQAA";
     public static final String LEAD_MARATHON_GRAVITY = "CgkI4vHs17ETEAIQCA";
+    public static final String LEAD_MARATHON_RETRO = "CgkI4vHs17ETEAIQQg";
     public static final String LEAD_MARATHON_GAMEPAD = "CgkI4vHs17ETEAIQCQ";
     public static final String LEAD_PRACTICE_MODE = "CgkI4vHs17ETEAIQPA";
     public static final String LEAD_SPRINT_MODE = "CgkI4vHs17ETEAIQQA";
     public static final String EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED = "CgkI4vHs17ETEAIQAg";
     public static final String EVENT_MULTIPLAYER_MATCH_WON = "CgkI4vHs17ETEAIQAQ";
-    public static final String EVENT_GESTURE_MARATHON_STARTED = "CgkI4vHs17ETEAIQAw";
+    public static final String EVENT_MARATHON_STARTED = "CgkI4vHs17ETEAIQAw";
     public static final String EVENT_BLOCK_DROP = "CgkI4vHs17ETEAIQBA";
     public static final String EVENT_LINES_CLEARED = "CgkI4vHs17ETEAIQBQ";
     public static final String EVENT_GRAVITY_MARATHON_STARTED = "CgkI4vHs17ETEAIQBg";
@@ -82,13 +85,15 @@ public class GpgsHelper {
             return null;
 
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_NORMAL_ID))
-            return LEAD_MARATHON_GESTURES;
+            return LEAD_MARATHON;
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GRAVITY_ID))
             return LEAD_MARATHON_GRAVITY;
         if (gameModelId.equalsIgnoreCase(PracticeModel.MODEL_PRACTICE_ID))
             return LEAD_PRACTICE_MODE;
         if (gameModelId.equalsIgnoreCase(SprintModel.MODEL_SPRINT_ID))
             return LEAD_SPRINT_MODE;
+        if (gameModelId.equalsIgnoreCase(RetroMarathonModel.MODEL_MARATHON_RETRO89))
+            return LEAD_MARATHON_RETRO;
 
         return null;
     }
@@ -97,7 +102,7 @@ public class GpgsHelper {
         String retVal;
 
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_NORMAL_ID))
-            return EVENT_GESTURE_MARATHON_STARTED;
+            return EVENT_MARATHON_STARTED;
         if (gameModelId.equalsIgnoreCase(MarathonModel.MODEL_MARATHON_GRAVITY_ID))
             return EVENT_GRAVITY_MARATHON_STARTED;
 
@@ -144,8 +149,7 @@ public class GpgsHelper {
     public static class GamejoltScoreboardMapper implements IGameServiceIdMapper<Integer> {
         @Override
         public Integer mapToGsId(String independantId) {
-            if (independantId.equals(LEAD_MARATHON_GESTURES)
-                    || independantId.equals(LEAD_MARATHON_GAMEPAD)
+            if (independantId.equals(LEAD_MARATHON)
                     || independantId.equals(LEAD_MARATHON_GRAVITY))
                 return 264029;
             else
