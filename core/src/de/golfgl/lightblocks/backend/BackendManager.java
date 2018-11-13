@@ -162,15 +162,13 @@ public class BackendManager {
                 backendClient.postScore(currentlySendingScore, new BackendClient.IBackendResponse<Void>() {
                     @Override
                     public void onFail(int statusCode, String errorMsg) {
-                        if (statusCode == BackendClient.SC_NO_CONNECTION)
-                            synchronized (enqueuedScores) {
-                                // wieder zurück in die Queue und ein andermal probieren
-                                enqueuedScores.addFirst(currentlySendingScore);
-                                currentlySendingScore = null;
-                            }
-                        else
-                            // wenn es einen Fehler gab, wird der nicht von selbst verschwinden - also ignorieren
-                            onSuccess(null);
+                        // Ein Fehler ist irgendeine Art von Server- oder Verbindungsfehler (das Backend nimmt alle
+                        // Scores mit 200 an). Daher wieder einreihen für den nächsten Versuch, aber ans Ende
+                        synchronized (enqueuedScores) {
+                            // wieder zurück in die Queue und ein andermal probieren
+                            enqueuedScores.addLast(currentlySendingScore);
+                            currentlySendingScore = null;
+                        }
                     }
 
                     @Override

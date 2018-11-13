@@ -137,18 +137,16 @@ public class BackendScoreTable extends Table {
                         FONT_SCALE);
                 add(errorMsgLabel).minHeight(errorMsgLabel.getPrefHeight() * 1.5f);
 
-                if (cachedScoreboard.isLastErrorConnectionProblem()) {
-                    FaButton retry = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
-                    add(retry).pad(10);
-                    focusableActors.add(retry);
-                    retry.addListener(new ChangeListener() {
-                        @Override
-                        public void changed(ChangeEvent event, Actor actor) {
-                            reload();
-                        }
-                    });
-                    addFocusableActorsToStage();
-                }
+                FaButton retry = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
+                add(retry).pad(10);
+                focusableActors.add(retry);
+                retry.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        reload();
+                    }
+                });
+                addFocusableActorsToStage();
 
                 isFilled = true;
             }
@@ -374,6 +372,7 @@ public class BackendScoreTable extends Table {
 
     @Override
     public float getPrefHeight() {
-        return super.getPrefHeight() * Interpolation.fade.apply(Math.max(0, (TOTAL_TIME_ENLARGE - enlargeTime) / TOTAL_TIME_ENLARGE));
+        return super.getPrefHeight() * Interpolation.fade.apply(Math.max(0, (TOTAL_TIME_ENLARGE - enlargeTime) /
+                TOTAL_TIME_ENLARGE));
     }
 }
