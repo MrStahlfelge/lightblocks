@@ -134,23 +134,23 @@ public class BackendClientTest {
 
             int blocksNowPlayer = MathUtils.random(20, 1000);
             backendClientPlayer1.postScore(new BackendScore(player1Mode1, KEY_GAMEMODE1, "android", "", "params",
-                    "replay", blocksNowPlayer, 0, player1Mode1, 0), null);
+                    null, blocksNowPlayer, 0, player1Mode1, 0), null);
             blocksPlayer1 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
             backendClientPlayer1.postScore(new BackendScore(player1Mode2, KEY_GAMEMODE2, "android", "", "params",
-                    "replay",
+                    null,
                     blocksNowPlayer, 0, player1Mode2, 0), null);
             blocksPlayer1 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
             backendClientPlayer2.postScore(new BackendScore(player2Mode1, KEY_GAMEMODE1, "android", "", "params",
-                    "replay", blocksNowPlayer, 0, player2Mode1, 0), null);
+                    null, blocksNowPlayer, 0, player2Mode1, 0), null);
             blocksPlayer2 += blocksNowPlayer;
 
             blocksNowPlayer = MathUtils.random(20, 1000);
             backendClientPlayer2.postScore(new BackendScore(player2Mode2, KEY_GAMEMODE2, "android", "", "params",
-                    "replay",
+                    null,
                     blocksNowPlayer, 0, player2Mode2, 0), null);
             blocksPlayer2 += blocksNowPlayer;
 
