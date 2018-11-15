@@ -33,6 +33,8 @@ public class BackendManager {
     private final HashMap<String, CachedScoreboard> bestScores = new HashMap<String, CachedScoreboard>();
     private boolean authenticated;
     private BackendScore currentlySendingScore;
+    private BackendClient.WelcomeResponse lastWelcomeResponse;
+    private boolean isFetchingWelcomes;
 
     public BackendManager(LocalPrefs prefs) {
         backendClient = new BackendClient();
@@ -74,6 +76,40 @@ public class BackendManager {
         prefs.saveBackendUser(backendUserId, backendUserKey);
         backendClient.setUserId(backendUserId);
         backendClient.setUserPass(backendUserKey);
+    }
+
+    public BackendClient.WelcomeResponse getLastWelcomeResponse() {
+        return lastWelcomeResponse;
+    }
+
+    public boolean hasLastWelcomeResponse() {
+        return lastWelcomeResponse != null;
+    }
+
+    public boolean isFetchingWelcomes() {
+        return isFetchingWelcomes;
+    }
+
+    public void fetchNewWelcomeResponseIfExpired(int expirationTimeSeconds, long drawnBlocks, int donatorState) {
+        if (!isFetchingWelcomes && (lastWelcomeResponse == null || (TimeUtils.millis() + lastWelcomeResponse
+                .timeDelta - lastWelcomeResponse
+                .responseTime) / 1000 > expirationTimeSeconds)) {
+            isFetchingWelcomes = true;
+            backendClient.fetchWelcomeMessage(LightBlocksGame.GAME_VERSIONNUMBER, drawnBlocks, donatorState,
+                    new BackendClient.IBackendResponse<BackendClient.WelcomeResponse>() {
+                        @Override
+                        public void onFail(int statusCode, String errorMsg) {
+                            // kann man nix machen
+                            isFetchingWelcomes = false;
+                        }
+
+                        @Override
+                        public void onSuccess(BackendClient.WelcomeResponse retrievedData) {
+                            lastWelcomeResponse = retrievedData;
+                            isFetchingWelcomes = false;
+                        }
+                    });
+        }
     }
 
     /**

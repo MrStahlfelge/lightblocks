@@ -4,6 +4,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.backend.BackendClient;
+import de.golfgl.lightblocks.backend.BackendMessage;
 import de.golfgl.lightblocks.menu.SinglePlayerScreen;
 import de.golfgl.lightblocks.menu.WelcomeButton;
 import de.golfgl.lightblocks.model.Mission;
@@ -42,16 +44,18 @@ public class WelcomeTextUtils {
             listNewFeatures(welcomes, app, lastUsedVersion);
         }
 
-        // 2. EINBLENDUNGEN ZU NOCH NICHT GESPIELTEN MODIS ODER UNGENUTZTEN FEATURES
+        // 2. EINBLENDUNGEN VOM SERVER / BESONDERE TAGE ODER SOWAS (WEIHNACHTEN ETC)
+        if (app.backendManager.hasLastWelcomeResponse()) {
+            listBackendMessages(app, welcomes, app.backendManager.getLastWelcomeResponse());
+        }
+
+        // 3. EINBLENDUNGEN ZU NOCH NICHT GESPIELTEN MODIS ODER UNGENUTZTEN FEATURES
 
         // Unter 50 Reihen und tutorial verfügbar und nicht gemacht: anbieten
         if (clearedLines < 100 && TutorialModel.tutorialAvailable() &&
                 app.savegame.getBestScore(Mission.KEY_TUTORIAL).getRating() == 0)
             welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeTutorial"),
                     new ShowSinglePlayerPageRunnable(app, SinglePlayerScreen.PAGEIDX_MISSION)));
-
-        // 3. BESONDERE TAGE ODER SOWAS (WEIHNACHTEN ETC)
-
 
         // 4. WENN NOCH KEIN TEXT DA, BEGRÜSSEN WIR SPORADISCHE NUTZER
         if (welcomes.size == 0 && daysSinceLastStart >= 5 && !alreadyShownDaysSinceLastStart) {
@@ -83,6 +87,30 @@ public class WelcomeTextUtils {
         //welcomes.add(new WelcomeButton.WelcomeText("Have a\ngood day", null));
 
         return welcomes;
+    }
+
+    private static void listBackendMessages(final LightBlocksGame app, Array<WelcomeButton.WelcomeText> welcomes,
+                                            BackendClient.WelcomeResponse welcomeResponse) {
+        // Warnungen als erstes
+        //TODO der sollte rot sein oder sowas
+        if (welcomeResponse.warningMsg != null && !welcomeResponse.warningMsg.isEmpty())
+            welcomes.add(new WelcomeButton.WelcomeText(welcomeResponse.warningMsg, null));
+
+
+        for (final BackendMessage message : welcomeResponse.messageList) {
+            if (BackendMessage.TYPE_WELCOME.equals(message.type)) {
+                Runnable run = null;
+                if (message.infoUrl != null && !message.infoUrl.isEmpty())
+                    run = new OpenWebsiteRunnable(app) {
+                        @Override
+                        public void run() {
+                            app.openOrShowUri(message.infoUrl);
+                        }
+                    };
+
+                welcomes.add(new WelcomeButton.WelcomeText(message.content, run));
+            }
+        }
     }
 
     protected static void listNewFeatures(Array<WelcomeButton.WelcomeText> welcomes,

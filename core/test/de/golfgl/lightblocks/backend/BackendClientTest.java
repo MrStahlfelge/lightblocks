@@ -230,9 +230,9 @@ public class BackendClientTest {
         BackendClient backendClientNoAuth = new BackendClient();
 
         // anonyme Anfrage
-        WaitForResponseListener<BackendClient.NewMessagesResponse> newMessagesResponse = new
-                WaitForResponseListener<BackendClient.NewMessagesResponse>();
-        backendClientNoAuth.fetchNewMessages(0, LightBlocksGame.GAME_VERSIONNUMBER, 1023, 1,
+        WaitForResponseListener<BackendClient.WelcomeResponse> newMessagesResponse = new
+                WaitForResponseListener<BackendClient.WelcomeResponse>();
+        backendClientNoAuth.fetchWelcomeMessage(LightBlocksGame.GAME_VERSIONNUMBER, 1023, 1,
                 newMessagesResponse);
         waitWhileRequesting();
 
@@ -242,8 +242,8 @@ public class BackendClientTest {
         Assert.assertNull(newMessagesResponse.retrievedData.warningMsg);
 
         // veraltete Clientversion
-        newMessagesResponse = new WaitForResponseListener<BackendClient.NewMessagesResponse>();
-        backendClientNoAuth.fetchNewMessages(0, 1, 1023, 1,
+        newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
+        backendClientNoAuth.fetchWelcomeMessage(1, 1023, 1,
                 newMessagesResponse);
         waitWhileRequesting();
 
@@ -256,12 +256,12 @@ public class BackendClientTest {
         BackendClient backendClientPlayer = new BackendClient();
         WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
                 = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
-        backendClientPlayer.createPlayer("player", createdResponse);
+        backendClientPlayer.createPlayer("player" + MathUtils.random(1000, 2000), createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData);
 
-        newMessagesResponse = new WaitForResponseListener<BackendClient.NewMessagesResponse>();
-        backendClientPlayer.fetchNewMessages(0, LightBlocksGame.GAME_VERSIONNUMBER, 1024, 1, newMessagesResponse);
+        newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
+        backendClientPlayer.fetchWelcomeMessage(LightBlocksGame.GAME_VERSIONNUMBER, 1024, 1, newMessagesResponse);
         waitWhileRequesting();
         Assert.assertNotNull(newMessagesResponse.retrievedData);
         Assert.assertTrue(newMessagesResponse.retrievedData.authenticated);
@@ -269,10 +269,10 @@ public class BackendClientTest {
         Assert.assertNull(newMessagesResponse.retrievedData.warningMsg);
 
         // Anfrage mit falscher Authentifizierung
-        newMessagesResponse = new WaitForResponseListener<BackendClient.NewMessagesResponse>();
+        newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
         BackendClient noAuthPlayer = new BackendClient();
         noAuthPlayer.setUserId("----");
-        noAuthPlayer.fetchNewMessages(0, LightBlocksGame.GAME_VERSIONNUMBER, 1024, 1, newMessagesResponse);
+        noAuthPlayer.fetchWelcomeMessage(LightBlocksGame.GAME_VERSIONNUMBER, 1024, 1, newMessagesResponse);
         waitWhileRequesting();
         Assert.assertNotNull(newMessagesResponse.retrievedData);
         Assert.assertFalse(newMessagesResponse.retrievedData.authenticated);

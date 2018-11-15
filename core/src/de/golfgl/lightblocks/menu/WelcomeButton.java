@@ -9,22 +9,30 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.backend.BackendClient;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
+import de.golfgl.lightblocks.state.WelcomeTextUtils;
 
 /**
  * Created by Benjamin Schulte on 30.04.2018.
  */
 
 public class WelcomeButton extends FaTextButton {
-    private static final float DURATION = 10f;
+    private static final float DURATION_SHOW_PAGE = 10f;
+    private static final float DURATION_RESIZE = .2f;
     private final Label welcomeLabel;
+    private final LightBlocksGame app;
     private Array<WelcomeText> texts;
     private int currentPage = -1;
     private float oneLineHeight;
     private float nextChange;
+    private BackendClient.WelcomeResponse shownResponse;
+    private float lastPrefHeight;
+    private float resizeTimeLeft;
 
     public WelcomeButton(LightBlocksGame app) {
         super(" ", app.skin, LightBlocksGame.SKIN_BUTTON_WELCOME);
+        this.app = app;
 
         welcomeLabel = getLabel();
         welcomeLabel.setFontScale(.75f);
@@ -48,13 +56,22 @@ public class WelcomeButton extends FaTextButton {
 
         if (nextChange < 0 && nextChange + delta >= 0)
             changePage();
+
+        // neu setzen, falls es aus dem Backend neue Texte gibt
+        if (app.backendManager.hasLastWelcomeResponse() && app.backendManager.getLastWelcomeResponse() != shownResponse)
+            refreshTexts();
+
+        if (resizeTimeLeft > 0) {
+            resizeTimeLeft = Math.max(resizeTimeLeft - delta, 0);
+            invalidateHierarchy();
+        }
     }
 
     private void changePage() {
-        if (texts == null || texts.size <= 1 || DURATION - nextChange < .5f)
+        if (texts == null || texts.size <= 1 || DURATION_SHOW_PAGE - nextChange < .5f)
             return;
 
-        nextChange = DURATION;
+        nextChange = DURATION_SHOW_PAGE;
 
         addAction(Actions.sequence(Actions.fadeOut(.3f, Interpolation.fade), Actions.run(new Runnable() {
             @Override
@@ -80,22 +97,60 @@ public class WelcomeButton extends FaTextButton {
     private void setPage(int pageIdx) {
         pageIdx = Math.min(pageIdx, (texts == null ? 0 : texts.size) - 1);
         currentPage = pageIdx;
-        if (currentPage >= 0) {
+        boolean hasContent = currentPage >= 0;
+        lastPrefHeight = getPrefHeight();
+
+        if (hasContent) {
+            float welcomePrefHeight = welcomeLabel.getPrefHeight();
             WelcomeText wt = texts.get(pageIdx);
             welcomeLabel.setText(wt.text);
+            if (welcomeLabel.getPrefHeight() != welcomePrefHeight)
+                resizeTimeLeft = DURATION_RESIZE;
         }
-        setVisible(currentPage >= 0);
+
+        if (hasContent != isVisible()) {
+            setVisible(hasContent);
+            resizeTimeLeft = DURATION_RESIZE;
+        }
     }
 
     @Override
     public float getPrefHeight() {
-        return isVisible() ? oneLineHeight * 2 : 1;
+        float prefHeight;
+        if (welcomeLabel != null)
+            prefHeight = isVisible() ? Math.max(oneLineHeight * 2, welcomeLabel.getPrefHeight()) : 1;
+        else
+            prefHeight = 0;
+
+        if (resizeTimeLeft > 0)
+            prefHeight = Interpolation.fade.apply(lastPrefHeight, prefHeight,
+                    (DURATION_RESIZE - resizeTimeLeft) / DURATION_RESIZE);
+        return prefHeight;
     }
 
     public void setTexts(Array<WelcomeText> welcomeTexts) {
         texts = welcomeTexts;
         setPage(0);
-        nextChange = DURATION;
+        nextChange = DURATION_SHOW_PAGE;
+    }
+
+    /**
+     * setzt die Texte neu aus Texten aus dem Backend und lokalen Meldungen und löst wenn nötig auch ein neues
+     * Refresh vom Server aus
+     */
+    public void refreshTexts() {
+        try {
+            shownResponse = app.backendManager.getLastWelcomeResponse();
+            // die Texte setzen
+            setTexts(WelcomeTextUtils.fillWelcomes(app));
+        } catch (Throwable t) {
+            // alles beim alten lassen
+            // es gab Crashreports von Geräten mit Tasten??? über NPE in fillWelcomes. Einfach abfangen und dann eben
+            // nix anzeigen
+        }
+        int expirationSeconds = app.backendManager.hasUserId() ? 3 * 60 : 60 * 60;
+        app.backendManager.fetchNewWelcomeResponseIfExpired(expirationSeconds, app.savegame.getTotalScore()
+                .getDrawnTetrominos(), app.localPrefs.getSupportLevel());
     }
 
     public static class WelcomeText {
