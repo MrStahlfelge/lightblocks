@@ -49,6 +49,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
                         + Input.Keys.toString(tvRemoteKeyConfig.keyCodeSoftDrop);
                 helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteHardDrop") + ": "
                         + Input.Keys.toString(tvRemoteKeyConfig.keyCodeHarddrop);
+                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteHold") + ": "
+                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeHold);
             }
             return helpText;
         } else
