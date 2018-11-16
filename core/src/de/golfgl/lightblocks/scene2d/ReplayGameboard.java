@@ -239,6 +239,7 @@ public class ReplayGameboard extends BlockGroup {
     public void windToFirstStep() {
         nextStep = replay.seekToFirstStep();
         transitionToNextStep();
+        onScoreChange(0);
     }
 
     public void playReplay() {

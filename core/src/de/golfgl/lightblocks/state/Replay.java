@@ -115,7 +115,7 @@ public class Replay {
 
         // und nochmal zurück!
         int[] nextPiece = null;
-        for (int i = arraySteps.size() - 1; i > 0; i--) {
+        for (int i = arraySteps.size() - 1; i >= 0; i--) {
             AdditionalInformation currAdd = arrayAdditional.get(i);
             ReplayStep currentStep = arraySteps.get(i);
 
