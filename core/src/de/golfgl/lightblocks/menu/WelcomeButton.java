@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -20,6 +21,8 @@ import de.golfgl.lightblocks.state.WelcomeTextUtils;
 public class WelcomeButton extends FaTextButton {
     private static final float DURATION_SHOW_PAGE = 10f;
     private static final float DURATION_RESIZE = .2f;
+    private static final int EXPIRATION_MINUTES_REGISTERED = 3;
+    private static final int EXPIRATION_MINUTES_UNREGISTERED = 120;
     private final Label welcomeLabel;
     private final LightBlocksGame app;
     private Array<WelcomeText> texts;
@@ -118,7 +121,8 @@ public class WelcomeButton extends FaTextButton {
     public float getPrefHeight() {
         float prefHeight;
         if (welcomeLabel != null)
-            prefHeight = isVisible() ? Math.max(oneLineHeight * 2, welcomeLabel.getPrefHeight()) : 1;
+            prefHeight = isVisible() ? MathUtils.clamp(welcomeLabel.getPrefHeight(), oneLineHeight * 2,
+                    oneLineHeight * 3) : 1;
         else
             prefHeight = 0;
 
@@ -148,7 +152,8 @@ public class WelcomeButton extends FaTextButton {
             // es gab Crashreports von Geräten mit Tasten??? über NPE in fillWelcomes. Einfach abfangen und dann eben
             // nix anzeigen
         }
-        int expirationSeconds = app.backendManager.hasUserId() ? 3 * 60 : 60 * 60;
+        int expirationSeconds = app.backendManager.hasUserId() ? EXPIRATION_MINUTES_REGISTERED * 60 :
+                EXPIRATION_MINUTES_UNREGISTERED * 60;
         app.backendManager.fetchNewWelcomeResponseIfExpired(expirationSeconds, app.savegame.getTotalScore()
                 .getDrawnTetrominos(), app.localPrefs.getSupportLevel());
     }
