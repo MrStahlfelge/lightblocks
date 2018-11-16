@@ -23,6 +23,7 @@ public class Replay {
     private static final String KEY_VERSION = "1";
     private LinkedList<ReplayStep> replaySteps;
     private ArrayList<ReplayStep> arraySteps;
+    private ArrayList<AdditionalInformation> arrayAdditional;
     private boolean isValid;
     private int currentReplayStepIdx;
     private int lastGameboardStepIdx;
@@ -58,8 +59,70 @@ public class Replay {
             if (!isValid())
                 arraySteps.clear();
 
+            calcAdditionalInformation();
+
             currentReplayStepIdx = -1;
             lastGameboardStepIdx = -1;
+        }
+    }
+
+    /**
+     * Berechnet die Infos, die nicht explizit im Replay stehen
+     */
+    private void calcAdditionalInformation() {
+        int numBlocks = 0;
+        int cleared = 0;
+        byte[] gameboard = null;
+        arrayAdditional = new ArrayList<>(arraySteps.size());
+
+        // einmal von vorn nach hinten...
+        for (int step = 0; step < arraySteps.size(); step++) {
+            ReplayStep currentStep = arraySteps.get(step);
+            AdditionalInformation add = new AdditionalInformation();
+            arrayAdditional.add(add);
+
+            if (currentStep instanceof ReplayGameboardStep)
+                gameboard = ((ReplayGameboardStep) currentStep).gameboard;
+
+            // gezogene Blöcke
+            if (currentStep.isNextPieceStep())
+                numBlocks++;
+
+            // abgebaute Reihen
+            if (currentStep.isDropStep()) {
+                int[] activePiecePos = currentStep.getActivePiecePosition();
+                for (int row = 0; row < Gameboard.GAMEBOARD_ALLROWS; row++) {
+                    boolean rowIsFull = true;
+                    for (int col = 0; col < Gameboard.GAMEBOARD_COLUMNS && rowIsFull; col++) {
+                        int pos = row * Gameboard.GAMEBOARD_COLUMNS + col;
+                        boolean colIsFul = gameboard[pos] != Gameboard.SQUARE_EMPTY;
+                        if (!colIsFul)
+                            for (int i = 0; i < activePiecePos.length; i++) {
+                                if (activePiecePos[i] == pos)
+                                    colIsFul = true;
+                            }
+
+                        rowIsFull = rowIsFull && colIsFul;
+                    }
+                    if (rowIsFull)
+                        cleared++;
+                }
+            }
+
+            add.blockNum = numBlocks;
+            add.clearedLines = cleared;
+        }
+
+        // und nochmal zurück!
+        int[] nextPiece = null;
+        for (int i = arraySteps.size() - 1; i > 0; i--) {
+            AdditionalInformation currAdd = arrayAdditional.get(i);
+            ReplayStep currentStep = arraySteps.get(i);
+
+            currAdd.nextPiece = nextPiece;
+
+            if (currentStep.isNextPieceStep())
+                nextPiece = currentStep.getActivePiecePosition();
         }
     }
 
@@ -148,6 +211,14 @@ public class Replay {
 
             return replayStep;
         } else
+            return null;
+    }
+
+    public AdditionalInformation getCurrentAdditionalInformation() {
+        setReplayMode();
+        if (currentReplayStepIdx >= 0 && currentReplayStepIdx < arraySteps.size())
+            return arrayAdditional.get(currentReplayStepIdx);
+        else
             return null;
     }
 
@@ -548,5 +619,11 @@ public class Replay {
         public int getMoveY() {
             return moveDistance;
         }
+    }
+
+    public class AdditionalInformation {
+        public int blockNum;
+        public int clearedLines;
+        public int[] nextPiece;
     }
 }

@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.scene2d;
 
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 
@@ -16,12 +17,15 @@ import de.golfgl.lightblocks.state.Replay;
 
 public class ReplayGameboard extends BlockGroup {
     private final Replay replay;
+    private final BlockActor[] activePieceBlock;
+    private final BlockActor[] nextPieceBlock;
     private float playSpeed = 0f;
     private Replay.ReplayStep shownStep;
     private Replay.ReplayStep nextStep;
     private float waitTime;
+    private int timeMsSinceShownStep;
+    private Group nextPieceBlockGroup;
     private BlockActor[] currentShownBlocks;
-    private BlockActor[] activePieceBlock;
     private int[] activePiecePos;
     private Array<BlockActor> actorsToRemove;
 
@@ -33,12 +37,18 @@ public class ReplayGameboard extends BlockGroup {
 
         currentShownBlocks = new BlockActor[Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_ALLROWS];
         activePieceBlock = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
+        nextPieceBlock = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
         activePiecePos = new int[Tetromino.TETROMINO_BLOCKCOUNT];
         actorsToRemove = new Array<BlockActor>();
         for (int i = 0; i < activePieceBlock.length; i++) {
             activePieceBlock[i] = new BlockActor(app, Tetromino.TETRO_IDX_L);
             activePieceBlock[i].setEnlightened(true, true);
+            nextPieceBlock[i] = new BlockActor(app, Tetromino.TETRO_IDX_L);
+            nextPieceBlock[i].getColor().a = .5f;
         }
+        nextPieceBlockGroup = new Group();
+        nextPieceBlockGroup.setX(BlockActor.blockWidth * 7.3f);
+        addActor(nextPieceBlockGroup);
 
         windToFirstStep();
     }
@@ -47,10 +57,12 @@ public class ReplayGameboard extends BlockGroup {
     public void act(float delta) {
         if (nextStep != null && playSpeed > 0) {
             waitTime = waitTime - delta * playSpeed;
+            timeMsSinceShownStep = timeMsSinceShownStep + (int) (delta * playSpeed * 1000);
 
-            if (waitTime <= 0) {
+            if (waitTime <= 0)
                 transitionToNextStep();
-            }
+            else if (shownStep != null && timeMsSinceShownStep > 0)
+                onTimeChange(Math.min(shownStep.timeMs + timeMsSinceShownStep, nextStep.timeMs));
         }
 
         super.act(delta * Math.max(1, playSpeed));
@@ -66,7 +78,11 @@ public class ReplayGameboard extends BlockGroup {
 
         // Gameboard umbauen
         shownStep = nextStep;
+        Replay.AdditionalInformation currentAdditionalInformation = replay.getCurrentAdditionalInformation();
+
         transitionGameboard(replay.getCurrentGameboard());
+        transitionNextPiece(currentAdditionalInformation.nextPiece);
+
         nextStep = replay.seekToNextStep();
         if (nextStep != null)
             waitTime = (float) (nextStep.timeMs - shownStep.timeMs) / 1000;
@@ -78,13 +94,26 @@ public class ReplayGameboard extends BlockGroup {
 
         // Anzeige aktualisieren
         onTimeChange(shownStep.timeMs);
+        onClearedLinesChange(currentAdditionalInformation.clearedLines);
+        timeMsSinceShownStep = 0;
+
         if (shownStep.isDropStep()) {
             onScoreChange(replay.getCurrentScore());
             // ARE
-            waitTime = waitTime + .2f;
+            waitTime = waitTime + .15f;
 
             // Abzubauende Reihen verstärken
             clearLinesOnGameboard();
+        }
+    }
+
+    private void transitionNextPiece(int[] nextPiece) {
+        for (int i = 0; i < nextPieceBlock.length; i++) {
+            if (nextPiece != null) {
+                setBlockActorToPosition(nextPieceBlock[i], nextPiece[i], !nextPieceBlock[i].hasParent());
+                nextPieceBlockGroup.addActor(nextPieceBlock[i]);
+            } else
+                nextPieceBlock[i].remove();
         }
     }
 
@@ -102,8 +131,6 @@ public class ReplayGameboard extends BlockGroup {
                 setBlockActorToPosition(activePieceBlock[i], activePiecePos[i], false);
             }
         }
-
-        // TODO bei Drop ganze Zeilen highlighten und bei NewPieceStep "abbauen"
     }
 
     /**
@@ -287,6 +314,10 @@ public class ReplayGameboard extends BlockGroup {
     }
 
     protected void onScoreChange(int score) {
+
+    }
+
+    protected void onClearedLinesChange(int clearedLines) {
 
     }
 }
