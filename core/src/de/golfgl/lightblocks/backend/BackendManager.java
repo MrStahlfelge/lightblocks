@@ -28,6 +28,7 @@ public class BackendManager {
     private final LocalPrefs prefs;
     private final Queue<BackendScore> enqueuedScores = new Queue<BackendScore>();
     private final String platformString;
+    private final String osString;
     private final BackendClient backendClient;
     private final HashMap<String, CachedScoreboard> latestScores = new HashMap<String, CachedScoreboard>();
     private final HashMap<String, CachedScoreboard> bestScores = new HashMap<String, CachedScoreboard>();
@@ -47,15 +48,19 @@ public class BackendManager {
         switch (Gdx.app.getType()) {
             case Android:
                 platformString = LightBlocksGame.isOnAndroidTV() ? PLATFORM_TV : PLATFORM_MOBILE;
+                osString = "android";
                 break;
             case iOS:
                 platformString = PLATFORM_MOBILE;
+                osString = "ios";
                 break;
             case WebGL:
                 platformString = LightBlocksGame.isWebAppOnMobileDevice() ? PLATFORM_MOBILE : PLATFORM_DESKTOP;
+                osString = "webgl";
                 break;
             default:
                 platformString = PLATFORM_DESKTOP;
+                osString = "desktop";
         }
     }
 
@@ -66,6 +71,10 @@ public class BackendManager {
 
     public boolean hasUserId() {
         return backendClient.hasUserId();
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
     }
 
     public String ownUserId() {
@@ -95,8 +104,8 @@ public class BackendManager {
                 .timeDelta - lastWelcomeResponse
                 .responseTime) / 1000 > expirationTimeSeconds)) {
             isFetchingWelcomes = true;
-            backendClient.fetchWelcomeMessage(LightBlocksGame.GAME_VERSIONNUMBER, drawnBlocks, donatorState,
-                    new BackendClient.IBackendResponse<BackendClient.WelcomeResponse>() {
+            backendClient.fetchWelcomeMessage(LightBlocksGame.GAME_VERSIONNUMBER, platformString, osString,
+                    drawnBlocks, donatorState, new BackendClient.IBackendResponse<BackendClient.WelcomeResponse>() {
                         @Override
                         public void onFail(int statusCode, String errorMsg) {
                             // kann man nix machen
@@ -106,6 +115,7 @@ public class BackendManager {
                         @Override
                         public void onSuccess(BackendClient.WelcomeResponse retrievedData) {
                             lastWelcomeResponse = retrievedData;
+                            authenticated = lastWelcomeResponse.authenticated;
                             isFetchingWelcomes = false;
                         }
                     });
