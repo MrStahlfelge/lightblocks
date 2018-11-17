@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
+import de.golfgl.gdx.controllers.IControllerActable;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.AboutScreen;
@@ -29,7 +30,6 @@ import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabel;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
-import de.golfgl.lightblocks.state.WelcomeTextUtils;
 
 /**
  * Das Hauptmenü
@@ -217,6 +217,11 @@ public class MainMenuScreen extends AbstractMenuScreen {
         gameVersion.setAlignment(Align.bottom);
         mainGroup.addActor(gameVersion);
 
+        Actor exitButton = new ExitActor();
+        mainGroup.addActor(exitButton);
+        stage.addFocusableActor(exitButton);
+        stage.setEscapeActor(exitButton);
+
         // den Platz für die Version in der Tabelle frei halten
         buttonTable.row();
         buttonTable.add().minHeight(gameVersion.getHeight());
@@ -248,7 +253,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
     public void show() {
         Gdx.input.setInputProcessor(stage);
         app.controllerMappings.setInputProcessor(stage);
-        Gdx.input.setCatchBackKey(!isOnMainLevel());
+        Gdx.input.setCatchBackKey(true);
         resumeGameCell.setActor(app.savegame.hasSavedGame() ? resumeGameButton : null);
         resumeGameCell.expand(true, resumeGameCell.hasActor());
         if (stage.getFocusedActor() == null || !stage.getFocusedActor().hasParent())
@@ -361,5 +366,25 @@ public class MainMenuScreen extends AbstractMenuScreen {
         //TODO hier muss catchBackKey gesetzt werden, aber eben bei zurück auch wieder zurückgesetzt werden
         if (app.canDonate())
             new DonationDialog(app).show(stage);
+    }
+
+    class ExitActor extends Actor implements IControllerActable {
+
+        @Override
+        public boolean onControllerDefaultKeyDown() {
+            switch (Gdx.app.getType()) {
+                case Android:
+                case Desktop:
+                    Gdx.app.exit();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public boolean onControllerDefaultKeyUp() {
+            return false;
+        }
     }
 }
