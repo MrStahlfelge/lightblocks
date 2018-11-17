@@ -291,7 +291,7 @@ public class BackendClientTest {
         BackendClient backendClientPlayer = new BackendClient();
         WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
                 = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
-        backendClientPlayer.createPlayer("player", createdResponse);
+        backendClientPlayer.createPlayer("player" + MathUtils.random(1000, 2000), createdResponse);
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData);
 
@@ -329,6 +329,39 @@ public class BackendClientTest {
 
     }
 
+    @Test
+    public void testListOwnMatches() throws InterruptedException {
+        BackendClient backendClientPlayer = new BackendClient();
+        WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
+                = new WaitForResponseListener<>();
+        backendClientPlayer.createPlayer("player" + MathUtils.random(1000, 2000), createdResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(createdResponse.retrievedData);
+
+        // neuer Spieler hat noch keine
+        WaitForResponseListener<List<MatchEntity>> callback = new WaitForResponseListener<>();
+        backendClientPlayer.listPlayerMatches(0, callback);
+        waitWhileRequesting();
+        Assert.assertNotNull(callback.retrievedData);
+        Assert.assertTrue(callback.retrievedData.isEmpty());
+
+        //jetzt einfügen
+        WaitForResponseListener<MatchEntity> addlistener = new WaitForResponseListener<>();
+        backendClientPlayer.openNewMatch(null, 9, addlistener);
+        waitWhileRequesting();
+        Assert.assertTrue(addlistener.successful);
+
+        callback = new WaitForResponseListener<>();
+        backendClientPlayer.listPlayerMatches(0, callback);
+        waitWhileRequesting();
+        Assert.assertNotNull(callback.retrievedData);
+        Assert.assertEquals(1, callback.retrievedData.size());
+
+        backendClientPlayer.deletePlayer(new WaitForResponseListener<Void>());
+        waitWhileRequesting();
+
+    }
+
     @After
     public void waitWhileRequesting() throws InterruptedException {
         while (requesting) {
@@ -354,10 +387,10 @@ public class BackendClientTest {
 
         @Override
         public void onSuccess(T retrievedData) {
-            requesting = false;
             this.retrievedData = retrievedData;
             successful = true;
             lastCode = 0;
+            requesting = false;
         }
     }
 }
