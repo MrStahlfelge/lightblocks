@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -28,7 +27,6 @@ import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
-import de.golfgl.lightblocks.scene2d.PagedScrollPane;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -47,22 +45,18 @@ import de.golfgl.lightblocks.state.MultiplayerMatch;
  * Created by Benjamin Schulte on 24.02.2017.
  */
 
-public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomListener {
+public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IRoomListener {
     protected Dialog waitForConnectionOverlay;
     private Button startGameButton;
     private BeginningLevelChooser beginningLevelSlider;
     private InputButtonTable inputButtonTable;
-    private Cell mainCell;
     private MultiplayerMatch matchStats = new MultiplayerMatch();
     private HashMap<String, boolean[]> availablePlayerInputs = new HashMap<String, boolean[]>();
     private boolean hasToRefresh = false;
     private ChangeListener gameParameterListener;
-    private Button shareAppButton;
     private boolean screenNotActive = false;
-    private PagedScrollPane modePager;
-    private PagedScrollPane.PageIndicator pageIndicator;
 
-    public MultiplayerMenuScreen(MultiplayerLightblocks app, Group actorToHide) {
+    public RtMultiplayerMenuScreen(MultiplayerLightblocks app, Group actorToHide) {
         super(app, actorToHide);
     }
 
@@ -132,16 +126,6 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
     protected void fillButtonTable(Table buttons) {
         super.fillButtonTable(buttons);
 
-        shareAppButton = new ShareButton(app);
-
-        pageIndicator = modePager.getPageIndicator();
-        buttons.add(pageIndicator)
-                .minWidth(modePager.getPageIndicator().getPrefWidth() * 2)
-                .uniform(false, false);
-
-        buttons.add(shareAppButton);
-        addFocusableActor(shareAppButton);
-
         // Die folgenden Elemente sind nicht in der Buttontable, aber die Initialisierung hier macht Sinn
 
         startGameButton = new PlayButton(app);
@@ -181,40 +165,13 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
         inputButtonTable.setExternalChangeListener(gameParameterListener);
 
         setOpenJoinRoomButtons();
-
-        validate();
-        modePager.scrollToPage(app.localPrefs.getLastMultiPlayerMenuPage());
-    }
-
-    @Override
-    protected String getTitleIcon() {
-        return FontAwesome.NET_PEOPLE;
-    }
-
-    @Override
-    protected String getSubtitle() {
-        return null;
-    }
-
-    @Override
-    protected String getTitle() {
-        return app.TEXTS.get("menuPlayMultiplayerButton");
     }
 
     @Override
     protected void fillMenuTable(Table menuTable) {
 
-        modePager = new PagedScrollPane(app.skin, LightBlocksGame.SKIN_STYLE_PAGER);
-        modePager.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                if (actor == modePager && getStage() != null) {
-                    ((MyStage) getStage()).setFocusedActor(((IMultiplayerModePage) modePager.getCurrentPage())
-                            .getDefaultActor());
-                    app.localPrefs.saveLastUsedMultiPlayerMenuPage(modePager.getCurrentPageIndex());
-                }
-            }
-        });
+        super.fillMenuTable(menuTable);
+
         modePager.addPage(new LocalGameTable());
 
         if (app.gpgsClient != null && app.gpgsClient instanceof IMultiplayerGsClient)
@@ -623,10 +580,6 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
         return ((IMultiplayerModePage) modePager.getCurrentPage()).getDefaultActor();
     }
 
-    private interface IMultiplayerModePage {
-        Actor getDefaultActor();
-    }
-
     private class RoomTable extends Table {
         private Actor defaultActor;
 
@@ -850,7 +803,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog implements IRoomLi
 
         public ConnectionWaitDialog() {
             super(app.TEXTS.get("labelMultiplayerConnecting"), app,
-                    .75f * MultiplayerMenuScreen.this.getStage().getWidth());
+                    .75f * RtMultiplayerMenuScreen.this.getStage().getWidth());
         }
 
         @Override

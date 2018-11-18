@@ -29,7 +29,7 @@ import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
-import de.golfgl.lightblocks.menu.CompetitionMenuScreen;
+import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -410,7 +410,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     }
 
     public AbstractMenuDialog getNewMultiplayerMenu(Group actorToHide) {
-        return new CompetitionMenuScreen(this, actorToHide);
+        return new MultiplayerMenuScreen(this, actorToHide);
     }
 
     /**

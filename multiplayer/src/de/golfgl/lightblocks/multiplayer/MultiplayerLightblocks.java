@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
-import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
+import de.golfgl.lightblocks.menu.RtMultiplayerMenuScreen;
 
 /**
  * Created by Benjamin Schulte on 16.03.2018.
@@ -74,7 +74,7 @@ public class MultiplayerLightblocks extends LightBlocksGame {
         if (netUtils == null)
             netUtils = new NetUtils();
 
-        return new MultiplayerMenuScreen(this, actorToHide);
+        return new RtMultiplayerMenuScreen(this, actorToHide);
     }
 
     @Override
