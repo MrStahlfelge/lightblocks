@@ -1,20 +1,16 @@
 package de.golfgl.lightblocks.menu;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.menu.backend.BackendBattleMenuPage;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
-import de.golfgl.lightblocks.scene2d.RoundedTextButton;
-import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
@@ -79,42 +75,10 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
             }
         });
 
-        modePager.addPage(new GtbDuel());
+        modePager.addPage(new BackendBattleMenuPage(app, this));
     }
 
-    protected interface IMultiplayerModePage {
+    public interface IMultiplayerModePage {
         Actor getDefaultActor();
     }
-
-    private class GtbDuel extends Table implements IMultiplayerModePage {
-        private Button websiteButton;
-
-        public GtbDuel() {
-            Label competitionIntro = new ScaledLabel(app.TEXTS.get("competitionIntro"), app.skin, app.SKIN_FONT_TITLE);
-            competitionIntro.setAlignment(Align.center);
-            competitionIntro.setWrap(true);
-
-            websiteButton = new RoundedTextButton(app.TEXTS.get("buttonWebsite"), app.skin);
-            websiteButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    Gdx.net.openURI(LightBlocksGame.GAME_URL);
-                }
-            });
-
-            row();
-            add(competitionIntro).fill().expandX().pad(20);
-
-            row().padTop(30);
-            add(websiteButton);
-            addFocusableActor(websiteButton);
-
-        }
-
-        @Override
-        public Actor getDefaultActor() {
-            return websiteButton;
-        }
-    }
-
 }

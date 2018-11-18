@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,10 +33,14 @@ public class BackendManager {
     private final BackendClient backendClient;
     private final HashMap<String, CachedScoreboard> latestScores = new HashMap<String, CachedScoreboard>();
     private final HashMap<String, CachedScoreboard> bestScores = new HashMap<String, CachedScoreboard>();
+    private final HashMap<String, MatchEntity> multiplayerMatchesList;
     private boolean authenticated;
     private BackendScore currentlySendingScore;
     private BackendClient.WelcomeResponse lastWelcomeResponse;
     private boolean isFetchingWelcomes;
+    private long multiplayerMatchesLastFetchMs;
+    private boolean isFetchingMultiplayerMatches;
+    private boolean multiplayerMatchesLastFetchSuccessful;
 
     public BackendManager(LocalPrefs prefs) {
         backendClient = new BackendClient();
@@ -62,6 +67,11 @@ public class BackendManager {
                 platformString = PLATFORM_DESKTOP;
                 osString = "desktop";
         }
+
+        multiplayerMatchesList = new HashMap<>();
+        if (hasUserId()) {
+            //TODO persistierte Multiplayerspiele laden statt hier gleich zu gehen
+        }
     }
 
     @Nonnull
@@ -87,6 +97,18 @@ public class BackendManager {
         backendClient.setUserPass(backendUserKey);
     }
 
+    public List<MatchEntity> getMultiplayerMatchesList() {
+        return new ArrayList(multiplayerMatchesList.values());
+    }
+
+    public long getMultiplayerMatchesLastFetchMs() {
+        return multiplayerMatchesLastFetchMs;
+    }
+
+    public boolean isMultiplayerMatchesLastFetchSuccessful() {
+        return multiplayerMatchesLastFetchSuccessful;
+    }
+
     public BackendClient.WelcomeResponse getLastWelcomeResponse() {
         return lastWelcomeResponse;
     }
@@ -95,8 +117,46 @@ public class BackendManager {
         return lastWelcomeResponse != null;
     }
 
+    public boolean isFetchingMultiplayerMatches() {
+        return isFetchingMultiplayerMatches;
+    }
+
     public boolean isFetchingWelcomes() {
         return isFetchingWelcomes;
+    }
+
+    public void fetchMultiplayerMatches() {
+        if (!isFetchingMultiplayerMatches && hasUserId()) {
+            isFetchingMultiplayerMatches = true;
+
+            // TODO wenn zu oft gedrückt wird nur so tun als ob
+
+            backendClient.listPlayerMatches(multiplayerMatchesLastFetchMs, new BackendClient
+                    .IBackendResponse<List<MatchEntity>>() {
+                @Override
+                public void onFail(int statusCode, String errorMsg) {
+                    isFetchingMultiplayerMatches = false;
+                    multiplayerMatchesLastFetchSuccessful = false;
+                }
+
+                @Override
+                public void onSuccess(final List<MatchEntity> retrievedData) {
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run() {
+                            isFetchingMultiplayerMatches = false;
+                            multiplayerMatchesLastFetchSuccessful = true;
+
+                            for (MatchEntity newFetchedMatch : retrievedData) {
+                                multiplayerMatchesList.put(newFetchedMatch.uuid, newFetchedMatch);
+                            }
+
+                            multiplayerMatchesLastFetchMs = TimeUtils.millis();
+                        }
+                    });
+                }
+            });
+        }
     }
 
     public void fetchNewWelcomeResponseIfExpired(int expirationTimeSeconds, long drawnBlocks, int donatorState) {
@@ -239,10 +299,6 @@ public class BackendManager {
         getCachedScoreboard(gameMode, true).setExpired();
         getCachedScoreboard(gameMode, false).setExpired();
     }
-
-    // TODO Fetch der Scores auch nur, wenn nicht gerade Score gesendet wird oder in Schlange steht (falls
-    // authentifiziert)
-    // - sonst Anfrage zurückstellen
 
     public String getPlatformString() {
         return platformString;

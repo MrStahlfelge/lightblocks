@@ -54,6 +54,7 @@ public abstract class AbstractMenuDialog extends ControllerMenuDialog {
 
         Table content = isScrolling() ? new Table() : getContentTable();
         int scollBarWidth = isScrolling() ? SCROLLBAR_WIDTH : 0;
+        getContentTable().defaults().space(0);
 
         String title = getTitle();
         if (title != null) {
