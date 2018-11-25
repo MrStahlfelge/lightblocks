@@ -3,8 +3,6 @@ package de.golfgl.lightblocks.model;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-import de.golfgl.lightblocks.state.Replay;
-
 /**
  * Type A "Relax" Modell mit Ziel eine bestimmte Anzahl Reihen oder Score mit begrenzten Blöcken zu machen
  * <p>

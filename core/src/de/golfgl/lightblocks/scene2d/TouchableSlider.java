@@ -3,7 +3,6 @@ package de.golfgl.lightblocks.scene2d;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
-import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.gdx.controllers.ControllerSlider;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.ITouchActionButton;

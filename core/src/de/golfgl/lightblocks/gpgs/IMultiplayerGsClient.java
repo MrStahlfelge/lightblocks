@@ -1,7 +1,5 @@
 package de.golfgl.lightblocks.gpgs;
 
-import de.golfgl.gdxgamesvcs.GameServiceException;
-import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
 /**

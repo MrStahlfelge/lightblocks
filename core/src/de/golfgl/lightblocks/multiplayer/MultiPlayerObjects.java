@@ -1,7 +1,5 @@
 package de.golfgl.lightblocks.multiplayer;
 
-import java.util.ArrayList;
-
 import de.golfgl.lightblocks.LightBlocksGame;
 
 /**
