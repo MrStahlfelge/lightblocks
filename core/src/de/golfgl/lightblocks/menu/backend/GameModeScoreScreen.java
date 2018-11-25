@@ -74,7 +74,7 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
 
             menuTable.row();
             BackendScoreTable backendScoreTable = new BackendScoreTable(app, latestScores);
-            backendScoreTable.setMaxNicknameWidth(130);
+            backendScoreTable.setMaxNicknameWidth(125);
             menuTable.add(backendScoreTable).fillX().expandY().top();
         }
 
@@ -86,7 +86,7 @@ public class GameModeScoreScreen extends AbstractMenuDialog {
             menuTable.add(labelBest);
             menuTable.row();
             final BackendScoreTable backendScoreTable = new BackendScoreTable(app, bestScores);
-            backendScoreTable.setMaxNicknameWidth(130);
+            backendScoreTable.setMaxNicknameWidth(125);
             if (!LOAD_BEST_SCORES_IMMEDIATELY && bestScores.isExpired()) {
                 TextButton showBest = new RoundedTextButton(app.TEXTS.get("buttonLoad").toUpperCase(), app.skin);
                 Table showBestTab = new Table();

@@ -48,7 +48,7 @@ public class BackendScoreTable extends Table {
     private boolean showBlocks = false;
     private boolean showTimePassed = true;
     private boolean showDetailsButton = true;
-    private float maxNicknameWidth = 130;
+    private float maxNicknameWidth = 125;
     private float maxPassedTimeWidth;
     private float enlargeTime;
 
@@ -206,7 +206,7 @@ public class BackendScoreTable extends Table {
     private void fillTable(List<ScoreListEntry> scoreboard) {
         clear();
 
-        defaults().right().pad(2, 7, 2, 7);
+        defaults().right().pad(2, 6, 2, 6);
 
         String buttonDetailsLabel = app.TEXTS.get("buttonDetails").toUpperCase();
         int timeMsDigits = BestScore.getTimeMsDigits(cachedScoreboard.getGameMode());
