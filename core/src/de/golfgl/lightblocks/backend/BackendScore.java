@@ -34,10 +34,18 @@ public class BackendScore {
         this.platform = platform;
         this.inputType = inputType;
         this.params = params;
-        this.replay = (replay != null && replay.isValid() ? replay.toString() : null);
         this.drawnBlocks = drawnBlocks;
         this.lines = lines;
         this.score = score;
         this.timePlayedMs = timePlayedMs;
+
+        String replayString = null;
+        if (replay != null && replay.isValid()) {
+            replayString = replay.toString();
+            // Nicht hochladen, wenn über 5MB
+            if (replayString != null && replayString.length() > 4900000)
+                replayString = null;
+        }
+        this.replay = replayString;
     }
 }
