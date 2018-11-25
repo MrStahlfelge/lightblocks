@@ -130,7 +130,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
         } else if (statusCode == HttpStatus.SC_NOT_FOUND && app.backendManager.hasUserId() &&
                 userId.equalsIgnoreCase(app.backendManager.ownUserId())) {
             // der eigene Spieler wurde nicht gefunden => löschen anbieten damit man neu anlegen kann
-            RoundedTextButton deleteUserEntry = new RoundedTextButton("Unlink this device from user", app.skin);
+            RoundedTextButton deleteUserEntry = new RoundedTextButton("Unlink this device from profile", app.skin);
             errorTable.row();
             errorTable.add(deleteUserEntry).pad(10);
             addFocusableActor(deleteUserEntry);
