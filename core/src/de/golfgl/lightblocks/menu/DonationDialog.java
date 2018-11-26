@@ -38,7 +38,7 @@ public class DonationDialog extends ControllerMenuDialog {
     private static final float MAX_WAIT_TIME_FORCEDMODE = 5f;
     private static final float MIN_WAIT_TIME_FORCEDMODE = 3f;
     private final LightBlocksGame app;
-    private final RoundedTextButton reclaimButton;
+    private final RoundedTextButton restoreButton;
     private final RoundedTextButton closeButton;
     private Cell mainDonationButtonsCell;
     private DonationButton donateSupporter;
@@ -58,18 +58,18 @@ public class DonationDialog extends ControllerMenuDialog {
         closeButton = new RoundedTextButton(app.TEXTS.get("donationNoThanks"), app.skin);
         button(closeButton);
 
-        reclaimButton = new RoundedTextButton(app.TEXTS.get("donationReclaim"), app.skin);
-        reclaimButton.setDisabled(true);
-        reclaimButton.addListener(new ChangeListener() {
+        restoreButton = new RoundedTextButton(app.TEXTS.get("donationReclaim"), app.skin);
+        restoreButton.setDisabled(true);
+        restoreButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 reclaimPressed = true;
-                reclaimButton.setDisabled(true);
+                restoreButton.setDisabled(true);
                 app.purchaseManager.purchaseRestore();
             }
         });
-        addFocusableActor(reclaimButton);
-        getButtonTable().add(reclaimButton);
+        addFocusableActor(restoreButton);
+        getButtonTable().add(restoreButton);
 
         // GUI erstmal so aufbauen
         fillContent(app);
@@ -199,7 +199,7 @@ public class DonationDialog extends ControllerMenuDialog {
         canShowTable = true;
 
         if (app.purchaseManager.installed() && errorMessage == null) {
-            reclaimButton.setDisabled(false);
+            restoreButton.setDisabled(false);
         } else {
             errorMessage = (errorMessage == null ? "Error instantiating the donation system" : errorMessage);
             ScaledLabel errorLabel = new ScaledLabel(errorMessage, app.skin,
@@ -325,7 +325,7 @@ public class DonationDialog extends ControllerMenuDialog {
         @Override
         public void handleRestoreError(Throwable e) {
             if (reclaimPressed)
-                showErrorOnMainThread("Error reclaiming donations: " + e.getMessage(), false);
+                showErrorOnMainThread("Error restoring donations: " + e.getMessage(), false);
         }
 
         @Override
