@@ -75,7 +75,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
             }
         });
 
-        modePager.addPage(new BackendBattleMenuPage(app, this));
+        if (LightBlocksGame.GAME_DEVMODE)
+            modePager.addPage(new BackendBattleMenuPage(app, this));
     }
 
     public interface IMultiplayerModePage {
