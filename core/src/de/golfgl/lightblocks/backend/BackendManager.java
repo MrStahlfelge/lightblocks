@@ -33,7 +33,7 @@ public class BackendManager {
     private final BackendClient backendClient;
     private final HashMap<String, CachedScoreboard> latestScores = new HashMap<String, CachedScoreboard>();
     private final HashMap<String, CachedScoreboard> bestScores = new HashMap<String, CachedScoreboard>();
-    private final HashMap<String, MatchEntity> multiplayerMatchesList;
+    private List<MatchEntity> multiplayerMatchesList;
     private boolean authenticated;
     private BackendScore currentlySendingScore;
     private BackendClient.WelcomeResponse lastWelcomeResponse;
@@ -68,7 +68,7 @@ public class BackendManager {
                 osString = "desktop";
         }
 
-        multiplayerMatchesList = new HashMap<>();
+        multiplayerMatchesList = new ArrayList<>();
         if (hasUserId()) {
             //TODO persistierte Multiplayerspiele laden statt hier gleich zu gehen
         }
@@ -98,7 +98,7 @@ public class BackendManager {
     }
 
     public List<MatchEntity> getMultiplayerMatchesList() {
-        return new ArrayList(multiplayerMatchesList.values());
+        return multiplayerMatchesList;
     }
 
     public long getMultiplayerMatchesLastFetchMs() {
@@ -146,11 +146,7 @@ public class BackendManager {
                         public void run() {
                             isFetchingMultiplayerMatches = false;
                             multiplayerMatchesLastFetchSuccessful = true;
-
-                            for (MatchEntity newFetchedMatch : retrievedData) {
-                                multiplayerMatchesList.put(newFetchedMatch.uuid, newFetchedMatch);
-                            }
-
+                            multiplayerMatchesList = retrievedData;
                             multiplayerMatchesLastFetchMs = TimeUtils.millis();
                         }
                     });

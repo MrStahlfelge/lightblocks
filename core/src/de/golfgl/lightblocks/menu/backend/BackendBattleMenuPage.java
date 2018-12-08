@@ -88,8 +88,11 @@ public class BackendBattleMenuPage extends Table implements MultiplayerMenuScree
 
         myGamesTable.add(buttonTable);
 
+        //TODO einmal beim Start fetchen (wenn nicht bereits gemacht)
+        myGamesTable.setDebug(true);
+
         myGamesTable.row();
-        matchesListCell = myGamesTable.add(new BackendMatchesTable(app)).expand();
+        matchesListCell = myGamesTable.add(new BackendMatchesTable(app)).expand().fillX();
         //TODO wenn noch kein Match vorhanden, statt leerer Tabelle Introtext anzeigen
 
         return myGamesTable;
