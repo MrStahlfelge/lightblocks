@@ -42,6 +42,7 @@ public class BackendManager {
     private long multiplayerMatchesLastFetchMs;
     private boolean isFetchingMultiplayerMatches;
     private boolean multiplayerMatchesLastFetchSuccessful;
+    private String multiplayerLastFetchError;
 
     public BackendManager(LocalPrefs prefs) {
         backendClient = new BackendClient();
@@ -110,6 +111,10 @@ public class BackendManager {
         return multiplayerMatchesLastFetchSuccessful;
     }
 
+    public String getMultiplayerLastFetchError() {
+        return multiplayerLastFetchError;
+    }
+
     public BackendClient.WelcomeResponse getLastWelcomeResponse() {
         return lastWelcomeResponse;
     }
@@ -168,6 +173,7 @@ public class BackendManager {
                 public void onFail(int statusCode, String errorMsg) {
                     isFetchingMultiplayerMatches = false;
                     multiplayerMatchesLastFetchSuccessful = false;
+                    multiplayerLastFetchError = errorMsg;
                 }
 
                 @Override

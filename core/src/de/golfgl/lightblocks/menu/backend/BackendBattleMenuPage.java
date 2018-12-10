@@ -33,6 +33,7 @@ public class BackendBattleMenuPage extends Table implements MultiplayerMenuScree
     private final MultiplayerMenuScreen parent;
     private Button websiteButton;
     private Cell progressOrRefreshCell;
+    private Cell errorLabelCell;
 
     public BackendBattleMenuPage(final LightBlocksGame app, MultiplayerMenuScreen parent) {
         progressIndicator = new ProgressDialog.WaitRotationImage(app);
@@ -82,6 +83,8 @@ public class BackendBattleMenuPage extends Table implements MultiplayerMenuScree
         Table myGamesTable = new Table();
 
         myGamesTable.add(buttonTable);
+        myGamesTable.row();
+        errorLabelCell = myGamesTable.add();
 
         myGamesTable.row();
         ControllerScrollPane scrollPane = new ControllerScrollPane(new BackendMatchesTable(app), app.skin);
@@ -99,12 +102,19 @@ public class BackendBattleMenuPage extends Table implements MultiplayerMenuScree
 
         //TODO von unregistered auf registered wechseln können
 
-        // TODO anzeigen wenn es einen Fehler gab
-
         if (app.backendManager.isFetchingMultiplayerMatches() && !progressIndicator.hasParent())
             progressOrRefreshCell.setActor(progressIndicator);
         else if (!app.backendManager.isFetchingMultiplayerMatches() && !refreshButton.hasParent())
             progressOrRefreshCell.setActor(refreshButton);
+
+        if (errorLabelCell != null && !app.backendManager.isFetchingMultiplayerMatches()) {
+            if (errorLabelCell.hasActor() && app.backendManager
+                    .isMultiplayerMatchesLastFetchSuccessful())
+                errorLabelCell.setActor(null);
+            else if (!errorLabelCell.hasActor() && !app.backendManager.isMultiplayerMatchesLastFetchSuccessful() &&
+                    app.backendManager.getMultiplayerLastFetchError() != null)
+                errorLabelCell.setActor(new ScaledLabel(app.backendManager.getMultiplayerLastFetchError(), app.skin));
+        }
     }
 
     private Actor fillUnregistered() {
