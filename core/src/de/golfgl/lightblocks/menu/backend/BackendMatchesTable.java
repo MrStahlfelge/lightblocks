@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.menu.backend;
 
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -22,6 +23,7 @@ public class BackendMatchesTable extends WidgetGroup {
     private final LightBlocksGame app;
     private long listTimeStamp;
     private HashMap<String, BackendMatchRow> uuidMatchMap = new HashMap<>(1);
+    private float lastLayoutHeight;
 
     public BackendMatchesTable(LightBlocksGame app) {
         this.app = app;
@@ -42,10 +44,16 @@ public class BackendMatchesTable extends WidgetGroup {
         listTimeStamp = app.backendManager.getMultiplayerMatchesLastFetchMs();
         HashMap<String, BackendMatchRow> newMatchesMap = new HashMap<>(shownMatchesList.size());
 
+        float newHeight = calcPrefHeight(shownMatchesList.size());
+        if (newHeight != lastLayoutHeight)
+            for (Actor a : getChildren()) {
+                a.setY(a.getY() + newHeight - lastLayoutHeight);
+            }
+        lastLayoutHeight = newHeight;
         for (int i = 0; i < shownMatchesList.size(); i++) {
             MatchEntity me = shownMatchesList.get(i);
 
-            int yPos = (shownMatchesList.size() - i - 1) * ROW_HEIGHT;
+            float yPos = newHeight - (i + 1) * ROW_HEIGHT;
 
             BackendMatchRow backendMatchRow;
             if (!uuidMatchMap.containsKey(me.uuid)) {
@@ -54,17 +62,20 @@ public class BackendMatchesTable extends WidgetGroup {
                 backendMatchRow.setPosition(X_PADDING, yPos);
                 backendMatchRow.setHeight(ROW_HEIGHT);
                 backendMatchRow.getColor().a = 0;
-                backendMatchRow.addAction(Actions.delay(.15f, Actions.fadeIn(.1f, Interpolation.fade)));
+                backendMatchRow.addAction(Actions.delay(.15f, Actions.fadeIn(.25f, Interpolation.fade)));
             } else {
                 backendMatchRow = uuidMatchMap.remove(me.uuid);
-                backendMatchRow.addAction(Actions.moveTo(X_PADDING, yPos, .3f, Interpolation.fade));
+                if (yPos != backendMatchRow.getY())
+                    backendMatchRow.addAction(Actions.moveTo(X_PADDING, yPos, .3f, Interpolation.fade));
             }
             newMatchesMap.put(me.uuid, backendMatchRow);
         }
 
         for (BackendMatchRow row : uuidMatchMap.values()) {
-            // TODO die entfernten Actor von der focusable-List entfernen
-            row.addAction(Actions.sequence(Actions.fadeOut(.3f, Interpolation.fade), Actions.removeActor()));
+            row.removeFocusables();
+            row.remove();
+            //Die Folgende Zeile löst fehlerhafterweise auch fadeout des ersten Elements aus???
+            //row.addAction(Actions.sequence(Actions.fadeOut(.2f, Interpolation.fade), Actions.removeActor()));
         }
 
         uuidMatchMap = newMatchesMap;
@@ -73,7 +84,11 @@ public class BackendMatchesTable extends WidgetGroup {
 
     @Override
     public float getPrefHeight() {
-        return ROW_HEIGHT * Math.max(uuidMatchMap.size(), 5);
+        return calcPrefHeight(uuidMatchMap.size());
+    }
+
+    public int calcPrefHeight(int shownEntries) {
+        return ROW_HEIGHT * Math.max(shownEntries, 5);
     }
 
     @Override
@@ -85,14 +100,18 @@ public class BackendMatchesTable extends WidgetGroup {
         private MatchEntity me;
 
         public BackendMatchRow(MatchEntity match) {
-            setDebug(true);
             me = match;
+            //TODO das muss in diesem Fall genauere Anzeige (Minuten/Stunden) sein
             addActor(new ScaledLabel(BackendScoreTable.formatTimePassedString(app, match.lastChangeTime), app.skin));
 
         }
 
         public MatchEntity getMatchEntity() {
             return me;
+        }
+
+        public void removeFocusables() {
+            // TODO die entfernten Actor von der focusable-List entfernen
         }
     }
 }

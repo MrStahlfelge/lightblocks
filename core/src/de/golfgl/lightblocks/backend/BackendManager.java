@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.backend;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.Timer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,11 +126,41 @@ public class BackendManager {
         return isFetchingWelcomes;
     }
 
+    public void openNewMultiplayerMatch(final String opponentId, final int maxLevel,
+                                        final AbstractQueuedBackendResponse<MatchEntity> callback) {
+        if (!hasUserId())
+            return;
+
+        if (isFetchingMultiplayerMatches)
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    openNewMultiplayerMatch(opponentId, maxLevel, callback);
+                }
+            }, 1f);
+        else
+            backendClient.openNewMatch(opponentId, maxLevel, new BackendClient.IBackendResponse<MatchEntity>() {
+                @Override
+                public void onFail(int statusCode, String errorMsg) {
+                    callback.onFail(statusCode, errorMsg);
+                }
+
+                @Override
+                public void onSuccess(MatchEntity retrievedData) {
+                    multiplayerMatchesList.add(0, retrievedData);
+                    multiplayerMatchesLastFetchMs = TimeUtils.millis();
+                    callback.onSuccess(retrievedData);
+                }
+            });
+    }
+
     public void fetchMultiplayerMatches() {
+        // wenn zu oft gedrückt wird nichts machen
+        if (TimeUtils.timeSinceMillis(multiplayerMatchesLastFetchMs) < 1000 * 10L)
+            return;
+
         if (!isFetchingMultiplayerMatches && hasUserId()) {
             isFetchingMultiplayerMatches = true;
-
-            // TODO wenn zu oft gedrückt wird nur so tun als ob
 
             backendClient.listPlayerMatches(multiplayerMatchesLastFetchMs, new BackendClient
                     .IBackendResponse<List<MatchEntity>>() {

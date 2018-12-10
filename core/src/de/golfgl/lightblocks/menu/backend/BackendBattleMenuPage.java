@@ -8,7 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.TimeUtils;
 
+import de.golfgl.gdx.controllers.ControllerScrollPane;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
@@ -31,7 +33,6 @@ public class BackendBattleMenuPage extends Table implements MultiplayerMenuScree
     private final MultiplayerMenuScreen parent;
     private Button websiteButton;
     private Cell progressOrRefreshCell;
-    private Cell matchesListCell;
 
     public BackendBattleMenuPage(final LightBlocksGame app, MultiplayerMenuScreen parent) {
         progressIndicator = new ProgressDialog.WaitRotationImage(app);
@@ -42,14 +43,8 @@ public class BackendBattleMenuPage extends Table implements MultiplayerMenuScree
         newMatchButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                app.backendManager.getBackendClient().openNewMatch(null, 0,
-                        new WaitForResponse<MatchEntity>(app, getStage()) {
-                            @Override
-                            protected void onSuccess() {
-                                // TODO muss über den backendmanager gehen und der die Rückgabe dann selbst in
-                                // die hashmap einsortieren
-                            }
-                        });
+                app.backendManager.openNewMultiplayerMatch(null, 0,
+                        new WaitForResponse<MatchEntity>(app, getStage()));
             }
         });
 
@@ -72,28 +67,28 @@ public class BackendBattleMenuPage extends Table implements MultiplayerMenuScree
             mainCell.setActor(fillUnregistered()).fill();
         else {
             mainCell.setActor(fillMenu()).fill();
+            if (TimeUtils.timeSinceMillis(app.backendManager.getMultiplayerMatchesLastFetchMs()) > 5 * 60 * 1000L)
+                app.backendManager.fetchMultiplayerMatches();
         }
     }
 
     private Actor fillMenu() {
-        //TODO das ganze in einen ScrollPager
-
         Table buttonTable = new Table();
         buttonTable.add().uniform();
         buttonTable.add(newMatchButton);
         progressOrRefreshCell = buttonTable.add(progressIndicator).minSize(refreshButton.getPrefWidth() * 1.5f,
-                refreshButton.getPrefHeight()).uniform();
+                progressIndicator.getHeight()).uniform();
 
         Table myGamesTable = new Table();
 
         myGamesTable.add(buttonTable);
 
-        //TODO einmal beim Start fetchen (wenn nicht bereits gemacht)
-        myGamesTable.setDebug(true);
-
         myGamesTable.row();
-        matchesListCell = myGamesTable.add(new BackendMatchesTable(app)).expand().fillX();
+        ControllerScrollPane scrollPane = new ControllerScrollPane(new BackendMatchesTable(app), app.skin);
+        scrollPane.setScrollingDisabled(true, false);
+        myGamesTable.add(scrollPane).expand().fillX();
         //TODO wenn noch kein Match vorhanden, statt leerer Tabelle Introtext anzeigen
+
 
         return myGamesTable;
     }
