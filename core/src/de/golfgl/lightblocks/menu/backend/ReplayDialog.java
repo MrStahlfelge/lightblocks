@@ -196,6 +196,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
             Label scoreLines = new ScaledLabel(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
             linesNum = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
             linesNum.setCountingSpeed(100);
+            linesNum.setMaxCountingTime(.3f);
             scoreTable.add(scoreLines).padBottom(-2).right();
             scoreTable.row();
             scoreTable.add(linesNum).pad(-3, 0, -5, 0);
