@@ -71,6 +71,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public static final String SKIN_WINDOW_ALLBLACK = "fullsize";
     public static final String SKIN_BUTTON_ROUND = "round";
     public static final String SKIN_BUTTON_CHECKBOX = "checkbox";
+    public static final String SKIN_BUTTON_SMOKE = "smoke";
     public static final String SKIN_BUTTON_WELCOME = "welcome";
     public static final String SKIN_STYLE_PAGER = "pager";
     public static final String SKIN_LIST = "list";

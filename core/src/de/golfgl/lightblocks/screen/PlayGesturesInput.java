@@ -626,7 +626,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             boolean isPressed;
 
             public PortraitButton(String label, int alignment) {
-                super(playScreen.app.skin, "smoke");
+                super(playScreen.app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
                 Label buttonLabel = new Label(label, playScreen.app.skin, FontAwesome.SKIN_FONT_FA);
                 buttonLabel.setAlignment(alignment);
                 buttonLabel.setFontScale(.8f);
@@ -657,7 +657,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     private class HoldButton extends Button {
         public HoldButton() {
-            super(playScreen.app.skin, "smoke");
+            super(playScreen.app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
             Label buttonLabel = new Label("HOLD", playScreen.app.skin, LightBlocksGame.SKIN_FONT_TITLE);
             buttonLabel.setAlignment(Align.top);
             buttonLabel.setFontScale(.8f);

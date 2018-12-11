@@ -8,19 +8,22 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public class MatchEntity {
     public final String uuid;
-    public final String initiatorId;
     public final String opponentId;
     public final long lastChangeTime;
-    public final int matchState;
+    // abgelaufen/warten/gewonnen/verloren
+    public final String matchState;
     public final int maxLevel;
+    public final boolean myTurn;
+    public final String opponentNick;
     public final int turnBlockCount;
 
     public MatchEntity(JsonValue fromJson) {
         uuid = fromJson.getString("uuid");
-        initiatorId = fromJson.getString("initiatorId");
+        myTurn = fromJson.getBoolean("yourTurn");
         opponentId = fromJson.getString("opponentId", null);
+        opponentNick = fromJson.getString("opponentNick", null);
         lastChangeTime = fromJson.getLong("lastChangeTime");
-        matchState = fromJson.getInt("matchState");
+        matchState = fromJson.getString("yourMatchState").toLowerCase();
         maxLevel = fromJson.getInt("maxLevel");
         turnBlockCount = fromJson.getInt("turnBlockCount");
     }

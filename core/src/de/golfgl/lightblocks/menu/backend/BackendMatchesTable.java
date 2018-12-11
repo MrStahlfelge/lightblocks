@@ -2,13 +2,16 @@ package de.golfgl.lightblocks.menu.backend;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.HashMap;
 import java.util.List;
 
+import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -18,6 +21,7 @@ import de.golfgl.lightblocks.scene2d.ScaledLabel;
  */
 
 public class BackendMatchesTable extends WidgetGroup {
+    private static final int ROW_WIDTH = 400;
     private static final int ROW_HEIGHT = 40;
     private static final int X_PADDING = 30;
     private final LightBlocksGame app;
@@ -29,6 +33,24 @@ public class BackendMatchesTable extends WidgetGroup {
         this.app = app;
 
         refresh();
+    }
+
+    public static String formatTimePassedString(LightBlocksGame app, long lastChangeTime) {
+        long minutesPassed = TimeUtils.timeSinceMillis(lastChangeTime) / (1000 * 60);
+
+        if (minutesPassed <= 1) {
+            return app.TEXTS.get("timeNow");
+        } else if (minutesPassed < 60)
+            return app.TEXTS.format("timeXMinutes", minutesPassed);
+
+
+        int hoursPassed = (int) (minutesPassed / 60);
+
+        if (hoursPassed <= 1)
+            return app.TEXTS.get("time1hour");
+        else
+            return app.TEXTS.format("timeXhours", hoursPassed);
+
     }
 
     @Override
@@ -60,7 +82,6 @@ public class BackendMatchesTable extends WidgetGroup {
                 backendMatchRow = new BackendMatchRow(me);
                 addActor(backendMatchRow);
                 backendMatchRow.setPosition(X_PADDING, yPos);
-                backendMatchRow.setHeight(ROW_HEIGHT);
                 backendMatchRow.getColor().a = 0;
                 backendMatchRow.addAction(Actions.delay(.15f, Actions.fadeIn(.25f, Interpolation.fade)));
             } else {
@@ -96,14 +117,23 @@ public class BackendMatchesTable extends WidgetGroup {
         return LightBlocksGame.nativeGameWidth * .7f;
     }
 
-    private class BackendMatchRow extends HorizontalGroup {
+    private class BackendMatchRow extends Button {
         private MatchEntity me;
 
         public BackendMatchRow(MatchEntity match) {
+            super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
             me = match;
-            //TODO das muss in diesem Fall genauere Anzeige (Minuten/Stunden) sein
-            addActor(new ScaledLabel(BackendScoreTable.formatTimePassedString(app, match.lastChangeTime), app.skin));
+            defaults().padRight(10);
+            ScaledLabel opponentLabel = new ScaledLabel(match.opponentNick != null ? match.opponentNick : "???", app
+                    .skin, LightBlocksGame.SKIN_FONT_TITLE);
+            opponentLabel.setEllipsis(true);
+            add(opponentLabel).width(150);
+            add(new ScaledLabel(match.matchState, app.skin, LightBlocksGame.SKIN_FONT_BIG)).width(80);
+            ScaledLabel timePassed = new ScaledLabel(formatTimePassedString(app, match.lastChangeTime), app.skin);
+            timePassed.setEllipsis(true);
+            add(timePassed).width(90);
 
+            setSize(ROW_WIDTH, ROW_HEIGHT);
         }
 
         public MatchEntity getMatchEntity() {
@@ -111,7 +141,16 @@ public class BackendMatchesTable extends WidgetGroup {
         }
 
         public void removeFocusables() {
-            // TODO die entfernten Actor von der focusable-List entfernen
+            if (getStage() != null && getStage() instanceof ControllerMenuStage)
+                ((ControllerMenuStage) getStage()).removeFocusableActor(this);
+        }
+
+        @Override
+        protected void setStage(Stage stage) {
+            super.setStage(stage);
+
+            if (stage != null && stage instanceof ControllerMenuStage)
+                ((ControllerMenuStage) stage).addFocusableActor(this);
         }
     }
 }
