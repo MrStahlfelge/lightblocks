@@ -362,6 +362,43 @@ public class BackendClientTest {
 
     }
 
+    @Test
+    public void testMatchTwoPlayers() throws InterruptedException {
+        BackendClient backendClientPlayer1 = new BackendClient();
+        BackendClient backendClientPlayer2 = new BackendClient();
+
+        int random = MathUtils.random(1000, 2000);
+
+        WaitForResponseListener<BackendClient.PlayerCreatedInfo> createdResponse
+                = new WaitForResponseListener<BackendClient.PlayerCreatedInfo>();
+        backendClientPlayer1.createPlayer("player1player1player1neu" + random, createdResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(createdResponse.retrievedData);
+        backendClientPlayer2.createPlayer("player2player1player2neu" + random, createdResponse);
+        waitWhileRequesting();
+        Assert.assertNotNull(createdResponse.retrievedData);
+        Thread.sleep(50);
+
+        //jetzt einfügen
+        WaitForResponseListener<MatchEntity> addlistener = new WaitForResponseListener<>();
+        backendClientPlayer2.openNewMatch(null, 9, addlistener);
+        waitWhileRequesting();
+        Assert.assertTrue("Received HTTP " + addlistener.lastCode, addlistener.successful);
+        Thread.sleep(50);
+
+        WaitForResponseListener<MatchEntity> addlistener2 = new WaitForResponseListener<>();
+        backendClientPlayer1.openNewMatch(null, 9, addlistener2);
+        waitWhileRequesting();
+        Assert.assertTrue(addlistener2.successful);
+        Assert.assertNotNull(addlistener2.retrievedData.opponentId);
+
+        backendClientPlayer1.deletePlayer(new WaitForResponseListener<Void>());
+        waitWhileRequesting();
+        backendClientPlayer2.deletePlayer(new WaitForResponseListener<Void>());
+        waitWhileRequesting();
+
+    }
+
     @After
     public void waitWhileRequesting() throws InterruptedException {
         while (requesting) {

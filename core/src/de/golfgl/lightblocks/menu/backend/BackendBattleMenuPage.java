@@ -102,10 +102,12 @@ public class BackendBattleMenuPage extends Table implements MultiplayerMenuScree
 
         //TODO von unregistered auf registered wechseln können
 
-        if (app.backendManager.isFetchingMultiplayerMatches() && !progressIndicator.hasParent())
-            progressOrRefreshCell.setActor(progressIndicator);
-        else if (!app.backendManager.isFetchingMultiplayerMatches() && !refreshButton.hasParent())
-            progressOrRefreshCell.setActor(refreshButton);
+        if (progressOrRefreshCell != null) {
+            if (app.backendManager.isFetchingMultiplayerMatches() && !progressIndicator.hasParent())
+                progressOrRefreshCell.setActor(progressIndicator);
+            else if (!app.backendManager.isFetchingMultiplayerMatches() && !refreshButton.hasParent())
+                progressOrRefreshCell.setActor(refreshButton);
+        }
 
         if (errorLabelCell != null && !app.backendManager.isFetchingMultiplayerMatches()) {
             if (errorLabelCell.hasActor() && app.backendManager

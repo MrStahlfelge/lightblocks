@@ -94,9 +94,15 @@ public class BackendManager {
     }
 
     public void setCredentials(String backendUserId, String backendUserKey) {
+        boolean deleted = (backendUserId == null && backendClient.getUserId() != null);
+
         prefs.saveBackendUser(backendUserId, backendUserKey);
         backendClient.setUserId(backendUserId);
         backendClient.setUserPass(backendUserKey);
+
+        if (deleted) {
+            multiplayerMatchesList.clear();
+        }
     }
 
     public List<MatchEntity> getMultiplayerMatchesList() {
