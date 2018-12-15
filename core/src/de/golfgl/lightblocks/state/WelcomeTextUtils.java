@@ -24,8 +24,9 @@ public class WelcomeTextUtils {
 
     // Hier kann "Welcome back :-)", "Have a good morning" usw. stehen, "Hi MrStahlfelge"
     private static boolean alreadyShownDaysSinceLastStart = false;
+    private static Array<WelcomeButton.WelcomeText> randomWelcomes;
 
-    public static Array<WelcomeButton.WelcomeText> fillWelcomes(final LightBlocksGame app) {
+    public static Array<WelcomeButton.WelcomeText> fillWelcomes(final LightBlocksGame app, boolean refreshRandoms) {
         Array<WelcomeButton.WelcomeText> welcomes = new Array<WelcomeButton.WelcomeText>();
 
         int lastUsedVersion = app.localPrefs.getLastUsedLbVersion();
@@ -66,19 +67,7 @@ public class WelcomeTextUtils {
         // 5. WERBUNG UND ÄHNLICHES, DASS NACH ZUFALLSPRINZIP EINGEBLENDET WIRD
         // wird aufgrund von 4. nur für wiederkehrende Nutzer angezeigt
         if (welcomes.size == 0) {
-            if (isLongTimePlayer && MathUtils.randomBoolean(.01f))
-                welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeOtherPlatforms"),
-                        new OpenWebsiteRunnable(app)));
-
-            if (isLongTimePlayer && app.localPrefs.getSupportLevel() == 0 && app.canDonate() &&
-                    MathUtils.randomBoolean(.05f))
-                welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeDonations"),
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                app.mainMenuScreen.showDonationDialog();
-                            }
-                        }));
+            addRandomMessages(app, welcomes, isLongTimePlayer, refreshRandoms);
         }
 
         // ENDE
@@ -87,6 +76,30 @@ public class WelcomeTextUtils {
         //welcomes.add(new WelcomeButton.WelcomeText("Have a\ngood day", null));
 
         return welcomes;
+    }
+
+    public static void addRandomMessages(final LightBlocksGame app, Array<WelcomeButton.WelcomeText> welcomes,
+                                         boolean isLongTimePlayer, boolean refreshRandoms) {
+
+        if (refreshRandoms || randomWelcomes == null) {
+            randomWelcomes = new Array<>();
+
+            if (isLongTimePlayer && MathUtils.randomBoolean(.01f))
+                randomWelcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeOtherPlatforms"),
+                        new OpenWebsiteRunnable(app)));
+
+            if (isLongTimePlayer && app.localPrefs.getSupportLevel() == 0 && app.canDonate() &&
+                    MathUtils.randomBoolean(.05f))
+                randomWelcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("welcomeDonations"),
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                app.mainMenuScreen.showDonationDialog();
+                            }
+                        }));
+        }
+
+        welcomes.addAll(randomWelcomes);
     }
 
     private static void listBackendMessages(final LightBlocksGame app, Array<WelcomeButton.WelcomeText> welcomes,

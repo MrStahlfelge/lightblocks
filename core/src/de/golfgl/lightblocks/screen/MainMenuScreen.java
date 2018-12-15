@@ -246,7 +246,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
     @Override
     public void resume() {
         super.resume();
-        welcomeButton.refreshTexts();
+        welcomeButton.refreshTexts(false);
     }
 
     @Override
@@ -279,7 +279,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
             mainGroup.addAction(Actions.scaleTo(1, 1, .15f, Interpolation.circle));
         }
 
-        welcomeButton.refreshTexts();
+        welcomeButton.refreshTexts(true);
     }
 
     /**

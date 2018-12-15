@@ -62,7 +62,7 @@ public class WelcomeButton extends FaTextButton {
 
         // neu setzen, falls es aus dem Backend neue Texte gibt
         if (app.backendManager.hasLastWelcomeResponse() && app.backendManager.getLastWelcomeResponse() != shownResponse)
-            refreshTexts();
+            refreshTexts(false);
 
         if (resizeTimeLeft > 0) {
             resizeTimeLeft = Math.max(resizeTimeLeft - delta, 0);
@@ -142,11 +142,11 @@ public class WelcomeButton extends FaTextButton {
      * setzt die Texte neu aus Texten aus dem Backend und lokalen Meldungen und löst wenn nötig auch ein neues
      * Refresh vom Server aus
      */
-    public void refreshTexts() {
+    public void refreshTexts(boolean refreshRandoms) {
         try {
             shownResponse = app.backendManager.getLastWelcomeResponse();
             // die Texte setzen
-            setTexts(WelcomeTextUtils.fillWelcomes(app));
+            setTexts(WelcomeTextUtils.fillWelcomes(app, refreshRandoms));
         } catch (Throwable t) {
             // alles beim alten lassen
             // es gab Crashreports von Geräten mit Tasten??? über NPE in fillWelcomes. Einfach abfangen und dann eben
