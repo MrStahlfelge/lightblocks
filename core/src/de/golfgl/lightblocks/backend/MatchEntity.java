@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.JsonValue;
  * Created by Benjamin Schulte on 17.11.2018.
  */
 
-public class MatchEntity {
+public class MatchEntity implements IPlayerInfo {
     public static final String PLAYER_STATE_WAIT = "WAIT";
     public static final String PLAYER_STATE_CHALLENGED = "CHALLENGED";
     public static final String PLAYER_STATE_YOURTURN = "YOURTURN";
@@ -19,6 +19,7 @@ public class MatchEntity {
     public final int beginningLevel;
     public final boolean myTurn;
     public final String opponentNick;
+    public final String opponentDecoration;
     public final int turnBlockCount;
 
     public MatchEntity(JsonValue fromJson) {
@@ -30,5 +31,21 @@ public class MatchEntity {
         matchState = fromJson.getString("yourMatchState").toLowerCase();
         beginningLevel = fromJson.getInt("beginningLevel");
         turnBlockCount = fromJson.getInt("turnBlockCount");
+        opponentDecoration = fromJson.getString("opponentDecoration", null);
+    }
+
+    @Override
+    public String getUserId() {
+        return opponentId;
+    }
+
+    @Override
+    public String getUserNickName() {
+        return opponentNick;
+    }
+
+    @Override
+    public String getUserDecoration() {
+        return opponentDecoration;
     }
 }

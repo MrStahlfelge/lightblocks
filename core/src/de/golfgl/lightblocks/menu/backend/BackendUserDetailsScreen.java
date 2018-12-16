@@ -3,23 +3,18 @@ package de.golfgl.lightblocks.menu.backend;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.backend.BackendClient;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.backend.PlayerDetails;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
-import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
 import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.model.SprintModel;
-import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
-import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.TextInputDialog;
@@ -30,32 +25,24 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  * Created by Benjamin Schulte on 12.10.2018.
  */
 
-public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
-
-    private final ProgressDialog.WaitRotationImage waitRotationImage;
-    private final Cell contentCell;
-    private final String userId;
+public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<String, PlayerDetails> {
 
     public BackendUserDetailsScreen(final LightBlocksGame app, String userId) {
-        super(app);
-        this.userId = userId;
+        super(app, userId);
+    }
 
-        // Fill Content
+    @Override
+    protected void fillFixContent() {
         Table contentTable = getContentTable();
 
         contentTable.row();
         contentTable.add(new Label(FontAwesome.NET_PERSON, app.skin, FontAwesome.SKIN_FONT_FA));
-
-        contentTable.row();
-        waitRotationImage = new ProgressDialog.WaitRotationImage(app);
-        contentCell = contentTable.add().minHeight(waitRotationImage.getHeight() * 3);
-
-        reload();
     }
 
+    @Override
     protected void reload() {
         contentCell.setActor(waitRotationImage);
-        app.backendManager.getBackendClient().fetchPlayerDetails(userId, new BackendManager
+        app.backendManager.getBackendClient().fetchPlayerDetails(backendId, new BackendManager
                 .AbstractQueuedBackendResponse<PlayerDetails>(app) {
 
             @Override
@@ -103,32 +90,11 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
         contentCell.setActor(mainTable).fill().maxWidth(LightBlocksGame.nativeGameWidth - 50);
     }
 
-    protected void fillErrorScreen(int statusCode, String errorMsg) {
-        boolean isConnectionProblem = statusCode == BackendClient.SC_NO_CONNECTION;
-        String errorMessage = (isConnectionProblem ? app.TEXTS.get("errorNoInternetConnection") :
-                errorMsg);
-
-        Table errorTable = new Table();
-        Label errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        float noWrapHeight = errorMsgLabel.getPrefHeight();
-        errorMsgLabel.setWrap(true);
-        errorMsgLabel.setAlignment(Align.center);
-        errorTable.add(errorMsgLabel).minHeight(noWrapHeight * 1.5f).fill()
-                .minWidth(LightBlocksGame.nativeGameWidth - 50);
-
-        if (isConnectionProblem) {
-            FaButton retry = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
-            errorTable.row();
-            errorTable.add(retry);
-            addFocusableActor(retry);
-            retry.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    reload();
-                }
-            });
-        } else if (statusCode == HttpStatus.SC_NOT_FOUND && app.backendManager.hasUserId() &&
-                userId.equalsIgnoreCase(app.backendManager.ownUserId())) {
+    @Override
+    protected Table fillErrorScreen(int statusCode, String errorMsg) {
+        Table errorTable = super.fillErrorScreen(statusCode, errorMsg);
+        if (statusCode == HttpStatus.SC_NOT_FOUND && app.backendManager.hasUserId() &&
+                backendId.equalsIgnoreCase(app.backendManager.ownUserId())) {
             // der eigene Spieler wurde nicht gefunden => löschen anbieten damit man neu anlegen kann
             RoundedTextButton deleteUserEntry = new RoundedTextButton("Unlink this device from profile", app.skin);
             errorTable.row();
@@ -142,8 +108,7 @@ public class BackendUserDetailsScreen extends AbstractFullScreenDialog {
                 }
             });
         }
-
-        contentCell.setActor(errorTable).fillX();
+        return errorTable;
     }
 
     private String getDonatorLabelString(int supportLevel) {

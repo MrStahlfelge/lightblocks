@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
 
 /**
  * Created by Benjamin Schulte on 18.11.2018.
@@ -126,6 +128,17 @@ public class BackendMatchesTable extends WidgetGroup {
 
             setMatchEntity(match);
             setSize(ROW_WIDTH, ROW_HEIGHT);
+
+            addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    if (me.opponentId != null)
+                        new BackendMatchDetailsScreen(app, me.uuid).show(getStage());
+                    else
+                        new VetoDialog("Please wait until another player was matched against you.", app.skin,
+                                getStage().getWidth() * .9f).show(getStage());
+                }
+            });
         }
 
         public MatchEntity getMatchEntity() {
