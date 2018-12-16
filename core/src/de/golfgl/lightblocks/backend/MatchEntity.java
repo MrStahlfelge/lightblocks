@@ -16,7 +16,7 @@ public class MatchEntity {
     public final long lastChangeTime;
     // abgelaufen/warten/gewonnen/verloren
     public final String matchState;
-    public final int maxLevel;
+    public final int beginningLevel;
     public final boolean myTurn;
     public final String opponentNick;
     public final int turnBlockCount;
@@ -28,7 +28,7 @@ public class MatchEntity {
         opponentNick = fromJson.getString("opponentNick", null);
         lastChangeTime = fromJson.getLong("lastChangeTime");
         matchState = fromJson.getString("yourMatchState").toLowerCase();
-        maxLevel = fromJson.getInt("maxLevel");
+        beginningLevel = fromJson.getInt("beginningLevel");
         turnBlockCount = fromJson.getInt("turnBlockCount");
     }
 }

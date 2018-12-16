@@ -357,6 +357,14 @@ public class BackendClientTest {
         Assert.assertNotNull(callback.retrievedData);
         Assert.assertEquals(1, callback.retrievedData.size());
 
+        // und einen abholen
+        WaitForResponseListener<MatchEntity> matchCallback = new WaitForResponseListener<>();
+        String matchid = callback.retrievedData.get(0).uuid;
+        backendClientPlayer.fetchMatchWithTurns(matchid, matchCallback);
+        waitWhileRequesting();
+        Assert.assertNotNull(matchCallback.retrievedData);
+        Assert.assertEquals(matchid, matchCallback.retrievedData.uuid);
+
         backendClientPlayer.deletePlayer(new WaitForResponseListener<Void>());
         waitWhileRequesting();
 
