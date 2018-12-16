@@ -173,7 +173,9 @@ public class BackendManager {
         if (!isFetchingMultiplayerMatches && hasUserId()) {
             isFetchingMultiplayerMatches = true;
 
-            backendClient.listPlayerMatches(multiplayerMatchesLastFetchMs, new BackendClient
+            //TODO: sinceTime den ersten in der bisherigen Liste übergeben und dann im onSuccess die Listen zusammenführen
+
+            backendClient.listPlayerMatches(0, new BackendClient
                     .IBackendResponse<List<MatchEntity>>() {
                 @Override
                 public void onFail(int statusCode, String errorMsg) {

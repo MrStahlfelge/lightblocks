@@ -7,6 +7,10 @@ import com.badlogic.gdx.utils.JsonValue;
  */
 
 public class MatchEntity {
+    public static final String PLAYER_STATE_WAIT = "WAIT";
+    public static final String PLAYER_STATE_CHALLENGED = "CHALLENGED";
+    public static final String PLAYER_STATE_YOURTURN = "YOURTURN";
+
     public final String uuid;
     public final String opponentId;
     public final long lastChangeTime;

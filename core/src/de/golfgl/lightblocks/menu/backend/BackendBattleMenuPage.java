@@ -89,7 +89,7 @@ public class BackendBattleMenuPage extends Table implements MultiplayerMenuScree
         myGamesTable.row();
         ControllerScrollPane scrollPane = new ControllerScrollPane(new BackendMatchesTable(app), app.skin);
         scrollPane.setScrollingDisabled(true, false);
-        myGamesTable.add(scrollPane).expand().fillX();
+        myGamesTable.add(scrollPane).expand().width(LightBlocksGame.nativeGameWidth);
         //TODO wenn noch kein Match vorhanden, statt leerer Tabelle Introtext anzeigen
 
 

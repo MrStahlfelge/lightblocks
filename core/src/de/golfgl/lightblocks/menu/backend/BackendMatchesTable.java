@@ -21,9 +21,8 @@ import de.golfgl.lightblocks.scene2d.ScaledLabel;
  */
 
 public class BackendMatchesTable extends WidgetGroup {
-    private static final int ROW_WIDTH = 400;
+    private static final int ROW_WIDTH = 420;
     private static final int ROW_HEIGHT = 40;
-    private static final int X_PADDING = 30;
     private final LightBlocksGame app;
     private long listTimeStamp;
     private HashMap<String, BackendMatchRow> uuidMatchMap = new HashMap<>(1);
@@ -81,14 +80,15 @@ public class BackendMatchesTable extends WidgetGroup {
             if (!uuidMatchMap.containsKey(me.uuid)) {
                 backendMatchRow = new BackendMatchRow(me);
                 addActor(backendMatchRow);
-                backendMatchRow.setPosition(X_PADDING, yPos);
+                backendMatchRow.setPosition((LightBlocksGame.nativeGameWidth - ROW_WIDTH) / 2, yPos);
                 backendMatchRow.getColor().a = 0;
                 backendMatchRow.addAction(Actions.delay(.15f, Actions.fadeIn(.25f, Interpolation.fade)));
             } else {
                 backendMatchRow = uuidMatchMap.remove(me.uuid);
                 backendMatchRow.setMatchEntity(me);
                 if (yPos != backendMatchRow.getY())
-                    backendMatchRow.addAction(Actions.moveTo(X_PADDING, yPos, .3f, Interpolation.fade));
+                    backendMatchRow.addAction(Actions.moveTo((LightBlocksGame.nativeGameWidth - ROW_WIDTH) / 2,
+                            yPos, .3f, Interpolation.fade));
             }
             newMatchesMap.put(me.uuid, backendMatchRow);
         }
@@ -132,6 +132,25 @@ public class BackendMatchesTable extends WidgetGroup {
             return me;
         }
 
+        public void setMatchEntity(MatchEntity match) {
+            if (me == null || me.lastChangeTime < match.lastChangeTime) {
+                clearChildren();
+                defaults().padRight(10);
+                ScaledLabel opponentLabel = new ScaledLabel(match.opponentNick != null ? match.opponentNick : "???", app
+                        .skin, LightBlocksGame.SKIN_FONT_TITLE);
+                opponentLabel.setEllipsis(true);
+                add(opponentLabel).width(150);
+                ScaledLabel matchState = new ScaledLabel(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS, match
+                        .matchState, "mmturn_"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                matchState.setEllipsis(true);
+                add(matchState).width(120);
+                ScaledLabel timePassed = new ScaledLabel(formatTimePassedString(app, match.lastChangeTime), app.skin);
+                timePassed.setEllipsis(true);
+                add(timePassed).width(90);
+            }
+            me = match;
+        }
+
         public void removeFocusables() {
             if (getStage() != null && getStage() instanceof ControllerMenuStage)
                 ((ControllerMenuStage) getStage()).removeFocusableActor(this);
@@ -143,22 +162,6 @@ public class BackendMatchesTable extends WidgetGroup {
 
             if (stage != null && stage instanceof ControllerMenuStage)
                 ((ControllerMenuStage) stage).addFocusableActor(this);
-        }
-
-        public void setMatchEntity(MatchEntity match) {
-            if (me == null || me.lastChangeTime < match.lastChangeTime) {
-                clear();
-                defaults().padRight(10);
-                ScaledLabel opponentLabel = new ScaledLabel(match.opponentNick != null ? match.opponentNick : "???", app
-                        .skin, LightBlocksGame.SKIN_FONT_TITLE);
-                opponentLabel.setEllipsis(true);
-                add(opponentLabel).width(150);
-                add(new ScaledLabel(match.matchState, app.skin, LightBlocksGame.SKIN_FONT_BIG)).width(80);
-                ScaledLabel timePassed = new ScaledLabel(formatTimePassedString(app, match.lastChangeTime), app.skin);
-                timePassed.setEllipsis(true);
-                add(timePassed).width(90);
-            }
-            me = match;
         }
     }
 }
