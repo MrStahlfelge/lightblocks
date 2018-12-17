@@ -38,9 +38,9 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
     public BackendMatchesMenuPage(final LightBlocksGame app, MultiplayerMenuScreen parent) {
         progressIndicator = new ProgressDialog.WaitRotationImage(app);
         refreshButton = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
-        newMatchButton = new RoundedTextButton("New match", app.skin);
         this.app = app;
         this.parent = parent;
+        newMatchButton = new RoundedTextButton("Challenge new battle", app.skin);
         newMatchButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

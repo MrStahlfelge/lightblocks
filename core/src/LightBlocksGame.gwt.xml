@@ -8,6 +8,7 @@
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.TetrominoDrawyer"/>
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.RetroDrawyer"/>
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.RelaxModel"/>
+    <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.BackendBattleModel"/>
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.CleanModel"/>
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.GarbageModel"/>
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.MissionSpecialModel"/>
