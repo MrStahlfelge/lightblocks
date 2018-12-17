@@ -2,6 +2,9 @@ package de.golfgl.lightblocks.backend;
 
 import com.badlogic.gdx.utils.JsonValue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Benjamin Schulte on 17.11.2018.
  */
@@ -21,6 +24,7 @@ public class MatchEntity implements IPlayerInfo {
     public final String opponentNick;
     public final String opponentDecoration;
     public final int turnBlockCount;
+    public final List<MatchTurn> turns;
 
     public MatchEntity(JsonValue fromJson) {
         uuid = fromJson.getString("uuid");
@@ -32,6 +36,13 @@ public class MatchEntity implements IPlayerInfo {
         beginningLevel = fromJson.getInt("beginningLevel");
         turnBlockCount = fromJson.getInt("turnBlockCount");
         opponentDecoration = fromJson.getString("opponentDecoration", null);
+
+        turns = new ArrayList<>();
+        JsonValue turnJson = fromJson.get("turns");
+        if (turnJson != null)
+            for (JsonValue turn = turnJson.child; turn != null; turn = turn.next) {
+                turns.add(new MatchTurn(turn));
+            }
     }
 
     @Override
@@ -47,5 +58,29 @@ public class MatchEntity implements IPlayerInfo {
     @Override
     public String getUserDecoration() {
         return opponentDecoration;
+    }
+
+    public static class MatchTurn {
+        public final String matchId;
+        public final int turnNum;
+        public final String yourReplay;
+        public final String opponentReplay;
+        public final int yourScore;
+        public final int opponentScore;
+        public final boolean youDroppedOut;
+        public final boolean opponentDroppedOut;
+        public final int linesSent;
+
+        public MatchTurn(JsonValue turn) {
+            matchId = turn.getString("matchId");
+            turnNum = turn.getInt("turnNum");
+            yourReplay = turn.getString("yourReplay", null);
+            opponentReplay = turn.getString("opponentReplay", null);
+            yourScore = turn.getInt("yourScore");
+            opponentScore = turn.getInt("opponentScore");
+            youDroppedOut = turn.getBoolean("youDroppedOut");
+            opponentDroppedOut = turn.getBoolean("opponentDroppedOut");
+            linesSent = turn.getInt("linesSent");
+        }
     }
 }
