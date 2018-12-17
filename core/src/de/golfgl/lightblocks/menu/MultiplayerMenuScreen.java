@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.menu.backend.BackendBattleMenuPage;
+import de.golfgl.lightblocks.menu.backend.BackendMatchesMenuPage;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
 import de.golfgl.lightblocks.screen.FontAwesome;
@@ -76,7 +76,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
         });
 
         if (LightBlocksGame.GAME_DEVMODE)
-            modePager.addPage(new BackendBattleMenuPage(app, this));
+            modePager.addPage(new BackendMatchesMenuPage(app, this));
     }
 
     public interface IMultiplayerModePage {

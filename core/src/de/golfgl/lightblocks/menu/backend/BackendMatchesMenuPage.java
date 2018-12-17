@@ -24,7 +24,7 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  * Created by Benjamin Schulte on 18.11.2018.
  */
 
-public class BackendBattleMenuPage extends Table implements MultiplayerMenuScreen.IMultiplayerModePage {
+public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScreen.IMultiplayerModePage {
     private final Cell mainCell;
     private final ProgressDialog.WaitRotationImage progressIndicator;
     private final FaButton refreshButton;
@@ -35,7 +35,7 @@ public class BackendBattleMenuPage extends Table implements MultiplayerMenuScree
     private Cell progressOrRefreshCell;
     private Cell errorLabelCell;
 
-    public BackendBattleMenuPage(final LightBlocksGame app, MultiplayerMenuScreen parent) {
+    public BackendMatchesMenuPage(final LightBlocksGame app, MultiplayerMenuScreen parent) {
         progressIndicator = new ProgressDialog.WaitRotationImage(app);
         refreshButton = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
         newMatchButton = new RoundedTextButton("New match", app.skin);
