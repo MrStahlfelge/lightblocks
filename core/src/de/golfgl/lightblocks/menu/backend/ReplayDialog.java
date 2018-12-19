@@ -205,6 +205,16 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         }
 
         @Override
+        public void act(float delta) {
+            float oldPrefWidth = linesNum.getPrefWidth();
+            super.act(delta);
+            if (oldPrefWidth != linesNum.getPrefWidth()) {
+                scoreTable.pack();
+                scoreTable.setPosition(getWidth() - scoreTable.getPrefWidth(), 0);
+            }
+        }
+
+        @Override
         protected void sizeChanged() {
             super.sizeChanged();
             gameType.pack();
