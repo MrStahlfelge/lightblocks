@@ -12,7 +12,12 @@ import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.menu.PlayButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.screen.PlayScreenInput;
+import de.golfgl.lightblocks.screen.VetoException;
+import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
  * Created by Benjamin Schulte on 16.12.2018.
@@ -31,7 +36,18 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         playTurnButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                // TODO das eigentliche Spiel beginnen
+                // das eigentliche Spiel beginnen
+                InitGameParameters initGameParametersParams = new InitGameParameters();
+                initGameParametersParams.setGameMode(InitGameParameters.GameMode.TurnbasedBattle);
+                initGameParametersParams.setBeginningLevel(match.beginningLevel);
+                initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYORTOUCH);
+                initGameParametersParams.setMatchEntity(match);
+                try {
+                    PlayScreen.gotoPlayScreen(BackendMatchDetailsScreen.this.app, initGameParametersParams);
+                } catch (VetoException e) {
+                    new VetoDialog(e.getMessage(), getSkin(), LightBlocksGame.nativeGameWidth * .75f).show(getStage());
+                }
+
             }
         });
         addFocusableActor(playTurnButton);

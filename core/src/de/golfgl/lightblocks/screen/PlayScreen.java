@@ -358,6 +358,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             gameModel.startNewGame(initGameParametersParams);
         }
 
+        gameModel.app = app;
         gameModel.setUserInterface(this);
 
         // input initialisieren
@@ -370,7 +371,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         gameModel.totalScore = app.savegame.getTotalScore();
         //TODO das sollte ins GameModel
         gameModel.setBestScore(app.savegame.getBestScore(gameModel.getIdentifier()));
-        gameModel.app = app;
 
         // erst nach dem Laden setzen, damit das noch ohne Animation läuft
         scoreTable.setEmphasizeTresholds();
