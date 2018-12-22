@@ -36,18 +36,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         playTurnButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                // das eigentliche Spiel beginnen
-                InitGameParameters initGameParametersParams = new InitGameParameters();
-                initGameParametersParams.setGameMode(InitGameParameters.GameMode.TurnbasedBattle);
-                initGameParametersParams.setBeginningLevel(match.beginningLevel);
-                initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYORTOUCH);
-                initGameParametersParams.setMatchEntity(match);
-                try {
-                    PlayScreen.gotoPlayScreen(BackendMatchDetailsScreen.this.app, initGameParametersParams);
-                } catch (VetoException e) {
-                    new VetoDialog(e.getMessage(), getSkin(), LightBlocksGame.nativeGameWidth * .75f).show(getStage());
-                }
-
+                startPlaying();
             }
         });
         addFocusableActor(playTurnButton);
@@ -61,6 +50,34 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         });
 
         // TODO Akzeptieren/Ablehnen button
+    }
+
+    public void startPlaying() {
+        app.backendManager.getBackendClient().postMatchStartPlayingTurn(match.uuid,
+                new WaitForResponse<String>(app, getStage()) {
+                    @Override
+                    public void onRequestSuccess(String retrievedData) {
+                        super.onRequestSuccess(retrievedData);
+                        startPlayingWithKey(retrievedData);
+                    }
+                });
+    }
+
+    public void startPlayingWithKey(String playKey) {
+        // das eigentliche Spiel beginnen
+        InitGameParameters initGameParametersParams = new InitGameParameters();
+        initGameParametersParams.setGameMode(InitGameParameters.GameMode.TurnbasedBattle);
+        initGameParametersParams.setBeginningLevel(match.beginningLevel);
+        initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYORTOUCH);
+        initGameParametersParams.setMatchEntity(match);
+        initGameParametersParams.setPlayKey(playKey);
+        try {
+            PlayScreen ps = PlayScreen.gotoPlayScreen(BackendMatchDetailsScreen.this.app, initGameParametersParams);
+            ps.setShowScoresWhenGameOver(false);
+            //TODO trotzdem sollte die Erinnerung an Spende gezeigt werden!!!
+        } catch (VetoException e) {
+            new VetoDialog(e.getMessage(), getSkin(), LightBlocksGame.nativeGameWidth * .75f).show(getStage());
+        }
     }
 
     @Override

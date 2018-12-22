@@ -55,6 +55,10 @@ public interface IGameModelListener {
 
     void showComboHeight(int comboHeight);
 
+    void addGameBlocker(GameBlocker e);
+
+    void removeGameBlocker(GameBlocker e);
+
     enum MotivationTypes {
         newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
         boardCleared, newHighscore, gameOver, gameWon, gameSuccess, playerOver,

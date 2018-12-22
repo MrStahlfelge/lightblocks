@@ -23,8 +23,13 @@ public class InitGameParameters {
     private int beginningLevel;
     private String missionId;
     private GameMode gameMode;
+
+    // für Multiplayer
     private AbstractMultiplayerRoom multiplayerRoom;
+
+    // für Battle
     private MatchEntity matchEntity;
+    private String playKey;
 
     public String getMissionId() {
         return missionId;
@@ -76,6 +81,14 @@ public class InitGameParameters {
 
     public void setMatchEntity(MatchEntity matchEntity) {
         this.matchEntity = matchEntity;
+    }
+
+    public String getPlayKey() {
+        return playKey;
+    }
+
+    public void setPlayKey(String playKey) {
+        this.playKey = playKey;
     }
 
     public GameModel newGameModelInstance() {

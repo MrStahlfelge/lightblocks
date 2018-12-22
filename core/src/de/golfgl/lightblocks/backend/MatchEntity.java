@@ -25,6 +25,8 @@ public class MatchEntity implements IPlayerInfo {
     public final String opponentDecoration;
     public final int turnBlockCount;
     public final List<MatchTurn> turns;
+    public String garbageGap;
+    public String drawyer;
 
     public MatchEntity(JsonValue fromJson) {
         uuid = fromJson.getString("uuid");
@@ -36,6 +38,8 @@ public class MatchEntity implements IPlayerInfo {
         beginningLevel = fromJson.getInt("beginningLevel");
         turnBlockCount = fromJson.getInt("turnBlockCount");
         opponentDecoration = fromJson.getString("opponentDecoration", null);
+        garbageGap = fromJson.getString("garbageGap", "");
+        drawyer = fromJson.getString("drawyer", "");
 
         turns = new ArrayList<>();
         JsonValue turnJson = fromJson.get("turns");

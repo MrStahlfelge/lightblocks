@@ -1038,6 +1038,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         return dialog;
     }
 
+    @Override
     public void addGameBlocker(GameBlocker e) {
         gameBlockers.add(e);
         refreshResumeFromPauseText();
@@ -1047,6 +1048,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             switchPause(false);
     }
 
+    @Override
     public void removeGameBlocker(GameBlocker e) {
         gameBlockers.remove(e);
         refreshResumeFromPauseText();
