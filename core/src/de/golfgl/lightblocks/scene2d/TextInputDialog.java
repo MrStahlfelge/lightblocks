@@ -157,7 +157,7 @@ public class TextInputDialog extends ControllerMenuDialog {
                 }
             };
 
-            final String[] keys = {"1234567890", "qwertyuiop", "@asdfghjkl", "\ryxcvbnm." + BACKSPACE};
+            final String[] keys = {"1234567890", "qwertyuiop", "@asdfghjkl", "\rzxcvbnm." + BACKSPACE};
 
             for (int row = 0; row < keys.length; row++) {
                 String thisRow = keys[row];
