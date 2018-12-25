@@ -419,6 +419,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             goToHighscores();
 
         else if (isPaused() || gameModel.isGameOver()) {
+            //TODO im Fall von isPaused und !isGameOver bei BattleModel eine Warnung einblenden
             saveGameState();
             super.goBackToMenu();
         } else
@@ -948,6 +949,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             case comboCount:
                 text = app.TEXTS.format("motivationComboCount", extraMsg);
                 duration = .5f;
+                break;
+            case turnGarbage:
+                playSound = true;
+                text = app.TEXTS.format("motivationTurnGarbage");
+                break;
+            case turnOver:
+                text = app.TEXTS.format("motivationTurnOver");
                 break;
         }
 

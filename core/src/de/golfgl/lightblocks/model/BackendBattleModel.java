@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -19,6 +20,8 @@ public class BackendBattleModel extends GameModel {
     private boolean firstTurnFirstPlayer = false;
     private boolean sendingGarbage = false;
     private Replay otherPlayersTurn;
+    private int garbageNum;
+    private ByteArray garbagePos = new ByteArray();
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -59,7 +62,6 @@ public class BackendBattleModel extends GameModel {
     public void initGameboardFromLastTurn() {
         if (matchEntity.turns.size() == 1) {
             // Sonderfall erster Zug des ersten Spielers
-
             firstTurnFirstPlayer = true;
             // gleich mit Garbage senden beginnen
             sendingGarbage = true;
@@ -67,16 +69,21 @@ public class BackendBattleModel extends GameModel {
             MatchEntity.MatchTurn lastTurn = matchEntity.turns.get(matchEntity.turns.size() - 1);
             otherPlayersTurn = new Replay();
             otherPlayersTurn.fromString(lastTurn.opponentReplay);
-            // TODO
+            //TODO garbagenum initialisieren
+
+            //TODO Drawyer aus dem längeren der beiden Replays aufbauen
         }
 
-        //TODO Drawyer
+        //GarbageGapPos
+        for (int i = 0; i < matchEntity.garbageGap.length(); i++)
+            garbagePos.add(Byte.valueOf(matchEntity.garbageGap.substring(i, 1)));
     }
 
     @Override
     protected int[] drawGarbageLines() {
-        //TODO otherPlayersTurn auswerten und die Garbage rein
-
+        if (otherPlayersTurn != null && !sendingGarbage) {
+            //TODO otherPlayersTurn auswerten und die Garbage rein
+        }
         return null;
     }
 
@@ -91,26 +98,31 @@ public class BackendBattleModel extends GameModel {
         if (firstPartOver && !sendingGarbage) {
             //TODO Anzeigen in Spielfeld
             sendingGarbage = true;
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, null);
         } else if (everythingsOver && !isGameOver()) {
             // TODO
-            setGameOverWon(IGameModelListener.MotivationTypes.gameSuccess);
+            setGameOverWon(IGameModelListener.MotivationTypes.turnOver);
         }
     }
 
     @Override
     protected void submitGameEnded(boolean success) {
         super.submitGameEnded(success);
-        //TODO Aktualisierung Turn mit Replay, auch Drawyer und GarbageHole
+        //TODO Aktualisierung Turn mit Replay, auch drawn Tetros und Restbestand Drawyer und GarbageHole
     }
 
     @Override
     public void read(Json json, JsonValue jsonData) {
-        super.read(json, jsonData);
+        throw new UnsupportedOperationException("Not allowed in battle mode");
+    }
+
+    @Override
+    public void write(Json json) {
+        throw new UnsupportedOperationException("Not allowed in battle mode");
     }
 
     @Override
     public String saveGameModel() {
-        //TODO playkey, drawyer, garbagegap
-        return super.saveGameModel();
+        return null;
     }
 }

@@ -62,6 +62,6 @@ public interface IGameModelListener {
     enum MotivationTypes {
         newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
         boardCleared, newHighscore, gameOver, gameWon, gameSuccess, playerOver,
-        bonusScore, comboCount
+        bonusScore, comboCount, turnOver, turnGarbage
     }
 }
