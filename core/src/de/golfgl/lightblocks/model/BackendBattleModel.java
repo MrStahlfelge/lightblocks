@@ -68,7 +68,7 @@ public class BackendBattleModel extends GameModel {
         } else {
             MatchEntity.MatchTurn lastTurn = matchEntity.turns.get(matchEntity.turns.size() - 1);
             otherPlayersTurn = new Replay();
-            otherPlayersTurn.fromString(lastTurn.opponentReplay);
+            otherPlayersTurn.fromString(matchEntity.opponentReplay);
             //TODO garbagenum initialisieren
 
             //TODO Drawyer aus dem längeren der beiden Replays aufbauen

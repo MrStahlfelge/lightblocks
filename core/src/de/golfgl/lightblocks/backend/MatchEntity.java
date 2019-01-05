@@ -25,8 +25,10 @@ public class MatchEntity implements IPlayerInfo {
     public final String opponentDecoration;
     public final int turnBlockCount;
     public final List<MatchTurn> turns;
+    public final String opponentReplay;
     public String garbageGap;
     public String drawyer;
+    public String yourReplay;
 
     public MatchEntity(JsonValue fromJson) {
         uuid = fromJson.getString("uuid");
@@ -40,6 +42,8 @@ public class MatchEntity implements IPlayerInfo {
         opponentDecoration = fromJson.getString("opponentDecoration", null);
         garbageGap = fromJson.getString("garbageGap", "");
         drawyer = fromJson.getString("drawyer", "");
+        yourReplay = fromJson.getString("yourReplay", null);
+        opponentReplay = fromJson.getString("opponentReplay", null);
 
         turns = new ArrayList<>();
         JsonValue turnJson = fromJson.get("turns");
@@ -67,8 +71,6 @@ public class MatchEntity implements IPlayerInfo {
     public static class MatchTurn {
         public final String matchId;
         public final int turnNum;
-        public final String yourReplay;
-        public final String opponentReplay;
         public final int yourScore;
         public final int opponentScore;
         public final boolean youDroppedOut;
@@ -78,8 +80,6 @@ public class MatchEntity implements IPlayerInfo {
         public MatchTurn(JsonValue turn) {
             matchId = turn.getString("matchId");
             turnNum = turn.getInt("turnNum");
-            yourReplay = turn.getString("yourReplay", null);
-            opponentReplay = turn.getString("opponentReplay", null);
             yourScore = turn.getInt("yourScore");
             opponentScore = turn.getInt("opponentScore");
             youDroppedOut = turn.getBoolean("youDroppedOut");
