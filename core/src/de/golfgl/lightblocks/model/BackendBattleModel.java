@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 import de.golfgl.lightblocks.backend.MatchEntity;
+import de.golfgl.lightblocks.backend.MatchTurnRequestInfo;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.Replay;
 
@@ -22,6 +23,7 @@ public class BackendBattleModel extends GameModel {
     private Replay otherPlayersTurn;
     private int garbageNum;
     private ByteArray garbagePos = new ByteArray();
+    MatchTurnRequestInfo infoForServer;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -53,6 +55,9 @@ public class BackendBattleModel extends GameModel {
     @Override
     public void startNewGame(InitGameParameters newGameParams) {
         matchEntity = newGameParams.getMatchEntity();
+        infoForServer = new MatchTurnRequestInfo();
+        infoForServer.matchId = matchEntity.uuid;
+        infoForServer.turnKey = newGameParams.getPlayKey();
 
         // Das Spielbrett aufbauen
         initGameboardFromLastTurn();
@@ -71,7 +76,7 @@ public class BackendBattleModel extends GameModel {
             otherPlayersTurn.fromString(matchEntity.opponentReplay);
             //TODO garbagenum initialisieren
 
-            //TODO Drawyer aus dem längeren der beiden Replays aufbauen
+            //TODO Drawyer aufbauen
         }
 
         //GarbageGapPos
@@ -99,6 +104,8 @@ public class BackendBattleModel extends GameModel {
             //TODO Anzeigen in Spielfeld
             sendingGarbage = true;
             userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, null);
+
+            infoForServer.score1 = getScore().getScore();
         } else if (everythingsOver && !isGameOver()) {
             // TODO
             setGameOverWon(IGameModelListener.MotivationTypes.turnOver);
@@ -109,6 +116,20 @@ public class BackendBattleModel extends GameModel {
     protected void submitGameEnded(boolean success) {
         super.submitGameEnded(success);
         //TODO Aktualisierung Turn mit Replay, auch drawn Tetros und Restbestand Drawyer und GarbageHole
+
+        if (firstTurnFirstPlayer || !sendingGarbage) {
+            infoForServer.score1 = getScore().getScore();
+            infoForServer.droppedOut1 = !success;
+        } else {
+            infoForServer.score2 = getScore().getScore();
+            infoForServer.droppedOut2 = !success;
+        }
+
+        infoForServer.replay = replay.toString();
+
+        //TODO garbagepos, drawyer, linessent
+
+        app.backendManager.setPlayedTurnToUpload(infoForServer, null);
     }
 
     @Override

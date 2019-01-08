@@ -388,17 +388,43 @@ public class BackendClientTest {
         Thread.sleep(50);
 
         //jetzt einfügen
-        WaitForResponseListener<MatchEntity> addlistener = new WaitForResponseListener<>();
-        backendClientPlayer2.openNewMatch(null, 9, addlistener);
-        waitWhileRequesting();
-        Assert.assertTrue("Received HTTP " + addlistener.lastCode, addlistener.successful);
-        Thread.sleep(50);
+        String matchId = null;
+
+        while (matchId == null) {
+            WaitForResponseListener<MatchEntity> addlistener = new WaitForResponseListener<>();
+            backendClientPlayer2.openNewMatch(null, 9, addlistener);
+            waitWhileRequesting();
+            Assert.assertTrue("Received HTTP " + addlistener.lastCode, addlistener.successful);
+            Thread.sleep(50);
+
+            if (addlistener.retrievedData.opponentId == null)
+                matchId = addlistener.retrievedData.uuid;
+        }
 
         WaitForResponseListener<MatchEntity> addlistener2 = new WaitForResponseListener<>();
         backendClientPlayer1.openNewMatch(null, 9, addlistener2);
         waitWhileRequesting();
         Assert.assertTrue(addlistener2.successful);
         Assert.assertNotNull(addlistener2.retrievedData.opponentId);
+        Assert.assertEquals(backendClientPlayer2.getUserId(), addlistener2.retrievedData.opponentId);
+
+
+        WaitForResponseListener<String> turnKeyListener = new WaitForResponseListener<>();
+        backendClientPlayer1.postMatchStartPlayingTurn(matchId, turnKeyListener);
+        waitWhileRequesting();
+        Assert.assertNotNull(turnKeyListener.retrievedData);
+        String turnKey = turnKeyListener.retrievedData;
+
+        addlistener2 = new WaitForResponseListener<>();
+        MatchTurnRequestInfo turnInfo = new MatchTurnRequestInfo();
+        turnInfo.matchId = matchId;
+        turnInfo.turnKey = turnKey;
+        turnInfo.score1 = 123455;
+        turnInfo.replay = "SOMEREPLAY";
+
+        backendClientPlayer1.postMatchPlayedTurn(turnInfo, addlistener2);
+        waitWhileRequesting();
+        Assert.assertTrue(addlistener2.successful);
 
         backendClientPlayer1.deletePlayer(new WaitForResponseListener<Void>());
         waitWhileRequesting();

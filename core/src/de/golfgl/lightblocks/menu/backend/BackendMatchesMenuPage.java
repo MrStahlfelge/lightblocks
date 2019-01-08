@@ -92,6 +92,9 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
         myGamesTable.add(scrollPane).expand().width(LightBlocksGame.nativeGameWidth);
         //TODO wenn noch kein Match vorhanden, statt leerer Tabelle Introtext anzeigen
 
+        // einen eventuell noch nicht abgesendeten Turn abgesenden
+        if (app.backendManager.hasPlayedTurnToUpload())
+            app.backendManager.sendEnqueuedTurnToUpload(null);
 
         return myGamesTable;
     }

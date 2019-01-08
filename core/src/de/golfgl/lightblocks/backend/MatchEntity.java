@@ -26,9 +26,9 @@ public class MatchEntity implements IPlayerInfo {
     public final int turnBlockCount;
     public final List<MatchTurn> turns;
     public final String opponentReplay;
-    public String garbageGap;
-    public String drawyer;
-    public String yourReplay;
+    public final String garbageGap;
+    public final String drawyer;
+    public final String yourReplay;
 
     public MatchEntity(JsonValue fromJson) {
         uuid = fromJson.getString("uuid");

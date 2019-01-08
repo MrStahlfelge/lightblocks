@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.backend;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MarathonModel;
@@ -43,6 +45,8 @@ public class BackendManager {
     private boolean isFetchingMultiplayerMatches;
     private boolean multiplayerMatchesLastFetchSuccessful;
     private String multiplayerLastFetchError;
+    private MatchTurnRequestInfo playedTurnToUpload;
+    private boolean uploadingPlayedTurn;
 
     public BackendManager(LocalPrefs prefs) {
         backendClient = new BackendClient();
@@ -173,7 +177,8 @@ public class BackendManager {
         if (!isFetchingMultiplayerMatches && hasUserId()) {
             isFetchingMultiplayerMatches = true;
 
-            //TODO: sinceTime den ersten in der bisherigen Liste übergeben und dann im onSuccess die Listen zusammenführen
+            //TODO: sinceTime den ersten in der bisherigen Liste übergeben und dann im onSuccess die Listen
+            // zusammenführen
 
             backendClient.listPlayerMatches(0, new BackendClient
                     .IBackendResponse<List<MatchEntity>>() {
@@ -345,6 +350,62 @@ public class BackendManager {
         return platformString;
     }
 
+    public boolean hasPlayedTurnToUpload() {
+        return playedTurnToUpload != null && !uploadingPlayedTurn;
+    }
+
+    public void setPlayedTurnToUpload(MatchTurnRequestInfo playedTurnToUpload, BackendClient
+            .IBackendResponse<MatchEntity> callback) {
+        if (this.playedTurnToUpload != null && playedTurnToUpload != this.playedTurnToUpload)
+            throw new IllegalStateException("Cannot upload new turn data while other turn data is still queued.");
+
+        this.playedTurnToUpload = playedTurnToUpload;
+
+        //TODO persistieren
+    }
+
+    public void sendEnqueuedTurnToUpload(@Nullable final BackendClient.IBackendResponse<MatchEntity> callback) {
+        if (!hasPlayedTurnToUpload())
+            return;
+
+        uploadingPlayedTurn = true;
+        getBackendClient().postMatchPlayedTurn(playedTurnToUpload, new BackendClient.IBackendResponse<MatchEntity>() {
+            @Override
+            public void onFail(final int statusCode, final String errorMsg) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        uploadingPlayedTurn = false;
+                        if (statusCode < 500 && statusCode >= HttpStatus.SC_OK)
+                            playedTurnToUpload = null;
+
+                        if (callback != null)
+                            callback.onFail(statusCode, errorMsg);
+                    }
+                });
+            }
+
+            @Override
+            public void onSuccess(final MatchEntity retrievedData) {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        uploadingPlayedTurn = false;
+                        playedTurnToUpload = null;
+                        for (int i = multiplayerMatchesList.size() - 1; i >= 0; i--)
+                            if (multiplayerMatchesList.get(i).uuid.equalsIgnoreCase(retrievedData.uuid))
+                                multiplayerMatchesList.remove(i);
+
+                        multiplayerMatchesList.add(0, retrievedData);
+                        multiplayerMatchesLastFetchMs = TimeUtils.millis();
+                        if (callback != null)
+                            callback.onSuccess(retrievedData);
+                    }
+                });
+            }
+        });
+    }
+
     public abstract static class AbstractQueuedBackendResponse<T> implements BackendClient.IBackendResponse<T> {
         private final LightBlocksGame app;
 
@@ -374,8 +435,14 @@ public class BackendManager {
             });
         }
 
+        /**
+         * auf dem Main-Thread
+         */
         protected abstract void onRequestSuccess(T retrievedData);
 
+        /**
+         * auf dem Main-Thread
+         */
         protected abstract void onRequestFailed(int statusCode, String errorMsg);
     }
 

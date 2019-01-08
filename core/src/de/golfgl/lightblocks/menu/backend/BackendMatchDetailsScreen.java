@@ -27,6 +27,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     private final Button playTurnButton;
     private final Button resignButton;
     private MatchEntity match;
+    private boolean wasPlaying;
 
     public BackendMatchDetailsScreen(LightBlocksGame app, String matchId) {
         super(app, matchId);
@@ -53,6 +54,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     }
 
     public void startPlaying() {
+        //TODO erst dafür sorgen dass ein eventuell noch nicht abgesendeter Turn abgesendet wird
+
         app.backendManager.getBackendClient().postMatchStartPlayingTurn(match.uuid,
                 new WaitForResponse<String>(app, getStage()) {
                     @Override
@@ -75,6 +78,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             PlayScreen ps = PlayScreen.gotoPlayScreen(BackendMatchDetailsScreen.this.app, initGameParametersParams);
             ps.setShowScoresWhenGameOver(false);
             //TODO trotzdem sollte die Erinnerung an Spende gezeigt werden!!!
+            wasPlaying = true;
         } catch (VetoException e) {
             new VetoDialog(e.getMessage(), getSkin(), LightBlocksGame.nativeGameWidth * .75f).show(getStage());
         }
@@ -139,5 +143,28 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     @Override
     protected boolean hasScrollPane() {
         return true;
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        if (wasPlaying) {
+            // wieder zurückgekommen aus Playscreen
+            wasPlaying = false;
+            onComeBackFromPlayingTurn();
+        }
+    }
+
+    private void onComeBackFromPlayingTurn() {
+        if (app.backendManager.hasPlayedTurnToUpload()) {
+            app.backendManager.sendEnqueuedTurnToUpload(new WaitForResponse<MatchEntity>(app, getStage()) {
+                @Override
+                public void onRequestSuccess(MatchEntity retrievedData) {
+                    super.onRequestSuccess(retrievedData);
+                    fillMatchDetails(retrievedData);
+                }
+            });
+        }
     }
 }
