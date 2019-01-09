@@ -105,7 +105,7 @@ public class BackendBattleModel extends GameModel {
             sendingGarbage = true;
             userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, null);
 
-            infoForServer.score1 = getScore().getScore();
+            //TODO beenden, falls der Gegner bereits beendet hat
         } else if (everythingsOver && !isGameOver()) {
             // TODO
             setGameOverWon(IGameModelListener.MotivationTypes.turnOver);
@@ -117,14 +117,7 @@ public class BackendBattleModel extends GameModel {
         super.submitGameEnded(success);
         //TODO Aktualisierung Turn mit Replay, auch drawn Tetros und Restbestand Drawyer und GarbageHole
 
-        if (firstTurnFirstPlayer || !sendingGarbage) {
-            infoForServer.score1 = getScore().getScore();
-            infoForServer.droppedOut1 = !success;
-        } else {
-            infoForServer.score2 = getScore().getScore();
-            infoForServer.droppedOut2 = !success;
-        }
-
+        infoForServer.droppedOut = !success;
         infoForServer.replay = replay.toString();
 
         //TODO garbagepos, drawyer, linessent
