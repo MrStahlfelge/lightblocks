@@ -46,9 +46,10 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         resignButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                // TODO aufgeben
+                resignMatch();
             }
         });
+        addFocusableActor(resignButton);
 
         // TODO Akzeptieren/Ablehnen button
     }
@@ -82,6 +83,17 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         } catch (VetoException e) {
             new VetoDialog(e.getMessage(), getSkin(), LightBlocksGame.nativeGameWidth * .75f).show(getStage());
         }
+    }
+
+    public void resignMatch() {
+        app.backendManager.getBackendClient().postMatchGiveUp(match.uuid, new WaitForResponse<MatchEntity>
+                (app, getStage()) {
+            @Override
+            public void onRequestSuccess(MatchEntity retrievedData) {
+                super.onRequestSuccess(retrievedData);
+                fillMatchDetails(retrievedData);
+            }
+        });
     }
 
     @Override
@@ -128,13 +140,21 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
         if (match.myTurn) {
             matchDetailTable.row();
-            if (match.matchState == MatchEntity.PLAYER_STATE_CHALLENGED) {
+            if (match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
                 // TODO aufgefordert: annehmen oder ablehnen
             } else {
                 matchDetailTable.add(playTurnButton).padTop(20);
-                //TODO aufgeben
-
             }
+        }
+
+        if (match.turns.size() > 0) {
+            matchDetailTable.row();
+            matchDetailTable.add(new MatchTurnsTable()).padTop(40);
+        }
+
+        if (match.myTurn && !match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
+            matchDetailTable.row();
+            matchDetailTable.add(resignButton).padTop(40);
         }
 
         contentCell.setActor(matchDetailTable);
@@ -165,6 +185,25 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                     fillMatchDetails(retrievedData);
                 }
             });
+        }
+    }
+
+    private class MatchTurnsTable extends Table {
+        public MatchTurnsTable() {
+            defaults().pad(10).expandX();
+            //TODO Kopfzeile
+            for (MatchEntity.MatchTurn turn : match.turns) {
+                row();
+                String yourScoreText = turn.youDroppedOut ? "XXX" : turn.yourScore > 0 ? String.valueOf(turn
+                        .yourScore) : "???";
+                String opponentScoreText = turn.opponentDroppedOut ? "XXX" : turn.opponentScore > 0 ? String
+                        .valueOf(turn.opponentScore) : "???";
+                add(new ScaledLabel(yourScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform().right();
+                add(new ScaledLabel((turn.yourScore > 0 || turn.youDroppedOut) &&
+                        (turn.opponentScore > 0 || turn.opponentDroppedOut) ? String.valueOf(turn.linesSent) : "",
+                        app.skin, LightBlocksGame.SKIN_FONT_BIG));
+                add(new ScaledLabel(opponentScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform().left();
+            }
         }
     }
 }

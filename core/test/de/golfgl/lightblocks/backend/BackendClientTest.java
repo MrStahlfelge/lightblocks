@@ -425,6 +425,19 @@ public class BackendClientTest {
         waitWhileRequesting();
         Assert.assertTrue(addlistener2.successful);
 
+        // direkt danach kann man nicht mehr aufgeben, man ist nicht dran
+        addlistener2 = new WaitForResponseListener<>();
+        backendClientPlayer1.postMatchGiveUp(matchId, addlistener2);
+        waitWhileRequesting();
+        Assert.assertFalse(addlistener2.successful);
+
+        // der andere kann aber aufgeben
+        addlistener2 = new WaitForResponseListener<>();
+        backendClientPlayer2.postMatchGiveUp(matchId, addlistener2);
+        waitWhileRequesting();
+        Assert.assertTrue(addlistener2.successful);
+        Assert.assertTrue(addlistener2.retrievedData.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_GAVEUP));
+
         backendClientPlayer1.deletePlayer(new WaitForResponseListener<Void>());
         waitWhileRequesting();
         backendClientPlayer2.deletePlayer(new WaitForResponseListener<Void>());

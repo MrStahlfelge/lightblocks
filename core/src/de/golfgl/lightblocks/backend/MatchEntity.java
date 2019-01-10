@@ -13,6 +13,10 @@ public class MatchEntity implements IPlayerInfo {
     public static final String PLAYER_STATE_WAIT = "WAIT";
     public static final String PLAYER_STATE_CHALLENGED = "CHALLENGED";
     public static final String PLAYER_STATE_YOURTURN = "YOURTURN";
+    public static final String PLAYER_STATE_GAVEUP = "GAVEUP";
+    public static final String PLAYER_STATE_TIMESUP = "TIMESUP";
+    public static final String PLAYER_STATE_WON = "WON";
+    public static final String PLAYER_STATE_LOST = "LOST";
 
     public final String uuid;
     public final String opponentId;
