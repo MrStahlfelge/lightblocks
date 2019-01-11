@@ -14,4 +14,6 @@ public class MatchTurnRequestInfo {
     public String drawyer;
     public String garbagePos;
     public boolean droppedOut;
+    public String platform;
+    public String inputType;
 }

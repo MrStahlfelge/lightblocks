@@ -18,12 +18,12 @@ import de.golfgl.lightblocks.state.Replay;
 public class BackendBattleModel extends GameModel {
     public static final String MODEL_ID = "tbbattle";
     protected MatchEntity matchEntity;
+    MatchTurnRequestInfo infoForServer;
     private boolean firstTurnFirstPlayer = false;
     private boolean sendingGarbage = false;
     private Replay otherPlayersTurn;
     private int garbageNum;
     private ByteArray garbagePos = new ByteArray();
-    MatchTurnRequestInfo infoForServer;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -119,6 +119,8 @@ public class BackendBattleModel extends GameModel {
 
         infoForServer.droppedOut = !success;
         infoForServer.replay = replay.toString();
+        infoForServer.platform = app.backendManager.getPlatformString();
+        infoForServer.inputType = ""; //TODO
 
         //TODO garbagepos, drawyer, linessent
 
