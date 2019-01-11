@@ -28,6 +28,8 @@ import com.badlogic.gdx.utils.Timer;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import javax.annotation.Nullable;
+
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendScore;
 import de.golfgl.lightblocks.gpgs.GaHelper;
@@ -35,6 +37,7 @@ import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.menu.PauseDialog;
 import de.golfgl.lightblocks.menu.RoundOverScoreScreen;
 import de.golfgl.lightblocks.menu.ScoreTable;
+import de.golfgl.lightblocks.model.BackendBattleModel;
 import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
@@ -896,7 +899,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void showMotivation(MotivationTypes achievement, String extraMsg) {
+    public void showMotivation(MotivationTypes achievement, @Nullable  String extraMsg) {
 
         boolean playSound = true;
         String text = "";
@@ -956,6 +959,14 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 break;
             case turnOver:
                 text = app.TEXTS.format("motivationTurnOver");
+                break;
+            case prepare:
+                text = app.TEXTS.format("motivationPrepare");
+                duration = BackendBattleModel.PREPARE_TIME_SECONDS;
+                break;
+            case go:
+                text = app.TEXTS.format("motivationGo");
+                duration = .75f;
                 break;
         }
 

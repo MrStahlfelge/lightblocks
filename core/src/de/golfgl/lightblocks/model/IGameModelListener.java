@@ -2,6 +2,8 @@ package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.utils.IntArray;
 
+import javax.annotation.Nullable;
+
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 
 /**
@@ -47,7 +49,7 @@ public interface IGameModelListener {
 
     void markConflict(int x, int y);
 
-    void showMotivation(MotivationTypes achievement, String extra);
+    void showMotivation(MotivationTypes achievement, @Nullable String extra);
 
     void showOverlayMessage(String message, float autoHide, String... params);
 
@@ -62,6 +64,6 @@ public interface IGameModelListener {
     enum MotivationTypes {
         newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
         boardCleared, newHighscore, gameOver, gameWon, gameSuccess, playerOver,
-        bonusScore, comboCount, turnOver, turnGarbage
+        bonusScore, comboCount, turnOver, turnGarbage, prepare, go
     }
 }

@@ -17,13 +17,16 @@ import de.golfgl.lightblocks.state.Replay;
 
 public class BackendBattleModel extends GameModel {
     public static final String MODEL_ID = "tbbattle";
+    public static final float PREPARE_TIME_SECONDS = 1.5f;
     protected MatchEntity matchEntity;
     MatchTurnRequestInfo infoForServer;
     private boolean firstTurnFirstPlayer = false;
     private boolean sendingGarbage = false;
     private Replay otherPlayersTurn;
-    private int garbageNum;
+    private int garbageReceived;
     private ByteArray garbagePos = new ByteArray();
+    private float prepareForGameDelay = PREPARE_TIME_SECONDS;
+    private int garbageWaiting = 0;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -43,8 +46,13 @@ public class BackendBattleModel extends GameModel {
 
     @Override
     public boolean beginPaused() {
-        //TODO stattdessen dann 3... 2... 1...
         return false;
+    }
+
+    @Override
+    public void setUserInterface(IGameModelListener userInterface) {
+        super.setUserInterface(userInterface);
+        userInterface.showMotivation(IGameModelListener.MotivationTypes.prepare, null);
     }
 
     @Override
@@ -65,16 +73,30 @@ public class BackendBattleModel extends GameModel {
     }
 
     public void initGameboardFromLastTurn() {
-        if (matchEntity.turns.size() == 1) {
+        if (matchEntity.turns.size() == 1 && matchEntity.opponentReplay == null
+                && matchEntity.turns.get(0).opponentScore <= 0) {
             // Sonderfall erster Zug des ersten Spielers
             firstTurnFirstPlayer = true;
             // gleich mit Garbage senden beginnen
             sendingGarbage = true;
         } else {
-            MatchEntity.MatchTurn lastTurn = matchEntity.turns.get(matchEntity.turns.size() - 1);
+            int lastTurnSequenceNum = matchEntity.turns.size() - 1;
+            MatchEntity.MatchTurn lastTurn = matchEntity.turns.get(lastTurnSequenceNum);
+
+            // das andere Replay laden und am Ende des letzten Zuges positionieren
             otherPlayersTurn = new Replay();
             otherPlayersTurn.fromString(matchEntity.opponentReplay);
-            //TODO garbagenum initialisieren
+            otherPlayersTurn.seekToTimePos((lastTurnSequenceNum - 1) * 1000 * matchEntity.turnBlockCount);
+            replay.seekToPreviousStep();
+
+            // garbageReceived initialisieren: aufsummieren, wieviel ich vorher schon bekommen habe
+            for (int turnPos = 0; turnPos < lastTurnSequenceNum; turnPos++) {
+                int linesSentInTurn = matchEntity.turns.get(turnPos).linesSent;
+
+                // kleiner als 0 bedeutet, ich habe garbage bekommen
+                if (linesSentInTurn < 0)
+                    garbageReceived = garbageReceived + linesSentInTurn * -1;
+            }
 
             //TODO Drawyer aufbauen
         }
@@ -87,21 +109,63 @@ public class BackendBattleModel extends GameModel {
     @Override
     protected int[] drawGarbageLines() {
         if (otherPlayersTurn != null && !sendingGarbage) {
-            //TODO otherPlayersTurn auswerten und die Garbage rein
+            calcGarbageAmountSinceLastCalc();
         }
+
+        if (garbageWaiting > 0) {
+            int[] retVal = new int[garbageWaiting];
+
+            //TODO garbagepos benutzen
+            for (int i = 0; i < garbageWaiting; i++)
+                retVal[i] = 0;
+
+            garbageWaiting = 0;
+
+            return retVal;
+        }
+
         return null;
+    }
+
+    private void calcGarbageAmountSinceLastCalc() {
+        Replay.ReplayStep step = otherPlayersTurn.getCurrentStep();
+        int clearedLinesLastStep = otherPlayersTurn.getCurrentAdditionalInformation() != null
+                ? otherPlayersTurn.getCurrentAdditionalInformation().clearedLines : 0;
+
+        while (step != null && step.timeMs <= getScore().getTimeMs()) {
+            int clearedLinesThisStep = otherPlayersTurn.getCurrentAdditionalInformation().clearedLines - clearedLinesLastStep;
+            clearedLinesLastStep = otherPlayersTurn.getCurrentAdditionalInformation().clearedLines;
+
+            if (clearedLinesThisStep == 4)
+                garbageWaiting = garbageWaiting + 4;
+            else if (clearedLinesThisStep >= 2)
+                garbageWaiting = garbageWaiting + clearedLinesThisStep - 1;
+
+            step = otherPlayersTurn.seekToNextStep();
+        }
     }
 
     @Override
     public void update(float delta) {
+        if (prepareForGameDelay > 0) {
+            prepareForGameDelay = prepareForGameDelay - delta;
+
+            if (prepareForGameDelay > 0)
+                return;
+
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.go, null);
+        }
+
         super.update(delta);
+
         boolean firstPartOver = sendingGarbage || firstTurnFirstPlayer ||
                 getScore().getTimeMs() > matchEntity.turnBlockCount * 1000;
         boolean everythingsOver = isGameOver() ||
                 getScore().getTimeMs() > matchEntity.turnBlockCount * 1000 * (firstTurnFirstPlayer ? 1 : 2);
 
         if (firstPartOver && !sendingGarbage) {
-            //TODO Anzeigen in Spielfeld
+            calcGarbageAmountSinceLastCalc();
+            //TODO Stärker Anzeigen in Spielfeld
             sendingGarbage = true;
             userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, null);
 
