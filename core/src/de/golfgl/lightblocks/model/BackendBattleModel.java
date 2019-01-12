@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.model;
 import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.Queue;
 
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.backend.MatchTurnRequestInfo;
@@ -22,13 +23,12 @@ public class BackendBattleModel extends GameModel {
     MatchTurnRequestInfo infoForServer;
     private boolean firstTurnFirstPlayer = false;
     private boolean sendingGarbage = false;
-    private Replay otherPlayersReplay;
     private int garbageReceived;
     private ByteArray garbagePos = new ByteArray();
     private float prepareForGameDelay = PREPARE_TIME_SECONDS;
-    private int garbageWaiting = 0;
     private MatchEntity.MatchTurn lastTurnOnServer;
     private int lastTurnSequenceNum;
+    private Queue<WaitingGarbage> waitingGarbage = new Queue<>();
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -80,11 +80,7 @@ public class BackendBattleModel extends GameModel {
             lastTurnSequenceNum = matchEntity.turns.size() - 1;
             lastTurnOnServer = matchEntity.turns.get(lastTurnSequenceNum);
 
-            // das andere Replay laden und am Ende des letzten Zuges positionieren
-            otherPlayersReplay = new Replay();
-            otherPlayersReplay.fromString(matchEntity.opponentReplay);
-            otherPlayersReplay.seekToTimePos(1000 * getThisTurnsStartSeconds());
-            replay.seekToPreviousStep();
+            calcWaitingGarbage();
 
             // garbageReceived initialisieren: aufsummieren, wieviel ich vorher schon bekommen habe
             for (int turnPos = 0; turnPos < lastTurnSequenceNum; turnPos++) {
@@ -103,6 +99,35 @@ public class BackendBattleModel extends GameModel {
             garbagePos.add(Byte.valueOf(matchEntity.garbageGap.substring(i, 1)));
 
         super.startNewGame(newGameParams);
+    }
+
+    public void calcWaitingGarbage() {
+        // das andere Replay laden und am Ende des letzten Zuges positionieren
+        Replay otherPlayersReplay = new Replay();
+        otherPlayersReplay.fromString(matchEntity.opponentReplay);
+
+        otherPlayersReplay.seekToTimePos(1000 * getThisTurnsStartSeconds());
+        Replay.ReplayStep step = otherPlayersReplay.seekToPreviousStep();
+
+        int clearedLinesLastStep = otherPlayersReplay.getCurrentAdditionalInformation() != null
+                ? otherPlayersReplay.getCurrentAdditionalInformation().clearedLines : 0;
+
+        while (step != null && step.timeMs <= (getThisTurnsStartSeconds() + matchEntity.turnBlockCount) * 1000) {
+            int garbageThisStep = 0;
+            int clearedLinesThisStep = otherPlayersReplay.getCurrentAdditionalInformation().clearedLines -
+                    clearedLinesLastStep;
+            clearedLinesLastStep = otherPlayersReplay.getCurrentAdditionalInformation().clearedLines;
+
+            if (clearedLinesThisStep == 4)
+                garbageThisStep = 4;
+            else if (clearedLinesThisStep >= 2)
+                garbageThisStep =  clearedLinesThisStep - 1;
+
+            if (garbageThisStep > 0)
+                waitingGarbage.addLast(new WaitingGarbage(step.timeMs, garbageThisStep));
+
+            step = otherPlayersReplay.seekToNextStep();
+        }
     }
 
     public int getThisTurnsStartSeconds() {
@@ -137,42 +162,19 @@ public class BackendBattleModel extends GameModel {
 
     @Override
     protected int[] drawGarbageLines() {
-        if (otherPlayersReplay != null && !sendingGarbage) {
-            calcGarbageAmountSinceLastCalc();
-        }
+        if (waitingGarbage.size > 0 && waitingGarbage.first().timeMs <= getScore().getTimeMs()) {
+            WaitingGarbage garbageToAdd = this.waitingGarbage.removeFirst();
 
-        if (garbageWaiting > 0) {
-            int[] retVal = new int[garbageWaiting];
+            int[] retVal = new int[garbageToAdd.lines];
 
             //TODO garbagepos benutzen
-            for (int i = 0; i < garbageWaiting; i++)
+            for (int i = 0; i < retVal.length; i++)
                 retVal[i] = 0;
-
-            garbageWaiting = 0;
 
             return retVal;
         }
 
         return null;
-    }
-
-    private void calcGarbageAmountSinceLastCalc() {
-        Replay.ReplayStep step = otherPlayersReplay.getCurrentStep();
-        int clearedLinesLastStep = otherPlayersReplay.getCurrentAdditionalInformation() != null
-                ? otherPlayersReplay.getCurrentAdditionalInformation().clearedLines : 0;
-
-        while (step != null && step.timeMs <= getScore().getTimeMs()) {
-            int clearedLinesThisStep = otherPlayersReplay.getCurrentAdditionalInformation().clearedLines -
-                    clearedLinesLastStep;
-            clearedLinesLastStep = otherPlayersReplay.getCurrentAdditionalInformation().clearedLines;
-
-            if (clearedLinesThisStep == 4)
-                garbageWaiting = garbageWaiting + 4;
-            else if (clearedLinesThisStep >= 2)
-                garbageWaiting = garbageWaiting + clearedLinesThisStep - 1;
-
-            step = otherPlayersReplay.seekToNextStep();
-        }
     }
 
     @Override
@@ -199,7 +201,6 @@ public class BackendBattleModel extends GameModel {
 
         if (firstPartOver && !sendingGarbage) {
             if (!lastTurnOnServer.opponentDroppedOut) {
-                calcGarbageAmountSinceLastCalc();
                 //TODO Stärker Anzeigen in Spielfeld
                 sendingGarbage = true;
                 userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, null);
@@ -225,6 +226,8 @@ public class BackendBattleModel extends GameModel {
         //TODO garbagepos, drawyer, linessent
 
         app.backendManager.setPlayedTurnToUpload(infoForServer, null);
+
+        // TODO besser hier auch den Upload anstoßen!
     }
 
     @Override
@@ -245,5 +248,15 @@ public class BackendBattleModel extends GameModel {
     @Override
     public String saveGameModel() {
         return null;
+    }
+
+    private static class WaitingGarbage {
+        int timeMs;
+        int lines;
+
+        public WaitingGarbage(int timeMs, int lines) {
+            this.timeMs = timeMs;
+            this.lines = lines;
+        }
     }
 }

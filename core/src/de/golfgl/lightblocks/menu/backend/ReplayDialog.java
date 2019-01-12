@@ -103,7 +103,10 @@ public class ReplayDialog extends AbstractFullScreenDialog {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (!programmaticChange) {
-                    replayGameboard.windToTimePos((int) seekSlider.getValue() * 100);
+                    int timeMs = (int) seekSlider.getValue() * 100;
+                    replayGameboard.windToTimePos(timeMs);
+                    if (replayGameboard2 != null)
+                        replayGameboard2.windToTimePos(timeMs);
                 }
             }
         });
@@ -117,7 +120,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                 seekSlider.setValue(timeMs / 100);
                 programmaticChange = false;
 
-                if (replayGameboard2 != null && Math.abs(replayGameboard2.getCurrentTime() - timeMs) > 500) {
+                if (replayGameboard2 != null && Math.abs(replayGameboard2.getCurrentTime() - timeMs) > 1000) {
                     replayGameboard2.windToTimePos(timeMs);
                 }
             }
@@ -193,7 +196,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
 
         replayGameboard2.playReplay();
 
-        // TODO wenn das zweite länger ist als das erste, dann bis dahin Abspielen zulassen
+        // TODO wenn das zweite länger ist als das erste, dann bis dahin Abspielen zulassen (nach Spielende)
     }
 
     @Override
