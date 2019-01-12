@@ -28,6 +28,7 @@ public class ReplayGameboard extends BlockGroup {
     private BlockActor[] currentShownBlocks;
     private int[] activePiecePos;
     private Array<BlockActor> actorsToRemove;
+    private int currentTime;
 
     public ReplayGameboard(LightBlocksGame app, Replay replay) {
         super(app);
@@ -62,10 +63,19 @@ public class ReplayGameboard extends BlockGroup {
             if (waitTime <= 0)
                 transitionToNextStep();
             else if (shownStep != null && timeMsSinceShownStep > 0)
-                onTimeChange(Math.min(shownStep.timeMs + timeMsSinceShownStep, nextStep.timeMs));
+                setCurrentTime(Math.min(shownStep.timeMs + timeMsSinceShownStep, nextStep.timeMs));
         }
 
         super.act(delta * Math.max(1, playSpeed));
+    }
+
+    public int getCurrentTime() {
+        return currentTime;
+    }
+
+    private void setCurrentTime(int currentTime) {
+        this.currentTime = currentTime;
+        onTimeChange(currentTime);
     }
 
     private void transitionToNextStep() {
@@ -93,14 +103,14 @@ public class ReplayGameboard extends BlockGroup {
         transitionActivePiece(shownStep);
 
         // Anzeige aktualisieren
-        onTimeChange(shownStep.timeMs);
+        setCurrentTime(shownStep.timeMs);
         onClearedLinesChange(currentAdditionalInformation.clearedLines);
         timeMsSinceShownStep = 0;
 
         if (shownStep.isDropStep()) {
             onScoreChange(replay.getCurrentScore());
             // ARE
-            waitTime = waitTime + .15f;
+            addAditionalDelayTimeInternal(.15f);
 
             // Abzubauende Reihen verstärken
             clearLinesOnGameboard();
@@ -209,9 +219,18 @@ public class ReplayGameboard extends BlockGroup {
         }
 
         if (linesCleared > 0)
-            waitTime = waitTime + PlayScreen.DURATION_REMOVE_DELAY + PlayScreen.DURATION_REMOVE_FADEOUT;
+            addAditionalDelayTimeInternal(PlayScreen.DURATION_REMOVE_DELAY + PlayScreen.DURATION_REMOVE_FADEOUT);
 
         return linesCleared > 0;
+    }
+
+    private void addAditionalDelayTimeInternal(float additionalTime) {
+        waitTime = waitTime + additionalTime;
+        onAdditionalDelayTimeAdded(additionalTime);
+    }
+
+    public void addAdditionalDelayTime(float additionalTime) {
+        waitTime = waitTime + additionalTime;
     }
 
     private int getIntFromRowAndCol(int row, int col) {
@@ -311,6 +330,10 @@ public class ReplayGameboard extends BlockGroup {
     }
 
     protected void onTimeChange(int timeMs) {
+
+    }
+
+    protected void onAdditionalDelayTimeAdded(float additionalTime) {
 
     }
 

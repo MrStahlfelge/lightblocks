@@ -121,17 +121,16 @@ public class BackendBattleModel extends GameModel {
     public void initFromLastTurn() {
         // Den vorherigen Spielzustand wieder herstellen
         if (matchEntity.yourReplay != null) {
-            Replay myReplay = new Replay();
-            myReplay.fromString(matchEntity.yourReplay);
-            myReplay.seekToLastStep();
-            getGameboard().readFromReplay(myReplay.getCurrentGameboard());
+            getReplay().fromString(matchEntity.yourReplay);
+            getReplay().seekToLastStep();
+            getGameboard().readFromReplay(getReplay().getCurrentGameboard());
 
             // active und next piece
             // TODO hold piece, kann auch aus Replay gewonnen werden
 
             // Score vom letzten Mals setzen
-            Replay.AdditionalInformation replayAdditionalInfo = myReplay.getCurrentAdditionalInformation();
-            getScore().initFromReplay(myReplay.getCurrentScore(), replayAdditionalInfo.clearedLines,
+            Replay.AdditionalInformation replayAdditionalInfo = getReplay().getCurrentAdditionalInformation();
+            getScore().initFromReplay(getReplay().getCurrentScore(), replayAdditionalInfo.clearedLines,
                     replayAdditionalInfo.blockNum, getThisTurnsStartSeconds());
         }
     }
@@ -189,6 +188,9 @@ public class BackendBattleModel extends GameModel {
 
         super.update(delta);
 
+        if (isGameOver())
+            return;
+
         boolean firstPartOver = sendingGarbage || firstTurnFirstPlayer ||
                 getScore().getTimeMs() > (matchEntity.turnBlockCount + getThisTurnsStartSeconds()) * 1000;
         boolean everythingsOver = isGameOver() ||
@@ -205,7 +207,7 @@ public class BackendBattleModel extends GameModel {
                 // beenden, falls der Gegner bereits beendet hat
                 setGameOverWon(IGameModelListener.MotivationTypes.playerOver);
             }
-        } else if (everythingsOver && !isGameOver()) {
+        } else if (everythingsOver) {
             setGameOverWon(IGameModelListener.MotivationTypes.turnOver);
         }
     }
@@ -223,6 +225,11 @@ public class BackendBattleModel extends GameModel {
         //TODO garbagepos, drawyer, linessent
 
         app.backendManager.setPlayedTurnToUpload(infoForServer, null);
+    }
+
+    @Override
+    public boolean isHoldMoveAllowedByModel() {
+        return false;
     }
 
     @Override

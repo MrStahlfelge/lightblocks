@@ -32,6 +32,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
     private final TextButton playPause;
     private final TextButton fastOrStopPlay;
     private ReplayGameboard replayGameboard;
+    private ReplayGameboard replayGameboard2;
     private boolean isPlaying;
     private boolean programmaticChange;
 
@@ -66,9 +67,11 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         fastOrStopPlay.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (replayGameboard.isPlaying())
+                if (replayGameboard.isPlaying()) {
                     replayGameboard.playFast();
-                else
+                    if (replayGameboard2 != null)
+                        replayGameboard2.playFast();
+                } else
                     replayGameboard.windToFirstStep();
             }
         });
@@ -113,6 +116,10 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                 programmaticChange = true;
                 seekSlider.setValue(timeMs / 100);
                 programmaticChange = false;
+
+                if (replayGameboard2 != null && Math.abs(replayGameboard2.getCurrentTime() - timeMs) > 500) {
+                    replayGameboard2.windToTimePos(timeMs);
+                }
             }
 
             @Override
@@ -124,13 +131,19 @@ public class ReplayDialog extends AbstractFullScreenDialog {
             protected void onClearedLinesChange(int clearedLines) {
                 rightInfo.setLines(clearedLines);
             }
+
+            @Override
+            protected void onAdditionalDelayTimeAdded(float additionalTime) {
+                if (replayGameboard2 != null)
+                    replayGameboard2.addAdditionalDelayTime(additionalTime);
+            }
         };
         replayGameboard.setScale(.7f);
 
         Table contentTable = getContentTable();
         contentTable.add(extraInfo).uniformX().fill();
-        replaysCell = contentTable.add(replayGameboard).size(replayGameboard.getWidth() * replayGameboard
-                .getScaleX(), replayGameboard.getHeight() * replayGameboard.getScaleY());
+        replaysCell = contentTable.add(replayGameboard);
+        setCellSizeToGameboard(replaysCell, replayGameboard);
         contentTable.add(rightInfo).uniformX().fill();
 
         contentTable.row();
@@ -155,6 +168,34 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         replayGameboard.playReplay();
     }
 
+    private void setCellSizeToGameboard(Cell replaysCell, ReplayGameboard replayGameboard) {
+        replaysCell.size(replayGameboard.getWidth() * replayGameboard
+                .getScaleX(), replayGameboard.getHeight() * replayGameboard.getScaleY());
+    }
+
+    public void addSecondReplay(Replay replay2) {
+        replayGameboard2 = new ReplayGameboard(app, replay2) {
+            @Override
+            protected void onAdditionalDelayTimeAdded(float additionalTime) {
+                replayGameboard.addAdditionalDelayTime(additionalTime);
+            }
+        };
+        replayGameboard.setScale(.35f);
+        replayGameboard2.setScale(.35f);
+
+        Table bothReplays = new Table();
+        Cell<ReplayGameboard> cell1 = bothReplays.add(replayGameboard).pad(30, 0, 30, 30);
+        Cell<ReplayGameboard> cell2 = bothReplays.add(replayGameboard2).pad(30, 30, 30, 0);
+        setCellSizeToGameboard(cell1, replayGameboard);
+        setCellSizeToGameboard(cell2, replayGameboard2);
+        bothReplays.validate();
+        replaysCell.setActor(bothReplays).size(bothReplays.getPrefWidth(), bothReplays.getPrefHeight());
+
+        replayGameboard2.playReplay();
+
+        // TODO wenn das zweite länger ist als das erste, dann bis dahin Abspielen zulassen
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -176,11 +217,22 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                 }
             }));
         }
+
+        if (replayGameboard2 != null) {
+            if (replayGameboard.isPlaying() && !replayGameboard2.isPlaying())
+                replayGameboard2.playReplay();
+            else if (!replayGameboard.isPlaying() && replayGameboard2.isPlaying())
+                replayGameboard2.pauseReplay();
+        }
     }
 
     @Override
     protected Actor getConfiguredDefaultActor() {
         return playPause;
+    }
+
+    public void windToTimePos(int timePos) {
+        replayGameboard.windToTimePos(timePos);
     }
 
     private class RightInfoGroup extends WidgetGroup {
