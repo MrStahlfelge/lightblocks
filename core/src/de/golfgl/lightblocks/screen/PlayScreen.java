@@ -899,7 +899,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void showMotivation(MotivationTypes achievement, @Nullable  String extraMsg) {
+    public void showMotivation(MotivationTypes achievement, @Nullable String extraMsg) {
 
         boolean playSound = true;
         String text = "";
@@ -926,7 +926,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 playSound = false;
                 break;
             case playerOver:
-                if (extraMsg.length() >= 12)
+                if (extraMsg == null)
+                    extraMsg = "Other player";
+                else if (extraMsg.length() >= 12)
                     extraMsg = extraMsg.substring(0, 10) + "...";
                 text = app.TEXTS.format("motivationPlayerOver", extraMsg);
                 break;

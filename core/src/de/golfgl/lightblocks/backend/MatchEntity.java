@@ -80,6 +80,8 @@ public class MatchEntity implements IPlayerInfo {
         public final boolean youDroppedOut;
         public final boolean opponentDroppedOut;
         public final int linesSent;
+        public final boolean youPlayed;
+        public final boolean opponentPlayed;
 
         public MatchTurn(JsonValue turn) {
             matchId = turn.getString("matchId");
@@ -89,6 +91,8 @@ public class MatchEntity implements IPlayerInfo {
             youDroppedOut = turn.getBoolean("youDroppedOut");
             opponentDroppedOut = turn.getBoolean("opponentDroppedOut");
             linesSent = turn.getInt("linesSent");
+            youPlayed = turn.getBoolean("youPlayed");
+            opponentPlayed = turn.getBoolean("opponentPlayed");
         }
     }
 }

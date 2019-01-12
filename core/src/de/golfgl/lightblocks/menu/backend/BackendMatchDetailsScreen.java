@@ -52,6 +52,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         addFocusableActor(resignButton);
 
         // TODO Akzeptieren/Ablehnen button
+
+        // TODO Replay
     }
 
     public void startPlaying() {
@@ -86,6 +88,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     }
 
     public void resignMatch() {
+        //TODO Sicherheitsabfrage
         app.backendManager.getBackendClient().postMatchGiveUp(match.uuid, new WaitForResponse<MatchEntity>
                 (app, getStage()) {
             @Override
@@ -194,9 +197,9 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             //TODO Kopfzeile
             for (MatchEntity.MatchTurn turn : match.turns) {
                 row();
-                String yourScoreText = turn.youDroppedOut ? "XXX" : turn.yourScore > 0 ? String.valueOf(turn
+                String yourScoreText = turn.youDroppedOut ? "XXX" : turn.youPlayed ? String.valueOf(turn
                         .yourScore) : "???";
-                String opponentScoreText = turn.opponentDroppedOut ? "XXX" : turn.opponentScore > 0 ? String
+                String opponentScoreText = turn.opponentDroppedOut ? "XXX" : turn.opponentPlayed ? String
                         .valueOf(turn.opponentScore) : "???";
                 add(new ScaledLabel(yourScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform().right();
                 add(new ScaledLabel((turn.yourScore > 0 || turn.youDroppedOut) &&

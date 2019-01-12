@@ -27,6 +27,7 @@ public class BackendBattleModel extends GameModel {
     private ByteArray garbagePos = new ByteArray();
     private float prepareForGameDelay = PREPARE_TIME_SECONDS;
     private int garbageWaiting = 0;
+    private MatchEntity.MatchTurn lastTurnOnServer;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -74,14 +75,14 @@ public class BackendBattleModel extends GameModel {
 
     public void initGameboardFromLastTurn() {
         if (matchEntity.turns.size() == 1 && matchEntity.opponentReplay == null
-                && matchEntity.turns.get(0).opponentScore <= 0) {
+                && !matchEntity.turns.get(0).opponentPlayed) {
             // Sonderfall erster Zug des ersten Spielers
             firstTurnFirstPlayer = true;
             // gleich mit Garbage senden beginnen
             sendingGarbage = true;
         } else {
             int lastTurnSequenceNum = matchEntity.turns.size() - 1;
-            MatchEntity.MatchTurn lastTurn = matchEntity.turns.get(lastTurnSequenceNum);
+            lastTurnOnServer = matchEntity.turns.get(lastTurnSequenceNum);
 
             // das andere Replay laden und am Ende des letzten Zuges positionieren
             otherPlayersTurn = new Replay();
@@ -164,14 +165,16 @@ public class BackendBattleModel extends GameModel {
                 getScore().getTimeMs() > matchEntity.turnBlockCount * 1000 * (firstTurnFirstPlayer ? 1 : 2);
 
         if (firstPartOver && !sendingGarbage) {
-            calcGarbageAmountSinceLastCalc();
-            //TODO Stärker Anzeigen in Spielfeld
-            sendingGarbage = true;
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, null);
-
-            //TODO beenden, falls der Gegner bereits beendet hat
+            if (!lastTurnOnServer.opponentDroppedOut) {
+                calcGarbageAmountSinceLastCalc();
+                //TODO Stärker Anzeigen in Spielfeld
+                sendingGarbage = true;
+                userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, null);
+            } else {
+                // beenden, falls der Gegner bereits beendet hat
+                setGameOverWon(IGameModelListener.MotivationTypes.playerOver);
+            }
         } else if (everythingsOver && !isGameOver()) {
-            // TODO
             setGameOverWon(IGameModelListener.MotivationTypes.turnOver);
         }
     }
