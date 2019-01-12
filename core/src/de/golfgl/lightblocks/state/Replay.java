@@ -62,7 +62,7 @@ public class Replay {
             calcAdditionalInformation();
 
             currentReplayStepIdx = -1;
-            lastGameboardStepIdx = -1;
+            lastGameboardStepIdx = arraySteps.size() + 1;
         }
     }
 

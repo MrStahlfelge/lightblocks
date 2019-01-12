@@ -22,12 +22,13 @@ public class BackendBattleModel extends GameModel {
     MatchTurnRequestInfo infoForServer;
     private boolean firstTurnFirstPlayer = false;
     private boolean sendingGarbage = false;
-    private Replay otherPlayersTurn;
+    private Replay otherPlayersReplay;
     private int garbageReceived;
     private ByteArray garbagePos = new ByteArray();
     private float prepareForGameDelay = PREPARE_TIME_SECONDS;
     private int garbageWaiting = 0;
     private MatchEntity.MatchTurn lastTurnOnServer;
+    private int lastTurnSequenceNum;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -68,26 +69,21 @@ public class BackendBattleModel extends GameModel {
         infoForServer.matchId = matchEntity.uuid;
         infoForServer.turnKey = newGameParams.getPlayKey();
 
-        // Das Spielbrett aufbauen
-        initGameboardFromLastTurn();
-        super.startNewGame(newGameParams);
-    }
-
-    public void initGameboardFromLastTurn() {
         if (matchEntity.turns.size() == 1 && matchEntity.opponentReplay == null
                 && !matchEntity.turns.get(0).opponentPlayed) {
             // Sonderfall erster Zug des ersten Spielers
             firstTurnFirstPlayer = true;
+            lastTurnSequenceNum = 0;
             // gleich mit Garbage senden beginnen
             sendingGarbage = true;
         } else {
-            int lastTurnSequenceNum = matchEntity.turns.size() - 1;
+            lastTurnSequenceNum = matchEntity.turns.size() - 1;
             lastTurnOnServer = matchEntity.turns.get(lastTurnSequenceNum);
 
             // das andere Replay laden und am Ende des letzten Zuges positionieren
-            otherPlayersTurn = new Replay();
-            otherPlayersTurn.fromString(matchEntity.opponentReplay);
-            otherPlayersTurn.seekToTimePos((lastTurnSequenceNum - 1) * 1000 * matchEntity.turnBlockCount);
+            otherPlayersReplay = new Replay();
+            otherPlayersReplay.fromString(matchEntity.opponentReplay);
+            otherPlayersReplay.seekToTimePos(1000 * getThisTurnsStartSeconds());
             replay.seekToPreviousStep();
 
             // garbageReceived initialisieren: aufsummieren, wieviel ich vorher schon bekommen habe
@@ -99,17 +95,50 @@ public class BackendBattleModel extends GameModel {
                     garbageReceived = garbageReceived + linesSentInTurn * -1;
             }
 
-            //TODO Drawyer aufbauen
+            //TODO Drawyer und nextpiece aufbauen
         }
 
         //GarbageGapPos
         for (int i = 0; i < matchEntity.garbageGap.length(); i++)
             garbagePos.add(Byte.valueOf(matchEntity.garbageGap.substring(i, 1)));
+
+        super.startNewGame(newGameParams);
+    }
+
+    public int getThisTurnsStartSeconds() {
+        return (lastTurnSequenceNum) * matchEntity.turnBlockCount;
+    }
+
+    @Override
+    protected void initGameScore(int beginningLevel) {
+
+        super.initGameScore(beginningLevel);
+
+        // Das Spielbrett aufbauen und den Score setzen
+        initFromLastTurn();
+    }
+
+    public void initFromLastTurn() {
+        // Den vorherigen Spielzustand wieder herstellen
+        if (matchEntity.yourReplay != null) {
+            Replay myReplay = new Replay();
+            myReplay.fromString(matchEntity.yourReplay);
+            myReplay.seekToLastStep();
+            getGameboard().readFromReplay(myReplay.getCurrentGameboard());
+
+            // active und next piece
+            // TODO hold piece, kann auch aus Replay gewonnen werden
+
+            // Score vom letzten Mals setzen
+            Replay.AdditionalInformation replayAdditionalInfo = myReplay.getCurrentAdditionalInformation();
+            getScore().initFromReplay(myReplay.getCurrentScore(), replayAdditionalInfo.clearedLines,
+                    replayAdditionalInfo.blockNum, getThisTurnsStartSeconds());
+        }
     }
 
     @Override
     protected int[] drawGarbageLines() {
-        if (otherPlayersTurn != null && !sendingGarbage) {
+        if (otherPlayersReplay != null && !sendingGarbage) {
             calcGarbageAmountSinceLastCalc();
         }
 
@@ -129,20 +158,21 @@ public class BackendBattleModel extends GameModel {
     }
 
     private void calcGarbageAmountSinceLastCalc() {
-        Replay.ReplayStep step = otherPlayersTurn.getCurrentStep();
-        int clearedLinesLastStep = otherPlayersTurn.getCurrentAdditionalInformation() != null
-                ? otherPlayersTurn.getCurrentAdditionalInformation().clearedLines : 0;
+        Replay.ReplayStep step = otherPlayersReplay.getCurrentStep();
+        int clearedLinesLastStep = otherPlayersReplay.getCurrentAdditionalInformation() != null
+                ? otherPlayersReplay.getCurrentAdditionalInformation().clearedLines : 0;
 
         while (step != null && step.timeMs <= getScore().getTimeMs()) {
-            int clearedLinesThisStep = otherPlayersTurn.getCurrentAdditionalInformation().clearedLines - clearedLinesLastStep;
-            clearedLinesLastStep = otherPlayersTurn.getCurrentAdditionalInformation().clearedLines;
+            int clearedLinesThisStep = otherPlayersReplay.getCurrentAdditionalInformation().clearedLines -
+                    clearedLinesLastStep;
+            clearedLinesLastStep = otherPlayersReplay.getCurrentAdditionalInformation().clearedLines;
 
             if (clearedLinesThisStep == 4)
                 garbageWaiting = garbageWaiting + 4;
             else if (clearedLinesThisStep >= 2)
                 garbageWaiting = garbageWaiting + clearedLinesThisStep - 1;
 
-            step = otherPlayersTurn.seekToNextStep();
+            step = otherPlayersReplay.seekToNextStep();
         }
     }
 
@@ -160,9 +190,10 @@ public class BackendBattleModel extends GameModel {
         super.update(delta);
 
         boolean firstPartOver = sendingGarbage || firstTurnFirstPlayer ||
-                getScore().getTimeMs() > matchEntity.turnBlockCount * 1000;
+                getScore().getTimeMs() > (matchEntity.turnBlockCount + getThisTurnsStartSeconds()) * 1000;
         boolean everythingsOver = isGameOver() ||
-                getScore().getTimeMs() > matchEntity.turnBlockCount * 1000 * (firstTurnFirstPlayer ? 1 : 2);
+                getScore().getTimeMs() > (matchEntity.turnBlockCount * (firstTurnFirstPlayer ? 1 : 2)
+                        + getThisTurnsStartSeconds()) * 1000;
 
         if (firstPartOver && !sendingGarbage) {
             if (!lastTurnOnServer.opponentDroppedOut) {

@@ -11,6 +11,7 @@ import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.menu.PlayButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
+import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
@@ -54,6 +55,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         // TODO Akzeptieren/Ablehnen button
 
         // TODO Replay
+
+        // TODO Reload wenn gewartet wird
     }
 
     public void startPlaying() {
@@ -147,6 +150,9 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 // TODO aufgefordert: annehmen oder ablehnen
             } else {
                 matchDetailTable.add(playTurnButton).padTop(20);
+                // TODO funktioniert noch nicht wegen der Animation
+                if (getStage() != null)
+                    ((MyStage) getStage()).setFocusedActor(playTurnButton);
             }
         }
 
@@ -179,6 +185,14 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         }
     }
 
+    @Override
+    protected Actor getConfiguredDefaultActor() {
+        if (playTurnButton.hasParent())
+            return playTurnButton;
+        else
+            return super.getConfiguredDefaultActor();
+    }
+
     private void onComeBackFromPlayingTurn() {
         if (app.backendManager.hasPlayedTurnToUpload()) {
             app.backendManager.sendEnqueuedTurnToUpload(new WaitForResponse<MatchEntity>(app, getStage()) {
@@ -197,15 +211,16 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             //TODO Kopfzeile
             for (MatchEntity.MatchTurn turn : match.turns) {
                 row();
-                String yourScoreText = turn.youDroppedOut ? "XXX" : turn.youPlayed ? String.valueOf(turn
-                        .yourScore) : "???";
-                String opponentScoreText = turn.opponentDroppedOut ? "XXX" : turn.opponentPlayed ? String
-                        .valueOf(turn.opponentScore) : "???";
+                String yourScoreText = turn.youPlayed ? String.valueOf(turn.yourScore) : "";
+                if (turn.youDroppedOut)
+                    yourScoreText += "X";
+                String opponentScoreText = turn.opponentPlayed ? String.valueOf(turn.opponentScore) : "";
+                if (turn.opponentDroppedOut)
+                    opponentScoreText += "X";
                 add(new ScaledLabel(yourScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform().right();
-                add(new ScaledLabel((turn.yourScore > 0 || turn.youDroppedOut) &&
-                        (turn.opponentScore > 0 || turn.opponentDroppedOut) ? String.valueOf(turn.linesSent) : "",
-                        app.skin, LightBlocksGame.SKIN_FONT_BIG));
-                add(new ScaledLabel(opponentScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform().left();
+                add(new ScaledLabel(turn.youPlayed ? String.valueOf(turn.linesSent) : "", app.skin, LightBlocksGame.SKIN_FONT_BIG));
+                add(new ScaledLabel(opponentScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform()
+                        .left();
             }
         }
     }

@@ -220,6 +220,14 @@ public class Gameboard implements Json.Serializable {
 
     }
 
+    protected void readFromReplay(byte[] gameboard) {
+        for (int y = 0; y < GAMEBOARD_ALLROWS; y++) {
+            for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
+                gameboardSquare[y][x] = gameboard[y * GAMEBOARD_COLUMNS + x];
+            }
+        }
+    }
+
     /**
      * Inserts n lines of garbage
      *
