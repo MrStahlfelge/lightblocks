@@ -56,6 +56,10 @@ class TetrominoDrawyer implements Json.Serializable {
         }
     }
 
+    protected IntArray getDrawyerQueue() {
+        return new IntArray(drawyer);
+    }
+
     @Override
     public void write(Json json) {
         // da es nur von 0 bis 6 geht, einfach in einen String

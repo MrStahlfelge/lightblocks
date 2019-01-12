@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.utils.ByteArray;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Queue;
@@ -29,6 +30,7 @@ public class BackendBattleModel extends GameModel {
     private MatchEntity.MatchTurn lastTurnOnServer;
     private int lastTurnSequenceNum;
     private Queue<WaitingGarbage> waitingGarbage = new Queue<>();
+    private IntArray completeDrawyer = new IntArray();
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -69,6 +71,9 @@ public class BackendBattleModel extends GameModel {
         infoForServer.matchId = matchEntity.uuid;
         infoForServer.turnKey = newGameParams.getPlayKey();
 
+        if (matchEntity.yourReplay != null)
+            getReplay().fromString(matchEntity.yourReplay);
+
         if (matchEntity.turns.size() == 1 && matchEntity.opponentReplay == null
                 && !matchEntity.turns.get(0).opponentPlayed) {
             // Sonderfall erster Zug des ersten Spielers
@@ -90,8 +95,6 @@ public class BackendBattleModel extends GameModel {
                 if (linesSentInTurn < 0)
                     garbageReceived = garbageReceived + linesSentInTurn * -1;
             }
-
-            //TODO Drawyer und nextpiece aufbauen
         }
 
         //GarbageGapPos
@@ -99,6 +102,35 @@ public class BackendBattleModel extends GameModel {
             garbagePos.add(Byte.valueOf(matchEntity.garbageGap.substring(i, 1)));
 
         super.startNewGame(newGameParams);
+    }
+
+    @Override
+    protected void initializeActiveAndNextTetromino() {
+        int blocksSoFar = 0;
+
+        if (matchEntity.drawyer != null) {
+            for (int i = 0; i < matchEntity.drawyer.length(); i++) {
+                completeDrawyer.add(matchEntity.drawyer.charAt(i) - 48);
+            }
+        }
+
+        // Drawyer
+        blocksSoFar = getScore().getDrawnTetrominos();
+        if (completeDrawyer.size > blocksSoFar) {
+            int[] queue = new int[completeDrawyer.size - blocksSoFar];
+            for (int i = 0; i < queue.length; i++)
+                queue[i] = completeDrawyer.get(blocksSoFar + i);
+
+            drawyer.queueNextTetrominos(queue);
+        }
+
+        super.initializeActiveAndNextTetromino();
+    }
+
+    @Override
+    protected void activeTetrominoDropped() {
+        if (getScore().getDrawnTetrominos() > completeDrawyer.size)
+            completeDrawyer.add(getActiveTetromino().getTetrominoType());
     }
 
     public void calcWaitingGarbage() {
@@ -121,7 +153,7 @@ public class BackendBattleModel extends GameModel {
             if (clearedLinesThisStep == 4)
                 garbageThisStep = 4;
             else if (clearedLinesThisStep >= 2)
-                garbageThisStep =  clearedLinesThisStep - 1;
+                garbageThisStep = clearedLinesThisStep - 1;
 
             if (garbageThisStep > 0)
                 waitingGarbage.addLast(new WaitingGarbage(step.timeMs, garbageThisStep));
@@ -146,7 +178,6 @@ public class BackendBattleModel extends GameModel {
     public void initFromLastTurn() {
         // Den vorherigen Spielzustand wieder herstellen
         if (matchEntity.yourReplay != null) {
-            getReplay().fromString(matchEntity.yourReplay);
             getReplay().seekToLastStep();
             getGameboard().readFromReplay(getReplay().getCurrentGameboard());
 
@@ -156,7 +187,10 @@ public class BackendBattleModel extends GameModel {
             // Score vom letzten Mals setzen
             Replay.AdditionalInformation replayAdditionalInfo = getReplay().getCurrentAdditionalInformation();
             getScore().initFromReplay(getReplay().getCurrentScore(), replayAdditionalInfo.clearedLines,
-                    replayAdditionalInfo.blockNum, getThisTurnsStartSeconds());
+                    // der aktive Block wenn das Spiel unterbrochen wird ist in blocknum zweimal gezählt, daher
+                    // entsprechend oft abziehen
+                    replayAdditionalInfo.blockNum - 1 - ((lastTurnSequenceNum - 1) / 2),
+                    Math.max(getThisTurnsStartSeconds() * 1000, getReplay().getLastStep().timeMs));
         }
     }
 
@@ -216,14 +250,33 @@ public class BackendBattleModel extends GameModel {
     @Override
     protected void submitGameEnded(boolean success) {
         super.submitGameEnded(success);
-        //TODO Aktualisierung Turn mit Replay, auch drawn Tetros und Restbestand Drawyer und GarbageHole
 
         infoForServer.droppedOut = !success;
         infoForServer.replay = replay.toString();
         infoForServer.platform = app.backendManager.getPlatformString();
         infoForServer.inputType = ""; //TODO
 
-        //TODO garbagepos, drawyer, linessent
+        // Drawyer zusammenbauen
+        int blocks = getScore().getDrawnTetrominos();
+
+        if (completeDrawyer.size < blocks)
+            completeDrawyer.add(getActiveTetromino().getTetrominoType());
+
+        if (completeDrawyer.size < blocks + 1)
+            completeDrawyer.add(getNextTetromino().getTetrominoType());
+
+        IntArray onDrawyer = this.drawyer.getDrawyerQueue();
+        for (int i = 0; i < onDrawyer.size; i++)
+            if (completeDrawyer.size < blocks + 2 + i)
+                completeDrawyer.add(onDrawyer.get(i));
+
+        StringBuilder drawyerString = new StringBuilder();
+        for (int i = 0; i < completeDrawyer.size; i++)
+            drawyerString.append(String.valueOf(completeDrawyer.get(i)));
+
+        infoForServer.drawyer = drawyerString.toString();
+
+        //TODO garbagepos
 
         app.backendManager.setPlayedTurnToUpload(infoForServer, null);
 

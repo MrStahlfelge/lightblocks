@@ -237,10 +237,11 @@ public class GameScore implements IRoundScore {
         return comboCounter;
     }
 
-    protected void initFromReplay(int score, int clearedLines, int drawnTetrominos, int seconds) {
+    protected void initFromReplay(int score, int clearedLines, int drawnTetrominos, int timeMs) {
         this.score = score;
         this.clearedLines = clearedLines;
         this.drawnTetrominos = drawnTetrominos;
-        this.seconds = seconds;
+        this.seconds = timeMs / 1000;
+        this.secondFraction = (float) (timeMs % 1000) / 1000;
     }
 }

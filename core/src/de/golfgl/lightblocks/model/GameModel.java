@@ -85,6 +85,10 @@ public abstract class GameModel implements Json.Serializable {
         return activeTetromino;
     }
 
+    public Tetromino getNextTetromino() {
+        return nextTetromino;
+    }
+
     public void update(float delta) {
 
         if (isGameOver) return;
