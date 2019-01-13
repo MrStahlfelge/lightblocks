@@ -13,7 +13,6 @@ import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.menu.DonationDialog;
 import de.golfgl.lightblocks.menu.PlayButton;
 import de.golfgl.lightblocks.scene2d.FaButton;
-import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -33,6 +32,7 @@ import de.golfgl.lightblocks.state.Replay;
 public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<String, MatchEntity> {
     private final Button playTurnButton;
     private final Button resignButton;
+    private final Button showReplayButton;
     private MatchEntity match;
     private boolean wasPlaying;
 
@@ -60,11 +60,23 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         getButtonTable().add(resignButton);
         resignButton.setDisabled(true);
 
+        showReplayButton = new FaButton(FontAwesome.CIRCLE_PLAY, app.skin);
+        showReplayButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                showReplay(0);
+            }
+        });
+        showReplayButton.setDisabled(true);
+        addFocusableActor(showReplayButton);
+        getButtonTable().add(showReplayButton);
+
+
         // TODO Akzeptieren/Ablehnen button
 
         // TODO Reload wenn gewartet wird
 
-        // TODO Nochmal
+        // TODO Nochmal Button
     }
 
     public void startPlaying() {
@@ -180,8 +192,10 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
         if (match.turns.size() > 0) {
             matchDetailTable.row();
-            matchDetailTable.add(new MatchTurnsTable()).padTop(40);
+            matchDetailTable.add(new MatchTurnsTable()).padTop(40).padBottom(40);
         }
+
+        showReplayButton.setDisabled(match.yourReplay == null);
 
         resignButton.setDisabled(true);
         if (match.myTurn) {
@@ -260,35 +274,44 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
     private class MatchTurnsTable extends Table {
         public MatchTurnsTable() {
-            defaults().pad(10).expandX();
-            //TODO Kopfzeile
+            defaults().pad(5).right();
+
+            add();
+            add(new ScaledLabel("YOU", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).expandX();
+            add(new ScaledLabel("OPPONENT", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).expandX();
+
+            int linesSentYou = 0;
+            int linesSentOpp = 0;
+
             for (final MatchEntity.MatchTurn turn : match.turns) {
                 row();
+                add(new ScaledLabel("TURN #" + String.valueOf(turn.turnNum + 1), app.skin, LightBlocksGame
+                        .SKIN_FONT_REG));
                 String yourScoreText = turn.youPlayed ? String.valueOf(turn.yourScore) : "";
                 if (turn.youDroppedOut)
                     yourScoreText += "X";
                 String opponentScoreText = turn.opponentPlayed ? String.valueOf(turn.opponentScore) : "";
                 if (turn.opponentDroppedOut)
                     opponentScoreText += "X";
-                add(new ScaledLabel(yourScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform().right();
-                add(new ScaledLabel(turn.youPlayed ? String.valueOf(turn.linesSent) : "", app.skin, LightBlocksGame
-                        .SKIN_FONT_BIG));
-                add(new ScaledLabel(opponentScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform()
-                        .left();
+                add(new ScaledLabel(yourScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform();
+                add(new ScaledLabel(opponentScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform();
 
-                if (turn.opponentPlayed && turn.youPlayed) {
-                    Button showReplay = new FaTextButton("Replay".toUpperCase(), app.skin, LightBlocksGame
-                            .SKIN_FONT_BIG);
-                    showReplay.addListener(new ChangeListener() {
-                        @Override
-                        public void changed(ChangeEvent event, Actor actor) {
-                            showReplay(turn.turnNum);
-                        }
-                    });
-                    addFocusableActor(showReplay);
-                    add(showReplay);
-                } else
-                    add();
+                if (turn.linesSent > 0)
+                    linesSentYou = linesSentYou + turn.linesSent;
+                else if (turn.youPlayed)
+                    // nur zeigen, wenn bereits gespielt ist
+                    linesSentOpp = linesSentOpp - turn.linesSent;
+            }
+
+            // TODO Bonus Score
+
+            if (linesSentYou > 0 || linesSentOpp > 0) {
+                row().padTop(10);
+                add(new ScaledLabel("LINES SENT", app.skin, LightBlocksGame.SKIN_FONT_REG));
+                add(new ScaledLabel(String.valueOf(linesSentYou), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f))
+                        .uniform();
+                add(new ScaledLabel(String.valueOf(linesSentOpp), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f))
+                        .uniform();
             }
         }
     }
