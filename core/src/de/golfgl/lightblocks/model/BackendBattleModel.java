@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
@@ -99,7 +100,7 @@ public class BackendBattleModel extends GameModel {
 
         //GarbageGapPos
         for (int i = 0; i < matchEntity.garbageGap.length(); i++)
-            garbagePos.add(Byte.valueOf(matchEntity.garbageGap.substring(i, 1)));
+            garbagePos.add((byte) (matchEntity.garbageGap.charAt(i) - 48));
 
         super.startNewGame(newGameParams);
     }
@@ -181,15 +182,12 @@ public class BackendBattleModel extends GameModel {
             getReplay().seekToLastStep();
             getGameboard().readFromReplay(getReplay().getCurrentGameboard());
 
-            // active und next piece
-            // TODO hold piece, kann auch aus Replay gewonnen werden
-
             // Score vom letzten Mals setzen
             Replay.AdditionalInformation replayAdditionalInfo = getReplay().getCurrentAdditionalInformation();
             getScore().initFromReplay(getReplay().getCurrentScore(), replayAdditionalInfo.clearedLines,
                     // der aktive Block wenn das Spiel unterbrochen wird ist in blocknum zweimal gezählt, daher
                     // entsprechend oft abziehen
-                    replayAdditionalInfo.blockNum - 1 - ((lastTurnSequenceNum - 1) / 2),
+                    replayAdditionalInfo.blockNum - ((lastTurnSequenceNum + 1) / 2),
                     Math.max(getThisTurnsStartSeconds() * 1000, getReplay().getLastStep().timeMs));
         }
     }
@@ -201,9 +199,15 @@ public class BackendBattleModel extends GameModel {
 
             int[] retVal = new int[garbageToAdd.lines];
 
-            //TODO garbagepos benutzen
-            for (int i = 0; i < retVal.length; i++)
-                retVal[i] = 0;
+            for (int i = 0; i < retVal.length; i++) {
+                int garbageSlotPos = garbageReceived / MultiplayerModel.GARBAGEGAP_CHANGECOUNT;
+
+                if (garbagePos.size <= garbageSlotPos)
+                    garbagePos.add((byte) MathUtils.random(0, Gameboard.GAMEBOARD_COLUMNS - 1));
+
+                retVal[i] = garbagePos.get(garbageSlotPos);
+                garbageReceived++;
+            }
 
             return retVal;
         }
@@ -276,15 +280,20 @@ public class BackendBattleModel extends GameModel {
 
         infoForServer.drawyer = drawyerString.toString();
 
-        //TODO garbagepos
+        StringBuilder garbagePosString = new StringBuilder();
+        for (int i = 0; i < garbagePos.size; i++)
+            garbagePosString.append(String.valueOf(garbagePos.get(i)));
+        infoForServer.garbagePos = garbagePosString.toString();
 
-        app.backendManager.setPlayedTurnToUpload(infoForServer, null);
+        app.backendManager.setPlayedTurnToUpload(infoForServer);
 
         // TODO besser hier auch den Upload anstoßen!
     }
 
     @Override
     public boolean isHoldMoveAllowedByModel() {
+        // Problem 1: das Hold Piece müsste für die Unterbrechnung gespeichert werden
+        // Problem 2 (größer): Hold verändert den Block Count im Replay, der zum Finden des Aufsatzpunkts benötigt wird
         return false;
     }
 

@@ -354,8 +354,7 @@ public class BackendManager {
         return playedTurnToUpload != null && !uploadingPlayedTurn;
     }
 
-    public void setPlayedTurnToUpload(MatchTurnRequestInfo playedTurnToUpload, BackendClient
-            .IBackendResponse<MatchEntity> callback) {
+    public void setPlayedTurnToUpload(MatchTurnRequestInfo playedTurnToUpload) {
         if (this.playedTurnToUpload != null && playedTurnToUpload != this.playedTurnToUpload)
             throw new IllegalStateException("Cannot upload new turn data while other turn data is still queued.");
 
