@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.menu.backend;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -9,12 +10,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.backend.MatchEntity;
+import de.golfgl.lightblocks.menu.DonationDialog;
 import de.golfgl.lightblocks.menu.PlayButton;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
+import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
@@ -52,7 +56,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 resignMatch();
             }
         });
-        button(resignButton);
+        addFocusableActor(resignButton);
+        getButtonTable().add(resignButton);
         resignButton.setDisabled(true);
 
         // TODO Akzeptieren/Ablehnen button
@@ -63,16 +68,19 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     }
 
     public void startPlaying() {
-        //TODO erst dafür sorgen dass ein eventuell noch nicht abgesendeter Turn abgesendet wird
+        if (app.backendManager.hasPlayedTurnToUpload() || app.backendManager.isUploadingPlayedTurn())
+            new VetoDialog("You still have a turn not in sync with server. Please sync before playing another turn.",
+                    app.skin, .8f * LightBlocksGame.nativeGameWidth);
 
-        app.backendManager.getBackendClient().postMatchStartPlayingTurn(match.uuid,
-                new WaitForResponse<String>(app, getStage()) {
-                    @Override
-                    public void onRequestSuccess(String retrievedData) {
-                        super.onRequestSuccess(retrievedData);
-                        startPlayingWithKey(retrievedData);
-                    }
-                });
+        else
+            app.backendManager.getBackendClient().postMatchStartPlayingTurn(match.uuid,
+                    new WaitForResponse<String>(app, getStage()) {
+                        @Override
+                        public void onRequestSuccess(String retrievedData) {
+                            super.onRequestSuccess(retrievedData);
+                            startPlayingWithKey(retrievedData);
+                        }
+                    });
     }
 
     public void startPlayingWithKey(String playKey) {
@@ -86,7 +94,6 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         try {
             PlayScreen ps = PlayScreen.gotoPlayScreen(BackendMatchDetailsScreen.this.app, initGameParametersParams);
             ps.setShowScoresWhenGameOver(false);
-            //TODO trotzdem sollte die Erinnerung an Spende gezeigt werden!!!
             wasPlaying = true;
         } catch (VetoException e) {
             new VetoDialog(e.getMessage(), getSkin(), LightBlocksGame.nativeGameWidth * .75f).show(getStage());
@@ -94,15 +101,24 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     }
 
     public void resignMatch() {
-        //TODO Sicherheitsabfrage
-        app.backendManager.getBackendClient().postMatchGiveUp(match.uuid, new WaitForResponse<MatchEntity>
-                (app, getStage()) {
+        Dialog shouldResign = new AbstractScreen.RunnableDialog(app.skin, app.TEXTS.get("askIfResign"), new Runnable() {
             @Override
-            public void onRequestSuccess(MatchEntity retrievedData) {
-                super.onRequestSuccess(retrievedData);
-                fillMatchDetails(retrievedData);
+            public void run() {
+                app.backendManager.getBackendClient().postMatchGiveUp(match.uuid, new WaitForResponse<MatchEntity>
+                        (app, getStage()) {
+                    @Override
+                    public void onRequestSuccess(MatchEntity retrievedData) {
+                        super.onRequestSuccess(retrievedData);
+                        // zur Sicherheit einen zum Hochladen gespeicherten Turn vernichten. Das kann auch ein
+                        // anderes Spiel
+                        // treffen. Ist aber unwahrscheinlich und kann sogar genutzt werden
+                        app.backendManager.resetTurnToUpload();
+                        fillMatchDetails(retrievedData);
+                    }
+                });
             }
-        });
+        }, null, app.TEXTS.get("menuYes"), app.TEXTS.get("menuNo"));
+        shouldResign.show(getStage());
     }
 
     private void showReplay(int turnNum) {
@@ -172,16 +188,30 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             matchDetailTable.row();
             if (match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
                 // TODO aufgefordert: annehmen oder ablehnen
+            } else if (app.backendManager.hasTurnToUploadForMatch(match.uuid)) {
+                Button syncButton = new GlowLabelButton(FontAwesome.NET_CLOUDSAVE, "Sync with server", app.skin);
+                syncButton.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        uploadTurn();
+                    }
+                });
+                addFocusableActor(syncButton);
+                matchDetailTable.add(syncButton).padTop(20);
+
+                // es gibt noch einen zum hochladen
+                resignButton.setDisabled(true);
             } else {
+                // okay, normaler Zustand zum Spielen
                 matchDetailTable.add(playTurnButton).padTop(20);
                 resignButton.setDisabled(false);
-                // TODO funktioniert noch nicht wegen der Animation
-                if (getStage() != null)
-                    ((MyStage) getStage()).setFocusedActor(playTurnButton);
             }
         }
 
         contentCell.setActor(matchDetailTable);
+
+        if (getStage() != null && playTurnButton.hasParent())
+            ((MyStage) getStage()).setFocusedActor(playTurnButton);
     }
 
     @Override
@@ -196,7 +226,15 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         if (wasPlaying) {
             // wieder zurückgekommen aus Playscreen
             wasPlaying = false;
-            onComeBackFromPlayingTurn();
+            remindToDonate();
+            uploadTurn();
+        }
+    }
+
+    private void remindToDonate() {
+        if (app.canDonate() && app.localPrefs.getSupportLevel() == 0
+                && app.savegame.getTotalScore().getDrawnTetrominos() >= app.localPrefs.getNextDonationReminder()) {
+            new DonationDialog(app).setForcedMode().show(getStage());
         }
     }
 
@@ -208,7 +246,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             return super.getConfiguredDefaultActor();
     }
 
-    private void onComeBackFromPlayingTurn() {
+    private void uploadTurn() {
         if (app.backendManager.hasPlayedTurnToUpload()) {
             app.backendManager.sendEnqueuedTurnToUpload(new WaitForResponse<MatchEntity>(app, getStage()) {
                 @Override

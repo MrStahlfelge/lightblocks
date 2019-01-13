@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import javax.annotation.Nonnull;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.backend.MatchTurnRequestInfo;
 import de.golfgl.lightblocks.menu.DonationDialog;
 import de.golfgl.lightblocks.menu.SettingsScreen;
 import de.golfgl.lightblocks.scene2d.BlockActor;
@@ -44,6 +45,7 @@ public class LocalPrefs {
     private static final String PREF_KEY_BACKEND_USERID = "backendUserId";
     private static final String PREF_KEY_BACKEND_PASS = "backendPassKey";
     private static final String PREF_KEY_BACKEND_NICK = "backendNickname";
+    private static final String PREF_KEY_TURN_TO_UPLOAD = "turnTouUpload";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -483,6 +485,24 @@ public class LocalPrefs {
             this.nickName = nickName;
             prefs.flush();
         }
+    }
+
+    public MatchTurnRequestInfo getTurnToUpload() {
+        String turnJson = prefs.getString(PREF_KEY_TURN_TO_UPLOAD, null);
+
+        if (turnJson == null)
+            return null;
+
+        return MatchTurnRequestInfo.fromJson(turnJson);
+    }
+
+    public void saveTurnToUpload(MatchTurnRequestInfo playedTurnToUpload) {
+        if (playedTurnToUpload != null)
+            prefs.putString(PREF_KEY_TURN_TO_UPLOAD, playedTurnToUpload.toPersistJson());
+        else
+            prefs.remove(PREF_KEY_TURN_TO_UPLOAD);
+
+        prefs.flush();
     }
 
     public static class TvRemoteKeyConfig {

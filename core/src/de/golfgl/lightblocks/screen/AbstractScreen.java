@@ -141,19 +141,9 @@ public abstract class AbstractScreen implements Screen {
     }
 
     public Dialog showConfirmationDialog(String text, Runnable doWhenYes, Runnable doWhenNo, String... buttonLabels) {
-        Dialog dialog = new RunnableDialog("", app.skin);
-        Label errorMsgLabel = new ScaledLabel(text, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        errorMsgLabel.setWrap(true);
-        errorMsgLabel.setAlignment(Align.center);
-        dialog.getContentTable().add(errorMsgLabel).prefWidth
-                (LightBlocksGame.nativeGameWidth * .8f).pad(20);
-        dialog.getButtonTable().defaults().expandX().pad(20).fill();
-        dialog.button(new GlowLabelButton(buttonLabels.length >= 1 ? buttonLabels[0] : app.TEXTS.get("menuYes"),
-                app.skin, GlowLabelButton.FONT_SCALE_SUBMENU / GlowLabelButton.SMALL_SCALE_MENU,
-                GlowLabelButton.SMALL_SCALE_MENU), doWhenYes);
-        dialog.button(new GlowLabelButton(buttonLabels.length >= 2 ? buttonLabels[1] : app.TEXTS.get("menuNo"), app.skin,
-                GlowLabelButton.FONT_SCALE_SUBMENU / GlowLabelButton.SMALL_SCALE_MENU,
-                GlowLabelButton.SMALL_SCALE_MENU), doWhenNo);
+        Dialog dialog = new RunnableDialog(app.skin, text, doWhenYes, doWhenNo,
+                buttonLabels.length >= 1 ? buttonLabels[0] : app.TEXTS.get("menuYes"),
+                buttonLabels.length >= 2 ? buttonLabels[1] : app.TEXTS.get("menuNo"));
         dialog.show(stage);
         return dialog;
     }
@@ -179,9 +169,21 @@ public abstract class AbstractScreen implements Screen {
     }
 
     public static class RunnableDialog extends ControllerMenuDialog {
-
-        public RunnableDialog(String title, Skin skin) {
-            super(title, skin);
+        public RunnableDialog(Skin skin, String text, Runnable doWhenYes, Runnable doWhenNo, String buttonYes, String
+                buttonNo) {
+            super("", skin);
+            Label errorMsgLabel = new ScaledLabel(text, skin, LightBlocksGame.SKIN_FONT_TITLE);
+            errorMsgLabel.setWrap(true);
+            errorMsgLabel.setAlignment(Align.center);
+            getContentTable().add(errorMsgLabel).prefWidth
+                    (LightBlocksGame.nativeGameWidth * .8f).pad(20);
+            getButtonTable().defaults().expandX().pad(20).fill();
+            button(new GlowLabelButton(buttonYes,
+                    skin, GlowLabelButton.FONT_SCALE_SUBMENU / GlowLabelButton.SMALL_SCALE_MENU,
+                    GlowLabelButton.SMALL_SCALE_MENU), doWhenYes);
+            button(new GlowLabelButton(buttonNo, skin,
+                    GlowLabelButton.FONT_SCALE_SUBMENU / GlowLabelButton.SMALL_SCALE_MENU,
+                    GlowLabelButton.SMALL_SCALE_MENU), doWhenNo);
         }
 
         @Override

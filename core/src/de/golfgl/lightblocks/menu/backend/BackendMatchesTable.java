@@ -1,8 +1,10 @@
 package de.golfgl.lightblocks.menu.backend;
 
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -15,6 +17,9 @@ import java.util.List;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.MatchEntity;
+import de.golfgl.lightblocks.menu.ITouchActionButton;
+import de.golfgl.lightblocks.scene2d.MyActions;
+import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 
@@ -24,7 +29,7 @@ import de.golfgl.lightblocks.scene2d.VetoDialog;
 
 public class BackendMatchesTable extends WidgetGroup {
     private static final int ROW_WIDTH = 420;
-    private static final int ROW_HEIGHT = 40;
+    private static final int ROW_HEIGHT = 60;
     private final LightBlocksGame app;
     private long listTimeStamp;
     private HashMap<String, BackendMatchRow> uuidMatchMap = new HashMap<>(1);
@@ -120,8 +125,9 @@ public class BackendMatchesTable extends WidgetGroup {
         return LightBlocksGame.nativeGameWidth * .7f;
     }
 
-    private class BackendMatchRow extends Button {
+    private class BackendMatchRow extends Button implements ITouchActionButton {
         private MatchEntity me;
+        Action colorAction;
 
         public BackendMatchRow(MatchEntity match) {
             super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
@@ -153,8 +159,11 @@ public class BackendMatchesTable extends WidgetGroup {
                         .skin, LightBlocksGame.SKIN_FONT_TITLE);
                 opponentLabel.setEllipsis(true);
                 add(opponentLabel).width(150);
-                ScaledLabel matchState = new ScaledLabel(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS, match
-                        .matchState, "mmturn_"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                boolean notInSync = app.backendManager.hasTurnToUploadForMatch(match.uuid);
+                ScaledLabel matchState = new ScaledLabel(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS,
+                        notInSync ? "needssync" : match.matchState, "mmturn_"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                if (notInSync)
+                    matchState.setColor(LightBlocksGame.EMPHASIZE_COLOR);
                 matchState.setEllipsis(true);
                 add(matchState).width(120);
                 ScaledLabel timePassed = new ScaledLabel(formatTimePassedString(app, match.lastChangeTime), app.skin);
@@ -175,6 +184,22 @@ public class BackendMatchesTable extends WidgetGroup {
 
             if (stage != null && stage instanceof ControllerMenuStage)
                 ((ControllerMenuStage) stage).addFocusableActor(this);
+        }
+
+        @Override
+        public boolean isPressed() {
+            return super.isPressed() || getStage() != null && ((MyStage) getStage()).getFocusedActor() == this;
+        }
+
+        @Override
+        public void touchAction() {
+            // leider in GlowLabelButton nochmal drin
+            if (!isDisabled()) {
+                if (colorAction != null)
+                    removeAction(colorAction);
+                colorAction = MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR, getColor());
+                addAction(colorAction);
+            }
         }
     }
 }

@@ -77,6 +77,9 @@ public class BackendManager {
         multiplayerMatchesList = new ArrayList<>();
         if (hasUserId()) {
             //TODO persistierte Multiplayerspiele laden statt hier gleich zu gehen
+
+            // einen eventuell noch zum Hochladen vorgemerkten laden
+            playedTurnToUpload = prefs.getTurnToUpload();
         }
     }
 
@@ -354,13 +357,27 @@ public class BackendManager {
         return playedTurnToUpload != null && !uploadingPlayedTurn;
     }
 
+    public boolean hasTurnToUploadForMatch(String matchId) {
+        return playedTurnToUpload != null && playedTurnToUpload.matchId.equalsIgnoreCase(matchId);
+    }
+
+    public boolean isUploadingPlayedTurn() {
+        return uploadingPlayedTurn;
+    }
+
     public void setPlayedTurnToUpload(MatchTurnRequestInfo playedTurnToUpload) {
         if (this.playedTurnToUpload != null && playedTurnToUpload != this.playedTurnToUpload)
             throw new IllegalStateException("Cannot upload new turn data while other turn data is still queued.");
 
         this.playedTurnToUpload = playedTurnToUpload;
+        prefs.saveTurnToUpload(playedTurnToUpload);
+    }
 
-        //TODO persistieren
+    public void resetTurnToUpload() {
+        if (!uploadingPlayedTurn) {
+            playedTurnToUpload = null;
+            prefs.saveTurnToUpload(null);
+        }
     }
 
     public void sendEnqueuedTurnToUpload(@Nullable final BackendClient.IBackendResponse<MatchEntity> callback) {
@@ -375,8 +392,9 @@ public class BackendManager {
                     @Override
                     public void run() {
                         uploadingPlayedTurn = false;
-                        if (statusCode < 500 && statusCode >= HttpStatus.SC_OK)
-                            playedTurnToUpload = null;
+                        if (statusCode < 500 && statusCode >= HttpStatus.SC_OK) {
+                            resetTurnToUpload();
+                        }
 
                         if (callback != null)
                             callback.onFail(statusCode, errorMsg);
@@ -390,7 +408,7 @@ public class BackendManager {
                     @Override
                     public void run() {
                         uploadingPlayedTurn = false;
-                        playedTurnToUpload = null;
+                        resetTurnToUpload();
                         for (int i = multiplayerMatchesList.size() - 1; i >= 0; i--)
                             if (multiplayerMatchesList.get(i).uuid.equalsIgnoreCase(retrievedData.uuid))
                                 multiplayerMatchesList.remove(i);
