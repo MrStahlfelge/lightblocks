@@ -957,18 +957,22 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 break;
             case turnGarbage:
                 playSound = true;
-                text = app.TEXTS.format("motivationTurnGarbage");
+                if (extraMsg.length() >= 12)
+                    extraMsg = extraMsg.substring(0, 10) + "...";
+                text = app.TEXTS.format("motivationTurnGarbage", extraMsg);
                 break;
             case turnOver:
                 text = app.TEXTS.format("motivationTurnOver");
                 break;
+            case turnSurvive:
+                if (extraMsg.length() >= 12)
+                    extraMsg = extraMsg.substring(0, 10) + "...";
+                text = app.TEXTS.format("motivationSurvive", extraMsg);
+                duration = .75f;
+                break;
             case prepare:
                 text = app.TEXTS.format("motivationPrepare");
                 duration = BackendBattleModel.PREPARE_TIME_SECONDS;
-                break;
-            case go:
-                text = app.TEXTS.format("motivationGo");
-                duration = .75f;
                 break;
         }
 

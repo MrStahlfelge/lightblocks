@@ -10,6 +10,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.menu.PlayButton;
+import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -44,18 +45,17 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         });
         addFocusableActor(playTurnButton);
 
-        resignButton = new FaTextButton("Resign", app.skin, LightBlocksGame.SKIN_BUTTON_CHECKBOX);
+        resignButton = new FaButton(FontAwesome.MISC_CROSS, app.skin);
         resignButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 resignMatch();
             }
         });
-        addFocusableActor(resignButton);
+        button(resignButton);
+        resignButton.setDisabled(true);
 
         // TODO Akzeptieren/Ablehnen button
-
-        // TODO Replay
 
         // TODO Reload wenn gewartet wird
 
@@ -162,26 +162,23 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         matchDetailTable.add(new ScaledLabel(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS, match
                 .matchState, "mmturn_"), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .6f)).padTop(40);
 
+        if (match.turns.size() > 0) {
+            matchDetailTable.row();
+            matchDetailTable.add(new MatchTurnsTable()).padTop(40);
+        }
+
+        resignButton.setDisabled(true);
         if (match.myTurn) {
             matchDetailTable.row();
             if (match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
                 // TODO aufgefordert: annehmen oder ablehnen
             } else {
                 matchDetailTable.add(playTurnButton).padTop(20);
+                resignButton.setDisabled(false);
                 // TODO funktioniert noch nicht wegen der Animation
                 if (getStage() != null)
                     ((MyStage) getStage()).setFocusedActor(playTurnButton);
             }
-        }
-
-        if (match.turns.size() > 0) {
-            matchDetailTable.row();
-            matchDetailTable.add(new MatchTurnsTable()).padTop(40);
-        }
-
-        if (match.myTurn && !match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
-            matchDetailTable.row();
-            matchDetailTable.add(resignButton).padTop(40);
         }
 
         contentCell.setActor(matchDetailTable);
@@ -242,7 +239,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                         .left();
 
                 if (turn.opponentPlayed && turn.youPlayed) {
-                    Button showReplay = new FaTextButton("Replay", app.skin, LightBlocksGame.SKIN_FONT_BIG);
+                    Button showReplay = new FaTextButton("Replay".toUpperCase(), app.skin, LightBlocksGame
+                            .SKIN_FONT_BIG);
                     showReplay.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {

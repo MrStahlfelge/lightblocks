@@ -45,8 +45,7 @@ public class BackendBattleModel extends GameModel {
 
     @Override
     public String getGoalDescription() {
-        //TODO
-        return "";
+        return "goalModelTurnBattle";
     }
 
     @Override
@@ -223,7 +222,8 @@ public class BackendBattleModel extends GameModel {
             if (prepareForGameDelay > 0)
                 return;
 
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.go, null);
+            userInterface.showMotivation(sendingGarbage ? IGameModelListener.MotivationTypes.turnGarbage
+                    : IGameModelListener.MotivationTypes.turnSurvive, matchEntity.opponentNick);
         }
 
         super.update(delta);
@@ -241,7 +241,7 @@ public class BackendBattleModel extends GameModel {
             if (!lastTurnOnServer.opponentDroppedOut) {
                 //TODO Stärker Anzeigen in Spielfeld
                 sendingGarbage = true;
-                userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, null);
+                userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, matchEntity.opponentNick);
             } else {
                 // beenden, falls der Gegner bereits beendet hat
                 setGameOverWon(IGameModelListener.MotivationTypes.playerOver);
