@@ -33,6 +33,8 @@ public class MatchEntity implements IPlayerInfo {
     public final String garbageGap;
     public final String drawyer;
     public final String yourReplay;
+    public final int yourBonus;
+    public final int opponentBonus;
     public final boolean isFullMatchInfo;
 
     public MatchEntity(JsonValue fromJson) {
@@ -49,6 +51,8 @@ public class MatchEntity implements IPlayerInfo {
         drawyer = fromJson.getString("drawyer", "");
         yourReplay = fromJson.getString("yourReplay", null);
         opponentReplay = fromJson.getString("opponentReplay", null);
+        yourBonus = fromJson.getInt("yourBonus", 0);
+        opponentBonus = fromJson.getInt("opponentBonus", 0);
 
         turns = new ArrayList<>();
         JsonValue turnJson = fromJson.get("turns");

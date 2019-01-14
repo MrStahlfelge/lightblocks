@@ -308,7 +308,22 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                     linesSentOpp = linesSentOpp - turn.linesSent;
             }
 
-            // TODO Bonus Score
+            if (match.opponentBonus > 0 || match.yourBonus > 0) {
+                row();
+                add(new ScaledLabel("BONUS", app.skin, LightBlocksGame.SKIN_FONT_REG));
+
+                if (match.yourBonus > 0)
+                    add(new ScaledLabel(String.valueOf(match.yourBonus), app.skin, LightBlocksGame.SKIN_FONT_TITLE,
+                            .5f)).uniform();
+                else
+                    add();
+
+                if (match.opponentBonus > 0)
+                    add(new ScaledLabel(String.valueOf(match.opponentBonus), app.skin, LightBlocksGame
+                            .SKIN_FONT_TITLE, .5f)).uniform();
+                else
+                    add();
+            }
 
             if (linesSentYou > 0 || linesSentOpp > 0) {
                 row().padTop(10);
