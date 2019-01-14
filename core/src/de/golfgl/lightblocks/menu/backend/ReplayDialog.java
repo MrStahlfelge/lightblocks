@@ -196,7 +196,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
 
         replayGameboard2.playReplay();
 
-        // TODO wenn das zweite länger ist als das erste, dann bis dahin Abspielen zulassen (nach Spielende)
+        // TODO wenn das zweite länger ist als das erste, dann bis dahin Abspielen zulassen (nach Spielende, DONE, TIMESUP etc)
     }
 
     @Override

@@ -58,7 +58,6 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         });
         addFocusableActor(resignButton);
         getButtonTable().add(resignButton);
-        resignButton.setDisabled(true);
 
         showReplayButton = new FaButton(FontAwesome.CIRCLE_PLAY, app.skin);
         showReplayButton.addListener(new ChangeListener() {
@@ -67,16 +66,23 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 showReplay(0);
             }
         });
-        showReplayButton.setDisabled(true);
         addFocusableActor(showReplayButton);
         getButtonTable().add(showReplayButton);
-
 
         // TODO Akzeptieren/Ablehnen button
 
         // TODO Reload wenn gewartet wird
 
         // TODO Nochmal Button
+
+        resetButtonEnabling();
+    }
+
+    private void resetButtonEnabling() {
+        if (resignButton != null)
+            resignButton.setDisabled(true);
+        if (showReplayButton != null)
+            showReplayButton.setDisabled(true);
     }
 
     public void startPlaying() {
@@ -156,9 +162,9 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     }
 
     protected void reload() {
+        resetButtonEnabling();
         contentCell.setActor(waitRotationImage);
-        //TODO über den Manager gehen und cachen
-        app.backendManager.getBackendClient().fetchMatchWithTurns(backendId, new BackendManager
+        app.backendManager.fetchFullMatchInfo(backendId, new BackendManager
                 .AbstractQueuedBackendResponse<MatchEntity>(app) {
 
             @Override
@@ -195,15 +201,16 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             matchDetailTable.add(new MatchTurnsTable()).padTop(40).padBottom(40);
         }
 
-        showReplayButton.setDisabled(match.yourReplay == null);
+        resetButtonEnabling();
 
-        resignButton.setDisabled(true);
+        showReplayButton.setDisabled(match.yourReplay == null);
         if (match.myTurn) {
             matchDetailTable.row();
             if (match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
                 // TODO aufgefordert: annehmen oder ablehnen
             } else if (app.backendManager.hasTurnToUploadForMatch(match.uuid)) {
-                Button syncButton = new GlowLabelButton(FontAwesome.NET_CLOUDSAVE, "Sync with server", app.skin);
+                Button syncButton = new GlowLabelButton(FontAwesome.NET_CLOUDSAVE, "Sync with server", app.skin,
+                        GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
                 syncButton.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
@@ -241,7 +248,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             // wieder zurückgekommen aus Playscreen
             wasPlaying = false;
             remindToDonate();
-            uploadTurn();
+            reload();
         }
     }
 
@@ -261,15 +268,13 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     }
 
     private void uploadTurn() {
-        if (app.backendManager.hasPlayedTurnToUpload()) {
-            app.backendManager.sendEnqueuedTurnToUpload(new WaitForResponse<MatchEntity>(app, getStage()) {
-                @Override
-                public void onRequestSuccess(MatchEntity retrievedData) {
-                    super.onRequestSuccess(retrievedData);
-                    fillMatchDetails(retrievedData);
-                }
-            });
-        }
+        app.backendManager.sendEnqueuedTurnToUpload(new WaitForResponse<MatchEntity>(app, getStage()) {
+            @Override
+            public void onRequestSuccess(MatchEntity retrievedData) {
+                super.onRequestSuccess(retrievedData);
+                fillMatchDetails(retrievedData);
+            }
+        });
     }
 
     private class MatchTurnsTable extends Table {

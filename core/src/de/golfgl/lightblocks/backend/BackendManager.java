@@ -208,6 +208,47 @@ public class BackendManager {
         }
     }
 
+    /**
+     * Wenn die Info schon vorhanden ist, wird der bisher gecachete Wert zurückgegeben. Falls nicht, wird sie abgefragt
+     * Sollte jedoch gerade ein Upload des Turns passieren, wird die Antwort in beiden Fällen zurückgehalten
+     */
+    public void fetchFullMatchInfo(final String matchId, final BackendClient.IBackendResponse<MatchEntity> callback) {
+        if (isUploadingPlayedTurn() && hasTurnToUploadForMatch(matchId)) {
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    fetchFullMatchInfo(matchId, callback);
+                }
+            }, 1f);
+            return;
+        }
+
+        for (int i = 0; i < multiplayerMatchesList.size(); i++)
+            if (multiplayerMatchesList.get(i).uuid.equalsIgnoreCase(matchId)
+                    && multiplayerMatchesList.get(i).isFullMatchInfo) {
+                callback.onSuccess(multiplayerMatchesList.get(i));
+                return;
+            }
+
+        backendClient.fetchMatchWithTurns(matchId, new BackendClient.IBackendResponse<MatchEntity>() {
+            @Override
+            public void onFail(int statusCode, String errorMsg) {
+                callback.onFail(statusCode, errorMsg);
+            }
+
+            @Override
+            public void onSuccess(final MatchEntity retrievedData) {
+                callback.onSuccess(retrievedData);
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateMatchEntityInList(retrievedData);
+                    }
+                });
+            }
+        });
+    }
+
     public void fetchNewWelcomeResponseIfExpired(int expirationTimeSeconds, long drawnBlocks, int donatorState) {
         if (!isFetchingWelcomes && (lastWelcomeResponse == null || (TimeUtils.millis() + lastWelcomeResponse
                 .timeDelta - lastWelcomeResponse
@@ -365,12 +406,14 @@ public class BackendManager {
         return uploadingPlayedTurn;
     }
 
-    public void setPlayedTurnToUpload(MatchTurnRequestInfo playedTurnToUpload) {
+    public void queueAndUploadPlayedTurn(MatchTurnRequestInfo playedTurnToUpload) {
         if (this.playedTurnToUpload != null && playedTurnToUpload != this.playedTurnToUpload)
             throw new IllegalStateException("Cannot upload new turn data while other turn data is still queued.");
 
         this.playedTurnToUpload = playedTurnToUpload;
         prefs.saveTurnToUpload(playedTurnToUpload);
+
+        sendEnqueuedTurnToUpload(null);
     }
 
     public void resetTurnToUpload() {
@@ -409,18 +452,36 @@ public class BackendManager {
                     public void run() {
                         uploadingPlayedTurn = false;
                         resetTurnToUpload();
-                        for (int i = multiplayerMatchesList.size() - 1; i >= 0; i--)
-                            if (multiplayerMatchesList.get(i).uuid.equalsIgnoreCase(retrievedData.uuid))
-                                multiplayerMatchesList.remove(i);
+                        updateMatchEntityInList(retrievedData);
 
-                        multiplayerMatchesList.add(0, retrievedData);
-                        multiplayerMatchesLastFetchMs = TimeUtils.millis();
                         if (callback != null)
                             callback.onSuccess(retrievedData);
                     }
                 });
             }
         });
+    }
+
+    private void updateMatchEntityInList(MatchEntity matchToInsert) {
+        // erstmal aus der Liste entfernen, falls das Match schon enthalten ist
+        for (int i = multiplayerMatchesList.size() - 1; i >= 0; i--)
+            if (multiplayerMatchesList.get(i).uuid.equalsIgnoreCase(matchToInsert.uuid))
+                multiplayerMatchesList.remove(i);
+
+        // und dann an der richtigen Stelle einfügen
+        boolean added = false;
+        for (int i = 0; i < multiplayerMatchesList.size(); i++) {
+            if (multiplayerMatchesList.get(i).lastChangeTime < matchToInsert.lastChangeTime) {
+                multiplayerMatchesList.add(i, matchToInsert);
+                added = true;
+                break;
+            }
+        }
+
+        if (!added)
+            multiplayerMatchesList.add(matchToInsert);
+
+        multiplayerMatchesLastFetchMs = TimeUtils.millis();
     }
 
     public abstract static class AbstractQueuedBackendResponse<T> implements BackendClient.IBackendResponse<T> {

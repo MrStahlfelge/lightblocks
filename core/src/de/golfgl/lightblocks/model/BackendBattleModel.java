@@ -285,9 +285,7 @@ public class BackendBattleModel extends GameModel {
             garbagePosString.append(String.valueOf(garbagePos.get(i)));
         infoForServer.garbagePos = garbagePosString.toString();
 
-        app.backendManager.setPlayedTurnToUpload(infoForServer);
-
-        // TODO besser hier auch den Upload anstoßen!
+        app.backendManager.queueAndUploadPlayedTurn(infoForServer);
     }
 
     @Override

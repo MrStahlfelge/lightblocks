@@ -33,6 +33,7 @@ public class MatchEntity implements IPlayerInfo {
     public final String garbageGap;
     public final String drawyer;
     public final String yourReplay;
+    public final boolean isFullMatchInfo;
 
     public MatchEntity(JsonValue fromJson) {
         uuid = fromJson.getString("uuid");
@@ -51,10 +52,13 @@ public class MatchEntity implements IPlayerInfo {
 
         turns = new ArrayList<>();
         JsonValue turnJson = fromJson.get("turns");
-        if (turnJson != null)
+        if (turnJson != null) {
             for (JsonValue turn = turnJson.child; turn != null; turn = turn.next) {
                 turns.add(new MatchTurn(turn));
             }
+            isFullMatchInfo = true;
+        } else
+            isFullMatchInfo = yourReplay != null || opponentReplay != null;
     }
 
     @Override
