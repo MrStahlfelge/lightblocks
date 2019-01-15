@@ -29,6 +29,7 @@ public class ReplayGameboard extends BlockGroup {
     private int[] activePiecePos;
     private Array<BlockActor> actorsToRemove;
     private int currentTime;
+    private int maxTime;
 
     public ReplayGameboard(LightBlocksGame app, Replay replay) {
         super(app);
@@ -51,6 +52,9 @@ public class ReplayGameboard extends BlockGroup {
         nextPieceBlockGroup.setX(BlockActor.blockWidth * 7.3f);
         addActor(nextPieceBlockGroup);
 
+        Replay.ReplayStep lastStep = replay.getLastStep();
+        maxTime = lastStep != null ? lastStep.timeMs : 0;
+
         windToFirstStep();
     }
 
@@ -71,6 +75,10 @@ public class ReplayGameboard extends BlockGroup {
 
     public int getCurrentTime() {
         return currentTime;
+    }
+
+    public int getMaxTime() {
+        return maxTime;
     }
 
     private void setCurrentTime(int currentTime) {

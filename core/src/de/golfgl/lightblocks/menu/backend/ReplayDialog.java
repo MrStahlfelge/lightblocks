@@ -31,10 +31,13 @@ public class ReplayDialog extends AbstractFullScreenDialog {
     private final Cell replaysCell;
     private final TextButton playPause;
     private final TextButton fastOrStopPlay;
+    private final ScaledLabel maxTimeLabel;
+    private final TouchableSlider seekSlider;
     private ReplayGameboard replayGameboard;
     private ReplayGameboard replayGameboard2;
     private boolean isPlaying;
     private boolean programmaticChange;
+    private int maxTimeMs;
 
     public ReplayDialog(LightBlocksGame app, Replay replay, String gameModeLabel, String performerLabel) {
         super(app);
@@ -53,10 +56,15 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         playPause.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (replayGameboard.isPlaying())
+                if (isOneGameboardPlaying()) {
                     replayGameboard.pauseReplay();
-                else
+                    if (replayGameboard2 != null)
+                        replayGameboard2.pauseReplay();
+                } else {
                     replayGameboard.playReplay();
+                    if (replayGameboard2 != null)
+                        replayGameboard2.playReplay();
+                }
             }
         });
         addFocusableActor(playPause);
@@ -67,12 +75,15 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         fastOrStopPlay.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if (replayGameboard.isPlaying()) {
+                if (isOneGameboardPlaying()) {
                     replayGameboard.playFast();
                     if (replayGameboard2 != null)
                         replayGameboard2.playFast();
-                } else
+                } else {
                     replayGameboard.windToFirstStep();
+                    if (replayGameboard2 != null)
+                        replayGameboard2.windToFirstStep();
+                }
             }
         });
         addFocusableActor(fastOrStopPlay);
@@ -91,9 +102,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         forward.getLabel().setFontScale(.7f);
 
         final ScaledLabel currentTimeLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f);
-        Replay.ReplayStep lastStep = replay.getLastStep();
-        int lastStepTimeMs = lastStep != null ? lastStep.timeMs : 0;
-        final TouchableSlider seekSlider = new TouchableSlider(0, lastStepTimeMs / 100, 1, false, app.skin) {
+        seekSlider = new TouchableSlider(0, 0, 1, false, app.skin) {
             @Override
             protected float getControllerScrollStepSize() {
                 return Math.max(getStepSize(), getMaxValue() / 15);
@@ -119,10 +128,6 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                 programmaticChange = true;
                 seekSlider.setValue(timeMs / 100);
                 programmaticChange = false;
-
-                if (replayGameboard2 != null && Math.abs(replayGameboard2.getCurrentTime() - timeMs) > 1000) {
-                    replayGameboard2.windToTimePos(timeMs);
-                }
             }
 
             @Override
@@ -152,9 +157,10 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         contentTable.row();
         contentTable.add(currentTimeLabel).uniformX().right();
         contentTable.add(seekSlider).fillX();
-        contentTable.add(new ScaledLabel(ScoreTable.formatTimeString(lastStepTimeMs, 1), app.skin,
-                LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniformX().left();
+        maxTimeLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f);
+        contentTable.add(maxTimeLabel).uniformX().left();
         addFocusableActor(seekSlider);
+        setMaxSliderTime(replayGameboard.getMaxTime());
 
         Table buttonsLeft = new Table();
         buttonsLeft.defaults().uniform().pad(10);
@@ -169,6 +175,16 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         getButtonTable().add().width(closeButton.getPrefWidth());
 
         replayGameboard.playReplay();
+    }
+
+    private void setMaxSliderTime(int maxTimeMs) {
+        this.maxTimeMs = maxTimeMs;
+        seekSlider.setRange(0, maxTimeMs / 100);
+        maxTimeLabel.setText(ScoreTable.formatTimeString(maxTimeMs, 1));
+    }
+
+    private boolean isOneGameboardPlaying() {
+        return replayGameboard.isPlaying() || replayGameboard2 != null && replayGameboard2.isPlaying();
     }
 
     private void setCellSizeToGameboard(Cell replaysCell, ReplayGameboard replayGameboard) {
@@ -196,13 +212,15 @@ public class ReplayDialog extends AbstractFullScreenDialog {
 
         replayGameboard2.playReplay();
 
-        // TODO wenn das zweite länger ist als das erste, dann bis dahin Abspielen zulassen (nach Spielende, DONE, TIMESUP etc)
+        // TODO wenn das zweite länger ist als das erste, dann bis dahin Abspielen zulassen (nach Spielende, DONE,
+        // TIMESUP etc)
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
-        boolean isNowPlaying = replayGameboard != null && replayGameboard.isPlaying();
+        boolean isNowPlaying = replayGameboard != null && isOneGameboardPlaying();
+
         if (isNowPlaying != isPlaying) {
             isPlaying = isNowPlaying;
             playPause.setOrigin(Align.center);
@@ -222,10 +240,33 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         }
 
         if (replayGameboard2 != null) {
-            if (replayGameboard.isPlaying() && !replayGameboard2.isPlaying())
-                replayGameboard2.playReplay();
-            else if (!replayGameboard.isPlaying() && replayGameboard2.isPlaying())
+            int currentTimeMs = Math.max(replayGameboard2.getCurrentTime(), replayGameboard.getCurrentTime());
+
+            replayGameboard2.setVisible(currentTimeMs < replayGameboard2.getMaxTime());
+            replayGameboard.setVisible(currentTimeMs < replayGameboard.getMaxTime());
+
+            if (currentTimeMs > maxTimeMs) {
+                replayGameboard.pauseReplay();
                 replayGameboard2.pauseReplay();
+            }
+
+            // wenn noch beide am Laufen sind
+            if (replayGameboard2.isVisible() && replayGameboard.isVisible()) {
+                if (isPlaying && Math.abs(replayGameboard2.getCurrentTime() - replayGameboard.getCurrentTime()) > 500) {
+                    // den vorausgeeilten pausieren
+                    if (replayGameboard2.getCurrentTime() > replayGameboard.getCurrentTime())
+                        replayGameboard2.pauseReplay();
+                    else
+                        replayGameboard.pauseReplay();
+                } else if (isPlaying && Math.abs(replayGameboard2.getCurrentTime() -
+                        replayGameboard.getCurrentTime()) <= 100) {
+                    // wieder eingeholt => dann los
+                    if (!replayGameboard2.isPlaying())
+                        replayGameboard2.playReplay();
+                    if (!replayGameboard.isPlaying())
+                        replayGameboard.playReplay();
+                }
+            }
         }
     }
 
