@@ -33,16 +33,20 @@ public class ReplayDialog extends AbstractFullScreenDialog {
     private final TextButton fastOrStopPlay;
     private final ScaledLabel maxTimeLabel;
     private final TouchableSlider seekSlider;
+    private final TextButton forward;
+    private final TextButton rewind;
+    private final ScaledLabel currentTimeLabel;
     private ReplayGameboard replayGameboard;
     private ReplayGameboard replayGameboard2;
     private boolean isPlaying;
     private boolean programmaticChange;
     private int maxTimeMs;
+    private final LeftInfoGroup extraInfo;
 
     public ReplayDialog(LightBlocksGame app, Replay replay, String gameModeLabel, String performerLabel) {
         super(app);
 
-        TextButton rewind = new FaTextButton(FontAwesome.BIG_FASTBW, app.skin, FontAwesome.SKIN_FONT_FA);
+        rewind = new FaTextButton(FontAwesome.BIG_FASTBW, app.skin, FontAwesome.SKIN_FONT_FA);
         rewind.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -90,7 +94,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         fastOrStopPlay.setTransform(true);
         fastOrStopPlay.getLabel().setFontScale(.7f);
 
-        TextButton forward = new FaTextButton(FontAwesome.BIG_FASTFW, app.skin, FontAwesome.SKIN_FONT_FA);
+        forward = new FaTextButton(FontAwesome.BIG_FASTFW, app.skin, FontAwesome.SKIN_FONT_FA);
         forward.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -101,7 +105,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         addFocusableActor(forward);
         forward.getLabel().setFontScale(.7f);
 
-        final ScaledLabel currentTimeLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f);
+        currentTimeLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f);
         seekSlider = new TouchableSlider(0, 0, 1, false, app.skin) {
             @Override
             protected float getControllerScrollStepSize() {
@@ -113,23 +117,15 @@ public class ReplayDialog extends AbstractFullScreenDialog {
             public void changed(ChangeEvent event, Actor actor) {
                 if (!programmaticChange) {
                     int timeMs = (int) seekSlider.getValue() * 100;
-                    replayGameboard.windToTimePos(timeMs);
+                    replayGameboard.windToTimePos(Math.min(timeMs, replayGameboard.getMaxTime()));
                     if (replayGameboard2 != null)
                         replayGameboard2.windToTimePos(timeMs);
                 }
             }
         });
-        final LeftInfoGroup extraInfo = new LeftInfoGroup(gameModeLabel, performerLabel);
+        extraInfo = new LeftInfoGroup(gameModeLabel, performerLabel);
         final RightInfoGroup rightInfo = new RightInfoGroup();
         replayGameboard = new ReplayGameboard(app, replay) {
-            @Override
-            protected void onTimeChange(int timeMs) {
-                currentTimeLabel.setText(ScoreTable.formatTimeString(timeMs, 1));
-                programmaticChange = true;
-                seekSlider.setValue(timeMs / 100);
-                programmaticChange = false;
-            }
-
             @Override
             protected void onScoreChange(int score) {
                 extraInfo.setScore(score);
@@ -192,7 +188,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                 .getScaleX(), replayGameboard.getHeight() * replayGameboard.getScaleY());
     }
 
-    public void addSecondReplay(Replay replay2) {
+    public void addSecondReplay(Replay replay2, boolean canViewFullLength) {
         replayGameboard2 = new ReplayGameboard(app, replay2) {
             @Override
             protected void onAdditionalDelayTimeAdded(float additionalTime) {
@@ -212,8 +208,13 @@ public class ReplayDialog extends AbstractFullScreenDialog {
 
         replayGameboard2.playReplay();
 
-        // TODO wenn das zweite länger ist als das erste, dann bis dahin Abspielen zulassen (nach Spielende, DONE,
-        // TIMESUP etc)
+        // die Synchronisation funktioniert mit diesen Buttons nicht
+        rewind.setDisabled(true);
+        forward.setDisabled(true);
+
+        // wenn das Spiel beendet ist, darf alles gesehen werden
+        if (canViewFullLength && maxTimeMs < replayGameboard2.getMaxTime())
+            setMaxSliderTime(replayGameboard2.getMaxTime());
     }
 
     @Override
@@ -239,11 +240,18 @@ public class ReplayDialog extends AbstractFullScreenDialog {
             }));
         }
 
+        int timeMs = replayGameboard.getCurrentTime();
         if (replayGameboard2 != null) {
             int currentTimeMs = Math.max(replayGameboard2.getCurrentTime(), replayGameboard.getCurrentTime());
 
             replayGameboard2.setVisible(currentTimeMs < replayGameboard2.getMaxTime());
             replayGameboard.setVisible(currentTimeMs < replayGameboard.getMaxTime());
+            extraInfo.setScoreVisible(replayGameboard.isVisible());
+
+            if (!replayGameboard.isVisible() && replayGameboard.isPlaying())
+                replayGameboard.pauseReplay();
+            if (!replayGameboard2.isVisible() && replayGameboard2.isPlaying())
+                replayGameboard2.pauseReplay();
 
             if (currentTimeMs > maxTimeMs) {
                 replayGameboard.pauseReplay();
@@ -267,7 +275,15 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                         replayGameboard.playReplay();
                 }
             }
+
+            if (!replayGameboard.isVisible())
+                timeMs = currentTimeMs;
         }
+
+        currentTimeLabel.setText(ScoreTable.formatTimeString(timeMs, 1));
+        programmaticChange = true;
+        seekSlider.setValue(timeMs / 100);
+        programmaticChange = false;
     }
 
     @Override
@@ -375,6 +391,10 @@ public class ReplayDialog extends AbstractFullScreenDialog {
 
         public void setScore(int score) {
             scoreNum.setScore(score);
+        }
+
+        public void setScoreVisible(boolean visible) {
+            scoreNum.setVisible(visible);
         }
 
         @Override

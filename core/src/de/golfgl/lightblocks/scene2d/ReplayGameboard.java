@@ -83,7 +83,6 @@ public class ReplayGameboard extends BlockGroup {
 
     private void setCurrentTime(int currentTime) {
         this.currentTime = currentTime;
-        onTimeChange(currentTime);
     }
 
     private void transitionToNextStep() {
@@ -335,10 +334,6 @@ public class ReplayGameboard extends BlockGroup {
         transitionToNextStep();
 
         onScoreChange(replay.getCurrentScore());
-    }
-
-    protected void onTimeChange(int timeMs) {
-
     }
 
     protected void onAdditionalDelayTimeAdded(float additionalTime) {
