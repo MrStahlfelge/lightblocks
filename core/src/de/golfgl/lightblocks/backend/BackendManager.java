@@ -47,6 +47,7 @@ public class BackendManager {
     private String multiplayerLastFetchError;
     private MatchTurnRequestInfo playedTurnToUpload;
     private boolean uploadingPlayedTurn;
+    private boolean fetchingFullMatchInfo;
 
     public BackendManager(LocalPrefs prefs) {
         backendClient = new BackendClient();
@@ -213,7 +214,7 @@ public class BackendManager {
      * Sollte jedoch gerade ein Upload des Turns passieren, wird die Antwort in beiden Fällen zurückgehalten
      */
     public void fetchFullMatchInfo(final String matchId, final BackendClient.IBackendResponse<MatchEntity> callback) {
-        if (isUploadingPlayedTurn() && hasTurnToUploadForMatch(matchId)) {
+        if (fetchingFullMatchInfo || isUploadingPlayedTurn() && hasTurnToUploadForMatch(matchId)) {
             Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
@@ -230,9 +231,11 @@ public class BackendManager {
                 return;
             }
 
+        fetchingFullMatchInfo = true;
         backendClient.fetchMatchWithTurns(matchId, new BackendClient.IBackendResponse<MatchEntity>() {
             @Override
             public void onFail(int statusCode, String errorMsg) {
+                fetchingFullMatchInfo = false;
                 callback.onFail(statusCode, errorMsg);
             }
 
@@ -242,6 +245,7 @@ public class BackendManager {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
+                        fetchingFullMatchInfo = false;
                         updateMatchEntityInList(retrievedData);
                     }
                 });

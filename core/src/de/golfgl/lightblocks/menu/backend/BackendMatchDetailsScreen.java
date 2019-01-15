@@ -87,7 +87,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
     public void startPlaying() {
         if (app.backendManager.hasPlayedTurnToUpload() || app.backendManager.isUploadingPlayedTurn())
-            new VetoDialog("You still have a turn not in sync with server. Please sync before playing another turn.",
+            new VetoDialog("You still have a turn not in sync with server. Please sync before playing another match.",
                     app.skin, .8f * LightBlocksGame.nativeGameWidth);
 
         else
