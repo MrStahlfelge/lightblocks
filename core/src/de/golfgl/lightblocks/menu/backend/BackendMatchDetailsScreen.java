@@ -186,7 +186,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         this.match = match;
         Table matchDetailTable = new Table();
 
-        matchDetailTable.add(new ScaledLabel("Battle against", app.skin,
+        matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelTurnAgainst"), app.skin,
                 LightBlocksGame.SKIN_FONT_TITLE, .6f));
 
         BackendUserLabel opponentLabel = new BackendUserLabel(match, app, "default");

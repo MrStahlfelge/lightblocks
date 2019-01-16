@@ -177,7 +177,6 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
         private final RoundedTextButton connectProfileButton;
 
         public LinkProfileTable() {
-            //TODO i18n
             pad(10);
             row();
             ScaledLabel titleLabel = new ScaledLabel(app.TEXTS.get("connectProfileLabel"), app.skin, LightBlocksGame
@@ -194,7 +193,7 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
             add(createProfileConnectHint).fill();
 
             row().padTop(10);
-            add(new ScaledLabel("1. Enter your profile's nickname:", app.skin, LightBlocksGame
+            add(new ScaledLabel("1. " + app.TEXTS.get("labelEnterNickname") + ":", app.skin, LightBlocksGame
                     .SKIN_FONT_REG)).fill();
             row();
             nicknameEditable = new EditableLabel(new ScaledLabel("", app.skin, LightBlocksGame
@@ -206,7 +205,7 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
             addFocusableActor(nicknameEditable);
 
             row().padTop(15);
-            add(new ScaledLabel("2. Enter the profile's recovery e-mail address:", app.skin,
+            add(new ScaledLabel("2. " + app.TEXTS.get("labelEnterProfileRecovery") + ":", app.skin,
                     LightBlocksGame.SKIN_FONT_REG)).fill();
             row();
             mailEditable = new EditableLabel(new ScaledLabel("", app.skin, LightBlocksGame.SKIN_EDIT_BIG),
@@ -217,7 +216,7 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
             addFocusableActor(mailEditable);
 
             row();
-            requestCode = new RoundedTextButton("Request activation code", app.skin);
+            requestCode = new RoundedTextButton(app.TEXTS.get("labelRequestActivationCode"), app.skin);
             requestCode.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -229,7 +228,7 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
             addFocusableActor(requestCode);
 
             row().padTop(15);
-            add(new ScaledLabel("3. Enter the activation code here:", app.skin, LightBlocksGame
+            add(new ScaledLabel("3. " + app.TEXTS.get("labelEnterCode") + ":", app.skin, LightBlocksGame
                     .SKIN_FONT_REG)).fill();
             row();
             activationEditable = new EditableLabel(new ScaledLabel("", app.skin, LightBlocksGame

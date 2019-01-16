@@ -40,7 +40,7 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
         refreshButton = new FaButton(FontAwesome.ROTATE_RELOAD, app.skin);
         this.app = app;
         this.parent = parent;
-        newMatchButton = new RoundedTextButton("Challenge new battle", app.skin);
+        newMatchButton = new RoundedTextButton(app.TEXTS.get("buttonNewBattle"), app.skin);
         newMatchButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

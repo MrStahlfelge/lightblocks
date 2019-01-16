@@ -207,8 +207,9 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
             profileItIsYouLabel.setFontScale(.65f);
             add(profileItIsYouLabel);
 
-            //TODO change decoration, i18n
-            FaTextButton changeNickname = new FaTextButton("Change nickname", app.skin, LightBlocksGame
+            //TODO Button für change decoration
+            final String labelChangeNickname = app.TEXTS.get("labelChangeNickname");
+            FaTextButton changeNickname = new FaTextButton(labelChangeNickname, app.skin, LightBlocksGame
                     .SKIN_BUTTON_CHECKBOX);
             changeNickname.getLabel().setFontScale(.55f);
             changeNickname.addListener(new ChangeListener() {
@@ -233,35 +234,35 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
                         public void canceled() {
 
                         }
-                    }, "Change nickname", playerDetails.nickName, app.skin, getStage());
+                    }, labelChangeNickname, playerDetails.nickName, app.skin, getStage());
                 }
             });
 
-            FaTextButton deleteAccount = new FaTextButton("Delete profile", app.skin, LightBlocksGame
+            FaTextButton deleteAccount = new FaTextButton(app.TEXTS.get("labelDeleteProfile"), app.skin, LightBlocksGame
                     .SKIN_BUTTON_CHECKBOX);
             deleteAccount.getLabel().setFontScale(.55f);
             deleteAccount.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    ((AbstractScreen) app.getScreen()).showConfirmationDialog("Are you sure you want to erase your " +
-                                    "public profile and all its data?",
-                            new Runnable() {
+                    ((AbstractScreen) app.getScreen()).showConfirmationDialog(app.TEXTS.get
+                            ("labelConfirmDeleteProfile"), new Runnable() {
+                        @Override
+                        public void run() {
+                            app.backendManager.getBackendClient().deletePlayer(new WaitForResponse<Void>(app,
+                                    getStage()) {
                                 @Override
-                                public void run() {
-                                    app.backendManager.getBackendClient().deletePlayer(new WaitForResponse<Void>(app,
-                                            getStage()) {
-                                        @Override
-                                        protected void onSuccess() {
-                                            BackendUserDetailsScreen.this.hide();
-                                            app.backendManager.setCredentials(null, null);
-                                        }
-                                    });
+                                protected void onSuccess() {
+                                    BackendUserDetailsScreen.this.hide();
+                                    app.backendManager.setCredentials(null, null);
                                 }
                             });
+                        }
+                    });
                 }
             });
 
-            FaTextButton emailaddress = new FaTextButton("Set recovery e-mail", app.skin, LightBlocksGame
+            final String labelSetRecoveryAddress = app.TEXTS.get("labelSetRecoveryAddress");
+            FaTextButton emailaddress = new FaTextButton(labelSetRecoveryAddress, app.skin, LightBlocksGame
                     .SKIN_BUTTON_CHECKBOX);
             myEmailAddress = playerDetails.passwordEmail != null ? playerDetails.passwordEmail : "";
             emailaddress.addListener(new ChangeListener() {
@@ -286,7 +287,7 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
                         public void canceled() {
 
                         }
-                    }, "Set recovery e-mail", myEmailAddress, app.skin, getStage());
+                    }, labelSetRecoveryAddress, myEmailAddress, app.skin, getStage());
                 }
             });
             emailaddress.getLabel().setFontScale(.55f);
