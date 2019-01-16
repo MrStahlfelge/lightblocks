@@ -36,12 +36,13 @@ public class ReplayDialog extends AbstractFullScreenDialog {
     private final TextButton forward;
     private final TextButton rewind;
     private final ScaledLabel currentTimeLabel;
+    private final LeftInfoGroup extraInfo;
+    private final RightInfoGroup rightInfo;
     private ReplayGameboard replayGameboard;
     private ReplayGameboard replayGameboard2;
     private boolean isPlaying;
     private boolean programmaticChange;
     private int maxTimeMs;
-    private final LeftInfoGroup extraInfo;
 
     public ReplayDialog(LightBlocksGame app, Replay replay, String gameModeLabel, String performerLabel) {
         super(app);
@@ -124,7 +125,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
             }
         });
         extraInfo = new LeftInfoGroup(gameModeLabel, performerLabel);
-        final RightInfoGroup rightInfo = new RightInfoGroup();
+        rightInfo = new RightInfoGroup();
         replayGameboard = new ReplayGameboard(app, replay) {
             @Override
             protected void onScoreChange(int score) {
@@ -194,6 +195,11 @@ public class ReplayDialog extends AbstractFullScreenDialog {
             protected void onAdditionalDelayTimeAdded(float additionalTime) {
                 replayGameboard.addAdditionalDelayTime(additionalTime);
             }
+
+            @Override
+            protected void onScoreChange(int score) {
+                rightInfo.setScoreValue(score);
+            }
         };
         replayGameboard.setScale(.35f);
         replayGameboard2.setScale(.35f);
@@ -211,6 +217,8 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         // die Synchronisation funktioniert mit diesen Buttons nicht
         rewind.setDisabled(true);
         forward.setDisabled(true);
+
+        rightInfo.setScoresTableVisible(false);
 
         // wenn das Spiel beendet ist, darf alles gesehen werden
         if (canViewFullLength && maxTimeMs < replayGameboard2.getMaxTime())
@@ -247,6 +255,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
             replayGameboard2.setVisible(currentTimeMs < replayGameboard2.getMaxTime());
             replayGameboard.setVisible(currentTimeMs < replayGameboard.getMaxTime());
             extraInfo.setScoreVisible(replayGameboard.isVisible());
+            rightInfo.setScoreVisible(replayGameboard2.isVisible());
 
             if (!replayGameboard.isVisible() && replayGameboard.isPlaying())
                 replayGameboard.pauseReplay();
@@ -299,10 +308,17 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         private final Label gameType;
         private final ScoreLabel linesNum;
         private final Table scoreTable;
+        private final ScoreLabel scoreNum;
 
         public RightInfoGroup() {
             gameType = new ScaledLabel("REPLAY", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
             addActor(gameType);
+
+            scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            scoreNum.setMaxCountingTime(.3f);
+            scoreNum.setCountingSpeed(2000);
+            scoreNum.setVisible(false);
+            addActor(scoreNum);
 
             scoreTable = new Table();
             Label scoreLines = new ScaledLabel(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
@@ -330,15 +346,30 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         protected void sizeChanged() {
             super.sizeChanged();
             gameType.pack();
+            scoreNum.pack();
             scoreTable.pack();
             gameType.setPosition(getWidth() - gameType.getPrefWidth(),
                     getHeight() - 10 - gameType.getPrefHeight()
                             - (BlockActor.blockWidth * .8f - gameType.getPrefHeight()) / 2);
+            scoreNum.setPosition(getWidth() - scoreNum.getPrefWidth(), gameType.getY());
             scoreTable.setPosition(getWidth() - scoreTable.getPrefWidth(), 0);
         }
 
         void setLines(long lines) {
             linesNum.setScore(lines);
+        }
+
+        public void setScoreVisible(boolean scoreVisible) {
+            scoreNum.setVisible(scoreVisible);
+            gameType.setVisible(!scoreVisible);
+        }
+
+        public void setScoresTableVisible(boolean tableVisible) {
+            scoreTable.setVisible(tableVisible);
+        }
+
+        public void setScoreValue(int score) {
+            scoreNum.setScore(score);
         }
     }
 
