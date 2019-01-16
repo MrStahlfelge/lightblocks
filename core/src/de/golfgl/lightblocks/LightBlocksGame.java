@@ -410,7 +410,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
         return purchaseManager != null;
     }
 
-    public AbstractMenuDialog getNewMultiplayerMenu(Group actorToHide) {
+    public MultiplayerMenuScreen getNewMultiplayerMenu(Group actorToHide) {
         return new MultiplayerMenuScreen(this, actorToHide);
     }
 

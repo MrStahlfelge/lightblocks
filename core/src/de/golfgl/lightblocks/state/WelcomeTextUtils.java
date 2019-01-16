@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendClient;
 import de.golfgl.lightblocks.backend.BackendMessage;
+import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.menu.SinglePlayerScreen;
 import de.golfgl.lightblocks.menu.WelcomeButton;
 import de.golfgl.lightblocks.model.Mission;
@@ -109,6 +110,9 @@ public class WelcomeTextUtils {
         if (welcomeResponse.warningMsg != null && !welcomeResponse.warningMsg.isEmpty())
             welcomes.add(new WelcomeButton.WelcomeText(welcomeResponse.warningMsg, null));
 
+        if (welcomeResponse.competitionActionRequired)
+            welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("labelCompetitionActions"),
+                    new ShowMultiPlayerPageRunnable(app, 0)));
 
         for (final BackendMessage message : welcomeResponse.messageList) {
             if (BackendMessage.TYPE_WELCOME.equals(message.type)) {
@@ -186,6 +190,22 @@ public class WelcomeTextUtils {
         @Override
         public void run() {
             SinglePlayerScreen sp = app.mainMenuScreen.showSinglePlayerScreen();
+            sp.showPage(pageidx);
+        }
+    }
+
+    private static class ShowMultiPlayerPageRunnable implements Runnable {
+        private final LightBlocksGame app;
+        private final int pageidx;
+
+        public ShowMultiPlayerPageRunnable(LightBlocksGame app, int pageIdx) {
+            this.app = app;
+            this.pageidx = pageIdx;
+        }
+
+        @Override
+        public void run() {
+            MultiplayerMenuScreen sp = app.mainMenuScreen.showMultiplayerScreen();
             sp.showPage(pageidx);
         }
     }

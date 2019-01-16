@@ -79,6 +79,10 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
             modePager.addPage(new BackendMatchesMenuPage(app, this));
     }
 
+    public void showPage(int idx) {
+        modePager.scrollToPage(idx);
+    }
+
     public interface IMultiplayerModePage {
         Actor getDefaultActor();
     }

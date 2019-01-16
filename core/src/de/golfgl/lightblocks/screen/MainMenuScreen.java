@@ -20,6 +20,7 @@ import de.golfgl.lightblocks.menu.AboutScreen;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.AnimatedLightblocksLogo;
 import de.golfgl.lightblocks.menu.DonationDialog;
+import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.menu.PlayerAccountMenuScreen;
 import de.golfgl.lightblocks.menu.SettingsScreen;
 import de.golfgl.lightblocks.menu.SinglePlayerScreen;
@@ -347,8 +348,8 @@ public class MainMenuScreen extends AbstractMenuScreen {
         return singlePlayerScreen;
     }
 
-    public AbstractMenuDialog showMultiplayerScreen() {
-        AbstractMenuDialog multiplayerMenu = app.getNewMultiplayerMenu(mainGroup);
+    public MultiplayerMenuScreen showMultiplayerScreen() {
+        MultiplayerMenuScreen multiplayerMenu = app.getNewMultiplayerMenu(mainGroup);
 
         if (multiplayerMenu != null)
             multiplayerMenu.show(stage);
