@@ -141,7 +141,7 @@ public class BackendMatchesTable extends WidgetGroup {
                     if (me.opponentId != null)
                         new BackendMatchDetailsScreen(app, me.uuid).show(getStage());
                     else
-                        new VetoDialog("Please wait until another player was matched against you.", app.skin,
+                        new VetoDialog(app.TEXTS.get("labelWaitForMatchedPlayer"), app.skin,
                                 getStage().getWidth() * .9f).show(getStage());
                 }
             });

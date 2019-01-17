@@ -1,6 +1,8 @@
 package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -13,6 +15,7 @@ import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.menu.DonationDialog;
 import de.golfgl.lightblocks.menu.PlayButton;
 import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -33,6 +36,9 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     private final Button playTurnButton;
     private final Button resignButton;
     private final Button showReplayButton;
+    private final Button rematchButton;
+    private final Button acceptChallengeButton;
+    private final Button declineChallengeButton;
     private MatchEntity match;
     private boolean wasPlaying;
 
@@ -69,11 +75,34 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         addFocusableActor(showReplayButton);
         getButtonTable().add(showReplayButton);
 
-        // TODO Akzeptieren/Ablehnen button
+        acceptChallengeButton = new GlowLabelButton(FontAwesome.BIG_PLAY, app.TEXTS.get("labelAcceptChallenge"), app
+                .skin);
+        addFocusableActor(acceptChallengeButton);
+        acceptChallengeButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                acceptChallenge(true);
+            }
+        });
+        declineChallengeButton = new FaTextButton(app.TEXTS.get("labelDeclineChallenge"), app.skin, "default");
+        addFocusableActor(declineChallengeButton);
+        declineChallengeButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                acceptChallenge(false);
+            }
+        });
 
         // TODO Reload wenn gewartet wird
 
-        // TODO Nochmal Button
+        rematchButton = new GlowLabelButton(FontAwesome.ROTATE_RIGHT, "Rematch", app.skin);
+        addFocusableActor(rematchButton);
+        rematchButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                doRematch();
+            }
+        });
 
         resetButtonEnabling();
     }
@@ -131,12 +160,35 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                         // anderes Spiel
                         // treffen. Ist aber unwahrscheinlich und kann sogar genutzt werden
                         app.backendManager.resetTurnToUpload();
+                        app.backendManager.updateMatchEntityInList(retrievedData);
                         fillMatchDetails(retrievedData);
                     }
                 });
             }
         }, null, app.TEXTS.get("menuYes"), app.TEXTS.get("menuNo"));
         shouldResign.show(getStage());
+    }
+
+    private void acceptChallenge(boolean accepted) {
+        app.backendManager.getBackendClient().postMatchAccepted(match.uuid, accepted, new WaitForResponse<MatchEntity>
+                (app, getStage()) {
+            @Override
+            public void onRequestSuccess(MatchEntity retrievedData) {
+                super.onRequestSuccess(retrievedData);
+                app.backendManager.updateMatchEntityInList(retrievedData);
+                fillMatchDetails(retrievedData);
+            }
+        });
+    }
+
+    private void doRematch() {
+        app.backendManager.openNewMultiplayerMatch(match.opponentId, match.beginningLevel,
+                new WaitForResponse<MatchEntity>(app, getStage()) {
+                    @Override
+                    protected void onSuccess() {
+                        hide();
+                    }
+                });
     }
 
     private void showReplay(int turnNum) {
@@ -199,18 +251,29 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         matchDetailTable.add(new ScaledLabel(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS, match
                 .matchState, "mmturn_"), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .6f)).padTop(40);
 
+        matchDetailTable.row();
         if (match.turns.size() > 0) {
-            matchDetailTable.row();
             matchDetailTable.add(new MatchTurnsTable()).padTop(40).padBottom(40);
+        } else if (!match.myTurn) {
+            matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelNoTurnsPlayed"), app.skin,
+                    LightBlocksGame.SKIN_FONT_BIG)).padTop(40).padBottom(40);
         }
 
         resetButtonEnabling();
 
         showReplayButton.setDisabled(match.yourReplay == null);
+        Actor toFocus = null;
         if (match.myTurn) {
             matchDetailTable.row();
             if (match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
-                // TODO aufgefordert: annehmen oder ablehnen
+                matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel")
+                        + " " + match.beginningLevel, app.skin, LightBlocksGame.SKIN_FONT_BIG))
+                        .padTop(30);
+                matchDetailTable.row();
+                matchDetailTable.add(acceptChallengeButton).pad(40, 0, 30, 0);
+                matchDetailTable.row();
+                matchDetailTable.add(declineChallengeButton);
+                toFocus = acceptChallengeButton;
             } else if (app.backendManager.hasTurnToUploadForMatch(match.uuid)) {
                 Button syncButton = new GlowLabelButton(FontAwesome.NET_CLOUDSAVE, "Sync with server", app.skin,
                         GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
@@ -225,17 +288,29 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
                 // es gibt noch einen zum hochladen
                 resignButton.setDisabled(true);
+                toFocus = syncButton;
             } else {
                 // okay, normaler Zustand zum Spielen
                 matchDetailTable.add(playTurnButton).padTop(20);
                 resignButton.setDisabled(false);
+                toFocus = playTurnButton;
             }
+        } else if (!match.matchState.equals(MatchEntity.PLAYER_STATE_WAIT)
+                && !match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)
+                && match.turns.size() >= 1) {
+            // Match um => retry button
+            matchDetailTable.row();
+            matchDetailTable.add(rematchButton).padTop(20);
+            toFocus = rematchButton;
         }
 
         contentCell.setActor(matchDetailTable);
 
-        if (getStage() != null && playTurnButton.hasParent())
-            ((MyStage) getStage()).setFocusedActor(playTurnButton);
+        if (getStage() != null && toFocus != null && toFocus.hasParent())
+            ((MyStage) getStage()).setFocusedActor(toFocus);
+
+        matchDetailTable.getColor().a = 0;
+        matchDetailTable.addAction(Actions.fadeIn(.2f, Interpolation.fade));
     }
 
     @Override

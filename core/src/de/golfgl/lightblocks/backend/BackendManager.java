@@ -466,7 +466,7 @@ public class BackendManager {
         });
     }
 
-    private void updateMatchEntityInList(MatchEntity matchToInsert) {
+    public void updateMatchEntityInList(MatchEntity matchToInsert) {
         // erstmal aus der Liste entfernen, falls das Match schon enthalten ist
         for (int i = multiplayerMatchesList.size() - 1; i >= 0; i--)
             if (multiplayerMatchesList.get(i).uuid.equalsIgnoreCase(matchToInsert.uuid))
