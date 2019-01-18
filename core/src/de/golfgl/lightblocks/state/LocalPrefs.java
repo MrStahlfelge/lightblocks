@@ -47,6 +47,7 @@ public class LocalPrefs {
     private static final String PREF_KEY_BACKEND_NICK = "backendNickname";
     private static final String PREF_KEY_TURN_TO_UPLOAD = "turnTouUpload";
     private static final String PREF_KEY_LAST_WELCOME_REQUEST = "lastWelcomeRequest";
+    private static final String PREF_KEY_BATTLE_LEVEL = "battleLevel";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -257,6 +258,15 @@ public class LocalPrefs {
 
     public void saveMarathonLevel(int beginningLevel) {
         prefs.putInteger(PREF_KEY_LEVEL, beginningLevel);
+        prefs.flush();
+    }
+
+    public int getBattleBeginningLevel() {
+        return prefs.getInteger(PREF_KEY_BATTLE_LEVEL, 0);
+    }
+
+    public void saveBattleBeginningLevel(int beginningLevel) {
+        prefs.putInteger(PREF_KEY_BATTLE_LEVEL, beginningLevel);
         prefs.flush();
     }
 

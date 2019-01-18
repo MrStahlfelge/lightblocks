@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import de.golfgl.gdx.controllers.ControllerScrollPane;
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
@@ -44,8 +43,7 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
         newMatchButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                app.backendManager.openNewMultiplayerMatch(null, 0,
-                        new WaitForResponse<MatchEntity>(app, getStage()));
+                new BackendNewMatchDialog(app).show(getStage());
             }
         });
 
