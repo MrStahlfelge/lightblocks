@@ -46,6 +46,7 @@ public class LocalPrefs {
     private static final String PREF_KEY_BACKEND_PASS = "backendPassKey";
     private static final String PREF_KEY_BACKEND_NICK = "backendNickname";
     private static final String PREF_KEY_TURN_TO_UPLOAD = "turnTouUpload";
+    private static final String PREF_KEY_LAST_WELCOME_REQUEST = "lastWelcomeRequest";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -503,6 +504,18 @@ public class LocalPrefs {
             prefs.remove(PREF_KEY_TURN_TO_UPLOAD);
 
         prefs.flush();
+    }
+
+    /**
+     * @return gibt zurück, wann die Methode das letzte Mal ausgeführt wurde. Beim ersten Mal 0
+     */
+    public long getWelcomeMessagesTime() {
+        long retVal = prefs.getLong(PREF_KEY_LAST_WELCOME_REQUEST, 0);
+
+        prefs.putLong(PREF_KEY_LAST_WELCOME_REQUEST, TimeUtils.millis());
+        prefs.flush();
+
+        return retVal;
     }
 
     public static class TvRemoteKeyConfig {

@@ -41,6 +41,7 @@ public class BackendManager {
     private BackendScore currentlySendingScore;
     private BackendClient.WelcomeResponse lastWelcomeResponse;
     private boolean isFetchingWelcomes;
+    private long fetchWelcomesSinceTime;
     private long multiplayerMatchesLastFetchMs;
     private boolean isFetchingMultiplayerMatches;
     private boolean multiplayerMatchesLastFetchSuccessful;
@@ -82,6 +83,8 @@ public class BackendManager {
             // einen eventuell noch zum Hochladen vorgemerkten laden
             playedTurnToUpload = prefs.getTurnToUpload();
         }
+
+        fetchWelcomesSinceTime = prefs.getWelcomeMessagesTime();
     }
 
     @Nonnull
@@ -258,8 +261,8 @@ public class BackendManager {
                 .timeDelta - lastWelcomeResponse
                 .responseTime) / 1000 > expirationTimeSeconds)) {
             isFetchingWelcomes = true;
-            backendClient.fetchWelcomeMessage(LightBlocksGame.GAME_VERSIONNUMBER, platformString, osString,
-                    drawnBlocks, donatorState, new BackendClient.IBackendResponse<BackendClient.WelcomeResponse>() {
+            backendClient.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, platformString, osString,
+                    drawnBlocks, donatorState, fetchWelcomesSinceTime, new BackendClient.IBackendResponse<BackendClient.WelcomeResponse>() {
                         @Override
                         public void onFail(int statusCode, String errorMsg) {
                             // kann man nix machen

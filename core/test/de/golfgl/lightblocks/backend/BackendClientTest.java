@@ -232,7 +232,7 @@ public class BackendClientTest {
         // anonyme Anfrage
         WaitForResponseListener<BackendClient.WelcomeResponse> newMessagesResponse = new
                 WaitForResponseListener<BackendClient.WelcomeResponse>();
-        backendClientNoAuth.fetchWelcomeMessage(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1023, 1,
+        backendClientNoAuth.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1023, 1,
                 newMessagesResponse);
         waitWhileRequesting();
 
@@ -243,7 +243,7 @@ public class BackendClientTest {
 
         // veraltete Clientversion
         newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
-        backendClientNoAuth.fetchWelcomeMessage(1, "smarttv", "webgl", 1023, 1,
+        backendClientNoAuth.fetchWelcomeMessages(1, "smarttv", "webgl", 1023, 1,
                 newMessagesResponse);
         waitWhileRequesting();
 
@@ -261,7 +261,7 @@ public class BackendClientTest {
         Assert.assertNotNull(createdResponse.retrievedData);
 
         newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
-        backendClientPlayer.fetchWelcomeMessage(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1024, 1,
+        backendClientPlayer.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1024, 1,
                 newMessagesResponse);
         waitWhileRequesting();
         Assert.assertNotNull(newMessagesResponse.retrievedData);
@@ -273,7 +273,7 @@ public class BackendClientTest {
         newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
         BackendClient noAuthPlayer = new BackendClient();
         noAuthPlayer.setUserId("----");
-        noAuthPlayer.fetchWelcomeMessage(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1024, 1,
+        noAuthPlayer.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1024, 1,
                 newMessagesResponse);
         waitWhileRequesting();
         Assert.assertNotNull(newMessagesResponse.retrievedData);
