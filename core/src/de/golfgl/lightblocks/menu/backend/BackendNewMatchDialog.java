@@ -5,10 +5,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
+import java.util.List;
+
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.MatchEntity;
+import de.golfgl.lightblocks.backend.PlayerDetails;
 import de.golfgl.lightblocks.menu.BeginningLevelChooser;
+import de.golfgl.lightblocks.scene2d.EditableLabel;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
@@ -24,6 +28,9 @@ public class BackendNewMatchDialog extends ControllerMenuDialog {
     private final Button randomPlayerButton;
     private final BeginningLevelChooser beginningLevelSlider;
     private final Button leaveButton;
+    private final EditableLabel nicknameEditable;
+    private String opponentId;
+    private final Button againstFriendButton;
 
     public BackendNewMatchDialog(LightBlocksGame app) {
         super("", app.skin);
@@ -52,10 +59,20 @@ public class BackendNewMatchDialog extends ControllerMenuDialog {
         randomPlayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                openNewMatch();
+                openNewMatch(null);
             }
         });
         addFocusableActor(randomPlayerButton);
+
+        againstFriendButton = new RoundedTextButton(app.TEXTS.get("buttonChallengeFriend"), app.skin);
+        againstFriendButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                openNewMatch(opponentId);
+            }
+        });
+        againstFriendButton.setDisabled(true);
+        addFocusableActor(againstFriendButton);
 
         Table contentTable = getContentTable();
         contentTable.add(new ScaledLabel(app.TEXTS.get("buttonNewBattle"), app.skin, LightBlocksGame.SKIN_FONT_TITLE)
@@ -64,13 +81,50 @@ public class BackendNewMatchDialog extends ControllerMenuDialog {
         contentTable.row().pad(15, 20, 15, 20);
         contentTable.add(levelSliderTable);
 
-        contentTable.row().padBottom(15);
+        contentTable.row();
         contentTable.add(randomPlayerButton);
+
+        contentTable.row().padTop(15);
+        contentTable.add(new ScaledLabel(app.TEXTS.get("labelChallengeAFriend"), app.skin,
+                LightBlocksGame.SKIN_FONT_TITLE, 0.5f));
+        contentTable.row().padTop(10);
+        nicknameEditable = new EditableLabel(new ScaledLabel("", app.skin, LightBlocksGame
+                .SKIN_EDIT_BIG),
+                new FaButton(FontAwesome.SETTING_PENCIL, app.skin), app.skin, "Nickname") {
+            @Override
+            protected void onNewTextSet(String newText) {
+                searchForFriendNick(newText);
+            }
+
+        };
+        contentTable.add(nicknameEditable).pad(0, 20, 0, 20);
+        addFocusableActor(nicknameEditable);
+        nicknameEditable.setWidth(LightBlocksGame.nativeGameWidth - 100);
+        nicknameEditable.getLabel().setEllipsis(true);
+
+        contentTable.row();
+        contentTable.add(againstFriendButton).padBottom(10);
     }
 
-    private void openNewMatch() {
+    private void searchForFriendNick(final String nick) {
+        app.backendManager.getBackendClient().fetchPlayerByNicknamePrefixList(nick,
+                new WaitForResponse<List<PlayerDetails>>(app, getStage()) {
+                    @Override
+                    public void onRequestSuccess(List<PlayerDetails> retrievedData) {
+                        if (!retrievedData.isEmpty()) {
+                            super.onRequestSuccess(retrievedData);
+                            nicknameEditable.getLabel().setText(retrievedData.get(0).getUserNickName());
+                            opponentId = retrievedData.get(0).uuid;
+                            againstFriendButton.setDisabled(false);
+                        } else
+                            showError("No profile with nickname " + nick + " found");
+                    }
+                });
+    }
+
+    private void openNewMatch(String opponentId) {
         app.localPrefs.saveBattleBeginningLevel(beginningLevelSlider.getValue());
-        app.backendManager.openNewMultiplayerMatch(null, beginningLevelSlider.getValue(),
+        app.backendManager.openNewMultiplayerMatch(opponentId, beginningLevelSlider.getValue(),
                 new WaitForResponse<MatchEntity>(app, getStage()) {
                     @Override
                     protected void onSuccess() {

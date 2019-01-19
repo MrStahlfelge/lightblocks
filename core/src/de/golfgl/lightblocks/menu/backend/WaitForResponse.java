@@ -24,6 +24,10 @@ public class WaitForResponse<T> extends BackendManager.AbstractQueuedBackendResp
 
     @Override
     public void onRequestFailed(int statusCode, final String errorMsg) {
+        showError(errorMsg);
+    }
+
+    protected void showError(String errorMsg) {
         progressDialog.getLabel().setText(errorMsg);
         progressDialog.showOkButton();
     }
