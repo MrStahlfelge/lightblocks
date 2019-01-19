@@ -1,6 +1,5 @@
 package de.golfgl.lightblocks.menu.backend;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -30,9 +29,10 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
     private final RoundedTextButton newMatchButton;
     private final LightBlocksGame app;
     private final MultiplayerMenuScreen parent;
-    private Button websiteButton;
+    private Button createProfile;
     private Cell progressOrRefreshCell;
     private Cell errorLabelCell;
+    private boolean showsUnregistered;
 
     public BackendMatchesMenuPage(final LightBlocksGame app, MultiplayerMenuScreen parent) {
         progressIndicator = new ProgressDialog.WaitRotationImage(app);
@@ -65,10 +65,14 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
         if (!app.backendManager.hasUserId())
             mainCell.setActor(fillUnregistered()).fill();
         else {
-            mainCell.setActor(fillMenu()).fill();
-            if (TimeUtils.timeSinceMillis(app.backendManager.getMultiplayerMatchesLastFetchMs()) > 5 * 60 * 1000L)
-                app.backendManager.fetchMultiplayerMatches();
+            switchToMatchTable();
         }
+    }
+
+    protected void switchToMatchTable() {
+        mainCell.setActor(fillMenu()).fill();
+        if (TimeUtils.timeSinceMillis(app.backendManager.getMultiplayerMatchesLastFetchMs()) > 5 * 60 * 1000L)
+            app.backendManager.fetchMultiplayerMatches();
     }
 
     private Actor fillMenu() {
@@ -88,11 +92,12 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
         ControllerScrollPane scrollPane = new ControllerScrollPane(new BackendMatchesTable(app), app.skin);
         scrollPane.setScrollingDisabled(true, false);
         myGamesTable.add(scrollPane).expand().width(LightBlocksGame.nativeGameWidth);
-        //TODO wenn noch kein Match vorhanden, statt leerer Tabelle Introtext anzeigen
 
         // einen eventuell noch nicht abgesendeten Turn abgesenden
         if (app.backendManager.hasPlayedTurnToUpload())
             app.backendManager.sendEnqueuedTurnToUpload(null);
+
+        showsUnregistered = false;
 
         return myGamesTable;
     }
@@ -101,7 +106,8 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
     public void act(float delta) {
         super.act(delta);
 
-        //TODO von unregistered auf registered wechseln können
+        if (showsUnregistered && app.backendManager.hasUserId())
+            switchToMatchTable();
 
         if (progressOrRefreshCell != null) {
             if (app.backendManager.isFetchingMultiplayerMatches() && !progressIndicator.hasParent())
@@ -122,31 +128,32 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
 
     private Actor fillUnregistered() {
         Table unregistered = new Table();
-        Label competitionIntro = new ScaledLabel(app.TEXTS.get("competitionIntro"), app.skin, app.SKIN_FONT_TITLE);
-        competitionIntro.setAlignment(Align.center);
+        Label competitionIntro = new ScaledLabel(app.TEXTS.get("competitionIntro"), app.skin,
+                LightBlocksGame.SKIN_FONT_REG, .75f);
         competitionIntro.setWrap(true);
 
-        if (websiteButton == null) {
-            websiteButton = new RoundedTextButton(app.TEXTS.get("buttonWebsite"), app.skin);
-            websiteButton.addListener(new ChangeListener() {
+        if (createProfile == null) {
+            createProfile = new RoundedTextButton(app.TEXTS.get("createPublicProfileLabel"), app.skin);
+            createProfile.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    Gdx.net.openURI(LightBlocksGame.GAME_URL);
+                    new CreateNewAccountDialog(app).show(getStage());
                 }
             });
-            parent.addFocusableActor(websiteButton);
+            parent.addFocusableActor(createProfile);
         }
 
         unregistered.row();
         unregistered.add(competitionIntro).fill().expand().pad(20);
 
         unregistered.row().padTop(30);
-        unregistered.add(websiteButton);
+        unregistered.add(createProfile);
+        showsUnregistered = true;
         return unregistered;
     }
 
     @Override
     public Actor getDefaultActor() {
-        return newMatchButton.hasParent() ? newMatchButton : websiteButton;
+        return newMatchButton.hasParent() ? newMatchButton : createProfile;
     }
 }

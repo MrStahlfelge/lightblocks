@@ -4,9 +4,9 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -34,9 +34,16 @@ public class BackendMatchesTable extends WidgetGroup {
     private long listTimeStamp;
     private HashMap<String, BackendMatchRow> uuidMatchMap = new HashMap<>(1);
     private float lastLayoutHeight;
+    private Label introLabel;
 
     public BackendMatchesTable(LightBlocksGame app) {
         this.app = app;
+
+        introLabel = new ScaledLabel(app.TEXTS.get("competitionIntro"), app.skin,
+                LightBlocksGame.SKIN_FONT_REG, .75f);
+        introLabel.setWrap(true);
+        introLabel.setWidth(ROW_WIDTH);
+        addActor(introLabel);
 
         refresh();
     }
@@ -109,6 +116,11 @@ public class BackendMatchesTable extends WidgetGroup {
 
         uuidMatchMap = newMatchesMap;
 
+        introLabel.setVisible(uuidMatchMap.isEmpty());
+        if (introLabel.isVisible()) {
+            introLabel.setPosition((LightBlocksGame.nativeGameWidth - ROW_WIDTH) / 2,
+                    newHeight - introLabel.getPrefHeight());
+        }
     }
 
     @Override
@@ -126,8 +138,8 @@ public class BackendMatchesTable extends WidgetGroup {
     }
 
     private class BackendMatchRow extends Button implements ITouchActionButton {
-        private MatchEntity me;
         Action colorAction;
+        private MatchEntity me;
 
         public BackendMatchRow(MatchEntity match) {
             super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
