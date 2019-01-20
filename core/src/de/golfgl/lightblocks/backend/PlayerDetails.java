@@ -21,6 +21,8 @@ public class PlayerDetails implements IPlayerInfo {
     public final String passwordEmail;
     public final int donator;
     public final String country;
+    public final int multiplayerMatchesCount;
+    public final int multiplayerWinCount;
 
     PlayerDetails(JsonValue fromJson) {
         uuid = fromJson.getString("id");
@@ -35,6 +37,8 @@ public class PlayerDetails implements IPlayerInfo {
         passwordEmail = fromJson.getString("passwordEmail", null);
         donator = fromJson.getInt("donator", 0);
         country = fromJson.getString("country", null);
+        multiplayerMatchesCount = fromJson.getInt("multiplayerMatchesCount", 0);
+        multiplayerWinCount = fromJson.getInt("multiplayerWinCount", 0);
 
         highscores = new ArrayList<ScoreListEntry>();
         JsonValue highscorejson = fromJson.get("highscores");

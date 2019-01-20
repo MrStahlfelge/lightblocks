@@ -43,6 +43,7 @@ public class BackendMatchesTable extends WidgetGroup {
                 LightBlocksGame.SKIN_FONT_REG, .75f);
         introLabel.setWrap(true);
         introLabel.setWidth(ROW_WIDTH);
+        introLabel.getColor().a = 0;
         addActor(introLabel);
 
         refresh();
@@ -120,7 +121,11 @@ public class BackendMatchesTable extends WidgetGroup {
         if (introLabel.isVisible()) {
             introLabel.setPosition((LightBlocksGame.nativeGameWidth - ROW_WIDTH) / 2,
                     newHeight - introLabel.getPrefHeight());
-        }
+            // Gerade erst sichtbar geworden?
+            if (introLabel.getColor().a == 0)
+                introLabel.addAction(Actions.delay(1f, Actions.fadeIn(.2f, Interpolation.fade)));
+        } else
+            introLabel.getColor().a = 0;
     }
 
     @Override
