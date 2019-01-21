@@ -159,7 +159,7 @@ public class BackendMatchesTable extends WidgetGroup {
                         new BackendMatchDetailsScreen(app, me.uuid).show(getStage());
                     else
                         new VetoDialog(app.TEXTS.get("labelWaitForMatchedPlayer"), app.skin,
-                                getStage().getWidth() * .9f).show(getStage());
+                                LightBlocksGame.nativeGameWidth * .9f).show(getStage());
                 }
             });
         }

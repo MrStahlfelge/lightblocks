@@ -201,7 +201,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             Replay opponentReplay = new Replay();
             opponentReplay.fromString(match.opponentReplay);
 
-            dialog.addSecondReplay(opponentReplay, !(match.myTurn || match.matchState.equals(MatchEntity
+            dialog.addSecondReplay(opponentReplay, !(match.myTurn || match.matchState.equalsIgnoreCase(MatchEntity
                     .PLAYER_STATE_WAIT)));
         }
         dialog.windToTimePos(match.turnBlockCount * 1000 * turnNum);
@@ -249,14 +249,22 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
         matchDetailTable.row();
         matchDetailTable.add(new ScaledLabel(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS, match
-                .matchState, "mmturn_"), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .6f)).padTop(40);
+                .matchState, "mmturn_"), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .6f)).padTop(30);
 
-        matchDetailTable.row();
-        if (match.turns.size() > 0) {
-            matchDetailTable.add(new MatchTurnsTable()).padTop(40).padBottom(40);
+        matchDetailTable.row().padTop(30);
+        if (match.turns.size() > 1 || match.turns.size() == 1 && match.turns.get(0).youPlayed) {
+            matchDetailTable.add(new MatchTurnsTable()).padBottom(30);
+        } else if (match.myTurn && !match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED) ||
+                match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_WAIT) ||
+                !match.myTurn && match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
+            ScaledLabel competitionHelp = new ScaledLabel(app.TEXTS.format("competitionHelp",
+                    match.turnBlockCount), app.skin, LightBlocksGame.SKIN_FONT_REG, .75f);
+            competitionHelp.setWrap(true);
+            matchDetailTable.add(competitionHelp).width(LightBlocksGame.nativeGameWidth - 80).padBottom(15);
+
         } else if (!match.myTurn) {
             matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelNoTurnsPlayed"), app.skin,
-                    LightBlocksGame.SKIN_FONT_BIG)).padTop(40).padBottom(40);
+                    LightBlocksGame.SKIN_FONT_BIG)).padBottom(30);
         }
 
         resetButtonEnabling();
@@ -267,10 +275,11 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             matchDetailTable.row();
             if (match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
                 matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel")
-                        + " " + match.beginningLevel, app.skin, LightBlocksGame.SKIN_FONT_BIG))
+                        + " " + app.TEXTS.get("labelLevel") + " "
+                        + match.beginningLevel, app.skin, LightBlocksGame.SKIN_FONT_BIG))
                         .padTop(30);
                 matchDetailTable.row();
-                matchDetailTable.add(acceptChallengeButton).pad(40, 0, 30, 0);
+                matchDetailTable.add(acceptChallengeButton).pad(40, 0, 20, 0);
                 matchDetailTable.row();
                 matchDetailTable.add(declineChallengeButton);
                 toFocus = acceptChallengeButton;
@@ -284,23 +293,23 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                     }
                 });
                 addFocusableActor(syncButton);
-                matchDetailTable.add(syncButton).padTop(20);
+                matchDetailTable.add(syncButton).padTop(15);
 
                 // es gibt noch einen zum hochladen
                 resignButton.setDisabled(true);
                 toFocus = syncButton;
             } else {
                 // okay, normaler Zustand zum Spielen
-                matchDetailTable.add(playTurnButton).padTop(20);
+                matchDetailTable.add(playTurnButton).padTop(15);
                 resignButton.setDisabled(false);
                 toFocus = playTurnButton;
             }
-        } else if (!match.matchState.equals(MatchEntity.PLAYER_STATE_WAIT)
+        } else if (!match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_WAIT)
                 && !match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)
                 && match.turns.size() >= 1) {
             // Match um => retry button
             matchDetailTable.row();
-            matchDetailTable.add(rematchButton).padTop(20);
+            matchDetailTable.add(rematchButton).padTop(15);
             toFocus = rematchButton;
         }
 
