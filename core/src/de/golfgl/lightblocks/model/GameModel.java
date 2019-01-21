@@ -931,4 +931,11 @@ public abstract class GameModel implements Json.Serializable {
     public Replay getReplay() {
         return (replay.isValid() ? replay : null);
     }
+
+    /**
+     * @return i18n einer Warning-Msg, die vor Verlassen angezeigt werden soll. null, wenn nichts angezeigt werden soll
+     */
+    public String getExitWarningMessage() {
+        return null;
+    }
 }

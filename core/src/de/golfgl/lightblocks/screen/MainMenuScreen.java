@@ -364,7 +364,6 @@ public class MainMenuScreen extends AbstractMenuScreen {
     }
 
     public void showDonationDialog() {
-        //TODO hier muss catchBackKey gesetzt werden, aber eben bei zurück auch wieder zurückgesetzt werden
         if (app.canDonate())
             new DonationDialog(app).show(stage);
     }

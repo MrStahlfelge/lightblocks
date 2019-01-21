@@ -18,6 +18,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -87,7 +88,7 @@ public class PauseDialog extends ControllerMenuDialog {
                 new Runnable() {
                     @Override
                     public void run() {
-                        playScreen.goBackToMenu();
+                        exitGame();
                     }
                 });
         button(new GlowLabelButton("", "?", app.skin, GlowLabelButton.SMALL_SCALE_MENU),
@@ -103,6 +104,25 @@ public class PauseDialog extends ControllerMenuDialog {
 
         // Modal wird ausgeschaltet, da sonst alle InputEvents weggeklaut werden
         setModal(false);
+    }
+
+    protected void exitGame() {
+        String warningMsg = playScreen.gameModel.getExitWarningMessage();
+
+        if (warningMsg == null)
+            playScreen.goBackToMenu();
+        else {
+            Dialog dialog = new AbstractScreen.RunnableDialog(app.skin, app.TEXTS.get(warningMsg),
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            playScreen.goBackToMenu();
+                        }
+                    }, null,
+                    app.TEXTS.get("menuYes"),
+                    app.TEXTS.get("menuNo"));
+            dialog.show(getStage());
+        }
     }
 
     public boolean isEmphasizeInputMsg() {

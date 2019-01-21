@@ -319,4 +319,9 @@ public class BackendBattleModel extends GameModel {
             this.lines = lines;
         }
     }
+
+    @Override
+    public String getExitWarningMessage() {
+        return "exitWarningTurnBattle";
+    }
 }

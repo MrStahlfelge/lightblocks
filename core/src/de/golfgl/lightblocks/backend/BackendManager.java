@@ -78,8 +78,6 @@ public class BackendManager {
 
         multiplayerMatchesList = new ArrayList<>();
         if (hasUserId()) {
-            //TODO persistierte Multiplayerspiele laden statt hier gleich zu gehen
-
             // einen eventuell noch zum Hochladen vorgemerkten laden
             playedTurnToUpload = prefs.getTurnToUpload();
         }
