@@ -24,6 +24,7 @@ public class AbstractFullScreenDialog extends ControllerMenuDialog {
     protected final LightBlocksGame app;
     protected FaButton closeButton;
     protected Table scrollPadContentTable;
+    private BetterScrollPane scrollPane;
 
     public AbstractFullScreenDialog(LightBlocksGame app) {
         super("", app.skin, LightBlocksGame.SKIN_WINDOW_ALLBLACK);
@@ -35,7 +36,7 @@ public class AbstractFullScreenDialog extends ControllerMenuDialog {
 
         if (hasScrollPane()) {
             scrollPadContentTable = new Table();
-            BetterScrollPane scrollPane = new BetterScrollPane(scrollPadContentTable, app.skin);
+            scrollPane = new BetterScrollPane(scrollPadContentTable, app.skin);
             scrollPane.setScrollingDisabled(true, false);
             super.getContentTable().add(scrollPane).expand().fill();
             closeButton.addListener(new AbstractMenuDialog.ScrollOnKeyDownListener(scrollPane));
@@ -47,6 +48,13 @@ public class AbstractFullScreenDialog extends ControllerMenuDialog {
     @Override
     public Table getContentTable() {
         return hasScrollPane() ? scrollPadContentTable : super.getContentTable();
+    }
+
+    /**
+     * @return ScrollPane, wenn {@link #hasScrollPane()} true ist
+     */
+    public BetterScrollPane getScrollPane() {
+        return scrollPane;
     }
 
     @Override

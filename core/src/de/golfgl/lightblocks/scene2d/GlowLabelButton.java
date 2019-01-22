@@ -147,7 +147,9 @@ public class GlowLabelButton extends Button implements ITouchActionButton, Music
 
         if (faLabel != null) {
             faLabel.setColor(labelGroup.getColor());
-            faLabel.setFontScale(labelGroup.getScaleX());
+            // Wird in setFontScale nicht überprüft, und ein unnötiges Setzen löst auf Tabellen stetiges layout() aus
+            if (faLabel.getFontScaleX() != labelGroup.getScaleX())
+                faLabel.setFontScale(labelGroup.getScaleX());
         }
 
         isFirstAct = false;

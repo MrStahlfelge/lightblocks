@@ -8,10 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Timer;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.backend.MatchEntity;
+import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.DonationDialog;
 import de.golfgl.lightblocks.menu.PlayButton;
 import de.golfgl.lightblocks.scene2d.FaButton;
@@ -315,11 +317,26 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
         contentCell.setActor(matchDetailTable);
 
-        if (getStage() != null && toFocus != null && toFocus.hasParent())
+        if (getStage() != null && toFocus != null && toFocus.hasParent()) {
+            scrollToActor(toFocus);
             ((MyStage) getStage()).setFocusedActor(toFocus);
+        }
 
         matchDetailTable.getColor().a = 0;
         matchDetailTable.addAction(Actions.fadeIn(.2f, Interpolation.fade));
+    }
+
+    private void scrollToActor(final Actor toFocus) {
+        // zeitlich verzögert wegen der Eingangsanimation
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                if (toFocus.hasParent()) {
+                    getContentTable().validate();
+                    getScrollPane().scrollTo(toFocus.getX(), toFocus.getY(), toFocus.getWidth(), toFocus.getHeight());
+                }
+            }
+        }, AbstractMenuDialog.TIME_SWOSHIN * 2);
     }
 
     @Override
