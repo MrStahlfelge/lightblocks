@@ -39,7 +39,11 @@ public class BackendMatchesTable extends WidgetGroup {
     public BackendMatchesTable(LightBlocksGame app) {
         this.app = app;
 
-        introLabel = new ScaledLabel(app.TEXTS.get("competitionIntro"), app.skin,
+        String competitionIntro = app.TEXTS.get("competitionIntro1") + "\n" +
+                app.TEXTS.get("competitionIntro2b") + "\n\n" +
+                app.TEXTS.get("competitionIntro3");
+
+        introLabel = new ScaledLabel(competitionIntro, app.skin,
                 LightBlocksGame.SKIN_FONT_REG, .75f);
         introLabel.setWrap(true);
         introLabel.setWidth(ROW_WIDTH);

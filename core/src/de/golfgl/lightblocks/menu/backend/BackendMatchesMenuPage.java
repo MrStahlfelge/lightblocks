@@ -128,7 +128,10 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
 
     private Actor fillUnregistered() {
         Table unregistered = new Table();
-        Label competitionIntro = new ScaledLabel(app.TEXTS.get("competitionIntro"), app.skin,
+        String competitionIntroString = app.TEXTS.get("competitionIntro1") + "\n" +
+                app.TEXTS.get("competitionIntro2a") + "\n\n" +
+                app.TEXTS.get("competitionIntro3");
+        Label competitionIntro = new ScaledLabel(competitionIntroString, app.skin,
                 LightBlocksGame.SKIN_FONT_REG, .75f);
         competitionIntro.setWrap(true);
 
@@ -144,7 +147,7 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
         }
 
         unregistered.row();
-        unregistered.add(competitionIntro).fill().expand().pad(20);
+        unregistered.add(competitionIntro).fill().expand().pad(30);
 
         unregistered.row().padTop(30);
         unregistered.add(createProfile);
