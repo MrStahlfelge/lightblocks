@@ -149,6 +149,8 @@ public class BackendMatchesTable extends WidgetGroup {
     private class BackendMatchRow extends Button implements ITouchActionButton {
         Action colorAction;
         private MatchEntity me;
+        private ScaledLabel timePassedLabel;
+        private float timePassedRefreshWait;
 
         public BackendMatchRow(MatchEntity match) {
             super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
@@ -187,11 +189,30 @@ public class BackendMatchesTable extends WidgetGroup {
                     matchState.setColor(LightBlocksGame.EMPHASIZE_COLOR);
                 matchState.setEllipsis(true);
                 add(matchState).width(120);
-                ScaledLabel timePassed = new ScaledLabel(formatTimePassedString(app, match.lastChangeTime), app.skin);
-                timePassed.setEllipsis(true);
-                add(timePassed).width(90);
+                timePassedLabel = new ScaledLabel("", app.skin);
+                timePassedLabel.setEllipsis(true);
+                add(timePassedLabel).width(90);
             }
             me = match;
+            refreshTimePassed();
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+            if (timePassedRefreshWait > 0) {
+                timePassedRefreshWait = timePassedRefreshWait - delta;
+
+                if (timePassedRefreshWait <= 0)
+                    refreshTimePassed();
+            }
+        }
+
+        private void refreshTimePassed() {
+            if (timePassedLabel != null && me != null) {
+                timePassedLabel.setText(formatTimePassedString(app, me.lastChangeTime));
+                timePassedRefreshWait = 30f;
+            }
         }
 
         public void removeFocusables() {
