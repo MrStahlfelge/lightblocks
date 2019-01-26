@@ -30,6 +30,8 @@ public class BackendBattleModel extends GameModel {
     private float prepareForGameDelay = PREPARE_TIME_SECONDS;
     private MatchEntity.MatchTurn lastTurnOnServer;
     private int lastTurnSequenceNum;
+    private int firstPartOverTimeMs;
+    private int everyThingsOverTimeMs;
     private Queue<WaitingGarbage> waitingGarbage = new Queue<>();
     private IntArray completeDrawyer = new IntArray();
 
@@ -62,6 +64,11 @@ public class BackendBattleModel extends GameModel {
     @Override
     public boolean showTime() {
         return true;
+    }
+
+    @Override
+    public int getShownTimeMs() {
+        return everyThingsOverTimeMs - getScore().getTimeMs();
     }
 
     @Override
@@ -100,6 +107,11 @@ public class BackendBattleModel extends GameModel {
         //GarbageGapPos
         for (int i = 0; i < matchEntity.garbageGap.length(); i++)
             garbagePos.add((byte) (matchEntity.garbageGap.charAt(i) - 48));
+
+        // Spielendezeiten vorberechnen
+        firstPartOverTimeMs = (matchEntity.turnBlockCount + getThisTurnsStartSeconds()) * 1000;
+        everyThingsOverTimeMs = (matchEntity.turnBlockCount * (firstTurnFirstPlayer ? 1 : 2)
+                + getThisTurnsStartSeconds()) * 1000;
 
         super.startNewGame(newGameParams);
     }
@@ -232,10 +244,9 @@ public class BackendBattleModel extends GameModel {
             return;
 
         boolean firstPartOver = sendingGarbage || firstTurnFirstPlayer ||
-                getScore().getTimeMs() > (matchEntity.turnBlockCount + getThisTurnsStartSeconds()) * 1000;
+                getScore().getTimeMs() > firstPartOverTimeMs;
         boolean everythingsOver = isGameOver() ||
-                getScore().getTimeMs() > (matchEntity.turnBlockCount * (firstTurnFirstPlayer ? 1 : 2)
-                        + getThisTurnsStartSeconds()) * 1000;
+                getScore().getTimeMs() > everyThingsOverTimeMs;
 
         if (firstPartOver && !sendingGarbage) {
             if (!lastTurnOnServer.opponentDroppedOut) {

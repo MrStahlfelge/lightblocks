@@ -920,6 +920,13 @@ public abstract class GameModel implements Json.Serializable {
         return false;
     }
 
+    /**
+     * @return Zeit für die Anzeige im Playscreen
+     */
+    public int getShownTimeMs() {
+        return getScore().getTimeMs();
+    }
+
     public BestScore getBestScore() {
         return bestScore;
     }

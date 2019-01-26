@@ -1016,9 +1016,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     protected void updateTimeLabel() {
         if (gameModel.showTime() && timeLabel != null) {
-            int timeMs = gameModel.getScore().getTimeMs();
+            int timeMs = gameModel.getShownTimeMs();
 
-            if (timeMs - currentShownTime >= 100) {
+            if (Math.abs(timeMs - currentShownTime) >= 100) {
                 timeLabel.setText(de.golfgl.lightblocks.menu.ScoreTable.formatTimeString(timeMs, 1));
                 currentShownTime = timeMs;
             }
