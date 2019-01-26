@@ -177,8 +177,6 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
         if (app.gpgsClient != null && app.gpgsClient instanceof IMultiplayerGsClient)
             modePager.addPage(new GpgsGameTable());
 
-        mainCell = menuTable.add(modePager).fill().expand();
-
     }
 
     protected void buttonOpenLocalRoomPressed() {

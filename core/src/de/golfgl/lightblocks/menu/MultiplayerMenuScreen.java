@@ -77,6 +77,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
 
         if (LightBlocksGame.GAME_DEVMODE)
             modePager.addPage(new BackendMatchesMenuPage(app, this));
+
+        mainCell = menuTable.add(modePager).fill().expand();
     }
 
     public void showPage(int idx) {
