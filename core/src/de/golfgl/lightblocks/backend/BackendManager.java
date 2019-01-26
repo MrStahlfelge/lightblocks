@@ -115,6 +115,11 @@ public class BackendManager {
     }
 
     public List<MatchEntity> getMultiplayerMatchesList() {
+        // Aufforderung in Main-Screen "gelesen" markieren
+        if (lastWelcomeResponse != null && lastWelcomeResponse.competitionActionRequired) {
+            lastWelcomeResponse = new BackendClient.WelcomeResponse(lastWelcomeResponse);
+        }
+
         return multiplayerMatchesList;
     }
 
@@ -272,6 +277,10 @@ public class BackendManager {
                             lastWelcomeResponse = retrievedData;
                             authenticated = lastWelcomeResponse.authenticated;
                             isFetchingWelcomes = false;
+                            // falls es offene Spiele gibt zurücksetzen, wann das letzte Mal die Liste der
+                            // Multiplayer-Matches gezogen wurde, um einen Refresh zu erzwingen
+                            if (lastWelcomeResponse.competitionActionRequired)
+                                multiplayerMatchesLastFetchMs = 0;
                         }
                     });
         }
