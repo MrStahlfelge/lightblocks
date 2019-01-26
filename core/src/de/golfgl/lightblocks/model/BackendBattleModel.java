@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.IntArray;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Queue;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.backend.MatchTurnRequestInfo;
 import de.golfgl.lightblocks.state.InitGameParameters;
@@ -34,6 +36,7 @@ public class BackendBattleModel extends GameModel {
     private int everyThingsOverTimeMs;
     private Queue<WaitingGarbage> waitingGarbage = new Queue<>();
     private IntArray completeDrawyer = new IntArray();
+    private String currentTurnString;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -69,6 +72,16 @@ public class BackendBattleModel extends GameModel {
     @Override
     public int getShownTimeMs() {
         return everyThingsOverTimeMs - getScore().getTimeMs();
+    }
+
+    @Override
+    public Color getShownTimeColor() {
+        return sendingGarbage ? LightBlocksGame.COLOR_FOCUSSED_ACTOR : Color.WHITE;
+    }
+
+    @Override
+    public String getShownTimeDescription() {
+        return currentTurnString;
     }
 
     @Override
@@ -113,7 +126,13 @@ public class BackendBattleModel extends GameModel {
         everyThingsOverTimeMs = (matchEntity.turnBlockCount * (firstTurnFirstPlayer ? 1 : 2)
                 + getThisTurnsStartSeconds()) * 1000;
 
+        setCurrentTurnString(lastTurnSequenceNum + 1);
+
         super.startNewGame(newGameParams);
+    }
+
+    protected void setCurrentTurnString(int i) {
+        currentTurnString = "#" + (i);
     }
 
     @Override
@@ -253,6 +272,7 @@ public class BackendBattleModel extends GameModel {
                 //TODO Stärker Anzeigen in Spielfeld
                 sendingGarbage = true;
                 userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, matchEntity.opponentNick);
+                setCurrentTurnString(lastTurnSequenceNum + 2);
             } else {
                 // beenden, falls der Gegner bereits beendet hat
                 setGameOverWon(IGameModelListener.MotivationTypes.playerOver);
@@ -321,6 +341,11 @@ public class BackendBattleModel extends GameModel {
         return null;
     }
 
+    @Override
+    public String getExitWarningMessage() {
+        return "exitWarningTurnBattle";
+    }
+
     private static class WaitingGarbage {
         int timeMs;
         int lines;
@@ -329,10 +354,5 @@ public class BackendBattleModel extends GameModel {
             this.timeMs = timeMs;
             this.lines = lines;
         }
-    }
-
-    @Override
-    public String getExitWarningMessage() {
-        return "exitWarningTurnBattle";
     }
 }

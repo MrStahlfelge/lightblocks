@@ -94,6 +94,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     Music music;
     private ScoreLabel blocksLeft;
     private ScaledLabel timeLabel;
+    private Label timeLabelDesc;
     private PauseDialog pauseDialog;
     private Dialog pauseMsgDialog;
     private boolean isPaused = true;
@@ -216,8 +217,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             scoreTable.add(blocksLeft).left().colspan(3);
         } else if (gameModel.showTime()) {
             scoreTable.row();
-            final Label labelBlocks = new ScaledLabel(app.TEXTS.get("labelTime").toUpperCase(), app.skin);
-            scoreTable.add(labelBlocks).right().bottom().padBottom(-2).spaceRight(3);
+            timeLabelDesc = new ScaledLabel(app.TEXTS.get("labelTime").toUpperCase(), app.skin);
+            scoreTable.add(timeLabelDesc).right().bottom().padBottom(-2).spaceRight(3);
             timeLabel = new ScaledLabel(ScoreTable.formatTimeString(0, 1), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
             scoreTable.add(timeLabel).left().colspan(3);
         }
@@ -1019,7 +1020,18 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             int timeMs = gameModel.getShownTimeMs();
 
             if (Math.abs(timeMs - currentShownTime) >= 100) {
-                timeLabel.setText(de.golfgl.lightblocks.menu.ScoreTable.formatTimeString(timeMs, 1));
+                String timeDesc = gameModel.getShownTimeDescription();
+                Color timeLabelColor = gameModel.getShownTimeColor();
+
+                String formattedTime = ScoreTable.formatTimeString(timeMs, 1);
+
+                if (timeDesc != null)
+                    timeLabelDesc.setText(timeDesc);
+
+                if (timeLabelColor != null && !timeLabel.getColor().equals(timeLabelColor))
+                    timeLabel.setColor(timeLabelColor);
+
+                timeLabel.setText(formattedTime);
                 currentShownTime = timeMs;
             }
         }

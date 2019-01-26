@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
@@ -925,6 +926,14 @@ public abstract class GameModel implements Json.Serializable {
      */
     public int getShownTimeMs() {
         return getScore().getTimeMs();
+    }
+
+    public String getShownTimeDescription() {
+        return null;
+    }
+
+    public Color getShownTimeColor() {
+        return null;
     }
 
     public BestScore getBestScore() {
