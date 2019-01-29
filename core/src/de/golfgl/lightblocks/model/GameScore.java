@@ -1,5 +1,7 @@
 package de.golfgl.lightblocks.model;
 
+import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.state.GameStateHandler;
 import de.golfgl.lightblocks.state.IRoundScore;
 
 /**
@@ -34,6 +36,8 @@ public class GameScore implements IRoundScore {
     private int seconds;
     private float secondFraction;
     private boolean lastClearLinesWasSpecial = false;
+    private boolean fraudDetected = false;
+    private String hashValue;
 
     private int scoringType = TYPE_NORMAL;
 
@@ -51,6 +55,9 @@ public class GameScore implements IRoundScore {
      * eingetragen werden soll
      */
     public int getLeaderboardScore() {
+        if (fraudDetected)
+            return -1;
+
         switch (scoringType) {
             case TYPE_PRACTICE:
                 return getDrawnTetrominos();
@@ -162,7 +169,9 @@ public class GameScore implements IRoundScore {
     }
 
     public void addBonusScore(int bonusScore) {
+        checkHashValue();
         this.score += bonusScore;
+        saveHashValue();
     }
 
     public void addSoftDropScore(float softDropScore) {
@@ -173,10 +182,12 @@ public class GameScore implements IRoundScore {
      * sets the current dropscore to the gained score and returns it for displaying in user interface
      */
     public int flushScore() {
+        checkHashValue();
         int flushedScore = (int) dropScore;
 
         this.score += flushedScore;
         dropScore = 0;
+        saveHashValue();
 
         return flushedScore;
     }
@@ -239,9 +250,33 @@ public class GameScore implements IRoundScore {
 
     protected void initFromReplay(int score, int clearedLines, int drawnTetrominos, int timeMs) {
         this.score = score;
+        saveHashValue();
         this.clearedLines = clearedLines;
         this.drawnTetrominos = drawnTetrominos;
         this.seconds = timeMs / 1000;
         this.secondFraction = (float) (timeMs % 1000) / 1000;
+    }
+
+    private void saveHashValue() {
+        hashValue = calcHash();
+    }
+
+    private String calcHash() {
+        String s = String.valueOf(score);
+        while (s.length() < 10)
+            s = s + s;
+        return GameStateHandler.encode(s, LightBlocksGame.SKIN_FONT_TITLE);
+    }
+
+    private void checkHashValue() {
+        if (score > 100 && !fraudDetected) {
+            String shouldBe = calcHash();
+            if (!shouldBe.equals(hashValue))
+                fraudDetected = true;
+        }
+    }
+
+    public boolean isFraudDetected() {
+        return fraudDetected;
     }
 }

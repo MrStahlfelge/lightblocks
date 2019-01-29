@@ -287,7 +287,8 @@ public class BackendBattleModel extends GameModel {
         super.submitGameEnded(success);
 
         infoForServer.droppedOut = !success;
-        infoForServer.replay = replay.toString();
+        if (!getScore().isFraudDetected())
+            infoForServer.replay = replay.toString();
         infoForServer.platform = app.backendManager.getPlatformString();
         infoForServer.inputType = ""; //TODO
 
