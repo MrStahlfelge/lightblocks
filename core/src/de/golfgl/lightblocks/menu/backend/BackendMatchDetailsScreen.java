@@ -283,7 +283,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 matchDetailTable.row();
                 matchDetailTable.add(acceptChallengeButton).pad(40, 0, 20, 0);
                 matchDetailTable.row();
-                matchDetailTable.add(declineChallengeButton);
+                matchDetailTable.add(declineChallengeButton).padBottom(20);
                 toFocus = acceptChallengeButton;
             } else if (app.backendManager.hasTurnToUploadForMatch(match.uuid)) {
                 Button syncButton = new GlowLabelButton(FontAwesome.NET_CLOUDSAVE, "Sync with server", app.skin,
@@ -295,14 +295,14 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                     }
                 });
                 addFocusableActor(syncButton);
-                matchDetailTable.add(syncButton).padTop(15);
+                matchDetailTable.add(syncButton).padTop(15).padBottom(20);
 
                 // es gibt noch einen zum hochladen
                 resignButton.setDisabled(true);
                 toFocus = syncButton;
             } else {
                 // okay, normaler Zustand zum Spielen
-                matchDetailTable.add(playTurnButton).padTop(15);
+                matchDetailTable.add(playTurnButton).padTop(15).padBottom(20);
                 resignButton.setDisabled(false);
                 toFocus = playTurnButton;
             }
@@ -311,7 +311,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 && match.turns.size() >= 1) {
             // Match um => retry button
             matchDetailTable.row();
-            matchDetailTable.add(rematchButton).padTop(15);
+            matchDetailTable.add(rematchButton).padTop(15).padBottom(20);
             toFocus = rematchButton;
         }
 
@@ -391,6 +391,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
             int linesSentYou = 0;
             int linesSentOpp = 0;
+            int yourScore = 0;
+            int oppScore = 0;
 
             for (final MatchEntity.MatchTurn turn : match.turns) {
                 row();
@@ -410,6 +412,9 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 else if (turn.youPlayed)
                     // nur zeigen, wenn bereits gespielt ist
                     linesSentOpp = linesSentOpp - turn.linesSent;
+
+                yourScore = turn.yourScore;
+                oppScore = turn.opponentScore;
             }
 
             if (match.opponentBonus > 0 || match.yourBonus > 0) {
@@ -427,6 +432,13 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                             .SKIN_FONT_TITLE, .5f)).uniform();
                 else
                     add();
+
+                row();
+                add(new ScaledLabel("TOTAL", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f));
+                add(new ScaledLabel(String.valueOf(yourScore + match.yourBonus), app.skin,
+                        LightBlocksGame.SKIN_FONT_TITLE, .65f));
+                add(new ScaledLabel(String.valueOf(oppScore + match.opponentBonus), app.skin,
+                        LightBlocksGame.SKIN_FONT_TITLE, .65f));
             }
 
             if (linesSentYou > 0 || linesSentOpp > 0) {
