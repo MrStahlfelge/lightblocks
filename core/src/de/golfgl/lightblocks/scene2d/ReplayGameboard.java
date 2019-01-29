@@ -289,6 +289,10 @@ public class ReplayGameboard extends BlockGroup {
             playSpeed = 1f;
     }
 
+    public boolean isPlayingFast() {
+        return playSpeed >= 2f;
+    }
+
     public void windToNextDrop() {
         pauseReplay();
         while (nextStep != null && !nextStep.isDropStep() && replay.seekToNextStep() != null) {

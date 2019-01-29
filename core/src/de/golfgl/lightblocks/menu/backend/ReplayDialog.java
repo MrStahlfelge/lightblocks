@@ -278,10 +278,16 @@ public class ReplayDialog extends AbstractFullScreenDialog {
                 } else if (isPlaying && Math.abs(replayGameboard2.getCurrentTime() -
                         replayGameboard.getCurrentTime()) <= 100) {
                     // wieder eingeholt => dann los
-                    if (!replayGameboard2.isPlaying())
+                    if (!replayGameboard2.isPlaying()) {
                         replayGameboard2.playReplay();
-                    if (!replayGameboard.isPlaying())
+                        if (replayGameboard.isPlayingFast())
+                            replayGameboard2.playFast();
+                    }
+                    if (!replayGameboard.isPlaying()) {
                         replayGameboard.playReplay();
+                        if (replayGameboard2.isPlayingFast())
+                            replayGameboard.playFast();
+                    }
                 }
             }
 
