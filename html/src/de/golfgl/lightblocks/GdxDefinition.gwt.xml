@@ -13,4 +13,6 @@
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 	<set-configuration-property name="gdx.assetpath" value="../android/assets" />
 	<set-configuration-property name="gdx.assetfilterclass" value="de.golfgl.lightblocks.AssetFilter"/>
+	<set-property name="user.agent" value="gecko1_8, safari"/>
+	<collapse-property name="user.agent" values="*" />
 </module>
