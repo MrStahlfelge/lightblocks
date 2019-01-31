@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -150,7 +151,9 @@ public class BackendMatchesTable extends WidgetGroup {
         Action colorAction;
         private MatchEntity me;
         private ScaledLabel timePassedLabel;
+        private ScaledLabel matchState;
         private float timePassedRefreshWait;
+        private boolean notInSync;
 
         public BackendMatchRow(MatchEntity match) {
             super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
@@ -182,11 +185,7 @@ public class BackendMatchesTable extends WidgetGroup {
                         .skin, LightBlocksGame.SKIN_FONT_TITLE);
                 opponentLabel.setEllipsis(true);
                 add(opponentLabel).width(150);
-                boolean notInSync = app.backendManager.hasTurnToUploadForMatch(match.uuid);
-                ScaledLabel matchState = new ScaledLabel(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS,
-                        notInSync ? "needssync" : match.matchState, "mmturn_"), app.skin, LightBlocksGame.SKIN_FONT_BIG);
-                if (notInSync)
-                    matchState.setColor(LightBlocksGame.EMPHASIZE_COLOR);
+                matchState = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
                 matchState.setEllipsis(true);
                 add(matchState).width(120);
                 timePassedLabel = new ScaledLabel("", app.skin);
@@ -195,6 +194,14 @@ public class BackendMatchesTable extends WidgetGroup {
             }
             me = match;
             refreshTimePassed();
+            refreshMatchState();
+        }
+
+        protected void refreshMatchState() {
+            notInSync = app.backendManager.hasTurnToUploadForMatch(me.uuid);
+            matchState.setText(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS,
+                    notInSync ? "needssync" : me.matchState, "mmturn_"));
+            matchState.setColor(notInSync ? LightBlocksGame.EMPHASIZE_COLOR : Color.WHITE);
         }
 
         @Override
@@ -206,6 +213,8 @@ public class BackendMatchesTable extends WidgetGroup {
                 if (timePassedRefreshWait <= 0)
                     refreshTimePassed();
             }
+            if (notInSync && me != null && !app.backendManager.hasTurnToUploadForMatch(me.uuid))
+                refreshMatchState();
         }
 
         private void refreshTimePassed() {
