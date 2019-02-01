@@ -2,11 +2,12 @@ package de.golfgl.lightblocks.backend;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.net.HttpStatus;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class BackendManager {
     private final BackendClient backendClient;
     private final HashMap<String, CachedScoreboard> latestScores = new HashMap<String, CachedScoreboard>();
     private final HashMap<String, CachedScoreboard> bestScores = new HashMap<String, CachedScoreboard>();
-    private List<MatchEntity> multiplayerMatchesList;
+    private Array<MatchEntity> multiplayerMatchesList;
     private boolean authenticated;
     private BackendScore currentlySendingScore;
     private BackendClient.WelcomeResponse lastWelcomeResponse;
@@ -76,7 +77,7 @@ public class BackendManager {
                 osString = "desktop";
         }
 
-        multiplayerMatchesList = new ArrayList<>();
+        multiplayerMatchesList = new Array<>();
         if (hasUserId()) {
             // einen eventuell noch zum Hochladen vorgemerkten laden
             playedTurnToUpload = prefs.getTurnToUpload();
@@ -114,7 +115,7 @@ public class BackendManager {
         }
     }
 
-    public List<MatchEntity> getMultiplayerMatchesList() {
+    public Array<MatchEntity> getMultiplayerMatchesList() {
         // Aufforderung in Main-Screen "gelesen" markieren
         if (lastWelcomeResponse != null && lastWelcomeResponse.competitionActionRequired) {
             lastWelcomeResponse = new BackendClient.WelcomeResponse(lastWelcomeResponse);
@@ -172,7 +173,7 @@ public class BackendManager {
 
                 @Override
                 public void onSuccess(MatchEntity retrievedData) {
-                    multiplayerMatchesList.add(0, retrievedData);
+                    updateMatchEntityInList(retrievedData);
                     multiplayerMatchesLastFetchMs = TimeUtils.millis();
                     callback.onSuccess(retrievedData);
                 }
@@ -191,7 +192,7 @@ public class BackendManager {
             // zusammenführen
 
             backendClient.listPlayerMatches(0, new BackendClient
-                    .IBackendResponse<List<MatchEntity>>() {
+                    .IBackendResponse<Array<MatchEntity>>() {
                 @Override
                 public void onFail(int statusCode, String errorMsg) {
                     isFetchingMultiplayerMatches = false;
@@ -200,13 +201,14 @@ public class BackendManager {
                 }
 
                 @Override
-                public void onSuccess(final List<MatchEntity> retrievedData) {
+                public void onSuccess(final Array<MatchEntity> retrievedData) {
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {
                             isFetchingMultiplayerMatches = false;
                             multiplayerMatchesLastFetchSuccessful = true;
                             multiplayerMatchesList = retrievedData;
+                            multiplayerMatchesList.sort(new MultiplayerMatchComparator());
                             multiplayerMatchesLastFetchMs = TimeUtils.millis();
                         }
                     });
@@ -230,7 +232,7 @@ public class BackendManager {
             return;
         }
 
-        for (int i = 0; i < multiplayerMatchesList.size(); i++)
+        for (int i = 0; i < multiplayerMatchesList.size; i++)
             if (multiplayerMatchesList.get(i).uuid.equalsIgnoreCase(matchId)
                     && multiplayerMatchesList.get(i).isFullMatchInfo) {
                 callback.onSuccess(multiplayerMatchesList.get(i));
@@ -478,15 +480,17 @@ public class BackendManager {
 
     public void updateMatchEntityInList(MatchEntity matchToInsert) {
         // erstmal aus der Liste entfernen, falls das Match schon enthalten ist
-        for (int i = multiplayerMatchesList.size() - 1; i >= 0; i--)
+        for (int i = multiplayerMatchesList.size - 1; i >= 0; i--)
             if (multiplayerMatchesList.get(i).uuid.equalsIgnoreCase(matchToInsert.uuid))
-                multiplayerMatchesList.remove(i);
+                multiplayerMatchesList.removeIndex(i);
 
         // und dann an der richtigen Stelle einfügen
         boolean added = false;
-        for (int i = 0; i < multiplayerMatchesList.size(); i++) {
-            if (multiplayerMatchesList.get(i).lastChangeTime < matchToInsert.lastChangeTime) {
-                multiplayerMatchesList.add(i, matchToInsert);
+        MultiplayerMatchComparator comparator = new MultiplayerMatchComparator();
+        for (int i = 0; i < multiplayerMatchesList.size; i++) {
+            MatchEntity nextEntity = multiplayerMatchesList.get(i);
+            if (comparator.compare(matchToInsert, nextEntity) <= 0) {
+                multiplayerMatchesList.insert(i, matchToInsert);
                 added = true;
                 break;
             }
@@ -536,6 +540,24 @@ public class BackendManager {
          * auf dem Main-Thread
          */
         protected abstract void onRequestFailed(int statusCode, String errorMsg);
+    }
+
+    private static class MultiplayerMatchComparator implements Comparator<MatchEntity> {
+        @Override
+        public int compare(MatchEntity m1, MatchEntity m2) {
+            if (m1.myTurn && !m2.myTurn)
+                return -1;
+            else if (!m1.myTurn && m2.myTurn)
+                return 1;
+            else {
+                if (m1.lastChangeTime > m2.lastChangeTime)
+                    return -1;
+                else if (m1.lastChangeTime < m2.lastChangeTime)
+                    return 1;
+            }
+
+            return 0;
+        }
     }
 
     public class CachedScoreboard {

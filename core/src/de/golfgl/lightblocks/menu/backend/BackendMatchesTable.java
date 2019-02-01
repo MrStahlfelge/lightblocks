@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.HashMap;
@@ -81,17 +82,17 @@ public class BackendMatchesTable extends WidgetGroup {
     }
 
     private void refresh() {
-        List<MatchEntity> shownMatchesList = app.backendManager.getMultiplayerMatchesList();
+        Array<MatchEntity> shownMatchesList = app.backendManager.getMultiplayerMatchesList();
         listTimeStamp = app.backendManager.getMultiplayerMatchesLastFetchMs();
-        HashMap<String, BackendMatchRow> newMatchesMap = new HashMap<>(shownMatchesList.size());
+        HashMap<String, BackendMatchRow> newMatchesMap = new HashMap<>(shownMatchesList.size);
 
-        float newHeight = calcPrefHeight(shownMatchesList.size());
+        float newHeight = calcPrefHeight(shownMatchesList.size);
         if (newHeight != lastLayoutHeight)
             for (Actor a : getChildren()) {
                 a.setY(a.getY() + newHeight - lastLayoutHeight);
             }
         lastLayoutHeight = newHeight;
-        for (int i = 0; i < shownMatchesList.size(); i++) {
+        for (int i = 0; i < shownMatchesList.size; i++) {
             MatchEntity me = shownMatchesList.get(i);
 
             float yPos = newHeight - (i + 1) * ROW_HEIGHT;
