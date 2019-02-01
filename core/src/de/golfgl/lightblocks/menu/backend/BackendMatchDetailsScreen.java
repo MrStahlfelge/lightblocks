@@ -400,10 +400,10 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                         .SKIN_FONT_REG));
                 String yourScoreText = turn.youPlayed ? String.valueOf(turn.yourScore) : "";
                 if (turn.youDroppedOut)
-                    yourScoreText = "X" + yourScoreText;
+                    yourScoreText = "†" + yourScoreText;
                 String opponentScoreText = turn.opponentPlayed ? String.valueOf(turn.opponentScore) : "";
                 if (turn.opponentDroppedOut)
-                    opponentScoreText = "X" + opponentScoreText;
+                    opponentScoreText = "†" + opponentScoreText;
                 add(new ScaledLabel(yourScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform();
                 add(new ScaledLabel(opponentScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform();
 
