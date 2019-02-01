@@ -134,6 +134,12 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        if (listChangesSince < 1901) {
+            welcomes.add(new WelcomeButton.WelcomeText("New: Global turn based multiplayer mode! " +
+                    "With a turn 90 seconds play time at max, you can play in every break you have!",
+                    new ShowMultiPlayerPageRunnable(app, 0)));
+        }
+
         if (listChangesSince < 1837) {
             welcomes.add(new WelcomeButton.WelcomeText("New: REPLAYS! You can watch your and all other players' " +
                     "best performances! Check the score details to see if a replay is available.", null));

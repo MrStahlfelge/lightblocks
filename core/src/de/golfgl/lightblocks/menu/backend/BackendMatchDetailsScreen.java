@@ -281,7 +281,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                         + match.beginningLevel, app.skin, LightBlocksGame.SKIN_FONT_BIG))
                         .padTop(30);
                 matchDetailTable.row();
-                matchDetailTable.add(acceptChallengeButton).pad(40, 0, 20, 0);
+                matchDetailTable.add(acceptChallengeButton).pad(60, 0, 30, 0);
                 matchDetailTable.row();
                 matchDetailTable.add(declineChallengeButton).padBottom(20);
                 toFocus = acceptChallengeButton;
@@ -400,10 +400,10 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                         .SKIN_FONT_REG));
                 String yourScoreText = turn.youPlayed ? String.valueOf(turn.yourScore) : "";
                 if (turn.youDroppedOut)
-                    yourScoreText += "X";
+                    yourScoreText = "X" + yourScoreText;
                 String opponentScoreText = turn.opponentPlayed ? String.valueOf(turn.opponentScore) : "";
                 if (turn.opponentDroppedOut)
-                    opponentScoreText += "X";
+                    opponentScoreText = "X" + opponentScoreText;
                 add(new ScaledLabel(yourScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform();
                 add(new ScaledLabel(opponentScoreText, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).uniform();
 

@@ -31,7 +31,7 @@ import de.golfgl.lightblocks.scene2d.VetoDialog;
 
 public class BackendMatchesTable extends WidgetGroup {
     private static final int ROW_WIDTH = 420;
-    private static final int ROW_HEIGHT = 60;
+    private static final int ROW_HEIGHT = 50;
     private final LightBlocksGame app;
     private long listTimeStamp;
     private HashMap<String, BackendMatchRow> uuidMatchMap = new HashMap<>(1);
@@ -202,7 +202,8 @@ public class BackendMatchesTable extends WidgetGroup {
             notInSync = app.backendManager.hasTurnToUploadForMatch(me.uuid);
             matchState.setText(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS,
                     notInSync ? "needssync" : me.matchState, "mmturn_"));
-            matchState.setColor(notInSync ? LightBlocksGame.EMPHASIZE_COLOR : Color.WHITE);
+            matchState.setColor(notInSync ? LightBlocksGame.EMPHASIZE_COLOR :
+                    me.myTurn ? LightBlocksGame.COLOR_FOCUSSED_ACTOR : Color.WHITE);
         }
 
         @Override
