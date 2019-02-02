@@ -3,7 +3,7 @@ atlasData: {
 	atlasCurrent: true
 	drawables: [
 		{
-			file: ../fa-45.png
+			file: "../fa-45.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -14,9 +14,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: fa-45
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../qs-25-bold.png
+			file: "../qs-25-bold.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -27,9 +31,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: qs-25-bold
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../slider.9.png
+			file: "../slider.9.png"
 			bgColor: {
 				r: 1
 				g: 1
@@ -40,9 +48,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: slider
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../slider-knob.png
+			file: "../slider-knob.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -53,9 +65,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: slider-knob
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../slider-knob-pressed.png
+			file: "../slider-knob-pressed.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -66,9 +82,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: slider-knob-pressed
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../slider-knob.png
+			file: "../slider-knob.png"
 			bgColor: {
 				r: 1
 				g: 1
@@ -79,9 +99,13 @@ atlasData: {
 			tint: null
 			tintName: disabled
 			name: slider-knob-disabled
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../slider-before.9.png
+			file: "../slider-before.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -92,9 +116,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: slider-before
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../scroll-horizontal.9.png
+			file: "../scroll-horizontal.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -105,9 +133,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: scroll-horizontal
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../scroll-vertical.9.png
+			file: "../scroll-vertical.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -118,9 +150,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: scroll-vertical
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../block-deactivated.png
+			file: "../block-deactivated.png"
 			bgColor: {
 				r: 1
 				g: 1
@@ -131,9 +167,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: block-deactivated
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../block-light.png
+			file: "../block-light.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -144,9 +184,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: block-light
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../lineglow.png
+			file: "../lineglow.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -157,9 +201,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: lineglow
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../window.9.png
+			file: "../window.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -170,9 +218,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: window
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../list.9.png
+			file: "../list.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -183,9 +235,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: list
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../white.png
+			file: "../white.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -196,9 +252,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: white
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../white.png
+			file: "../white.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -209,9 +269,13 @@ atlasData: {
 			tint: null
 			tintName: lightselection
 			name: selection
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../qs-60-bold.png
+			file: "../qs-60-bold.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -222,9 +286,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: qs-60-bold
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../qs-40-bold.png
+			file: "../qs-40-bold.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -235,9 +303,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: qs-40-bold
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../qs-25-reg.png
+			file: "../qs-25-reg.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -248,9 +320,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: qs-25-reg
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../qs-60-boldglow.png
+			file: "../qs-60-boldglow.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -261,9 +337,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: qs-60-boldglow
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../window-bl.9.png
+			file: "../window-bl.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -274,9 +354,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: window-bl
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../white.png
+			file: "../white.png"
 			bgColor: {
 				r: 1
 				g: 1
@@ -292,9 +376,13 @@ atlasData: {
 			}
 			tintName: null
 			name: smoke
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../qs-40-boldglow.png
+			file: "../qs-40-boldglow.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -305,9 +393,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: qs-40-boldglow
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_small_font.9.png
+			file: "../button_small_font.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -318,9 +410,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: button_small_font
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_small_font_glow.9.png
+			file: "../button_small_font_glow.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -331,9 +427,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: button_small_font_glow
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_small_font_filled.9.png
+			file: "../button_small_font_filled.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -344,9 +444,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: button_small_font_filled
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../white.png
+			file: "../white.png"
 			bgColor: {
 				r: 1
 				g: 1
@@ -357,9 +461,13 @@ atlasData: {
 			tint: null
 			tintName: black
 			name: black
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_round.9.png
+			file: "../button_round.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -370,9 +478,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: button_round
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../white.png
+			file: "../white.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -388,9 +500,13 @@ atlasData: {
 			}
 			tintName: null
 			name: transparent
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../radio.png
+			file: "../radio.png"
 			bgColor: {
 				r: 1
 				g: 1
@@ -401,9 +517,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: radio
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../radio-over.png
+			file: "../radio-over.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -414,9 +534,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: radio-over
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_small_font.9.png
+			file: "../button_small_font.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -427,9 +551,13 @@ atlasData: {
 			tint: null
 			tintName: disabled
 			name: button_small_font_disabled
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../touchpad.png
+			file: "../touchpad.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -440,9 +568,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: touchpad
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../touchpad_knob.png
+			file: "../touchpad_knob.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -453,9 +585,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: touchpad_knob
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_rotateright.png
+			file: "../button_rotateright.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -466,9 +602,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: button_rotateright
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_rotateright.png
+			file: "../button_rotateright.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -479,9 +619,13 @@ atlasData: {
 			tint: null
 			tintName: disabled
 			name: button_rotateright_pressed
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_rotateleft.png
+			file: "../button_rotateleft.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -492,9 +636,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: button_rotateleft
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_rotateleft.png
+			file: "../button_rotateleft.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -505,9 +653,13 @@ atlasData: {
 			tint: null
 			tintName: disabled
 			name: button_rotateleft_pressed
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_harddrop.png
+			file: "../button_harddrop.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -518,9 +670,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: button_harddrop
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../button_harddrop.png
+			file: "../button_harddrop.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -531,9 +687,13 @@ atlasData: {
 			tint: null
 			tintName: disabled
 			name: button_harddrop_pressed
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../block-ghost.png
+			file: "../block-ghost.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -544,9 +704,13 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: block-ghost
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../white.png
+			file: "../white.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -562,9 +726,13 @@ atlasData: {
 			}
 			tintName: null
 			name: whitesmoke
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 		{
-			file: ../window-bl.9.png
+			file: "../window-bl.9.png"
 			bgColor: {
 				r: 0
 				g: 0
@@ -575,6 +743,10 @@ atlasData: {
 			tint: null
 			tintName: lightselection
 			name: focused-window-bl
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
 		}
 	]
 }
@@ -645,39 +817,40 @@ jsonData: {
 		{
 			class: com.ray3k.skincomposer.data.FontData
 			name: fa45
-			file: ../fa-45.fnt
+			file: "../fa-45.fnt"
 		}
 		{
 			class: com.ray3k.skincomposer.data.FontData
 			name: qs-25-bold
-			file: ../qs-25-bold.fnt
+			file: "../qs-25-bold.fnt"
 		}
 		{
 			class: com.ray3k.skincomposer.data.FontData
 			name: qs-25-reg
-			file: ../qs-25-reg.fnt
+			file: "../qs-25-reg.fnt"
 		}
 		{
 			class: com.ray3k.skincomposer.data.FontData
 			name: qs-40-bold
-			file: ../qs-40-bold.fnt
+			file: "../qs-40-bold.fnt"
 		}
 		{
 			class: com.ray3k.skincomposer.data.FontData
 			name: qs-40-boldglow
-			file: ../qs-40-boldglow.fnt
+			file: "../qs-40-boldglow.fnt"
 		}
 		{
 			class: com.ray3k.skincomposer.data.FontData
 			name: qs-60-bold
-			file: ../qs-60-bold.fnt
+			file: "../qs-60-bold.fnt"
 		}
 		{
 			class: com.ray3k.skincomposer.data.FontData
 			name: qs-60-boldglow
-			file: ../qs-60-boldglow.fnt
+			file: "../qs-60-boldglow.fnt"
 		}
 	]
+	freeTypeFonts: []
 	classStyleMap: {
 		com.badlogic.gdx.scenes.scene2d.ui.Button: [
 			{
@@ -771,6 +944,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -863,6 +1037,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -955,6 +1130,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.CheckBox: [
@@ -1133,6 +1309,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.ImageButton: [
@@ -1269,6 +1446,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -1403,6 +1581,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -1537,6 +1716,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -1671,6 +1851,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton: [
@@ -1856,6 +2037,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.Label: [
@@ -1887,6 +2069,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -1916,6 +2099,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -1945,6 +2129,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -1974,6 +2159,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2003,6 +2189,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2032,6 +2219,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2061,6 +2249,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2090,6 +2279,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2119,6 +2309,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.List: [
@@ -2164,6 +2355,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.ProgressBar: [
@@ -2230,6 +2422,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2294,6 +2487,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.ScrollPane: [
@@ -2346,6 +2540,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2396,6 +2591,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2446,6 +2642,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.SelectBox: [
@@ -2519,6 +2716,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.Slider: [
@@ -2599,6 +2797,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2677,6 +2876,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.SplitPane: [
@@ -2694,6 +2894,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2709,6 +2910,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.TextButton: [
@@ -2852,6 +3054,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -2993,6 +3196,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -3134,6 +3338,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -3275,6 +3480,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -3416,6 +3622,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -3557,6 +3764,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.TextField: [
@@ -3644,6 +3852,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.TextTooltip: [
@@ -3675,6 +3884,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.Touchpad: [
@@ -3699,6 +3909,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.Tree: [
@@ -3744,6 +3955,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.Window: [
@@ -3782,6 +3994,7 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -3818,6 +4031,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -3854,6 +4068,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 			{
 				class: com.ray3k.skincomposer.data.StyleData
@@ -3890,6 +4105,7 @@ jsonData: {
 					}
 				}
 				deletable: true
+				parent: null
 			}
 		]
 	}
@@ -3909,5 +4125,5 @@ preferences: {
 		value: false
 	}
 }
-saveFile: ../skin/lb.scmp
+saveFile: "../skin/lb.scmp"
 }
