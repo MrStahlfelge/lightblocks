@@ -89,8 +89,10 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
         errorLabelCell = myGamesTable.add();
 
         myGamesTable.row();
-        ControllerScrollPane scrollPane = new ControllerScrollPane(new BackendMatchesTable(app), app.skin);
+        BackendMatchesTable matchesTable = new BackendMatchesTable(app);
+        final ControllerScrollPane scrollPane = new ControllerScrollPane(matchesTable, app.skin);
         scrollPane.setScrollingDisabled(true, false);
+        matchesTable.setEnclosingScrollPane(scrollPane);
         myGamesTable.add(scrollPane).expand().width(LightBlocksGame.nativeGameWidth);
 
         // einen eventuell noch nicht abgesendeten Turn abgesenden

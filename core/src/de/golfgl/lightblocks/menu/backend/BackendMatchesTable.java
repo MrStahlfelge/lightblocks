@@ -8,20 +8,19 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.HashMap;
-import java.util.List;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.menu.ITouchActionButton;
 import de.golfgl.lightblocks.scene2d.MyActions;
-import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 
@@ -34,9 +33,11 @@ public class BackendMatchesTable extends WidgetGroup {
     private static final int ROW_HEIGHT = 50;
     private final LightBlocksGame app;
     private long listTimeStamp;
+    private long firstShownTimestamp;
     private HashMap<String, BackendMatchRow> uuidMatchMap = new HashMap<>(1);
     private float lastLayoutHeight;
     private Label introLabel;
+    private ScrollPane enclosingScrollPane;
 
     public BackendMatchesTable(LightBlocksGame app) {
         this.app = app;
@@ -132,6 +133,13 @@ public class BackendMatchesTable extends WidgetGroup {
                 introLabel.addAction(Actions.delay(1f, Actions.fadeIn(.2f, Interpolation.fade)));
         } else
             introLabel.getColor().a = 0;
+
+        long newFirstShownTs = (shownMatchesList.size >= 1) ? shownMatchesList.get(0).lastChangeTime : 0;
+        if (newFirstShownTs != firstShownTimestamp) {
+            firstShownTimestamp = newFirstShownTs;
+            if (enclosingScrollPane != null)
+                enclosingScrollPane.scrollTo(0, getPrefHeight(), getPrefWidth(), ROW_HEIGHT);
+        }
     }
 
     @Override
@@ -146,6 +154,10 @@ public class BackendMatchesTable extends WidgetGroup {
     @Override
     public float getPrefWidth() {
         return LightBlocksGame.nativeGameWidth * .7f;
+    }
+
+    public void setEnclosingScrollPane(ScrollPane scrollPane) {
+        enclosingScrollPane = scrollPane;
     }
 
     private class BackendMatchRow extends Button implements ITouchActionButton {
