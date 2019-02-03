@@ -554,7 +554,7 @@ public class BackendManager {
 
             if (outerSortVal1 < outerSortVal2)
                 return -1;
-            else if (outerSortVal2 > outerSortVal1)
+            else if (outerSortVal1 > outerSortVal2)
                 return 1;
             else {
                 if (m1.lastChangeTime > m2.lastChangeTime)
