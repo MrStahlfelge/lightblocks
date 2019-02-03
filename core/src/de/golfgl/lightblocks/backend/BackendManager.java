@@ -542,12 +542,19 @@ public class BackendManager {
         protected abstract void onRequestFailed(int statusCode, String errorMsg);
     }
 
+    /**
+     * Sortierung: erst welche wo man dran ist, dann wartende, dann abgeschlossene. Jeweils in sich
+     * nach Zeitstempel
+     */
     private static class MultiplayerMatchComparator implements Comparator<MatchEntity> {
         @Override
         public int compare(MatchEntity m1, MatchEntity m2) {
-            if (m1.myTurn && !m2.myTurn)
+            int outerSortVal1 = getOuterSortVal(m1);
+            int outerSortVal2 = getOuterSortVal(m2);
+
+            if (outerSortVal1 < outerSortVal2)
                 return -1;
-            else if (!m1.myTurn && m2.myTurn)
+            else if (outerSortVal2 > outerSortVal1)
                 return 1;
             else {
                 if (m1.lastChangeTime > m2.lastChangeTime)
@@ -557,6 +564,18 @@ public class BackendManager {
             }
 
             return 0;
+        }
+
+        private int getOuterSortVal(MatchEntity match) {
+            int outerSortVal;
+            if (match.myTurn)
+                outerSortVal = 0;
+            else if (match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_WAIT)
+                    || match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED))
+                outerSortVal = 1;
+            else
+                outerSortVal = 2;
+            return outerSortVal;
         }
     }
 
