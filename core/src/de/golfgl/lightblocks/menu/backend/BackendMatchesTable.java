@@ -155,9 +155,13 @@ public class BackendMatchesTable extends WidgetGroup {
         private ScaledLabel matchState;
         private float timePassedRefreshWait;
         private boolean notInSync;
+        private final ScaledLabel opponentLabel;
 
         public BackendMatchRow(MatchEntity match) {
             super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
+
+            opponentLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            opponentLabel.setEllipsis(true);
 
             setMatchEntity(match);
             setSize(ROW_WIDTH, ROW_HEIGHT);
@@ -182,9 +186,7 @@ public class BackendMatchesTable extends WidgetGroup {
             if (me == null || me.lastChangeTime < match.lastChangeTime) {
                 clearChildren();
                 defaults().padRight(10);
-                ScaledLabel opponentLabel = new ScaledLabel(match.opponentNick != null ? match.opponentNick : "???", app
-                        .skin, LightBlocksGame.SKIN_FONT_TITLE);
-                opponentLabel.setEllipsis(true);
+                opponentLabel.setText(match.opponentNick != null ? match.opponentNick : "???");
                 add(opponentLabel).width(150);
                 matchState = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_BIG);
                 matchState.setEllipsis(true);
@@ -240,18 +242,13 @@ public class BackendMatchesTable extends WidgetGroup {
         }
 
         @Override
-        public boolean isPressed() {
-            return super.isPressed() || getStage() != null && ((MyStage) getStage()).getFocusedActor() == this;
-        }
-
-        @Override
         public void touchAction() {
             // leider in GlowLabelButton nochmal drin
             if (!isDisabled()) {
                 if (colorAction != null)
-                    removeAction(colorAction);
+                    opponentLabel.removeAction(colorAction);
                 colorAction = MyActions.getTouchAction(LightBlocksGame.COLOR_FOCUSSED_ACTOR, getColor());
-                addAction(colorAction);
+                opponentLabel.addAction(colorAction);
             }
         }
     }
