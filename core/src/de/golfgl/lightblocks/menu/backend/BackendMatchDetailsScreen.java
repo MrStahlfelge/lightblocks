@@ -387,7 +387,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
             add();
             add(new ScaledLabel("YOU", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).expandX();
-            add(new ScaledLabel("OPPONENT", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).expandX();
+            add(new ScaledLabel("OPPONENT", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).expandX().padLeft(15);
 
             int linesSentYou = 0;
             int linesSentOpp = 0;
