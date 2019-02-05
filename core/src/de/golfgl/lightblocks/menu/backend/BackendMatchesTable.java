@@ -53,7 +53,13 @@ public class BackendMatchesTable extends WidgetGroup {
         introLabel.getColor().a = 0;
         addActor(introLabel);
 
+        fetchMatchesIfNeeded();
         refresh();
+    }
+
+    private void fetchMatchesIfNeeded() {
+        if (TimeUtils.timeSinceMillis(app.backendManager.getMultiplayerMatchesLastFetchMs()) > 5 * 60 * 1000L)
+            app.backendManager.fetchMultiplayerMatches();
     }
 
     public static String formatTimePassedString(LightBlocksGame app, long lastChangeTime) {
@@ -69,14 +75,20 @@ public class BackendMatchesTable extends WidgetGroup {
 
         if (hoursPassed <= 1)
             return app.TEXTS.get("time1hour");
-        else
+        else if (hoursPassed < 48)
             return app.TEXTS.format("timeXhours", hoursPassed);
+
+        int daysPassed = hoursPassed / 24;
+
+        return app.TEXTS.format("timeXDays", daysPassed);
 
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
+
+        fetchMatchesIfNeeded();
 
         if (app.backendManager.getMultiplayerMatchesLastFetchMs() > listTimeStamp)
             refresh();

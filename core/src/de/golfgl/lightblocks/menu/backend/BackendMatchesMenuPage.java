@@ -71,8 +71,6 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
 
     protected void switchToMatchTable() {
         mainCell.setActor(fillMenu()).fill();
-        if (TimeUtils.timeSinceMillis(app.backendManager.getMultiplayerMatchesLastFetchMs()) > 5 * 60 * 1000L)
-            app.backendManager.fetchMultiplayerMatches();
     }
 
     private Actor fillMenu() {
