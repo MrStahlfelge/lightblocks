@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -233,7 +234,7 @@ public class BackendClientTest {
         WaitForResponseListener<BackendClient.WelcomeResponse> newMessagesResponse = new
                 WaitForResponseListener<BackendClient.WelcomeResponse>();
         backendClientNoAuth.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1023, 1,
-                newMessagesResponse);
+                0, newMessagesResponse);
         waitWhileRequesting();
 
         Assert.assertNotNull(newMessagesResponse.retrievedData);
@@ -244,7 +245,7 @@ public class BackendClientTest {
         // veraltete Clientversion
         newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
         backendClientNoAuth.fetchWelcomeMessages(1, "smarttv", "webgl", 1023, 1,
-                newMessagesResponse);
+                0, newMessagesResponse);
         waitWhileRequesting();
 
         Assert.assertNotNull(newMessagesResponse.retrievedData);
@@ -262,7 +263,7 @@ public class BackendClientTest {
 
         newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
         backendClientPlayer.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1024, 1,
-                newMessagesResponse);
+                0, newMessagesResponse);
         waitWhileRequesting();
         Assert.assertNotNull(newMessagesResponse.retrievedData);
         Assert.assertTrue(newMessagesResponse.retrievedData.authenticated);
@@ -274,7 +275,7 @@ public class BackendClientTest {
         BackendClient noAuthPlayer = new BackendClient();
         noAuthPlayer.setUserId("----");
         noAuthPlayer.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1024, 1,
-                newMessagesResponse);
+                0, newMessagesResponse);
         waitWhileRequesting();
         Assert.assertNotNull(newMessagesResponse.retrievedData);
         Assert.assertFalse(newMessagesResponse.retrievedData.authenticated);
@@ -339,11 +340,11 @@ public class BackendClientTest {
         Assert.assertNotNull(createdResponse.retrievedData);
 
         // neuer Spieler hat noch keine
-        WaitForResponseListener<List<MatchEntity>> callback = new WaitForResponseListener<>();
+        WaitForResponseListener<Array<MatchEntity>> callback = new WaitForResponseListener<>();
         backendClientPlayer.listPlayerMatches(0, callback);
         waitWhileRequesting();
         Assert.assertNotNull(callback.retrievedData);
-        Assert.assertTrue(callback.retrievedData.isEmpty());
+        Assert.assertTrue(callback.retrievedData.size == 0);
 
         //jetzt einfügen
         WaitForResponseListener<MatchEntity> addlistener = new WaitForResponseListener<>();
@@ -355,7 +356,7 @@ public class BackendClientTest {
         backendClientPlayer.listPlayerMatches(0, callback);
         waitWhileRequesting();
         Assert.assertNotNull(callback.retrievedData);
-        Assert.assertEquals(1, callback.retrievedData.size());
+        Assert.assertEquals(1, callback.retrievedData.size);
 
         // und einen abholen
         WaitForResponseListener<MatchEntity> matchCallback = new WaitForResponseListener<>();
