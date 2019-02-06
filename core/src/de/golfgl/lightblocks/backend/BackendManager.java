@@ -30,6 +30,9 @@ public class BackendManager {
     public static final String PLATFORM_TV = "smarttv";
     public static final String PLATFORM_MOBILE = "mobile";
     public static final String PLATFORM_DESKTOP = "desktop";
+
+    public static final String PUSH_PAYLOAD_MULTIPLAYER = "multiplayer";
+
     private final LocalPrefs prefs;
     private final Queue<BackendScore> enqueuedScores = new Queue<BackendScore>();
     private final String platformString;

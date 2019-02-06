@@ -5,4 +5,8 @@
     <string name="app_short_name">Lightblocks</string>
     <string name="app_id">666172602594</string>
 
+    <string name="multiplayer_notification">There are news regarding your multiplayer matches!</string>
+    <string name="multiplayer_channel_name">Multiplayer</string>
+    <string name="multiplayer_channel_desc">Multiplayer notifications</string>
+
 </resources>

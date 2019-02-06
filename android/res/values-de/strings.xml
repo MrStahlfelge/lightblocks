@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="multiplayer_notification">Es gibt Neuigkeiten bei Deinen Multiplayer-Matches!</string>
+    <string name="multiplayer_channel_name">Multiplayer</string>
+    <string name="multiplayer_channel_desc">Multiplayer Benachrichtigungen</string>
+
+</resources>

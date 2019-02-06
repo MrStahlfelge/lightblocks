@@ -447,8 +447,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
 
     @Override
     public void onPushMessageArrived(String payload) {
-        // TODO payload kontrollieren
-        if (backendManager.hasUserId()) {
+        if (backendManager.hasUserId() && payload != null
+                && payload.startsWith(BackendManager.PUSH_PAYLOAD_MULTIPLAYER)) {
             backendManager.invalidateCachedMatches();
         }
     }
