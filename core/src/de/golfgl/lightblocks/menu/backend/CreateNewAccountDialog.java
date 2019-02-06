@@ -293,6 +293,8 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
             // muss nach dem Hide kommen, damit focus im TotalScoreScreen sauber übergeht
             app.backendManager.setCredentials(retrievedData.userId, retrievedData.userKey);
             app.localPrefs.setBackendNickname(retrievedData.nickName);
+            if (app.pushMessageProvider != null)
+                app.pushMessageProvider.initService(app);
 
             new BackendUserDetailsScreen(app, retrievedData.userId).show(getStage());
         }

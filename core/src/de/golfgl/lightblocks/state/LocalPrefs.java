@@ -48,6 +48,7 @@ public class LocalPrefs {
     private static final String PREF_KEY_TURN_TO_UPLOAD = "turnTouUpload";
     private static final String PREF_KEY_LAST_WELCOME_REQUEST = "lastWelcomeRequest";
     private static final String PREF_KEY_BATTLE_LEVEL = "battleLevel";
+    private static final String PREF_KEY_PUSH_TOKEN = "pushToken";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -67,6 +68,8 @@ public class LocalPrefs {
     private Boolean showGhostpiece;
     private Boolean showTouchHoldButton;
     private String nickName;
+    private String pushToken;
+    private boolean readPushToken;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -494,6 +497,25 @@ public class LocalPrefs {
         if (this.nickName == null || !this.nickName.equals(nickName)) {
             prefs.putString(PREF_KEY_BACKEND_NICK, nickName);
             this.nickName = nickName;
+            prefs.flush();
+        }
+    }
+
+    public String getPushToken() {
+        if (!readPushToken) {
+            pushToken = prefs.getString(PREF_KEY_PUSH_TOKEN, null);
+            readPushToken = true;
+        }
+
+        return pushToken;
+    }
+
+    public void setPushToken(String pushToken) {
+        if (this.pushToken == null && pushToken != null
+                || this.pushToken != null && !this.pushToken.equals(pushToken)) {
+            this.pushToken = pushToken;
+            readPushToken = true;
+            prefs.putString(PREF_KEY_PUSH_TOKEN, pushToken);
             prefs.flush();
         }
     }

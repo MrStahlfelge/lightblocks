@@ -57,6 +57,7 @@ repositories {
 dependencies {
     googleCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamsvcsVersion"
     googleCompile "com.badlogicgames.gdxpay:gdx-pay-android-googlebilling:$gdxPayVersion"
+    googleCompile "de.golfgl.gdxpushmessages:gdx-pushmessages-android-fcm:$pushMsgsVersion"
     amazonCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-amazongc:$gamsvcsVersion"
     amazonCompile "com.badlogicgames.gdxpay:gdx-pay-android-amazon:$gdxPayVersion"
 }
@@ -161,5 +162,15 @@ idea {
                 }
             }
         }
+    }
+}
+
+apply plugin: 'com.google.gms.google-services'
+
+// Deaktivieren für alle außer google
+android.applicationVariants.all { variant ->
+    if (!variant.name.startsWith('google')) {
+        project.logger.warn('Google services not applied for ' + variant.name)
+        project.tasks.getByName('process' + variant.name.capitalize() + 'GoogleServices').enabled = false
     }
 }

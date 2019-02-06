@@ -25,6 +25,8 @@ import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.gdxgamesvcs.gamestate.ILoadGameStateResponseListener;
+import de.golfgl.gdxpushmessages.IPushMessageListener;
+import de.golfgl.gdxpushmessages.IPushMessageProvider;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
@@ -46,7 +48,7 @@ import de.golfgl.lightblocks.state.Player;
 
 import static com.badlogic.gdx.Gdx.app;
 
-public class LightBlocksGame extends Game implements IGameServiceListener {
+public class LightBlocksGame extends Game implements IGameServiceListener, IPushMessageListener {
     public static final int nativeGameWidth = 480;
     public static final int nativeGameHeight = 800;
     public static final float menuLandscapeHeight = nativeGameHeight * .8f;
@@ -112,6 +114,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
     public MyControllerMapping controllerMappings;
     public GameAnalytics gameAnalytics;
     public PurchaseManager purchaseManager;
+    public IPushMessageProvider pushMessageProvider;
     private FPSLogger fpsLogger;
     private List<Mission> missionList;
     private HashMap<String, Mission> missionMap;
@@ -153,6 +156,9 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
         // bevor gpgs angemeldet wird (wegen Cloud save)
         backendManager = new BackendManager(localPrefs);
+
+        if (pushMessageProvider != null && backendManager.hasUserId())
+            pushMessageProvider.initService(this);
 
         if (share == null)
             share = new ShareHandler();
@@ -432,6 +438,19 @@ public class LightBlocksGame extends Game implements IGameServiceListener {
 
     public float getDisplayDensityRatio() {
         return 1f;
+    }
+
+    @Override
+    public void onRegistrationTokenRetrieved(String token) {
+        localPrefs.setPushToken(token);
+    }
+
+    @Override
+    public void onPushMessageArrived(String payload) {
+        // TODO payload kontrollieren
+        if (backendManager.hasUserId()) {
+            backendManager.invalidateCachedMatches();
+        }
     }
 
     private class MyOwnPlayer extends Player {

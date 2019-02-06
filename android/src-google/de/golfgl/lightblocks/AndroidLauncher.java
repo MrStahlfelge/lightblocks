@@ -2,9 +2,12 @@ package de.golfgl.lightblocks;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.pay.android.googlebilling.PurchaseManagerGoogleBilling;
 
+import de.golfgl.gdxpushmessages.FcmMessageProvider;
 import de.golfgl.lightblocks.gpgs.GpgsMultiPlayerClient;
 
 public class AndroidLauncher extends GeneralAndroidLauncher {
@@ -13,6 +16,7 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
 
     //Google Play Games
     GpgsMultiPlayerClient gpgsClient;
+    private FcmMessageProvider fcm;
 
     @Override
     protected void initFlavor(LightBlocksGame game) {
@@ -25,11 +29,21 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
 
         game.gpgsClient = gpgsClient;
 
+        fcm = new FcmMessageProvider(this);
+        game.pushMessageProvider = fcm;
+
+
         // on Google Play Android TV, don't even try to open web links :-(
         if (isOnGooglePlayAndroidTV())
             game.setOpenWeblinks(false);
 
         game.purchaseManager = new PurchaseManagerGoogleBilling(this);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Gdx.app.addLifecycleListener(fcm);
     }
 
     /**

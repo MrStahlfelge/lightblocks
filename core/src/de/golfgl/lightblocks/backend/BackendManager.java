@@ -180,6 +180,10 @@ public class BackendManager {
             });
     }
 
+    public void invalidateCachedMatches() {
+        multiplayerMatchesLastFetchMs = 0;
+    }
+
     public void fetchMultiplayerMatches() {
         // wenn zu oft gedrückt wird nichts machen
         if (TimeUtils.timeSinceMillis(multiplayerMatchesLastFetchMs) < 1000 * 10L)
@@ -261,13 +265,15 @@ public class BackendManager {
         });
     }
 
-    public void fetchNewWelcomeResponseIfExpired(int expirationTimeSeconds, long drawnBlocks, int donatorState) {
+    public void fetchNewWelcomeResponseIfExpired(int expirationTimeSeconds, long drawnBlocks, int donatorState,
+                                                 String pushProviderId, String pushToken) {
         if (!isFetchingWelcomes && (lastWelcomeResponse == null || (TimeUtils.millis() + lastWelcomeResponse
                 .timeDelta - lastWelcomeResponse
                 .responseTime) / 1000 > expirationTimeSeconds)) {
             isFetchingWelcomes = true;
             backendClient.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, platformString, osString,
-                    drawnBlocks, donatorState, fetchWelcomesSinceTime, new BackendClient.IBackendResponse<BackendClient.WelcomeResponse>() {
+                    drawnBlocks, donatorState, fetchWelcomesSinceTime, pushProviderId, pushToken,
+                    new BackendClient.IBackendResponse<BackendClient.WelcomeResponse>() {
                         @Override
                         public void onFail(int statusCode, String errorMsg) {
                             // kann man nix machen
@@ -282,7 +288,7 @@ public class BackendManager {
                             // falls es offene Spiele gibt zurücksetzen, wann das letzte Mal die Liste der
                             // Multiplayer-Matches gezogen wurde, um einen Refresh zu erzwingen
                             if (lastWelcomeResponse.competitionActionRequired)
-                                multiplayerMatchesLastFetchMs = 0;
+                                invalidateCachedMatches();
                         }
                     });
         }

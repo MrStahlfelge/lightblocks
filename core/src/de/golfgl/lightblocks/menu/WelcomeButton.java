@@ -154,8 +154,19 @@ public class WelcomeButton extends FaTextButton {
         }
         int expirationSeconds = app.backendManager.hasUserId() ? EXPIRATION_MINUTES_REGISTERED * 60 :
                 EXPIRATION_MINUTES_UNREGISTERED * 60;
+
+        String pushProviderId = null;
+        String pushToken = null;
+        if (app.pushMessageProvider != null) {
+            pushProviderId = app.pushMessageProvider.getProviderId();
+            pushToken = app.pushMessageProvider.getRegistrationToken();
+            // falls das token noch nicht geladen wurde das letzte aus den Prefs laden
+            if (pushToken == null)
+                pushToken = app.localPrefs.getPushToken();
+        }
+
         app.backendManager.fetchNewWelcomeResponseIfExpired(expirationSeconds, app.savegame.getTotalScore()
-                .getDrawnTetrominos(), app.localPrefs.getSupportLevel());
+                .getDrawnTetrominos(), app.localPrefs.getSupportLevel(), pushProviderId, pushToken);
     }
 
     public static class WelcomeText {

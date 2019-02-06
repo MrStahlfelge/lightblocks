@@ -234,7 +234,7 @@ public class BackendClientTest {
         WaitForResponseListener<BackendClient.WelcomeResponse> newMessagesResponse = new
                 WaitForResponseListener<BackendClient.WelcomeResponse>();
         backendClientNoAuth.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1023, 1,
-                0, newMessagesResponse);
+                0, null, null, newMessagesResponse);
         waitWhileRequesting();
 
         Assert.assertNotNull(newMessagesResponse.retrievedData);
@@ -245,7 +245,7 @@ public class BackendClientTest {
         // veraltete Clientversion
         newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
         backendClientNoAuth.fetchWelcomeMessages(1, "smarttv", "webgl", 1023, 1,
-                0, newMessagesResponse);
+                0, "FCM", "token", newMessagesResponse);
         waitWhileRequesting();
 
         Assert.assertNotNull(newMessagesResponse.retrievedData);
@@ -263,7 +263,7 @@ public class BackendClientTest {
 
         newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
         backendClientPlayer.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1024, 1,
-                0, newMessagesResponse);
+                0, null, null, newMessagesResponse);
         waitWhileRequesting();
         Assert.assertNotNull(newMessagesResponse.retrievedData);
         Assert.assertTrue(newMessagesResponse.retrievedData.authenticated);
@@ -275,7 +275,7 @@ public class BackendClientTest {
         BackendClient noAuthPlayer = new BackendClient();
         noAuthPlayer.setUserId("----");
         noAuthPlayer.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1024, 1,
-                0, newMessagesResponse);
+                0, "FCM", "token", newMessagesResponse);
         waitWhileRequesting();
         Assert.assertNotNull(newMessagesResponse.retrievedData);
         Assert.assertFalse(newMessagesResponse.retrievedData.authenticated);
