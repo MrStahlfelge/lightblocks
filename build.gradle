@@ -99,6 +99,7 @@ project(":html") {
         compile "de.golfgl.gdxgameanalytics:gdx-gameanalytics-html:$gaVersion:sources"
         compile "com.badlogicgames.gdxpay:gdx-pay:$gdxPayVersion:sources"
         compile "com.badlogicgames.gdxpay:gdx-pay-client:$gdxPayVersion:sources"
+        compile "de.golfgl.gdxpushmessages:gdx-pushmessages-core:$pushMsgsVersion:sources"
     }
 }
 
