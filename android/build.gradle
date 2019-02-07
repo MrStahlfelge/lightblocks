@@ -55,6 +55,7 @@ repositories {
 }
 
 dependencies {
+    compile "com.android.support:support-core-utils:26.1.0"
     googleCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamsvcsVersion"
     googleCompile "com.badlogicgames.gdxpay:gdx-pay-android-googlebilling:$gdxPayVersion"
     googleCompile "de.golfgl.gdxpushmessages:gdx-pushmessages-android-fcm:$pushMsgsVersion"
