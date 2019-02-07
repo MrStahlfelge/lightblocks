@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Falling Lightblocks</string>
-    <string name="app_short_name">Lightblocks</string>
-    <string name="app_id">666172602594</string>
+    <string name="app_name" translatable="false">Falling Lightblocks</string>
+    <string name="app_short_name" translatable="false">Lightblocks</string>
+    <string name="app_id" translatable="false">666172602594</string>
 
     <string name="multiplayer_notification">There are news regarding your multiplayer matches!</string>
     <string name="multiplayer_channel_name">Multiplayer</string>
