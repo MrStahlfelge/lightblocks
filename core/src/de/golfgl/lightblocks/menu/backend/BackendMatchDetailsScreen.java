@@ -203,8 +203,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             Replay opponentReplay = new Replay();
             opponentReplay.fromString(match.opponentReplay);
 
-            dialog.addSecondReplay(opponentReplay, !(match.myTurn || match.matchState.equalsIgnoreCase(MatchEntity
-                    .PLAYER_STATE_WAIT)));
+            dialog.addSecondReplay(opponentReplay, match.opponentNick,
+                    !(match.myTurn || match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_WAIT)));
         }
         dialog.windToTimePos(match.turnBlockCount * 1000 * turnNum);
 

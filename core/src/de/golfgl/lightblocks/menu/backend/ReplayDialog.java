@@ -166,7 +166,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         buttonsLeft.add(rewind);
         buttonsLeft.add(forward);
 
-        getButtonTable().add(buttonsLeft).width(replayGameboard.getWidth() * replayGameboard.getScaleX())
+        getButtonTable().add(buttonsLeft).width(getGameboardWith(replayGameboard))
                 .padLeft(0).padRight(0);
         // mittige Ausrichtung erzwingen
         getButtonTable().add().width(closeButton.getPrefWidth());
@@ -185,11 +185,15 @@ public class ReplayDialog extends AbstractFullScreenDialog {
     }
 
     private void setCellSizeToGameboard(Cell replaysCell, ReplayGameboard replayGameboard) {
-        replaysCell.size(replayGameboard.getWidth() * replayGameboard
-                .getScaleX(), replayGameboard.getHeight() * replayGameboard.getScaleY());
+        replaysCell.size(getGameboardWith(replayGameboard),
+                replayGameboard.getHeight() * replayGameboard.getScaleY());
     }
 
-    public void addSecondReplay(Replay replay2, boolean canViewFullLength) {
+    private float getGameboardWith(ReplayGameboard replayGameboard) {
+        return replayGameboard.getWidth() * replayGameboard.getScaleX();
+    }
+
+    public void addSecondReplay(Replay replay2, String opponentNick, boolean canViewFullLength) {
         replayGameboard2 = new ReplayGameboard(app, replay2) {
             @Override
             protected void onAdditionalDelayTimeAdded(float additionalTime) {
@@ -205,11 +209,22 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         replayGameboard2.setScale(.35f);
 
         Table bothReplays = new Table();
-        Cell<ReplayGameboard> cell1 = bothReplays.add(replayGameboard).pad(30, 0, 30, 30);
-        Cell<ReplayGameboard> cell2 = bothReplays.add(replayGameboard2).pad(30, 30, 30, 0);
+        Cell<ReplayGameboard> cell1 = bothReplays.add(replayGameboard).pad(30, 0, 0, 30);
+        Cell<ReplayGameboard> cell2 = bothReplays.add(replayGameboard2).pad(30, 30, 0, 0);
         setCellSizeToGameboard(cell1, replayGameboard);
         setCellSizeToGameboard(cell2, replayGameboard2);
+
+        bothReplays.row();
+        ScaledLabel yourNickLabel = new ScaledLabel("YOU", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f);
+        yourNickLabel.setAlignment(Align.center);
+        yourNickLabel.setEllipsis(true);
+        bothReplays.add(yourNickLabel).width(getGameboardWith(replayGameboard)).padRight(30);
+        ScaledLabel opponentNickLabel = new ScaledLabel(opponentNick, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f);
+        opponentNickLabel.setAlignment(Align.center);
+        opponentNickLabel.setEllipsis(true);
+        bothReplays.add(opponentNickLabel).width(getGameboardWith(replayGameboard2)).padLeft(30);
         bothReplays.validate();
+
         replaysCell.setActor(bothReplays).size(bothReplays.getPrefWidth(), bothReplays.getPrefHeight());
 
         replayGameboard2.playReplay();
