@@ -45,7 +45,7 @@ public class GeneralAndroidLauncher extends AndroidApplication {
 
         // Notification bauen
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, NOTIF_CHANNEL_ID_MULTIPLAYER)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_notification)
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(context.getString(R.string.multiplayer_notification))
                 .setContentIntent(pendingIntent)
