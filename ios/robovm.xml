@@ -11,6 +11,10 @@
       <includes>
         <include>**</include>
       </includes>
+      <excludes>
+        <exclude>**/*.ogg</exclude>
+        <exclude>**/_*/**</exclude>
+      </excludes>
       <skipPngCrush>true</skipPngCrush>
     </resource>
     <resource>
@@ -31,6 +35,8 @@
     <pattern>com.android.org.bouncycastle.crypto.digests.AndroidDigestFactoryOpenSSL</pattern>
     <pattern>org.apache.harmony.security.provider.cert.DRLCertFactory</pattern>
     <pattern>org.apache.harmony.security.provider.crypto.CryptoProvider</pattern>
+    <pattern>de.golfgl.lightblocks.model.**</pattern>
+    <pattern>com.esotericsoftware.kryo.**</pattern>
   </forceLinkClasses>
   <libs>
       <lib>z</lib>   

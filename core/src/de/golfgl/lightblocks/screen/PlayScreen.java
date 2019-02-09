@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.screen;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Music;
@@ -199,7 +200,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             }
         });
         // Im Webbrowser ohne Tastatur den PauseButton anzeigen
-        pauseButton.setVisible(LightBlocksGame.isWebAppOnMobileDevice());
+        pauseButton.setVisible(LightBlocksGame.isWebAppOnMobileDevice() ||
+                Gdx.app.getType() == Application.ApplicationType.iOS);
 
         pauseDialog = new PauseDialog(app, this);
 

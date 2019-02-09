@@ -16,11 +16,13 @@ public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new LightBlocksGame() {
+        // TODO Multiplayer - wenn RoboVM 2.3.6 da ist probieren
+        LightBlocksGame game = new LightBlocksGame() {
             @Override
             public String getSoundAssetFilename(String name) {
                 return "sound/" + name + ".mp3";
             }
-        }, config);
+        };
+        return new IOSApplication(game, config);
     }
 }
