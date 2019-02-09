@@ -230,20 +230,25 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
         gameAnalytics.startSession();
     }
 
+    public String getSoundAssetFilename(String name) {
+        //overriden for iOS
+        return "sound/" + name + ".ogg";
+    }
+
     private void loadAndInitAssets() {
         assetManager = new AssetManager();
         // den Sound als erstes und danach finish, damit er möglichst auf allen Geräten rechtzeitig zur Verfügung steht
-        assetManager.load("sound/cleanspecial.ogg", Sound.class);
+        assetManager.load(getSoundAssetFilename("cleanspecial"), Sound.class);
         assetManager.finishLoading();
 
-        assetManager.load("sound/swosh.ogg", Sound.class);
+        assetManager.load(getSoundAssetFilename("swosh"), Sound.class);
         assetManager.load("i18n/strings", I18NBundle.class);
-        assetManager.load("sound/switchon.ogg", Sound.class);
-        assetManager.load("sound/switchflip.ogg", Sound.class);
-        assetManager.load("sound/glow05.ogg", Sound.class);
-        assetManager.load("sound/gameover.ogg", Sound.class);
-        assetManager.load("sound/unlocked.ogg", Sound.class);
-        assetManager.load("sound/garbage.ogg", Sound.class);
+        assetManager.load(getSoundAssetFilename("switchon"), Sound.class);
+        assetManager.load(getSoundAssetFilename("switchflip"), Sound.class);
+        assetManager.load(getSoundAssetFilename("glow05"), Sound.class);
+        assetManager.load(getSoundAssetFilename("gameover"), Sound.class);
+        assetManager.load(getSoundAssetFilename("unlocked"), Sound.class);
+        assetManager.load(getSoundAssetFilename("garbage"), Sound.class);
         assetManager.load("skin/lb.json", Skin.class);
         assetManager.finishLoading();
 
@@ -253,14 +258,14 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
         trGhostBlock = skin.getRegion("block-ghost");
         trBlockEnlightened = skin.getRegion("block-light");
         trGlowingLine = skin.getRegion("lineglow");
-        dropSound = assetManager.get("sound/switchon.ogg", Sound.class);
-        rotateSound = assetManager.get("sound/switchflip.ogg", Sound.class);
-        removeSound = assetManager.get("sound/glow05.ogg", Sound.class);
-        gameOverSound = assetManager.get("sound/gameover.ogg", Sound.class);
-        unlockedSound = assetManager.get("sound/unlocked.ogg", Sound.class);
-        garbageSound = assetManager.get("sound/garbage.ogg", Sound.class);
-        cleanSpecialSound = assetManager.get("sound/cleanspecial.ogg", Sound.class);
-        swoshSound = assetManager.get("sound/swosh.ogg", Sound.class);
+        dropSound = assetManager.get(getSoundAssetFilename("switchon"), Sound.class);
+        rotateSound = assetManager.get(getSoundAssetFilename("switchflip"), Sound.class);
+        removeSound = assetManager.get(getSoundAssetFilename("glow05"), Sound.class);
+        gameOverSound = assetManager.get(getSoundAssetFilename("gameover"), Sound.class);
+        unlockedSound = assetManager.get(getSoundAssetFilename("unlocked"), Sound.class);
+        garbageSound = assetManager.get(getSoundAssetFilename("garbage"), Sound.class);
+        cleanSpecialSound = assetManager.get(getSoundAssetFilename("cleanspecial"), Sound.class);
+        swoshSound = assetManager.get(getSoundAssetFilename("swosh"), Sound.class);
 
         COLOR_DISABLED = skin.getColor("disabled");
         COLOR_FOCUSSED_ACTOR = skin.getColor("lightselection");

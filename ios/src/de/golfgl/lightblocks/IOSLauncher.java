@@ -16,6 +16,11 @@ public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new LightBlocksGame(), config);
+        return new IOSApplication(new LightBlocksGame() {
+            @Override
+            public String getSoundAssetFilename(String name) {
+                return "sound/" + name + ".mp3";
+            }
+        }, config);
     }
 }

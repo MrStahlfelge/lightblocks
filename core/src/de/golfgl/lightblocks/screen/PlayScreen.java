@@ -1049,7 +1049,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     public void setMusic(boolean playMusic) {
         if (playMusic && music == null) {
-            music = Gdx.audio.newMusic(Gdx.files.internal("sound/dd.ogg"));
+            music = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("dd")));
             music.setVolume(1f);                 // sets the volume to half the maximum volume
             music.setLooping(true);
         } else if (!playMusic && music != null) {
