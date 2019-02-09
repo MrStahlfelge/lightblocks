@@ -23,6 +23,9 @@ public class IOSLauncher extends IOSApplication.Delegate {
                 return "sound/" + name + ".mp3";
             }
         };
+
+        game.gameAnalytics = new IosGameAnalytics();
+
         return new IOSApplication(game, config);
     }
 }
