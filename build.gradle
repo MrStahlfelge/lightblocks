@@ -9,6 +9,7 @@ buildscript {
     dependencies {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
         classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.3'
         classpath 'com.google.gms:google-services:4.2.0' // google-services plugin
     }
 }
@@ -21,7 +22,7 @@ allprojects {
     ext {
         appName = "lightblocks"
         gdxVersion = '1.9.8'
-        roboVMVersion = '2.3.0'
+        roboVMVersion = '2.3.3'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
@@ -73,6 +74,21 @@ project(":android") {
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
         compile "de.golfgl.gdxgameanalytics:gdx-gameanalytics-android:$gaVersion"
+    }
+}
+
+project(":ios") {
+    apply plugin: "java"
+    apply plugin: "robovm"
+
+
+    dependencies {
+        compile project(":core")
+        compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
+        compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
+        compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+
     }
 }
 
