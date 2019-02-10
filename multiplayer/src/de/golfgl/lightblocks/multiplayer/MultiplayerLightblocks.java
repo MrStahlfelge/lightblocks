@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
-import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.menu.RtMultiplayerMenuScreen;
 
@@ -118,5 +117,10 @@ public class MultiplayerLightblocks extends LightBlocksGame {
                 }, .5f);
 
         }
+    }
+
+    @Override
+    public boolean supportsRealTimeMultiplayer() {
+        return true;
     }
 }

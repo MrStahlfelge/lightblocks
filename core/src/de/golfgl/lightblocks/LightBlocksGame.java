@@ -30,7 +30,6 @@ import de.golfgl.gdxpushmessages.IPushMessageProvider;
 import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
-import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
@@ -438,6 +437,10 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
 
     public float getDisplayDensityRatio() {
         return 1f;
+    }
+
+    public boolean supportsRealTimeMultiplayer() {
+        return false;
     }
 
     @Override
