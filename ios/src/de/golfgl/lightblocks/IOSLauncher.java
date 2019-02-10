@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
+import com.badlogic.gdx.backends.iosrobovm.MyIosApplication;
 
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAutoreleasePool;
@@ -11,6 +12,7 @@ import org.robovm.apple.foundation.NSString;
 import org.robovm.apple.uikit.UIActivityViewController;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
+import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 
 public class IOSLauncher extends IOSApplication.Delegate {
     public static void main(String[] argv) {
@@ -21,7 +23,9 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
     @Override
     protected IOSApplication createApplication() {
-        IOSApplicationConfiguration config = new IOSApplicationConfiguration();
+        final IOSApplicationConfiguration config = new IOSApplicationConfiguration();
+        config.useCompass = false;
+
         // TODO Multiplayer - wenn RoboVM 2.3.6 da ist probieren
         LightBlocksGame game = new LightBlocksGame() {
             @Override
@@ -31,18 +35,24 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
             @Override
             public void lockOrientation(Input.Orientation orientation) {
-                //UIDevice.getCurrentDevice().getOrientation()
-                //if (orientation == null)
-                // TODO setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-                //else if (orientation.equals(Input.Orientation.Landscape))
-                // TODO setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                //else
-                // TODO setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                UIInterfaceOrientationMask newSet;
+
+                if (orientation == null)
+                    orientation = Gdx.input.getNativeOrientation();
+
+                if (orientation.equals(Input.Orientation.Landscape))
+                    newSet = UIInterfaceOrientationMask.Landscape;
+                else
+                    newSet = UIInterfaceOrientationMask.Portrait;
+
+                config.orientationLandscape = newSet == UIInterfaceOrientationMask.Landscape;
+                config.orientationPortrait = newSet == UIInterfaceOrientationMask.Portrait;
             }
 
             @Override
             public void unlockOrientation() {
-                // TODO setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                config.orientationLandscape = true;
+                config.orientationPortrait = true;
             }
 
             @Override
@@ -65,7 +75,8 @@ public class IOSLauncher extends IOSApplication.Delegate {
         // Für Bewertungen
         // TODO LightBlocksGame.gameStoreUrl = "http://www.amazon.com/gp/mas/dl/android?p=de.golfgl.lightblocks";
 
-        return new IOSApplication(game, config);
+        IOSApplication app = new MyIosApplication(game, config);
+        return app;
     }
 
     private static class IosShareHandler extends ShareHandler {
