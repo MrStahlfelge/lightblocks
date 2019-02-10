@@ -62,6 +62,9 @@ public class IOSLauncher extends IOSApplication.Delegate {
         // Gerätemodell wird für den Spielernamen benötigt
         game.modelNameRunningOn = UIDevice.getCurrentDevice().getModel();
 
+        // Für Bewertungen
+        // TODO LightBlocksGame.gameStoreUrl = "http://www.amazon.com/gp/mas/dl/android?p=de.golfgl.lightblocks";
+
         return new IOSApplication(game, config);
     }
 
