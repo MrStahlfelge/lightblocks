@@ -43,8 +43,10 @@ public class BackendMatchesTable extends WidgetGroup {
         this.app = app;
 
         String competitionIntro = app.TEXTS.get("competitionIntro1") + "\n" +
-                app.TEXTS.get("competitionIntro2b") + "\n\n" +
-                app.TEXTS.get("competitionIntro3");
+                app.TEXTS.get("competitionIntro2b");
+
+        if (app.supportsRealTimeMultiplayer())
+            competitionIntro = competitionIntro + "\n\n" + app.TEXTS.get("competitionIntro3");
 
         introLabel = new ScaledLabel(competitionIntro, app.skin,
                 LightBlocksGame.SKIN_FONT_REG, .75f);
@@ -55,11 +57,6 @@ public class BackendMatchesTable extends WidgetGroup {
 
         fetchMatchesIfNeeded();
         refresh();
-    }
-
-    private void fetchMatchesIfNeeded() {
-        if (TimeUtils.timeSinceMillis(app.backendManager.getMultiplayerMatchesLastFetchMs()) > 5 * 60 * 1000L)
-            app.backendManager.fetchMultiplayerMatches();
     }
 
     public static String formatTimePassedString(LightBlocksGame app, long lastChangeTime) {
@@ -82,6 +79,11 @@ public class BackendMatchesTable extends WidgetGroup {
 
         return app.TEXTS.format("timeXDays", daysPassed);
 
+    }
+
+    private void fetchMatchesIfNeeded() {
+        if (TimeUtils.timeSinceMillis(app.backendManager.getMultiplayerMatchesLastFetchMs()) > 5 * 60 * 1000L)
+            app.backendManager.fetchMultiplayerMatches();
     }
 
     @Override
@@ -173,13 +175,13 @@ public class BackendMatchesTable extends WidgetGroup {
     }
 
     private class BackendMatchRow extends Button implements ITouchActionButton {
+        private final ScaledLabel opponentLabel;
         Action colorAction;
         private MatchEntity me;
         private ScaledLabel timePassedLabel;
         private ScaledLabel matchState;
         private float timePassedRefreshWait;
         private boolean notInSync;
-        private final ScaledLabel opponentLabel;
 
         public BackendMatchRow(MatchEntity match) {
             super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);

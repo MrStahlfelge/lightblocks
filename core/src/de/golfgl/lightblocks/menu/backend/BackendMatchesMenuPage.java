@@ -6,8 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.TimeUtils;
 
 import de.golfgl.gdx.controllers.ControllerScrollPane;
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -129,8 +127,10 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
     private Actor fillUnregistered() {
         Table unregistered = new Table();
         String competitionIntroString = app.TEXTS.get("competitionIntro1") + "\n" +
-                app.TEXTS.get("competitionIntro2a") + "\n\n" +
-                app.TEXTS.get("competitionIntro3");
+                app.TEXTS.get("competitionIntro2a");
+        if (app.supportsRealTimeMultiplayer())
+            competitionIntroString = competitionIntroString + "\n\n" + app.TEXTS.get("competitionIntro3");
+
         Label competitionIntro = new ScaledLabel(competitionIntroString, app.skin,
                 LightBlocksGame.SKIN_FONT_REG, .75f);
         competitionIntro.setWrap(true);

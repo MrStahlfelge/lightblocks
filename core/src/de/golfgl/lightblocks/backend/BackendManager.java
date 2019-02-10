@@ -194,6 +194,7 @@ public class BackendManager {
 
         if (!isFetchingMultiplayerMatches && hasUserId()) {
             isFetchingMultiplayerMatches = true;
+            multiplayerMatchesLastFetchMs = TimeUtils.millis();
 
             //TODO: sinceTime den ersten in der bisherigen Liste übergeben und dann im onSuccess die Listen
             // zusammenführen
