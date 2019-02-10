@@ -390,12 +390,14 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     }
 
     /**
-     * locks the orientation on Android to portrait, landscape or current
+     * locks the orientation on Android/IOS to portrait, landscape or current
      *
-     * @param orientation give null for current
+     * @param orientation, oder null um auf den aktuellen zu sperren
+     * @return true, wenn gleichzeitig auch eine Drehung erzwungen wurde.
+     * false, wenn noch auf falscher Orientation steht
      */
-    public void lockOrientation(Input.Orientation orientation) {
-
+    public boolean lockOrientation(Input.Orientation orientation) {
+        return Gdx.input.getNativeOrientation().equals(orientation);
     }
 
     /**

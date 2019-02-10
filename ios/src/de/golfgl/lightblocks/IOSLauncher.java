@@ -34,7 +34,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
             }
 
             @Override
-            public void lockOrientation(Input.Orientation orientation) {
+            public boolean lockOrientation(Input.Orientation orientation) {
                 UIInterfaceOrientationMask newSet;
 
                 if (orientation == null)
@@ -47,6 +47,8 @@ public class IOSLauncher extends IOSApplication.Delegate {
 
                 config.orientationLandscape = newSet == UIInterfaceOrientationMask.Landscape;
                 config.orientationPortrait = newSet == UIInterfaceOrientationMask.Portrait;
+
+                return Gdx.input.getNativeOrientation().equals(orientation);
             }
 
             @Override

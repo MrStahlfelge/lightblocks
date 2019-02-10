@@ -19,6 +19,13 @@ public abstract class GameBlocker {
         }
     }
 
+    public static class UsePortraitGameBlocker extends GameBlocker {
+        @Override
+        public String getDescription(I18NBundle bundle) {
+            return bundle.get("labelRotatePortrait");
+        }
+    }
+
     public static class NoGamepadGameBlocker extends GameBlocker {
         @Override
         public String getDescription(I18NBundle bundle) {

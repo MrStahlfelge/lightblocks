@@ -74,13 +74,14 @@ public class GeneralAndroidLauncher extends AndroidApplication {
 
         MultiplayerLightblocks game = new MultiplayerLightblocks() {
             @Override
-            public void lockOrientation(Input.Orientation orientation) {
+            public boolean lockOrientation(Input.Orientation orientation) {
                 if (orientation == null)
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
                 else if (orientation.equals(Input.Orientation.Landscape))
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 else
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                return true;
             }
 
             @Override

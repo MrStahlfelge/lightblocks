@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
@@ -103,6 +104,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private boolean showScoresWhenGameOver = true;
     private int currentShownTime;
     private float timeSinceGameOver = 0;
+    private GameBlocker.UsePortraitGameBlocker usePortraitGameBlocker = new GameBlocker.UsePortraitGameBlocker();
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
@@ -368,8 +370,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // input initialisieren
         inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey, app);
         inputAdapter.setPlayScreen(this);
-        if (inputAdapter.getRequestedScreenOrientation() != null)
-            app.lockOrientation(inputAdapter.getRequestedScreenOrientation());
+        if (inputAdapter.getRequestedScreenOrientation() != null) {
+            boolean rotated = app.lockOrientation(inputAdapter.getRequestedScreenOrientation());
+            if (!rotated)
+                addGameBlocker(usePortraitGameBlocker);
+        }
 
         // Highscores
         gameModel.totalScore = app.savegame.getTotalScore();
@@ -1164,8 +1169,15 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             pauseButton.setPosition(scoreTable.getX() - scoreTable.getPrefWidth() / 2, scoreTable.getY() - 2f * pauseButton.getHeight());
 
         // GestureInput neues TouchPanel und Resize On Screen Controls
-        if (inputAdapter != null)
+        if (inputAdapter != null) {
             inputAdapter.setPlayScreen(this);
+
+            // es gibt momentan nur Portrait Zwang, eigentlich usePortraitGameBlocker natürlich für Landscape falsch
+            Input.Orientation requestedScreenOrientation = inputAdapter.getRequestedScreenOrientation();
+            if (requestedScreenOrientation != null && (requestedScreenOrientation.equals(Input.Orientation.Portrait)
+                    && !isLandscape() || isLandscape() && requestedScreenOrientation.equals(Input.Orientation.Landscape)))
+                removeGameBlocker(usePortraitGameBlocker);
+        }
     }
 
     public static class PlayScoreTable extends Table {
