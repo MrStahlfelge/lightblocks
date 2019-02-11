@@ -281,7 +281,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                         + match.beginningLevel, app.skin, LightBlocksGame.SKIN_FONT_BIG))
                         .padTop(30);
                 matchDetailTable.row();
-                matchDetailTable.add(acceptChallengeButton).pad(60, 0, 30, 0);
+                matchDetailTable.add(acceptChallengeButton).pad(50, 0, 20, 0)
+                        .minHeight(acceptChallengeButton.getPrefHeight() * 2f);
                 matchDetailTable.row();
                 matchDetailTable.add(declineChallengeButton).padBottom(20);
                 toFocus = acceptChallengeButton;

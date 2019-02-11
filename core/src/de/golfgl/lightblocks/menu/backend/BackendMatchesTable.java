@@ -250,7 +250,7 @@ public class BackendMatchesTable extends WidgetGroup {
         private void refreshTimePassed() {
             if (timePassedLabel != null && me != null) {
                 timePassedLabel.setText(formatTimePassedString(app, me.lastChangeTime));
-                timePassedRefreshWait = 30f;
+                timePassedRefreshWait = 2f;
             }
         }
 

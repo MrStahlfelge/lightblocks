@@ -29,8 +29,8 @@ public class BackendNewMatchDialog extends ControllerMenuDialog {
     private final BeginningLevelChooser beginningLevelSlider;
     private final Button leaveButton;
     private final EditableLabel nicknameEditable;
-    private String opponentId;
     private final Button againstFriendButton;
+    private String opponentId;
 
     public BackendNewMatchDialog(LightBlocksGame app) {
         super("", app.skin);
@@ -107,6 +107,9 @@ public class BackendNewMatchDialog extends ControllerMenuDialog {
     }
 
     private void searchForFriendNick(final String nick) {
+        if (nick == null || nick.isEmpty())
+            return;
+
         app.backendManager.getBackendClient().fetchPlayerByNicknamePrefixList(nick,
                 new WaitForResponse<List<PlayerDetails>>(app, getStage()) {
                     @Override
