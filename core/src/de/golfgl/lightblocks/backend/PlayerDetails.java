@@ -23,6 +23,8 @@ public class PlayerDetails implements IPlayerInfo {
     public final String country;
     public final int multiplayerMatchesCount;
     public final int multiplayerWinCount;
+    public final int multiplayerLinesSent;
+    public final int multiplayerTurns;
 
     PlayerDetails(JsonValue fromJson) {
         uuid = fromJson.getString("id");
@@ -39,6 +41,8 @@ public class PlayerDetails implements IPlayerInfo {
         country = fromJson.getString("country", null);
         multiplayerMatchesCount = fromJson.getInt("multiplayerMatchesCount", 0);
         multiplayerWinCount = fromJson.getInt("multiplayerWinCount", 0);
+        multiplayerLinesSent = fromJson.getInt("multiplayerLinesSent", 0);
+        multiplayerTurns = fromJson.getInt("multiplayerTurns", 0);
 
         highscores = new ArrayList<ScoreListEntry>();
         JsonValue highscorejson = fromJson.get("highscores");
