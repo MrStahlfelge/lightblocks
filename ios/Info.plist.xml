@@ -8,6 +8,11 @@
     <string>${app.name}</string>
     <key>CFBundleExecutable</key>
     <string>${app.executable}</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>en</string>
+        <string>de</string>
+    </array>
     <key>CFBundleIdentifier</key>
     <string>${app.id}</string>
     <key>CFBundleInfoDictionaryVersion</key>
@@ -34,7 +39,7 @@
     </array>
     <key>UIRequiredDeviceCapabilities</key>
     <array>
-        <string>armv7</string>
+        <string>arm64</string>
         <string>opengles-2</string>
     </array>
     <key>UISupportedInterfaceOrientations</key>
