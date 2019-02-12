@@ -30,6 +30,7 @@ public class InitGameParameters {
     // für Battle
     private MatchEntity matchEntity;
     private String playKey;
+    private boolean startPaused;
 
     public String getMissionId() {
         return missionId;
@@ -89,6 +90,14 @@ public class InitGameParameters {
 
     public void setPlayKey(String playKey) {
         this.playKey = playKey;
+    }
+
+    public boolean isStartPaused() {
+        return startPaused;
+    }
+
+    public void setStartPaused(boolean startPaused) {
+        this.startPaused = startPaused;
     }
 
     public GameModel newGameModelInstance() {

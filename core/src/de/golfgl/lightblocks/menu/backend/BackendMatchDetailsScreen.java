@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -121,18 +122,21 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             new VetoDialog("You still have a turn not in sync with server. Please sync before playing another match.",
                     app.skin, .8f * LightBlocksGame.nativeGameWidth);
 
-        else
+        else {
+            final long timeRequestStarted = TimeUtils.millis();
             app.backendManager.getBackendClient().postMatchStartPlayingTurn(match.uuid,
                     new WaitForResponse<String>(app, getStage()) {
                         @Override
                         public void onRequestSuccess(String retrievedData) {
                             super.onRequestSuccess(retrievedData);
-                            startPlayingWithKey(retrievedData);
+                            startPlayingWithKey(retrievedData,
+                                    TimeUtils.timeSinceMillis(timeRequestStarted) > 4000);
                         }
                     });
+        }
     }
 
-    public void startPlayingWithKey(String playKey) {
+    public void startPlayingWithKey(String playKey, boolean paused) {
         // das eigentliche Spiel beginnen
         InitGameParameters initGameParametersParams = new InitGameParameters();
         initGameParametersParams.setGameMode(InitGameParameters.GameMode.TurnbasedBattle);
@@ -140,6 +144,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYORTOUCH);
         initGameParametersParams.setMatchEntity(match);
         initGameParametersParams.setPlayKey(playKey);
+        initGameParametersParams.setStartPaused(paused);
         try {
             PlayScreen ps = PlayScreen.gotoPlayScreen(BackendMatchDetailsScreen.this.app, initGameParametersParams);
             ps.setShowScoresWhenGameOver(false);
@@ -281,7 +286,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                         + match.beginningLevel, app.skin, LightBlocksGame.SKIN_FONT_BIG))
                         .padTop(30);
                 matchDetailTable.row();
-                matchDetailTable.add(acceptChallengeButton).pad(60, 0, 30, 0);
+                matchDetailTable.add(acceptChallengeButton).pad(50, 0, 20, 0)
+                        .minHeight(acceptChallengeButton.getPrefHeight() * 2f);
                 matchDetailTable.row();
                 matchDetailTable.add(declineChallengeButton).padBottom(20);
                 toFocus = acceptChallengeButton;

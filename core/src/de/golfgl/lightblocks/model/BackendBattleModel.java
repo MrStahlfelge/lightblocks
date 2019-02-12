@@ -37,6 +37,7 @@ public class BackendBattleModel extends GameModel {
     private Queue<WaitingGarbage> waitingGarbage = new Queue<>();
     private IntArray completeDrawyer = new IntArray();
     private String currentTurnString;
+    private boolean beginPaused;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -55,13 +56,17 @@ public class BackendBattleModel extends GameModel {
 
     @Override
     public boolean beginPaused() {
-        return false;
+        return beginPaused;
     }
 
     @Override
     public void setUserInterface(IGameModelListener userInterface) {
         super.setUserInterface(userInterface);
-        userInterface.showMotivation(IGameModelListener.MotivationTypes.prepare, null);
+        if (!beginPaused)
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.prepare, null);
+        else
+            // Hack: es muss über 0 sein. siehe update()
+            prepareForGameDelay = 0.02f;
     }
 
     @Override
@@ -87,6 +92,7 @@ public class BackendBattleModel extends GameModel {
     @Override
     public void startNewGame(InitGameParameters newGameParams) {
         matchEntity = newGameParams.getMatchEntity();
+        beginPaused = newGameParams.isStartPaused();
         infoForServer = new MatchTurnRequestInfo();
         infoForServer.matchId = matchEntity.uuid;
         infoForServer.turnKey = newGameParams.getPlayKey();
