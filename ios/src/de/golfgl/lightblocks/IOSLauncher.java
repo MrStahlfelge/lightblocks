@@ -3,7 +3,8 @@ package de.golfgl.lightblocks;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
-import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
+import com.badlogic.gdx.backends.iosrobovm.MyIosAppConfig;
+import com.badlogic.gdx.backends.iosrobovm.MyIosApplication;
 
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAutoreleasePool;
@@ -14,7 +15,7 @@ import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIRectEdge;
 
-public class IOSLauncher extends IOSApplication.Delegate {
+public class IOSLauncher extends MyIosApplication.Delegate {
     public static void main(String[] argv) {
         NSAutoreleasePool pool = new NSAutoreleasePool();
         UIApplication.main(argv, null, IOSLauncher.class);
@@ -22,10 +23,9 @@ public class IOSLauncher extends IOSApplication.Delegate {
     }
 
     @Override
-    protected IOSApplication createApplication() {
-        final IOSApplicationConfiguration config = new IOSApplicationConfiguration();
+    protected MyIosApplication createApplication() {
+        final MyIosAppConfig config = new MyIosAppConfig();
         config.useCompass = false;
-        // 1.9.9 is needed for this
         config.screenEdgesDeferringSystemGestures = UIRectEdge.None;
 
         // TODO Multiplayer - wenn RoboVM 2.3.6 da ist probieren
@@ -79,7 +79,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
         // Für Bewertungen
         // TODO LightBlocksGame.gameStoreUrl = "http://www.amazon.com/gp/mas/dl/android?p=de.golfgl.lightblocks";
 
-        IOSApplication app = new IOSApplication(game, config);
+        MyIosApplication app = new MyIosApplication(game, config);
         return app;
     }
 
