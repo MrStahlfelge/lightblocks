@@ -89,7 +89,7 @@ public class IOSLauncher extends MyIosApplication.Delegate {
             NSString textShare = new NSString(message);
             NSArray texttoshare = new NSArray(textShare);
             UIActivityViewController share = new UIActivityViewController(texttoshare, null);
-            ((IOSApplication) Gdx.app).getUIViewController().presentViewController(share, true, null);
+            ((MyIosApplication) Gdx.app).getUIViewController().presentViewController(share, true, null);
         }
     }
 }
