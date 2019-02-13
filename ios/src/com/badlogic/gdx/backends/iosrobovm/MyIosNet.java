@@ -39,6 +39,7 @@ public class MyIosNet implements Net {
 
     @Override
     public void sendHttpRequest (HttpRequest httpRequest, HttpResponseListener httpResponseListener) {
+        httpRequest.setTimeOut(10000);
         netJavaImpl.sendHttpRequest(httpRequest, httpResponseListener);
     }
 
