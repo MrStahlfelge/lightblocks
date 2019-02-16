@@ -2,7 +2,6 @@ package de.golfgl.lightblocks;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.MyIosAppConfig;
 import com.badlogic.gdx.backends.iosrobovm.MyIosApplication;
 
@@ -14,6 +13,8 @@ import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIRectEdge;
+
+import de.golfgl.gdxgamesvcs.GameCenterClient;
 
 public class IOSLauncher extends MyIosApplication.Delegate {
     public static void main(String[] argv) {
@@ -66,6 +67,12 @@ public class IOSLauncher extends MyIosApplication.Delegate {
                 // IOSGraphics teilt bereits durch 160, also nur noch durch 2 teilen
                 return Gdx.graphics.getDensity() / 2f;
             }
+
+            @Override
+            public void create() {
+                gpgsClient = new GameCenterClient(((MyIosApplication) Gdx.app).getUIViewController());
+                super.create();
+            }
         };
 
         // Initialize Android dependant classes
@@ -77,7 +84,7 @@ public class IOSLauncher extends MyIosApplication.Delegate {
         game.modelNameRunningOn = UIDevice.getCurrentDevice().getModel();
 
         // Für Bewertungen
-        // TODO LightBlocksGame.gameStoreUrl = "http://www.amazon.com/gp/mas/dl/android?p=de.golfgl.lightblocks";
+        LightBlocksGame.gameStoreUrl = "https://itunes.apple.com/app/id1453041696";
 
         MyIosApplication app = new MyIosApplication(game, config);
         return app;
