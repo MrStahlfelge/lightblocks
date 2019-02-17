@@ -63,11 +63,13 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
 
     @Override
     protected String getTitle() {
-        if (app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_GAMEJOLT_ID)) {
+        String gameServiceId = app.gpgsClient.getGameServiceId();
+        if (gameServiceId.equals(IGameServiceClient.GS_GAMEJOLT_ID)) {
             return "GameJolt";
         } else
-            return app.TEXTS.get(app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_AMAZONGC_ID) ?
-                    "menuAccountGc" : "menuAccountGpgs");
+            return app.TEXTS.get(gameServiceId.equals(IGameServiceClient.GS_AMAZONGC_ID) ?
+                    "menuAccountGc" : gameServiceId.equals(IGameServiceClient.GS_GAMECENTER_ID) ?
+                    "menuAccountApple" : "menuAccountGpgs");
     }
 
     @Override
@@ -166,7 +168,8 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
         achievementsButton.setDisabled(!gpgsConnected);
         //TODO auf canLogin oder ähnliches checken
         logInOutButton.setDisabled(app.gpgsClient == null
-                || app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_GAMEJOLT_ID));
+                || app.gpgsClient.getGameServiceId().equals(IGameServiceClient.GS_GAMEJOLT_ID)
+                || gpgsConnected && !app.gpgsClient.isFeatureSupported(IGameServiceClient.GameServiceFeature.PlayerLogOut));
         // Achievements etc auch
     }
 }

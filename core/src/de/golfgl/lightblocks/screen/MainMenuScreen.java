@@ -146,7 +146,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
         buttonTable.row();
 
         Table smallButtonTable = new Table();
-        smallButtonTable.add().width(30);
+        smallButtonTable.add().width(10);
         smallButtonTable.defaults().uniform().expandX().center();
 
         if (app.gpgsClient != null && !app.gpgsClient.getGameServiceId().equals(NoGameServiceClient.GAMESERVICE_ID)) {
@@ -207,10 +207,11 @@ public class MainMenuScreen extends AbstractMenuScreen {
                                        }
                                    }
         );
-        smallButtonTable.add(settingsButton).padRight(30);
+        smallButtonTable.add(settingsButton);
+        smallButtonTable.add().width(10).uniform(false, false).expand(false, false);
         stage.addFocusableActor(settingsButton);
 
-        buttonTable.add(smallButtonTable).fill().top().minWidth(gameTitle.getWidth()).expandX();
+        buttonTable.add(smallButtonTable).fill().top().minWidth(LightBlocksGame.nativeGameWidth * .85f).expandX();
 
         gameVersion = new ScaledLabel(LightBlocksGame.GAME_VERSIONSTRING +
                 (LightBlocksGame.GAME_DEVMODE ? "-DEV" : ""), app.skin);
