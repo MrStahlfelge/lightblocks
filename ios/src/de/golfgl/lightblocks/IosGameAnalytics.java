@@ -1,8 +1,9 @@
 package de.golfgl.lightblocks;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.iosrobovm.custom.HWMachine;
 
+import org.robovm.apple.foundation.NSDictionary;
+import org.robovm.apple.foundation.NSException;
 import org.robovm.apple.uikit.UIDevice;
 
 import java.io.PrintWriter;
@@ -31,10 +32,11 @@ public class IosGameAnalytics extends GameAnalytics {
     public void registerUncaughtExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             public void uncaughtException(Thread t, Throwable e) {
+                String exceptionAsString = "(no stacktrace)";
                 try {
                     StringWriter sw = new StringWriter();
                     e.printStackTrace(new PrintWriter(sw));
-                    String exceptionAsString = sw.toString();
+                    exceptionAsString = sw.toString();
                     submitErrorEvent(ErrorType.error, exceptionAsString);
                     flushQueueImmediately();
 
@@ -44,7 +46,9 @@ public class IosGameAnalytics extends GameAnalytics {
                 } catch (Throwable throwable) {
                     // do nothing
                 } finally {
-                    Gdx.app.exit();
+                    // crash the app in iOS
+                    NSException exception = new NSException(e.getClass().getName(), exceptionAsString, new NSDictionary());
+                    exception.raise();
                 }
 
             }
