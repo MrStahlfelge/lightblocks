@@ -69,8 +69,8 @@ public class MarathonModel extends GameModel {
     protected void achievementsClearedLines(int levelBeforeRemove, int removedLines) {
         super.achievementsClearedLines(levelBeforeRemove, removedLines);
 
-        if (inputTypeKey == PlayScreenInput.KEY_KEYSORGAMEPAD && !gamepadMarathonAchievementPosted
-                && Controllers.getControllers().size > 0) {
+        if ((inputTypeKey == PlayScreenInput.KEY_KEYSORGAMEPAD || inputTypeKey == PlayScreenInput.KEY_KEYORTOUCH)
+                && !gamepadMarathonAchievementPosted && Controllers.getControllers().size > 0) {
             gpgsUpdateAchievement(GpgsHelper.ACH_GAMEPAD_OWNER);
             gamepadMarathonAchievementPosted = true;
         }
