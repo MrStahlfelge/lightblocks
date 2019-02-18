@@ -19,6 +19,7 @@ package com.badlogic.gdx.backends.iosrobovm;
 import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.uikit.UIApplication;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.net.NetJavaImpl;
 import com.badlogic.gdx.net.NetJavaServerSocketImpl;
@@ -39,8 +40,8 @@ public class MyIosNet implements Net {
 
     @Override
     public void sendHttpRequest (HttpRequest httpRequest, HttpResponseListener httpResponseListener) {
-        httpRequest.setTimeOut(10000);
-        netJavaImpl.sendHttpRequest(httpRequest, httpResponseListener);
+        Gdx.app.debug("net", httpRequest.getMethod() + " " + httpRequest.getUrl());
+        netJavaImpl.sendHttpRequest(httpRequest, new LoggingResponseListener(httpRequest, httpResponseListener));
     }
 
     @Override
@@ -71,5 +72,35 @@ public class MyIosNet implements Net {
             return true;
         }
         return false;
+    }
+
+    private static class LoggingResponseListener implements HttpResponseListener {
+
+        private final HttpRequest request;
+        private final HttpResponseListener originalListener;
+
+        public LoggingResponseListener(HttpRequest request, HttpResponseListener originalListener) {
+            this.request = request;
+            this.originalListener = originalListener;
+        }
+
+        @Override
+        public void handleHttpResponse(HttpResponse httpResponse) {
+            String resultAsString = httpResponse.getResultAsString();
+            Gdx.app.debug("net", httpResponse.getStatus().toString() + ": Length " + (resultAsString != null ? resultAsString.length() : "0"));
+            originalListener.handleHttpResponse(httpResponse);
+        }
+
+        @Override
+        public void failed(Throwable t) {
+            Gdx.app.debug("net", "failed " + request.getUrl());
+            originalListener.failed(t);
+        }
+
+        @Override
+        public void cancelled() {
+            Gdx.app.debug("net", "cancelled " + request.getUrl());
+            originalListener.cancelled();
+        }
     }
 }
