@@ -26,16 +26,6 @@ public class MyGameCenterClient extends GameCenterClient {
     }
 
     @Override
-    public boolean unlockAchievement(String achievementId) {
-        String gcAch = mapAchievements(achievementId);
-
-        if (gcAch != null)
-            return super.unlockAchievement(gcAch);
-        else
-            return false;
-    }
-
-    @Override
     public boolean fetchLeaderboardEntries(String leaderBoardId, int limit, boolean relatedToPlayer,
                                            IFetchLeaderBoardEntriesResponseListener callback) {
         String gcLeader = mapLeaderboards(leaderBoardId);
