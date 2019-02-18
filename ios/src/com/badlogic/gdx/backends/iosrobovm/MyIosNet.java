@@ -86,8 +86,7 @@ public class MyIosNet implements Net {
 
         @Override
         public void handleHttpResponse(HttpResponse httpResponse) {
-            String resultAsString = httpResponse.getResultAsString();
-            Gdx.app.debug("net", httpResponse.getStatus().toString() + ": Length " + (resultAsString != null ? resultAsString.length() : "0"));
+            Gdx.app.debug("net", String.valueOf(httpResponse.getStatus().getStatusCode()));
             originalListener.handleHttpResponse(httpResponse);
         }
 

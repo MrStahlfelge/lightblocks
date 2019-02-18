@@ -50,5 +50,6 @@
     <framework>AudioToolbox</framework>
     <framework>AVFoundation</framework>
     <framework>GameKit</framework>
+    <framework>CloudKit</framework>
   </frameworks>
 </config>
