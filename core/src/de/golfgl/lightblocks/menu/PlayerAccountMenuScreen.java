@@ -42,6 +42,8 @@ public class PlayerAccountMenuScreen extends AbstractMenuDialog {
             return FontAwesome.GC_LOGO;
         if (gameServiceId.equals(IGameServiceClient.GS_GOOGLEPLAYGAMES_ID))
             return FontAwesome.GPGS_LOGO;
+        if (gameServiceId.equals(IGameServiceClient.GS_GAMECENTER_ID))
+            return FontAwesome.APPLE_LOGO;
 
         return FontAwesome.NET_CLOUDSAVE;
     }

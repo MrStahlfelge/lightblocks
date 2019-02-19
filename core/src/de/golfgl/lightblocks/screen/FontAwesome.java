@@ -8,6 +8,7 @@ public class FontAwesome {
 
     public static final String SKIN_FONT_FA = "fontawesome";
 
+    public static final String APPLE_LOGO = "E";
     public static final String GC_LOGO = "D";
     public static final String GPGS_LOGO = "A";
     public static final String GPGS_LEADERBOARD = "B";
