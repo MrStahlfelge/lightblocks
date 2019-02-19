@@ -276,6 +276,8 @@ public class MyIosApplication implements Application {
         if (audioSession != null) {
             audioSession.forceEndInterruption();
         }
+        // workaround for net queue blocked
+        net.resume();
     }
 
     final void willResignActive (UIApplication uiApp) {
