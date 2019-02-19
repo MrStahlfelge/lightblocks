@@ -302,7 +302,7 @@ public class DonationDialog extends ControllerMenuDialog {
         public void handleInstallError(final Throwable e) {
             Gdx.app.error("LB-IAP", "Error when trying to install PurchaseManager", e);
             if (app.gameAnalytics != null)
-                app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.error, e.getMessage());
+                app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.warning, e.getMessage());
 
             Gdx.app.postRunnable(new Runnable() {
                 @Override
@@ -353,7 +353,7 @@ public class DonationDialog extends ControllerMenuDialog {
         @Override
         public void handlePurchaseError(Throwable e) {
             if (app.gameAnalytics != null)
-                app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.error, e.getMessage());
+                app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.warning, e.getMessage());
             showErrorOnMainThread("Error making donation:\n" + e.getMessage(), false);
         }
 

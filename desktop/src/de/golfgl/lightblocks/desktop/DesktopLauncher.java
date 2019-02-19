@@ -109,7 +109,7 @@ public class DesktopLauncher {
 
         @Override
         public String getGameServiceId() {
-            return IGameServiceClient.GS_GOOGLEPLAYGAMES_ID;
+            return IGameServiceClient.GS_GAMECENTER_ID;
         }
 
         @Override

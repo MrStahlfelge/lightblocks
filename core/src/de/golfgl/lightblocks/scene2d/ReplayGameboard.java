@@ -98,7 +98,7 @@ public class ReplayGameboard extends BlockGroup {
         Replay.AdditionalInformation currentAdditionalInformation = replay.getCurrentAdditionalInformation();
 
         transitionGameboard(replay.getCurrentGameboard());
-        transitionNextPiece(currentAdditionalInformation.nextPiece);
+        transitionNextPiece(currentAdditionalInformation != null ? currentAdditionalInformation.nextPiece : null);
 
         nextStep = replay.seekToNextStep();
         if (nextStep != null)
@@ -111,7 +111,7 @@ public class ReplayGameboard extends BlockGroup {
 
         // Anzeige aktualisieren
         setCurrentTime(shownStep.timeMs);
-        onClearedLinesChange(currentAdditionalInformation.clearedLines);
+        onClearedLinesChange(currentAdditionalInformation != null ? currentAdditionalInformation.clearedLines : 0);
         timeMsSinceShownStep = 0;
 
         if (shownStep.isDropStep()) {

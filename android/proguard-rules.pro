@@ -99,3 +99,6 @@
 -keep class com.amazon.** {*;}
 -keepattributes *Annotation*
 -optimizations !code/allocation/variable
+
+# GPGS
+-keep class com.google.android.gms.games.multiplayer.InvitationEntity
