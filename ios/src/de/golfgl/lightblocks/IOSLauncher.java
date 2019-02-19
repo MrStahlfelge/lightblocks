@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.iosrobovm.MyIosAppConfig;
 import com.badlogic.gdx.backends.iosrobovm.MyIosApplication;
+import com.badlogic.gdx.pay.ios.apple.PurchaseManageriOSApple;
 
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAutoreleasePool;
@@ -83,6 +84,8 @@ public class IOSLauncher extends MyIosApplication.Delegate {
 
         // Für Bewertungen
         LightBlocksGame.gameStoreUrl = "https://itunes.apple.com/app/id1453041696";
+
+        game.purchaseManager = new PurchaseManageriOSApple();
 
         MyIosApplication app = new MyIosApplication(game, config);
         return app;

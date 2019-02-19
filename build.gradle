@@ -90,6 +90,7 @@ project(":ios") {
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
 
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-ios-gamecenter:$gamsvcsVersion"
+        compile "com.badlogicgames.gdxpay:gdx-pay-iosrobovm-apple:$gdxPayVersion"
     }
 }
 
