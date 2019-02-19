@@ -15,6 +15,8 @@ import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIRectEdge;
 
+import de.golfgl.gdxgameanalytics.IosGameAnalytics;
+
 public class IOSLauncher extends MyIosApplication.Delegate {
     public static void main(String[] argv) {
         NSAutoreleasePool pool = new NSAutoreleasePool();
