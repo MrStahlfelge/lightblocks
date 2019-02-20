@@ -69,9 +69,13 @@ public class MyGameCenterClient extends GameCenterClient {
     public boolean submitToLeaderboard(String leaderboardId, long score, String tag) {
         String gcLeader = mapLeaderboards(leaderboardId);
 
-        if (gcLeader != null)
+        if (gcLeader != null) {
+            // Im Sprint-Fall müssen die MS in 100stel-Sekunden umgerechnet werden...
+            if (gcLeader.equals(LEAD_SPRINT))
+                score = score / 10;
+
             return super.submitToLeaderboard(gcLeader, score, tag);
-        else
+        } else
             return false;
     }
 
