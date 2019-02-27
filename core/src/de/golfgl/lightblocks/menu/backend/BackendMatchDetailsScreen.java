@@ -48,6 +48,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     public BackendMatchDetailsScreen(LightBlocksGame app, String matchId) {
         super(app, matchId);
 
+        getButtonTable().defaults().pad(0, 30, 20, 30);
+
         playTurnButton = new PlayButton(app);
 //                =new RoundedTextButton("P", app.skin);
         playTurnButton.addListener(new ChangeListener() {
@@ -66,7 +68,18 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             }
         });
         addFocusableActor(resignButton);
-        getButtonTable().add(resignButton);
+        getButtonTable().add(resignButton).padLeft(20);
+
+        Button howToPlay = new GlowLabelButton("", "?", app.skin, GlowLabelButton.SMALL_SCALE_MENU);
+        howToPlay.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                new VetoDialog(BackendMatchDetailsScreen.this.app.TEXTS.format("competitionHelp", match.turnBlockCount),
+                        getSkin(), LightBlocksGame.nativeGameWidth * .9f).show(getStage());
+            }
+        });
+        addFocusableActor(howToPlay);
+        getButtonTable().add(howToPlay).width(howToPlay.getPrefWidth() * 1.2f);
 
         showReplayButton = new FaButton(FontAwesome.CIRCLE_PLAY, app.skin);
         showReplayButton.addListener(new ChangeListener() {
@@ -95,8 +108,6 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 acceptChallenge(false);
             }
         });
-
-        // TODO Reload wenn gewartet wird
 
         rematchButton = new GlowLabelButton(FontAwesome.ROTATE_RIGHT, "Rematch", app.skin);
         addFocusableActor(rematchButton);
@@ -241,7 +252,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         });
     }
 
-    private void fillMatchDetails(MatchEntity match) {
+    private void fillMatchDetails(final MatchEntity match) {
         this.match = match;
         Table matchDetailTable = new Table();
 
@@ -253,13 +264,15 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         opponentLabel.setMaxLabelWidth(LightBlocksGame.nativeGameWidth - 50);
         matchDetailTable.row().padBottom(5);
         matchDetailTable.add(opponentLabel);
+        addFocusableActor(opponentLabel);
 
         matchDetailTable.row();
         matchDetailTable.add(new ScaledLabel(BackendScoreDetailsScreen.findI18NIfExistant(app.TEXTS, match
                 .matchState, "mmturn_"), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .6f)).padTop(30);
 
         matchDetailTable.row().padTop(30);
-        if (match.turns.size() > 1 || match.turns.size() == 1 && match.turns.get(0).youPlayed) {
+        if (match.turns.size() > 1 || match.turns.size() == 1 &&
+                (match.turns.get(0).youPlayed || match.turns.get(0).opponentPlayed)) {
             matchDetailTable.add(new MatchTurnsTable()).padBottom(30);
         } else if (match.myTurn && !match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED) ||
                 match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_WAIT) ||
