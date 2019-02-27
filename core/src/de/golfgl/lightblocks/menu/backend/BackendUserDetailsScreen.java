@@ -140,6 +140,13 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
                         String.valueOf(details.multiplayerMatchesCount) + ")",
                         LightBlocksGame.SKIN_FONT_REG);
 
+            if (details.multiplayerMatchesCount > 5 && details.multiplayerTurns > 0) {
+                addLine("profileAvgSentLines",
+                        app.TEXTS.format("profileAvgSentLinesLbl", String.valueOf(details.multiplayerLinesSent / details.multiplayerTurns)),
+                        LightBlocksGame.SKIN_FONT_REG);
+
+            }
+
             if (details.country != null && !details.country.isEmpty())
                 addLine("profileCountryLabel", details.country,
                         LightBlocksGame.SKIN_FONT_REG);
