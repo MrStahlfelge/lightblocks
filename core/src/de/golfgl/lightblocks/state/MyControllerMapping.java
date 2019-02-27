@@ -4,6 +4,9 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -84,5 +87,16 @@ public class MyControllerMapping extends ControllerMappings {
         defaultMapping.putMapping(new MappedInput(BUTTON_CANCEL, new ControllerButton(onAndroid ? 4 : 8)));
 
         return true;
+    }
+
+    public boolean hasHardDropMapping() {
+        boolean hasHardDropMapping = false;
+        Array<Controller> controllers = Controllers.getControllers();
+        for (int i = 0; i < controllers.size; i++) {
+            hasHardDropMapping = hasHardDropMapping ||
+                    getControllerMapping(controllers.get(i)).getMappedInput(BUTTON_HARDDROP) != null;
+
+        }
+        return hasHardDropMapping;
     }
 }

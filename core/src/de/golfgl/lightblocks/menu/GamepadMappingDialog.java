@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.JsonWriter;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.mapping.ControllerMappings;
+import de.golfgl.gdx.controllers.mapping.MappedController;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -23,6 +24,7 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
     private final LightBlocksGame app;
     private final ControllerMappings mappings;
     private final Controller controller;
+    private MappedController mappedController;
     private final GlowLabelButton skipButton;
     private final Label instructionLabel;
     private final String instructionIntro;
@@ -61,8 +63,7 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (inputToRecord >= 0) {
-                    currentStep = currentStep + 2 - (currentStep % 2);
-                    switchStep();
+                    switchToNextFullStep();
                 } else
                     hide();
             }
@@ -87,6 +88,11 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
         switchStep();
     }
 
+    private void switchToNextFullStep() {
+        currentStep = currentStep + 2 - (currentStep % 2);
+        switchStep();
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -103,11 +109,14 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
                     switchStep();
                     break;
                 case recorded:
-                    currentStep = currentStep + 2 - (currentStep % 2);
-                    switchStep();
+                    switchToNextFullStep();
                     break;
                 default:
                     //nix zu tun, wir warten ab
+                    // außer wir sind im Hard Drop Schritt und es wird auf der vertikalen Achse Up gehalten, dann skip
+                    if (inputToRecord == MyControllerMapping.BUTTON_HARDDROP && mappedController != null
+                     && mappedController.getConfiguredAxisValue(MyControllerMapping.AXIS_VERTICAL) == -1)
+                        switchToNextFullStep();
             }
         }
     }
@@ -145,6 +154,7 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
             case 9:
                 instructionLabel.setText(instructionIntro + app.TEXTS.get("configGamepadStep7"));
                 inputToRecord = MyControllerMapping.BUTTON_HARDDROP;
+                this.mappedController = new MappedController(controller, mappings);
                 break;
             case 10:
             case 11:

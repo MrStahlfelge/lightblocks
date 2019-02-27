@@ -25,6 +25,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     private int connectedControllersOnLastCheck = 0;
     private float timeSinceLastControllerCheck = 0f;
+    private boolean hardDropMapped;
 
     public PlayKeyboardInput() {
         this.useTvRemoteControl = LightBlocksGame.isOnAndroidTV() && Controllers.getControllers().size == 0;
@@ -91,6 +92,14 @@ public class PlayKeyboardInput extends PlayScreenInput {
         return keycode;
     }
 
+    /**
+     * auf Up-Button Hard Drop gdw an Hardware-Tastatur, oder auf allen angeschlossenen Controllern
+     * kein anderweitiger Button für Hard Drop konfiguriert wurde
+     */
+    protected boolean performHardDropOnUpButton() {
+        return !isOnTvRemote() && (isOnKeyboard() || !hardDropMapped);
+    }
+
     protected boolean isOnKeyboard() {
         return Controllers.getControllers().size == 0 && Gdx.input.isPeripheralAvailable(Input.Peripheral
                 .HardwareKeyboard);
@@ -101,13 +110,16 @@ public class PlayKeyboardInput extends PlayScreenInput {
         timeSinceLastControllerCheck = timeSinceLastControllerCheck + delta;
 
         if (timeSinceLastControllerCheck > .2f) {
-            checkControllerConnections();
+            checkControllerConnections(false);
             timeSinceLastControllerCheck = 0;
         }
     }
 
-    private void checkControllerConnections() {
+    private void checkControllerConnections(boolean init) {
         int currentConnectedControllers = Controllers.getControllers().size;
+
+        if (init || currentConnectedControllers != connectedControllersOnLastCheck)
+            hardDropMapped = playScreen.app.controllerMappings.hasHardDropMapping();
 
         if (currentConnectedControllers <= 0 && connectedControllersOnLastCheck > 0
                 && !isOnKeyboard() && !isOnTvRemote())
@@ -127,7 +139,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
         // Blocker falls kein Gamepad vorhanden sofort setzen
         connectedControllersOnLastCheck = 1;
-        checkControllerConnections();
+        checkControllerConnections(true);
 
         if (useTvRemoteControl)
             tvRemoteKeyConfig = playScreen.app.localPrefs.getTvRemoteKeyConfig();
@@ -145,7 +157,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
         // Spezialfall TV Remote: auf normale Tasten drehen
         if (!isPaused() && isOnTvRemote())
             keycode = mapTvRemoteKeys(keycode);
-        else if (!isPaused() && isOnKeyboard() && keycode == Input.Keys.UP)
+        else if (!isPaused() && keycode == Input.Keys.UP && performHardDropOnUpButton())
             keycode = Input.Keys.CONTROL_RIGHT;
 
         switch (keycode) {
@@ -201,7 +213,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
         // Spezialfall TV Remote: auf normale Tasten drehen
         if (!isPaused() && isOnTvRemote())
             keycode = mapTvRemoteKeys(keycode);
-        else if (!isPaused() && isOnKeyboard() && keycode == Input.Keys.UP)
+        else if (!isPaused() && keycode == Input.Keys.UP && performHardDropOnUpButton())
             keycode = Input.Keys.CONTROL_RIGHT;
 
         if (keycode == Input.Keys.DOWN || keycode == Input.Keys.CONTROL_RIGHT) {
