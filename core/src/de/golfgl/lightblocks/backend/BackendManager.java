@@ -50,6 +50,7 @@ public class BackendManager {
     private boolean isFetchingMultiplayerMatches;
     private boolean multiplayerMatchesLastFetchSuccessful;
     private String multiplayerLastFetchError;
+    private boolean multiplayerLastFetchErrorConnectionProblem;
     private MatchTurnRequestInfo playedTurnToUpload;
     private boolean uploadingPlayedTurn;
     private boolean fetchingFullMatchInfo;
@@ -139,6 +140,10 @@ public class BackendManager {
         return multiplayerLastFetchError;
     }
 
+    public boolean isMultiplayerLastFetchErrorConnectionProblem() {
+        return multiplayerLastFetchErrorConnectionProblem;
+    }
+
     public BackendClient.WelcomeResponse getLastWelcomeResponse() {
         return lastWelcomeResponse;
     }
@@ -205,6 +210,7 @@ public class BackendManager {
                 public void onFail(int statusCode, String errorMsg) {
                     isFetchingMultiplayerMatches = false;
                     multiplayerMatchesLastFetchSuccessful = false;
+                    multiplayerLastFetchErrorConnectionProblem = statusCode == BackendClient.SC_NO_CONNECTION;
                     multiplayerLastFetchError = errorMsg;
                 }
 

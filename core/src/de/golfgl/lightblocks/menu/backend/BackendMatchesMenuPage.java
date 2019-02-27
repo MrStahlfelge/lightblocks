@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerScrollPane;
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -119,8 +120,14 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
                     .isMultiplayerMatchesLastFetchSuccessful())
                 errorLabelCell.setActor(null);
             else if (!errorLabelCell.hasActor() && !app.backendManager.isMultiplayerMatchesLastFetchSuccessful() &&
-                    app.backendManager.getMultiplayerLastFetchError() != null)
-                errorLabelCell.setActor(new ScaledLabel(app.backendManager.getMultiplayerLastFetchError(), app.skin));
+                    app.backendManager.getMultiplayerLastFetchError() != null) {
+                String errorText = app.backendManager.isMultiplayerLastFetchErrorConnectionProblem() ?
+                        app.TEXTS.get("errorNoInternetConnection") : app.backendManager.getMultiplayerLastFetchError();
+                ScaledLabel errorLabel = new ScaledLabel(errorText, app.skin);
+                errorLabel.setEllipsis(true);
+                errorLabel.setAlignment(Align.center);
+                errorLabelCell.setActor(errorLabel).fill();
+            }
         }
     }
 
