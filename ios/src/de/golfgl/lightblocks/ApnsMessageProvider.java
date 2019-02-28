@@ -23,11 +23,14 @@ public class ApnsMessageProvider implements IPushMessageProvider {
     protected static final String PROVIDER_ID = "APNS";
     private static String pushToken;
     private static boolean isRequestingToken;
+    private static IPushMessageListener listener;
 
     @Override
     public boolean initService(IPushMessageListener listener) {
-        if (pushToken != null || isRequestingToken)
+        if (pushToken != null || isRequestingToken || this.listener != null)
             return false;
+
+        this.listener = listener;
 
         isRequestingToken = true;
         UNUserNotificationCenter.currentNotificationCenter().requestAuthorization(UNAuthorizationOptions.with(UNAuthorizationOptions.Badge,
@@ -84,9 +87,11 @@ public class ApnsMessageProvider implements IPushMessageProvider {
     static void didRegisterForRemoteNotifications(boolean success, byte[] token) {
         isRequestingToken = false;
         pushToken = byteToHex(token);
-        if (success)
+        if (success) {
             Gdx.app.log(PROVIDER_ID, "Retrieved token: " + pushToken);
-        else
+            if (listener != null)
+                listener.onRegistrationTokenRetrieved(pushToken);
+        } else
             Gdx.app.error(PROVIDER_ID, "Failure retrieving push token");
     }
 
