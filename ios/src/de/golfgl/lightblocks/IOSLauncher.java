@@ -16,6 +16,8 @@ import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIRectEdge;
 
 import de.golfgl.gdxgameanalytics.IosGameAnalytics;
+import de.golfgl.gdxpushmessages.ApnsAppDelegate;
+import de.golfgl.gdxpushmessages.ApnsMessageProvider;
 
 public class IOSLauncher extends ApnsAppDelegate {
     public static void main(String[] argv) {

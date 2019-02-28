@@ -1,4 +1,4 @@
-package de.golfgl.lightblocks;
+package de.golfgl.gdxpushmessages;
 
 import com.badlogic.gdx.backends.iosrobovm.MyIosApplication;
 

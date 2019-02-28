@@ -30,7 +30,7 @@ allprojects {
         cuversion = '0.1.3'
         gaVersion = '0.1.3-SNAPSHOT'
         gdxPayVersion = '0.12.0'
-        pushMsgsVersion = '0.0.1-SNAPSHOT'
+        pushMsgsVersion = '0.1.0-SNAPSHOT'
     }
 
     repositories {
@@ -92,6 +92,7 @@ project(":ios") {
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-ios-gamecenter:$gamsvcsVersion"
         compile "com.badlogicgames.gdxpay:gdx-pay-iosrobovm-apple:$gdxPayVersion"
         compile "de.golfgl.gdxgameanalytics:gdx-gameanalytics-ios:$gaVersion"
+        compile "de.golfgl.gdxpushmessages:gdx-pushmessages-ios-apn:$pushMsgsVersion"
     }
 }
 
