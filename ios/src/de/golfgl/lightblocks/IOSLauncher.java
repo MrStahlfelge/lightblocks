@@ -17,7 +17,7 @@ import org.robovm.apple.uikit.UIRectEdge;
 
 import de.golfgl.gdxgameanalytics.IosGameAnalytics;
 
-public class IOSLauncher extends MyIosApplication.Delegate {
+public class IOSLauncher extends ApnsAppDelegate {
     public static void main(String[] argv) {
         NSAutoreleasePool pool = new NSAutoreleasePool();
         UIApplication.main(argv, null, IOSLauncher.class);
@@ -80,6 +80,7 @@ public class IOSLauncher extends MyIosApplication.Delegate {
         game.share = new IosShareHandler();
         game.gameAnalytics = new IosGameAnalytics();
         ((IosGameAnalytics) game.gameAnalytics).registerUncaughtExceptionHandler();
+        game.pushMessageProvider = new ApnsMessageProvider();
 
         // Gerätemodell wird für den Spielernamen benötigt
         game.modelNameRunningOn = UIDevice.getCurrentDevice().getModel();
