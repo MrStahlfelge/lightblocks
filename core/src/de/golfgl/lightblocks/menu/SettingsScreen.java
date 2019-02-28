@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.menu;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
@@ -216,8 +217,10 @@ public class SettingsScreen extends AbstractMenuDialog {
             row();
             add(colorModeCheck);
 
-            row();
-            add(gamePadButton);
+            if (Gdx.app.getType() != Application.ApplicationType.iOS) {
+                row();
+                add(gamePadButton);
+            }
 
             addFocusableActor(menuMusicButton);
             addFocusableActor(gridIntensitySlider);

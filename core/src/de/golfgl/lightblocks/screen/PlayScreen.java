@@ -1,6 +1,8 @@
 package de.golfgl.lightblocks.screen;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
@@ -12,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -78,7 +79,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private static final int NINE_PATCH_BORDER_SIZE = 5;
     private static final float GAMEOVER_TOUCHFREEZE = 1.5f;
     protected final Image imGarbageIndicator;
-    protected final Button pauseButton;
+    protected final TextButton pauseButton;
     protected final Group centerGroup;
     protected final BlockGroup blockGroup;
     private final Image imComboIndicator;
@@ -103,6 +104,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private boolean showScoresWhenGameOver = true;
     private int currentShownTime;
     private float timeSinceGameOver = 0;
+    private GameBlocker.UsePortraitGameBlocker usePortraitGameBlocker = new GameBlocker.UsePortraitGameBlocker();
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
@@ -191,7 +193,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         centerGroup.addActor(labelGroup);
 
         pauseButton = new TextButton(FontAwesome.CIRCLE_PAUSE, app.skin, FontAwesome.SKIN_FONT_FA);
-        pauseButton.setY(imLine.getY());
         pauseButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -199,7 +200,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             }
         });
         // Im Webbrowser ohne Tastatur den PauseButton anzeigen
-        pauseButton.setVisible(LightBlocksGame.isWebAppOnMobileDevice());
+        pauseButton.setVisible(LightBlocksGame.isWebAppOnMobileDevice() ||
+                Gdx.app.getType() == Application.ApplicationType.iOS);
 
         pauseDialog = new PauseDialog(app, this);
 
@@ -226,7 +228,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         // nun die allerletzten Actor auf die Stage
         centerGroup.addActor(scoreTable);
-        stage.addActor(pauseButton);
+        centerGroup.addActor(pauseButton);
 
         Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
         String modelIdLabel = (mission != null ? app.TEXTS.format("labelMission", mission.getIndex())
@@ -368,8 +370,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // input initialisieren
         inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey, app);
         inputAdapter.setPlayScreen(this);
-        if (inputAdapter.getRequestedScreenOrientation() != null)
-            app.lockOrientation(inputAdapter.getRequestedScreenOrientation());
+        if (inputAdapter.getRequestedScreenOrientation() != null) {
+            boolean rotated = app.lockOrientation(inputAdapter.getRequestedScreenOrientation());
+            if (!rotated)
+                addGameBlocker(usePortraitGameBlocker);
+        }
 
         // Highscores
         gameModel.totalScore = app.savegame.getTotalScore();
@@ -1049,7 +1054,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     public void setMusic(boolean playMusic) {
         if (playMusic && music == null) {
-            music = Gdx.audio.newMusic(Gdx.files.internal("sound/dd.ogg"));
+            music = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("dd")));
             music.setVolume(1f);                 // sets the volume to half the maximum volume
             music.setLooping(true);
         } else if (!playMusic && music != null) {
@@ -1154,12 +1159,25 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 scoreTable.getPrefHeight() / 2 + 5, scoreTable.getLinePrefHeight() * 2 + scoreTable.getPrefHeight() /
                         2));
 
-        pauseButton.setX(Math.max(LightBlocksGame.nativeGameWidth / 2 - 5 + stage.getWidth() / 2,
-                stage.getWidth() - pauseButton.getY()), Align.right);
+        pauseButton.getLabel().setFontScale(MathUtils.clamp((float) width / height, 1f, 2f));
+        pauseButton.pack();
+
+        if ((scoreTable.getX() + centerGroup.getX() - scoreTable.getPrefWidth() / 2) > pauseButton.getWidth() * 1.2f)
+            pauseButton.setPosition(scoreTable.getX() - scoreTable.getPrefWidth() / 2 - pauseButton.getWidth() * 1.2f,
+                    (scoreTable.getHeight() - pauseButton.getHeight()) / 2 + scoreTable.getY());
+        else
+            pauseButton.setPosition(scoreTable.getX() - scoreTable.getPrefWidth() / 2, scoreTable.getY() - 2f * pauseButton.getHeight());
 
         // GestureInput neues TouchPanel und Resize On Screen Controls
-        if (inputAdapter != null)
+        if (inputAdapter != null) {
             inputAdapter.setPlayScreen(this);
+
+            // es gibt momentan nur Portrait Zwang, eigentlich usePortraitGameBlocker natürlich für Landscape falsch
+            Input.Orientation requestedScreenOrientation = inputAdapter.getRequestedScreenOrientation();
+            if (requestedScreenOrientation != null && (requestedScreenOrientation.equals(Input.Orientation.Portrait)
+                    && !isLandscape() || isLandscape() && requestedScreenOrientation.equals(Input.Orientation.Landscape)))
+                removeGameBlocker(usePortraitGameBlocker);
+        }
     }
 
     public static class PlayScoreTable extends Table {
