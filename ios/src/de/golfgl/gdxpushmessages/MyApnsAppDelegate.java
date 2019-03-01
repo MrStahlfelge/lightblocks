@@ -38,9 +38,11 @@ public abstract class MyApnsAppDelegate extends MyIosApplication.Delegate {
     @Override
     public boolean didFinishLaunching(UIApplication application, UIApplicationLaunchOptions launchOptions) {
         boolean retVal = super.didFinishLaunching(application, launchOptions);
-        UIRemoteNotification remoteNotification = launchOptions.getRemoteNotification();
-        if (remoteNotification != null)
-            ApnsMessageProvider.pushMessageArrived(remoteNotification);
+        if (launchOptions != null) {
+            UIRemoteNotification remoteNotification = launchOptions.getRemoteNotification();
+            if (remoteNotification != null)
+                ApnsMessageProvider.pushMessageArrived(remoteNotification);
+        }
         return retVal;
     }
 }
