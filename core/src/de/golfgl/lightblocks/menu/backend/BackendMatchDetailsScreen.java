@@ -42,6 +42,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     private final Button rematchButton;
     private final Button acceptChallengeButton;
     private final Button declineChallengeButton;
+    private final Button howToPlay;
     private MatchEntity match;
     private boolean wasPlaying;
 
@@ -70,7 +71,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         addFocusableActor(resignButton);
         getButtonTable().add(resignButton).padLeft(20);
 
-        Button howToPlay = new GlowLabelButton("", "?", app.skin, GlowLabelButton.SMALL_SCALE_MENU);
+        howToPlay = new GlowLabelButton("", "?", app.skin, GlowLabelButton.SMALL_SCALE_MENU);
         howToPlay.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -80,6 +81,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         });
         addFocusableActor(howToPlay);
         getButtonTable().add(howToPlay).width(howToPlay.getPrefWidth() * 1.2f);
+        howToPlay.setDisabled(true);
 
         showReplayButton = new FaButton(FontAwesome.CIRCLE_PLAY, app.skin);
         showReplayButton.addListener(new ChangeListener() {
@@ -254,6 +256,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
     private void fillMatchDetails(final MatchEntity match) {
         this.match = match;
+        howToPlay.setDisabled(false);
+
         Table matchDetailTable = new Table();
 
         matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelTurnAgainst"), app.skin,
