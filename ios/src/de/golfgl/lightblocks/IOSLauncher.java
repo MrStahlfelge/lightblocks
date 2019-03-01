@@ -16,10 +16,10 @@ import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIRectEdge;
 
 import de.golfgl.gdxgameanalytics.IosGameAnalytics;
-import de.golfgl.gdxpushmessages.ApnsAppDelegate;
+import de.golfgl.gdxpushmessages.MyApnsAppDelegate;
 import de.golfgl.gdxpushmessages.ApnsMessageProvider;
 
-public class IOSLauncher extends ApnsAppDelegate {
+public class IOSLauncher extends MyApnsAppDelegate {
     public static void main(String[] argv) {
         NSAutoreleasePool pool = new NSAutoreleasePool();
         UIApplication.main(argv, null, IOSLauncher.class);
@@ -82,7 +82,7 @@ public class IOSLauncher extends ApnsAppDelegate {
         game.share = new IosShareHandler();
         game.gameAnalytics = new IosGameAnalytics();
         ((IosGameAnalytics) game.gameAnalytics).registerUncaughtExceptionHandler();
-        game.pushMessageProvider = new ApnsMessageProvider();
+        game.pushMessageProvider = new ApnsMessageProvider(true);
 
         // Gerätemodell wird für den Spielernamen benötigt
         game.modelNameRunningOn = UIDevice.getCurrentDevice().getModel();
