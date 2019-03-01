@@ -137,12 +137,13 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
             if (details.multiplayerMatchesCount > 5)
                 addLine("profileWinRatioLabel",
                         String.valueOf(details.multiplayerWinCount * 100 / details.multiplayerMatchesCount) + "% (" +
-                        String.valueOf(details.multiplayerMatchesCount) + ")",
+                                String.valueOf(details.multiplayerMatchesCount) + ")",
                         LightBlocksGame.SKIN_FONT_REG);
 
             if (details.multiplayerMatchesCount > 5 && details.multiplayerTurns > 0) {
                 addLine("profileAvgSentLines",
-                        app.TEXTS.format("profileAvgSentLinesLbl", String.valueOf(details.multiplayerLinesSent / details.multiplayerTurns)),
+                        app.TEXTS.format("profileAvgSentLinesLbl", String.valueOf(details.multiplayerLinesSent / details.multiplayerTurns)
+                                + "." + String.valueOf((details.multiplayerLinesSent * 10 / details.multiplayerTurns) % 10)),
                         LightBlocksGame.SKIN_FONT_REG);
 
             }
