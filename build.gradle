@@ -28,7 +28,7 @@ allprojects {
         aiVersion = '1.8.0'
         gamsvcsVersion = '1.0.0-SNAPSHOT'
         cuversion = '0.1.3'
-        gaVersion = '0.1.3-SNAPSHOT'
+        gaVersion = '0.1.3'
         gdxPayVersion = '0.12.1-SNAPSHOT'
         pushMsgsVersion = '0.1.0-SNAPSHOT'
     }
