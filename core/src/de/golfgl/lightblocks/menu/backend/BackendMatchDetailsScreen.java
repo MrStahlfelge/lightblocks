@@ -298,10 +298,13 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         if (match.myTurn) {
             matchDetailTable.row();
             if (match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
-                matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel")
-                        + " " + app.TEXTS.get("labelLevel") + " "
-                        + match.beginningLevel, app.skin, LightBlocksGame.SKIN_FONT_BIG))
-                        .padTop(30);
+                // Ich bin aufgefordert
+
+                matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel"),
+                        app.skin, LightBlocksGame.SKIN_FONT_BIG)).padTop(30);
+                matchDetailTable.row();
+                matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelLevel") + " "
+                        + match.beginningLevel, app.skin, LightBlocksGame.SKIN_FONT_TITLE));
                 matchDetailTable.row();
                 matchDetailTable.add(acceptChallengeButton).pad(50, 0, 20, 0)
                         .minHeight(acceptChallengeButton.getPrefHeight() * 2f);
