@@ -5,12 +5,18 @@ import com.badlogic.gdx.audio.Music;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 
+/**
+ * Übernimmt die Steuerung der Music (an/aus) sowie den gerade angenommenen Zustand siehe MusicState)
+ */
 public class PlayMusic {
     private final LightBlocksGame app;
-    private Music playingMusic;
+    private Music slowMusic;
     private Music startMusic;
+    private Music transitionMusic;
+    private Music fastMusic;
     private boolean isPlayMusic;
-    private MusicState state = MusicState.starting;
+    private MusicState state;
+    private boolean shouldPlayFast;
 
     public PlayMusic(LightBlocksGame app) {
         this.app = app;
@@ -18,22 +24,35 @@ public class PlayMusic {
 
     public void setPlayingMusic(boolean playMusic) {
         if (playMusic && !isPlayMusic) {
+            state = MusicState.starting;
             startMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameStart")));
             startMusic.setOnCompletionListener(new Music.OnCompletionListener() {
                 @Override
                 public void onCompletion(Music music) {
-                    state = MusicState.playingSlowly;
-                    playingMusic.play();
+                    completedTransition();
                 }
             });
-            playingMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameSlow")));
-            playingMusic.setVolume(1f);                 // sets the volume to half the maximum volume
-            playingMusic.setLooping(true);
+            transitionMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameTransition")));
+            transitionMusic.setOnCompletionListener(new Music.OnCompletionListener() {
+                @Override
+                public void onCompletion(Music music) {
+                    completedTransition();
+                }
+            });
+            slowMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameSlow")));
+            slowMusic.setLooping(true);
+            fastMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameFast")));
+            fastMusic.setLooping(true);
+
         } else if (!playMusic && isPlayMusic) {
-            playingMusic.dispose();
-            playingMusic = null;
+            slowMusic.dispose();
+            slowMusic = null;
             startMusic.dispose();
             startMusic = null;
+            fastMusic.dispose();
+            fastMusic = null;
+            transitionMusic.dispose();
+            transitionMusic = null;
         }
         isPlayMusic = playMusic;
     }
@@ -42,10 +61,16 @@ public class PlayMusic {
         if (isPlayMusic)
             switch (state) {
                 case playingSlowly:
-                    playingMusic.play();
+                    slowMusic.play();
                     break;
                 case starting:
                     startMusic.play();
+                    break;
+                case transitioning:
+                    transitionMusic.play();
+                    break;
+                case playingFast:
+                    fastMusic.play();
                     break;
             }
     }
@@ -54,10 +79,16 @@ public class PlayMusic {
         if (isPlayMusic)
             switch (state) {
                 case playingSlowly:
-                    playingMusic.pause();
+                    slowMusic.pause();
                     break;
                 case starting:
                     startMusic.pause();
+                    break;
+                case transitioning:
+                    transitionMusic.pause();
+                    break;
+                case playingFast:
+                    fastMusic.pause();
                     break;
             }
     }
@@ -66,10 +97,16 @@ public class PlayMusic {
         if (isPlayMusic)
             switch (state) {
                 case playingSlowly:
-                    playingMusic.stop();
+                    slowMusic.stop();
                     break;
                 case starting:
                     startMusic.stop();
+                    break;
+                case transitioning:
+                    transitionMusic.stop();
+                    break;
+                case playingFast:
+                    fastMusic.stop();
                     break;
             }
     }
@@ -78,5 +115,30 @@ public class PlayMusic {
         setPlayingMusic(false);
     }
 
-    private enum MusicState {starting, playingSlowly}
+    public void setFastPlay(boolean fastPlay) {
+        if (this.shouldPlayFast != fastPlay) {
+
+            switch (state) {
+                case playingFast:
+                case playingSlowly:
+                    stop();
+                    state = MusicState.transitioning;
+                    play();
+                    break;
+            }
+
+            this.shouldPlayFast = fastPlay;
+        }
+    }
+
+    private void completedTransition() {
+        if (shouldPlayFast) {
+            state = MusicState.playingFast;
+        } else {
+            state = MusicState.playingSlowly;
+        }
+        play();
+    }
+
+    private enum MusicState {starting, playingSlowly, transitioning, playingFast}
 }

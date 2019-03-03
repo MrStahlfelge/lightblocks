@@ -516,6 +516,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         }
     }
 
+    @Override
+    public void setGameboardCriticalFill(boolean critical) {
+        music.setFastPlay(critical);
+    }
+
     private void goToHighscores() {
 
         RoundOverScoreScreen scoreScreen = new RoundOverScoreScreen(app);
