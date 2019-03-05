@@ -20,10 +20,12 @@ public class FaRadioButton<T> extends GlowLabelButton {
     private Array<FaText> texts = new Array<FaText>();
     private Action changeAction;
     private boolean changing;
+    private boolean showIndicator = true;
 
     public FaRadioButton(Skin skin) {
         this(skin, GlowLabelButton.FONT_SCALE_SUBMENU);
     }
+
     public FaRadioButton(Skin skin, float fontScale) {
         super(" ", " ", skin, fontScale, 1f);
         this.skin = skin;
@@ -47,6 +49,8 @@ public class FaRadioButton<T> extends GlowLabelButton {
 
         if (valueIndex < 0)
             setValueIndex(0);
+        else if (showIndicator)
+            changeLabels(texts.get(valueIndex), valueIndex);
 
         return this;
     }
@@ -65,6 +69,10 @@ public class FaRadioButton<T> extends GlowLabelButton {
             setValueIndex(idx);
     }
 
+    public void setShowIndicator(boolean showIndicator) {
+        this.showIndicator = showIndicator;
+    }
+
     public void changeValue() {
         if (valueIndex < valueArray.size - 1)
             setValueIndex(valueIndex + 1);
@@ -72,7 +80,7 @@ public class FaRadioButton<T> extends GlowLabelButton {
             setValueIndex(0);
     }
 
-    private void setValueIndex(int idx) {
+    private void setValueIndex(final int idx) {
         if (valueIndex == idx || idx < 0 || idx >= valueArray.size)
             return;
 
@@ -89,8 +97,7 @@ public class FaRadioButton<T> extends GlowLabelButton {
             changeAction = MyActions.getChangeSequence(new Runnable() {
                 @Override
                 public void run() {
-                    setFaText(text.fa);
-                    setText(text.text);
+                    changeLabels(text, idx);
                 }
             });
             addAction(changeAction);
@@ -100,9 +107,25 @@ public class FaRadioButton<T> extends GlowLabelButton {
             fire(changeEvent);
             changing = false;
         } else {
-            setFaText(text.fa);
-            setText(text.text);
+            changeLabels(text, idx);
         }
+    }
+
+    private void changeLabels(FaText text, int pos) {
+        setFaText(text.fa);
+
+        String textForLabel;
+
+        if (showIndicator && (text.fa == null || text.fa.isEmpty())) {
+            char[] indicator = new char[texts.size + 1];
+            for (int i = 0; i < texts.size; i++)
+                indicator[i] = i == pos ? '·' : '.';
+            indicator[texts.size] = ' ';
+            textForLabel = new String(indicator) + text.text;
+        } else
+            textForLabel = text.text;
+
+        setText(textForLabel);
     }
 
     class FaText {
