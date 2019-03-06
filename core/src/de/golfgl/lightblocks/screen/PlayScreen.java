@@ -396,6 +396,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Controller und Schwerkraft müssen gepollt werden
         inputAdapter.doPoll(delta);
 
+        music.act(delta);
+
         delta = Math.min(delta, 1 / 30f);
 
         if (!isPaused)
