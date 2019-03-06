@@ -15,7 +15,7 @@ public class PlayMusic {
     private Music transitionMusic;
     private Music fastMusic;
     private boolean isPlayMusic;
-    private MusicState state;
+    private MusicState state = MusicState.starting;
     private boolean shouldPlayFast;
 
     public PlayMusic(LightBlocksGame app) {
