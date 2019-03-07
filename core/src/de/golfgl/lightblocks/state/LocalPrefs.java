@@ -31,6 +31,7 @@ public class LocalPrefs {
     private static final String KEY_LASTSTARTEDVERSION = "lastStartedVersion";
     private static final String KEY_LASTSTARTTIME = "lastStartTime";
     private static final String PREF_KEY_ONSCREENCONTROLS = "onScreenControls";
+    private static final String PREF_KEY_HIDEONSCREENCONTROLS = "hideOnScreenControls";
     private static final String TVREMOTE_HARDDROP = "tvremote_harddrop";
     private static final String TVREMOTE_HOLD = "tvremote_hold";
     private static final String TVREMOTE_SOFTDROP = "tvremote_softdrop";
@@ -61,6 +62,7 @@ public class LocalPrefs {
     private Integer lastUsedVersion;
     private Integer daysSinceLastStart;
     private Boolean useOnScreenControls;
+    private Boolean hideOnScreenControlsWhenGamepad;
     private TvRemoteKeyConfig tvRemoteKeyConfig;
     private boolean suppressSounds;
     private Integer supportLevel;
@@ -242,6 +244,19 @@ public class LocalPrefs {
     public void setUseOnScreenControls(boolean useOnScreenControls) {
         this.useOnScreenControls = useOnScreenControls;
         prefs.putBoolean(PREF_KEY_ONSCREENCONTROLS, useOnScreenControls);
+        prefs.flush();
+    }
+
+    public Boolean hideOnScreenControlsWhenGamepad() {
+        if (hideOnScreenControlsWhenGamepad == null)
+            hideOnScreenControlsWhenGamepad = prefs.getBoolean(PREF_KEY_HIDEONSCREENCONTROLS, false);
+
+        return hideOnScreenControlsWhenGamepad;
+    }
+
+    public void setHideOnScreenControlsWhenGamepad(Boolean hideOnScreenControlsWhenGamepad) {
+        this.hideOnScreenControlsWhenGamepad = hideOnScreenControlsWhenGamepad;
+        prefs.putBoolean(PREF_KEY_HIDEONSCREENCONTROLS, hideOnScreenControlsWhenGamepad);
         prefs.flush();
     }
 
