@@ -15,7 +15,11 @@ public class FaCheckbox extends GlowLabelButton {
     private boolean checkedState;
 
     public FaCheckbox(String text, Skin skin) {
-        super(FontAwesome.CIRCLE_CROSS, text, skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
+        this(text, skin, GlowLabelButton.FONT_SCALE_SUBMENU);
+    }
+
+    public FaCheckbox(String text, Skin skin, float fontScale) {
+        super(FontAwesome.CIRCLE_CROSS, text, skin, fontScale, 1f);
         setChecked(isChecked());
         checkbox = new Table();
         getCell(faLabel).setActor(checkbox).fill(false, true).right();

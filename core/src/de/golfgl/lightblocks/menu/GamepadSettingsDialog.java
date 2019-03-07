@@ -19,10 +19,12 @@ import com.badlogic.gdx.utils.Array;
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.FaButton;
+import de.golfgl.lightblocks.scene2d.FaCheckbox;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.PlayScreenInput;
 
 /**
  * Created by Benjamin Schulte on 04.11.2017.
@@ -35,11 +37,12 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
     private Button refreshButton;
     private boolean runsOnChrome;
     private Actor defaultActor;
+    private FaCheckbox checkHideOnScreenControls;
 
     private int connectedControllersOnLastCheck;
     private float timeSinceLastControllerCheck;
 
-    public GamepadSettingsDialog(LightBlocksGame app) {
+    public GamepadSettingsDialog(final LightBlocksGame app) {
         super("", app.skin);
 
         this.app = app;
@@ -58,6 +61,16 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
 
         getButtonTable().add(refreshButton);
         addFocusableActor(refreshButton);
+
+        checkHideOnScreenControls = new FaCheckbox(app.TEXTS.get("configHideOnScreenControls"), app.skin, .3f);
+        checkHideOnScreenControls.setChecked(app.localPrefs.hideOnScreenControlsWhenGamepad());
+        checkHideOnScreenControls.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                app.localPrefs.setHideOnScreenControlsWhenGamepad(checkHideOnScreenControls.isChecked());
+            }
+        });
+        addFocusableActor(checkHideOnScreenControls);
     }
 
     @Override
@@ -137,6 +150,11 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
 
         contentTable.row();
         contentTable.add(controllerList);
+
+        if (app.localPrefs.useOnScreenControls() && PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
+            contentTable.row().padTop(20);
+            contentTable.add(checkHideOnScreenControls);
+        }
 
         contentTable.row().padTop(20);
         Label hint = new ScaledLabel(app.TEXTS.get("configGamepadHelp") +
