@@ -196,6 +196,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             public void onRequestSuccess(MatchEntity retrievedData) {
                 super.onRequestSuccess(retrievedData);
                 app.backendManager.updateMatchEntityInList(retrievedData);
+                if (app.localPrefs.isPlaySounds())
+                    app.rotateSound.play();
                 fillMatchDetails(retrievedData);
             }
         });
