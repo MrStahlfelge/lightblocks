@@ -121,11 +121,15 @@ public class BackendManager {
 
     public Array<MatchEntity> getMultiplayerMatchesList() {
         // Aufforderung in Main-Screen "gelesen" markieren
-        if (lastWelcomeResponse != null && lastWelcomeResponse.competitionActionRequired) {
-            lastWelcomeResponse = new BackendClient.WelcomeResponse(lastWelcomeResponse);
-        }
+        setCompetitionActionRequiredFlag(false);
 
         return multiplayerMatchesList;
+    }
+
+    public void setCompetitionActionRequiredFlag(boolean competitionActionRequired) {
+        if (lastWelcomeResponse != null && lastWelcomeResponse.competitionActionRequired != competitionActionRequired) {
+            lastWelcomeResponse = new BackendClient.WelcomeResponse(lastWelcomeResponse, competitionActionRequired);
+        }
     }
 
     public long getMultiplayerMatchesLastFetchMs() {
