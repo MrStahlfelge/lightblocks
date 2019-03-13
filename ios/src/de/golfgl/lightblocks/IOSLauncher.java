@@ -18,6 +18,7 @@ import org.robovm.apple.uikit.UIRectEdge;
 import de.golfgl.gdxgameanalytics.IosGameAnalytics;
 import de.golfgl.gdxpushmessages.MyApnsAppDelegate;
 import de.golfgl.gdxpushmessages.ApnsMessageProvider;
+import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 
 public class IOSLauncher extends MyApnsAppDelegate {
     public static void main(String[] argv) {
@@ -32,8 +33,7 @@ public class IOSLauncher extends MyApnsAppDelegate {
         config.useCompass = false;
         config.screenEdgesDeferringSystemGestures = UIRectEdge.None;
 
-        // TODO Multiplayer - wenn RoboVM 2.3.6 da ist probieren
-        LightBlocksGame game = new LightBlocksGame() {
+        LightBlocksGame game = new MultiplayerLightblocks() {
             @Override
             public String getSoundAssetFilename(String name) {
                 return "sound/" + name + ".mp3";
