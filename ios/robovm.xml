@@ -37,6 +37,7 @@
     <pattern>org.apache.harmony.security.provider.crypto.CryptoProvider</pattern>
     <pattern>de.golfgl.lightblocks.model.**</pattern>
     <pattern>com.esotericsoftware.kryo.**</pattern>
+    <pattern>de.golfgl.lightblocks.multiplayer.MultiPlayerObjects</pattern>
   </forceLinkClasses>
   <libs>
       <lib>z</lib>   
