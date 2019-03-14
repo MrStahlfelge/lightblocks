@@ -3,17 +3,11 @@ package de.golfgl.lightblocks;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 
-import org.robovm.apple.foundation.NSData;
-import org.robovm.apple.foundation.NSDictionary;
-import org.robovm.apple.foundation.NSInputStream;
 import org.robovm.apple.foundation.NSNetService;
 import org.robovm.apple.foundation.NSNetServiceBrowser;
-import org.robovm.apple.foundation.NSNetServiceBrowserDelegate;
-import org.robovm.apple.foundation.NSNetServiceDelegate;
+import org.robovm.apple.foundation.NSNetServiceBrowserDelegateAdapter;
+import org.robovm.apple.foundation.NSNetServiceDelegateAdapter;
 import org.robovm.apple.foundation.NSNetServiceErrorUserInfo;
-import org.robovm.apple.foundation.NSNumber;
-import org.robovm.apple.foundation.NSOutputStream;
-import org.robovm.apple.foundation.NSString;
 import org.robovm.apple.uikit.UIDevice;
 
 import java.net.InetAddress;
@@ -25,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
+import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.KryonetRoomLocation;
 
 
@@ -43,27 +38,7 @@ public class BonjourAdapter implements INsdHelper {
         myNetServiceDelegate = new MyNetServiceDelegate();
 
         browser = new NSNetServiceBrowser();
-        browser.setDelegate(new NSNetServiceBrowserDelegate() {
-            @Override
-            public void willSearch(NSNetServiceBrowser nsNetServiceBrowser) {
-
-            }
-
-            @Override
-            public void didStopSearch(NSNetServiceBrowser nsNetServiceBrowser) {
-
-            }
-
-            @Override
-            public void didNotSearch(NSNetServiceBrowser nsNetServiceBrowser, NSDictionary<NSString, NSNumber> nsDictionary) {
-
-            }
-
-            @Override
-            public void didFindDomain(NSNetServiceBrowser nsNetServiceBrowser, String s, boolean b) {
-
-            }
-
+        browser.setDelegate(new NSNetServiceBrowserDelegateAdapter() {
             @Override
             public void didFindService(NSNetServiceBrowser nsNetServiceBrowser, NSNetService nsNetService, boolean b) {
                 if (nsNetService.getName().startsWith(SERVICE_NAME)) {
@@ -72,11 +47,6 @@ public class BonjourAdapter implements INsdHelper {
                     nsNetService.setDelegate(myNetServiceDelegate);
                     nsNetService.resolve(.3);
                 }
-            }
-
-            @Override
-            public void didRemoveDomain(NSNetServiceBrowser nsNetServiceBrowser, String s, boolean b) {
-
             }
 
             @Override
@@ -93,7 +63,8 @@ public class BonjourAdapter implements INsdHelper {
     @Override
     public void registerService() {
         if (service == null) {
-            service = new NSNetService("", HTTP_SERVICE, SERVICE_NAME + "-" + UIDevice.getCurrentDevice().getLocalizedModel() + "-" + MathUtils.random(100, 999));
+            service = new NSNetService("", HTTP_SERVICE, SERVICE_NAME + "-" + UIDevice.getCurrentDevice().getLocalizedModel()
+                    + "-" + MathUtils.random(100, 999), KryonetMultiplayerRoom.TCP_PORT);
             service.setDelegate(myNetServiceDelegate);
             service.publish();
         }
@@ -130,12 +101,7 @@ public class BonjourAdapter implements INsdHelper {
         return retVal;
     }
 
-    private class MyNetServiceDelegate implements NSNetServiceDelegate {
-        @Override
-        public void willPublish(NSNetService nsNetService) {
-
-        }
-
+    private class MyNetServiceDelegate extends NSNetServiceDelegateAdapter {
         @Override
         public void didPublish(NSNetService nsNetService) {
             Gdx.app.debug(TAG, "Published service.");
@@ -144,11 +110,6 @@ public class BonjourAdapter implements INsdHelper {
         @Override
         public void didNotPublish(NSNetService nsNetService, NSNetServiceErrorUserInfo nsNetServiceErrorUserInfo) {
             Gdx.app.debug(TAG, "Service not published.");
-        }
-
-        @Override
-        public void willResolve(NSNetService nsNetService) {
-
         }
 
         @Override
@@ -168,23 +129,8 @@ public class BonjourAdapter implements INsdHelper {
         }
 
         @Override
-        public void didNotResolve(NSNetService nsNetService, NSNetServiceErrorUserInfo nsNetServiceErrorUserInfo) {
-
-        }
-
-        @Override
         public void didStop(NSNetService nsNetService) {
             Gdx.app.debug(TAG, "Published service stopped.");
-        }
-
-        @Override
-        public void didUpdateTXTRecordData(NSNetService nsNetService, NSData nsData) {
-
-        }
-
-        @Override
-        public void didAcceptConnection(NSNetService nsNetService, NSInputStream nsInputStream, NSOutputStream nsOutputStream) {
-
         }
     }
 }
