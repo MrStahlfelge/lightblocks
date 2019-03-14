@@ -9,20 +9,21 @@ import java.util.List;
  */
 
 public interface INsdHelper {
+    String SERVICE_NAME = "Lightblocks";
 
-    public void registerService();
+    void registerService();
 
-    public void unregisterService();
+    void unregisterService();
 
-    public void startDiscovery();
+    void startDiscovery();
 
-    public void stopDiscovery();
+    void stopDiscovery();
 
     /**
      * returns list of currently discovered services.
      *
      * @return Copy of the list at the time the method is called
      */
-    public List<IRoomLocation> getDiscoveredServices();
+    List<IRoomLocation> getDiscoveredServices();
 
 }

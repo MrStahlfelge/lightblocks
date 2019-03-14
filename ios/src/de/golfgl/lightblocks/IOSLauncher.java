@@ -78,11 +78,12 @@ public class IOSLauncher extends MyApnsAppDelegate {
             }
         };
 
-        // Initialize Android dependant classes
+        // Initialize platform dependant classes
         game.share = new IosShareHandler();
         game.gameAnalytics = new IosGameAnalytics();
         ((IosGameAnalytics) game.gameAnalytics).registerUncaughtExceptionHandler();
         game.pushMessageProvider = new ApnsMessageProvider(true);
+        game.nsdHelper = new BonjourAdapter();
 
         // Gerätemodell wird für den Spielernamen benötigt
         game.modelNameRunningOn = UIDevice.getCurrentDevice().getModel();

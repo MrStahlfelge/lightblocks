@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class NsdAdapter implements INsdHelper, NsdListener {
 
-    public static final String SERVICE_NAME = "Lightblocks";
     final Map<String, InetAddress> currentServices;
     private NsdHelper nsdHelper;
 
