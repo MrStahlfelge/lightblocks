@@ -354,6 +354,11 @@ public class GpgsMultiPlayerRoom extends AbstractMultiplayerRoom implements Room
     }
 
     @Override
+    public String getRoomTypeId() {
+        return "gpgs";
+    }
+
+    @Override
     public void startGame(boolean force) throws VetoException {
         if (room == null)
             throw new VetoException("No room opened.");

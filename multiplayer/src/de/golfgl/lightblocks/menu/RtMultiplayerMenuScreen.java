@@ -494,7 +494,7 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
     @Override
     public void multiPlayerRoomEstablishingConnection() {
         if (app.multiRoom != null)
-            app.gameAnalytics.submitDesignEvent("openroom:" + (app.multiRoom.isLocalGame() ? "local" : "internet"));
+            app.gameAnalytics.submitDesignEvent("openroom:" + app.multiRoom.getRoomTypeId());
         showOverlay();
     }
 

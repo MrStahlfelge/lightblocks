@@ -80,6 +80,11 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         return true;
     }
 
+    @Override
+    public String getRoomTypeId() {
+        return "local";
+    }
+
     public String getRoomName() {
         return "LAN";
     }

@@ -252,6 +252,8 @@ public abstract class AbstractMultiplayerRoom {
      */
     public abstract boolean isLocalGame();
 
+    public abstract String getRoomTypeId();
+
     /**
      * for locking the interface while connection to a server is established asynchronously
      */
