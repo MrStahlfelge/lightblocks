@@ -1,5 +1,7 @@
 package de.golfgl.lightblocks.state;
 
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
@@ -133,6 +135,13 @@ public class WelcomeTextUtils {
     protected static void listNewFeatures(Array<WelcomeButton.WelcomeText> welcomes,
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
+
+        if (listChangesSince < 1909 && Gdx.app.getType() == Application.ApplicationType.iOS
+                && app.supportsRealTimeMultiplayer()) {
+            welcomes.add(new WelcomeButton.WelcomeText("New: Local real time multiplayer mode!\n" +
+                    "Play with up to 4 friends on the same network",
+                    new ShowMultiPlayerPageRunnable(app, 1)));
+        }
 
         if (listChangesSince < 1901) {
             welcomes.add(new WelcomeButton.WelcomeText("New: Global turn based multiplayer mode! " +
