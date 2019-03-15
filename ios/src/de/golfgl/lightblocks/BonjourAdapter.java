@@ -43,7 +43,7 @@ public class BonjourAdapter implements INsdHelper {
             public void didFindService(NSNetServiceBrowser nsNetServiceBrowser, NSNetService nsNetService, boolean b) {
                 if (nsNetService.getName().startsWith(SERVICE_NAME)) {
                     Gdx.app.debug(TAG, "Service found: " + nsNetService.getName());
-                    nsNetServiceBrowser.addStrongRef(nsNetService);
+                    nsNetService.retain();
                     nsNetService.setDelegate(myNetServiceDelegate);
                     nsNetService.resolve(.3);
                 }
@@ -121,7 +121,7 @@ public class BonjourAdapter implements INsdHelper {
                         currentServices.put(nsNetService.getName().substring(SERVICE_NAME.length() + 1), InetAddress.getByName
                                 (nsNetService.getHostName()));
                     }
-                    browser.removeStrongRef(nsNetService);
+                    nsNetService.release();
                 } catch (UnknownHostException e) {
                     // eat
                 }
