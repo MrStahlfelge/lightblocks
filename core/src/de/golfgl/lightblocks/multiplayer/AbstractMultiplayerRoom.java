@@ -140,7 +140,7 @@ public abstract class AbstractMultiplayerRoom {
      */
     public void gameStopped() throws VetoException {
         if (!isOwner())
-            throw new VetoException("Only room owner can end of the game");
+            throw new VetoException("Only room owner can end the game");
         if (!getRoomState().equals(MultiPlayerObjects.RoomState.inGame))
             throw new VetoException("No game active.");
 

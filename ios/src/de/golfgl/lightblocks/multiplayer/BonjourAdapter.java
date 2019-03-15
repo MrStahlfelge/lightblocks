@@ -1,4 +1,4 @@
-package de.golfgl.lightblocks;
+package de.golfgl.lightblocks.multiplayer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;

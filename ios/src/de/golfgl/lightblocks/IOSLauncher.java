@@ -18,6 +18,7 @@ import org.robovm.apple.uikit.UIRectEdge;
 import de.golfgl.gdxgameanalytics.IosGameAnalytics;
 import de.golfgl.gdxpushmessages.MyApnsAppDelegate;
 import de.golfgl.gdxpushmessages.ApnsMessageProvider;
+import de.golfgl.lightblocks.multiplayer.BonjourAdapter;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 
 public class IOSLauncher extends MyApnsAppDelegate {
