@@ -9,9 +9,10 @@ import org.robovm.apple.gamekit.GKPlayer;
 import org.robovm.apple.uikit.UIViewController;
 
 import de.golfgl.gdxgamesvcs.GameCenterClient;
+import de.golfgl.lightblocks.MyGameCenterClient;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 
-public class GameCenterMultiplayerClient extends GameCenterClient implements IMultiplayerGsClient {
+public class GameCenterMultiplayerClient extends MyGameCenterClient implements IMultiplayerGsClient {
 
     private final UIViewController viewController;
     private GcMultiplayerRoom gcMultiplayerRoom;

@@ -7,6 +7,7 @@ import com.esotericsoftware.kryo.io.Output;
 
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSData;
+import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.foundation.NSErrorException;
 import org.robovm.apple.gamekit.GKLocalPlayer;
 import org.robovm.apple.gamekit.GKMatch;
@@ -30,13 +31,14 @@ import de.golfgl.lightblocks.state.Player;
 
 public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
+    public static final int MAX_PLAYERS = 2;
     private final GameCenterClient gameCenterClient;
     private final UIViewController viewController;
     private final Kryo kryo;
     private GKMatch runningMatch;
     private GKPlayer owner;
     private boolean iAmOwner;
-    private HashSet<String> allPlayers;
+    private HashSet<String> allPlayers = new HashSet<>(MAX_PLAYERS);
 
     public GcMultiplayerRoom(GameCenterClient gameCenterClient, UIViewController viewController) {
         this.gameCenterClient = gameCenterClient;
@@ -75,9 +77,10 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
         // TODO EInladungsScreen
         GKMatchRequest request = new GKMatchRequest();
-        request.setMaxPlayers(2);
+        request.setMaxPlayers(MAX_PLAYERS);
         request.setMinPlayers(2);
         request.setDefaultNumberOfPlayers(2);
+        allPlayers.clear();
 
         GKMatchmakerViewController gmc = new GKMatchmakerViewController(request);
         gmc.setMatchmakerDelegate(new GKMatchmakerViewControllerDelegateAdapter() {
@@ -85,6 +88,17 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
             @Override
             public void didFindMatch(GKMatchmakerViewController viewController, GKMatch match) {
                 matchWasOpened(match);
+                viewController.dismissViewController(true, null);
+            }
+
+            @Override
+            public void wasCancelled(GKMatchmakerViewController viewController) {
+                viewController.dismissViewController(true, null);
+            }
+
+            @Override
+            public void didFail(GKMatchmakerViewController viewController, NSError error) {
+                //TODO error an gslistener weitergeben
             }
         });
 
@@ -95,14 +109,18 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
     private void matchWasOpened(GKMatch match) {
         myPlayerId = gameCenterClient.getPlayerDisplayName();
         runningMatch = match;
+        determineOwner();
         setRoomState(MultiPlayerObjects.RoomState.join);
         playersChanged(myPlayerId, true);
+        for (GKPlayer player : match.getPlayers())
+            playersChanged(player.getAlias(), true);
         match.setDelegate(new GKMatchDelegateAdapter() {
             @Override
             public void didChangeConnectionState(GKMatch match, GKPlayer player, GKPlayerConnectionState state) {
                 playersChanged(player.getAlias(), state.equals(GKPlayerConnectionState.Connected));
-                // TODO wenn nur noch einer da ist, dann Raum schließen?
-                // setRoomState(MultiPlayerObjects.RoomState.closed);
+                // TODO hier wird der Raum nicht verlassen (X noch da), sollte aber... warum passiert es nicht?
+                if (state.equals(GKPlayerConnectionState.Disconnected) && match.getPlayers().size() <= 1)
+                    setRoomState(MultiPlayerObjects.RoomState.closed);
             }
 
             @Override
@@ -110,6 +128,19 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
                 onMessageReceived(data.getBytes(), player.getAlias());
             }
         });
+    }
+
+    private void determineOwner() {
+        // owner vorbegelen
+        owner = null;
+        for (GKPlayer player : runningMatch.getPlayers())
+            if (owner == null || owner.getAlias().compareTo(player.getAlias()) > 0)
+                owner = player;
+
+        if (owner != null)
+            Gdx.app.debug(GameCenterClient.GAMESERVICE_ID, "Room owner is " + owner.getAlias());
+
+        iAmOwner = owner != null && owner.getAlias().equals(myPlayerId);
     }
 
     private void onMessageReceived(byte[] messageData, String fromPlayerId) {
@@ -133,6 +164,9 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
         if (runningMatch == null)
             return;
 
+        Gdx.app.debug(GameCenterClient.GAMESERVICE_ID, "Player change: " +
+                playerId + " " + (isConnected ? "joined" : "left"));
+
         if (isConnected && !allPlayers.contains(playerId)) {
             allPlayers.add(playerId);
 
@@ -146,6 +180,9 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
         } else if (!isConnected && allPlayers.contains(playerId)) {
             allPlayers.remove(playerId);
 
+            if (owner.getAlias().equals(playerId))
+                determineOwner();
+
             final MultiPlayerObjects.PlayerChanged pc = new MultiPlayerObjects.PlayerChanged();
             final MultiPlayerObjects.Player player = new MultiPlayerObjects.Player();
             player.name = playerId;
@@ -154,16 +191,6 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
             informRoomInhabitantsChanged(pc);
         }
-
-        if (isConnected && runningMatch.getExpectedPlayerCount() == 0 && owner == null)
-            runningMatch.chooseBestHostingPlayer(new VoidBlock1<GKPlayer>() {
-                @Override
-                public void invoke(GKPlayer gkPlayer) {
-                    owner = gkPlayer;
-                    // TODO prüfen. Wenn es nicht geht, dann kleinste ID
-                    iAmOwner = owner.getPlayerID().equals(GKLocalPlayer.getLocalPlayer().getPlayerID());
-                }
-            });
     }
 
     @Override
@@ -171,6 +198,7 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
         runningMatch.disconnect();
         runningMatch.setDelegate(null);
         allPlayers.clear();
+        setRoomState(MultiPlayerObjects.RoomState.closed);
         owner = null;
         runningMatch = null;
     }
