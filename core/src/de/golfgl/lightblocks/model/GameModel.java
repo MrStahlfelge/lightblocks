@@ -224,8 +224,12 @@ public abstract class GameModel implements Json.Serializable {
             // T-Spin nur zeigen, wenn nicht eh schon die Explosion erfolgt
             userInterface.showMotivation(IGameModelListener.MotivationTypes.tSpin, null);
 
+        int gameboardFill = gameboard.calcGameboardFill();
+        userInterface.setGameboardCriticalFill(gameboardFill * 100 /
+                (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS) >= 70);
+
         if (removedLines > 0)
-            achievementsClearedLines(levelBeforeRemove, removedLines);
+            achievementsClearedLines(levelBeforeRemove, removedLines, gameboardFill);
 
         // Oder vielleicht x100 Tetrominos?
         final int drawnTetrominos = score.getDrawnTetrominos();
@@ -294,7 +298,7 @@ public abstract class GameModel implements Json.Serializable {
      * @param levelBeforeRemove das Level das vor dem aktuellen Zeilenabbau galt
      * @param removedLines      die gerade abgebauten Reihen
      */
-    protected void achievementsClearedLines(int levelBeforeRemove, int removedLines) {
+    protected void achievementsClearedLines(int levelBeforeRemove, int removedLines, int gameboardFill) {
         final int clearedLines = score.getClearedLines();
 
         // Level hoch? Super!
@@ -310,7 +314,7 @@ public abstract class GameModel implements Json.Serializable {
         if (clearedLines >= 100 && clearedLines - removedLines < 100)
             gpgsUpdateAchievement(GpgsHelper.ACH_LONGCLEANER);
 
-        if (score.getDrawnTetrominos() > 10 && gameboard.calcGameboardFill() == 0)
+        if (score.getDrawnTetrominos() > 10 && gameboardFill == 0)
             gpgsUpdateAchievement(GpgsHelper.ACH_CLEAN_COMPLETE);
 
         float fTotalClearedLines = totalScore.getClearedLines();

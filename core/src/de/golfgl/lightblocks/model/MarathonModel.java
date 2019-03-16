@@ -66,8 +66,8 @@ public class MarathonModel extends GameModel {
     }
 
     @Override
-    protected void achievementsClearedLines(int levelBeforeRemove, int removedLines) {
-        super.achievementsClearedLines(levelBeforeRemove, removedLines);
+    protected void achievementsClearedLines(int levelBeforeRemove, int removedLines, int gameboardFill) {
+        super.achievementsClearedLines(levelBeforeRemove, removedLines, gameboardFill);
 
         if ((inputTypeKey == PlayScreenInput.KEY_KEYSORGAMEPAD || inputTypeKey == PlayScreenInput.KEY_KEYORTOUCH)
                 && !gamepadMarathonAchievementPosted && Controllers.getControllers().size > 0) {
