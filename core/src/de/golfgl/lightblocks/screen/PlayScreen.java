@@ -4,7 +4,6 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -92,7 +91,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final PlayScoreTable scoreTable;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
-    Music music;
+    private final PlayMusic music;
     private ScoreLabel blocksLeft;
     private ScaledLabel timeLabel;
     private Label timeLabelDesc;
@@ -109,6 +108,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
         super(app);
+
+        music = new PlayMusic(app);
 
         centerGroup = new Group();
         centerGroup.setTransform(false);
@@ -395,6 +396,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Controller und Schwerkraft müssen gepollt werden
         inputAdapter.doPoll(delta);
 
+        music.act(delta);
+
         delta = Math.min(delta, 1 / 30f);
 
         if (!isPaused)
@@ -450,7 +453,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void dispose() {
         if (inputAdapter != null)
             inputAdapter.dispose();
-        setMusic(false);
+        music.dispose();
         app.unlockOrientation();
         weldEffect.dispose();
         super.dispose();
@@ -485,10 +488,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
             if (!isPaused) {
 
-                setMusic(app.localPrefs.isPlayMusic());
-                if (music != null)
-                    music.play();
-
+                music.setPlayingMusic(app.localPrefs.isPlayMusic());
+                music.play();
                 if (blockGroup.getColor().a < 1) {
                     blockGroup.addAction(Actions.fadeIn(fadingInterval));
                     gameModel.setFreezeInterval(fadingInterval);
@@ -505,8 +506,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 gameModel.fromPause();
             } else {
                 blockGroup.addAction(Actions.fadeOut(fadingInterval));
-                if (music != null)
-                    music.pause();
+                music.pause();
 
                 // Spielstand speichern
                 saveGameState();
@@ -516,6 +516,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     app.unlockOrientation();
             }
         }
+    }
+
+    @Override
+    public void setGameboardCriticalFill(boolean critical) {
+        music.setFastPlay(critical);
     }
 
     private void goToHighscores() {
@@ -758,8 +763,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     @Override
     public void setGameOver() {
-        if (music != null)
-            music.stop();
+        music.stop();
         if (app.localPrefs.isPlaySounds())
             app.gameOverSound.play();
         inputAdapter.setGameOver();
@@ -1051,18 +1055,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void playersGameboardChanged(MultiPlayerObjects.ChatMessage gameboardInfo) {
         // Das passiert nur beim Multiplayer daher hier nichts
     }
-
-    public void setMusic(boolean playMusic) {
-        if (playMusic && music == null) {
-            music = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("dd")));
-            music.setVolume(1f);                 // sets the volume to half the maximum volume
-            music.setLooping(true);
-        } else if (!playMusic && music != null) {
-            music.dispose();
-            music = null;
-        }
-    }
-
 
     public void showInputHelp() {
         pauseMsgDialog = new VetoDialog(inputAdapter.getInputHelpText(), app.skin,
