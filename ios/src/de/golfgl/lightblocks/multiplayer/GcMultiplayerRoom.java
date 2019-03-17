@@ -9,6 +9,7 @@ import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSData;
 import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.foundation.NSErrorException;
+import org.robovm.apple.gamekit.GKLocalPlayer;
 import org.robovm.apple.gamekit.GKMatch;
 import org.robovm.apple.gamekit.GKMatchDelegateAdapter;
 import org.robovm.apple.gamekit.GKMatchRequest;
@@ -142,7 +143,7 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
     private void determineOwner() {
         // owner vorbegelen
-        owner = null;
+        owner = GKLocalPlayer.getLocalPlayer();
         for (GKPlayer player : runningMatch.getPlayers())
             if (owner == null || owner.getAlias().compareTo(player.getAlias()) > 0)
                 owner = player;
