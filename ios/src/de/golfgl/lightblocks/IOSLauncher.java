@@ -33,6 +33,7 @@ public class IOSLauncher extends MyApnsAppDelegate {
         final MyIosAppConfig config = new MyIosAppConfig();
         config.useCompass = false;
         config.screenEdgesDeferringSystemGestures = UIRectEdge.None;
+        config.allowIpod = true;
 
         LightBlocksGame game = new MultiplayerLightblocks() {
             @Override
