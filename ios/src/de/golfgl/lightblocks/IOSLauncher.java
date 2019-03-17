@@ -90,7 +90,6 @@ public class IOSLauncher extends MyApnsAppDelegate {
                     viewport.setDeadZoneBottom((int) bottom);
 
                     Gdx.app.debug("UI", "Dead Zones: " + top + ", " + bottom);
-                    // TODO prüfen wie es bei Landscape aussieht
                 } else {
                     super.setScreenDeadZones(viewport);
                 }

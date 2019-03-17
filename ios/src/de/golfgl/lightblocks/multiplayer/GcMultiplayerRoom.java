@@ -75,7 +75,6 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
         if (isConnected() || runningMatch != null)
             throw new VetoException("You are already in a room.");
 
-        // TODO EInladungsScreen
         GKMatchRequest request = new GKMatchRequest();
         request.setMaxPlayers(MAX_PLAYERS);
         request.setMinPlayers(2);
@@ -127,10 +126,8 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
             @Override
             public void didChangeConnectionState(GKMatch match, GKPlayer player, GKPlayerConnectionState state) {
                 playersChanged(player.getAlias(), state.equals(GKPlayerConnectionState.Connected));
-                // TODO hier wird der Raum nicht verlassen (X noch da), sollte aber... warum passiert es nicht?
                 if (state.equals(GKPlayerConnectionState.Disconnected) && match.getPlayers().size() <= 1) {
-                    allPlayers.clear();
-                    setRoomState(MultiPlayerObjects.RoomState.closed);
+                    closeRoom(false);
                 }
             }
 
@@ -205,7 +202,7 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
     }
 
     @Override
-    public void closeRoom(boolean force) throws VetoException {
+    public void closeRoom(boolean force) {
         runningMatch.disconnect();
         runningMatch.setDelegate(null);
         allPlayers.clear();
