@@ -15,7 +15,7 @@ public abstract class AbstractMenuScreen extends AbstractScreen {
 
     @Override
     protected void onOrientationChanged() {
-        stage.setViewport(new ExtendViewport(isLandscape() ? LightBlocksGame.nativeGameHeight :
+        stage.setViewport(getNewViewport(isLandscape() ? LightBlocksGame.nativeGameHeight :
                 LightBlocksGame.nativeGameWidth,
                 isLandscape() ? LightBlocksGame.menuLandscapeHeight : LightBlocksGame.nativeGameHeight));
     }
