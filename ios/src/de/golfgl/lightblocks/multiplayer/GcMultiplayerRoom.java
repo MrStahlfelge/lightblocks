@@ -9,7 +9,6 @@ import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSData;
 import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.foundation.NSErrorException;
-import org.robovm.apple.gamekit.GKLocalPlayer;
 import org.robovm.apple.gamekit.GKMatch;
 import org.robovm.apple.gamekit.GKMatchDelegateAdapter;
 import org.robovm.apple.gamekit.GKMatchRequest;
@@ -19,20 +18,20 @@ import org.robovm.apple.gamekit.GKMatchmakerViewControllerDelegateAdapter;
 import org.robovm.apple.gamekit.GKPlayer;
 import org.robovm.apple.gamekit.GKPlayerConnectionState;
 import org.robovm.apple.uikit.UIViewController;
-import org.robovm.objc.block.VoidBlock1;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import de.golfgl.gdxgamesvcs.GameCenterClient;
+import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.Player;
 
 public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
     public static final int MAX_PLAYERS = 2;
-    private final GameCenterClient gameCenterClient;
+    private final GameCenterMultiplayerClient gameCenterClient;
     private final UIViewController viewController;
     private final Kryo kryo;
     private GKMatch runningMatch;
@@ -40,7 +39,7 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
     private boolean iAmOwner;
     private HashSet<String> allPlayers = new HashSet<>(MAX_PLAYERS);
 
-    public GcMultiplayerRoom(GameCenterClient gameCenterClient, UIViewController viewController) {
+    public GcMultiplayerRoom(GameCenterMultiplayerClient gameCenterClient, UIViewController viewController) {
         this.gameCenterClient = gameCenterClient;
         this.viewController = viewController;
         this.kryo = new Kryo();
@@ -59,7 +58,7 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
     @Override
     public int getNumberOfPlayers() {
-        return isConnected() ? runningMatch.getPlayers().size() : 0;
+        return allPlayers.size();
     }
 
     @Override
@@ -98,7 +97,16 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
             @Override
             public void didFail(GKMatchmakerViewController viewController, NSError error) {
-                //TODO error an gslistener weitergeben
+                if (viewController != null)
+                    viewController.dismissViewController(true, null);
+
+                if (error != null)
+                    Gdx.app.error(GameCenterClient.GAMESERVICE_ID, "Match did fail: " + error.getCode());
+
+                if (error != null && gameCenterClient.getGsListener() != null) {
+                    gameCenterClient.getGsListener().gsShowErrorToUser(IGameServiceListener.GsErrorType.errorUnknown,
+                            "Game Center match error: " + error.getCode(), null);
+                }
             }
         });
 
@@ -119,8 +127,10 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
             public void didChangeConnectionState(GKMatch match, GKPlayer player, GKPlayerConnectionState state) {
                 playersChanged(player.getAlias(), state.equals(GKPlayerConnectionState.Connected));
                 // TODO hier wird der Raum nicht verlassen (X noch da), sollte aber... warum passiert es nicht?
-                if (state.equals(GKPlayerConnectionState.Disconnected) && match.getPlayers().size() <= 1)
+                if (state.equals(GKPlayerConnectionState.Disconnected) && match.getPlayers().size() <= 1) {
+                    allPlayers.clear();
                     setRoomState(MultiPlayerObjects.RoomState.closed);
+                }
             }
 
             @Override

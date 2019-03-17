@@ -8,7 +8,7 @@ import org.robovm.apple.gamekit.GKLocalPlayerListenerAdapter;
 import org.robovm.apple.gamekit.GKPlayer;
 import org.robovm.apple.uikit.UIViewController;
 
-import de.golfgl.gdxgamesvcs.GameCenterClient;
+import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.lightblocks.MyGameCenterClient;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 
@@ -17,6 +17,7 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
     private final UIViewController viewController;
     private GcMultiplayerRoom gcMultiplayerRoom;
     private GKInvite invitation;
+    private IGameServiceListener gsListener;
 
     public GameCenterMultiplayerClient(UIViewController viewController) {
         super(viewController);
@@ -48,5 +49,15 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
     public void acceptPendingInvitation() {
         // TODO
         Gdx.app.error(GAMESERVICE_ID, "acceptPendingInvitation not implemented");
+    }
+
+    @Override
+    public void setListener(IGameServiceListener gsListener) {
+        this.gsListener = gsListener;
+        super.setListener(gsListener);
+    }
+
+    protected IGameServiceListener getGsListener() {
+        return gsListener;
     }
 }
