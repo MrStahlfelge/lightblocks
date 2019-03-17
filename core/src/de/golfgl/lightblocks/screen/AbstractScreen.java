@@ -172,7 +172,8 @@ public abstract class AbstractScreen implements Screen {
      * is updated. Use to change stage's viewport if necessary.
      */
     protected void onOrientationChanged() {
-        // for overriding purpose, see AbstractMenuScreen
+        if (stage.getViewport() instanceof MyExtendViewport)
+            app.setScreenDeadZones((MyExtendViewport) stage.getViewport());
     }
 
     public static class RunnableDialog extends ControllerMenuDialog {

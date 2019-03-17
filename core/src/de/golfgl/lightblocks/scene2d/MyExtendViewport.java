@@ -33,13 +33,7 @@ public class MyExtendViewport extends ExtendViewport {
     public void update(int screenWidth, int screenHeight, boolean centerCamera) {
         if (deadZoneTop == 0 && deadZoneBottom == 0)
             super.update(screenWidth, screenHeight, centerCamera);
-        else if (screenWidth > screenHeight) {
-            // Landscape
-            super.update(screenWidth - deadZoneTop - deadZoneBottom, screenHeight, true);
-            setScreenX(getScreenX() + deadZoneTop);
-            apply(true);
-        } else {
-            // Portrait
+        else {
             super.update(screenWidth, screenHeight - deadZoneTop - deadZoneBottom, true);
             setScreenY(getScreenY() + deadZoneBottom);
             apply(true);
