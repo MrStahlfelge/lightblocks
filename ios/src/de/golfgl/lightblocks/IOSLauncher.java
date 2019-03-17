@@ -6,20 +6,24 @@ import com.badlogic.gdx.backends.iosrobovm.MyIosAppConfig;
 import com.badlogic.gdx.backends.iosrobovm.MyIosApplication;
 import com.badlogic.gdx.pay.ios.apple.PurchaseManageriOSApple;
 
+import org.robovm.apple.foundation.Foundation;
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSString;
 import org.robovm.apple.uikit.UIActivityViewController;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
+import org.robovm.apple.uikit.UIEdgeInsets;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIRectEdge;
+import org.robovm.apple.uikit.UIView;
 
 import de.golfgl.gdxgameanalytics.IosGameAnalytics;
 import de.golfgl.gdxpushmessages.MyApnsAppDelegate;
 import de.golfgl.gdxpushmessages.ApnsMessageProvider;
 import de.golfgl.lightblocks.multiplayer.BonjourAdapter;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
+import de.golfgl.lightblocks.scene2d.MyExtendViewport;
 
 public class IOSLauncher extends MyApnsAppDelegate {
     public static void main(String[] argv) {
@@ -71,6 +75,25 @@ public class IOSLauncher extends MyApnsAppDelegate {
                 // dm.xdpi / 320f
                 // IOSGraphics teilt bereits durch 160, also nur noch durch 2 teilen
                 return Gdx.graphics.getDensity() / 2f;
+            }
+
+            @Override
+            public void setScreenDeadZones(MyExtendViewport viewport) {
+                if (Foundation.getMajorSystemVersion() >= 11) {
+                    UIView view = UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView();
+                    UIEdgeInsets edgeInsets = view.getSafeAreaInsets();
+
+                    double top = edgeInsets.getTop() * view.getContentScaleFactor();
+                    double bottom = edgeInsets.getBottom() * view.getContentScaleFactor();
+
+                    viewport.setDeadZoneTop((int) top);
+                    viewport.setDeadZoneBottom((int) bottom);
+
+                    Gdx.app.debug("UI", "Dead Zones: " + top + ", " + bottom);
+                    // TODO prüfen wie es bei Landscape aussieht
+                } else {
+                    super.setScreenDeadZones(viewport);
+                }
             }
 
             @Override
