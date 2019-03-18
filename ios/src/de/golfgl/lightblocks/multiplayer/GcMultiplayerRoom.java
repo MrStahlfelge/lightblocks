@@ -9,16 +9,19 @@ import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSData;
 import org.robovm.apple.foundation.NSError;
 import org.robovm.apple.foundation.NSErrorException;
+import org.robovm.apple.gamekit.GKInvite;
 import org.robovm.apple.gamekit.GKLocalPlayer;
 import org.robovm.apple.gamekit.GKMatch;
 import org.robovm.apple.gamekit.GKMatchDelegateAdapter;
 import org.robovm.apple.gamekit.GKMatchRequest;
 import org.robovm.apple.gamekit.GKMatchSendDataMode;
+import org.robovm.apple.gamekit.GKMatchmaker;
 import org.robovm.apple.gamekit.GKMatchmakerViewController;
 import org.robovm.apple.gamekit.GKMatchmakerViewControllerDelegateAdapter;
 import org.robovm.apple.gamekit.GKPlayer;
 import org.robovm.apple.gamekit.GKPlayerConnectionState;
 import org.robovm.apple.uikit.UIViewController;
+import org.robovm.objc.block.VoidBlock2;
 
 import java.util.HashSet;
 import java.util.List;
@@ -33,16 +36,17 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
     public static final int MAX_PLAYERS = 2;
     private final GameCenterMultiplayerClient gameCenterClient;
-    private final UIViewController viewController;
+    private final UIViewController gameViewController;
     private final Kryo kryo;
     private GKMatch runningMatch;
     private GKPlayer owner;
     private boolean iAmOwner;
     private HashSet<String> allPlayers = new HashSet<>(MAX_PLAYERS);
+    private GKMatchmakerViewController matchmakerViewController;
 
     public GcMultiplayerRoom(GameCenterMultiplayerClient gameCenterClient, UIViewController viewController) {
         this.gameCenterClient = gameCenterClient;
-        this.viewController = viewController;
+        this.gameViewController = viewController;
         this.kryo = new Kryo();
         MultiplayerLightblocks.register(kryo);
     }
@@ -81,24 +85,24 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
         request.setDefaultNumberOfPlayers(2);
         allPlayers.clear();
 
-        GKMatchmakerViewController gmc = new GKMatchmakerViewController(request);
-        gmc.setMatchmakerDelegate(new GKMatchmakerViewControllerDelegateAdapter() {
+        matchmakerViewController = new GKMatchmakerViewController(request);
+        matchmakerViewController.setMatchmakerDelegate(new GKMatchmakerViewControllerDelegateAdapter() {
 
             @Override
             public void didFindMatch(GKMatchmakerViewController viewController, GKMatch match) {
                 matchWasOpened(match);
-                viewController.dismissViewController(true, null);
+                dismissMatchmakerView(viewController);
             }
 
             @Override
             public void wasCancelled(GKMatchmakerViewController viewController) {
-                viewController.dismissViewController(true, null);
+                dismissMatchmakerView(viewController);
             }
 
             @Override
             public void didFail(GKMatchmakerViewController viewController, NSError error) {
                 if (viewController != null)
-                    viewController.dismissViewController(true, null);
+                    dismissMatchmakerView(viewController);
 
                 if (error != null)
                     Gdx.app.error(GameCenterClient.GAMESERVICE_ID, "Match did fail: " + error.getCode());
@@ -111,7 +115,14 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
         });
 
 
-        viewController.presentViewController(gmc, true, null);
+        gameViewController.presentViewController(matchmakerViewController, true, null);
+    }
+
+    private void dismissMatchmakerView(GKMatchmakerViewController viewController) {
+        if (viewController != null) {
+            viewController.dismissViewController(true, null);
+            matchmakerViewController = null;
+        }
     }
 
     private void matchWasOpened(GKMatch match) {
@@ -213,7 +224,7 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
     @Override
     public void joinRoom(IRoomLocation roomLoc, Player player) throws VetoException {
-        // TODO join aus Invitation
+        // join aus Invitation hat anderen
     }
 
     @Override
@@ -306,4 +317,17 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
     public String getRoomTypeId() {
         return "agc";
     }
+
+    public void acceptInvitation(GKInvite invitation) {
+        GKMatchmaker.getSharedMatchmaker().match(invitation, new VoidBlock2<GKMatch, NSError>() {
+            @Override
+            public void invoke(GKMatch gkMatch, NSError nsError) {
+                if (gkMatch != null) {
+                    matchWasOpened(gkMatch);
+                    dismissMatchmakerView(matchmakerViewController);
+                }
+            }
+        });
+    }
+
 }

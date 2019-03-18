@@ -26,8 +26,10 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
 
             @Override
             public void didAcceptInvite(GKPlayer player, GKInvite invite) {
-                // TODO eventuell muss hier nochmal listener.gsOnActive aufgerufen werden um die Invitation.Prüfung auszulösen
                 invitation = invite;
+                // nochmal listener aufrufen um die Invitation-Prüfung auszulösen
+                if (gsListener != null)
+                    gsListener.gsOnSessionActive();
             }
         });
     }
@@ -47,8 +49,11 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
 
     @Override
     public void acceptPendingInvitation() {
-        // TODO
-        Gdx.app.error(GAMESERVICE_ID, "acceptPendingInvitation not implemented");
+        if (invitation != null) {
+            createMultiPlayerRoom();
+            gcMultiplayerRoom.acceptInvitation(invitation);
+            invitation = null;
+        }
     }
 
     @Override
