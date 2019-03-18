@@ -752,7 +752,7 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
 
             Table gpgButtons = new Table();
             gpgInviteButton = new RoundedTextButton(app.TEXTS.get
-                    ("menuInvitePlayers"), app.skin);
+                    (isGameCenter ? "labelMultiplayerOpenRoom" : "menuInvitePlayers"), app.skin);
             gpgInviteButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -763,19 +763,21 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
             gpgButtons.add(gpgInviteButton);
             addFocusableActor(gpgInviteButton);
 
-            Button gpgShowInvitationsButton = new RoundedTextButton(app.TEXTS.get
-                    ("menuShowInvitations"), app.skin);
-            gpgShowInvitationsButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    if (checkNewGpgsConnPreConditions()) return;
+            if (!isGameCenter) {
+                Button gpgShowInvitationsButton = new RoundedTextButton(app.TEXTS.get
+                        ("menuShowInvitations"), app.skin);
+                gpgShowInvitationsButton.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        if (checkNewGpgsConnPreConditions()) return;
 
-                    joinGpgsButtonPressed();
-                }
-            });
-            gpgButtons.row().padTop(10);
-            gpgButtons.add(gpgShowInvitationsButton);
-            addFocusableActor(gpgShowInvitationsButton);
+                        joinGpgsButtonPressed();
+                    }
+                });
+                gpgButtons.row().padTop(10);
+                gpgButtons.add(gpgShowInvitationsButton);
+                addFocusableActor(gpgShowInvitationsButton);
+            }
 
             row();
 
