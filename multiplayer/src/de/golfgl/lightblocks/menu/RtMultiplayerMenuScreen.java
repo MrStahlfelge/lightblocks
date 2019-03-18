@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Align;
 import java.util.HashMap;
 
 import de.golfgl.gdxgameanalytics.GameAnalytics;
+import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
@@ -175,7 +176,7 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
         modePager.addPage(new LocalGameTable());
 
         if (app.gpgsClient != null && app.gpgsClient instanceof IMultiplayerGsClient)
-            modePager.addPage(new GpgsGameTable());
+            modePager.addPage(new GpgsGameTable(app.gpgsClient.getGameServiceId()));
 
     }
 
@@ -743,9 +744,10 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
     private class GpgsGameTable extends Table implements IMultiplayerModePage {
         private final Button gpgInviteButton;
 
-        public GpgsGameTable() {
-            Label gpgHelp = new ScaledLabel(app.TEXTS.get("multiplayerGpgHelp"), app.skin,
-                    LightBlocksGame.SKIN_FONT_REG, .75f);
+        public GpgsGameTable(String gameServiceId) {
+            boolean isGameCenter = IGameServiceClient.GS_GAMECENTER_ID.equals(gameServiceId);
+            Label gpgHelp = new ScaledLabel(app.TEXTS.get(isGameCenter ? "multiplayerAgcHelp"
+                    : "multiplayerGpgHelp"), app.skin, LightBlocksGame.SKIN_FONT_REG, .75f);
             gpgHelp.setWrap(true);
 
             Table gpgButtons = new Table();
@@ -778,9 +780,10 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
             row();
 
             Table title = new Table();
-            title.add(new ScaledLabel(FontAwesome.GPGS_LOGO, app.skin, FontAwesome.SKIN_FONT_FA)).padRight(5);
-            title.add(new ScaledLabel(app.TEXTS.get("menuAccountGpgs"), app.skin, LightBlocksGame
-                    .SKIN_FONT_TITLE, .8f));
+            title.add(new ScaledLabel(isGameCenter ? FontAwesome.APPLE_LOGO : FontAwesome.GPGS_LOGO,
+                    app.skin, FontAwesome.SKIN_FONT_FA)).padRight(5);
+            title.add(new ScaledLabel(app.TEXTS.get(isGameCenter ? "menuAccountApple" : "menuAccountGpgs"),
+                    app.skin, LightBlocksGame.SKIN_FONT_TITLE, .8f));
             add(title);
             row();
             add(gpgHelp).fill().expandX().pad(20);
