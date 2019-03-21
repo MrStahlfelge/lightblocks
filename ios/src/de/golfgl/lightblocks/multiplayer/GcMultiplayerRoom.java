@@ -126,6 +126,7 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
     }
 
     private void matchWasOpened(GKMatch match) {
+        informEstablishingConnection();
         myPlayerId = gameCenterClient.getPlayerDisplayName();
         runningMatch = match;
         determineOwner();
