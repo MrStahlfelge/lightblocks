@@ -146,6 +146,9 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
     }
 
     private void matchWasOpened(GKMatch match) {
+        if (isConnected())
+            return;
+
         informEstablishingConnection();
         myPlayerId = gameCenterClient.getPlayerDisplayName();
         runningMatch = match;
@@ -274,7 +277,8 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
     @Override
     public void sendToAllPlayersExcept(String playerId, Object message) {
         for (GKPlayer player : runningMatch.getPlayers())
-            sendReliableMessage(player, message);
+            if (!playerId.equals(player.getAlias()))
+                sendReliableMessage(player, message);
     }
 
     @Override
