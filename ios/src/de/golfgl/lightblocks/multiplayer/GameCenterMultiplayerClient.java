@@ -40,12 +40,14 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
         if (listenerInstalled)
             return;
 
+        GKLocalPlayer.getLocalPlayer().unregisterAllListeners();
         GKLocalPlayer.getLocalPlayer().registerListener(new GKLocalPlayerListenerAdapter() {
 
             @Override
             public void didAcceptInvite(GKPlayer player, GKInvite invite) {
                 Gdx.app.debug(GAMESERVICE_ID, "Received invitation from player " + player.getDisplayName());
                 invitation = invite;
+                invite.retain();
                 // nochmal listener aufrufen um die Invitation-Prüfung auszulösen
                 if (gsListener != null)
                     gsListener.gsOnSessionActive();
@@ -72,6 +74,7 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
         if (invitation != null) {
             createMultiPlayerRoom();
             gcMultiplayerRoom.acceptInvitation(invitation);
+            invitation.release();
             invitation = null;
         }
     }

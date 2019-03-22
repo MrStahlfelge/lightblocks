@@ -112,6 +112,26 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
                             "Game Center match error: " + error.getCode(), null);
                 }
             }
+
+            @Override
+            public void didFindHostedPlayers(GKMatchmakerViewController viewController, NSArray<GKPlayer> players) {
+
+            }
+
+            @Override
+            public void didFindPlayers(GKMatchmakerViewController viewController, List<String> playerIDs) {
+
+            }
+
+            @Override
+            public void hostedPlayerDidAccept(GKMatchmakerViewController viewController, GKPlayer player) {
+
+            }
+
+            @Override
+            public void didReceiveAccept(GKMatchmakerViewController viewController, String playerID) {
+
+            }
         });
 
 
@@ -215,6 +235,9 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
     @Override
     public void closeRoom(boolean force) {
+        if (!isConnected())
+            return;
+
         runningMatch.disconnect();
         runningMatch.setDelegate(null);
         allPlayers.clear();
