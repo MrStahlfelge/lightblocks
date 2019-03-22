@@ -494,9 +494,11 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
 
     @Override
     public void multiPlayerRoomEstablishingConnection() {
-        if (app.multiRoom != null)
-            app.gameAnalytics.submitDesignEvent("openroom:" + app.multiRoom.getRoomTypeId());
-        showOverlay();
+        app.gameAnalytics.submitDesignEvent("openroom:" + app.multiRoom.getRoomTypeId());
+
+        // Overlay for Apple GameCenter nicht zeigen, dort ist ja eine eigene Logik vorhanden
+        if (!app.multiRoom.getRoomTypeId().equals("agc"))
+            showOverlay();
     }
 
     protected void showOverlay() {

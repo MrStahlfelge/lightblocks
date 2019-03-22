@@ -209,6 +209,7 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
         if (isConnected && !allPlayers.contains(playerId)) {
             allPlayers.add(playerId);
+            determineOwner();
 
             final MultiPlayerObjects.PlayerChanged pc = new MultiPlayerObjects.PlayerChanged();
             final MultiPlayerObjects.Player player = new MultiPlayerObjects.Player();
@@ -344,6 +345,7 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
     public void acceptInvitation(GKInvite invitation) {
         Gdx.app.debug(GameCenterClient.GAMESERVICE_ID, "Accepting invitation from " + invitation.getSender().getDisplayName());
+        dismissMatchmakerView(matchmakerViewController);
         GKMatchmaker.getSharedMatchmaker().match(invitation, new VoidBlock2<GKMatch, NSError>() {
             @Override
             public void invoke(GKMatch gkMatch, NSError nsError) {
@@ -355,7 +357,6 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
                 if (gkMatch != null) {
                     Gdx.app.debug(GameCenterClient.GAMESERVICE_ID, "Match opened from invitation");
                     matchWasOpened(gkMatch);
-                    dismissMatchmakerView(matchmakerViewController);
                 }
             }
         });
