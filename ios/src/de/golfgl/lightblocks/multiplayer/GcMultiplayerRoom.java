@@ -320,10 +320,17 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
     }
 
     public void acceptInvitation(GKInvite invitation) {
+        Gdx.app.debug(GameCenterClient.GAMESERVICE_ID, "Accepting invitation from " + invitation.getSender().getDisplayName());
         GKMatchmaker.getSharedMatchmaker().match(invitation, new VoidBlock2<GKMatch, NSError>() {
             @Override
             public void invoke(GKMatch gkMatch, NSError nsError) {
+                if (nsError != null) {
+                    Gdx.app.error(GameCenterClient.GAMESERVICE_ID, "Match opened from invitation had error: " + nsError.toString());
+                    gameCenterClient.getGsListener().gsShowErrorToUser(IGameServiceListener.GsErrorType.errorUnknown,
+                            "Game Center accept invitation error: " + nsError.getCode(), null);
+                }
                 if (gkMatch != null) {
+                    Gdx.app.debug(GameCenterClient.GAMESERVICE_ID, "Match opened from invitation");
                     matchWasOpened(gkMatch);
                     dismissMatchmakerView(matchmakerViewController);
                 }

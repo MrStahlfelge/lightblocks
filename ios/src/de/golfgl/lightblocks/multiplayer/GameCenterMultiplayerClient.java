@@ -26,6 +26,7 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
 
             @Override
             public void didAcceptInvite(GKPlayer player, GKInvite invite) {
+                Gdx.app.debug(GAMESERVICE_ID, "Received invitation from player " + player.getDisplayName());
                 invitation = invite;
                 // nochmal listener aufrufen um die Invitation-Prüfung auszulösen
                 if (gsListener != null)
