@@ -12,16 +12,27 @@ import de.golfgl.gdxgamesvcs.IGameServiceListener;
 import de.golfgl.lightblocks.MyGameCenterClient;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 
-public class GameCenterMultiplayerClient extends MyGameCenterClient implements IMultiplayerGsClient {
+public class GameCenterMultiplayerClient extends MyGameCenterClient implements IMultiplayerGsClient, IGameServiceListener {
 
     private final UIViewController viewController;
     private GcMultiplayerRoom gcMultiplayerRoom;
     private GKInvite invitation;
     private IGameServiceListener gsListener;
+    private boolean listenerInstalled;
 
     public GameCenterMultiplayerClient(UIViewController viewController) {
         super(viewController);
         this.viewController = viewController;
+
+        // diese Klasse selbst als Listener registrieren, damit der GKLocalPlayerListener nach
+        // erster Authentifizierung installiert werden kann.
+        setListener(this);
+    }
+
+    private void registerListener() {
+        if (listenerInstalled)
+            return;
+
         GKLocalPlayer.getLocalPlayer().registerListener(new GKLocalPlayerListenerAdapter() {
 
             @Override
@@ -33,6 +44,7 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
                     gsListener.gsOnSessionActive();
             }
         });
+        listenerInstalled = true;
     }
 
     @Override
@@ -60,10 +72,28 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
     @Override
     public void setListener(IGameServiceListener gsListener) {
         this.gsListener = gsListener;
-        super.setListener(gsListener);
     }
 
     protected IGameServiceListener getGsListener() {
         return gsListener;
+    }
+
+    @Override
+    public void gsOnSessionActive() {
+        registerListener();
+        if (gsListener != null)
+            gsListener.gsOnSessionActive();
+    }
+
+    @Override
+    public void gsOnSessionInactive() {
+        if (gsListener != null)
+            gsListener.gsOnSessionInactive();
+    }
+
+    @Override
+    public void gsShowErrorToUser(GsErrorType et, String msg, Throwable t) {
+        if (gsListener != null)
+            gsListener.gsShowErrorToUser(et, msg, t);
     }
 }
