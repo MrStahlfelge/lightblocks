@@ -257,6 +257,9 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
     @Override
     public void sendToPlayer(String playerId, Object message) {
+        if (!isConnected())
+            return;
+
         if (playerId.equals(myPlayerId))
             Gdx.app.log(GameCenterClient.GAMESERVICE_ID, "Message to myself - ignored.");
         else {
@@ -276,6 +279,9 @@ public class GcMultiplayerRoom extends AbstractMultiplayerRoom {
 
     @Override
     public void sendToAllPlayersExcept(String playerId, Object message) {
+        if (!isConnected())
+            return;
+
         for (GKPlayer player : runningMatch.getPlayers())
             if (!playerId.equals(player.getAlias()))
                 sendReliableMessage(player, message);

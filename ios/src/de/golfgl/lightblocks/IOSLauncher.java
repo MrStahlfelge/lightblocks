@@ -22,6 +22,7 @@ import de.golfgl.gdxgameanalytics.IosGameAnalytics;
 import de.golfgl.gdxpushmessages.MyApnsAppDelegate;
 import de.golfgl.gdxpushmessages.ApnsMessageProvider;
 import de.golfgl.lightblocks.multiplayer.BonjourAdapter;
+import de.golfgl.lightblocks.multiplayer.GameCenterMultiplayerClient;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 import de.golfgl.lightblocks.scene2d.MyExtendViewport;
 
@@ -97,7 +98,7 @@ public class IOSLauncher extends MyApnsAppDelegate {
 
             @Override
             public void create() {
-                gpgsClient = new MyGameCenterClient(((MyIosApplication) Gdx.app).getUIViewController());
+                gpgsClient = new GameCenterMultiplayerClient(((MyIosApplication) Gdx.app).getUIViewController());
                 super.create();
             }
         };

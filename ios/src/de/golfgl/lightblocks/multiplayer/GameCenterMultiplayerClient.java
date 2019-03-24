@@ -58,8 +58,10 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
 
     @Override
     public AbstractMultiplayerRoom createMultiPlayerRoom() {
-        if (gcMultiplayerRoom == null)
-            gcMultiplayerRoom = new GcMultiplayerRoom(this, viewController);
+        if (gcMultiplayerRoom != null && gcMultiplayerRoom.isConnected())
+            throw new IllegalStateException("GameCenter room open but new one should be created");
+
+        gcMultiplayerRoom = new GcMultiplayerRoom(this, viewController);
 
         return gcMultiplayerRoom;
     }
@@ -72,7 +74,6 @@ public class GameCenterMultiplayerClient extends MyGameCenterClient implements I
     @Override
     public void acceptPendingInvitation() {
         if (invitation != null) {
-            createMultiPlayerRoom();
             gcMultiplayerRoom.acceptInvitation(invitation);
             invitation.release();
             invitation = null;
