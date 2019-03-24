@@ -31,6 +31,11 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
         super(app, userId);
     }
 
+    protected static String formatBattleStrength(PlayerDetails details) {
+        return String.valueOf(details.multiplayerLinesSent / details.multiplayerTurns)
+                + "." + String.valueOf((details.multiplayerLinesSent * 10 / details.multiplayerTurns) % 10);
+    }
+
     @Override
     protected void fillFixContent() {
         Table contentTable = getContentTable();
@@ -142,8 +147,7 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
 
             if (details.multiplayerMatchesCount > 5 && details.multiplayerTurns > 0) {
                 addLine("profileAvgSentLines",
-                        app.TEXTS.format("profileAvgSentLinesLbl", String.valueOf(details.multiplayerLinesSent / details.multiplayerTurns)
-                                + "." + String.valueOf((details.multiplayerLinesSent * 10 / details.multiplayerTurns) % 10)),
+                        app.TEXTS.format("profileAvgSentLinesLbl", formatBattleStrength(details)),
                         LightBlocksGame.SKIN_FONT_REG);
 
             }

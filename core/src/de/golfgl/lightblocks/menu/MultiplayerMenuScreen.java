@@ -22,6 +22,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
     protected Button shareAppButton;
     protected PagedScrollPane modePager;
     protected PagedScrollPane.PageIndicator pageIndicator;
+    private Cell<Button> shareButtonCell;
 
     public MultiplayerMenuScreen(LightBlocksGame app, Group actorToHide) {
         super(app, actorToHide);
@@ -53,12 +54,12 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
                 .minWidth(modePager.getPageIndicator().getPrefWidth() * 2)
                 .uniform(false, false);
 
-        buttons.add(shareAppButton);
+        shareButtonCell = buttons.add(shareAppButton);
         addFocusableActor(shareAppButton);
 
         validate();
         modePager.scrollToPage(app.localPrefs.getLastMultiPlayerMenuPage());
-
+        setSecondButton((IMultiplayerModePage) modePager.getCurrentPage());
     }
 
     @Override
@@ -68,8 +69,9 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (actor == modePager && getStage() != null) {
-                    ((MyStage) getStage()).setFocusedActor(((IMultiplayerModePage) modePager.getCurrentPage())
-                            .getDefaultActor());
+                    IMultiplayerModePage currentPage = (IMultiplayerModePage) modePager.getCurrentPage();
+                    ((MyStage) getStage()).setFocusedActor(currentPage.getDefaultActor());
+                    setSecondButton(currentPage);
                     app.localPrefs.saveLastUsedMultiPlayerMenuPage(modePager.getCurrentPageIndex());
                 }
             }
@@ -80,11 +82,17 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
         mainCell = menuTable.add(modePager).fill().expand();
     }
 
+    protected void setSecondButton(IMultiplayerModePage currentPage) {
+        Actor secondButton = currentPage.getSecondMenuButton();
+        shareButtonCell.setActor(secondButton != null ? secondButton : shareAppButton);
+    }
+
     public void showPage(int idx) {
         modePager.scrollToPage(idx);
     }
 
     public interface IMultiplayerModePage {
         Actor getDefaultActor();
+        Actor getSecondMenuButton();
     }
 }

@@ -29,6 +29,7 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
     private final LightBlocksGame app;
     private final MultiplayerMenuScreen parent;
     private Button createProfile;
+    private Button leaderboardButton;
     private Cell progressOrRefreshCell;
     private Cell errorLabelCell;
     private boolean showsUnregistered;
@@ -45,9 +46,17 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
                 new BackendNewMatchDialog(app).show(getStage());
             }
         });
+        leaderboardButton = new FaButton(FontAwesome.GPGS_LEADERBOARD, app.skin);
+        leaderboardButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                new BackendMatchesLeaderboardScreen(app, null).show(getStage());
+            }
+        });
 
         parent.addFocusableActor(refreshButton);
         parent.addFocusableActor(newMatchButton);
+        parent.addFocusableActor(leaderboardButton);
         refreshButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -165,5 +174,10 @@ public class BackendMatchesMenuPage extends Table implements MultiplayerMenuScre
     @Override
     public Actor getDefaultActor() {
         return newMatchButton.hasParent() ? newMatchButton : createProfile;
+    }
+
+    @Override
+    public Actor getSecondMenuButton() {
+        return leaderboardButton;
     }
 }

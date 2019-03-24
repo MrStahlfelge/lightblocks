@@ -741,6 +741,11 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
         public Actor getDefaultActor() {
             return openRoomButton;
         }
+
+        @Override
+        public Actor getSecondMenuButton() {
+            return null;
+        }
     }
 
     private class GpgsGameTable extends Table implements IMultiplayerModePage {
@@ -800,6 +805,10 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
             return gpgInviteButton;
         }
 
+        @Override
+        public Actor getSecondMenuButton() {
+            return null;
+        }
     }
 
     private class ConnectionWaitDialog extends ProgressDialog {

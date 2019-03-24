@@ -12,6 +12,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.backend.PlayerDetails;
 import de.golfgl.lightblocks.menu.BeginningLevelChooser;
+import de.golfgl.lightblocks.menu.ShareButton;
 import de.golfgl.lightblocks.scene2d.EditableLabel;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
@@ -38,8 +39,11 @@ public class BackendNewMatchDialog extends ControllerMenuDialog {
 
         leaveButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
 
-        // Back button
+        getButtonTable().defaults().pad(20, 40, 20, 40);
         button(leaveButton);
+        ShareButton shareButton = new ShareButton(app);
+        getButtonTable().add(shareButton);
+        addFocusableActor(shareButton);
 
         beginningLevelSlider = new BeginningLevelChooser(app, app.localPrefs.getBattleBeginningLevel(), 9) {
             @Override
