@@ -86,9 +86,10 @@ public class IOSLauncher extends MyApnsAppDelegate {
 
                     double top = edgeInsets.getTop() * view.getContentScaleFactor();
                     double bottom = edgeInsets.getBottom() * view.getContentScaleFactor();
+                    double left = edgeInsets.getLeft() * view.getContentScaleFactor();
+                    double right = edgeInsets.getRight() * view.getContentScaleFactor();
 
-                    viewport.setDeadZoneTop((int) top);
-                    viewport.setDeadZoneBottom((int) bottom);
+                    viewport.setDeadZones((int) top, (int) left, (int) bottom, (int) right);
 
                     Gdx.app.debug("UI", "Dead Zones: " + top + ", " + bottom);
                 } else {

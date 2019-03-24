@@ -467,8 +467,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
 
     public void setScreenDeadZones(MyExtendViewport viewport) {
         // for iPhoneX, for all others it's just 0
-        viewport.setDeadZoneTop(0);
-        viewport.setDeadZoneBottom(0);
+        viewport.setDeadZones(0, 0, 0, 0);
     }
 
     private class MyOwnPlayer extends Player {
