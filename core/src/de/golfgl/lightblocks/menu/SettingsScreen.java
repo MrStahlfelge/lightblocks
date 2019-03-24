@@ -518,7 +518,8 @@ public class SettingsScreen extends AbstractMenuDialog {
 
                 contentTable.row();
                 ScaledLabel helpLabel = new ScaledLabel(app.TEXTS.format("configTvRemoteRecord",
-                        description.toUpperCase()), getSkin(), LightBlocksGame.SKIN_FONT_TITLE);
+                        description.toUpperCase(), LightBlocksGame.isOnAndroidTV() ? "BACK" : "ESC"),
+                        getSkin(), LightBlocksGame.SKIN_FONT_TITLE);
                 helpLabel.setAlignment(Align.center);
                 contentTable.add(helpLabel).pad(20);
             }
