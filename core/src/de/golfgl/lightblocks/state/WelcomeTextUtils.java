@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.state;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
@@ -136,10 +137,15 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        if (listChangesSince < 1910 && Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard)) {
+            welcomes.add(new WelcomeButton.WelcomeText("New: You can change the default key mapping " +
+                    "in the settings screen.", new ShowSettingsRunnable(app)));
+        }
+
         if (listChangesSince < 1909 && Gdx.app.getType() == Application.ApplicationType.iOS
                 && app.supportsRealTimeMultiplayer()) {
-            welcomes.add(new WelcomeButton.WelcomeText("New: Local real time multiplayer mode!\n" +
-                    "Play with up to 4 friends on the same network",
+            welcomes.add(new WelcomeButton.WelcomeText("New: Real time multiplayer mode!\n" +
+                    "Play on a local network or via Apple Game Center.",
                     new ShowMultiPlayerPageRunnable(app, 1)));
         }
 

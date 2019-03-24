@@ -34,8 +34,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public String getInputHelpText() {
-        if (isOnTvRemote()) {
-            String helpText = playScreen.app.TEXTS.get("inputTvRemoteHelp") + "\n";
+        if (isOnTvRemote() || isOnKeyboard()) {
+            String helpText = playScreen.app.TEXTS.get(isOnTvRemote() ? "inputTvRemoteHelp" : "inputKeyboardHelp") + "\n";
 
             if (tvRemoteKeyConfig != null) {
                 helpText += playScreen.app.TEXTS.get("configTvRemoteRight") + ": "
@@ -55,16 +55,16 @@ public class PlayKeyboardInput extends PlayScreenInput {
             }
             return helpText;
         } else
-            return playScreen.app.TEXTS.get(isOnKeyboard() ? "inputKeyboardHelp" : "inputGamepadHelp");
+            return playScreen.app.TEXTS.get("inputGamepadHelp");
     }
 
     @Override
     public String getTutorialContinueText() {
-        if (isOnTvRemote())
+        if (isOnTvRemote() || isOnKeyboard())
             return playScreen.app.TEXTS.format("tutorialContinueTv",
                     Input.Keys.toString(tvRemoteKeyConfig.keyCodeRotateClockwise));
         else
-            return playScreen.app.TEXTS.get(isOnKeyboard() ? "tutorialContinueKeyboard" : "tutorialContinueGamepad");
+            return playScreen.app.TEXTS.get("tutorialContinueGamepad");
     }
 
     protected boolean isOnTvRemote() {
@@ -141,7 +141,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
         connectedControllersOnLastCheck = 1;
         checkControllerConnections(true);
 
-        if (useTvRemoteControl)
+        if (useTvRemoteControl || Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard))
             tvRemoteKeyConfig = playScreen.app.localPrefs.getTvRemoteKeyConfig();
     }
 
@@ -155,7 +155,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     public boolean keyDown(int keycode) {
 
         // Spezialfall TV Remote: auf normale Tasten drehen
-        if (!isPaused() && isOnTvRemote())
+        if (!isPaused() && (isOnTvRemote() || isOnKeyboard()))
             keycode = mapTvRemoteKeys(keycode);
         else if (!isPaused() && keycode == Input.Keys.UP && performHardDropOnUpButton())
             keycode = Input.Keys.CONTROL_RIGHT;
@@ -211,7 +211,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     @Override
     public boolean keyUp(int keycode) {
         // Spezialfall TV Remote: auf normale Tasten drehen
-        if (!isPaused() && isOnTvRemote())
+        if (!isPaused() && (isOnTvRemote() || isOnKeyboard()))
             keycode = mapTvRemoteKeys(keycode);
         else if (!isPaused() && keycode == Input.Keys.UP && performHardDropOnUpButton())
             keycode = Input.Keys.CONTROL_RIGHT;

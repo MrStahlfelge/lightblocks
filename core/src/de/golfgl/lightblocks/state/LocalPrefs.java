@@ -354,22 +354,26 @@ public class LocalPrefs {
         return daysSinceLastStart;
     }
 
+    /**
+     * Tastenmapping für TV-Fernbedienungen und inzwischen auch Tastatur
+     */
     public TvRemoteKeyConfig getTvRemoteKeyConfig() {
         if (tvRemoteKeyConfig == null) {
             tvRemoteKeyConfig = new TvRemoteKeyConfig();
 
             boolean isFireTv = LightBlocksGame.isOnFireTv();
+            boolean isKeyboard = !LightBlocksGame.isOnAndroidTV();
 
             tvRemoteKeyConfig.keyCodeHarddrop = prefs.getInteger(TVREMOTE_HARDDROP,
-                    isFireTv ? Input.Keys.UP : Input.Keys.UNKNOWN);
+                    isFireTv || isKeyboard ? Input.Keys.UP : Input.Keys.UNKNOWN);
             tvRemoteKeyConfig.keyCodeSoftDrop = prefs.getInteger(TVREMOTE_SOFTDROP, Input.Keys.DOWN);
             tvRemoteKeyConfig.keyCodeLeft = prefs.getInteger(TVREMOTE_LEFT, Input.Keys.LEFT);
             tvRemoteKeyConfig.keyCodeRight = prefs.getInteger(TVREMOTE_RIGHT, Input.Keys.RIGHT);
             tvRemoteKeyConfig.keyCodeRotateClockwise = prefs.getInteger(TVREMOTE_ROTATE_CW,
-                    isFireTv ? Input.Keys.MENU : Input.Keys.CENTER);
+                    isKeyboard ? Input.Keys.SPACE : isFireTv ? Input.Keys.MENU : Input.Keys.CENTER);
             tvRemoteKeyConfig.keyCodeRotateCounterclock = prefs.getInteger(TVREMOTE_ROTATE_CC,
-                    isFireTv ? Input.Keys.MEDIA_FAST_FORWARD : Input.Keys.UP);
-            tvRemoteKeyConfig.keyCodeHold = prefs.getInteger(TVREMOTE_HOLD, Input.Keys.UNKNOWN);
+                    isKeyboard ? Input.Keys.CONTROL_LEFT : isFireTv ? Input.Keys.MEDIA_FAST_FORWARD : Input.Keys.UP);
+            tvRemoteKeyConfig.keyCodeHold = prefs.getInteger(TVREMOTE_HOLD, isKeyboard ? Input.Keys.H : Input.Keys.UNKNOWN);
         }
 
         return tvRemoteKeyConfig;

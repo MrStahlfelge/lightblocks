@@ -73,7 +73,7 @@ public class SettingsScreen extends AbstractMenuDialog {
         gesturesGroup = new TouchInputSettings();
         if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN))
             groupPager.addPage(gesturesGroup);
-        if (LightBlocksGame.isOnAndroidTV())
+        if (LightBlocksGame.isOnAndroidTV() || Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard))
             groupPager.addPage(new TvRemoteSettings());
 
         groupPager.addListener(new ChangeListener() {
@@ -431,8 +431,9 @@ public class SettingsScreen extends AbstractMenuDialog {
             defaults().expand().fillX();
 
             row();
-            add(new ScaledLabel(app.TEXTS.get("menuSettingsTvRemote"), app.skin, app.SKIN_FONT_TITLE, .8f))
-                    .top().fill(false);
+            add(new ScaledLabel(app.TEXTS.get(Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard)
+                    ? "menuSettingsKeyboard" : "menuSettingsTvRemote"),
+                    app.skin, app.SKIN_FONT_TITLE, .8f)).top().fill(false);
 
             row();
             ScaledLabel menuSettingsHelpTvRemote = new ScaledLabel(app.TEXTS.get("menuSettingsHelpTvRemote"), app
