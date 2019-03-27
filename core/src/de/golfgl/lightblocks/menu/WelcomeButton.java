@@ -147,26 +147,28 @@ public class WelcomeButton extends FaTextButton {
             shownResponse = app.backendManager.getLastWelcomeResponse();
             // die Texte setzen
             setTexts(WelcomeTextUtils.fillWelcomes(app, refreshRandoms));
+
+            int expirationSeconds = app.backendManager.hasUserId() ? EXPIRATION_MINUTES_REGISTERED * 60 :
+                    EXPIRATION_MINUTES_UNREGISTERED * 60;
+
+            String pushProviderId = null;
+            String pushToken = null;
+            if (app.pushMessageProvider != null) {
+                pushProviderId = app.pushMessageProvider.getProviderId();
+                pushToken = app.pushMessageProvider.getRegistrationToken();
+                // falls das token noch nicht geladen wurde das letzte aus den Prefs laden
+                if (pushToken == null)
+                    pushToken = app.localPrefs.getPushToken();
+            }
+
+            app.backendManager.fetchNewWelcomeResponseIfExpired(expirationSeconds, app.savegame.getTotalScore()
+                    .getDrawnTetrominos(), app.localPrefs.getSupportLevel(), pushProviderId, pushToken);
+
         } catch (Throwable t) {
             // alles beim alten lassen
-            // es gab Crashreports von Geräten mit Tasten??? über NPE in fillWelcomes. Einfach abfangen und dann eben
-            // nix anzeigen
+            // es gab Crashreports von Geräten mit Tasten, NPE in fillWelcomes bzw
+            // app.savegame.getTotalScore() lieferte null zurück
         }
-        int expirationSeconds = app.backendManager.hasUserId() ? EXPIRATION_MINUTES_REGISTERED * 60 :
-                EXPIRATION_MINUTES_UNREGISTERED * 60;
-
-        String pushProviderId = null;
-        String pushToken = null;
-        if (app.pushMessageProvider != null) {
-            pushProviderId = app.pushMessageProvider.getProviderId();
-            pushToken = app.pushMessageProvider.getRegistrationToken();
-            // falls das token noch nicht geladen wurde das letzte aus den Prefs laden
-            if (pushToken == null)
-                pushToken = app.localPrefs.getPushToken();
-        }
-
-        app.backendManager.fetchNewWelcomeResponseIfExpired(expirationSeconds, app.savegame.getTotalScore()
-                .getDrawnTetrominos(), app.localPrefs.getSupportLevel(), pushProviderId, pushToken);
     }
 
     public static class WelcomeText {

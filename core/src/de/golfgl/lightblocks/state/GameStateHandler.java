@@ -154,6 +154,7 @@ public class GameStateHandler {
                         totalScore = json.fromJson(TotalScore.class, Gdx.files.local(FILENAME_TOTALSCORE));
                     else
                         totalScore = json.fromJson(TotalScore.class, prefs.getString(FILENAME_TOTALSCORE));
+                    // es kann unter Umständen direkt beim Start vorkommen, dass null zurückgegeben wird?
                 } catch (Throwable t) {
                     totalScore = new TotalScore();
                 }
