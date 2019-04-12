@@ -217,10 +217,8 @@ public class SettingsScreen extends AbstractMenuDialog {
             row();
             add(colorModeCheck);
 
-            if (Gdx.app.getType() != Application.ApplicationType.iOS) {
-                row();
-                add(gamePadButton);
-            }
+            row();
+            add(gamePadButton);
 
             addFocusableActor(menuMusicButton);
             addFocusableActor(gridIntensitySlider);

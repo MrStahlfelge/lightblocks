@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.iosrobovm.MyIosAppConfig;
 import com.badlogic.gdx.backends.iosrobovm.MyIosApplication;
+import com.badlogic.gdx.controllers.IosControllerManager;
 import com.badlogic.gdx.pay.ios.apple.PurchaseManageriOSApple;
 
 import org.robovm.apple.foundation.Foundation;
@@ -100,6 +101,7 @@ public class IOSLauncher extends MyApnsAppDelegate {
             @Override
             public void create() {
                 gpgsClient = new GameCenterMultiplayerClient(((MyIosApplication) Gdx.app).getUIViewController());
+                IosControllerManager.initializeIosControllers();
                 super.create();
             }
         };
