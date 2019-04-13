@@ -1153,9 +1153,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         pauseButton.getLabel().setFontScale(MathUtils.clamp((float) width / height, 1f, 2f));
         pauseButton.pack();
+        pauseButton.setSize(pauseButton.getWidth() * 1.2f, pauseButton.getHeight() * 1.2f);
 
-        if ((scoreTable.getX() + centerGroup.getX() - scoreTable.getPrefWidth() / 2) > pauseButton.getWidth() * 1.2f)
-            pauseButton.setPosition(scoreTable.getX() - scoreTable.getPrefWidth() / 2 - pauseButton.getWidth() * 1.2f,
+        if ((scoreTable.getX() + centerGroup.getX() - scoreTable.getPrefWidth() / 2) > pauseButton.getWidth())
+            pauseButton.setPosition(scoreTable.getX() - scoreTable.getPrefWidth() / 2 - pauseButton.getWidth(),
                     (scoreTable.getHeight() - pauseButton.getHeight()) / 2 + scoreTable.getY());
         else
             pauseButton.setPosition(scoreTable.getX() - scoreTable.getPrefWidth() / 2, scoreTable.getY() - 2f * pauseButton.getHeight());
