@@ -517,7 +517,7 @@ public class MyIosInput implements Input {
 
     @Override
     public long getCurrentEventTime () {
-        return currentEvent.timestamp;
+        return currentEvent != null ? currentEvent.timestamp : 0;
     }
 
     @Override
