@@ -248,7 +248,7 @@ public class SettingsScreen extends AbstractMenuDialog {
         Group touchPanel;
         private Slider touchPanelSizeSlider;
         private Table gestureSettings;
-        private Table onScreenButtonSettings;
+        private ScrollPane onScreenButtonSettings;
 
         public TouchInputSettings() {
             final FaRadioButton<Boolean> onScreenControlsButton = new FaRadioButton<Boolean>(app.skin,
@@ -345,15 +345,23 @@ public class SettingsScreen extends AbstractMenuDialog {
             gestureSettings.row();
             gestureSettings.add(swipeUp);
 
-            onScreenButtonSettings = new Table();
+            Table onScreenButtonSettings = new Table();
+            ScaledLabel onScreenButtonIntro = new ScaledLabel(app.TEXTS.get("inputOnScreenButtonIntro"),
+                    app.skin, LightBlocksGame.SKIN_FONT_TITLE, .6f);
+            onScreenButtonIntro.setWrap(true);
+            onScreenButtonIntro.setAlignment(Align.center);
+            onScreenButtonSettings.add(onScreenButtonIntro).fillX().expandX().padBottom(20);
+            onScreenButtonSettings.row();
             ScaledLabel onScreenButtonHelp = new ScaledLabel(app.TEXTS.get("inputOnScreenButtonHelp"), app.skin,
                     LightBlocksGame.SKIN_FONT_BIG);
             onScreenButtonHelp.setWrap(true);
             onScreenButtonHelp.setAlignment(Align.center);
-            ScrollPane helpScrollPane = new ScrollPane(onScreenButtonHelp, app.skin);
+            onScreenButtonSettings.add(onScreenButtonHelp).fillX().expandX();
+            onScreenButtonSettings.validate();
+            ScrollPane helpScrollPane = new ScrollPane(onScreenButtonSettings, app.skin);
             helpScrollPane.setScrollingDisabled(true, false);
             helpScrollPane.setFadeScrollBars(false);
-            onScreenButtonSettings.add(helpScrollPane).fillX().expandX();
+            this.onScreenButtonSettings = helpScrollPane;
 
             row();
             settingsTableCell = add().height(gestureSettings.getPrefHeight()).fillX();
