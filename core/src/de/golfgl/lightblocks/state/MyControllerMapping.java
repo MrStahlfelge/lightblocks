@@ -79,8 +79,8 @@ public class MyControllerMapping extends ControllerMappings {
 
         defaultMapping.putMapping(new MappedInput(AXIS_VERTICAL, new ControllerAxis(1)));
         defaultMapping.putMapping(new MappedInput(AXIS_HORIZONTAL, new ControllerAxis(0)));
-        defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_CLOCKWISE, new ControllerButton(onAndroid ? 96 : 0)));
-        defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_COUNTERCLOCK, new ControllerButton(onAndroid ? 97 : 1)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_CLOCKWISE, new ControllerButton(onAndroid ? 97 : 1)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_COUNTERCLOCK, new ControllerButton(onAndroid ? 96 : 0)));
         defaultMapping.putMapping(new MappedInput(BUTTON_HARDDROP, new ControllerButton(onAndroid ? 98 : 2)));
         defaultMapping.putMapping(new MappedInput(BUTTON_HOLD, new ControllerButton(onAndroid ? 99 : 3)));
         defaultMapping.putMapping(new MappedInput(BUTTON_START, new ControllerButton(onAndroid ? 108 : 9)));
