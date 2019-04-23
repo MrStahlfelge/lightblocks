@@ -64,8 +64,6 @@ public class BackendMatchesLeaderboardScreen extends WaitForBackendFetchDetailsS
 
             defaults().right().pad(2, 6, 2, 6);
 
-            String buttonDetailsLabel = app.TEXTS.get("buttonDetails").toUpperCase();
-
             if (scoreboard.isEmpty()) {
                 add(new ScaledLabel(app.TEXTS.get("profileNoScores"), app.skin, LightBlocksGame.SKIN_FONT_TITLE,
                         FONT_SCALE)).center();

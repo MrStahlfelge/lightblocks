@@ -159,6 +159,10 @@ public class GameStateHandler {
                     totalScore = new TotalScore();
                 }
             }
+
+            // json.fromJson kann null zurückliefern
+            if (totalScore == null)
+                totalScore = new TotalScore();
         }
     }
 
