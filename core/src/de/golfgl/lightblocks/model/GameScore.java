@@ -171,6 +171,7 @@ public class GameScore implements IRoundScore {
     public void addBonusScore(int bonusScore) {
         checkHashValue();
         this.score += bonusScore;
+        this.score = Math.min(this.score, 999999);
         saveHashValue();
     }
 
@@ -186,6 +187,7 @@ public class GameScore implements IRoundScore {
         int flushedScore = (int) dropScore;
 
         this.score += flushedScore;
+        this.score = Math.min(this.score, 999999);
         dropScore = 0;
         saveHashValue();
 
