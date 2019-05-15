@@ -668,11 +668,14 @@ public class PlayGesturesInput extends PlayScreenInput {
 
             setVisible(playScreen.gameModel.isHoldMoveAllowedByModel() && playScreen.app.localPrefs
                     .isShowTouchHoldButton());
-            addListener(new ChangeListener() {
+            addListener(new InputListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    if (!isPaused())
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    if (!isPaused()) {
                         playScreen.gameModel.holdActiveTetromino();
+                        return true;
+                    }
+                    return false;
                 }
             });
 
