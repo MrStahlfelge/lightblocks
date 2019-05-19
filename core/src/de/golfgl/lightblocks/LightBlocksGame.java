@@ -45,6 +45,7 @@ import de.golfgl.lightblocks.state.GameStateHandler;
 import de.golfgl.lightblocks.state.LocalPrefs;
 import de.golfgl.lightblocks.state.MyControllerMapping;
 import de.golfgl.lightblocks.state.Player;
+import de.golfgl.lightblocks.state.Theme;
 
 import static com.badlogic.gdx.Gdx.app;
 
@@ -87,6 +88,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     // Android Modellname des Geräts
     public static String modelNameRunningOn;
     public Skin skin;
+    public Theme theme;
     public AssetManager assetManager;
     public I18NBundle TEXTS;
     public LocalPrefs localPrefs;
@@ -274,6 +276,9 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
 
         skin.get(SKIN_FONT_TITLE, Label.LabelStyle.class).font.setFixedWidthGlyphs("0123456789-+X");
         skin.get(SKIN_FONT_TITLE, Label.LabelStyle.class).font.setUseIntegerPositions(false);
+
+        // Theme aktiviert?
+        theme = new Theme(this);
     }
 
     @Override

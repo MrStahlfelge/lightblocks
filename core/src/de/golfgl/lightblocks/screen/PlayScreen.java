@@ -126,7 +126,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         holdTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
 
         // Die Blockgroup nimmt die Steinanimation auf
-        blockGroup = new BlockGroup(app);
+        blockGroup = new BlockGroup(app, true);
         blockGroup.setTransform(false);
         blockGroup.getColor().a = .4f;
 
@@ -541,7 +541,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     @Override
     public void insertNewBlock(int x, int y, int blockType) {
-        BlockActor block = new BlockActor(app, blockType);
+        BlockActor block = new BlockActor(app, blockType, true);
         insertBlock(x, y, block);
     }
 
@@ -746,7 +746,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
                 for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
                     if (x != holePos) {
-                        BlockActor block = new BlockActor(app, Gameboard.SQUARE_GARBAGE);
+                        BlockActor block = new BlockActor(app, Gameboard.SQUARE_GARBAGE, true);
                         block.setX(x * BlockActor.blockWidth);
                         block.setY((y - linesToInsert) * BlockActor.blockWidth);
                         block.setEnlightened(true, true);
@@ -789,7 +789,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         final float offsetY = getNextPieceYPos();
 
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
-            nextTetro[i] = new BlockActor(app, blockType);
+            nextTetro[i] = new BlockActor(app, blockType, true);
             nextTetro[i].setPosition((i == 0 || i == 2) ? -BlockActor.blockWidth : LightBlocksGame.nativeGameWidth +
                             BlockActor.blockWidth,
                     (i >= 2) ? 0 : LightBlocksGame.nativeGameHeight);
@@ -824,7 +824,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             if (block == null) {
                 //beim Spielstart noch nicht gesetzt und die Animation macht auch keinen Sinn,
                 //dann gleich an Zielposition instanziieren
-                block = new BlockActor(app, blockType);
+                block = new BlockActor(app, blockType, true);
                 insertBlock(x, y, block);
             } else {
                 nextTetro[i] = null;
@@ -868,7 +868,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 blockMatrix[oldX][oldY] = null;
             } else {
                 // Beim Spielstand laden hinzufügen
-                holdTetro[i] = new BlockActor(app, holdBlockType);
+                holdTetro[i] = new BlockActor(app, holdBlockType, true);
                 blockGroup.addActor(holdTetro[i]);
             }
 

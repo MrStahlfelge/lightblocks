@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.Tetromino;
@@ -54,7 +55,7 @@ public class BlockActor extends Actor {
     /**
      * constructor adds the Textures and Images
      */
-    public BlockActor(LightBlocksGame app, int blockType) {
+    public BlockActor(LightBlocksGame app, int blockType, boolean useTheme) {
         if (COLOR_L == null) {
             initColor(app.localPrefs.getBlockColorMode());
         }
@@ -62,8 +63,10 @@ public class BlockActor extends Actor {
         glowAction = Actions.action(AlphaAction.class);
         this.blockType = blockType;
 
-        imBlock = new Image(app.trBlock);
-        imBlockEnlightened = new Image(app.trBlockEnlightened);
+        imBlock = new Image(useTheme ? app.theme.getBlockTextureNormal(blockType) :
+                new TextureRegionDrawable(app.trBlock));
+        imBlockEnlightened = new Image(useTheme ? app.theme.getBlockTextureEnlightened(blockType)
+                : new TextureRegionDrawable(app.trBlockEnlightened));
 
         Color blockTypeColor = getBlockTypeColor(blockType);
         imBlockEnlightened.setColor(blockTypeColor.r, blockTypeColor.g, blockTypeColor.b, dislighentedAlpha);

@@ -60,7 +60,7 @@ public class AnimatedLightblocksLogo extends BlockGroup {
         weldEffect.setPosition(0, .5f * BlockActor.blockWidth);
 
         for (int i = 0; i < 4; i++) {
-            BlockActor block = new BlockActor(app, Tetromino.TETRO_IDX_L);
+            BlockActor block = new BlockActor(app, Tetromino.TETRO_IDX_L, false);
             allBlocks[i] = block;
             addActor(block);
             block.getColor().a = 0;

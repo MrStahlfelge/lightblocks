@@ -32,7 +32,7 @@ public class ReplayGameboard extends BlockGroup {
     private int maxTime;
 
     public ReplayGameboard(LightBlocksGame app, Replay replay) {
-        super(app);
+        super(app, false);
         setGhostPieceVisibility(false);
 
         this.replay = replay;
@@ -43,9 +43,9 @@ public class ReplayGameboard extends BlockGroup {
         activePiecePos = new int[Tetromino.TETROMINO_BLOCKCOUNT];
         actorsToRemove = new Array<BlockActor>();
         for (int i = 0; i < activePieceBlock.length; i++) {
-            activePieceBlock[i] = new BlockActor(app, Tetromino.TETRO_IDX_L);
+            activePieceBlock[i] = new BlockActor(app, Tetromino.TETRO_IDX_L, false);
             activePieceBlock[i].setEnlightened(true, true);
-            nextPieceBlock[i] = new BlockActor(app, Tetromino.TETRO_IDX_L);
+            nextPieceBlock[i] = new BlockActor(app, Tetromino.TETRO_IDX_L, false);
             nextPieceBlock[i].getColor().a = .5f;
         }
         nextPieceBlockGroup = new Group();
@@ -167,7 +167,7 @@ public class ReplayGameboard extends BlockGroup {
                 currentShownBlocks[i] = null;
             } else if (currentShownBlocks[i] == null && shouldHaveActor) {
                 // eventuell für das aufleuchten noch abgleich mit activePiecePos[]?
-                currentShownBlocks[i] = new BlockActor(app, Tetromino.TETRO_IDX_L);
+                currentShownBlocks[i] = new BlockActor(app, Tetromino.TETRO_IDX_L, false);
                 currentShownBlocks[i].setEnlightened(true, true);
                 setBlockActorToPosition(currentShownBlocks[i], i, true);
                 currentShownBlocks[i].addAction(Actions.delay(.05f,

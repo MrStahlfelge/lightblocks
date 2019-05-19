@@ -26,7 +26,7 @@ public class BlockGroup extends Group {
         app = null;
     }
 
-    public BlockGroup(LightBlocksGame app) {
+    public BlockGroup(LightBlocksGame app, boolean useTheme) {
         this.app = app;
         // Grid und Ghost
         grid = new Group();
@@ -35,7 +35,7 @@ public class BlockGroup extends Group {
         if (gridIntensity > 0) {
             for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++)
                 for (int y = 0; y < Gameboard.GAMEBOARD_NORMALROWS; y++) {
-                    Image imGrid = new Image(app.trBlock);
+                    Image imGrid = useTheme ? new Image(app.theme.blockGrid) : new Image(app.trBlock);
                     imGrid.setPosition(calcHorizontalPos(x), calcVerticalPos(y));
                     imGrid.setColor(gridIntensity, gridIntensity, gridIntensity, 1f);
                     grid.addActor(imGrid);
@@ -44,7 +44,7 @@ public class BlockGroup extends Group {
         if (app.localPrefs.getShowGhostpiece()) {
             ghostpiece = new Image[Tetromino.TETROMINO_BLOCKCOUNT];
             for (int i = 0; i < ghostpiece.length; i++) {
-                ghostpiece[i] = new Image(app.trGhostBlock);
+                ghostpiece[i] = useTheme ? new Image(app.theme.blockGhost) : new Image(app.trGhostBlock);
                 ghostpiece[i].setColor(.5f, .5f, .5f, 1f);
                 grid.addActor(ghostpiece[i]);
             }
