@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.scene2d;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -31,13 +32,22 @@ public class BlockGroup extends Group {
         // Grid und Ghost
         grid = new Group();
 
-        float gridIntensity = app.localPrefs.getGridIntensity() * GRIDINTENSITYFACTOR;
+        float gridIntensity = app.localPrefs.getGridIntensity();
         if (gridIntensity > 0) {
+            // wenn Hintergrund schwarz und Standardbild => dann abdunkeln. Sonst Transparenz anwenden
+            boolean applyMask = !useTheme || app.theme.usesDefaultBlockPictures && app.theme.bgColor.equals(Color.BLACK);
+            if (applyMask)
+                gridIntensity = gridIntensity * GRIDINTENSITYFACTOR;
+
             for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++)
                 for (int y = 0; y < Gameboard.GAMEBOARD_NORMALROWS; y++) {
                     Image imGrid = useTheme ? new Image(app.theme.blockGrid) : new Image(app.trBlock);
                     imGrid.setPosition(calcHorizontalPos(x), calcVerticalPos(y));
-                    imGrid.setColor(gridIntensity, gridIntensity, gridIntensity, 1f);
+
+                    if (applyMask)
+                        imGrid.setColor(gridIntensity, gridIntensity, gridIntensity, 1f);
+                    else
+                        imGrid.setColor(1, 1, 1, gridIntensity);
                     grid.addActor(imGrid);
                 }
         }

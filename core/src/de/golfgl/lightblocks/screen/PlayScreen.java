@@ -670,7 +670,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             }
 
             // den Explosions-Effekt einfügen
-            if (special && app.theme.showSpecialAnimation) {
+            if (special && app.theme.usesDefaultBlockPictures) {
                 weldEffect.setPosition(blockGroup.getX() + 5f * BlockActor.blockWidth, blockGroup.getY() +
                         (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth);
                 weldEffect.start();

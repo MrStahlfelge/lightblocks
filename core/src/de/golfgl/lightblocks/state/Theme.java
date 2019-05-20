@@ -32,7 +32,7 @@ public class Theme {
     public TextureRegionDrawable blockNormalGarbage;
     public TextureRegionDrawable blockGrid;
     public TextureRegionDrawable blockGhost;
-    public boolean showSpecialAnimation;
+    public boolean usesDefaultBlockPictures;
 
     public TextureRegionDrawable blockActiveL;
     public TextureRegionDrawable blockActiveJ;
@@ -116,7 +116,7 @@ public class Theme {
         blockActiveO = blockActiveI;
         blockActiveT = blockActiveI;
         blockActiveGarbage = blockActiveI;
-        showSpecialAnimation = true;
+        usesDefaultBlockPictures = true;
 
         bgColor = Color.BLACK;
         labelColor = Color.WHITE;
@@ -170,7 +170,7 @@ public class Theme {
 
             JsonValue normalNode = blockNode.get("normal_pics");
             if (normalNode != null) {
-                showSpecialAnimation = true;
+                usesDefaultBlockPictures = false;
 
                 blockNormalL = findDrawableOrThrow(themeAtlas, normalNode.getString("l"));
                 blockNormalI = findDrawableOrThrow(themeAtlas, normalNode.getString("i"));
