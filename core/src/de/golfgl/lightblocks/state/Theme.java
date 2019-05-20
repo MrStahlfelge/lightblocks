@@ -44,7 +44,10 @@ public class Theme {
     public TextureRegionDrawable blockActiveGarbage;
 
     public Color bgColor;
-    public Color labelColor;
+    public Color scoreColor;
+    public Color achievementColor;
+    public Color titleColor;
+    public Color wallColor;
 
     public Theme(LightBlocksGame app) {
         this.app = app;
@@ -119,7 +122,8 @@ public class Theme {
         usesDefaultBlockPictures = true;
 
         bgColor = Color.BLACK;
-        labelColor = Color.WHITE;
+        wallColor = new Color(.8f, .8f, .8f, 1);
+        titleColor = new Color(.7f, .7f, .7f, 1);
     }
 
     private void loadThemeIfPresent() {
@@ -161,6 +165,14 @@ public class Theme {
             Color bgColor = findOptionalColor(screenConfigNode, "bgcolor");
             if (bgColor != null)
                 this.bgColor = bgColor;
+
+            Color wallColor = findOptionalColor(screenConfigNode, "wallcolor");
+            if (wallColor != null)
+                this.wallColor = wallColor;
+
+            Color titleColor = findOptionalColor(screenConfigNode, "titlecolor");
+            if (titleColor != null)
+                this.titleColor = titleColor;
         }
     }
 

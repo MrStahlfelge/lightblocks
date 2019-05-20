@@ -1,0 +1,72 @@
+{
+  "name": "gameboy",
+  "author": "bsc",
+  "version": 1,
+  // music - TODO (slow and fast)
+
+  // sounds - optional (defaults to normal game sound) - TODO
+  "sounds": {
+    "rotate": "rotate.mp3",
+    "drop": "drop.mp3",
+    "normalclear": "clear.mp3",
+    "achievement": "achieve.mp3",
+    "garbage": "garbage.mp3",
+    "specialclear": "specialclear.mp3"
+  },
+  // background, all entries optional
+  "screen": {
+    "bgcolor": "94b13a",
+    // TODO
+    "bgpic": "",
+    // TODO optional, defaults to bgpic
+    "bgpic_landscape": "",
+    "scorecolor": "ffffff",
+    // TODO
+    "emphasizecolor": "ffffff",
+    "achievementcolor": "ffffff",
+    "titlecolor": "ffffff",
+    "wallcolor": "ffffff",
+    "buttoncolor": "ffffff"
+  },
+  "blocks": {
+    // Here come the normal block pics - optional
+    // https://www.spriters-resource.com/game_boy_gbc/tetris/
+    "normal_pics": {
+      "l": "blockl",
+      "i": "blocki",
+      "j": "blockj",
+      "z": "blockz",
+      "s": "blocks",
+      "o": "blocko",
+      "t": "blockt",
+      "garbage": "blocko",
+      "grid": "blockgrid",
+      "ghost": "blockghost"
+    },
+    // block colors rgb(a) - optional (default white) TODO
+    "tint": {
+      "l": "ffffff",
+      "i": "ffffff",
+      "j": "ffffff",
+      "z": "ffffff",
+      "s": "ffffff",
+      "o": "ffffff",
+      "t": "ffffff",
+      "garbage": "888888",
+      "grid": "888888",
+      "ghost": "ffffff"
+    },
+    // activated block pics, overlayed with different alpha. Applies only if normal_pics set. Optional (default: no overlay)
+    "activated_pics": {
+      "l": "",
+      "i": "",
+      "j": "",
+      "z": "",
+      "s": "",
+      "o": "",
+      "t": "",
+      "garbage": ""
+      // shortly activated when garbage is dropped in
+    }
+  }
+}

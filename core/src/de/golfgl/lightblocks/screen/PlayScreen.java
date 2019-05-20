@@ -144,7 +144,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         imLine.setY(blockGroup.getY() - NINE_PATCH_BORDER_SIZE);
         imLine.addAction(Actions.sizeTo(imLine.getWidth(), blockGroup.getGridHeight() +
                 2 * NINE_PATCH_BORDER_SIZE, 1f, Interpolation.circleOut));
-        imLine.setColor(.8f, .8f, .8f, 1);
+        imLine.setColor(app.theme.wallColor);
         centerGroup.addActor(imLine);
 
         imGarbageIndicator = new Image(line);
@@ -160,7 +160,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         imLine.setX(blockGroup.getX() - imLine.getWidth() - 2);
         imLine.addAction(Actions.sizeTo(imLine.getWidth(), blockGroup.getGridHeight() +
                 2 * NINE_PATCH_BORDER_SIZE, 1f, Interpolation.circleOut));
-        imLine.setColor(.8f, .8f, .8f, 1);
+        imLine.setColor(app.theme.wallColor);
         centerGroup.addActor(imLine);
 
         imComboIndicator = new Image(line);
@@ -173,7 +173,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         // Anzeige des Levelnamens - muss in Group, Rotation funktioniert direkt auf Label nicht
         Group gameTypeLabels = new Group();
         Label gameType = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        gameType.setColor(.7f, .7f, .7f, 1);
+        gameType.setColor(app.theme.titleColor);
         //gameType.setFontScale(.9f);
         gameTypeLabels.setPosition(imLine.getX(), blockGroup.getY());
         gameTypeLabels.addActor(gameType);
