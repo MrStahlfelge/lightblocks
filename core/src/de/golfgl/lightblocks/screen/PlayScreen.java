@@ -109,6 +109,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             InputNotAvailableException, VetoException {
         super(app);
 
+        bgColor = app.theme.bgColor;
+
         music = new PlayMusic(app);
 
         centerGroup = new Group();
@@ -668,7 +670,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             }
 
             // den Explosions-Effekt einfügen
-            if (special) {
+            if (special && app.theme.showSpecialAnimation) {
                 weldEffect.setPosition(blockGroup.getX() + 5f * BlockActor.blockWidth, blockGroup.getY() +
                         (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth);
                 weldEffect.start();

@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.state;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -31,6 +32,7 @@ public class Theme {
     public TextureRegionDrawable blockNormalGarbage;
     public TextureRegionDrawable blockGrid;
     public TextureRegionDrawable blockGhost;
+    public boolean showSpecialAnimation;
 
     public TextureRegionDrawable blockActiveL;
     public TextureRegionDrawable blockActiveJ;
@@ -40,6 +42,9 @@ public class Theme {
     public TextureRegionDrawable blockActiveT;
     public TextureRegionDrawable blockActiveI;
     public TextureRegionDrawable blockActiveGarbage;
+
+    public Color bgColor;
+    public Color labelColor;
 
     public Theme(LightBlocksGame app) {
         this.app = app;
@@ -111,6 +116,10 @@ public class Theme {
         blockActiveO = blockActiveI;
         blockActiveT = blockActiveI;
         blockActiveGarbage = blockActiveI;
+        showSpecialAnimation = true;
+
+        bgColor = Color.BLACK;
+        labelColor = Color.WHITE;
     }
 
     private void loadThemeIfPresent() {
@@ -122,8 +131,8 @@ public class Theme {
             if (jsonFile.exists()) {
                 Gdx.app.log(LOG_TAG, "Theme found - loading.");
 
-                JsonValue response = new JsonReader().parse(jsonFile);
-                if (response != null) {
+                JsonValue themeConfigJson = new JsonReader().parse(jsonFile);
+                if (themeConfigJson != null) {
 
                     FileHandle atlasFile = Gdx.files.local("theme/theme.atlas");
                     TextureAtlas themeAtlas;
@@ -133,7 +142,8 @@ public class Theme {
                         themeAtlas = new TextureAtlas();
 
                     // Blöcke laden
-                    loadBlocks(themeAtlas, response);
+                    loadBlocks(themeAtlas, themeConfigJson);
+                    loadScreen(themeAtlas, themeConfigJson);
                 }
             }
 
@@ -145,42 +155,67 @@ public class Theme {
 
     }
 
-    private void loadBlocks(TextureAtlas themeAtlas, JsonValue response) {
-        JsonValue blockNode = response.get("blocks");
+    private void loadScreen(TextureAtlas themeAtlas, JsonValue themeConfigJson) {
+        JsonValue screenConfigNode = themeConfigJson.get("screen");
+        if (screenConfigNode != null) {
+            Color bgColor = findOptionalColor(screenConfigNode, "bgcolor");
+            if (bgColor != null)
+                this.bgColor = bgColor;
+        }
+    }
+
+    private void loadBlocks(TextureAtlas themeAtlas, JsonValue themeConfigJson) {
+        JsonValue blockNode = themeConfigJson.get("blocks");
         if (blockNode != null) {
 
             JsonValue normalNode = blockNode.get("normal_pics");
-            blockNormalL = findOrThrow(themeAtlas, normalNode.getString("l"));
-            blockNormalI = findOrThrow(themeAtlas, normalNode.getString("i"));
-            blockNormalJ = findOrThrow(themeAtlas, normalNode.getString("j"));
-            blockNormalZ = findOrThrow(themeAtlas, normalNode.getString("z"));
-            blockNormalS = findOrThrow(themeAtlas, normalNode.getString("s"));
-            blockNormalO = findOrThrow(themeAtlas, normalNode.getString("o"));
-            blockNormalT = findOrThrow(themeAtlas, normalNode.getString("t"));
-            blockNormalGarbage = findOrThrow(themeAtlas, normalNode.getString("garbage"));
-            blockGrid = findOrThrow(themeAtlas, normalNode.getString("grid"));
-            blockGhost = findOrThrow(themeAtlas, normalNode.getString("ghost"));
+            if (normalNode != null) {
+                showSpecialAnimation = true;
 
-            JsonValue activatedNode = blockNode.get("activated_pics");
+                blockNormalL = findDrawableOrThrow(themeAtlas, normalNode.getString("l"));
+                blockNormalI = findDrawableOrThrow(themeAtlas, normalNode.getString("i"));
+                blockNormalJ = findDrawableOrThrow(themeAtlas, normalNode.getString("j"));
+                blockNormalZ = findDrawableOrThrow(themeAtlas, normalNode.getString("z"));
+                blockNormalS = findDrawableOrThrow(themeAtlas, normalNode.getString("s"));
+                blockNormalO = findDrawableOrThrow(themeAtlas, normalNode.getString("o"));
+                blockNormalT = findDrawableOrThrow(themeAtlas, normalNode.getString("t"));
+                blockNormalGarbage = findDrawableOrThrow(themeAtlas, normalNode.getString("garbage"));
+                blockGrid = findDrawableOrThrow(themeAtlas, normalNode.getString("grid"));
+                blockGhost = findDrawableOrThrow(themeAtlas, normalNode.getString("ghost"));
 
-            blockActiveL = findOptional(themeAtlas, activatedNode, "l");
-            blockActiveJ = findOptional(themeAtlas, activatedNode, "j");
-            blockActiveI = findOptional(themeAtlas, activatedNode, "i");
-            blockActiveZ = findOptional(themeAtlas, activatedNode, "z");
-            blockActiveS = findOptional(themeAtlas, activatedNode, "s");
-            blockActiveO = findOptional(themeAtlas, activatedNode, "o");
-            blockActiveT = findOptional(themeAtlas, activatedNode, "l");
-            blockActiveGarbage = findOptional(themeAtlas, activatedNode, "garbage");
+                JsonValue activatedNode = blockNode.get("activated_pics");
+
+                blockActiveL = findOptionalDrawable(themeAtlas, activatedNode, "l");
+                blockActiveJ = findOptionalDrawable(themeAtlas, activatedNode, "j");
+                blockActiveI = findOptionalDrawable(themeAtlas, activatedNode, "i");
+                blockActiveZ = findOptionalDrawable(themeAtlas, activatedNode, "z");
+                blockActiveS = findOptionalDrawable(themeAtlas, activatedNode, "s");
+                blockActiveO = findOptionalDrawable(themeAtlas, activatedNode, "o");
+                blockActiveT = findOptionalDrawable(themeAtlas, activatedNode, "l");
+                blockActiveGarbage = findOptionalDrawable(themeAtlas, activatedNode, "garbage");
+            }
         }
 
     }
 
     @Nullable
-    private TextureRegionDrawable findOptional(TextureAtlas themeAtlas, JsonValue activatedNode, String nodeName) {
-        if (activatedNode != null && activatedNode.has(nodeName)) {
-            String regionName = activatedNode.getString(nodeName);
+    private Color findOptionalColor(JsonValue parentNode, String nodeName) {
+        if (parentNode != null && parentNode.has(nodeName)) {
+            String hexColor = parentNode.getString(nodeName);
+            if (!hexColor.isEmpty())
+                return Color.valueOf(hexColor);
+            else
+                return null;
+        } else
+            return null;
+    }
+
+    @Nullable
+    private TextureRegionDrawable findOptionalDrawable(TextureAtlas themeAtlas, JsonValue parentNode, String nodeName) {
+        if (parentNode != null && parentNode.has(nodeName)) {
+            String regionName = parentNode.getString(nodeName);
             if (!regionName.isEmpty())
-                return findOrThrow(themeAtlas, regionName);
+                return findDrawableOrThrow(themeAtlas, regionName);
             else
                 return null;
         } else
@@ -188,7 +223,7 @@ public class Theme {
     }
 
     @Nonnull
-    private TextureRegionDrawable findOrThrow(TextureAtlas themeAtlas, String name) {
+    private TextureRegionDrawable findDrawableOrThrow(TextureAtlas themeAtlas, String name) {
         TextureRegion region = themeAtlas.findRegion(name);
         if (region == null)
             throw new IllegalArgumentException("Picture for " + name + " not found");
