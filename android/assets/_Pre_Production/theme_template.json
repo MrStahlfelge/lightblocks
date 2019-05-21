@@ -5,18 +5,19 @@
 
   // music - optional (defaults to normal music)
   "music": {
-    "slow": "",
-    "fast": ""
+    "slow": "slowmusic.mp3",
+    "fast": "fastmusic.mp3"
   },
 
-  // sounds - optional (defaults to normal game sound) - TODO
+  // sounds - optional (defaults to normal game sound, leave blank for no sound)
   "sounds": {
     "rotate": "rotate.mp3",
     "drop": "drop.mp3",
     "normalclear": "clear.mp3",
     "achievement": "achieve.mp3",
     "garbage": "garbage.mp3",
-    "specialclear": "specialclear.mp3"
+    "specialclear": "specialclear.mp3",
+    "gameover": "gbgameover.ogg"
   },
   // background, all entries optional
   "screen": {

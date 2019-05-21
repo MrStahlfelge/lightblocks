@@ -139,6 +139,14 @@ public class Theme {
 
         slowMusicFilename = null;
         fastMusicFilename = null;
+
+        rotateSound = app.rotateSound;
+        dropSound = app.dropSound;
+        removeSound = app.removeSound;
+        gameOverSound = app.gameOverSound;
+        cleanSpecialSound = app.cleanSpecialSound;
+        unlockedSound = app.unlockedSound;
+        garbageSound = app.garbageSound;
     }
 
     private void loadThemeIfPresent() {
@@ -164,6 +172,7 @@ public class Theme {
                     loadBlocks(themeAtlas, themeConfigJson);
                     loadScreen(themeAtlas, themeConfigJson);
                     loadMusic(themeConfigJson);
+                    loadSounds(themeConfigJson);
                 }
             }
 
@@ -173,6 +182,32 @@ public class Theme {
             initDefaults();
         }
 
+    }
+
+    private void loadSounds(JsonValue themeConfigJson) {
+        JsonValue soundNode = themeConfigJson.get("sounds");
+        if (soundNode != null) {
+            rotateSound = loadOptionalSound(soundNode, "rotate", app.rotateSound);
+            dropSound = loadOptionalSound(soundNode, "drop", app.dropSound);
+            removeSound = loadOptionalSound(soundNode, "normalclear", app.removeSound);
+            gameOverSound = loadOptionalSound(soundNode, "gameover", app.gameOverSound);
+            cleanSpecialSound = loadOptionalSound(soundNode, "specialclear", app.cleanSpecialSound);
+            unlockedSound = loadOptionalSound(soundNode, "achievement", app.unlockedSound);
+            garbageSound = loadOptionalSound(soundNode, "garbage", app.garbageSound);
+        }
+    }
+
+    private Sound loadOptionalSound(JsonValue parentNode, String nodeName, Sound defaultSound) {
+        if (!parentNode.has(nodeName))
+            return defaultSound;
+
+        else try {
+            return Gdx.audio.newSound(Gdx.files.local("theme/" + parentNode.getString(nodeName)));
+
+        } catch (Throwable t) {
+            Gdx.app.error(LOG_TAG, t.getMessage());
+            return null;
+        }
     }
 
     private void loadMusic(JsonValue themeConfigJson) {
