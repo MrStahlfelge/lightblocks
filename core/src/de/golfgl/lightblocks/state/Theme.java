@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.state;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -48,6 +49,17 @@ public class Theme {
     public Color achievementColor;
     public Color titleColor;
     public Color wallColor;
+
+    public Sound dropSound;
+    public Sound rotateSound;
+    public Sound removeSound;
+    public Sound gameOverSound;
+    public Sound cleanSpecialSound;
+    public Sound unlockedSound;
+    public Sound garbageSound;
+
+    public String slowMusicFilename;
+    public String fastMusicFilename;
 
     public Theme(LightBlocksGame app) {
         this.app = app;
@@ -124,6 +136,9 @@ public class Theme {
         bgColor = Color.BLACK;
         wallColor = new Color(.8f, .8f, .8f, 1);
         titleColor = new Color(.7f, .7f, .7f, 1);
+
+        slowMusicFilename = null;
+        fastMusicFilename = null;
     }
 
     private void loadThemeIfPresent() {
@@ -148,6 +163,7 @@ public class Theme {
                     // Blöcke laden
                     loadBlocks(themeAtlas, themeConfigJson);
                     loadScreen(themeAtlas, themeConfigJson);
+                    loadMusic(themeConfigJson);
                 }
             }
 
@@ -157,6 +173,20 @@ public class Theme {
             initDefaults();
         }
 
+    }
+
+    private void loadMusic(JsonValue themeConfigJson) {
+        JsonValue musicNode = themeConfigJson.get("music");
+        if (musicNode != null) {
+            slowMusicFilename = musicNode.getString("slow", null);
+            fastMusicFilename = musicNode.getString("fast", null);
+
+            if (slowMusicFilename != null)
+                slowMusicFilename = "theme/" + slowMusicFilename;
+
+            if (fastMusicFilename != null)
+                fastMusicFilename = "theme/" + fastMusicFilename;
+        }
     }
 
     private void loadScreen(TextureAtlas themeAtlas, JsonValue themeConfigJson) {

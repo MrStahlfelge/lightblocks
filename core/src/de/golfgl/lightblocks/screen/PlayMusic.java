@@ -3,7 +3,6 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 
@@ -50,11 +49,17 @@ public class PlayMusic {
         if (playMusic && !isPlayMusic) {
             state = shouldPlayFast ? MusicState.playingFast : MusicState.playingSlowly;
             try {
-                slowMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameSlow")));
+                if (app.theme.slowMusicFilename != null) {
+                    slowMusic = Gdx.audio.newMusic(Gdx.files.local(app.theme.slowMusicFilename));
+                    fastMusic = Gdx.audio.newMusic(Gdx.files.local(app.theme.fastMusicFilename != null
+                            ? app.theme.fastMusicFilename : app.theme.slowMusicFilename));
+                } else {
+                    slowMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameSlow")));
+                    fastMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameFast")));
+                }
                 slowMusic.setLooping(true);
-                fastMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameFast")));
                 fastMusic.setLooping(true);
-            } catch (GdxRuntimeException e) {
+            } catch (Throwable t) {
                 // tritt auf IOS manchmal auf, dann lassen wir die Musik deaktiviert
                 // evtl. schon bekommenes zerstören
                 if (slowMusic != null) {

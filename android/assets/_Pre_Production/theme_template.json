@@ -2,7 +2,12 @@
   "name": "gameboy",
   "author": "bsc",
   "version": 1,
-  // music - TODO (slow and fast)
+
+  // music - optional (defaults to normal music)
+  "music": {
+    "slow": "",
+    "fast": ""
+  },
 
   // sounds - optional (defaults to normal game sound) - TODO
   "sounds": {
