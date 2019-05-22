@@ -18,20 +18,24 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
+import java.io.FileNotFoundException;
+
 import de.golfgl.gdxgameanalytics.AndroidGameAnalytics;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.multiplayer.AndroidNetUtils;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 import de.golfgl.lightblocks.multiplayer.NsdAdapter;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 
 public class GeneralAndroidLauncher extends AndroidApplication {
     public static final String NOTIF_CHANNEL_ID_MULTIPLAYER = "multiplayer";
     public static final int MULTIPLAYER_NOTIFICATION_ID = 4811;
+    public static final int OPEN_ZIP_FILE = 4;
 
     private static boolean gameInForeground = false;
-
     // Network Service detection
     NsdAdapter nsdAdapter;
+    private MultiplayerLightblocks chooseFileCallback;
 
     public static boolean isGameInForeground() {
         return gameInForeground;
@@ -100,9 +104,28 @@ public class GeneralAndroidLauncher extends AndroidApplication {
                     return 1f;
                 }
             }
+
+            @Override
+            public boolean canInstallTheme() {
+                return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+            }
+
+            @Override
+            protected void chooseZipFile() {
+                chooseFileCallback = this;
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("application/zip");
+                try {
+                    startActivityForResult(intent, OPEN_ZIP_FILE);
+                } catch (Throwable t) {
+                    ((AbstractScreen) getScreen()).showDialog("Sorry, your device is not capable of installing theme files.");
+                }
+            }
         };
 
-        // Initialize Android dependant classes
+        // Initialize Android dependant classesonba
         game.share = new AndroidShareHandler();
         game.netUtils = new AndroidNetUtils(getContext());
         game.gameAnalytics = new AndroidGameAnalytics();
@@ -148,6 +171,18 @@ public class GeneralAndroidLauncher extends AndroidApplication {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.cancel(MULTIPLAYER_NOTIFICATION_ID);
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == OPEN_ZIP_FILE && resultCode == RESULT_OK) {
+            try {
+                chooseFileCallback.zipFileChosen(getContentResolver().openInputStream(data.getData()));
+                chooseFileCallback = null;
+            } catch (FileNotFoundException e) {
+
+            }
+        }
     }
 
     @Override

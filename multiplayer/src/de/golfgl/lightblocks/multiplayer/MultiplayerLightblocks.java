@@ -1,17 +1,26 @@
 package de.golfgl.lightblocks.multiplayer;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Timer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.minlog.Log;
 
+import java.io.BufferedOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.menu.RtMultiplayerMenuScreen;
+import de.golfgl.lightblocks.menu.ThemeSettingsDialog;
+import de.golfgl.lightblocks.screen.AbstractScreen;
+import de.golfgl.lightblocks.state.Theme;
 
 /**
  * Created by Benjamin Schulte on 16.03.2018.
@@ -122,5 +131,69 @@ public class MultiplayerLightblocks extends LightBlocksGame {
     @Override
     public boolean supportsRealTimeMultiplayer() {
         return true;
+    }
+
+    @Override
+    public boolean canInstallTheme() {
+        return true;
+    }
+
+    @Override
+    public void doInstallTheme(ThemeSettingsDialog themeSettingsDialog) {
+
+        chooseZipFile();
+    }
+
+    public void zipFileChosen(InputStream zipFile) {
+        try {
+            final int BUFFER = 2048;
+            ZipInputStream zis = new ZipInputStream(zipFile);
+
+            ZipEntry entry;
+            boolean foundJson = false;
+
+            // theme-Verzeichnis anlegen, wenn nicht da
+            Gdx.files.local(Theme.FOLDER_NAME).mkdirs();
+            theme.resetTheme();
+
+            BufferedOutputStream dest = null;
+            while ((entry = zis.getNextEntry()) != null) {
+                FileHandle file = Gdx.files.local(Theme.FOLDER_NAME + "/" + entry.getName());
+                if (entry.getName().equals("theme.json"))
+                    foundJson = true;
+
+                if (entry.isDirectory()) {
+                    if (!file.exists())
+                        file.mkdirs();
+                    continue;
+                }
+                int count;
+                byte data[] = new byte[BUFFER];
+                OutputStream fos = file.write(false);
+
+                dest = new BufferedOutputStream(fos, BUFFER);
+                while ((count = zis.read(data, 0, BUFFER)) != -1) {
+                    dest.write(data, 0, count);
+                }
+                dest.flush();
+                dest.close();
+            }
+            zis.close();
+
+            if (!foundJson) {
+                theme.resetTheme();
+                throw new RuntimeException("This is not a Lightblocks' theme archive.");
+            } else {
+                theme.loadThemeIfPresent();
+                ((AbstractScreen) getScreen()).showDialog("Theme successfully installed.");
+            }
+
+        } catch (Throwable t) {
+            Gdx.app.error("Zip", t.getMessage(), t);
+            ((AbstractScreen) getScreen()).showDialog("Error installing theme:\n" + t.getMessage());
+        }
+    }
+
+    protected void chooseZipFile() {
     }
 }

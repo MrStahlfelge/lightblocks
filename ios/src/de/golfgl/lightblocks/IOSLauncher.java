@@ -99,6 +99,11 @@ public class IOSLauncher extends MyApnsAppDelegate {
             }
 
             @Override
+            public boolean canInstallTheme() {
+                return false;
+            }
+
+            @Override
             public void create() {
                 gpgsClient = new GameCenterMultiplayerClient(((MyIosApplication) Gdx.app).getUIViewController());
                 IosControllerManager.initializeIosControllers();

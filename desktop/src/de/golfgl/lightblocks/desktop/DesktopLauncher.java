@@ -2,12 +2,19 @@ package de.golfgl.lightblocks.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.pay.Information;
 import com.badlogic.gdx.pay.PurchaseManager;
 import com.badlogic.gdx.pay.PurchaseManagerConfig;
 import com.badlogic.gdx.pay.PurchaseObserver;
 import com.badlogic.gdx.pay.Transaction;
 import com.badlogic.gdx.utils.Array;
+
+import java.io.File;
+import java.io.InputStream;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.MockGameServiceClient;
@@ -23,7 +30,38 @@ public class DesktopLauncher {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.width = LightBlocksGame.nativeGameWidth;
         config.height = LightBlocksGame.nativeGameHeight;
-        LightBlocksGame game = new MultiplayerLightblocks();
+        LightBlocksGame game = new MultiplayerLightblocks() {
+                @Override
+                protected void chooseZipFile() {
+                // Create Swing JFileChooser
+                JFileChooser fileChooser = new JFileChooser();
+
+                String title = "such mal aus";
+                if (title != null)
+                    fileChooser.setDialogTitle(title);
+
+                fileChooser.setFileFilter(new FileFilter() {
+                    @Override
+                    public boolean accept(File file) {
+                        return !file.isFile() || file.getName().endsWith(".zip");
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "FileFilter";
+                    }
+                });
+                fileChooser.setAcceptAllFileFilterUsed(false);
+
+                // Present it to the world
+                if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    FileHandle result = new FileHandle(file);
+                    zipFileChosen(result.read());
+                }
+            }
+
+        };
         game.gpgsClient = new MyTestClient();
         game.purchaseManager = new MyTestPurchaseManager();
         new LwjglApplication(game, config);

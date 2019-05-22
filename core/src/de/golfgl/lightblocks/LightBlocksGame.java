@@ -31,6 +31,7 @@ import de.golfgl.lightblocks.backend.BackendManager;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
+import de.golfgl.lightblocks.menu.ThemeSettingsDialog;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -473,6 +474,14 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     public void setScreenDeadZones(MyExtendViewport viewport) {
         // for iPhoneX, for all others it's just 0
         viewport.setDeadZones(0, 0, 0, 0);
+    }
+
+    public boolean canInstallTheme() {
+        return false;
+    }
+
+    public void doInstallTheme(ThemeSettingsDialog themeSettingsDialog) {
+
     }
 
     private class MyOwnPlayer extends Player {

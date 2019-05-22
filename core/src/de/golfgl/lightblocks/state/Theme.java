@@ -22,6 +22,7 @@ import de.golfgl.lightblocks.model.Tetromino;
  */
 public class Theme {
     public static final String LOG_TAG = "Theme";
+    public static final String FOLDER_NAME = "theme";
     private final LightBlocksGame app;
     public TextureRegionDrawable blockNormalL;
     public TextureRegionDrawable blockNormalJ;
@@ -60,6 +61,9 @@ public class Theme {
 
     public String slowMusicFilename;
     public String fastMusicFilename;
+
+    private boolean themePresent;
+    private String themeName;
 
     public Theme(LightBlocksGame app) {
         this.app = app;
@@ -112,6 +116,9 @@ public class Theme {
     }
 
     public void initDefaults() {
+        themePresent = false;
+        themeName = null;
+
         blockNormalL = new TextureRegionDrawable(app.trBlock);
         blockNormalJ = blockNormalL;
         blockNormalZ = blockNormalL;
@@ -149,30 +156,37 @@ public class Theme {
         garbageSound = app.garbageSound;
     }
 
-    private void loadThemeIfPresent() {
+    public void loadThemeIfPresent() {
         if (!Gdx.files.isLocalStorageAvailable())
             return;
 
         try {
-            FileHandle jsonFile = Gdx.files.local("theme/theme.json");
+            FileHandle jsonFile = Gdx.files.local(FOLDER_NAME + "/" + FOLDER_NAME + ".json");
             if (jsonFile.exists()) {
                 Gdx.app.log(LOG_TAG, "Theme found - loading.");
 
                 JsonValue themeConfigJson = new JsonReader().parse(jsonFile);
                 if (themeConfigJson != null) {
 
-                    FileHandle atlasFile = Gdx.files.local("theme/theme.atlas");
+                    FileHandle atlasFile = Gdx.files.local(FOLDER_NAME + "/" + FOLDER_NAME + ".atlas");
                     TextureAtlas themeAtlas;
                     if (atlasFile.exists())
                         themeAtlas = new TextureAtlas(atlasFile);
                     else
                         themeAtlas = new TextureAtlas();
 
+                    themeName = themeConfigJson.getString("name", null);
+
+                    if (themeName == null || themeName.isEmpty())
+                        themeName = "unnamed Theme";
+
                     // Blöcke laden
                     loadBlocks(themeAtlas, themeConfigJson);
                     loadScreen(themeAtlas, themeConfigJson);
                     loadMusic(themeConfigJson);
                     loadSounds(themeConfigJson);
+
+                    themePresent = true;
                 }
             }
 
@@ -202,7 +216,7 @@ public class Theme {
             return defaultSound;
 
         else try {
-            return Gdx.audio.newSound(Gdx.files.local("theme/" + parentNode.getString(nodeName)));
+            return Gdx.audio.newSound(Gdx.files.local(FOLDER_NAME + "/" + parentNode.getString(nodeName)));
 
         } catch (Throwable t) {
             Gdx.app.error(LOG_TAG, t.getMessage());
@@ -217,10 +231,10 @@ public class Theme {
             fastMusicFilename = musicNode.getString("fast", null);
 
             if (slowMusicFilename != null)
-                slowMusicFilename = "theme/" + slowMusicFilename;
+                slowMusicFilename = FOLDER_NAME + "/" + slowMusicFilename;
 
             if (fastMusicFilename != null)
-                fastMusicFilename = "theme/" + fastMusicFilename;
+                fastMusicFilename = FOLDER_NAME + "/" + fastMusicFilename;
         }
     }
 
@@ -308,4 +322,18 @@ public class Theme {
         return new TextureRegionDrawable(region);
     }
 
+    @Nonnull
+    public boolean isThemePresent() {
+        return themePresent;
+    }
+
+    @Nonnull
+    public String getThemeName() {
+        return themeName;
+    }
+
+    public void resetTheme() {
+        Gdx.files.local(Theme.FOLDER_NAME).emptyDirectory();
+        initDefaults();
+    }
 }

@@ -1,6 +1,5 @@
 package de.golfgl.lightblocks.menu;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
@@ -179,6 +178,15 @@ public class SettingsScreen extends AbstractMenuDialog {
                 }
             });
 
+            GlowLabelButton themeButton = new GlowLabelButton(FontAwesome.MISC_PIECE, app.TEXTS.get("menuThemeConfig"), app.skin,
+                    GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
+            themeButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    new ThemeSettingsDialog(app).show(getStage());
+                }
+            });
+
             gridPreview = new Image(app.trBlock) {
                 @Override
                 public float getPrefHeight() {
@@ -220,11 +228,17 @@ public class SettingsScreen extends AbstractMenuDialog {
             row();
             add(gamePadButton);
 
+            if (app.canInstallTheme()) {
+                row();
+                add(themeButton);
+            }
+
             addFocusableActor(menuMusicButton);
             addFocusableActor(gridIntensitySlider);
             addFocusableActor(colorModeCheck);
             addFocusableActor(showGhostpiece);
             addFocusableActor(gamePadButton);
+            addFocusableActor(themeButton);
         }
 
         protected void gridIntensityChanged() {
