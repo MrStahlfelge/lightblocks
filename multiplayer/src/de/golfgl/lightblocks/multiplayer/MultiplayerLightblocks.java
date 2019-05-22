@@ -184,13 +184,23 @@ public class MultiplayerLightblocks extends LightBlocksGame {
                 theme.resetTheme();
                 throw new RuntimeException("This is not a Lightblocks' theme archive.");
             } else {
-                theme.loadThemeIfPresent();
-                ((AbstractScreen) getScreen()).showDialog("Theme successfully installed.");
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        theme.loadThemeIfPresent();
+                        ((AbstractScreen) getScreen()).showDialog("Theme successfully installed.");
+                    }
+                });
             }
 
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             Gdx.app.error("Zip", t.getMessage(), t);
-            ((AbstractScreen) getScreen()).showDialog("Error installing theme:\n" + t.getMessage());
+            Gdx.app.postRunnable(new Runnable() {
+                @Override
+                public void run() {
+                    ((AbstractScreen) getScreen()).showDialog("Error installing theme:\n" + t.getMessage());
+                }
+            });
         }
     }
 
