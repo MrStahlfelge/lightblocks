@@ -327,7 +327,7 @@ public class Theme {
         return themePresent;
     }
 
-    @Nonnull
+    @Nullable
     public String getThemeName() {
         return themeName;
     }

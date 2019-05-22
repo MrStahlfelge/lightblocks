@@ -27,9 +27,12 @@ public class GaHelper {
                         : "false"));
             }
 
-            app.gameAnalytics.submitDesignEvent("blockColor:" + app.localPrefs.getBlockColorMode());
-            app.gameAnalytics.submitDesignEvent("sounds:" + (app.localPrefs.isPlayMusic() ?
-                    "music" : app.localPrefs.isPlaySounds() ? "sounds" : "none"));
+            app.gameAnalytics.submitDesignEvent("theme:" + (app.theme.isThemePresent() ? app.theme.getThemeName() : "none"));
+            if (!app.theme.isThemePresent()) {
+                app.gameAnalytics.submitDesignEvent("blockColor:" + app.localPrefs.getBlockColorMode());
+                app.gameAnalytics.submitDesignEvent("sounds:" + (app.localPrefs.isPlayMusic() ?
+                        "music" : app.localPrefs.isPlaySounds() ? "sounds" : "none"));
+            }
             app.gameAnalytics.submitDesignEvent("ghostpiece:" + (app.localPrefs.getShowGhostpiece() ? "yes" : "no"));
         }
     }
