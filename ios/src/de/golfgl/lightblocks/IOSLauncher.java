@@ -11,17 +11,25 @@ import org.robovm.apple.foundation.Foundation;
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSString;
+import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.uikit.UIActivityViewController;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
+import org.robovm.apple.uikit.UIDocumentPickerDelegateAdapter;
+import org.robovm.apple.uikit.UIDocumentPickerMode;
+import org.robovm.apple.uikit.UIDocumentPickerViewController;
 import org.robovm.apple.uikit.UIEdgeInsets;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIRectEdge;
 import org.robovm.apple.uikit.UIView;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Collections;
+
 import de.golfgl.gdxgameanalytics.IosGameAnalytics;
-import de.golfgl.gdxpushmessages.MyApnsAppDelegate;
 import de.golfgl.gdxpushmessages.ApnsMessageProvider;
+import de.golfgl.gdxpushmessages.MyApnsAppDelegate;
 import de.golfgl.lightblocks.multiplayer.BonjourAdapter;
 import de.golfgl.lightblocks.multiplayer.GameCenterMultiplayerClient;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
@@ -100,7 +108,34 @@ public class IOSLauncher extends MyApnsAppDelegate {
 
             @Override
             public boolean canInstallTheme() {
-                return false;
+                return true;
+            }
+
+            @Override
+            protected void chooseZipFile() {
+                UIDocumentPickerViewController picker = new UIDocumentPickerViewController(Collections.singletonList("application/zip"),
+                        UIDocumentPickerMode.Import);
+
+                picker.setDelegate(new UIDocumentPickerDelegateAdapter() {
+                    @Override
+                    public void didPickDocuments(UIDocumentPickerViewController controller, NSArray<NSURL> urls) {
+                        didPickDocument(controller, urls.first());
+                    }
+
+                    @Override
+                    public void didPickDocument(UIDocumentPickerViewController controller, NSURL url) {
+                        if (url.isFileURL()) {
+                            String fileUrl = url.getPath();
+                            try {
+                                zipFileChosen(new FileInputStream(fileUrl));
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+
+                ((MyIosApplication) Gdx.app).getUIViewController().presentViewController(picker, true, null);
             }
 
             @Override
