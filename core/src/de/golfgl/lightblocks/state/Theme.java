@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
@@ -24,27 +25,27 @@ public class Theme {
     public static final String LOG_TAG = "Theme";
     public static final String FOLDER_NAME = "theme";
     private final LightBlocksGame app;
-    public TextureRegionDrawable blockNormalL;
-    public TextureRegionDrawable blockNormalJ;
-    public TextureRegionDrawable blockNormalZ;
-    public TextureRegionDrawable blockNormalS;
-    public TextureRegionDrawable blockNormalO;
-    public TextureRegionDrawable blockNormalT;
-    public TextureRegionDrawable blockNormalI;
-    public TextureRegionDrawable blockNormalGarbage;
-    public TextureRegionDrawable blockGrid;
-    public TextureRegionDrawable blockGhost;
+    public Drawable blockNormalL;
+    public Drawable blockNormalJ;
+    public Drawable blockNormalZ;
+    public Drawable blockNormalS;
+    public Drawable blockNormalO;
+    public Drawable blockNormalT;
+    public Drawable blockNormalI;
+    public Drawable blockNormalGarbage;
+    public Drawable blockGrid;
+    public Drawable blockGhost;
     public boolean usesDefaultBlockPictures;
     public boolean usesDefaultSounds;
 
-    public TextureRegionDrawable blockActiveL;
-    public TextureRegionDrawable blockActiveJ;
-    public TextureRegionDrawable blockActiveZ;
-    public TextureRegionDrawable blockActiveS;
-    public TextureRegionDrawable blockActiveO;
-    public TextureRegionDrawable blockActiveT;
-    public TextureRegionDrawable blockActiveI;
-    public TextureRegionDrawable blockActiveGarbage;
+    public Drawable blockActiveL;
+    public Drawable blockActiveJ;
+    public Drawable blockActiveZ;
+    public Drawable blockActiveS;
+    public Drawable blockActiveO;
+    public Drawable blockActiveT;
+    public Drawable blockActiveI;
+    public Drawable blockActiveGarbage;
 
     public Color bgColor;
     public Color scoreColor;
@@ -73,6 +74,16 @@ public class Theme {
         loadThemeIfPresent();
     }
 
+    public static Drawable tintDrawableIfPossible(Drawable drawable, Color color) {
+        if (drawable instanceof TextureRegionDrawable) {
+            drawable = ((TextureRegionDrawable) drawable).tint(color);
+        } else if (drawable instanceof NinePatchDrawable) {
+            drawable = ((NinePatchDrawable) drawable).tint(color);
+        }
+
+        return drawable;
+    }
+
     public Drawable getBlockTextureNormal(int blockType) {
         switch (blockType) {
             case Tetromino.TETRO_IDX_L:
@@ -95,7 +106,7 @@ public class Theme {
     }
 
     @Nullable
-    public TextureRegionDrawable getBlockTextureEnlightened(int blockType) {
+    public Drawable getBlockTextureEnlightened(int blockType) {
         switch (blockType) {
             case Tetromino.TETRO_IDX_L:
                 return blockActiveL;
@@ -292,11 +303,60 @@ public class Theme {
                 blockActiveZ = findOptionalDrawable(themeAtlas, activatedNode, "z");
                 blockActiveS = findOptionalDrawable(themeAtlas, activatedNode, "s");
                 blockActiveO = findOptionalDrawable(themeAtlas, activatedNode, "o");
-                blockActiveT = findOptionalDrawable(themeAtlas, activatedNode, "l");
+                blockActiveT = findOptionalDrawable(themeAtlas, activatedNode, "t");
                 blockActiveGarbage = findOptionalDrawable(themeAtlas, activatedNode, "garbage");
             }
+
+            JsonValue tintNode = blockNode.get("tint");
+            if (tintNode != null) {
+                Color tintColor = findOptionalColor(tintNode, "l");
+                blockNormalL = tintPicsWithColor(tintColor, blockNormalL);
+                blockActiveL = tintPicsWithColor(tintColor, blockActiveL);
+
+                tintColor = findOptionalColor(tintNode, "i");
+                blockNormalI = tintPicsWithColor(tintColor, blockNormalI);
+                blockActiveI = tintPicsWithColor(tintColor, blockActiveI);
+
+                tintColor = findOptionalColor(tintNode, "j");
+                blockNormalJ = tintPicsWithColor(tintColor, blockNormalJ);
+                blockActiveJ = tintPicsWithColor(tintColor, blockActiveJ);
+
+                tintColor = findOptionalColor(tintNode, "z");
+                blockNormalZ = tintPicsWithColor(tintColor, blockNormalZ);
+                blockActiveZ = tintPicsWithColor(tintColor, blockActiveZ);
+
+                tintColor = findOptionalColor(tintNode, "s");
+                blockNormalS = tintPicsWithColor(tintColor, blockNormalS);
+                blockActiveS = tintPicsWithColor(tintColor, blockActiveS);
+
+                tintColor = findOptionalColor(tintNode, "o");
+                blockNormalO = tintPicsWithColor(tintColor, blockNormalO);
+                blockActiveO = tintPicsWithColor(tintColor, blockActiveO);
+
+                tintColor = findOptionalColor(tintNode, "t");
+                blockNormalT = tintPicsWithColor(tintColor, blockNormalT);
+                blockActiveT = tintPicsWithColor(tintColor, blockActiveT);
+
+                tintColor = findOptionalColor(tintNode, "garbage");
+                blockNormalGarbage = tintPicsWithColor(tintColor, blockNormalGarbage);
+                blockActiveGarbage = tintPicsWithColor(tintColor, blockActiveGarbage);
+
+                tintColor = findOptionalColor(tintNode, "grid");
+                blockGrid = tintPicsWithColor(tintColor, blockGrid);
+
+                tintColor = findOptionalColor(tintNode, "ghost");
+                blockGhost = tintPicsWithColor(tintColor, blockGhost);
+            }
+
         }
 
+    }
+
+    private Drawable tintPicsWithColor(Color color, Drawable pic) {
+        if (color != null && pic != null)
+            return tintDrawableIfPossible(pic, color);
+        else
+            return pic;
     }
 
     @Nullable
@@ -312,7 +372,7 @@ public class Theme {
     }
 
     @Nullable
-    private TextureRegionDrawable findOptionalDrawable(TextureAtlas themeAtlas, JsonValue parentNode, String nodeName) {
+    private Drawable findOptionalDrawable(TextureAtlas themeAtlas, JsonValue parentNode, String nodeName) {
         if (parentNode != null && parentNode.has(nodeName)) {
             String regionName = parentNode.getString(nodeName);
             if (!regionName.isEmpty())
@@ -324,12 +384,15 @@ public class Theme {
     }
 
     @Nonnull
-    private TextureRegionDrawable findDrawableOrThrow(TextureAtlas themeAtlas, String name) {
+    private Drawable findDrawableOrThrow(TextureAtlas themeAtlas, String name) {
         TextureRegion region = themeAtlas.findRegion(name);
         if (region == null)
             throw new IllegalArgumentException("Picture for " + name + " not found");
 
-        return new TextureRegionDrawable(region);
+        if (region instanceof TextureAtlas.AtlasRegion && ((TextureAtlas.AtlasRegion) region).splits != null)
+            return new NinePatchDrawable(themeAtlas.createPatch(name));
+        else
+            return new TextureRegionDrawable(region);
     }
 
     @Nonnull

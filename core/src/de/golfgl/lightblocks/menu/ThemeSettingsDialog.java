@@ -5,8 +5,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
@@ -18,6 +16,7 @@ import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.state.Theme;
 
 public class ThemeSettingsDialog extends ControllerMenuDialog {
 
@@ -139,9 +138,7 @@ public class ThemeSettingsDialog extends ControllerMenuDialog {
             featureTable.add(soundLabel).padLeft(tablePadding * 2).padRight(tablePadding);
         }
 
-        Drawable white = app.skin.getDrawable("white");
-        if (white instanceof TextureRegionDrawable)
-            featureTable.setBackground(((TextureRegionDrawable) white).tint(app.theme.bgColor));
+        featureTable.setBackground(Theme.tintDrawableIfPossible(app.skin.getDrawable("white"), app.theme.bgColor));
 
         themeFeatureCell.setActor(featureTable);
     }

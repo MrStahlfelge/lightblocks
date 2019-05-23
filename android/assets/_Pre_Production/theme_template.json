@@ -49,7 +49,7 @@
       "grid": "blockgrid",
       "ghost": "blockghost"
     },
-    // block colors rgb(a) - optional (default white) TODO
+    // block colors rgb(a) - optional (default white)
     "tint": {
       "l": "ffffff",
       "i": "ffffff",
