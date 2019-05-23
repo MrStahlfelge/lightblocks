@@ -113,7 +113,7 @@ public class IOSLauncher extends MyApnsAppDelegate {
 
             @Override
             protected void chooseZipFile() {
-                UIDocumentPickerViewController picker = new UIDocumentPickerViewController(Collections.singletonList("application/zip"),
+                UIDocumentPickerViewController picker = new UIDocumentPickerViewController(Collections.singletonList("com.pkware.zip-archive"),
                         UIDocumentPickerMode.Import);
 
                 picker.setDelegate(new UIDocumentPickerDelegateAdapter() {
