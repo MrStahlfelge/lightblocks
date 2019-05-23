@@ -35,6 +35,7 @@ public class Theme {
     public TextureRegionDrawable blockGrid;
     public TextureRegionDrawable blockGhost;
     public boolean usesDefaultBlockPictures;
+    public boolean usesDefaultSounds;
 
     public TextureRegionDrawable blockActiveL;
     public TextureRegionDrawable blockActiveJ;
@@ -64,11 +65,11 @@ public class Theme {
 
     private boolean themePresent;
     private String themeName;
+    private String lastLoadThemeErrorMessage;
 
     public Theme(LightBlocksGame app) {
         this.app = app;
 
-        initDefaults();
         loadThemeIfPresent();
     }
 
@@ -118,6 +119,7 @@ public class Theme {
     public void initDefaults() {
         themePresent = false;
         themeName = null;
+        lastLoadThemeErrorMessage = null;
 
         blockNormalL = new TextureRegionDrawable(app.trBlock);
         blockNormalJ = blockNormalL;
@@ -154,9 +156,13 @@ public class Theme {
         cleanSpecialSound = app.cleanSpecialSound;
         unlockedSound = app.unlockedSound;
         garbageSound = app.garbageSound;
+
+        usesDefaultSounds = true;
     }
 
     public void loadThemeIfPresent() {
+        initDefaults();
+
         if (!Gdx.files.isLocalStorageAvailable())
             return;
 
@@ -194,6 +200,7 @@ public class Theme {
             // sicherheitshalber eventuelle Änderungen zurücksetzen
             Gdx.app.error(LOG_TAG, t.getMessage());
             initDefaults();
+            lastLoadThemeErrorMessage = t.getMessage();
         }
 
     }
@@ -201,6 +208,7 @@ public class Theme {
     private void loadSounds(JsonValue themeConfigJson) {
         JsonValue soundNode = themeConfigJson.get("sounds");
         if (soundNode != null) {
+            usesDefaultSounds = false;
             rotateSound = loadOptionalSound(soundNode, "rotate", app.rotateSound);
             dropSound = loadOptionalSound(soundNode, "drop", app.dropSound);
             removeSound = loadOptionalSound(soundNode, "normalclear", app.removeSound);
@@ -230,8 +238,10 @@ public class Theme {
             slowMusicFilename = musicNode.getString("slow", null);
             fastMusicFilename = musicNode.getString("fast", null);
 
-            if (slowMusicFilename != null)
+            if (slowMusicFilename != null) {
                 slowMusicFilename = FOLDER_NAME + "/" + slowMusicFilename;
+                usesDefaultSounds = false;
+            }
 
             if (fastMusicFilename != null)
                 fastMusicFilename = FOLDER_NAME + "/" + fastMusicFilename;
@@ -328,8 +338,15 @@ public class Theme {
     }
 
     @Nullable
+    /**
+     * @return null nur, wenn kein Thema vorhanden. Sonst garantiert gefüllt
+     */
     public String getThemeName() {
         return themeName;
+    }
+
+    public String getLastLoadThemeErrorMessage() {
+        return lastLoadThemeErrorMessage;
     }
 
     public void resetTheme() {

@@ -1,12 +1,18 @@
 package de.golfgl.lightblocks.menu;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.Tetromino;
+import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
@@ -20,6 +26,7 @@ public class ThemeSettingsDialog extends ControllerMenuDialog {
     private final FaButton resetThemeButton;
     private final RoundedTextButton installThemeButton;
     private final FaButton closeButton;
+    private final Cell themeFeatureCell;
     private String shownThemeName;
 
     public ThemeSettingsDialog(final LightBlocksGame app) {
@@ -77,6 +84,8 @@ public class ThemeSettingsDialog extends ControllerMenuDialog {
         labelThemeName.setEllipsis(true);
         labelThemeName.setAlignment(Align.center);
         contentTable.add(labelThemeName).fillX();
+        contentTable.row();
+        themeFeatureCell = contentTable.add();
 
         contentTable.row().padTop(10);
         contentTable.add(installThemeButton);
@@ -99,6 +108,42 @@ public class ThemeSettingsDialog extends ControllerMenuDialog {
         shownThemeName = app.theme.getThemeName();
         labelThemeName.setText(app.theme.isThemePresent() ? shownThemeName : app.TEXTS.get("labelNoTheme"));
         resetThemeButton.setDisabled(!app.theme.isThemePresent());
+
+        Table featureTable = new Table() {
+            @Override
+            protected void drawChildren(Batch batch, float parentAlpha) {
+                //BlockActor muss zweimal gezeichnet werden
+                super.drawChildren(batch, parentAlpha);
+                super.drawChildren(batch, parentAlpha);
+            }
+        };
+
+        int tablePadding = 10;
+        featureTable.defaults().padBottom(tablePadding).padTop(tablePadding);
+
+        featureTable.add(new BlockActor(app, Tetromino.TETRO_IDX_L, true))
+                .width(BlockActor.blockWidth).height(BlockActor.blockWidth).bottom().padLeft(tablePadding)
+                .padRight(tablePadding);
+
+        if (!app.theme.usesDefaultBlockPictures) {
+            featureTable.add(new BlockActor(app, Tetromino.TETRO_IDX_O, true))
+                    .width(BlockActor.blockWidth).height(BlockActor.blockWidth).bottom().padRight(tablePadding);
+
+            featureTable.add(new BlockActor(app, Tetromino.TETRO_IDX_I, true))
+                    .width(BlockActor.blockWidth).height(BlockActor.blockWidth).bottom().padRight(tablePadding);
+        }
+
+        if (!app.theme.usesDefaultSounds) {
+            ScaledLabel soundLabel = new ScaledLabel(FontAwesome.SETTINGS_MUSIC, app.skin, FontAwesome.SKIN_FONT_FA, .5f);
+            soundLabel.setColor(app.theme.titleColor);
+            featureTable.add(soundLabel).padLeft(tablePadding * 2).padRight(tablePadding);
+        }
+
+        Drawable white = app.skin.getDrawable("white");
+        if (white instanceof TextureRegionDrawable)
+            featureTable.setBackground(((TextureRegionDrawable) white).tint(app.theme.bgColor));
+
+        themeFeatureCell.setActor(featureTable);
     }
 
     @Override

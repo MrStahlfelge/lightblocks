@@ -135,13 +135,13 @@ public class MultiplayerLightblocks extends LightBlocksGame {
 
     @Override
     public boolean canInstallTheme() {
-        return true;
+        return Gdx.files.isLocalStorageAvailable();
     }
 
     @Override
     public void doInstallTheme(ThemeSettingsDialog themeSettingsDialog) {
-
-        chooseZipFile();
+        if (canInstallTheme())
+            chooseZipFile();
     }
 
     public void zipFileChosen(InputStream zipFile) {
@@ -188,7 +188,10 @@ public class MultiplayerLightblocks extends LightBlocksGame {
                     @Override
                     public void run() {
                         theme.loadThemeIfPresent();
-                        ((AbstractScreen) getScreen()).showDialog("Theme successfully installed.");
+                        String errorMsg = theme.getLastLoadThemeErrorMessage();
+                        if (!theme.isThemePresent())
+                            ((AbstractScreen) getScreen()).showDialog("Error applying theme.\n"
+                                    + (errorMsg != null ? errorMsg : ""));
                     }
                 });
             }
