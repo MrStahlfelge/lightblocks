@@ -104,6 +104,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private int currentShownTime;
     private float timeSinceGameOver = 0;
     private GameBlocker.UsePortraitGameBlocker usePortraitGameBlocker = new GameBlocker.UsePortraitGameBlocker();
+    private final Image backgroundImage;
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
@@ -112,6 +113,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         bgColor = app.theme.bgColor;
 
         music = new PlayMusic(app);
+
+        backgroundImage = new Image(app.theme.backgroundPic);
+        backgroundImage.setAlign(Align.center);
+        backgroundImage.setSize(stage.getWidth(), stage.getHeight());
+        stage.addActor(backgroundImage);
 
         centerGroup = new Group();
         centerGroup.setTransform(false);
@@ -1140,6 +1146,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
+
+        backgroundImage.setSize(stage.getWidth(), stage.getHeight());
 
         centerGroup.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
                 (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);

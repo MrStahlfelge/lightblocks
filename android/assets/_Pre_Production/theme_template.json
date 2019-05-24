@@ -22,7 +22,6 @@
   // background, all entries optional
   "screen": {
     "bgcolor": "94b13a",
-    // TODO
     "bgpic": "",
     // TODO optional, defaults to bgpic
     "bgpic_landscape": "",
