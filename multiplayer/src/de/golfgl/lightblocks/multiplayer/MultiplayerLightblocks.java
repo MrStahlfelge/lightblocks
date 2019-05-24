@@ -159,7 +159,7 @@ public class MultiplayerLightblocks extends LightBlocksGame {
             BufferedOutputStream dest = null;
             while ((entry = zis.getNextEntry()) != null) {
                 FileHandle file = Gdx.files.local(Theme.FOLDER_NAME + "/" + entry.getName());
-                if (entry.getName().equals("theme.json"))
+                if (entry.getName().equals(Theme.THEME_FILE_NAME))
                     foundJson = true;
 
                 if (entry.isDirectory()) {
@@ -167,6 +167,12 @@ public class MultiplayerLightblocks extends LightBlocksGame {
                         file.mkdirs();
                     continue;
                 }
+
+                if (!theme.isThemeFile(entry.getName())) {
+                    Gdx.app.log(Theme.LOG_TAG, "Skipping theme archive file " + entry.getName());
+                    continue;
+                }
+
                 int count;
                 byte data[] = new byte[BUFFER];
                 OutputStream fos = file.write(false);
@@ -197,7 +203,7 @@ public class MultiplayerLightblocks extends LightBlocksGame {
             }
 
         } catch (final Throwable t) {
-            Gdx.app.error("Zip", t.getMessage(), t);
+            Gdx.app.error(Theme.LOG_TAG, t.getMessage(), t);
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {

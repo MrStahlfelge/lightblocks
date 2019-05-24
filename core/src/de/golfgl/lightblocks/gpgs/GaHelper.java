@@ -27,7 +27,12 @@ public class GaHelper {
                         : "false"));
             }
 
-            app.gameAnalytics.submitDesignEvent("theme:" + (app.theme.isThemePresent() ? app.theme.getThemeName() : "none"));
+            String themeName = app.theme.isThemePresent() ? app.theme.getThemeName() : "none";
+            if (themeName.length() >= 15)
+                themeName = themeName.substring(0, 15);
+            themeName = themeName.replace(':', '_').replace(' ', '_');
+
+            app.gameAnalytics.submitDesignEvent("theme:" + themeName);
             if (!app.theme.isThemePresent()) {
                 app.gameAnalytics.submitDesignEvent("blockColor:" + app.localPrefs.getBlockColorMode());
                 app.gameAnalytics.submitDesignEvent("sounds:" + (app.localPrefs.isPlayMusic() ?

@@ -24,6 +24,8 @@ import de.golfgl.lightblocks.model.Tetromino;
 public class Theme {
     public static final String LOG_TAG = "Theme";
     public static final String FOLDER_NAME = "theme";
+    public static final String ATLAS_FILE_NAME = FOLDER_NAME + ".atlas";
+    public static final String THEME_FILE_NAME = FOLDER_NAME + ".json";
     private final LightBlocksGame app;
     public Drawable blockNormalL;
     public Drawable blockNormalJ;
@@ -178,14 +180,14 @@ public class Theme {
             return;
 
         try {
-            FileHandle jsonFile = Gdx.files.local(FOLDER_NAME + "/" + FOLDER_NAME + ".json");
+            FileHandle jsonFile = Gdx.files.local(FOLDER_NAME + "/" + THEME_FILE_NAME);
             if (jsonFile.exists()) {
                 Gdx.app.log(LOG_TAG, "Theme found - loading.");
 
                 JsonValue themeConfigJson = new JsonReader().parse(jsonFile);
                 if (themeConfigJson != null) {
 
-                    FileHandle atlasFile = Gdx.files.local(FOLDER_NAME + "/" + FOLDER_NAME + ".atlas");
+                    FileHandle atlasFile = Gdx.files.local(FOLDER_NAME + "/" + ATLAS_FILE_NAME);
                     TextureAtlas themeAtlas;
                     if (atlasFile.exists())
                         themeAtlas = new TextureAtlas(atlasFile);
@@ -415,5 +417,13 @@ public class Theme {
     public void resetTheme() {
         Gdx.files.local(Theme.FOLDER_NAME).emptyDirectory();
         initDefaults();
+    }
+
+    public boolean isThemeFile(String fileName) {
+        if (fileName == null || fileName.isEmpty())
+            return false;
+
+        return (fileName.endsWith(".ogg") || fileName.endsWith(".mp3") || fileName.equals(THEME_FILE_NAME)
+                || fileName.equals(ATLAS_FILE_NAME) || fileName.endsWith(".png"));
     }
 }
