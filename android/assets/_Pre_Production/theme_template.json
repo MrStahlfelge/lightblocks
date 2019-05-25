@@ -1,15 +1,26 @@
 {
+  // Template file for Falling Lightblocks theme - see https://www.golfgl.de/lightblocks/themes.html
+  // To use this file in Lightblocks, it must be archived with all needed assets in a zip file and
+  // must be named "theme.json". Add the needed sound files as they are and reference them by their
+  // file name.
+  // Pictures have to be added to a texture atlas named theme.atlas/theme.png. They are referenced
+  // by their name in the atlas. You can create an atlas file with GDX Texture Packer GUI:
+  // https://github.com/crashinvaders/gdx-texture-packer-gui/ - or use an existing atlas file from
+  // another theme and insert your pics to the correct positions. :)
+
   "name": "gameboy",
   "author": "bsc",
   "version": 1,
 
   // music - optional (defaults to normal music)
+  // You can use mp3 or ogg files. mp3 is supported on all platforms, ogg will not work on iOS
   "music": {
     "slow": "slowmusic.mp3",
     "fast": "fastmusic.mp3"
   },
 
   // sounds - optional (defaults to normal game sound, leave blank for no sound)
+  // You can use mp3 or ogg files. mp3 is supported on all platforms, ogg will not work on iOS
   "sounds": {
     "rotate": "rotate.mp3",
     "drop": "drop.mp3",
@@ -20,6 +31,7 @@
     "gameover": "gbgameover.ogg"
   },
   // background, all entries optional
+  // Ninepatch pictures are supported here
   "screen": {
     "bgcolor": "94b13a",
     "bgpic": "",
@@ -35,7 +47,8 @@
   },
   "blocks": {
     // Here come the normal block pics - optional
-    // https://www.spriters-resource.com/game_boy_gbc/tetris/
+    // block pictures must be of size 72x72px with the actual block being centered. The grid size
+    // is 34x34. The default blocks have a size of 32x32px, therefore 2px padding
     "normal_pics": {
       "l": "blockl",
       "i": "blocki",
