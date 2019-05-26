@@ -215,7 +215,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         pauseDialog = new PauseDialog(app, this);
 
-        motivatorLabel = new MotivationLabel(app.skin, labelGroup);
+        motivatorLabel = new MotivationLabel(app.skin, labelGroup,
+                app.theme.achievementColor, app.theme.achievementShadowColor);
 
         // hier wird eventuell auch schon die erste Tutorial-Meldung angezeigt. Alles, was nach diesem Aufruf
         // auf die Stage kommt, liegt vor dem OverlayWindow!
@@ -225,13 +226,16 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (gameModel.showBlocksScore()) {
             scoreTable.row();
             final Label labelBlocks = new ScaledLabel(app.TEXTS.get("labelBlocksScore").toUpperCase(), app.skin);
+            app.theme.setScoreColor(labelBlocks);
             scoreTable.add(labelBlocks).right().bottom().padBottom(-2).spaceRight(3);
             scoreTable.add(blocksLeft).left().colspan(3);
         } else if (gameModel.showTime()) {
             scoreTable.row();
             timeLabelDesc = new ScaledLabel(app.TEXTS.get("labelTime").toUpperCase(), app.skin);
+            app.theme.setScoreColor(timeLabelDesc);
             scoreTable.add(timeLabelDesc).right().bottom().padBottom(-2).spaceRight(3);
             timeLabel = new ScaledLabel(ScoreTable.formatTimeString(0, 1), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            app.theme.setScoreColor(timeLabel);
             scoreTable.add(timeLabel).left().colspan(3);
         }
         scoreTable.validate();
@@ -333,6 +337,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     protected void populateScoreTable(Table scoreTable) {
         // in jedem Fall initialisieren, damit der beim ersten updateScore gefüllt wird
         blocksLeft = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+        app.theme.setScoreColor(blocksLeft);
     }
 
     /**
@@ -1203,33 +1208,38 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         private ScoreLabel scoreNum;
         private ScoreLabel levelNum;
         private ScoreLabel linesNum;
-        private ScoreLabel blocksLeft;
 
         public PlayScoreTable(LightBlocksGame app) {
             this.app = app;
             defaults().height(BlockActor.blockWidth * .8f);
             row();
             Label levelLabel = new ScaledLabel(app.TEXTS.get("labelLevel").toUpperCase(), app.skin);
+            app.theme.setScoreColor(levelLabel);
             add(levelLabel).right().bottom().padBottom(-2).spaceRight(3);
             levelNum = new ScoreLabel(2, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            app.theme.setScoreColor(levelNum);
             add(levelNum).left();
             Label linesLabel = new ScaledLabel(app.TEXTS.get("labelLines").toUpperCase(), app.skin);
+            app.theme.setScoreColor(linesLabel);
             add(linesLabel).right().bottom().padBottom(-2).spaceLeft(10).spaceRight(3);
             linesNum = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            app.theme.setScoreColor(linesNum);
             linesNum.setCountingSpeed(100);
             add(linesNum).left();
             row();
             Label scoreLabel = new ScaledLabel(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
+            app.theme.setScoreColor(scoreLabel);
             add(scoreLabel).right().bottom().padBottom(-2).spaceRight(3);
             scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            app.theme.setScoreColor(scoreNum);
             scoreNum.setCountingSpeed(2000);
             scoreNum.setMaxCountingTime(1);
             add(scoreNum).left().colspan(3);
         }
 
         public void setEmphasizeTresholds() {
-            levelNum.setEmphasizeTreshold(1, LightBlocksGame.EMPHASIZE_COLOR);
-            scoreNum.setEmphasizeTreshold(1000, LightBlocksGame.EMPHASIZE_COLOR);
+            levelNum.setEmphasizeTreshold(1, app.theme.emphasizeColor);
+            scoreNum.setEmphasizeTreshold(1000, app.theme.emphasizeColor);
         }
 
         public float getLinePrefHeight() {

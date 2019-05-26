@@ -6,6 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -54,6 +55,8 @@ public class Theme {
     public Color bgColor;
     public Color scoreColor;
     public Color achievementColor;
+    public Color achievementShadowColor;
+    public Color emphasizeColor;
     public Color titleColor;
     public Color wallColor;
 
@@ -160,6 +163,10 @@ public class Theme {
         backgroundPic = null;
         backgroundLandscapePic = null;
         bgColor = Color.BLACK;
+        scoreColor = null;
+        emphasizeColor = LightBlocksGame.EMPHASIZE_COLOR;
+        achievementColor = new Color(Color.WHITE);
+        achievementShadowColor = new Color(Color.BLACK);
         wallColor = new Color(.8f, .8f, .8f, 1);
         titleColor = new Color(.7f, .7f, .7f, 1);
 
@@ -279,6 +286,22 @@ public class Theme {
             Color titleColor = findOptionalColor(screenConfigNode, "titlecolor");
             if (titleColor != null)
                 this.titleColor = titleColor;
+
+            Color scoreColor = findOptionalColor(screenConfigNode, "scorecolor");
+            if (scoreColor != null)
+                this.scoreColor = scoreColor;
+
+            Color achievementColor = findOptionalColor(screenConfigNode, "achievementcolor");
+            if (achievementColor != null)
+                this.achievementColor = achievementColor;
+
+            Color achievementShadowColor = findOptionalColor(screenConfigNode, "achievementshadowcolor");
+            if (achievementShadowColor != null)
+                this.achievementShadowColor = achievementShadowColor;
+
+            Color emphasizeColor = findOptionalColor(screenConfigNode, "emphasizecolor");
+            if (emphasizeColor != null)
+                this.emphasizeColor = emphasizeColor;
 
             backgroundPic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic");
             backgroundLandscapePic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic_landscape");
@@ -419,6 +442,11 @@ public class Theme {
 
     public String getLastLoadThemeErrorMessage() {
         return lastLoadThemeErrorMessage;
+    }
+
+    public void setScoreColor(Actor actor) {
+        if (app.theme.scoreColor != null)
+            actor.setColor(new Color(app.theme.scoreColor));
     }
 
     public void resetTheme() {

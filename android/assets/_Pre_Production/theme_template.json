@@ -37,9 +37,10 @@
     "bgpic": "",
     "bgpic_landscape": "",
     "scorecolor": "ffffff",
-    // TODO
-    "emphasizecolor": "ffffff",
+    "emphasizecolor": "ff0000",
     "achievementcolor": "ffffff",
+    // set the achievement shadow color to the achievement color to deactivate the shadow
+    "achievementshadowcolor": "000000",
     "titlecolor": "ffffff",
     "wallcolor": "ffffff",
     "buttoncolor": "ffffff"

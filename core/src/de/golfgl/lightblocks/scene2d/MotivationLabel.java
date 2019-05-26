@@ -20,10 +20,10 @@ public class MotivationLabel extends GlowLabel {
 
     private boolean isActive;
 
-    public MotivationLabel(Skin skin, Group groupBox) {
+    public MotivationLabel(Skin skin, Group groupBox, Color mainColor, Color shadowColor) {
         super("", skin, .65f);
-        setGlowColor(Color.BLACK);
-        setGlowing(true);
+        setGlowColor(shadowColor);
+        setGlowing(!mainColor.equals(shadowColor));
 
         this.groupBox = groupBox;
 
@@ -32,7 +32,8 @@ public class MotivationLabel extends GlowLabel {
         setAlignment(Align.center);
 
         //erstmal unsichtbar
-        setColor(1, 1, 1, 0);
+        setColor(mainColor);
+        mainColor.a = 0;
         motivationTexts = new Array<String>();
         motivationDuration = new Array<Float>();
     }

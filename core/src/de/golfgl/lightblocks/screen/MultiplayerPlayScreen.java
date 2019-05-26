@@ -56,6 +56,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
         scoreTable.row();
         Label fillLabel = new ScaledLabel(app.TEXTS.get("labelFill").toUpperCase(), app.skin,
                 LightBlocksGame.SKIN_FONT_REG);
+        app.theme.setScoreColor(fillLabel);
         scoreTable.add(fillLabel).right().bottom().padBottom(-4).spaceRight(3);
 
         // noch eine Tabelle für die Spieler
@@ -64,12 +65,17 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
         playerGameboard = new HashMap<>(app.multiRoom.getNumberOfPlayers());
 
         for (String playerId : app.multiRoom.getPlayers()) {
-            fillingTable.add(new ScaledLabel(playerId.substring(0, 1), app.skin)).top().padTop(2);
+            ScaledLabel playerNameLabel = new ScaledLabel(playerId.substring(0, 1), app.skin);
+            app.theme.setScoreColor(playerNameLabel);
+            fillingTable.add(playerNameLabel).top().padTop(2);
             ScoreLabel lblFilling = new ScoreLabel(2, 100, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            app.theme.setScoreColor(lblFilling);
             lblFilling.setExceedChar('X');
             fillingTable.add(lblFilling);
             playerLabels.put(playerId, lblFilling);
-            fillingTable.add(new ScaledLabel("%", app.skin)).padRight(10).bottom().padBottom(4);
+            ScaledLabel playerFillingPercent = new ScaledLabel("%", app.skin);
+            app.theme.setScoreColor(playerFillingPercent);
+            fillingTable.add(playerFillingPercent).padRight(10).bottom().padBottom(4);
 
             if (!playerId.equals(app.multiRoom.getMyPlayerId())) {
                 final OtherPlayerGameboard gameboard = new OtherPlayerGameboard(app);
@@ -145,7 +151,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
             if (notInitialized) {
                 // geht nicht beim Init, da dieser mit 100 erfolgt und dann auf 0 zurückgesetzt wird
-                lblPlayerFill.setEmphasizeTreshold(15, LightBlocksGame.EMPHASIZE_COLOR);
+                lblPlayerFill.setEmphasizeTreshold(15, app.theme.emphasizeColor);
                 lblPlayerFill.setCountingSpeed(30);
                 lblPlayerFill.setMaxCountingTime(.3f);
             }
