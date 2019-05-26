@@ -35,7 +35,6 @@
   "screen": {
     "bgcolor": "94b13a",
     "bgpic": "",
-    // TODO optional, defaults to bgpic
     "bgpic_landscape": "",
     "scorecolor": "ffffff",
     // TODO

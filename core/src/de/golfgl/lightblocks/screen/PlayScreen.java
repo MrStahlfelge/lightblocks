@@ -19,10 +19,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Timer;
 
 import java.util.HashSet;
@@ -114,9 +117,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         music = new PlayMusic(app);
 
-        backgroundImage = new Image(app.theme.backgroundPic);
-        backgroundImage.setAlign(Align.center);
-        backgroundImage.setSize(stage.getWidth(), stage.getHeight());
+        backgroundImage = new Image();
         stage.addActor(backgroundImage);
 
         centerGroup = new Group();
@@ -1148,6 +1149,20 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         super.resize(width, height);
 
         backgroundImage.setSize(stage.getWidth(), stage.getHeight());
+        Drawable backgroundPic;
+        if (isLandscape() && app.theme.backgroundLandscapePic != null)
+            backgroundPic = app.theme.backgroundLandscapePic;
+        else
+            backgroundPic = app.theme.backgroundPic;
+
+        if (backgroundPic != backgroundImage.getDrawable()) {
+            backgroundImage.setDrawable(backgroundPic);
+
+            if (backgroundPic instanceof NinePatchDrawable)
+                backgroundImage.setScaling(Scaling.stretch);
+            else
+                backgroundImage.setScaling(Scaling.none);
+        }
 
         centerGroup.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
                 (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);

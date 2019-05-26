@@ -50,6 +50,7 @@ public class Theme {
     public Drawable blockActiveGarbage;
 
     public Drawable backgroundPic;
+    public Drawable backgroundLandscapePic;
     public Color bgColor;
     public Color scoreColor;
     public Color achievementColor;
@@ -157,6 +158,7 @@ public class Theme {
         usesDefaultBlockPictures = true;
 
         backgroundPic = null;
+        backgroundLandscapePic = null;
         bgColor = Color.BLACK;
         wallColor = new Color(.8f, .8f, .8f, 1);
         titleColor = new Color(.7f, .7f, .7f, 1);
@@ -279,6 +281,7 @@ public class Theme {
                 this.titleColor = titleColor;
 
             backgroundPic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic");
+            backgroundLandscapePic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic_landscape");
         }
     }
 
