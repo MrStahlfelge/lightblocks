@@ -27,6 +27,7 @@ public class ThemeSettingsDialog extends ControllerMenuDialog {
     private final FaButton closeButton;
     private final Cell themeFeatureCell;
     private String shownThemeName;
+    private final Cell themeAdditionalInfoCell;
 
     public ThemeSettingsDialog(final LightBlocksGame app) {
         super("", app.skin);
@@ -85,6 +86,8 @@ public class ThemeSettingsDialog extends ControllerMenuDialog {
         contentTable.add(labelThemeName).fillX();
         contentTable.row();
         themeFeatureCell = contentTable.add();
+        contentTable.row();
+        themeAdditionalInfoCell = contentTable.add().expandX().fillX();
 
         contentTable.row().padTop(10);
         contentTable.add(installThemeButton);
@@ -108,6 +111,28 @@ public class ThemeSettingsDialog extends ControllerMenuDialog {
         labelThemeName.setText(app.theme.isThemePresent() ? shownThemeName : app.TEXTS.get("labelNoTheme"));
         resetThemeButton.setDisabled(!app.theme.isThemePresent());
 
+        // Additional info zusammenbauen
+        themeAdditionalInfoCell.setActor(null);
+
+        String additionalInfo = app.theme.getThemeVersion() > 0 ?
+                app.TEXTS.format("labelThemeVersion", String.valueOf(app.theme.getThemeVersion())) : "";
+
+        if (app.theme.getThemeAuthor() != null) {
+            if (!additionalInfo.isEmpty())
+                additionalInfo = additionalInfo + "\n";
+
+            additionalInfo = additionalInfo.concat(app.TEXTS.format("labelThemeAuthor", app.theme.getThemeAuthor()));
+        }
+
+        if (!additionalInfo.isEmpty()) {
+            ScaledLabel addInfoLabel = new ScaledLabel(additionalInfo, app.skin, LightBlocksGame.SKIN_FONT_REG);
+            addInfoLabel.setAlignment(Align.center);
+            addInfoLabel.setEllipsis(true);
+
+            themeAdditionalInfoCell.setActor(addInfoLabel);
+        }
+
+        // Vorschautabelle zusammenbauen
         Table featureTable = new Table() {
             @Override
             protected void drawChildren(Batch batch, float parentAlpha) {

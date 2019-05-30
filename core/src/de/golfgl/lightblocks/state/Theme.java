@@ -73,6 +73,8 @@ public class Theme {
 
     private boolean themePresent;
     private String themeName;
+    private String themeAuthor;
+    private int themeVersion;
     private String lastLoadThemeErrorMessage;
 
     public Theme(LightBlocksGame app) {
@@ -137,6 +139,8 @@ public class Theme {
     public void initDefaults() {
         themePresent = false;
         themeName = null;
+        themeAuthor = null;
+        themeVersion = 0;
         lastLoadThemeErrorMessage = null;
 
         blockNormalL = new TextureRegionDrawable(app.trBlock);
@@ -209,6 +213,9 @@ public class Theme {
 
                     if (themeName == null || themeName.isEmpty())
                         themeName = "unnamed Theme";
+
+                    themeAuthor = themeConfigJson.getString("author", null);
+                    themeVersion = themeConfigJson.getInt("version", 0);
 
                     // Blöcke laden
                     loadBlocks(themeAtlas, themeConfigJson);
@@ -438,6 +445,18 @@ public class Theme {
      */
     public String getThemeName() {
         return themeName;
+    }
+
+    @Nullable
+    public String getThemeAuthor() {
+        return themeAuthor;
+    }
+
+    /**
+     * @return 0, wenn keine Version gesetzt ist
+     */
+    public int getThemeVersion() {
+        return themeVersion;
     }
 
     public String getLastLoadThemeErrorMessage() {
