@@ -568,6 +568,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
     @Override
     public void moveTetro(Integer[][] v, int dx, int dy, int ghostPieceDistance) {
+        if (dx != 0 && app.localPrefs.isPlaySounds() && app.theme.horizontalMoveSound != null)
+            app.theme.horizontalMoveSound.play();
+
         if (dx != 0 || dy != 0) {
             // erst alle vom Spielbrett einsammeln...
             Array<BlockActor> blocks = removeBlockActorsFromMatrix(v);

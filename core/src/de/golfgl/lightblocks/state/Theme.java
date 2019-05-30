@@ -67,6 +67,7 @@ public class Theme {
     public Sound cleanSpecialSound;
     public Sound unlockedSound;
     public Sound garbageSound;
+    public Sound horizontalMoveSound;
 
     public String slowMusicFilename;
     public String fastMusicFilename;
@@ -184,6 +185,7 @@ public class Theme {
         cleanSpecialSound = app.cleanSpecialSound;
         unlockedSound = app.unlockedSound;
         garbageSound = app.garbageSound;
+        horizontalMoveSound = null;
 
         usesDefaultSounds = true;
     }
@@ -247,6 +249,7 @@ public class Theme {
             cleanSpecialSound = loadOptionalSound(soundNode, "specialclear", app.cleanSpecialSound);
             unlockedSound = loadOptionalSound(soundNode, "achievement", app.unlockedSound);
             garbageSound = loadOptionalSound(soundNode, "garbage", app.garbageSound);
+            horizontalMoveSound = loadOptionalSound(soundNode, "horizontalmove", null);
         }
     }
 

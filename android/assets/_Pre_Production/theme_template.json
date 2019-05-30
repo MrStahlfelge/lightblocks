@@ -8,7 +8,7 @@
   // https://github.com/crashinvaders/gdx-texture-packer-gui/ - or use an existing atlas file from
   // another theme and insert your pics to the correct positions. :)
 
-  "name": "gameboy",
+  "name": "fulltemplate",
   "author": "bsc",
   "version": 1,
 
@@ -23,6 +23,7 @@
   // You can use mp3 or ogg files. mp3 is supported on all platforms, ogg will not work on iOS
   "sounds": {
     "rotate": "rotate.mp3",
+    "horizontalmove": "move.mp3",
     "drop": "drop.mp3",
     "normalclear": "clear.mp3",
     "achievement": "achieve.mp3",
