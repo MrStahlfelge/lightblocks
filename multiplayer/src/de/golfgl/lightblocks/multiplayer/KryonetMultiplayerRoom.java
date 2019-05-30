@@ -171,8 +171,8 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
 
         try {
             client.connect(2000, ((KryonetRoomLocation) roomLoc).address, TCP_PORT, UDP_PORT);
-        } catch (IOException e) {
-            throw new VetoException(e.getLocalizedMessage());
+        } catch (Throwable t) {
+            throw new VetoException(t.getLocalizedMessage());
         }
         MultiplayerLightblocks.register(client.getKryo());
         client.addListener(thisListener);
