@@ -472,7 +472,7 @@ public class Theme {
     }
 
     public void resetTheme() {
-        Gdx.files.local(Theme.FOLDER_NAME).emptyDirectory();
+        Gdx.files.local(Theme.FOLDER_NAME).deleteDirectory();
         initDefaults();
     }
 
