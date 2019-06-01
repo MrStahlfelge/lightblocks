@@ -15,6 +15,7 @@ public abstract class MyGwtApp extends GwtApplication {
     @Override
     void setupLoop() {
         super.setupLoop();
+        // Dieser Fix ist in libGDX 1.9.9 bereits enthalten
         GwtInput input = new GwtInput(graphics.canvas) {
             @Override
             public boolean isPeripheralAvailable(Peripheral peripheral) {
@@ -28,6 +29,7 @@ public abstract class MyGwtApp extends GwtApplication {
         Gdx.input = input;
     }
 
+    // Dieser Fix ist in libGDX 1.9.9 bereits enthalten
     /**
      * @return {@code true} if application runs on a mobile device
      */

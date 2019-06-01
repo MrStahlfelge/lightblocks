@@ -27,7 +27,7 @@ allprojects {
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
         gamsvcsVersion = '1.0.0'
-        cuversion = '0.1.5'
+        cuversion = '0.2.0-SNAPSHOT'
         gaVersion = '0.1.4'
         gdxPayVersion = '0.12.1'
         pushMsgsVersion = '1.0.0'
@@ -109,8 +109,8 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers-gwt:$gdxVersion:sources"
+        compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion"
+        compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion:sources"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-scene2d:$cuversion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-mapping:$cuversion:sources"
