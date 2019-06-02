@@ -111,6 +111,7 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion:sources"
+        compile "de.golfgl.gdxcontrollerutils:gdx-controllers-advanced:$cuversion:sources"
         compile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gamsvcsVersion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-scene2d:$cuversion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllerutils-mapping:$cuversion:sources"
