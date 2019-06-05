@@ -148,9 +148,10 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
 
     @Override
     public void create() {
-        if (GAME_DEVMODE)
+        if (GAME_DEVMODE) {
             fpsLogger = new FPSLogger();
-        else {
+            Gdx.app.setLogLevel(Application.LOG_INFO);
+        } else {
             Gdx.app.setLogLevel(Application.LOG_ERROR);
         }
 
