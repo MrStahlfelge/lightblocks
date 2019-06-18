@@ -22,6 +22,8 @@ import org.robovm.apple.uikit.UIEdgeInsets;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIRectEdge;
 import org.robovm.apple.uikit.UIView;
+import org.robovm.apple.uikit.UIViewController;
+import org.robovm.objc.Selector;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -140,8 +142,10 @@ public class IOSLauncher extends MyApnsAppDelegate {
 
             @Override
             public void create() {
-                gpgsClient = new GameCenterMultiplayerClient(((MyIosApplication) Gdx.app).getUIViewController());
+                UIViewController uiViewController = ((MyIosApplication) Gdx.app).getUIViewController();
+                gpgsClient = new GameCenterMultiplayerClient(uiViewController);
                 IosControllerManager.initializeIosControllers();
+                IosControllerManager.enableICade(uiViewController, Selector.register("keyPress:"));
                 super.create();
             }
         };

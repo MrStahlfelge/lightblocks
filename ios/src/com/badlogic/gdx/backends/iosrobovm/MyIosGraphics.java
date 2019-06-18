@@ -21,6 +21,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.LifecycleListener;
 import com.badlogic.gdx.backends.iosrobovm.custom.HWMachine;
+import com.badlogic.gdx.controllers.IosControllerManager;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.GL20;
@@ -44,10 +45,13 @@ import org.robovm.apple.opengles.EAGLRenderingAPI;
 import org.robovm.apple.uikit.UIEvent;
 import org.robovm.apple.uikit.UIInterfaceOrientation;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
+import org.robovm.apple.uikit.UIKeyCommand;
 import org.robovm.apple.uikit.UIRectEdge;
+import org.robovm.apple.uikit.UIViewController;
 import org.robovm.objc.Selector;
 import org.robovm.objc.annotation.BindSelector;
 import org.robovm.objc.annotation.Method;
+import org.robovm.objc.annotation.TypeEncoding;
 import org.robovm.rt.bro.annotation.Callback;
 import org.robovm.rt.bro.annotation.Pointer;
 
@@ -132,6 +136,14 @@ public class MyIosGraphics extends NSObject implements Graphics, GLKViewDelegate
                                                                        UIInterfaceOrientation orientation) {
             return self.shouldAutorotateToInterfaceOrientation(orientation);
         }
+
+        @Callback
+        @BindSelector("keyPress:")
+        @TypeEncoding("v@:@:@")
+        public static void keyPress(UIViewController self, Selector sel, UIKeyCommand sender) {
+            IosControllerManager.keyPress(sender);
+        }
+
     }
 
     static class IOSUIView extends GLKView {
