@@ -28,48 +28,10 @@ import com.badlogic.gdx.net.ServerSocketHints;
 import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.net.SocketHints;
 
-public class MyIosNet implements Net {
+public class MyIosNet extends IOSNet {
 
-    NetJavaImpl netJavaImpl = new NetJavaImpl();
-    final UIApplication uiApp;
-
-    public MyIosNet (MyIosApplication app) {
-        uiApp = app.uiApp;
-    }
-
-    @Override
-    public void sendHttpRequest (HttpRequest httpRequest, HttpResponseListener httpResponseListener) {
-        netJavaImpl.sendHttpRequest(httpRequest, httpResponseListener);
-    }
-
-    @Override
-    public void cancelHttpRequest (HttpRequest httpRequest) {
-        netJavaImpl.cancelHttpRequest(httpRequest);
-    }
-
-    @Override
-    public ServerSocket newServerSocket (Protocol protocol, String hostname, int port, ServerSocketHints hints) {
-        return new NetJavaServerSocketImpl(protocol, hostname, port, hints);
-    }
-
-    @Override
-    public ServerSocket newServerSocket (Protocol protocol, int port, ServerSocketHints hints) {
-        return new NetJavaServerSocketImpl(protocol, port, hints);
-    }
-
-    @Override
-    public Socket newClientSocket (Protocol protocol, String host, int port, SocketHints hints) {
-        return new NetJavaSocketImpl(protocol, host, port, hints);
-    }
-
-    @Override
-    public boolean openURI (String URI) {
-        NSURL url = new NSURL(URI);
-        if (uiApp.canOpenURL(url)) {
-            uiApp.openURL(url);
-            return true;
-        }
-        return false;
+    public MyIosNet(IOSApplication app) {
+        super(app);
     }
 
     public void resume() {
