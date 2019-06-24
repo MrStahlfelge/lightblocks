@@ -5,8 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
 import com.badlogic.gdx.backends.iosrobovm.IOSGraphics;
-import com.badlogic.gdx.backends.iosrobovm.IOSNet;
-import com.badlogic.gdx.backends.iosrobovm.MyIosNet;
+import com.badlogic.gdx.backends.iosrobovm.MyAppDelegate;
 import com.badlogic.gdx.controllers.IosControllerManager;
 import com.badlogic.gdx.pay.ios.apple.PurchaseManageriOSApple;
 
@@ -33,14 +32,13 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 
 import de.golfgl.gdxgameanalytics.IosGameAnalytics;
-import de.golfgl.gdxpushmessages.ApnsAppDelegate;
 import de.golfgl.gdxpushmessages.ApnsMessageProvider;
 import de.golfgl.lightblocks.multiplayer.BonjourAdapter;
 import de.golfgl.lightblocks.multiplayer.GameCenterMultiplayerClient;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 import de.golfgl.lightblocks.scene2d.MyExtendViewport;
 
-public class IOSLauncher extends ApnsAppDelegate {
+public class IOSLauncher extends MyAppDelegate {
     public static void main(String[] argv) {
         NSAutoreleasePool pool = new NSAutoreleasePool();
         UIApplication.main(argv, null, IOSLauncher.class);
@@ -173,20 +171,8 @@ public class IOSLauncher extends ApnsAppDelegate {
             protected IOSGraphics.IOSUIViewController createUIViewController(IOSGraphics graphics) {
                 return new MyUIViewController(this, graphics);
             }
-
-            @Override
-            protected IOSNet createNet() {
-                return new MyIosNet(this);
-            }
         };
         return app;
-    }
-
-    @Override
-    public void willEnterForeground(UIApplication application) {
-        super.willEnterForeground(application);
-        // workaround for net queue blocked
-        ((MyIosNet) Gdx.net).resume();
     }
 
     private static class IosShareHandler extends ShareHandler {
