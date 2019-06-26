@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
+import com.badlogic.gdx.backends.gwt.GwtGraphics;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
@@ -30,6 +31,12 @@ public class HtmlLauncher extends GwtApplication {
         int w = Window.getClientWidth() - PADDING;
         int h = Window.getClientHeight() - PADDING;
         cfg = new GwtApplicationConfiguration(w, h);
+
+        cfg.usePhysicalPixels = true;
+        double density = GwtGraphics.getNativeScreenDensity();
+        cfg.width = (int) (cfg.width * density);
+        cfg.height = (int) (cfg.height * density);
+
         Window.enableScrolling(false);
         Window.setMargin("0");
         Window.addResizeHandler(new ResizeListener());
@@ -102,6 +109,11 @@ public class HtmlLauncher extends GwtApplication {
             int height = event.getHeight() - PADDING;
             getRootPanel().setWidth("" + width + "px");
             getRootPanel().setHeight("" + height + "px");
+            if (cfg.usePhysicalPixels) {
+                double density = GwtGraphics.getNativeScreenDensity();
+                width = (int) (width * density);
+                height = (int) (height * density);
+            }
             getApplicationListener().resize(width, height);
             Gdx.graphics.setWindowedMode(width, height);
         }
