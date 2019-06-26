@@ -29,7 +29,7 @@ allprojects {
         gamsvcsVersion = '1.0.0'
         cuversion = '0.2.0'
         gaVersion = '0.1.4'
-        gdxPayVersion = '0.12.1'
+        gdxPayVersion = '1.0.0'
         pushMsgsVersion = '1.0.0'
     }
 
