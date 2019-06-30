@@ -61,7 +61,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
                 .bottom();
         row();
         menuScreen.addFocusableActor(missionsTable);
-        add(missionsTable).expand().fill();
+        add(missionsTable).expand().fill().maxWidth(LightBlocksGame.nativeGameWidth);
         row();
         missionTitle = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .95f);
         add(missionTitle).expand().top();
