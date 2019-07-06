@@ -51,14 +51,19 @@ public class PlayMusic {
             try {
                 if (app.theme.slowMusicFilename != null) {
                     slowMusic = Gdx.audio.newMusic(Gdx.files.local(app.theme.slowMusicFilename));
-                    fastMusic = Gdx.audio.newMusic(Gdx.files.local(app.theme.fastMusicFilename != null
-                            ? app.theme.fastMusicFilename : app.theme.slowMusicFilename));
+                    if (app.theme.fastMusicFilename != null)
+                        fastMusic = Gdx.audio.newMusic(Gdx.files.local(app.theme.fastMusicFilename));
+                    else {
+                        fastMusic = null;
+                        state = MusicState.playingSlowly;
+                    }
                 } else {
                     slowMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameSlow")));
                     fastMusic = Gdx.audio.newMusic(Gdx.files.internal(app.getSoundAssetFilename("gameFast")));
                 }
                 slowMusic.setLooping(true);
-                fastMusic.setLooping(true);
+                if (fastMusic != null)
+                    fastMusic.setLooping(true);
             } catch (Throwable t) {
                 // tritt auf IOS manchmal auf, dann lassen wir die Musik deaktiviert
                 // evtl. schon bekommenes zerstören
@@ -73,7 +78,8 @@ public class PlayMusic {
         } else if (!playMusic && isPlayMusic) {
             slowMusic.dispose();
             slowMusic = null;
-            fastMusic.dispose();
+            if (fastMusic != null)
+                fastMusic.dispose();
             fastMusic = null;
         }
         isPlayMusic = playMusic;
@@ -132,7 +138,7 @@ public class PlayMusic {
     }
 
     public void setFastPlay(boolean fastPlay) {
-        if (this.shouldPlayFast != fastPlay) {
+        if (this.shouldPlayFast != fastPlay && fastMusic != null) {
 
             switch (state) {
                 case playingFast:
