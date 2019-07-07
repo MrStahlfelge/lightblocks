@@ -64,6 +64,22 @@ public class SprintModel extends GameModel {
     }
 
     @Override
+    protected void initDrawyer() {
+        super.initDrawyer();
+
+        drawyer.determineNextTetrominos();
+
+        // Im Sprint ist es unerwünscht, mit O, Z oder S zu beginnen... also solange weitermachen bis das nicht mehr so ist
+        int firstTetro = drawyer.getDrawyerQueue().get(0);
+        switch (firstTetro) {
+            case Tetromino.TETRO_IDX_O:
+            case Tetromino.TETRO_IDX_S:
+            case Tetromino.TETRO_IDX_Z:
+                initDrawyer();
+        }
+    }
+
+    @Override
     public String saveGameModel() {
         // speichern unterdrücken
         return null;
