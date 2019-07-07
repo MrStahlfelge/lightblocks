@@ -171,8 +171,13 @@ public class GameScore implements IRoundScore {
     public void addBonusScore(int bonusScore) {
         checkHashValue();
         this.score += bonusScore;
-        this.score = Math.min(this.score, 999999);
+        capScore();
         saveHashValue();
+    }
+
+    protected void capScore() {
+        if (scoringType != TYPE_PRACTICE)
+            this.score = Math.min(this.score, 999999);
     }
 
     public void addSoftDropScore(float softDropScore) {
@@ -187,7 +192,7 @@ public class GameScore implements IRoundScore {
         int flushedScore = (int) dropScore;
 
         this.score += flushedScore;
-        this.score = Math.min(this.score, 999999);
+        capScore();
         dropScore = 0;
         saveHashValue();
 
