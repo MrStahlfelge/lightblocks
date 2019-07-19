@@ -73,7 +73,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-controllers-android:1.9.8"
         compile "de.golfgl.gdxgameanalytics:gdx-gameanalytics-android:$gaVersion"
     }
 }
