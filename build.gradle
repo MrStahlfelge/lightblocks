@@ -87,7 +87,7 @@ project(":ios") {
         compile project(":multiplayer")
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
-        compile "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-backend-robovm:1.98.1-SNAPSHOT"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
 
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-iosrvm:$cuversion"
@@ -105,9 +105,9 @@ project(":html") {
 
     dependencies {
         compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-backend-gwt:1.98.1-SNAPSHOT"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+        compile "com.badlogicgames.gdx:gdx-backend-gwt:1.98.1-SNAPSHOT:sources"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion:sources"

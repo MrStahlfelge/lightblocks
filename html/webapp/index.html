@@ -6,8 +6,6 @@
               <meta name="apple-mobile-web-app-capable" content="yes">
               <meta id="gameViewport" name="viewport" content="width=device-width initial-scale=1">
               <link href="styles.css" rel="stylesheet" type="text/css">
-              <script src="soundmanager2-setup.js"></script>
-  			  <script src="soundmanager2-jsmin.js"></script>
        </head>
 
        <body onkeydown="preventUseOfDefaultKeys(event);">
@@ -18,9 +16,6 @@
        </body>
 
        <script>
-              document.getElementById('gameViewport').setAttribute('content',
-                 'width=device-width initial-scale=' + 1/window.devicePixelRatio);
-
               function handleMouseDown(evt) {
 				window.focus(); 
                 evt.preventDefault();

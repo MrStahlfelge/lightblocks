@@ -94,7 +94,7 @@ public class LocalPrefs {
 
     public boolean isPlayMusic() {
         if (playMusic == null)
-            playMusic = prefs.getBoolean("musicPlayback", !LightBlocksGame.isWebAppOnMobileDevice());
+            playMusic = prefs.getBoolean("musicPlayback", true);
 
         return playMusic;
     }
@@ -109,7 +109,7 @@ public class LocalPrefs {
 
     public Boolean isPlaySounds() {
         if (playSounds == null)
-            playSounds = prefs.getBoolean("soundPlayback", !LightBlocksGame.isWebAppOnMobileDevice());
+            playSounds = prefs.getBoolean("soundPlayback", true);
 
         return playSounds && !suppressSounds;
     }

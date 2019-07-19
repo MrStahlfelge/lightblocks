@@ -2,8 +2,10 @@ package de.golfgl.lightblocks;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.backends.iosrobovm.MyIosAppConfig;
-import com.badlogic.gdx.backends.iosrobovm.MyIosApplication;
+import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
+import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
+import com.badlogic.gdx.backends.iosrobovm.IOSGraphics;
+import com.badlogic.gdx.backends.iosrobovm.MyAppDelegate;
 import com.badlogic.gdx.controllers.IosControllerManager;
 import com.badlogic.gdx.pay.ios.apple.PurchaseManageriOSApple;
 
@@ -31,13 +33,12 @@ import java.util.Collections;
 
 import de.golfgl.gdxgameanalytics.IosGameAnalytics;
 import de.golfgl.gdxpushmessages.ApnsMessageProvider;
-import de.golfgl.gdxpushmessages.MyApnsAppDelegate;
 import de.golfgl.lightblocks.multiplayer.BonjourAdapter;
 import de.golfgl.lightblocks.multiplayer.GameCenterMultiplayerClient;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 import de.golfgl.lightblocks.scene2d.MyExtendViewport;
 
-public class IOSLauncher extends MyApnsAppDelegate {
+public class IOSLauncher extends MyAppDelegate {
     public static void main(String[] argv) {
         NSAutoreleasePool pool = new NSAutoreleasePool();
         UIApplication.main(argv, null, IOSLauncher.class);
@@ -45,8 +46,8 @@ public class IOSLauncher extends MyApnsAppDelegate {
     }
 
     @Override
-    protected MyIosApplication createApplication() {
-        final MyIosAppConfig config = new MyIosAppConfig();
+    protected IOSApplication createApplication() {
+        final IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         config.useCompass = false;
         config.screenEdgesDeferringSystemGestures = UIRectEdge.None;
         config.allowIpod = true;
@@ -137,12 +138,12 @@ public class IOSLauncher extends MyApnsAppDelegate {
                     }
                 });
 
-                ((MyIosApplication) Gdx.app).getUIViewController().presentViewController(picker, true, null);
+                ((IOSApplication) Gdx.app).getUIViewController().presentViewController(picker, true, null);
             }
 
             @Override
             public void create() {
-                UIViewController uiViewController = ((MyIosApplication) Gdx.app).getUIViewController();
+                UIViewController uiViewController = ((IOSApplication) Gdx.app).getUIViewController();
                 gpgsClient = new GameCenterMultiplayerClient(uiViewController);
                 IosControllerManager.initializeIosControllers();
                 IosControllerManager.enableICade(uiViewController, Selector.register("keyPress:"));
@@ -165,7 +166,12 @@ public class IOSLauncher extends MyApnsAppDelegate {
 
         game.purchaseManager = new PurchaseManageriOSApple();
 
-        MyIosApplication app = new MyIosApplication(game, config);
+        IOSApplication app = new IOSApplication(game, config) {
+            @Override
+            protected IOSGraphics.IOSUIViewController createUIViewController(IOSGraphics graphics) {
+                return new MyUIViewController(this, graphics);
+            }
+        };
         return app;
     }
 
@@ -175,7 +181,7 @@ public class IOSLauncher extends MyApnsAppDelegate {
             NSString textShare = new NSString(message);
             NSArray texttoshare = new NSArray(textShare);
             UIActivityViewController share = new UIActivityViewController(texttoshare, null);
-            ((MyIosApplication) Gdx.app).getUIViewController().presentViewController(share, true, null);
+            ((IOSApplication) Gdx.app).getUIViewController().presentViewController(share, true, null);
         }
     }
 }
