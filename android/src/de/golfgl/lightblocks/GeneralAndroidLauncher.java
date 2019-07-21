@@ -17,6 +17,7 @@ import android.view.View;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.badlogic.gdx.controllers.android.AndroidControllers;
 
 import java.io.FileNotFoundException;
 
@@ -75,6 +76,8 @@ public class GeneralAndroidLauncher extends AndroidApplication {
         //immersive Mode leider immer noch nicht möglich, weil es zwei Probleme gibt:
         // nach Wechsel der Anwendung bleibt der Bereich manchmal schwarz, außerdem beim Runterziehen der Notifications
         // mehrmaliges Resize
+
+        AndroidControllers.ignoreNoGamepadButtons = false;
 
         MultiplayerLightblocks game = new MultiplayerLightblocks() {
             @Override

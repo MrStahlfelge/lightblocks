@@ -4,7 +4,9 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.controllers.AdvancedController;
 import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.ControllerMapping;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
@@ -74,17 +76,16 @@ public class MyControllerMapping extends ControllerMappings {
 
     @Override
     public boolean getDefaultMapping(MappedInputs defaultMapping, Controller controller) {
-        // see https://developer.android.com/reference/android/view/KeyEvent.html#KEYCODE_BUTTON_A
-        boolean onAndroid = Gdx.app.getType() == Application.ApplicationType.Android;
+        ControllerMapping controllerMapping = ((AdvancedController) controller).getMapping();
 
-        defaultMapping.putMapping(new MappedInput(AXIS_VERTICAL, new ControllerAxis(1)));
-        defaultMapping.putMapping(new MappedInput(AXIS_HORIZONTAL, new ControllerAxis(0)));
-        defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_CLOCKWISE, new ControllerButton(onAndroid ? 97 : 1)));
-        defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_COUNTERCLOCK, new ControllerButton(onAndroid ? 96 : 0)));
-        defaultMapping.putMapping(new MappedInput(BUTTON_HARDDROP, new ControllerButton(onAndroid ? 98 : 2)));
-        defaultMapping.putMapping(new MappedInput(BUTTON_HOLD, new ControllerButton(onAndroid ? 99 : 3)));
-        defaultMapping.putMapping(new MappedInput(BUTTON_START, new ControllerButton(onAndroid ? 108 : 9)));
-        defaultMapping.putMapping(new MappedInput(BUTTON_CANCEL, new ControllerButton(onAndroid ? 4 : 8)));
+        defaultMapping.putMapping(new MappedInput(AXIS_VERTICAL, new ControllerAxis(controllerMapping.axisLeftY)));
+        defaultMapping.putMapping(new MappedInput(AXIS_HORIZONTAL, new ControllerAxis(controllerMapping.axisLeftX)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_CLOCKWISE, new ControllerButton(controllerMapping.buttonB)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_COUNTERCLOCK, new ControllerButton(controllerMapping.buttonA)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_HARDDROP, new ControllerButton(controllerMapping.buttonX)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_HOLD, new ControllerButton(controllerMapping.buttonY)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_START, new ControllerButton(controllerMapping.buttonStart)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_CANCEL, new ControllerButton(controllerMapping.buttonBack)));
 
         return true;
     }
