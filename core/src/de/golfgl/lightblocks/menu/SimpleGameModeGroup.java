@@ -302,7 +302,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
 
         @Override
         protected int getMaxBeginningValue() {
-            return 14;
+            return PracticeModel.getMaxBeginningLevel(app);
         }
 
     }

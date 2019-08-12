@@ -1,8 +1,10 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -14,6 +16,21 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class PracticeModel extends GameModel {
     public static final String MODEL_PRACTICE_ID = "practice";
+
+    public static int getMaxBeginningLevel(LightBlocksGame app) {
+        // gibt mindestens 14 zurück, oder das ansonsten per Spiel erreichte Level plus 1
+
+        int maxClearedLines = app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_NORMAL_ID)
+                .getClearedLines();
+
+        maxClearedLines = Math.max(maxClearedLines,
+                app.savegame.getBestScore(RetroMarathonModel.MODEL_MARATHON_RETRO89).getClearedLines());
+
+        maxClearedLines = Math.max(maxClearedLines,
+                app.savegame.getBestScore(MarathonModel.MODEL_MARATHON_GRAVITY_ID).getClearedLines());
+
+        return MathUtils.clamp(maxClearedLines / 10 + 1, 14, 19);
+    }
 
     @Override
     public String getIdentifier() {
