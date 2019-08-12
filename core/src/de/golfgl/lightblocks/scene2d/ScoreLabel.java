@@ -151,6 +151,18 @@ public class ScoreLabel extends Label {
         setScore(this.score);
     }
 
+    public void setDigits(int digits) {
+        if (this.digits != digits) {
+            this.digits = digits;
+
+            if (scoreToAdd == 0) {
+                this.score = score - 1;
+                setScore(score + 1);
+                act(0);
+            }
+        }
+    }
+
     public long getCountingSpeed() {
         return countingSpeed;
     }

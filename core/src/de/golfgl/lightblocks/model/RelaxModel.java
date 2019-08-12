@@ -24,6 +24,11 @@ public class RelaxModel extends MissionModel {
     }
 
     @Override
+    public int getLinesToClear() {
+        return linesToClear;
+    }
+
+    @Override
     protected void activeTetrominoDropped() {
         if (linesToClear > 0) {
             if (getScore().getClearedLines() >= linesToClear) {

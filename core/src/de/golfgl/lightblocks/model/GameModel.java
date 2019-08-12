@@ -909,6 +909,10 @@ public abstract class GameModel implements Json.Serializable {
         return null;
     }
 
+    public int getLinesToClear() {
+        return 0;
+    }
+
     public int getMaxBlocksToUse() {
         return maxBlocksToUse;
     }

@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -238,6 +239,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             app.theme.setScoreColor(timeLabel);
             scoreTable.add(timeLabel).left().colspan(3);
         }
+        scoreTable.setLinesToClear(gameModel.getLinesToClear());
         scoreTable.validate();
 
         // nun die allerletzten Actor auf die Stage
@@ -1259,6 +1261,28 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         public void setScore(int score) {
             scoreNum.setScore(score);
+        }
+
+        public void setLinesToClear(int linesToClear) {
+            if (linesToClear == 0)
+                return;
+
+            String txtLinesToClear = String.valueOf(linesToClear);
+            Label linesToClearLbl = new ScaledLabel(txtLinesToClear, app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f);
+            app.theme.setScoreColor(linesToClearLbl);
+            Label linesToClearSepLbl = new ScaledLabel("/", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .4f);
+            app.theme.setScoreColor(linesToClearSepLbl);
+
+            Cell cellToAdd = getCell(linesNum);
+
+            Table linesTable = new Table();
+            linesTable.add(linesNum);
+            linesTable.add(linesToClearSepLbl).bottom().padBottom(5);
+            linesTable.add(linesToClearLbl).bottom().padBottom(1);
+
+            linesNum.setDigits(txtLinesToClear.length());
+
+            cellToAdd.setActor(linesTable);
         }
     }
 }
