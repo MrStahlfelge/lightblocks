@@ -468,8 +468,8 @@ public abstract class GameModel implements Json.Serializable {
     private void rotate(boolean clockwise) {
         int newRotation = activeTetromino.getCurrentRotation() + (clockwise ? 1 : -1);
 
-        if (activeTetromino.getTetrominoType() != Tetromino.TETRO_IDX_O &&
-                gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(), newRotation)) {
+        if (gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
+                newRotation)) {
 
             // Die Position und auch die Einzelteile darin muss geclonet werden, um nicht
             // durch die Rotation verloren zu gehen
