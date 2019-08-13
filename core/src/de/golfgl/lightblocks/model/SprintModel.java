@@ -33,6 +33,11 @@ public class SprintModel extends GameModel {
     }
 
     @Override
+    public int getLinesToClear() {
+        return NUM_LINES_TO_CLEAR;
+    }
+
+    @Override
     public InitGameParameters getInitParameters() {
         InitGameParameters retVal = new InitGameParameters();
 
