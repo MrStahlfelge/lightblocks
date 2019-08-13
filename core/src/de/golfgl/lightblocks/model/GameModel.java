@@ -54,6 +54,8 @@ public abstract class GameModel implements Json.Serializable {
     private float distanceRemainder;
     //nach remove Lines oder drop kurze Zeit warten
     private float freezeCountdown;
+    // lock delay
+    private int lastMovementMs;
     //Touchcontrol braucht etwas bis der Nutzer zeichnet... diese Zeit muss ihm gegeben werden. Damit sie nicht zu
     // einem bestehenden Freeze addiert und problemlos wieder abgezogen werden kann wenn der Nutzer fertig gezeichnet
     // hat, wird sie extra verwaltet
@@ -166,11 +168,15 @@ public abstract class GameModel implements Json.Serializable {
             score.addSoftDropScore(maxDistance * Math.min(softDropFactor, MAX_DROP_SCORE));
 
         // wenn nicht bewegen konnte, dann festnageln und nächsten aktivieren
-        if (maxDistance < distance)
-            dropActiveTetromino();
-        else {
+        if (maxDistance < distance) {
+            // ... aber nur, falls kein Lock delay da
+            int lockDelay = getLockDelay();
+            if (lockDelay <= 0 || softDropFactor >= FACTOR_HARD_DROP || score.getTimeMs() - lastMovementMs >= lockDelay)
+                dropActiveTetromino();
+        } else {
             distanceRemainder -= distance;
-            replay.addMovePieceStep(score.getTimeMs(), false, (byte) maxDistance);
+            lastMovementMs = score.getTimeMs();
+            replay.addMovePieceStep(lastMovementMs, false, (byte) maxDistance);
         }
     }
 
@@ -450,7 +456,8 @@ public abstract class GameModel implements Json.Serializable {
                     ghostPieceDistance);
             activeTetromino.getPosition().x += maxDistance;
             activeTetromino.setLastMovementType(0);
-            replay.addMovePieceStep(score.getTimeMs(), true, (byte) maxDistance);
+            lastMovementMs = score.getTimeMs();
+            replay.addMovePieceStep(lastMovementMs, true, (byte) maxDistance);
         }
 
         if (maxDistance != distance) {
@@ -480,7 +487,8 @@ public abstract class GameModel implements Json.Serializable {
             int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
             userInterface.rotateTetro(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions(),
                     ghostPieceDistance);
-            replay.addRotatePieceStep(score.getTimeMs(), activeTetromino);
+            lastMovementMs = score.getTimeMs();
+            replay.addRotatePieceStep(lastMovementMs, activeTetromino);
         }
     }
 
@@ -927,6 +935,10 @@ public abstract class GameModel implements Json.Serializable {
 
     public boolean showTime() {
         return false;
+    }
+
+    protected int getLockDelay() {
+        return 0;
     }
 
     /**
