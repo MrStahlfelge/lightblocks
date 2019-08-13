@@ -93,9 +93,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private final MotivationLabel motivatorLabel;
     private final ParticleEffectActor weldEffect;
     private final PlayScoreTable scoreTable;
+    private final PlayMusic music;
+    private final Image backgroundImage;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
-    private final PlayMusic music;
+    boolean moveIsFrozen;
     private ScoreLabel blocksLeft;
     private ScaledLabel timeLabel;
     private Label timeLabelDesc;
@@ -108,7 +110,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     private int currentShownTime;
     private float timeSinceGameOver = 0;
     private GameBlocker.UsePortraitGameBlocker usePortraitGameBlocker = new GameBlocker.UsePortraitGameBlocker();
-    private final Image backgroundImage;
+
+    // im Falle des Success-Spielendes muss das letzte abgelegte Teil nochmal auf Position gebracht werden
+    private Integer[][] lastPinnedPiecePos;
+    private Array<BlockActor> lastPinnedPieceBlocks;
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
@@ -735,7 +740,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                             Timer.schedule(new Timer.Task() {
                                 @Override
                                 public void run() {
-                                    timedBlock.setMoveAction(moveSequence);
+                                    if (!moveIsFrozen)
+                                        timedBlock.setMoveAction(moveSequence);
                                 }
                             }, delay);
 
@@ -833,6 +839,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     @Override
     public void activateNextTetro(Integer[][] boardBlockPositions, int blockType, int ghostPieceDistance) {
 
+        lastPinnedPieceBlocks = null;
+        lastPinnedPiecePos = null;
+
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
             // den bereits in nextTetro instantiierten Block ins Spielfeld an die gewünschte Stelle bringen
             BlockActor block = nextTetro[i];
@@ -917,8 +926,16 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     public void pinTetromino(Integer[][] currentBlockPositions) {
         if (app.localPrefs.isPlaySounds() && app.theme.dropSound != null)
             app.theme.dropSound.play();
-        for (Integer[] vAfterMove : currentBlockPositions)
-            blockMatrix[vAfterMove[0]][vAfterMove[1]].setEnlightened(false);
+
+        lastPinnedPieceBlocks = new Array<>(currentBlockPositions.length);
+
+        for (Integer[] vAfterMove : currentBlockPositions) {
+            BlockActor activePieceBlock = this.blockMatrix[vAfterMove[0]][vAfterMove[1]];
+            activePieceBlock.setEnlightened(false);
+            lastPinnedPieceBlocks.add(activePieceBlock);
+        }
+
+        lastPinnedPiecePos = currentBlockPositions;
     }
 
     @Override
@@ -975,6 +992,35 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 text = app.TEXTS.format("motivationGameSuccess");
                 duration = 10;
                 playSound = false;
+
+                // alle Animationen zu abgebauten Reihen entfernen
+                moveIsFrozen = true;
+                for (Actor a : blockGroup.getChildren())
+                    a.clearActions();
+
+                // beim Hard Drop ist der zuletzt abgelegte Tetromino evtl noch nicht am Boden
+                // angekommen... das Clear Actions wird ihn auch nicht mehr dort ankommen lassen
+                // daher nachhelfen
+                if (lastPinnedPieceBlocks != null)
+                    for (int i = 0; i < lastPinnedPiecePos.length; i++) {
+                        BlockActor pinnedBlock = lastPinnedPieceBlocks.get(i);
+                        if (pinnedBlock != null)
+                            pinnedBlock.setPosition(lastPinnedPiecePos[i][0] * BlockActor.blockWidth,
+                                    lastPinnedPiecePos[i][1] * BlockActor.blockWidth);
+                    }
+
+                // auskommentiert, da die Sounds sich nicht smooth abbrechen lassen
+
+                // Auch die Explosion nicht zeigen
+                //weldEffect.cancel();
+
+                // Und die Abbau-Sounds unterbrechen
+                //if (app.localPrefs.isPlaySounds() && app.theme.removeSound != null)
+                    //app.theme.removeSound.stop();
+
+                //if (app.localPrefs.isPlaySounds() && app.theme.cleanSpecialSound != null)
+                    //app.theme.cleanSpecialSound.stop();
+
                 break;
             case bonusScore:
                 text = app.TEXTS.format("motivationBonusScore", extraMsg);

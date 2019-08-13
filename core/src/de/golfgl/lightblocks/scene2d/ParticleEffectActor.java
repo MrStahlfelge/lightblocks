@@ -44,6 +44,10 @@ public class ParticleEffectActor extends Actor {
         particleEffect.start();
     }
 
+    public void cancel() {
+        isComplete = true;
+    }
+
     public void allowCompletion() {
         particleEffect.allowCompletion();
     }
