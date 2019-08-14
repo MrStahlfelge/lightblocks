@@ -24,7 +24,7 @@ public class Tetromino {
 
     //Die 7 Tetrominos
     // wiki/Nintendo_Rotation_System
-    private static Vector2[][][] tetrominoTemplates = {
+    private static Vector2[][][] nrsTemplates = {
             // das I
             {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(3, 1)},
                     {new Vector2(2, 0), new Vector2(2, 1), new Vector2(2, 2), new Vector2(2, 3)}
@@ -60,6 +60,57 @@ public class Tetromino {
             // O
             {{new Vector2(1, 0), new Vector2(2, 0), new Vector2(1, 1), new Vector2(2, 1)}}};
 
+    // wiki/SRS
+    private static Vector2[][][] srsTemplates = {
+            // das I
+            {{new Vector2(0, 2), new Vector2(1, 2), new Vector2(2, 2), new Vector2(3, 2)},
+                    {new Vector2(2, 0), new Vector2(2, 1), new Vector2(2, 2), new Vector2(2, 3)},
+                    {new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(3, 1)},
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2), new Vector2(1, 3)},
+            },
+
+            // T
+            {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2)},
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2)},
+                    {new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1)},
+                    {new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2)}
+            },
+
+            {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(2, 2)},
+                    {new Vector2(1, 0), new Vector2(2, 0), new Vector2(1, 1), new Vector2(1, 2)},
+                    {new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1)},
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 0), new Vector2(1, 2)}
+            },
+
+            {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(0, 2)},
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2)},
+                    {new Vector2(2, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1)},
+                    {new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(1, 2)}
+            },
+
+            // Z
+            {{new Vector2(1, 1), new Vector2(2, 1), new Vector2(0, 2), new Vector2(1, 2)},
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(2, 1), new Vector2(2, 2)},
+                    {new Vector2(1, 0), new Vector2(2, 0), new Vector2(0, 1), new Vector2(1, 1)},
+                    {new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2)}
+            },
+
+            // S
+            {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 2), new Vector2(2, 2)},
+                    {new Vector2(2, 0), new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2)},
+                    {new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(2, 1)},
+                    {new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(0, 2)}
+            },
+
+            // O
+            {{new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)},
+                    {new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)},
+                    {new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)},
+                    {new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)}
+            }};
+
+    private final Vector2[][][] tetrominoTemplates;
+
     private final int tetrominoIndex;
     private final Vector2 position;
     // wird immer wieder verwendet um Garbage Collection zu verhindern
@@ -69,7 +120,8 @@ public class Tetromino {
     // letzte Bewegung rotation (1) oder Positionsänderung (0)?
     private int lastMovementType;
 
-    Tetromino(int index) {
+    Tetromino(int index, boolean srs) {
+        tetrominoTemplates = srs ? srsTemplates : nrsTemplates;
         this.tetrominoIndex = index;
         this.blockPosition = new Integer[TETROMINO_BLOCKCOUNT][2];
 

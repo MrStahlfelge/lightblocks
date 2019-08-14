@@ -17,7 +17,7 @@ class TetrominoDrawyer implements Json.Serializable {
     /**
      * returns the next tetromino
      */
-    public Tetromino getNextTetromino() {
+    public Tetromino getNextTetromino(boolean useSrs) {
 
         Tetromino retVal;
 
@@ -25,7 +25,7 @@ class TetrominoDrawyer implements Json.Serializable {
             if (drawyer.size < 1)
                 determineNextTetrominos();
 
-            retVal = new Tetromino(drawyer.get(0));
+            retVal = new Tetromino(drawyer.get(0), useSrs);
 
             // Position weiterschieben
             drawyer.removeIndex(0);

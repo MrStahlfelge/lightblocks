@@ -537,7 +537,7 @@ public abstract class GameModel implements Json.Serializable {
             // resetMovements und replay.add... nicht nötig, ist bereits in activateNextTetro enthalten
         } else {
             Tetromino tmp = activeTetromino;
-            activeTetromino = new Tetromino(onHoldTetromino);
+            activeTetromino = new Tetromino(onHoldTetromino, isModernRotation());
             onHoldTetromino = tmp.getTetrominoType();
             int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
             userInterface.swapHoldAndActivePiece(newHoldPositions, oldActivePositions,
@@ -565,7 +565,7 @@ public abstract class GameModel implements Json.Serializable {
         }
 
         activeTetromino = nextTetromino;
-        nextTetromino = drawyer.getNextTetromino();
+        nextTetromino = drawyer.getNextTetromino(isModernRotation());
 
         // ins Display mit beiden
         if (userInterface != null)
@@ -713,7 +713,7 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     protected void initializeActiveAndNextTetromino() {
-        nextTetromino = drawyer.getNextTetromino();
+        nextTetromino = drawyer.getNextTetromino(isModernRotation());
         activateNextTetromino();
     }
 
@@ -742,7 +742,7 @@ public abstract class GameModel implements Json.Serializable {
         // und auch die aktiven Tetrominos
         fireUserInterfaceTetrominoSwap();
         if (this.onHoldTetromino >= 0)
-            userInterface.swapHoldAndActivePiece(new Tetromino(onHoldTetromino).getRelativeBlockPositions(),
+            userInterface.swapHoldAndActivePiece(new Tetromino(onHoldTetromino, isModernRotation()).getRelativeBlockPositions(),
                     null, null, 0, onHoldTetromino);
 
         // Score
@@ -895,8 +895,8 @@ public abstract class GameModel implements Json.Serializable {
         // parametrisierten Konstruktors (when set)
         JsonValue tetromino = jsonData.get("active");
         if (tetromino != null) {
-            this.nextTetromino = new Tetromino(jsonData.getInt("next"));
-            activeTetromino = new Tetromino(tetromino.getInt("tetrominoIndex"));
+            this.nextTetromino = new Tetromino(jsonData.getInt("next"), isModernRotation());
+            activeTetromino = new Tetromino(tetromino.getInt("tetrominoIndex"), isModernRotation());
             activeTetromino.setRotation(tetromino.getInt("currentRotation"));
             // unbedingt nach setRotation!
             activeTetromino.setLastMovementType(tetromino.getInt("lastMovementType"));
@@ -916,6 +916,10 @@ public abstract class GameModel implements Json.Serializable {
 
     public boolean beginPaused() {
         return true;
+    }
+
+    public boolean isModernRotation() {
+        return false;
     }
 
     public String[] getGoalParams() {

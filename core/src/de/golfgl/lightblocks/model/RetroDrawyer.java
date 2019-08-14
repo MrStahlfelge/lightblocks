@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 public class RetroDrawyer extends TetrominoDrawyer {
 
     @Override
-    public Tetromino getNextTetromino() {
+    public Tetromino getNextTetromino(boolean useSrs) {
         if (drawyer.size == 0)
             drawyer.add(-1);
 
@@ -24,6 +24,6 @@ public class RetroDrawyer extends TetrominoDrawyer {
             nextTetro = MathUtils.random(0, 6);
 
         drawyer.set(0, nextTetro);
-        return new Tetromino(nextTetro);
+        return new Tetromino(nextTetro, useSrs);
     }
 }

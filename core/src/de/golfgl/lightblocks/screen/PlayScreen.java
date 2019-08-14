@@ -847,7 +847,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     protected float getNextPieceYPos() {
-        return (Gameboard.GAMEBOARD_NORMALROWS + .3f) * BlockActor.blockWidth;
+        return (Gameboard.GAMEBOARD_NORMALROWS - (gameModel.isModernRotation() ? 1 : 0) + .3f) * BlockActor.blockWidth;
     }
 
     protected float getNextPieceXPos() {
@@ -892,7 +892,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         // Wenn das Next Piece schon rechts vom Gameboard dargestellt wird, dann Hold-Piece auch. Sonst mittig
         if (isLandscape())
-            offsetY = (Gameboard.GAMEBOARD_NORMALROWS - 3) * BlockActor.blockWidth;
+            offsetY = (Gameboard.GAMEBOARD_NORMALROWS - (gameModel.isModernRotation() ? 4 : 3)) * BlockActor.blockWidth;
         else {
             offsetX = offsetX - (Tetromino.TETROMINO_BLOCKCOUNT + .5f) * BlockActor.blockWidth;
             offsetY = getNextPieceYPos();
