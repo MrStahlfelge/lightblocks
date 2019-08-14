@@ -104,9 +104,9 @@ project(":html") {
 
     dependencies {
         compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:1.910.0"
+        compile "com.badlogicgames.gdx:gdx-backend-gwt:1.910.1"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        compile "com.badlogicgames.gdx:gdx-backend-gwt:1.910.0:sources"
+        compile "com.badlogicgames.gdx:gdx-backend-gwt:1.910.1:sources"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion:sources"
