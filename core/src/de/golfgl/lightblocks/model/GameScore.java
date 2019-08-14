@@ -115,7 +115,7 @@ public class GameScore implements IRoundScore {
                 removeScore = (isTSpin ? 1200 : 100);
                 break;
             case 3:
-                removeScore = 300;
+                removeScore = (isTSpin ? 1200 : 300);
                 break;
             case 4:
                 removeScore = 1200;

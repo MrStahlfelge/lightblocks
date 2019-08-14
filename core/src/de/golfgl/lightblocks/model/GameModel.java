@@ -174,7 +174,7 @@ public abstract class GameModel implements Json.Serializable {
         // wenn nicht bewegen konnte, dann festnageln und nächsten aktivieren
         if (maxDistance < distance) {
             // ... aber nur, falls kein Lock delay da
-            int lockDelay = getLockDelay();
+            int lockDelay = getLockDelayMs();
             if (lockDelay <= 0 || softDropFactor >= FACTOR_HARD_DROP || score.getTimeMs() - lastMovementMs >= lockDelay)
                 dropActiveTetromino();
         } else {
@@ -384,7 +384,7 @@ public abstract class GameModel implements Json.Serializable {
 
         int removeLinesCount = removedLines.size;
         int insertLinesCount = (garbageLines == null ? 0 : garbageLines.length);
-        removeWasSpecial = (removeLinesCount == 4) || (removeLinesCount == 2 && isTSpin);
+        removeWasSpecial = (removeLinesCount == 4) || (removeLinesCount >= 2 && isTSpin);
 
         if (removeLinesCount > 0) {
 
@@ -486,7 +486,7 @@ public abstract class GameModel implements Json.Serializable {
 
         if (!foundValidPosition && isModernRotation() && activeTetromino.getTetrominoType() != Tetromino.TETRO_IDX_O) {
             // Wallkicks testen
-            for (int i = 0; i < 4 && !foundValidPosition; i++) {
+            for (int i = 0; i <= 3 && !foundValidPosition; i++) {
                 wallkickPos = activeTetromino.getWallkickPosition(i, clockwise);
                 foundValidPosition = gameboard.isValidPosition(activeTetromino, wallkickPos, newRotation);
             }
@@ -959,7 +959,7 @@ public abstract class GameModel implements Json.Serializable {
         return false;
     }
 
-    protected int getLockDelay() {
+    protected int getLockDelayMs() {
         return 0;
     }
 
