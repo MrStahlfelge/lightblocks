@@ -110,9 +110,11 @@ public class Tetromino {
             }};
 
     private final Vector2[][][] tetrominoTemplates;
+    private final boolean srs;
 
     private final int tetrominoIndex;
     private final Vector2 position;
+    private final Vector2 wallkickPos;
     // wird immer wieder verwendet um Garbage Collection zu verhindern
     // also aufpassen und ggf. kopieren
     private transient final Integer[][] blockPosition;
@@ -121,6 +123,7 @@ public class Tetromino {
     private int lastMovementType;
 
     Tetromino(int index, boolean srs) {
+        this.srs = srs;
         tetrominoTemplates = srs ? srsTemplates : nrsTemplates;
         this.tetrominoIndex = index;
         this.blockPosition = new Integer[TETROMINO_BLOCKCOUNT][2];
@@ -128,6 +131,8 @@ public class Tetromino {
         // Die Startposition jedes Tetrominos
         this.position = new Vector2(GAMEBOARD_COLUMNS / 2 - 2, GAMEBOARD_NORMALROWS - 2);
         currentRotation = 0;
+
+        wallkickPos = srs ? new Vector2() : null;
     }
 
     public Vector2[] getRotationVectors(int rotation) {
@@ -209,5 +214,83 @@ public class Tetromino {
 
     public void setLastMovementType(int lastMovementType) {
         this.lastMovementType = lastMovementType;
+    }
+
+    public Vector2 getWallkickPosition(int i, boolean clockwise) {
+        if (!srs || getTetrominoType() == TETRO_IDX_O)
+            return getPosition();
+
+        wallkickPos.set(getPosition());
+
+        if (getTetrominoType() == TETRO_IDX_I) {
+            switch (i) {
+                case 0:
+                    if (currentRotation == 0 && clockwise || currentRotation == 3 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x - 2;
+                    }
+                    if (currentRotation == 1 && !clockwise || currentRotation == 2 && clockwise) {
+                        wallkickPos.x = wallkickPos.x + 2;
+                    }
+                    if (currentRotation == 1 && clockwise || currentRotation == 0 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x - 1;
+                    }
+                    if (currentRotation == 3 && clockwise || currentRotation == 2 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x + 1;
+                    }
+                    break;
+                case 1:
+                    if (currentRotation == 0 && clockwise || currentRotation == 3 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x + 1;
+                    }
+                    if (currentRotation == 1 && !clockwise || currentRotation == 2 && clockwise) {
+                        wallkickPos.x = wallkickPos.x - 1;
+                    }
+                    if (currentRotation == 1 && clockwise || currentRotation == 0 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x + 2;
+                    }
+                    if (currentRotation == 3 && clockwise || currentRotation == 2 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x - 2;
+                    }
+                    break;
+                case 2:
+                    if (currentRotation == 0 && clockwise || currentRotation == 3 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x + 2;
+                        wallkickPos.y = wallkickPos.y - 1;
+                    }
+                    if (currentRotation == 1 && !clockwise || currentRotation == 2 && clockwise) {
+                        wallkickPos.x = wallkickPos.x - 2;
+                        wallkickPos.y = wallkickPos.y + 1;
+                    }
+                    if (currentRotation == 1 && clockwise || currentRotation == 0 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x - 1;
+                        wallkickPos.y = wallkickPos.y + 2;
+                    }
+                    if (currentRotation == 3 && clockwise || currentRotation == 2 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x + 1;
+                        wallkickPos.y = wallkickPos.y - 2;
+                    }
+                    break;
+                case 3:
+                    if (currentRotation == 0 && clockwise || currentRotation == 3 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x + 1;
+                        wallkickPos.y = wallkickPos.y + 2;
+                    }
+                    if (currentRotation == 1 && !clockwise || currentRotation == 2 && clockwise) {
+                        wallkickPos.x = wallkickPos.x - 1;
+                        wallkickPos.y = wallkickPos.y - 2;
+                    }
+                    if (currentRotation == 1 && clockwise || currentRotation == 0 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x + 2;
+                        wallkickPos.y = wallkickPos.y - 1;
+                    }
+                    if (currentRotation == 3 && clockwise || currentRotation == 2 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x - 2;
+                        wallkickPos.y = wallkickPos.y + 1;
+                    }
+                    break;
+            }
+        }
+
+        return wallkickPos;
     }
 }

@@ -480,13 +480,26 @@ public abstract class GameModel implements Json.Serializable {
     private void rotate(boolean clockwise) {
         int newRotation = activeTetromino.getCurrentRotation() + (clockwise ? 1 : -1);
 
-        if (gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
-                newRotation)) {
+        boolean foundValidPosition = gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
+                newRotation);
+        Vector2 wallkickPos = null;
+
+        if (!foundValidPosition && isModernRotation() && activeTetromino.getTetrominoType() != Tetromino.TETRO_IDX_O) {
+            // Wallkicks testen
+            for (int i = 0; i < 4 && !foundValidPosition; i++) {
+                wallkickPos = activeTetromino.getWallkickPosition(i, clockwise);
+                foundValidPosition = gameboard.isValidPosition(activeTetromino, wallkickPos, newRotation);
+            }
+        }
+
+        if (foundValidPosition) {
 
             // Die Position und auch die Einzelteile darin muss geclonet werden, um nicht
             // durch die Rotation verloren zu gehen
             Integer[][] oldBlockPositionsNewArray = cloneDoubleIntegerArray(activeTetromino.getCurrentBlockPositions());
 
+            if (wallkickPos != null)
+                activeTetromino.getPosition().set(wallkickPos);
             activeTetromino.setRotation(newRotation);
 
             int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
