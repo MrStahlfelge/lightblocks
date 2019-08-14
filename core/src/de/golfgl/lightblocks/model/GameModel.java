@@ -31,7 +31,6 @@ public abstract class GameModel implements Json.Serializable {
     private static final float SOFT_DROP_SPEED = 30.0f;
     private static final float MAX_DROP_SCORE = 2f;
     // Speicherhaltung
-    private final IntArray linesToRemove;
     public TotalScore totalScore;
     public LightBlocksGame app;
     /**
@@ -76,9 +75,14 @@ public abstract class GameModel implements Json.Serializable {
     // Blocklimit?
     private int maxBlocksToUse;
 
+    // von removeLines geschrieben, für ui.clearAndInsertLines aufbewahrt
+    private final IntArray removedLines;
+    private int[] garbageLines;
+    private boolean removeWasSpecial;
+
     public GameModel() {
 
-        linesToRemove = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
+        removedLines = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
         isGameOver = false;
 
         replay = new Replay();
@@ -266,7 +270,12 @@ public abstract class GameModel implements Json.Serializable {
         if (gainedScore > 0)
             achievementsScore(gainedScore);
 
+        // hier wird das Spiel evtl. beendet
         activeTetrominoDropped();
+
+        // jetzt auch im UI abbilden. Nicht früher, damit evtl. bei Spielende anders reagiert werden kann
+        userInterface.clearAndInsertLines(this.removedLines, removeWasSpecial, garbageLines);
+
         // nicht mehr weiter machen wenn bereits geschafft
         if (!isGameOver()) {
             // dem Spieler ein bißchen ARE gönnen (wiki/ARE) - je weiter oben, je mehr
@@ -363,28 +372,28 @@ public abstract class GameModel implements Json.Serializable {
      * @return Anzahl entfernte Zeilen. Wird im Aufrufer für Achievement-Auswertung genutzt (Garbage egal)
      */
     private int removeFullAndInsertLines(boolean isTSpin) {
-        linesToRemove.clear();
+        removedLines.clear();
 
         for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
             if (gameboard.isRowFull(i)) {
-                linesToRemove.add(i);
+                removedLines.add(i);
             }
         }
 
-        int[] garbageLines = drawGarbageLines();
+        garbageLines = drawGarbageLines();
 
-        int removeLinesCount = linesToRemove.size;
+        int removeLinesCount = removedLines.size;
         int insertLinesCount = (garbageLines == null ? 0 : garbageLines.length);
-        boolean isSpecial = (removeLinesCount == 4) || (removeLinesCount == 2 && isTSpin);
+        removeWasSpecial = (removeLinesCount == 4) || (removeLinesCount == 2 && isTSpin);
 
         if (removeLinesCount > 0) {
 
-            gameboard.clearLines(linesToRemove);
-            boolean doubleSpecial = score.incClearedLines(removeLinesCount, isSpecial, isTSpin);
+            gameboard.clearLines(removedLines);
+            boolean doubleSpecial = score.incClearedLines(removeLinesCount, removeWasSpecial, isTSpin);
             achievementDoubleSpecial(doubleSpecial);
 
             submitEvent(GpgsHelper.EVENT_LINES_CLEARED, removeLinesCount);
-            linesRemoved(removeLinesCount, isSpecial, doubleSpecial);
+            linesRemoved(removeLinesCount, removeWasSpecial, doubleSpecial);
 
             setCurrentSpeed();
         } else if (isTSpin) {
@@ -395,10 +404,6 @@ public abstract class GameModel implements Json.Serializable {
 
         if (insertLinesCount > 0)
             gameboard.insertLines(garbageLines);
-
-        if (removeLinesCount > 0 || insertLinesCount > 0)
-            userInterface.clearAndInsertLines(linesToRemove, isSpecial, garbageLines);
-
 
         return removeLinesCount;
 
