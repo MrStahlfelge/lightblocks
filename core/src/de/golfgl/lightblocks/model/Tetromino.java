@@ -79,7 +79,7 @@ public class Tetromino {
             {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(2, 2)},
                     {new Vector2(1, 0), new Vector2(2, 0), new Vector2(1, 1), new Vector2(1, 2)},
                     {new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1)},
-                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 0), new Vector2(1, 2)}
+                    {new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 2), new Vector2(1, 2)}
             },
 
             {{new Vector2(0, 1), new Vector2(1, 1), new Vector2(2, 1), new Vector2(0, 2)},
@@ -286,6 +286,74 @@ public class Tetromino {
                     if (currentRotation == 3 && clockwise || currentRotation == 2 && !clockwise) {
                         wallkickPos.x = wallkickPos.x - 2;
                         wallkickPos.y = wallkickPos.y + 1;
+                    }
+                    break;
+            }
+        } else {
+            // J, L, S, T, Z
+            switch (i) {
+                case 0:
+                    if (currentRotation == 0 && clockwise || currentRotation == 2 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x - 1;
+                    }
+                    if (currentRotation == 1) {
+                        wallkickPos.x = wallkickPos.x + 1;
+                    }
+                    if (currentRotation == 2 && clockwise || currentRotation == 0 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x + 1;
+                    }
+                    if (currentRotation == 3) {
+                        wallkickPos.x = wallkickPos.x - 1;
+                    }
+                    break;
+                case 1:
+                    if (currentRotation == 0 && clockwise || currentRotation == 2 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x - 1;
+                        wallkickPos.y = wallkickPos.y + 1;
+                    }
+                    if (currentRotation == 1) {
+                        wallkickPos.x = wallkickPos.x + 1;
+                        wallkickPos.y = wallkickPos.y - 1;
+                    }
+                    if (currentRotation == 2 && clockwise || currentRotation == 0 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x + 1;
+                        wallkickPos.y = wallkickPos.y + 1;
+                    }
+                    if (currentRotation == 3) {
+                        wallkickPos.x = wallkickPos.x - 1;
+                        wallkickPos.y = wallkickPos.y - 1;
+                    }
+                    break;
+                case 2:
+                    if (currentRotation == 0 && clockwise || currentRotation == 2 && !clockwise) {
+                        wallkickPos.y = wallkickPos.y - 2;
+                    }
+                    if (currentRotation == 1) {
+                        wallkickPos.y = wallkickPos.y + 2;
+                    }
+                    if (currentRotation == 2 && clockwise || currentRotation == 0 && !clockwise) {
+                        wallkickPos.y = wallkickPos.y - 2;
+                    }
+                    if (currentRotation == 3) {
+                        wallkickPos.y = wallkickPos.y + 2;
+                    }
+                    break;
+                case 3:
+                    if (currentRotation == 0 && clockwise || currentRotation == 2 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x - 1;
+                        wallkickPos.y = wallkickPos.y - 2;
+                    }
+                    if (currentRotation == 1) {
+                        wallkickPos.x = wallkickPos.x + 1;
+                        wallkickPos.y = wallkickPos.y + 2;
+                    }
+                    if (currentRotation == 2 && clockwise || currentRotation == 0 && !clockwise) {
+                        wallkickPos.x = wallkickPos.x + 1;
+                        wallkickPos.y = wallkickPos.y - 2;
+                    }
+                    if (currentRotation == 3) {
+                        wallkickPos.x = wallkickPos.x - 1;
+                        wallkickPos.y = wallkickPos.y + 2;
                     }
                     break;
             }
