@@ -61,9 +61,7 @@ public abstract class PlayScreenInput extends InputAdapter {
                         Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard)
                         || LightBlocksGame.isOnAndroidTV();
             case KEY_ACCELEROMETER:
-                return Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer) &&
-                        // Chrome gaukelt uns auch am Desktop vor, dass er ein Accelerometer unterstützt
-                        (!Gdx.app.getType().equals(Application.ApplicationType.WebGL) || LightBlocksGame.isWebAppOnMobileDevice());
+                return Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
             default:
                 return false;
         }
