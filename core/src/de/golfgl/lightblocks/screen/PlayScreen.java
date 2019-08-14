@@ -649,6 +649,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     BlockActor block = blockMatrix[x][y];
                     blockMatrix[x][y] = null;
                     block.setEnlightened(true);
+
+                    block.addAction(sequence(Actions.delay(5), Actions.fadeOut(2),
+                            Actions.removeActor()));
+                    //block.addAction(Actions.moveBy((BlockActor.blockWidth / 2) * (x - 5), 0, 2 + 5));
                 }
             }
 
