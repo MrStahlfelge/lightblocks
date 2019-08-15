@@ -586,7 +586,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 block.setMoveAction(Actions.moveTo((x + dx) * BlockActor.blockWidth, (y + dy) * BlockActor
                         .blockWidth, DURATION_TETRO_MOVE));
                 blockMatrix[x + dx][y + dy] = block;
-                blockGroup.setGhostPiecePosition(i, x + dx, y - ghostPieceDistance);
+                blockGroup.setGhostPiecePosition(i, x + dx, y - ghostPieceDistance, ghostPieceDistance);
             }
         }
     }
@@ -620,7 +620,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             block.setMoveAction(Actions.moveTo((newx) * BlockActor.blockWidth, (newy) * BlockActor.blockWidth, 1 /
                     20f));
             blockMatrix[newx][newy] = block;
-            blockGroup.setGhostPiecePosition(i, newx, newy - ghostPieceDistance);
+            blockGroup.setGhostPiecePosition(i, newx, newy - ghostPieceDistance, ghostPieceDistance);
         }
 
 
@@ -880,7 +880,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             }
             block.setEnlightened(true);
 
-            blockGroup.setGhostPiecePosition(i, x, y - ghostPieceDistance);
+            blockGroup.setGhostPiecePosition(i, x, y - ghostPieceDistance, ghostPieceDistance);
         }
     }
 
@@ -932,7 +932,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                 oldHoldTetro[i].setMoveAction(Actions.moveTo(newX * BlockActor.blockWidth, newY * BlockActor.blockWidth,
                         .1f, Interpolation.fade));
 
-                blockGroup.setGhostPiecePosition(i, newX, newY - ghostPieceDistance);
+                blockGroup.setGhostPiecePosition(i, newX, newY - ghostPieceDistance, ghostPieceDistance);
             }
         }
 

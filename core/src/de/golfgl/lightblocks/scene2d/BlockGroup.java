@@ -96,11 +96,13 @@ public class BlockGroup extends Group {
         return Gameboard.GAMEBOARD_NORMALROWS * BlockActor.blockWidth;
     }
 
-    public void setGhostPiecePosition(int i, int x, int y) {
+    public void setGhostPiecePosition(int i, int x, int y, int distance) {
         if (ghostpiece != null) {
             ghostpiece[i].clearActions();
-            ghostpiece[i].addAction(Actions.moveTo(calcHorizontalPos(x), calcVerticalPos(y), .1f,
-                    Interpolation.fade));
+            // wenn nahe am Teil die Animation schneller durchführen, damit es nicht zu einem
+            // Nachschleif-Effekt kommt
+            ghostpiece[i].addAction(Actions.moveTo(calcHorizontalPos(x), calcVerticalPos(y),
+                    distance > 4 ? .1f : 1/30f, Interpolation.fade));
         }
     }
 
