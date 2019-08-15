@@ -175,11 +175,13 @@ public abstract class GameModel implements Json.Serializable {
         if (maxDistance < distance) {
             // ... aber nur, falls kein Lock delay da
             int lockDelay = getLockDelayMs();
-            if (lockDelay <= 0 || softDropFactor >= FACTOR_HARD_DROP || score.getTimeMs() - lastMovementMs >= lockDelay)
+            if (lockDelay <= 0 || softDropFactor >= FACTOR_HARD_DROP || activeTetromino.getLockDelayCount() >= 15
+                    || score.getTimeMs() - lastMovementMs >= lockDelay)
                 dropActiveTetromino();
         } else {
             distanceRemainder -= distance;
             lastMovementMs = score.getTimeMs();
+            activeTetromino.incLockDelayCount(0);
             replay.addMovePieceStep(lastMovementMs, false, (byte) maxDistance);
         }
     }
@@ -462,6 +464,7 @@ public abstract class GameModel implements Json.Serializable {
             activeTetromino.getPosition().x += maxDistance;
             activeTetromino.setLastMovementType(0);
             lastMovementMs = score.getTimeMs();
+            activeTetromino.incLockDelayCount(Math.abs(maxDistance));
             replay.addMovePieceStep(lastMovementMs, true, (byte) maxDistance);
         }
 
@@ -506,6 +509,7 @@ public abstract class GameModel implements Json.Serializable {
             userInterface.rotateTetro(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions(),
                     ghostPieceDistance);
             lastMovementMs = score.getTimeMs();
+            activeTetromino.incLockDelayCount(1);
             replay.addRotatePieceStep(lastMovementMs, activeTetromino);
         }
     }

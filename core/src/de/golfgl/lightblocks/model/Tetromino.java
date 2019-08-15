@@ -121,6 +121,9 @@ public class Tetromino {
     private int currentRotation;
     // letzte Bewegung rotation (1) oder Positionsänderung (0)?
     private int lastMovementType;
+    // für Lock-Delay Begrenzung
+    private int lowestMovementYPos;
+    private int lockDelayCount;
 
     Tetromino(int index, boolean srs) {
         this.srs = srs;
@@ -130,6 +133,7 @@ public class Tetromino {
 
         // Die Startposition jedes Tetrominos
         this.position = new Vector2(GAMEBOARD_COLUMNS / 2 - 2, GAMEBOARD_NORMALROWS - 2);
+        lowestMovementYPos = (int) position.y;
         currentRotation = 0;
 
         wallkickPos = srs ? new Vector2() : null;
@@ -360,5 +364,17 @@ public class Tetromino {
         }
 
         return wallkickPos;
+    }
+
+    public void incLockDelayCount(int count) {
+        if (position.y < lowestMovementYPos) {
+            lockDelayCount = 0;
+            lowestMovementYPos = (int) position.y;
+        }
+        lockDelayCount = lockDelayCount + count;
+    }
+
+    public int getLockDelayCount() {
+        return lockDelayCount;
     }
 }
