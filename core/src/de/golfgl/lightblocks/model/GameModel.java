@@ -178,6 +178,7 @@ public abstract class GameModel implements Json.Serializable {
             if (lockDelay <= 0 || softDropFactor >= FACTOR_HARD_DROP || activeTetromino.getLockDelayCount() >= 15
                     || score.getTimeMs() - lastMovementMs >= lockDelay)
                 dropActiveTetromino();
+            // bei Lock Delay den Distanceremainder irgendwie zurücksetzen, damit das Piece nicht in ein Loch reingesaugt wird?
         } else {
             distanceRemainder -= distance;
             lastMovementMs = score.getTimeMs();
@@ -936,7 +937,7 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     public boolean isModernRotation() {
-        return false;
+        return true;
     }
 
     public String[] getGoalParams() {
@@ -964,7 +965,7 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     protected int getLockDelayMs() {
-        return 0;
+        return 500;
     }
 
     /**

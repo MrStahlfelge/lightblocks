@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Timer;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MarathonModel;
+import de.golfgl.lightblocks.model.ModernFreezeModel;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.RetroMarathonModel;
 import de.golfgl.lightblocks.model.SprintModel;
@@ -385,6 +386,49 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
 
             playButtonCell.setActor(isLocked ? lockMessage : playButton);
             playButtonCell.expandX().fillX();
+        }
+    }
+
+    public static class ModernFreezeModeGroup extends SimpleGameModeGroup {
+        public ModernFreezeModeGroup(SinglePlayerScreen singlePlayerScreen, LightBlocksGame app) {
+            super(singlePlayerScreen, app);
+        }
+
+        @Override
+        protected int getMaxBeginningValue() {
+            // TODO 0 rückgeben um auszublenden und richtigen Schwierigkeitsauuswähler
+            return ModernFreezeModel.DIFFICULTY_HARD;
+        }
+
+        @Override
+        protected String getGameModeTitle() {
+            return app.TEXTS.get("labelModel_modernfreeze");
+        }
+
+        @Override
+        public String getGameModelId() {
+            return ModernFreezeModel.MODEL_ID;
+        }
+
+        @Override
+        protected void fillParamsTable(LightBlocksGame app) {
+            row().pad(20, 20, 0, 20);
+            ScaledLabel introLabel = new ScaledLabel(app.TEXTS.get("introModelModernFreeze"), app.skin,
+                    LightBlocksGame.SKIN_FONT_REG, .75f);
+            introLabel.setWrap(true);
+            introLabel.setAlignment(Align.center);
+            add(introLabel).bottom().fillX().expandX();
+
+            super.fillParamsTable(app);
+        }
+
+        @Override
+        protected InitGameParameters getInitGameParameters() {
+            InitGameParameters initGameParametersParams = new InitGameParameters();
+            initGameParametersParams.setGameMode(InitGameParameters.GameMode.ModernFreeze);
+            initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
+            initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYORTOUCH);
+            return initGameParametersParams;
         }
     }
 }

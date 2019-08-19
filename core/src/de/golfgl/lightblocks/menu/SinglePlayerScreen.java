@@ -66,6 +66,8 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         modePager.addPage(new SimpleGameModeGroup.MarathonGroup(this, app));
         modePager.addPage(new SimpleGameModeGroup.PracticeModeGroup(this, app));
         modePager.addPage(new SimpleGameModeGroup.SprintModeGroup(this, app));
+        if (LightBlocksGame.GAME_DEVMODE)
+        modePager.addPage(new SimpleGameModeGroup.ModernFreezeModeGroup(this, app));
         modePager.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

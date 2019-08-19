@@ -4,6 +4,7 @@ import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.model.BackendBattleModel;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.MarathonModel;
+import de.golfgl.lightblocks.model.ModernFreezeModel;
 import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.RetroMarathonModel;
@@ -116,9 +117,11 @@ public class InitGameParameters {
                 return new TutorialModel();
             case TurnbasedBattle:
                 return new BackendBattleModel();
+            case ModernFreeze:
+                return new ModernFreezeModel();
         }
         throw new IllegalStateException("Unsupported game mode");
     }
 
-    public enum GameMode {Multiplayer, Marathon, Tutorial, Sprint, MarathonRetro89, Practice, TurnbasedBattle}
+    public enum GameMode {Multiplayer, Marathon, Tutorial, Sprint, MarathonRetro89, Practice, TurnbasedBattle, ModernFreeze}
 }
