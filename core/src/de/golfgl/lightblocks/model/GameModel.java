@@ -374,7 +374,7 @@ public abstract class GameModel implements Json.Serializable {
      *
      * @return Anzahl entfernte Zeilen. Wird im Aufrufer für Achievement-Auswertung genutzt (Garbage egal)
      */
-    private int removeFullAndInsertLines(boolean isTSpin) {
+    int removeFullAndInsertLines(boolean isTSpin) {
         removedLines.clear();
 
         for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {

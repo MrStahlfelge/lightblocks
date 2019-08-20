@@ -233,7 +233,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             scoreTable.add(blocksLeft).left().colspan(3);
         } else if (gameModel.showTime()) {
             scoreTable.row();
-            timeLabelDesc = new ScaledLabel(app.TEXTS.get("labelTime").toUpperCase(), app.skin);
+            String timeLabelDescString = gameModel.getShownTimeDescription();
+            if (timeLabelDescString == null)
+                timeLabelDescString = app.TEXTS.get("labelTime").toUpperCase();
+            timeLabelDesc = new ScaledLabel(timeLabelDescString, app.skin);
             app.theme.setScoreColor(timeLabelDesc);
             scoreTable.add(timeLabelDesc).right().bottom().padBottom(-2).spaceRight(3);
             timeLabel = new ScaledLabel(ScoreTable.formatTimeString(0, 1), app.skin, LightBlocksGame.SKIN_FONT_TITLE);

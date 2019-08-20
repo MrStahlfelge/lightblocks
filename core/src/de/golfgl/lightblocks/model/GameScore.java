@@ -15,6 +15,7 @@ public class GameScore implements IRoundScore {
     protected static final int TYPE_PRACTICE = 1;
     protected static final int TYPE_SPRINT = 2;
     protected static final int TYPE_RETRO89 = 3;
+    protected static final int TYPE_MODERNFREEZE = 4;
 
     private static final int COMBO_COUNT_RESET = -1;
 
@@ -149,7 +150,7 @@ public class GameScore implements IRoundScore {
      * returns current level depending on starting level and cleared lines
      */
     public int getCurrentLevel() {
-        if (scoringType == TYPE_PRACTICE || scoringType == TYPE_SPRINT)
+        if (scoringType == TYPE_PRACTICE || scoringType == TYPE_SPRINT || scoringType == TYPE_MODERNFREEZE)
             return startingLevel;
         else
             return Math.max(startingLevel, clearedLines / 10);
