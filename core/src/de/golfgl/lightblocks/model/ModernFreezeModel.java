@@ -51,9 +51,57 @@ public class ModernFreezeModel extends GameModel {
     }
 
     @Override
+    public boolean onTimeLabelTouchedByPlayer() {
+        if (!isFreezed && freezeloadms > 0) {
+            isFreezed = true;
+            currentSpeed  = 0;
+        }
+
+        return isFreezed;
+    }
+
+    @Override
+    protected void incrementTime(float delta) {
+        // TODO ist der Block am Aufliegen auf einem anderen, muss er nach Lock Delay doch abgelegt werden
+
+        if (isFreezed)
+            freezeloadms = Math.max(freezeloadms - (int) (delta * 1000), 0);
+        super.incrementTime(delta);
+    }
+
+    @Override
     int removeFullAndInsertLines(boolean isTSpin) {
-        // TODO im Freeze Mode nichts abbauen, und direkt danach auch anders (nicht auf Score zählen)
-        return super.removeFullAndInsertLines(isTSpin);
+        if (!isFreezed)
+            return super.removeFullAndInsertLines(isTSpin);
+
+        if (isTSpin)
+            getScore().addTSpinBonus();
+
+        // die vollen Reihen sammeln, außer natürlich die untersten
+        IntArray removedLines = new IntArray();
+        boolean hadNonFullLine = false;
+        for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
+            if (getGameboard().isRowFull(i)) {
+                if (hadNonFullLine)
+                    removedLines.add(i);
+            } else
+                hadNonFullLine = true;
+        }
+
+        // jede volle Reihe natürlich unten auch wieder einfügen, ohne garbageHole
+        if (removedLines.size > 0) {
+            int[] garbageLines = new int[removedLines.size];
+            for (int i = 0; i < removedLines.size; i++)
+                garbageLines[i] = -1;
+
+            getGameboard().clearLines(removedLines);
+            getGameboard().insertLines(garbageLines);
+
+            // TODO der Sound und eventuell auch die Animation soll eine andere sein
+            userInterface.clearAndInsertLines(removedLines, false, garbageLines);
+        }
+
+        return 0;
     }
 
     @Override
@@ -71,8 +119,27 @@ public class ModernFreezeModel extends GameModel {
     }
 
     @Override
+    protected void setGameOverBoardFull() {
+        if (isFreezed) {
+            finishFreezeMode();
+            // TODO der doppelte Stein muss in der GUI repariert werden (hängt herum)
+        } else {
+            super.setGameOverBoardFull();
+        }
+    }
+
+    private void finishFreezeMode() {
+        isFreezed = false;
+        freezeloadms = 0;
+
+        // TODO die ganzen Reihen abbauen, aber nicht auf die abgebauten Reihen zählen sondern nur
+        // Bonuspunkte vergeben
+    }
+
+    @Override
     protected void activeTetrominoDropped() {
-        // TODO freeze deaktivieren, vor allem bei einem eigentlichen DropOut (dann auch Doppelte Blöcke reparieren)
+        if (isFreezed && freezeloadms <= 0)
+            finishFreezeMode();
 
         getScore().setStartingLevel(sliceSpeed.get(getCurrentSlice()));
 

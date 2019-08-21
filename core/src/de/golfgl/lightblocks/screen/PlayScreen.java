@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -242,6 +244,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             timeLabel = new ScaledLabel(ScoreTable.formatTimeString(0, 1), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
             app.theme.setScoreColor(timeLabel);
             scoreTable.add(timeLabel).left().colspan(3);
+            timeLabel.addListener(new InputListener() {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    return gameModel.onTimeLabelTouchedByPlayer();
+                }
+            });
         }
         scoreTable.setLinesToClear(gameModel.getLinesToClear());
         scoreTable.validate();

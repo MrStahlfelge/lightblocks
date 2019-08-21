@@ -149,12 +149,20 @@ public abstract class GameModel implements Json.Serializable {
             }
         }
 
-        score.incTime(delta);
+        incrementTime(delta);
 
         float speed = Math.max(SOFT_DROP_SPEED * softDropFactor, currentSpeed);
         distanceRemainder += delta * speed;
         if (distanceRemainder >= 1.0f)
             moveDown((int) distanceRemainder);
+    }
+
+    /**
+     * hier kommen wir an, wenn tatsächlich Zeit vergangen ist (nicht durch Touch, ARR angehalten u.ä.)
+     * @param delta vergangene Zeit
+     */
+    protected void incrementTime(float delta) {
+        score.incTime(delta);
     }
 
     private void moveDown(int distance) {
@@ -215,6 +223,7 @@ public abstract class GameModel implements Json.Serializable {
         int levelBeforeRemove = score.getCurrentLevel();
         int removedLines;
 
+        this.removedLines.clear();
         removedLines = removeFullAndInsertLines(tSpin);
 
         if (isComboScoreAllowedByModel()) {
@@ -674,6 +683,9 @@ public abstract class GameModel implements Json.Serializable {
         isInputRotate = (clockwise ? 1 : -1);
     }
 
+    public boolean onTimeLabelTouchedByPlayer() {
+        return false;
+    }
     /**
      * beginnt Horizontalbewegung. Classicmode wie bei NES mit DAS. Sonst mit allgemeinem Inputfreeze-Delay
      */
