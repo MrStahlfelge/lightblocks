@@ -28,7 +28,7 @@ public abstract class GameModel implements Json.Serializable {
     public static final float FACTOR_NO_DROP = 0f;
     private static final float REPEAT_START_OFFSET = 0.3f;
     private static final float REPEAT_INTERVAL = 0.05f;
-    private static final float SOFT_DROP_SPEED = 30.0f;
+    protected static final float SOFT_DROP_SPEED = 30.0f;
     private static final float MAX_DROP_SCORE = 2f;
     // Speicherhaltung
     public TotalScore totalScore;
@@ -247,8 +247,7 @@ public abstract class GameModel implements Json.Serializable {
             userInterface.showMotivation(IGameModelListener.MotivationTypes.tSpin, null);
 
         int gameboardFill = gameboard.calcGameboardFill();
-        userInterface.setGameboardCriticalFill(gameboardFill * 100 /
-                (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS) >= 70);
+        userInterface.setGameboardCriticalFill(isGameboardCriticalFill(gameboardFill));
 
         if (removedLines > 0)
             achievementsClearedLines(levelBeforeRemove, removedLines, gameboardFill);
@@ -298,6 +297,10 @@ public abstract class GameModel implements Json.Serializable {
 
             // Game Over kann hier erfolgt sein!
         }
+    }
+
+    protected boolean isGameboardCriticalFill(int gameboardFill) {
+        return gameboardFill * 100 / (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS) >= 70;
     }
 
     public boolean isHoldMoveAllowedByModel() {

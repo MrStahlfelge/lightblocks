@@ -26,6 +26,8 @@ public class ModernFreezeModel extends GameModel {
     private int freezeloadlines;
     private boolean isFreezed;
     private IntArray sliceSpeed;
+    private int freezedClearedLines;
+    private int freezeBonusMultiplier;
 
 
     @Override
@@ -54,18 +56,34 @@ public class ModernFreezeModel extends GameModel {
     public boolean onTimeLabelTouchedByPlayer() {
         if (!isFreezed && freezeloadms > 0) {
             isFreezed = true;
-            currentSpeed  = 0;
+            freezeBonusMultiplier = freezeloadms >= MAX_FREEZEMS ? 2 : 1;
+            freezedClearedLines = 0;
+            userInterface.setGameboardCriticalFill(false);
         }
 
         return isFreezed;
     }
 
     @Override
-    protected void incrementTime(float delta) {
-        // TODO ist der Block am Aufliegen auf einem anderen, muss er nach Lock Delay doch abgelegt werden
-
+    protected boolean isGameboardCriticalFill(int gameboardFill) {
         if (isFreezed)
+            return false;
+        else
+            return super.isGameboardCriticalFill(gameboardFill);
+    }
+
+    @Override
+    protected void incrementTime(float delta) {
+
+        if (isFreezed) {
             freezeloadms = Math.max(freezeloadms - (int) (delta * 1000), 0);
+
+            // ist der Block am Aufliegen auf einem anderen, muss er nach Lock Delay doch abgelegt werden
+            if (getGameboard().checkPossibleMoveDistance(false, -1, getActiveTetromino()) == 0)
+                currentSpeed = SOFT_DROP_SPEED;
+            else
+                currentSpeed  = 0;
+        }
         super.incrementTime(delta);
     }
 
@@ -74,14 +92,13 @@ public class ModernFreezeModel extends GameModel {
         if (!isFreezed)
             return super.removeFullAndInsertLines(isTSpin);
 
-        if (isTSpin)
-            getScore().addTSpinBonus();
-
         // die vollen Reihen sammeln, außer natürlich die untersten
+        int fullLines = 0;
         IntArray removedLines = new IntArray();
         boolean hadNonFullLine = false;
         for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
             if (getGameboard().isRowFull(i)) {
+                fullLines++;
                 if (hadNonFullLine)
                     removedLines.add(i);
             } else
@@ -98,8 +115,19 @@ public class ModernFreezeModel extends GameModel {
             getGameboard().insertLines(garbageLines);
 
             // TODO der Sound und eventuell auch die Animation soll eine andere sein
-            userInterface.clearAndInsertLines(removedLines, false, garbageLines);
+            if (freezeloadms > 0)
+                userInterface.clearAndInsertLines(removedLines, false, garbageLines);
         }
+
+        if (fullLines > freezedClearedLines) {
+            if (fullLines >= 8 && freezedClearedLines < 8)
+                freezeBonusMultiplier++;
+
+            getScore().addBonusScore(freezeBonusMultiplier * getScore()
+                    .getClearedLinesScore(fullLines - freezedClearedLines, isTSpin));
+            freezedClearedLines = fullLines;
+        } else if (isTSpin)
+            getScore().addTSpinBonus();
 
         return 0;
     }
@@ -132,8 +160,24 @@ public class ModernFreezeModel extends GameModel {
         isFreezed = false;
         freezeloadms = 0;
 
-        // TODO die ganzen Reihen abbauen, aber nicht auf die abgebauten Reihen zählen sondern nur
-        // Bonuspunkte vergeben
+        getScore().addBonusScore(100 * freezedClearedLines);
+        freezedClearedLines = 0;
+        // TODO Motivationstext
+
+        IntArray removedLines = new IntArray();
+        for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
+            if (getGameboard().isRowFull(i)) {
+                removedLines.add(i);
+            }
+        }
+
+        if (removedLines.size > 0) {
+            getGameboard().clearLines(removedLines);
+            // TODO sollte irgendeine ganz spezielle Animation sein
+            userInterface.clearAndInsertLines(removedLines, removedLines.size >= 8, null);
+        }
+
+        setCurrentSpeed();
     }
 
     @Override
@@ -196,7 +240,7 @@ public class ModernFreezeModel extends GameModel {
 
     @Override
     public Color getShownTimeColor() {
-        return isFreezed ? LightBlocksGame.EMPHASIZE_COLOR :
+        return isFreezed && freezeloadms > 0 ? LightBlocksGame.EMPHASIZE_COLOR :
                 freezeloadms >= MAX_FREEZEMS ? LightBlocksGame.COLOR_FOCUSSED_ACTOR : Color.WHITE;
     }
 

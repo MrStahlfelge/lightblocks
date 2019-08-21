@@ -105,9 +105,26 @@ public class GameScore implements IRoundScore {
             isTSpin = false;
         }
 
-        float removeScore;
         boolean doubleSpecial = specialMove && lastClearLinesWasSpecial;
 
+        float removeScore = getClearedLinesScore(clearedLines, isTSpin);
+
+        removeScore = getCurrentScoreFactor() * removeScore;
+
+        if (doubleSpecial)
+            removeScore = removeScore * 1.5f;
+
+        this.dropScore += removeScore;
+
+        lastClearLinesWasSpecial = specialMove;
+
+        this.clearedLines += clearedLines;
+
+        return doubleSpecial;
+    }
+
+    public int getClearedLinesScore(int clearedLines, boolean isTSpin) {
+        int removeScore;
         switch (clearedLines) {
             case 1:
                 removeScore = (isTSpin ? 300 : 40);
@@ -124,19 +141,7 @@ public class GameScore implements IRoundScore {
             default:
                 removeScore = 0;
         }
-
-        removeScore = getCurrentScoreFactor() * removeScore;
-
-        if (doubleSpecial)
-            removeScore = removeScore * 1.5f;
-
-        this.dropScore += removeScore;
-
-        lastClearLinesWasSpecial = specialMove;
-
-        this.clearedLines += clearedLines;
-
-        return doubleSpecial;
+        return removeScore;
     }
 
     protected int getCurrentScoreFactor() {
