@@ -109,12 +109,12 @@ public class Tetromino {
                     {new Vector2(1, 1), new Vector2(2, 1), new Vector2(1, 2), new Vector2(2, 2)}
             }};
 
-    private final Vector2[][][] tetrominoTemplates;
+    private transient final Vector2[][][] tetrominoTemplates;
     private final boolean srs;
 
     private final int tetrominoIndex;
     private final Vector2 position;
-    private final Vector2 wallkickPos;
+    private transient final Vector2 wallkickPos;
     // wird immer wieder verwendet um Garbage Collection zu verhindern
     // also aufpassen und ggf. kopieren
     private transient final Integer[][] blockPosition;
