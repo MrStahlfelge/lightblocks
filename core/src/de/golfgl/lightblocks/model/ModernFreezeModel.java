@@ -123,8 +123,10 @@ public class ModernFreezeModel extends GameModel {
             if (fullLines >= 8 && freezedClearedLines < 8)
                 freezeBonusMultiplier++;
 
-            getScore().addBonusScore(freezeBonusMultiplier * getScore()
-                    .getClearedLinesScore(fullLines - freezedClearedLines, isTSpin));
+            int removedLinesNum = fullLines - freezedClearedLines;
+            getScore().addBonusScore(freezeBonusMultiplier * getScore().getCurrentLevel() *
+                    getScore().getClearedLinesScore(removedLinesNum, isTSpin));
+            totalScore.addClearedLines(removedLinesNum);
             freezedClearedLines = fullLines;
         } else if (isTSpin)
             getScore().addTSpinBonus();
@@ -160,7 +162,7 @@ public class ModernFreezeModel extends GameModel {
         isFreezed = false;
         freezeloadms = 0;
 
-        getScore().addBonusScore(100 * freezedClearedLines);
+        getScore().addBonusScore(100 * freezedClearedLines * getScore().getCurrentLevel());
         freezedClearedLines = 0;
         // TODO Motivationstext
 
