@@ -569,6 +569,7 @@ public abstract class GameModel implements Json.Serializable {
             Tetromino tmp = activeTetromino;
             activeTetromino = new Tetromino(onHoldTetromino, isModernRotation());
             onHoldTetromino = tmp.getTetrominoType();
+            checkActiveTetroPosBeforeUiInformed();
             int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
             userInterface.swapHoldAndActivePiece(newHoldPositions, oldActivePositions,
                     activeTetromino.getCurrentBlockPositions(), ghostPieceDistance, onHoldTetromino);
@@ -588,6 +589,10 @@ public abstract class GameModel implements Json.Serializable {
         return true;
     }
 
+    protected void checkActiveTetroPosBeforeUiInformed() {
+        // für Freeze Mode benötigt
+    }
+
     private void activateNextTetromino() {
         if (maxBlocksToUse > 0 && maxBlocksToUse == score.getDrawnTetrominos()) {
             setGameOverBoardFull();
@@ -596,6 +601,7 @@ public abstract class GameModel implements Json.Serializable {
 
         activeTetromino = nextTetromino;
         nextTetromino = drawyer.getNextTetromino(isModernRotation());
+        checkActiveTetroPosBeforeUiInformed();
 
         // ins Display mit beiden
         if (userInterface != null)

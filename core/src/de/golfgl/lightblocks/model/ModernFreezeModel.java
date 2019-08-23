@@ -149,12 +149,12 @@ public class ModernFreezeModel extends GameModel {
     }
 
     @Override
-    protected void setGameOverBoardFull() {
-        if (isFreezed) {
+    protected void checkActiveTetroPosBeforeUiInformed() {
+        Tetromino activeTetromino = getActiveTetromino();
+        if (isFreezed && !getGameboard().isValidPosition(activeTetromino, activeTetromino.getPosition(),
+                activeTetromino.getCurrentRotation())) {
+
             finishFreezeMode();
-            // TODO der doppelte Stein muss in der GUI repariert werden (hängt herum)
-        } else {
-            super.setGameOverBoardFull();
         }
     }
 
