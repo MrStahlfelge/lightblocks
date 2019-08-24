@@ -116,11 +116,14 @@ public class ReplayGameboard extends BlockGroup {
 
         if (shownStep.isDropStep()) {
             onScoreChange(replay.getCurrentScore());
-            // ARE
-            addAditionalDelayTimeInternal(.15f);
 
-            // Abzubauende Reihen verstärken
-            clearLinesOnGameboard();
+            if (shownStep.getRemovedLines() != 0) {
+                // ARE
+                addAditionalDelayTimeInternal(.15f);
+
+                // Abzubauende Reihen verstärken
+                clearLinesOnGameboard();
+            }
         }
     }
 

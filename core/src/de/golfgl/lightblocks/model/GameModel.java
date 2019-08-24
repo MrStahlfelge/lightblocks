@@ -239,6 +239,7 @@ public abstract class GameModel implements Json.Serializable {
 
         int gainedScore = score.flushScore();
         replayStep.setScore(score.getScore());
+        replayStep.setRemovedLines(removedLines);
 
         // Auswertung Achievements für GPGS und UI
 

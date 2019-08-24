@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.JsonValue;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.state.InitGameParameters;
+import de.golfgl.lightblocks.state.Replay;
 
 public class ModernFreezeModel extends GameModel {
     public static final String MODEL_ID = "modernfreeze";
@@ -184,6 +185,8 @@ public class ModernFreezeModel extends GameModel {
             // TODO sollte irgendeine ganz spezielle Animation sein
             userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, String.valueOf(removedLines.size));
             userInterface.clearAndInsertLines(removedLines, removedLines.size >= 8, null);
+            Replay.ReplayDropPieceStep replayDropPieceStep = getReplay().addDropStep(getScore().getTimeMs(), getActiveTetromino());
+            replayDropPieceStep.setRemovedLines(removedLines.size);
 
             setFreezeInterval(LINE_FREEZE_END_DELAY * removedLines.size);
         }

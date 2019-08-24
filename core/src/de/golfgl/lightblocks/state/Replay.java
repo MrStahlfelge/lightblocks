@@ -413,6 +413,14 @@ public class Replay {
         public void setScore(int Score) {
             throw new UnsupportedOperationException("setScore called on wrong replay step");
         }
+
+        public int getRemovedLines() {
+            return 0;
+        }
+
+        public void setRemovedLines(int removedLines) {
+            throw new UnsupportedOperationException("setRemovedLines called on wrong replay step");
+        }
     }
 
     /**
@@ -532,8 +540,9 @@ public class Replay {
     /**
      * Tetromino abgelegt, neuer Score ermittelt
      */
-    private static class ReplayDropPieceStep extends ReplayActivePieceStep {
+    public static class ReplayDropPieceStep extends ReplayActivePieceStep {
         public int score;
+        public int removedLines = -1;
 
         @Override
         public void appendTo(StringBuilder stringBuilder, int lastTimeStamp) {
@@ -541,6 +550,10 @@ public class Replay {
             super.appendTo(stringBuilder, lastTimeStamp);
             stringBuilder.append(SEP_DEFAULT);
             stringBuilder.append(Integer.toHexString(score));
+            if (removedLines >= 0) {
+                stringBuilder.append(SEP_DEFAULT);
+                stringBuilder.append(Integer.toHexString(removedLines));
+            }
         }
 
         @Override
@@ -550,6 +563,15 @@ public class Replay {
                 currentPos += 1;
             int endSeperator = findEndSeperator(currentPos, maxPos, toParse, SEP_DEFAULT);
             score = Integer.parseInt(toParse.substring(currentPos, endSeperator), 16);
+            currentPos = endSeperator;
+            if (toParse.charAt(currentPos) == SEP_DEFAULT)
+                currentPos += 1;
+            if (currentPos < maxPos) {
+                endSeperator = findEndSeperator(currentPos, maxPos, toParse, SEP_DEFAULT);
+                removedLines = Integer.parseInt(toParse.substring(currentPos, endSeperator), 16);
+                currentPos = endSeperator;
+            }
+
             return currentPos;
         }
 
@@ -561,6 +583,16 @@ public class Replay {
         @Override
         public void setScore(int score) {
             this.score = score;
+        }
+
+        @Override
+        public int getRemovedLines() {
+            return removedLines;
+        }
+
+        @Override
+        public void setRemovedLines(int removedLines) {
+            this.removedLines = removedLines;
         }
     }
 
