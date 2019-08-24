@@ -29,6 +29,8 @@ public interface IGameModelListener {
      */
     void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition);
 
+    void markAndMoveFreezedLines(boolean playSound, IntArray removedLines, IntArray fullLines);
+
     void setGameOver();
 
     void showNextTetro(Integer[][] relativeBlockPositions, int blockType);

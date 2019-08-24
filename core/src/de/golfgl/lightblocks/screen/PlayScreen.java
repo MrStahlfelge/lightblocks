@@ -817,6 +817,64 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
+    public void markAndMoveFreezedLines(boolean playSound, IntArray movedLines, IntArray fullLines) {
+
+        if (movedLines.size == 0 && fullLines.size == 0)
+            return;
+
+        if (playSound && app.localPrefs.isPlaySounds() && app.theme.unlockedSound != null)
+            app.theme.unlockedSound.play();
+
+        // volle Reihen erleuchten
+        for (int i = 0; i < fullLines.size; i++) {
+            int y = fullLines.get(i);
+            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                BlockActor block = blockMatrix[x][y];
+                block.setEnlightened(true);
+            }
+
+        }
+        // zu verschiebende Reihen verschieben
+        BlockActor[] lineBlocks = new BlockActor[Gameboard.GAMEBOARD_COLUMNS];
+        for (int movedLineNum = 0; movedLineNum < movedLines.size; movedLineNum++) {
+
+            int y = movedLines.get(movedLineNum);
+
+            // die Reihe aufnehmen
+            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                lineBlocks[x] = blockMatrix[x][y];
+                lineBlocks[x].setEnlightened(true);
+            }
+
+            // nun die Referenzen weiter unten schieben
+            for (int i = y; i > movedLineNum; i--)
+                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                    BlockActor block = blockMatrix[x][i - 1];
+                    blockMatrix[x][i - 1] = null;
+                    blockMatrix[x][i] = block;
+                }
+
+            // und die eigentliche Reihe dann ablegen
+            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++)
+                blockMatrix[x][movedLineNum] = lineBlocks[x];
+        }
+
+        // die Blockmatrix zeigt jetzt den korrekten Stand der Dinge an, also jetzt auch in der
+        // GUI verschieben
+        if (movedLines.size > 0)
+            for (int y = 0; y <= movedLines.get(movedLines.size - 1); y++) {
+                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                    BlockActor block = blockMatrix[x][y];
+
+                    if (block != null)
+                        block.setMoveAction(Actions.moveTo((x) * BlockActor.blockWidth, y *
+                                BlockActor.blockWidth, .1f));
+                }
+            }
+
+    }
+
+    @Override
     public void setGameOver() {
         music.stop();
         if (app.localPrefs.isPlaySounds() && app.theme.gameOverSound != null)

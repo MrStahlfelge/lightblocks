@@ -60,6 +60,8 @@ public class ModernFreezeModel extends GameModel {
             freezeBonusMultiplier = freezeloadms >= MAX_FREEZEMS ? 2 : 1;
             freezedClearedLines = 0;
             userInterface.setGameboardCriticalFill(false);
+
+            // TODO irgendwie noch anzeigen im GUI
         }
 
         return isFreezed;
@@ -94,14 +96,17 @@ public class ModernFreezeModel extends GameModel {
             return super.removeFullAndInsertLines(isTSpin);
 
         // die vollen Reihen sammeln, außer natürlich die untersten
-        int fullLines = 0;
+        int fullLinesNum = 0;
         IntArray removedLines = new IntArray();
+        IntArray fullLines = new IntArray();
         boolean hadNonFullLine = false;
         for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
             if (getGameboard().isRowFull(i)) {
-                fullLines++;
+                fullLinesNum++;
                 if (hadNonFullLine)
                     removedLines.add(i);
+                else if (fullLinesNum > freezedClearedLines)
+                    fullLines.add(i);
             } else
                 hadNonFullLine = true;
         }
@@ -114,21 +119,19 @@ public class ModernFreezeModel extends GameModel {
 
             getGameboard().clearLines(removedLines);
             getGameboard().insertLines(garbageLines);
-
-            // TODO der Sound und eventuell auch die Animation soll eine andere sein
-            if (freezeloadms > 0)
-                userInterface.clearAndInsertLines(removedLines, false, garbageLines);
         }
 
-        if (fullLines > freezedClearedLines) {
-            if (fullLines >= 8 && freezedClearedLines < 8)
+        userInterface.markAndMoveFreezedLines(true, removedLines, fullLines);
+
+        if (fullLinesNum > freezedClearedLines) {
+            if (fullLinesNum >= 8 && freezedClearedLines < 8)
                 freezeBonusMultiplier++;
 
-            int removedLinesNum = fullLines - freezedClearedLines;
+            int removedLinesNum = fullLinesNum - freezedClearedLines;
             getScore().addBonusScore(freezeBonusMultiplier * getScore().getCurrentLevel() *
                     getScore().getClearedLinesScore(removedLinesNum, isTSpin));
             totalScore.addClearedLines(removedLinesNum);
-            freezedClearedLines = fullLines;
+            freezedClearedLines = fullLinesNum;
         } else if (isTSpin)
             getScore().addTSpinBonus();
 
@@ -240,6 +243,23 @@ public class ModernFreezeModel extends GameModel {
         freezedClearedLines = jsonData.getInt("freezedClearedLines");
         freezeBonusMultiplier = jsonData.getInt("freezeBonusMultiplier");
         sliceSpeed = new IntArray(json.readValue("sliceSpeed", int[].class, jsonData));
+    }
+
+    @Override
+    public void setUserInterface(IGameModelListener userInterface) {
+        super.setUserInterface(userInterface);
+
+        if (isFreezed) {
+            // volle reihen wieder markieren
+            IntArray fullLines = new IntArray();
+            for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
+                if (getGameboard().isRowFull(i)) {
+                    fullLines.add(i);
+                }
+            }
+
+            userInterface.markAndMoveFreezedLines(false, new IntArray(), fullLines);
+        }
     }
 
     @Override
