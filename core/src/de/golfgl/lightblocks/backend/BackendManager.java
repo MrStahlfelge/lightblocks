@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.MarathonModel;
+import de.golfgl.lightblocks.model.ModernFreezeModel;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.RetroMarathonModel;
 import de.golfgl.lightblocks.model.SprintModel;
@@ -373,6 +374,8 @@ public class BackendManager {
         if (gameModelId.equalsIgnoreCase(PracticeModel.MODEL_PRACTICE_ID))
             return true;
         if (gameModelId.equalsIgnoreCase(SprintModel.MODEL_SPRINT_ID))
+            return true;
+        if (gameModelId.equalsIgnoreCase(ModernFreezeModel.MODEL_ID))
             return true;
 
         return false;
