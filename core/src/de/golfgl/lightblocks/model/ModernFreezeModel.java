@@ -88,8 +88,12 @@ public class ModernFreezeModel extends GameModel {
             else
                 currentSpeed = 0;
 
-            if (freezeloadms <= 0 && getScore().getTimeMs() - lastMovementMs > FREEZE_TIMEOUT)
-                finishFreezeMode();
+            if (freezeloadms <= 0 && getScore().getTimeMs() - lastMovementMs > FREEZE_TIMEOUT) {
+                int removedLineNum = finishFreezeMode();
+                getActiveTetromino().getPosition().y -= removedLineNum;
+                // TODO das Replay ist hier noch durcheinander
+                // getReplay().addNextPieceStep(getScore().getTimeMs(), getGameboard(), getActiveTetromino());
+            }
         }
         super.incrementTime(delta);
     }
@@ -166,7 +170,7 @@ public class ModernFreezeModel extends GameModel {
         }
     }
 
-    private void finishFreezeMode() {
+    private int finishFreezeMode() {
         isFreezed = false;
         freezeloadms = 0;
 
@@ -180,18 +184,21 @@ public class ModernFreezeModel extends GameModel {
             }
         }
 
-        if (removedLines.size > 0) {
+        int removedLineNum = removedLines.size;
+        if (removedLineNum > 0) {
             getGameboard().clearLines(removedLines);
-            // TODO sollte irgendeine ganz spezielle Animation sein
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, String.valueOf(removedLines.size));
-            userInterface.clearAndInsertLines(removedLines, removedLines.size >= 8, null);
+            // TODO sollte irgendeine ganz spezielle Animation sein/Sound wieder an, postprocessing aus
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, String.valueOf(removedLineNum));
+            userInterface.clearAndInsertLines(removedLines, removedLineNum >= 8, null);
             Replay.ReplayDropPieceStep replayDropPieceStep = getReplay().addDropStep(getScore().getTimeMs(), getActiveTetromino());
-            replayDropPieceStep.setRemovedLines(removedLines.size);
+            replayDropPieceStep.setRemovedLines(removedLineNum);
 
-            setFreezeInterval(LINE_FREEZE_END_DELAY * removedLines.size);
+            setFreezeInterval(LINE_FREEZE_END_DELAY * removedLineNum);
         }
 
         setCurrentSpeed();
+
+        return removedLineNum;
     }
 
     @Override
