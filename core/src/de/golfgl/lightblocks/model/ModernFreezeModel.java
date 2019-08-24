@@ -17,6 +17,7 @@ public class ModernFreezeModel extends GameModel {
 
     public static final int MAX_FREEZEMS = 20 * 1000;
     public static final float LINE_FREEZE_END_DELAY = .05f;
+    public static final int FREEZE_TIMEOUT = 5000;
     public static final int CNT_SLICES_PER_ROUND = 3;
     public static final int CNT_ROUNDS_PER_GAME = 4;
     public static final int CNT_SLICES_PER_GAME = CNT_ROUNDS_PER_GAME * CNT_SLICES_PER_ROUND;
@@ -86,6 +87,9 @@ public class ModernFreezeModel extends GameModel {
                 currentSpeed = SOFT_DROP_SPEED;
             else
                 currentSpeed = 0;
+
+            if (freezeloadms <= 0 && getScore().getTimeMs() - lastMovementMs > FREEZE_TIMEOUT)
+                finishFreezeMode();
         }
         super.incrementTime(delta);
     }

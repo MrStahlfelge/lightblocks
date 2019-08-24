@@ -54,7 +54,7 @@ public abstract class GameModel implements Json.Serializable {
     //nach remove Lines oder drop kurze Zeit warten
     private float freezeCountdown;
     // lock delay
-    private int lastMovementMs;
+    protected int lastMovementMs;
     //Touchcontrol braucht etwas bis der Nutzer zeichnet... diese Zeit muss ihm gegeben werden. Damit sie nicht zu
     // einem bestehenden Freeze addiert und problemlos wieder abgezogen werden kann wenn der Nutzer fertig gezeichnet
     // hat, wird sie extra verwaltet
