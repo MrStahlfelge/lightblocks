@@ -390,14 +390,15 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
     }
 
     public static class ModernFreezeModeGroup extends SimpleGameModeGroup {
+        private FaRadioButton<Integer> difficultyButton;
+
         public ModernFreezeModeGroup(SinglePlayerScreen singlePlayerScreen, LightBlocksGame app) {
             super(singlePlayerScreen, app);
         }
 
         @Override
         protected int getMaxBeginningValue() {
-            // TODO 0 rückgeben um auszublenden und richtigen Schwierigkeitsauuswähler
-            return ModernFreezeModel.DIFFICULTY_HARD;
+            return 0;
         }
 
         @Override
@@ -419,14 +420,35 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
             introLabel.setAlignment(Align.center);
             add(introLabel).bottom().fillX().expandX();
 
+            params.row().padTop(15);
+            params.add(new ScaledLabel(app.TEXTS.get("labelDifficulty"), app.skin,
+                    LightBlocksGame.SKIN_FONT_BIG)).expandY().bottom();
+            difficultyButton = new FaRadioButton<>(app.skin);
+            difficultyButton.addEntry(ModernFreezeModel.DIFFICULTY_EASY, "",
+                    app.TEXTS.get("labelDifficulty" + String.valueOf(ModernFreezeModel.DIFFICULTY_EASY)));
+            difficultyButton.addEntry(ModernFreezeModel.DIFFICULTY_NORMAL, "",
+                    app.TEXTS.get("labelDifficulty" + String.valueOf(ModernFreezeModel.DIFFICULTY_NORMAL)));
+            difficultyButton.addEntry(ModernFreezeModel.DIFFICULTY_HARD, "",
+                    app.TEXTS.get("labelDifficulty" + String.valueOf(ModernFreezeModel.DIFFICULTY_HARD)));
+            difficultyButton.setValue(app.localPrefs.getFreezeDifficulty());
+
+            params.row();
+            params.add(difficultyButton).height(difficultyButton.getPrefHeight() * .7f);
+            menuScreen.addFocusableActor(difficultyButton);
+
             super.fillParamsTable(app);
+        }
+
+        @Override
+        protected void savePreselectionSettings() {
+            app.localPrefs.saveFreezeDifficulty(difficultyButton.getValue());
         }
 
         @Override
         protected InitGameParameters getInitGameParameters() {
             InitGameParameters initGameParametersParams = new InitGameParameters();
             initGameParametersParams.setGameMode(InitGameParameters.GameMode.ModernFreeze);
-            initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
+            initGameParametersParams.setBeginningLevel(difficultyButton.getValue());
             initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYORTOUCH);
             return initGameParametersParams;
         }

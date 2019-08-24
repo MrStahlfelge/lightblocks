@@ -25,6 +25,7 @@ public class LocalPrefs {
     private static final String CRYPTOKEY = "***REMOVED***";
     private static final String PREF_KEY_MARATHON_TYPE = "marathonType";
     private static final String PREF_KEY_LEVEL = "beginningLevel";
+    private static final String PREF_KEY_FREEZE_DIFFICULTY = "freezeDifficulty";
     private static final String PREF_KEY_SPACTIVEPAGE = "singlePlayerPage";
     private static final String PREF_KEY_MPACTIVEPAGE = "multiplayerPage";
     private static final String KEY_SCREENSHOWNPREFIX = "versionShownScreen_";
@@ -286,6 +287,15 @@ public class LocalPrefs {
 
     public void saveBattleBeginningLevel(int beginningLevel) {
         prefs.putInteger(PREF_KEY_BATTLE_LEVEL, beginningLevel);
+        prefs.flush();
+    }
+
+    public int getFreezeDifficulty() {
+        return prefs.getInteger(PREF_KEY_FREEZE_DIFFICULTY, 0);
+    }
+
+    public void saveFreezeDifficulty(int difficulty) {
+        prefs.putInteger(PREF_KEY_FREEZE_DIFFICULTY, difficulty);
         prefs.flush();
     }
 
