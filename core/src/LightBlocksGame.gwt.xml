@@ -15,6 +15,7 @@
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.GameScore"/>
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.MarathonModel"/>
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.RetroMarathonModel"/>
+    <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.ModernFreezeModel"/>
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.PracticeModel"/>
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.model.Gameboard"/>
     <extend-configuration-property name="gdx.reflect.include" value="de.golfgl.lightblocks.state.BestScore"/>

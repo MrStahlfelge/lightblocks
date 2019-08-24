@@ -82,7 +82,7 @@ public class ModernFreezeModel extends GameModel {
             if (getGameboard().checkPossibleMoveDistance(false, -1, getActiveTetromino()) == 0)
                 currentSpeed = SOFT_DROP_SPEED;
             else
-                currentSpeed  = 0;
+                currentSpeed = 0;
         }
         super.incrementTime(delta);
     }
@@ -234,7 +234,7 @@ public class ModernFreezeModel extends GameModel {
         isFreezed = jsonData.getBoolean("isFreezed");
         freezedClearedLines = jsonData.getInt("freezedClearedLines");
         freezeBonusMultiplier = jsonData.getInt("freezeBonusMultiplier");
-        sliceSpeed = json.readValue("sliceSpeed", IntArray.class, jsonData);
+        sliceSpeed = new IntArray(json.readValue("sliceSpeed", int[].class, jsonData));
     }
 
     @Override
@@ -246,7 +246,7 @@ public class ModernFreezeModel extends GameModel {
         json.writeValue("isFreezed", isFreezed);
         json.writeValue("freezedClearedLines", freezedClearedLines);
         json.writeValue("freezeBonusMultiplier", freezeBonusMultiplier);
-        json.writeValue("sliceSpeed", sliceSpeed);
+        json.writeValue("sliceSpeed", sliceSpeed.items);
     }
 
     @Override
