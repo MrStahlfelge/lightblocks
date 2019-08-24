@@ -463,7 +463,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             add(menuSettingsHelpTvRemote).fillX().expand();
 
             Table buttonConfig = new Table();
-            buttonConfig.defaults().pad(5, 10, 5, 10);
+            buttonConfig.defaults().pad(3, 10, 3, 10);
             defaultFocusedButton = addButtonRow(buttonConfig, 0, "configTvRemoteRight");
             addButtonRow(buttonConfig, 1, "configTvRemoteLeft");
             addButtonRow(buttonConfig, 2, "configTvRemoteRotateCw");
@@ -471,6 +471,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             addButtonRow(buttonConfig, 4, "configTvRemoteSoftDrop");
             addButtonRow(buttonConfig, 5, "configTvRemoteHardDrop");
             addButtonRow(buttonConfig, 6, "configTvRemoteHold");
+            addButtonRow(buttonConfig, 7, "configTvRemoteFreeze");
 
             row();
             add(buttonConfig).fillX().expand();
@@ -494,7 +495,7 @@ public class SettingsScreen extends AbstractMenuDialog {
         }
 
         protected void convertConfigToArray() {
-            configKey = new int[7];
+            configKey = new int[8];
             configKey[0] = tvRemoteKeyConfig.keyCodeRight;
             configKey[1] = tvRemoteKeyConfig.keyCodeLeft;
             configKey[2] = tvRemoteKeyConfig.keyCodeRotateClockwise;
@@ -502,6 +503,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             configKey[4] = tvRemoteKeyConfig.keyCodeSoftDrop;
             configKey[5] = tvRemoteKeyConfig.keyCodeHarddrop;
             configKey[6] = tvRemoteKeyConfig.keyCodeHold;
+            configKey[7] = tvRemoteKeyConfig.keyCodeFreeze;
         }
 
         protected void convertArrayToConfigAndSave() {
@@ -512,6 +514,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             tvRemoteKeyConfig.keyCodeSoftDrop = configKey[4];
             tvRemoteKeyConfig.keyCodeHarddrop = configKey[5];
             tvRemoteKeyConfig.keyCodeHold = configKey[6];
+            tvRemoteKeyConfig.keyCodeFreeze = configKey[7];
             app.localPrefs.saveTvRemoteConfig();
         }
 

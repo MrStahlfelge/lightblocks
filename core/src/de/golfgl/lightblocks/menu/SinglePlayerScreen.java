@@ -30,6 +30,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
     public static final int PAGEIDX_MARATHON = 2;
     public static final int PAGEIDX_PRACTICE = 3;
     public static final int PAGEIDX_SPRINT = 4;
+    public static final int PAGEIDX_FREEZE = 5;
     private PagedScrollPane modePager;
     private Button leaderboardButton;
 
@@ -66,7 +67,6 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         modePager.addPage(new SimpleGameModeGroup.MarathonGroup(this, app));
         modePager.addPage(new SimpleGameModeGroup.PracticeModeGroup(this, app));
         modePager.addPage(new SimpleGameModeGroup.SprintModeGroup(this, app));
-        if (LightBlocksGame.GAME_DEVMODE)
         modePager.addPage(new SimpleGameModeGroup.ModernFreezeModeGroup(this, app));
         modePager.addListener(new ChangeListener() {
             @Override
@@ -163,6 +163,9 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
             Button sprintButton = addPageScrollInfoButton(app.TEXTS.get("labelModel_sprint40"),
                     app.TEXTS.get("goalModelSprint"), PAGEIDX_SPRINT);
 
+            Button freezeButton = addPageScrollInfoButton(app.TEXTS.get("labelModel_modernfreeze"),
+                    app.TEXTS.get("introModelModernFreeze"), PAGEIDX_FREEZE);
+
             table.pad(0, 20, 0, 20);
             table.row();
             Label label1 = new ScaledLabel(app.TEXTS.get("introGameModels"), app.skin,
@@ -182,6 +185,9 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
 
             table.row().padTop(10);
             table.add(sprintButton).fill();
+
+            table.row().padTop(10);
+            table.add(freezeButton).fill();
         }
 
         public void scrollToActor(Actor focused) {

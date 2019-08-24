@@ -50,8 +50,7 @@ public class ModernFreezeModel extends GameModel {
 
     @Override
     public String getGoalDescription() {
-        //TODO
-        return null;
+        return "goalModelFreeze";
     }
 
     @Override

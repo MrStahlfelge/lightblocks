@@ -163,11 +163,16 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
                 break;
             case 12:
             case 13:
-                instructionLabel.setText(instructionIntro + app.TEXTS.get("configGamepadStep8"));
-                inputToRecord = MyControllerMapping.BUTTON_START;
+                instructionLabel.setText(instructionIntro + app.TEXTS.get("configGamepadStep7c"));
+                inputToRecord = MyControllerMapping.BUTTON_FREEZE;
                 break;
             case 14:
             case 15:
+                instructionLabel.setText(instructionIntro + app.TEXTS.get("configGamepadStep8"));
+                inputToRecord = MyControllerMapping.BUTTON_START;
+                break;
+            case 16:
+            case 17:
                 instructionLabel.setText(instructionIntro + app.TEXTS.get("configGamepadStep10"));
                 inputToRecord = MyControllerMapping.BUTTON_CANCEL;
                 break;

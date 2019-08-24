@@ -27,6 +27,7 @@ public class MyControllerMapping extends ControllerMappings {
     public static final int BUTTON_ROTATE_COUNTERCLOCK = 1;
     public static final int BUTTON_HARDDROP = 6;
     public static final int BUTTON_HOLD = 7;
+    public static final int BUTTON_FREEZE = 8;
     public static final int AXIS_VERTICAL = 2;
     public static final int AXIS_HORIZONTAL = 3;
     public static final int BUTTON_START = 4;
@@ -45,6 +46,7 @@ public class MyControllerMapping extends ControllerMappings {
         addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.axisDigital, AXIS_HORIZONTAL));
         addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.button, BUTTON_HARDDROP));
         addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.button, BUTTON_HOLD));
+        addConfiguredInput(new ConfiguredInput(ConfiguredInput.Type.button, BUTTON_FREEZE));
 
         commitConfig();
         loadedSavedSettings = false;
@@ -68,6 +70,7 @@ public class MyControllerMapping extends ControllerMappings {
         controllerToInputAdapter.addAxisMapping(AXIS_VERTICAL, Input.Keys.UP, Input.Keys.DOWN);
         controllerToInputAdapter.addButtonMapping(BUTTON_HARDDROP, Input.Keys.CONTROL_RIGHT);
         controllerToInputAdapter.addButtonMapping(BUTTON_HOLD, Input.Keys.H);
+        controllerToInputAdapter.addButtonMapping(BUTTON_FREEZE, Input.Keys.F);
     }
 
     public void setInputProcessor(InputProcessor input) {
@@ -84,6 +87,7 @@ public class MyControllerMapping extends ControllerMappings {
         defaultMapping.putMapping(new MappedInput(BUTTON_ROTATE_COUNTERCLOCK, new ControllerButton(controllerMapping.buttonA)));
         defaultMapping.putMapping(new MappedInput(BUTTON_HARDDROP, new ControllerButton(controllerMapping.buttonX)));
         defaultMapping.putMapping(new MappedInput(BUTTON_HOLD, new ControllerButton(controllerMapping.buttonY)));
+        defaultMapping.putMapping(new MappedInput(BUTTON_FREEZE, new ControllerButton(controllerMapping.buttonR2)));
         defaultMapping.putMapping(new MappedInput(BUTTON_START, new ControllerButton(controllerMapping.buttonStart)));
         defaultMapping.putMapping(new MappedInput(BUTTON_CANCEL, new ControllerButton(controllerMapping.buttonBack)));
 

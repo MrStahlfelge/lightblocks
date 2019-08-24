@@ -52,6 +52,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
                         + Input.Keys.toString(tvRemoteKeyConfig.keyCodeHarddrop);
                 helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteHold") + ": "
                         + Input.Keys.toString(tvRemoteKeyConfig.keyCodeHold);
+                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteFreeze") + ": "
+                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeFreeze);
             }
             return helpText;
         } else
@@ -87,6 +89,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
                 keycode = Input.Keys.ALT_LEFT;
             else if (keycode == tvRemoteKeyConfig.keyCodeHold)
                 keycode = Input.Keys.H;
+            else if (keycode == tvRemoteKeyConfig.keyCodeFreeze)
+                keycode = Input.Keys.F;
         }
 
         return keycode;
@@ -185,6 +189,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
             case Input.Keys.H:
                 if (!isPaused())
                     playScreen.gameModel.holdActiveTetromino();
+                return true;
+
+            case Input.Keys.F:
+                if (!isPaused())
+                    playScreen.gameModel.onTimeLabelTouchedByPlayer();
                 return true;
 
             case Input.Keys.CONTROL_LEFT:
