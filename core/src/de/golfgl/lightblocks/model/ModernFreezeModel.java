@@ -87,13 +87,6 @@ public class ModernFreezeModel extends GameModel {
                 currentSpeed = SOFT_DROP_SPEED;
             else
                 currentSpeed = 0;
-
-            if (freezeloadms <= 0 && getScore().getTimeMs() - lastMovementMs > FREEZE_TIMEOUT) {
-                int removedLineNum = finishFreezeMode();
-                getActiveTetromino().getPosition().y -= removedLineNum;
-                // TODO das Replay ist hier noch durcheinander
-                // getReplay().addNextPieceStep(getScore().getTimeMs(), getGameboard(), getActiveTetromino());
-            }
         }
         super.incrementTime(delta);
     }
