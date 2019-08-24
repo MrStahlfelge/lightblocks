@@ -864,11 +864,21 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (movedLines.size > 0)
             for (int y = 0; y <= movedLines.get(movedLines.size - 1); y++) {
                 for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                    BlockActor block = blockMatrix[x][y];
+                    final BlockActor block = blockMatrix[x][y];
+                    final int xf = x;
+                    final int yf = y;
 
-                    if (block != null)
-                        block.setMoveAction(Actions.moveTo((x) * BlockActor.blockWidth, y *
-                                BlockActor.blockWidth, .1f));
+                    if (block != null) {
+                        // der kleine Delay ist nötig, da bei Hard Drop der aktive nicht immer schon
+                        // da ist
+                        Timer.schedule(new Timer.Task() {
+                            @Override
+                            public void run() {
+                                block.setMoveAction(Actions.moveTo(xf * BlockActor.blockWidth, yf *
+                                        BlockActor.blockWidth, .3f));
+                            }
+                        }, .05f);
+                    }
                 }
             }
 

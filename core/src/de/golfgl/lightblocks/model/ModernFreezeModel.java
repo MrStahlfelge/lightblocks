@@ -16,7 +16,7 @@ public class ModernFreezeModel extends GameModel {
     public static final int DIFFICULTY_EASY = 0;
 
     public static final int MAX_FREEZEMS = 20 * 1000;
-    public static final float FREEZE_END_DELAY = 1f;
+    public static final float LINE_FREEZE_END_DELAY = .05f;
     public static final int CNT_SLICES_PER_ROUND = 3;
     public static final int CNT_ROUNDS_PER_GAME = 4;
     public static final int CNT_SLICES_PER_GAME = CNT_ROUNDS_PER_GAME * CNT_SLICES_PER_ROUND;
@@ -182,7 +182,7 @@ public class ModernFreezeModel extends GameModel {
             // TODO sollte irgendeine ganz spezielle Animation sein
             userInterface.clearAndInsertLines(removedLines, removedLines.size >= 8, null);
 
-            setFreezeInterval(FREEZE_END_DELAY);
+            setFreezeInterval(LINE_FREEZE_END_DELAY * removedLines.size);
         }
 
         setCurrentSpeed();
