@@ -144,11 +144,11 @@ public class ModernFreezeModel extends GameModel {
 
     @Override
     protected void linesRemoved(int lineCount, boolean isSpecial, boolean doubleSpecial) {
-        if (!isFreezed && freezeloadms < MAX_FREEZEMS) {
+        if (!isFreezed) {
             freezeloadlines = freezeloadlines + lineCount;
             int clearedLinesForFreeze = getClearedLinesForFreeze();
             if (freezeloadlines >= clearedLinesForFreeze) {
-                freezeloadms = freezeloadms + 5000;
+                freezeloadms = Math.min(freezeloadms + 5000, MAX_FREEZEMS);
                 freezeloadlines = freezeloadlines - clearedLinesForFreeze;
             }
         }
