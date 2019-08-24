@@ -20,7 +20,7 @@ public class ModernFreezeModel extends GameModel {
     public static final int CNT_ROUNDS_PER_GAME = 4;
     public static final int CNT_SLICES_PER_GAME = CNT_ROUNDS_PER_GAME * CNT_SLICES_PER_ROUND;
 
-    // TODO speichern/laden
+    // speichern/laden siehe read/write
     private int difficulty;
     private int freezeloadms;
     private int freezeloadlines;
@@ -195,6 +195,7 @@ public class ModernFreezeModel extends GameModel {
 
     @Override
     public void startNewGame(InitGameParameters newGameParams) {
+        difficulty = newGameParams.getBeginningLevel();
         createAndFillSliceSpeed();
 
         super.startNewGame(newGameParams);
@@ -226,8 +227,26 @@ public class ModernFreezeModel extends GameModel {
 
     @Override
     public void read(Json json, JsonValue jsonData) {
-        // TODO savegame
         super.read(json, jsonData);
+        difficulty = jsonData.getInt("difficulty");
+        freezeloadms = jsonData.getInt("freezeloadms");
+        freezeloadlines = jsonData.getInt("freezeloadlines");
+        isFreezed = jsonData.getBoolean("isFreezed");
+        freezedClearedLines = jsonData.getInt("freezedClearedLines");
+        freezeBonusMultiplier = jsonData.getInt("freezeBonusMultiplier");
+        sliceSpeed = json.readValue("sliceSpeed", IntArray.class, jsonData);
+    }
+
+    @Override
+    public void write(Json json) {
+        super.write(json);
+        json.writeValue("difficulty", difficulty);
+        json.writeValue("freezeloadms", freezeloadms);
+        json.writeValue("freezeloadlines", freezeloadlines);
+        json.writeValue("isFreezed", isFreezed);
+        json.writeValue("freezedClearedLines", freezedClearedLines);
+        json.writeValue("freezeBonusMultiplier", freezeBonusMultiplier);
+        json.writeValue("sliceSpeed", sliceSpeed);
     }
 
     @Override

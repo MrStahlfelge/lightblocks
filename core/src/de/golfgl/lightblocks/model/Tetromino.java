@@ -110,7 +110,7 @@ public class Tetromino {
             }};
 
     private transient final Vector2[][][] tetrominoTemplates;
-    private final boolean srs;
+    private transient final boolean srs;
 
     private final int tetrominoIndex;
     private final Vector2 position;
