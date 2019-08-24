@@ -172,7 +172,6 @@ public class ModernFreezeModel extends GameModel {
 
         getScore().addBonusScore(100 * freezedClearedLines * getScore().getCurrentLevel());
         freezedClearedLines = 0;
-        // TODO Motivationstext
 
         IntArray removedLines = new IntArray();
         for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
@@ -184,6 +183,7 @@ public class ModernFreezeModel extends GameModel {
         if (removedLines.size > 0) {
             getGameboard().clearLines(removedLines);
             // TODO sollte irgendeine ganz spezielle Animation sein
+            userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, String.valueOf(removedLines.size));
             userInterface.clearAndInsertLines(removedLines, removedLines.size >= 8, null);
 
             setFreezeInterval(LINE_FREEZE_END_DELAY * removedLines.size);

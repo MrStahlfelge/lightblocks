@@ -65,6 +65,7 @@ public class Theme {
     public Sound removeSound;
     public Sound gameOverSound;
     public Sound cleanSpecialSound;
+    public Sound cleanFreezedSound;
     public Sound unlockedSound;
     public Sound garbageSound;
     public Sound horizontalMoveSound;
@@ -183,6 +184,7 @@ public class Theme {
         removeSound = app.removeSound;
         gameOverSound = app.gameOverSound;
         cleanSpecialSound = app.cleanSpecialSound;
+        cleanFreezedSound = app.cleanFreezedSound;
         unlockedSound = app.unlockedSound;
         garbageSound = app.garbageSound;
         horizontalMoveSound = null;
@@ -247,6 +249,7 @@ public class Theme {
             removeSound = loadOptionalSound(soundNode, "normalclear", app.removeSound);
             gameOverSound = loadOptionalSound(soundNode, "gameover", app.gameOverSound);
             cleanSpecialSound = loadOptionalSound(soundNode, "specialclear", app.cleanSpecialSound);
+            cleanFreezedSound = loadOptionalSound(soundNode, "freezedclear", app.cleanFreezedSound);
             unlockedSound = loadOptionalSound(soundNode, "achievement", app.unlockedSound);
             garbageSound = loadOptionalSound(soundNode, "garbage", app.garbageSound);
             horizontalMoveSound = loadOptionalSound(soundNode, "horizontalmove", null);

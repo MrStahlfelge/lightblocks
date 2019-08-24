@@ -822,8 +822,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         if (movedLines.size == 0 && fullLines.size == 0)
             return;
 
-        if (playSound && app.localPrefs.isPlaySounds() && app.theme.unlockedSound != null)
-            app.theme.unlockedSound.play();
+        if (playSound && app.localPrefs.isPlaySounds() && app.theme.cleanFreezedSound != null)
+            app.theme.cleanFreezedSound.play();
 
         // volle Reihen erleuchten
         for (int i = 0; i < fullLines.size; i++) {
