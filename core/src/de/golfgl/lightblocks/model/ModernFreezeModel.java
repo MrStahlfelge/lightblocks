@@ -80,13 +80,29 @@ public class ModernFreezeModel extends GameModel {
         if (isFreezed) {
             freezeloadms = Math.max(freezeloadms - (int) (delta * 1000), 0);
 
+            currentSpeed = 0;
+
             // ist der Block am Aufliegen auf einem anderen, muss er nach Lock Delay doch abgelegt werden
             if (getGameboard().checkPossibleMoveDistance(false, -1, getActiveTetromino()) == 0)
-                currentSpeed = SOFT_DROP_SPEED;
-            else
-                currentSpeed = 0;
+                distanceRemainder = Math.max(distanceRemainder, 1f);
         }
         super.incrementTime(delta);
+    }
+
+    @Override
+    protected boolean moveHorizontal(int distance) {
+        if (isFreezed)
+            distanceRemainder = 0;
+
+        return super.moveHorizontal(distance);
+    }
+
+    @Override
+    protected void rotate(boolean clockwise) {
+        if (isFreezed)
+            distanceRemainder = 0;
+
+        super.rotate(clockwise);
     }
 
     @Override

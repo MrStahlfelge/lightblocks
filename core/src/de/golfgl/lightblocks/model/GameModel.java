@@ -50,7 +50,7 @@ public abstract class GameModel implements Json.Serializable {
     private int onHoldTetromino = -1;
     private boolean noDropSinceHoldMove;
     private Gameboard gameboard;
-    private float distanceRemainder;
+    protected float distanceRemainder;
     //nach remove Lines oder drop kurze Zeit warten
     private float freezeCountdown;
     // lock delay
@@ -465,7 +465,7 @@ public abstract class GameModel implements Json.Serializable {
      * @param distance Anzahl Blöcke die bewegt werden soll
      * @return true wenn eine Bewegung (auch kleiner als Distanz) möglich war, sonst false
      */
-    private boolean moveHorizontal(int distance) {
+    protected boolean moveHorizontal(int distance) {
         if (distance == 0)
             return false;
 
@@ -494,7 +494,7 @@ public abstract class GameModel implements Json.Serializable {
         return (maxDistance != 0);
     }
 
-    private void rotate(boolean clockwise) {
+    protected void rotate(boolean clockwise) {
         int newRotation = activeTetromino.getCurrentRotation() + (clockwise ? 1 : -1);
 
         boolean foundValidPosition = gameboard.isValidPosition(activeTetromino, activeTetromino.getPosition(),
