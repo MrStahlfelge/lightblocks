@@ -223,9 +223,13 @@ public class ModernFreezeModel extends GameModel {
         sliceSpeed = new IntArray(CNT_SLICES_PER_GAME);
 
         // füllen
+        // easy: zwischen 0 und 3-6
+        // normal: zwischen 4 und 7-10
+        // hard: zwischen 8 und 11-14
+
         int difficultyAddition = 4 * difficulty;
         for (int r = 0; r < CNT_ROUNDS_PER_GAME; r++) {
-            int roundAddition = 5 + r;
+            int roundAddition = 3 + r;
             for (int i = 0; i < CNT_SLICES_PER_ROUND; i++) {
                 int nextSpeed = MathUtils.random(difficultyAddition, roundAddition + difficultyAddition);
                 sliceSpeed.add(nextSpeed);
