@@ -69,7 +69,8 @@ public class ModernFreezeModel extends GameModel {
     @Override
     protected boolean isGameboardCriticalFill(int gameboardFill) {
         if (isFreezed)
-            return false;
+            return super.isGameboardCriticalFill(gameboardFill
+                    - freezedClearedLines * Gameboard.GAMEBOARD_COLUMNS);
         else
             return super.isGameboardCriticalFill(gameboardFill);
     }

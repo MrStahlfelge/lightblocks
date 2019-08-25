@@ -92,6 +92,7 @@ public class PlayMusic {
             switch (state) {
                 case playingSlowly:
                     slowMusic.play();
+                    slowMusic.setVolume(1f);
                     break;
                 case transitioning:
                     slowMusic.play();
@@ -99,6 +100,7 @@ public class PlayMusic {
                     break;
                 case playingFast:
                     fastMusic.play();
+                    fastMusic.setVolume(1f);
                     break;
             }
     }
@@ -144,13 +146,17 @@ public class PlayMusic {
     public void setFastPlay(boolean fastPlay) {
         if (this.shouldPlayFast != fastPlay && fastMusic != null) {
 
-            switch (state) {
-                case playingFast:
-                case playingSlowly:
-                    state = MusicState.transitioning;
-                    if (!isPaused)
+            if (!isPaused) {
+                switch (state) {
+                    case playingFast:
+                    case playingSlowly:
+                        state = MusicState.transitioning;
                         play();
-                    break;
+                        break;
+                }
+            } else {
+                stop();
+                state = fastPlay ? MusicState.playingFast : MusicState.playingSlowly;
             }
 
             this.shouldPlayFast = fastPlay;
