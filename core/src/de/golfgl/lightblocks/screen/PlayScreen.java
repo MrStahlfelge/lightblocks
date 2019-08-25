@@ -551,6 +551,24 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
         music.setFastPlay(critical);
     }
 
+    @Override
+    public void startFreezeMode() {
+        music.pause();
+        if (app.localPrefs.isPlaySounds() && app.theme.freezeBeginSound != null)
+            app.theme.freezeBeginSound.play();
+    }
+
+    @Override
+    public void endFreezeMode(IntArray removedLines) {
+        // TODO sollte irgendeine ganz spezielle Animation sein/Sound wieder an, postprocessing aus
+        int removedLineNum = removedLines.size;
+        if (removedLineNum > 0) {
+            motivatorLabel.addMotivationText((String.valueOf(removedLineNum) + " " + app.TEXTS.get("labelLines")).toUpperCase(), 1.5f);
+            clearAndInsertLines(removedLines, removedLineNum >= 8, null);
+        }
+        music.play();
+    }
+
     private void goToHighscores() {
 
         RoundOverScoreScreen scoreScreen = new RoundOverScoreScreen(app);

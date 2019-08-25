@@ -106,6 +106,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     public Sound gameOverSound;
     public Sound cleanSpecialSound;
     public Sound cleanFreezedSound;
+    public Sound freezeBeginSound;
     public Sound unlockedSound;
     public Sound swoshSound;
     public Sound garbageSound;
@@ -255,6 +256,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
         assetManager.load(getSoundAssetFilename("gameover"), Sound.class);
         assetManager.load(getSoundAssetFilename("unlocked"), Sound.class);
         assetManager.load(getSoundAssetFilename("garbage"), Sound.class);
+        assetManager.load(getSoundAssetFilename("freezestart"), Sound.class);
         assetManager.load("skin/lb.json", Skin.class);
         assetManager.finishLoading();
 
@@ -272,6 +274,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
         garbageSound = assetManager.get(getSoundAssetFilename("garbage"), Sound.class);
         cleanSpecialSound = assetManager.get(getSoundAssetFilename("cleanspecial"), Sound.class);
         cleanFreezedSound = assetManager.get(getSoundAssetFilename("cleanfreeze"), Sound.class);
+        freezeBeginSound = assetManager.get(getSoundAssetFilename("freezestart"), Sound.class);
         swoshSound = assetManager.get(getSoundAssetFilename("swosh"), Sound.class);
 
         COLOR_DISABLED = skin.getColor("disabled");

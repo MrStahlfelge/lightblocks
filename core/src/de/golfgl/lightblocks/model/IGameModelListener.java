@@ -65,6 +65,10 @@ public interface IGameModelListener {
 
     void setGameboardCriticalFill(boolean critical);
 
+    void startFreezeMode();
+
+    void endFreezeMode(IntArray removedLines);
+
     enum MotivationTypes {
         newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
         boardCleared, newHighscore, gameOver, gameWon, gameSuccess, playerOver,

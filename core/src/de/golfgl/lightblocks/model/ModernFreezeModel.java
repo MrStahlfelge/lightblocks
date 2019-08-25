@@ -60,9 +60,7 @@ public class ModernFreezeModel extends GameModel {
             isFreezed = true;
             freezeBonusMultiplier = freezeloadms >= MAX_FREEZEMS ? 2 : 1;
             freezedClearedLines = 0;
-            userInterface.setGameboardCriticalFill(false);
-
-            // TODO irgendwie noch anzeigen im GUI
+            userInterface.startFreezeMode();
         }
 
         return isFreezed;
@@ -180,14 +178,12 @@ public class ModernFreezeModel extends GameModel {
         int removedLineNum = removedLines.size;
         if (removedLineNum > 0) {
             getGameboard().clearLines(removedLines);
-            // TODO sollte irgendeine ganz spezielle Animation sein/Sound wieder an, postprocessing aus
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, String.valueOf(removedLineNum));
-            userInterface.clearAndInsertLines(removedLines, removedLineNum >= 8, null);
             Replay.ReplayDropPieceStep replayDropPieceStep = getReplay().addDropStep(getScore().getTimeMs(), getActiveTetromino());
             replayDropPieceStep.setRemovedLines(removedLineNum);
 
             setFreezeInterval(LINE_FREEZE_END_DELAY * removedLineNum);
         }
+        userInterface.endFreezeMode(removedLines);
 
         setCurrentSpeed();
 
