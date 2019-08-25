@@ -22,8 +22,6 @@ android {
         generic {
             java.srcDirs = ['src-generic']
         }
-
-        instrumentTest.setRoot('tests')
     }
     packagingOptions {
         exclude 'META-INF/robovm/ios/robovm.xml'
