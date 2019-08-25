@@ -959,7 +959,7 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     public boolean isModernRotation() {
-        return true;
+        return false;
     }
 
     public String[] getGoalParams() {
@@ -987,7 +987,7 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     protected int getLockDelayMs() {
-        return 500;
+        return 0;
     }
 
     /**
