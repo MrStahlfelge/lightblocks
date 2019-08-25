@@ -290,6 +290,13 @@ public class Replay {
         setChanged();
     }
 
+    public ReplayStep getLastAddedStep() {
+        if (arraySteps != null || replaySteps == null || replaySteps.isEmpty())
+            return null;
+
+        return replaySteps.getLast();
+    }
+
     @Override
     public String toString() {
         if (!isValid)

@@ -178,8 +178,18 @@ public class ModernFreezeModel extends GameModel {
         int removedLineNum = removedLines.size;
         if (removedLineNum > 0) {
             getGameboard().clearLines(removedLines);
-            Replay.ReplayDropPieceStep replayDropPieceStep = getReplay().addDropStep(getScore().getTimeMs(), getActiveTetromino());
-            replayDropPieceStep.setRemovedLines(removedLineNum);
+            Replay.ReplayStep lastAddedStep = getReplay().getLastAddedStep();
+
+            if (lastAddedStep != null && lastAddedStep.isDropStep()) {
+                lastAddedStep.setRemovedLines(removedLineNum);
+            } else {
+                Replay.ReplayDropPieceStep replayDropPieceStep = getReplay().addDropStep(getScore().getTimeMs(), getActiveTetromino());
+                replayDropPieceStep.setRemovedLines(removedLineNum);
+                //TODO im Falle dass wir aus einem Hold-Piece wechsel kommen ist das hier "vielleicht"
+                // noch nicht korrekt und das Replay ist nicht in Ordnung. Der Fall, dass im Freeze-Mode
+                // das Next-Piece passte, das Hold Piece aber nicht, dürfte sehr sehr selten sein
+
+            }
 
             setFreezeInterval(LINE_FREEZE_END_DELAY * removedLineNum);
         }
