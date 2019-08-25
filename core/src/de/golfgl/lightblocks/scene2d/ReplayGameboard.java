@@ -77,12 +77,12 @@ public class ReplayGameboard extends BlockGroup {
         return currentTime;
     }
 
-    public int getMaxTime() {
-        return maxTime;
-    }
-
     private void setCurrentTime(int currentTime) {
         this.currentTime = currentTime;
+    }
+
+    public int getMaxTime() {
+        return maxTime;
     }
 
     private void transitionToNextStep() {
@@ -211,18 +211,19 @@ public class ReplayGameboard extends BlockGroup {
                                         .DURATION_REMOVE_DELAY, Interpolation.fade),
                                 Actions.fadeIn(PlayScreen.DURATION_REMOVE_DELAY, Interpolation.fade))));
                         actorsToRemove.add(currentShownBlocks[pos]);
-
-                        // die Zuordnungen korrigieren
-                        for (int rowsAbove = row - linesCleared + 1; rowsAbove <= Gameboard.GAMEBOARD_ALLROWS;
-                             rowsAbove++) {
-                            int overWritePos = getIntFromRowAndCol(rowsAbove - 1, col);
-                            if (rowsAbove < Gameboard.GAMEBOARD_ALLROWS)
-                                currentShownBlocks[overWritePos] = currentShownBlocks[getIntFromRowAndCol(rowsAbove,
-                                        col)];
-                            else
-                                currentShownBlocks[overWritePos] = null;
-                        }
                     }
+
+                    // die Zuordnungen korrigieren
+                    for (int rowsAbove = row - linesCleared + 1; rowsAbove <= Gameboard.GAMEBOARD_ALLROWS;
+                         rowsAbove++) {
+                        int overWritePos = getIntFromRowAndCol(rowsAbove - 1, col);
+                        if (rowsAbove < Gameboard.GAMEBOARD_ALLROWS)
+                            currentShownBlocks[overWritePos] = currentShownBlocks[getIntFromRowAndCol(rowsAbove,
+                                    col)];
+                        else
+                            currentShownBlocks[overWritePos] = null;
+                    }
+
                 }
                 linesCleared++;
             }
