@@ -18,6 +18,7 @@ public class PlayMusic {
     private MusicState state = MusicState.playingSlowly;
     private boolean shouldPlayFast;
     private float fadingVolume;
+    private boolean isPaused;
 
     public PlayMusic(LightBlocksGame app) {
         this.app = app;
@@ -86,6 +87,7 @@ public class PlayMusic {
     }
 
     public void play() {
+        isPaused = false;
         if (isPlayMusic)
             switch (state) {
                 case playingSlowly:
@@ -102,6 +104,7 @@ public class PlayMusic {
     }
 
     public void pause() {
+        isPaused = true;
         if (isPlayMusic)
             switch (state) {
                 case playingSlowly:
@@ -118,6 +121,7 @@ public class PlayMusic {
     }
 
     public void stop() {
+        isPaused = false;
         if (isPlayMusic)
             switch (state) {
                 case playingSlowly:
@@ -144,7 +148,8 @@ public class PlayMusic {
                 case playingFast:
                 case playingSlowly:
                     state = MusicState.transitioning;
-                    play();
+                    if (!isPaused)
+                        play();
                     break;
             }
 
