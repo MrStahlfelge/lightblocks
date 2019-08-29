@@ -29,6 +29,8 @@
     "achievement": "achieve.mp3",
     "garbage": "garbage.mp3",
     "specialclear": "specialclear.mp3",
+    "freezedclear": "freezedclear.mp3",
+    "freezestart": "freezedstart.mp3",
     "gameover": "gbgameover.ogg"
   },
   // background, all entries optional
