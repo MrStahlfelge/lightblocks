@@ -137,6 +137,10 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        if (listChangesSince < 1923)
+            welcomes.add(new WelcomeButton.WelcomeText("New game mode: Play the modern way, with freeze!",
+                    new ShowSinglePlayerPageRunnable(app, SinglePlayerScreen.PAGEIDX_FREEZE)));
+
         if (listChangesSince < 1910 && Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard)) {
             welcomes.add(new WelcomeButton.WelcomeText("New: You can change the default key mapping " +
                     "in the settings screen.", new ShowSettingsRunnable(app)));
