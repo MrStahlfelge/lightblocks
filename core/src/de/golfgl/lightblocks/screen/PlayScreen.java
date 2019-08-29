@@ -835,12 +835,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
     }
 
     @Override
-    public void markAndMoveFreezedLines(boolean playSound, IntArray movedLines, IntArray fullLines) {
+    public void markAndMoveFreezedLines(boolean playSoundAndMove, IntArray movedLines, IntArray fullLines) {
 
         if (movedLines.size == 0 && fullLines.size == 0)
             return;
 
-        if (playSound && app.localPrefs.isPlaySounds() && app.theme.cleanFreezedSound != null)
+        if (playSoundAndMove && app.localPrefs.isPlaySounds() && app.theme.cleanFreezedSound != null)
             app.theme.cleanFreezedSound.play();
 
         // volle Reihen erleuchten
@@ -879,7 +879,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
 
         // die Blockmatrix zeigt jetzt den korrekten Stand der Dinge an, also jetzt auch in der
         // GUI verschieben
-        if (movedLines.size > 0)
+        if (movedLines.size > 0 && playSoundAndMove)
             for (int y = 0; y <= movedLines.get(movedLines.size - 1); y++) {
                 for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
                     final BlockActor block = blockMatrix[x][y];

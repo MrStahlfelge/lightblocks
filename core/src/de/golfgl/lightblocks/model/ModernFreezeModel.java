@@ -137,7 +137,7 @@ public class ModernFreezeModel extends GameModel {
             getGameboard().insertLines(garbageLines);
         }
 
-        userInterface.markAndMoveFreezedLines(true, removedLines, fullLines);
+        userInterface.markAndMoveFreezedLines(freezeloadms > 0, removedLines, fullLines);
 
         if (fullLinesNum > freezedClearedLines) {
             if (fullLinesNum >= 8 && freezedClearedLines < 8)

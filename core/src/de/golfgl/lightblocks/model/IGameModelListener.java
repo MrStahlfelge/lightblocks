@@ -29,7 +29,7 @@ public interface IGameModelListener {
      */
     void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition);
 
-    void markAndMoveFreezedLines(boolean playSound, IntArray removedLines, IntArray fullLines);
+    void markAndMoveFreezedLines(boolean playSoundAndMove, IntArray removedLines, IntArray fullLines);
 
     void setGameOver();
 
