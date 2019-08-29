@@ -182,7 +182,7 @@ public class GameScore implements IRoundScore {
     }
 
     protected void capScore() {
-        if (scoringType != TYPE_PRACTICE)
+        if (scoringType != TYPE_PRACTICE && scoringType != TYPE_MODERNFREEZE)
             this.score = Math.min(this.score, 999999);
     }
 
