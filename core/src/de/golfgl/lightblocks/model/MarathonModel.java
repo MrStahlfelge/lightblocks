@@ -75,7 +75,7 @@ public class MarathonModel extends GameModel {
             gamepadMarathonAchievementPosted = true;
         }
 
-        if (levelBeforeRemove < 16 && getScore().getCurrentLevel() >= 16)
+        if (levelBeforeRemove < 16 && getScore().getCurrentLevel() >= 16 && getLockDelayMs() == 0)
             gpgsUpdateAchievement(GpgsHelper.ACH_PLUMBOUS_TETROMINOS);
     }
 
