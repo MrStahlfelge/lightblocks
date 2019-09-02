@@ -240,9 +240,14 @@ public class GameScore implements IRoundScore {
      * @return den aktuellen Combocounter
      */
     public int redrawOnHold() {
-        lastClearLinesWasSpecial = false;
         dropScore = 0;
-        return setComboCounter(false);
+
+        if (scoringType != TYPE_MODERNFREEZE) {
+            lastClearLinesWasSpecial = false;
+            return setComboCounter(false);
+        } else {
+            return comboCounter;
+        }
     }
 
     /**
