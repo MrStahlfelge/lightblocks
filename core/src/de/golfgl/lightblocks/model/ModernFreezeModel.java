@@ -5,13 +5,14 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.Replay;
 
 public class ModernFreezeModel extends GameModel {
-    public static final String MODEL_ID = "modernfreeze";
+    public static final String MODEL_ID = "modernfreeze2";
     public static final int DIFFICULTY_HARD = 2;
     public static final int DIFFICULTY_NORMAL = 1;
     public static final int DIFFICULTY_EASY = 0;
@@ -144,7 +145,7 @@ public class ModernFreezeModel extends GameModel {
                 freezeBonusMultiplier++;
 
             int removedLinesNum = fullLinesNum - freezedClearedLines;
-            getScore().addBonusScore(freezeBonusMultiplier * getScore().getCurrentLevel() *
+            getScore().addBonusScore(freezeBonusMultiplier *
                     getScore().getClearedLinesScore(removedLinesNum, isTSpin));
             totalScore.addClearedLines(removedLinesNum);
             freezedClearedLines = fullLinesNum;
@@ -182,7 +183,7 @@ public class ModernFreezeModel extends GameModel {
         isFreezed = false;
         freezeloadms = 0;
 
-        getScore().addBonusScore(100 * freezedClearedLines * getScore().getCurrentLevel());
+        getScore().addBonusScore(100 * freezedClearedLines);
         freezedClearedLines = 0;
 
         IntArray removedLines = new IntArray();
@@ -259,6 +260,13 @@ public class ModernFreezeModel extends GameModel {
         super.initGameScore(beginningLevel);
         getScore().setScoringType(GameScore.TYPE_MODERNFREEZE);
         getScore().setStartingLevel(sliceSpeed.get(getCurrentSlice()));
+    }
+
+    @Override
+    public String getScoreboardParameters() {
+        JsonValue root = new JsonValue(JsonValue.ValueType.object);
+        root.addChild("difficulty", new JsonValue(difficulty));
+        return root.toJson(JsonWriter.OutputType.json);
     }
 
     private int getCurrentSlice() {

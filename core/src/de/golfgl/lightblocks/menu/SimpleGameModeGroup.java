@@ -403,7 +403,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
 
         @Override
         protected String getGameModeTitle() {
-            return app.TEXTS.get("labelModel_modernfreeze");
+            return app.TEXTS.get("labelModel_modernfreeze2");
         }
 
         @Override

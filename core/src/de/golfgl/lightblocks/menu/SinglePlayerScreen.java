@@ -163,7 +163,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
             Button sprintButton = addPageScrollInfoButton(app.TEXTS.get("labelModel_sprint40"),
                     app.TEXTS.get("goalModelSprint"), PAGEIDX_SPRINT);
 
-            Button freezeButton = addPageScrollInfoButton(app.TEXTS.get("labelModel_modernfreeze"),
+            Button freezeButton = addPageScrollInfoButton(app.TEXTS.get("labelModel_modernfreeze2"),
                     app.TEXTS.get("introModelModernFreeze"), PAGEIDX_FREEZE);
 
             table.pad(0, 20, 0, 20);

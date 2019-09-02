@@ -145,7 +145,7 @@ public class GameScore implements IRoundScore {
     }
 
     protected int getCurrentScoreFactor() {
-        if (scoringType == TYPE_PRACTICE || scoringType == TYPE_SPRINT)
+        if (scoringType == TYPE_PRACTICE || scoringType == TYPE_SPRINT || scoringType == TYPE_MODERNFREEZE)
             return 1;
         else
             return getCurrentLevel() + 1;
