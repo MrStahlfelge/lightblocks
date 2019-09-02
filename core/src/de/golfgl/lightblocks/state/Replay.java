@@ -90,22 +90,26 @@ public class Replay {
 
             // abgebaute Reihen
             if (currentStep.isDropStep()) {
-                int[] activePiecePos = currentStep.getActivePiecePosition();
-                for (int row = 0; row < Gameboard.GAMEBOARD_ALLROWS; row++) {
-                    boolean rowIsFull = true;
-                    for (int col = 0; col < Gameboard.GAMEBOARD_COLUMNS && rowIsFull; col++) {
-                        int pos = row * Gameboard.GAMEBOARD_COLUMNS + col;
-                        boolean colIsFul = gameboard[pos] != Gameboard.SQUARE_EMPTY;
-                        if (!colIsFul)
-                            for (int i = 0; i < activePiecePos.length; i++) {
-                                if (activePiecePos[i] == pos)
-                                    colIsFul = true;
-                            }
+                if (currentStep.getRemovedLines() >= 0)
+                    cleared = cleared + currentStep.getRemovedLines();
+                else {
+                    int[] activePiecePos = currentStep.getActivePiecePosition();
+                    for (int row = 0; row < Gameboard.GAMEBOARD_ALLROWS; row++) {
+                        boolean rowIsFull = true;
+                        for (int col = 0; col < Gameboard.GAMEBOARD_COLUMNS && rowIsFull; col++) {
+                            int pos = row * Gameboard.GAMEBOARD_COLUMNS + col;
+                            boolean colIsFul = gameboard[pos] != Gameboard.SQUARE_EMPTY;
+                            if (!colIsFul)
+                                for (int i = 0; i < activePiecePos.length; i++) {
+                                    if (activePiecePos[i] == pos)
+                                        colIsFul = true;
+                                }
 
-                        rowIsFull = rowIsFull && colIsFul;
+                            rowIsFull = rowIsFull && colIsFul;
+                        }
+                        if (rowIsFull)
+                            cleared++;
                     }
-                    if (rowIsFull)
-                        cleared++;
                 }
             }
 
