@@ -219,11 +219,17 @@ public class ModernFreezeModel extends GameModel {
     }
 
     @Override
+    protected void achievementsClearedLines(int levelBeforeRemove, int removedLines, int gameboardFill) {
+        // muss bereits hier gesetzt werden, damit Achievement-Signal kommt
+        getScore().setStartingLevel(sliceSpeed.get(getCurrentSlice()));
+
+        super.achievementsClearedLines(levelBeforeRemove, removedLines, gameboardFill);
+    }
+
+    @Override
     protected void activeTetrominoDropped() {
         if (isFreezed && freezeloadms <= 0)
             finishFreezeMode();
-
-        getScore().setStartingLevel(sliceSpeed.get(getCurrentSlice()));
 
         if (getScore().getClearedLines() >= getLinesToClear())
             setGameOverWon(IGameModelListener.MotivationTypes.gameSuccess);
