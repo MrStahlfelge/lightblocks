@@ -22,12 +22,12 @@ public class FaRadioButton<T> extends GlowLabelButton {
     private boolean changing;
     private boolean showIndicator = true;
 
-    public FaRadioButton(Skin skin) {
-        this(skin, GlowLabelButton.FONT_SCALE_SUBMENU);
+    public FaRadioButton(Skin skin, boolean withFa) {
+        this(skin, GlowLabelButton.FONT_SCALE_SUBMENU, withFa);
     }
 
-    public FaRadioButton(Skin skin, float fontScale) {
-        super(" ", " ", skin, fontScale, 1f);
+    public FaRadioButton(Skin skin, float fontScale, boolean withFa) {
+        super(withFa ? " " : "", " ", skin, fontScale, 1f);
         this.skin = skin;
 
         listener = new ChangeListener() {
@@ -112,7 +112,8 @@ public class FaRadioButton<T> extends GlowLabelButton {
     }
 
     private void changeLabels(FaText text, int pos) {
-        setFaText(text.fa);
+        if (faLabel != null)
+            setFaText(text.fa);
 
         String textForLabel;
 

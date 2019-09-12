@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
@@ -16,6 +17,10 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class PracticeModel extends GameModel {
     public static final String MODEL_PRACTICE_ID = "practice";
+    public static final int TYPE_CLASSIC = 0;
+    public static final int TYPE_MODERN = 1;
+
+    private int modeType;
 
     public static int getMaxBeginningLevel(LightBlocksGame app) {
         // gibt mindestens 14 zurück, oder das ansonsten per Spiel erreichte Level plus 1
@@ -49,8 +54,15 @@ public class PracticeModel extends GameModel {
         retVal.setBeginningLevel(getScore().getStartingLevel());
         retVal.setInputKey(inputTypeKey);
         retVal.setGameMode(InitGameParameters.GameMode.Practice);
+        retVal.setModeType(modeType);
 
         return retVal;
+    }
+
+    @Override
+    public void startNewGame(InitGameParameters newGameParams) {
+        modeType = newGameParams.getModeType();
+        super.startNewGame(newGameParams);
     }
 
     @Override
@@ -82,6 +94,29 @@ public class PracticeModel extends GameModel {
     public String getScoreboardParameters() {
         JsonValue root = new JsonValue(JsonValue.ValueType.object);
         root.addChild("startLevel", new JsonValue(getScore().getStartingLevel()));
+        root.addChild("type", new JsonValue(modeType));
         return root.toJson(JsonWriter.OutputType.json);
+    }
+
+    @Override
+    public boolean isModernRotation() {
+        return modeType == TYPE_MODERN;
+    }
+
+    @Override
+    protected int getLockDelayMs() {
+        return modeType == TYPE_MODERN ? ModernFreezeModel.LOCK_DELAY : super.getLockDelayMs();
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        modeType = jsonData.getInt("modeType", TYPE_CLASSIC);
+        super.read(json, jsonData);
+    }
+
+    @Override
+    public void write(Json json) {
+        super.write(json);
+        json.writeValue("modeType", modeType);
     }
 }

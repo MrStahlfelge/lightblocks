@@ -266,7 +266,7 @@ public class SettingsScreen extends AbstractMenuDialog {
 
         public TouchInputSettings() {
             final FaRadioButton<Boolean> onScreenControlsButton = new FaRadioButton<Boolean>(app.skin,
-                    GlowLabelButton.FONT_SCALE_SUBMENU * 1.1f);
+                    GlowLabelButton.FONT_SCALE_SUBMENU * 1.1f, false);
             onScreenControlsButton.addEntry(false, "", app.TEXTS.get("menuUseGestureControls"));
             onScreenControlsButton.addEntry(true, "", app.TEXTS.get("menuUseOnScreenControls"));
             onScreenControlsButton.setValue(app.localPrefs.useOnScreenControls());
@@ -295,7 +295,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                     touchPanelSizeChanged();
                 }
             });
-            final FaRadioButton<Integer> swipeUpButtons = new FaRadioButton<Integer>(app.skin);
+            final FaRadioButton<Integer> swipeUpButtons = new FaRadioButton<Integer>(app.skin, false);
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_DONOTHING, "", app.TEXTS.get("menuSwipeUpToNothing"));
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_PAUSE, "", app.TEXTS.get("menuSwipeUpToPause"));
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_HARDDROP, "", app.TEXTS.get("menuSwipeUpToHardDrop"));
@@ -327,7 +327,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                 }
             });
             touchControlTypeTable.add(menuControlTypeLabel);
-            touchControlTypeTable.row().padTop(-10);
+            touchControlTypeTable.row();
 
             touchControlTypeTable.add(onScreenControlsButton);
             add(touchControlTypeTable);
@@ -354,7 +354,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                 }
             });
             swipeUp.add(menuSwipeUpToLabel);
-            swipeUp.row().padTop(-10);
+            swipeUp.row();
             swipeUp.add(swipeUpButtons);
             gestureSettings.row();
             gestureSettings.add(swipeUp);

@@ -24,6 +24,7 @@ public class LocalPrefs {
     public static final String KEY_SETTINGS_SCREEN = "settings";
     private static final String CRYPTOKEY = "***REMOVED***";
     private static final String PREF_KEY_MARATHON_TYPE = "marathonType";
+    private static final String PREF_KEY_MODE_TYPE = "modeType";
     private static final String PREF_KEY_LEVEL = "beginningLevel";
     private static final String PREF_KEY_FREEZE_DIFFICULTY = "freezeDifficulty";
     private static final String PREF_KEY_SPACTIVEPAGE = "singlePlayerPage";
@@ -273,6 +274,15 @@ public class LocalPrefs {
     public void saveMarathonLevelAndType(int beginningLevel, int selectedType) {
         prefs.putInteger(PREF_KEY_MARATHON_TYPE, selectedType);
         prefs.putInteger(PREF_KEY_LEVEL, beginningLevel);
+        prefs.flush();
+    }
+
+    public int getLastUsedModeType() {
+        return prefs.getInteger(PREF_KEY_MODE_TYPE, 0);
+    }
+
+    public void saveLastUsedModeType(int selectedType) {
+        prefs.putInteger(PREF_KEY_MODE_TYPE, selectedType);
         prefs.flush();
     }
 

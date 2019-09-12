@@ -205,7 +205,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         protected void fillParamsTable(LightBlocksGame app) {
             row().pad(10, 20, 10, 20);
 
-            marathonType = new FaRadioButton<Integer>(app.skin);
+            marathonType = new FaRadioButton<Integer>(app.skin, false);
             marathonType.addEntry(MARATHON_NORMAL, "",
                     app.TEXTS.get("marathonChooseTypeTitle" + String.valueOf(MARATHON_NORMAL)));
             marathonType.addEntry(MARATHON_RETRO, "",
@@ -232,10 +232,10 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
                     marathonType.changeValue();
                 }
             });
-            marathonTypeTabel.add(marathonTypeLabel).padBottom(-10);
+            marathonTypeTabel.add(marathonTypeLabel);
             marathonTypeTabel.row();
             marathonTypeTabel.add(marathonType);
-            marathonTypeTabel.row();
+            marathonTypeTabel.row().padTop(10);
             marathonTypeDescription = new ScaledLabel("\n", app.skin, LightBlocksGame.SKIN_FONT_REG);
             marathonTypeDescription.setWrap(true);
             marathonTypeDescription.setAlignment(Align.top);
@@ -261,6 +261,8 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
 
     public static class PracticeModeGroup extends SimpleGameModeGroup {
 
+        private FaRadioButton<Integer> modeType;
+
         public PracticeModeGroup(SinglePlayerScreen myParentScreen, LightBlocksGame app) {
             super(myParentScreen, app);
         }
@@ -282,7 +284,17 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
 
         @Override
         protected void fillParamsTable(LightBlocksGame app) {
-            row().pad(20, 20, 0, 20);
+            row();
+            modeType = new FaRadioButton<>(app.skin, false);
+            modeType.setShowIndicator(false);
+            modeType.addEntry(PracticeModel.TYPE_CLASSIC, "", app.TEXTS.get("modeTypeClassic"));
+            modeType.addEntry(PracticeModel.TYPE_MODERN, "", app.TEXTS.get("modeTypeModern"));
+            modeType.setValue(app.localPrefs.getLastUsedModeType());
+
+            add(modeType).expandX().fill();
+            menuScreen.addFocusableActor(modeType);
+
+            row().pad(10, 20, 0, 20);
             ScaledLabel introLabel = new ScaledLabel(app.TEXTS.get("introModelPractice"), app.skin,
                     LightBlocksGame.SKIN_FONT_REG, .75f);
             introLabel.setWrap(true);
@@ -298,6 +310,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
             initGameParametersParams.setGameMode(InitGameParameters.GameMode.Practice);
             initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
             initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYORTOUCH);
+            initGameParametersParams.setModeType(modeType.getValue());
             return initGameParametersParams;
         }
 
@@ -306,6 +319,11 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
             return PracticeModel.getMaxBeginningLevel(app);
         }
 
+        @Override
+        protected void savePreselectionSettings() {
+            super.savePreselectionSettings();
+            app.localPrefs.saveLastUsedModeType(modeType.getValue());
+        }
     }
 
     public static class SprintModeGroup extends SimpleGameModeGroup {
@@ -423,7 +441,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
             params.row().padTop(15);
             params.add(new ScaledLabel(app.TEXTS.get("labelDifficulty"), app.skin,
                     LightBlocksGame.SKIN_FONT_BIG)).expandY().bottom();
-            difficultyButton = new FaRadioButton<>(app.skin);
+            difficultyButton = new FaRadioButton<>(app.skin, false);
             difficultyButton.addEntry(ModernFreezeModel.DIFFICULTY_EASY, "",
                     app.TEXTS.get("labelDifficulty" + String.valueOf(ModernFreezeModel.DIFFICULTY_EASY)));
             difficultyButton.addEntry(ModernFreezeModel.DIFFICULTY_NORMAL, "",
@@ -433,7 +451,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
             difficultyButton.setValue(app.localPrefs.getFreezeDifficulty());
 
             params.row();
-            params.add(difficultyButton).height(difficultyButton.getPrefHeight() * .7f);
+            params.add(difficultyButton);
             menuScreen.addFocusableActor(difficultyButton);
 
             super.fillParamsTable(app);

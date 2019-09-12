@@ -24,6 +24,7 @@ public class InitGameParameters {
     private int beginningLevel;
     private String missionId;
     private GameMode gameMode;
+    private int modeType;
 
     // für Multiplayer
     private AbstractMultiplayerRoom multiplayerRoom;
@@ -99,6 +100,14 @@ public class InitGameParameters {
 
     public void setStartPaused(boolean startPaused) {
         this.startPaused = startPaused;
+    }
+
+    public int getModeType() {
+        return modeType;
+    }
+
+    public void setModeType(int modeType) {
+        this.modeType = modeType;
     }
 
     public GameModel newGameModelInstance() {

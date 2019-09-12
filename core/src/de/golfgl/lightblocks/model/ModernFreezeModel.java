@@ -19,10 +19,10 @@ public class ModernFreezeModel extends GameModel {
 
     public static final int MAX_FREEZEMS = 20 * 1000;
     public static final float LINE_FREEZE_END_DELAY = .05f;
-    public static final int FREEZE_TIMEOUT = 5000;
     public static final int CNT_SLICES_PER_ROUND = 3;
     public static final int CNT_ROUNDS_PER_GAME = 4;
     public static final int CNT_SLICES_PER_GAME = CNT_ROUNDS_PER_GAME * CNT_SLICES_PER_ROUND;
+    public static final int LOCK_DELAY = 500;
 
     // speichern/laden siehe read/write
     private int difficulty;
@@ -349,7 +349,7 @@ public class ModernFreezeModel extends GameModel {
 
     @Override
     protected int getLockDelayMs() {
-        return 500;
+        return LOCK_DELAY;
     }
 
     @Override
