@@ -1072,6 +1072,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
             case tenLinesCleared:
                 text = extraMsg + " " + app.TEXTS.get("labelLines");
                 break;
+            case boardCleared:
+                text = app.TEXTS.get("motivationCleanComplete");
+                break;
             case newHighscore:
                 text = app.TEXTS.get("motivationNewHighscore");
                 break;

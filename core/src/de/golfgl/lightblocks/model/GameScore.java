@@ -297,4 +297,13 @@ public class GameScore implements IRoundScore {
     public boolean isFraudDetected() {
         return fraudDetected;
     }
+
+    public boolean addPerfectClear() {
+        if (scoringType != TYPE_MODERNFREEZE)
+            return false;
+        else {
+            addBonusScore(1500);
+            return true;
+        }
+    }
 }

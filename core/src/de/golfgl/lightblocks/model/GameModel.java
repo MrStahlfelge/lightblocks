@@ -346,8 +346,12 @@ public abstract class GameModel implements Json.Serializable {
         if (clearedLines >= 100 && clearedLines - removedLines < 100)
             gpgsUpdateAchievement(GpgsHelper.ACH_LONGCLEANER);
 
-        if (score.getDrawnTetrominos() > 10 && gameboardFill == 0)
+        if (score.getDrawnTetrominos() > 10 && gameboardFill == 0) {
             gpgsUpdateAchievement(GpgsHelper.ACH_CLEAN_COMPLETE);
+
+            if (score.addPerfectClear())
+                userInterface.showMotivation(IGameModelListener.MotivationTypes.boardCleared, null);
+        }
 
         float fTotalClearedLines = totalScore.getClearedLines();
         gpgsUpdateAchievement(GpgsHelper.ACH_ADDICTION_LEVEL_1, removedLines, fTotalClearedLines / 500);
