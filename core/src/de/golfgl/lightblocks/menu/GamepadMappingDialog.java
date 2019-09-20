@@ -125,6 +125,7 @@ public class GamepadMappingDialog extends ControllerMenuDialog {
         switch (currentStep) {
             case 0:
                 mappings.resetMappings(controller);
+                mappings.recordButtonsToIgnoreForMapping(controller);
                 instructionLabel.setText(instructionIntro + app.TEXTS.get("configGamepadStep0"));
                 inputToRecord = MyControllerMapping.AXIS_HORIZONTAL;
                 break;
