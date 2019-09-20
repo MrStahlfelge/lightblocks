@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.opensource.lightblocks"
-          android:versionCode="1925"
-          android:versionName="1.4.1925">
+          android:versionCode="1926"
+          android:versionName="1.4.1926">
 
     <!-- Kryonet/Multiplayer, GameJolt and GameCircle -->
     <uses-permission android:name="android.permission.INTERNET"/>
