@@ -11,6 +11,8 @@
   "name": "fulltemplate",
   "author": "bsc",
   "version": 1,
+  "minBuildNumber": 1926,
+  "targetBuildNumber": 1926,
 
   // music - optional (defaults to normal music)
   // You can use mp3 or ogg files. mp3 is supported on all platforms, ogg will not work on iOS

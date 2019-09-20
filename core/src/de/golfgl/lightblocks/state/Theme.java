@@ -215,6 +215,11 @@ public class Theme {
                     else
                         themeAtlas = new TextureAtlas();
 
+                    int minVersionToUse = themeConfigJson.getInt("minBuildNumber", 0);
+
+                    if (minVersionToUse > LightBlocksGame.GAME_VERSIONNUMBER)
+                        throw new RuntimeException("You need a newer Lightblocks version to use this theme.");
+
                     themeName = themeConfigJson.getString("name", null);
 
                     if (themeName == null || themeName.isEmpty())

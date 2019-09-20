@@ -112,7 +112,7 @@ public class ThemeSettingsDialog extends ControllerMenuDialog {
         resetThemeButton.setDisabled(!app.theme.isThemePresent());
 
         // Additional info zusammenbauen
-        themeAdditionalInfoCell.setActor(null);
+        themeAdditionalInfoCell.setActor(null).minHeight(50);
 
         String additionalInfo = app.theme.getThemeVersion() > 0 ?
                 app.TEXTS.format("labelThemeVersion", String.valueOf(app.theme.getThemeVersion())) : "";
