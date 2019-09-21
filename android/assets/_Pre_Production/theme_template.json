@@ -90,6 +90,19 @@
       "t": "",
       "garbage": ""
       // shortly activated when garbage is dropped in
-    }
+    },
+    // activated overlay block colors rgb(a) - optional (default is same as "tint")
+    "activated_tint": {
+      "l": "ffffff",
+      "i": "ffffff",
+      "j": "ffffff",
+      "z": "ffffff",
+      "s": "ffffff",
+      "o": "ffffff",
+      "t": "ffffff",
+      "garbage": "888888"
+    },
+    // Alpha value (0-255) with which the activated pics are overlayed when the block is deactivated. Default 0 if block pics are set
+    "activated_overlay_alpha": 0
   }
 }

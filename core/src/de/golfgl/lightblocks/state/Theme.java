@@ -49,6 +49,7 @@ public class Theme {
     public Drawable blockActiveT;
     public Drawable blockActiveI;
     public Drawable blockActiveGarbage;
+    public float activatedOverlayAlpha;
 
     public Drawable backgroundPic;
     public Drawable backgroundLandscapePic;
@@ -166,6 +167,7 @@ public class Theme {
         blockActiveT = blockActiveI;
         blockActiveGarbage = blockActiveI;
         usesDefaultBlockPictures = true;
+        activatedOverlayAlpha = 0;
 
         backgroundPic = null;
         backgroundLandscapePic = null;
@@ -361,37 +363,49 @@ public class Theme {
             }
 
             JsonValue tintNode = blockNode.get("tint");
+            JsonValue activatedTintNode = blockNode.get("activated_tint");
             if (tintNode != null) {
+                if (activatedTintNode == null)
+                    activatedTintNode = tintNode;
+
                 Color tintColor = findOptionalColor(tintNode, "l");
                 blockNormalL = tintPicsWithColor(tintColor, blockNormalL);
+                tintColor = findOptionalColor(activatedTintNode, "l");
                 blockActiveL = tintPicsWithColor(tintColor, blockActiveL);
 
                 tintColor = findOptionalColor(tintNode, "i");
                 blockNormalI = tintPicsWithColor(tintColor, blockNormalI);
+                tintColor = findOptionalColor(activatedTintNode, "i");
                 blockActiveI = tintPicsWithColor(tintColor, blockActiveI);
 
                 tintColor = findOptionalColor(tintNode, "j");
                 blockNormalJ = tintPicsWithColor(tintColor, blockNormalJ);
+                tintColor = findOptionalColor(activatedTintNode, "j");
                 blockActiveJ = tintPicsWithColor(tintColor, blockActiveJ);
 
                 tintColor = findOptionalColor(tintNode, "z");
                 blockNormalZ = tintPicsWithColor(tintColor, blockNormalZ);
+                tintColor = findOptionalColor(activatedTintNode, "z");
                 blockActiveZ = tintPicsWithColor(tintColor, blockActiveZ);
 
                 tintColor = findOptionalColor(tintNode, "s");
                 blockNormalS = tintPicsWithColor(tintColor, blockNormalS);
+                tintColor = findOptionalColor(activatedTintNode, "s");
                 blockActiveS = tintPicsWithColor(tintColor, blockActiveS);
 
                 tintColor = findOptionalColor(tintNode, "o");
                 blockNormalO = tintPicsWithColor(tintColor, blockNormalO);
+                tintColor = findOptionalColor(activatedTintNode, "o");
                 blockActiveO = tintPicsWithColor(tintColor, blockActiveO);
 
                 tintColor = findOptionalColor(tintNode, "t");
                 blockNormalT = tintPicsWithColor(tintColor, blockNormalT);
+                tintColor = findOptionalColor(activatedTintNode, "t");
                 blockActiveT = tintPicsWithColor(tintColor, blockActiveT);
 
                 tintColor = findOptionalColor(tintNode, "garbage");
                 blockNormalGarbage = tintPicsWithColor(tintColor, blockNormalGarbage);
+                tintColor = findOptionalColor(activatedTintNode, "garbage");
                 blockActiveGarbage = tintPicsWithColor(tintColor, blockActiveGarbage);
 
                 tintColor = findOptionalColor(tintNode, "grid");
@@ -400,6 +414,8 @@ public class Theme {
                 tintColor = findOptionalColor(tintNode, "ghost");
                 blockGhost = tintPicsWithColor(tintColor, blockGhost);
             }
+
+            activatedOverlayAlpha = (float) blockNode.getInt("activated_overlay_alpha", 0) / 255f;
 
         }
 

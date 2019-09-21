@@ -22,7 +22,6 @@ public class BlockActor extends Actor {
 
     public static final int COLOR_MODE_NONE = 0;
     public static final int COLOR_MODE_SHADEOFGREY = 1;
-    private final static float dislighentedAlpha = .4f;
     private final static float timeToEnlighten = .2f;
     private final static float timeToDislighten = .6f;
     private static Color COLOR_L;
@@ -35,6 +34,7 @@ public class BlockActor extends Actor {
     private static Color COLOR_GARBAGE;
     private final AlphaAction glowAction;
     private final int blockType;
+    private float dislighentedAlpha = .4f;
     private Image imBlock;
 
     private Image imBlockEnlightened;
@@ -68,7 +68,14 @@ public class BlockActor extends Actor {
         imBlockEnlightened = new Image(useTheme ? app.theme.getBlockTextureEnlightened(blockType)
                 : new TextureRegionDrawable(app.trBlockEnlightened));
 
-        Color blockTypeColor = getBlockTypeColor(blockType);
+        Color blockTypeColor;
+
+        if (useTheme && !app.theme.usesDefaultBlockPictures) {
+            blockTypeColor = Color.WHITE;
+            dislighentedAlpha = app.theme.activatedOverlayAlpha;
+        } else
+            blockTypeColor = getBlockTypeColor(blockType);
+
         imBlockEnlightened.setColor(blockTypeColor.r, blockTypeColor.g, blockTypeColor.b, dislighentedAlpha);
         imBlock.setColor(blockTypeColor);
     }
@@ -214,7 +221,7 @@ public class BlockActor extends Actor {
         if (isEnlightened)
             return;
 
-        imBlockEnlightened.getColor().a = 2 * dislighentedAlpha;
+        imBlockEnlightened.getColor().a = .8f;
 
         // kleiner Hack, damit setEnlightened(false) arbeitet
         isEnlightened = true;
