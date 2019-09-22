@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.gpgs;
 
 import de.golfgl.gdxgamesvcs.IGameServiceIdMapper;
 import de.golfgl.lightblocks.model.MarathonModel;
+import de.golfgl.lightblocks.model.ModernFreezeModel;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.RetroMarathonModel;
 import de.golfgl.lightblocks.model.SprintModel;
@@ -34,6 +35,8 @@ public class GpgsHelper {
     public static final String ACH_GRAVITY_KING = "CgkI4vHs17ETEAIQGg";
     public static final String ACH_MARATHON_FLYING_BASILICA = "CgkI4vHs17ETEAIQQw";
     public static final String ACH_SPRINTER = "CgkI4vHs17ETEAIQPw";
+    public static final String ACH_FREEZER = "CgkI4vHs17ETEAIQRQ";
+    public static final String ACH_SUPER_FREEZER = "CgkI4vHs17ETEAIQRg";
     public static final String ACH_MEGA_MULTI_PLAYER = "CgkI4vHs17ETEAIQGw";
     public static final String ACH_GAMEPAD_OWNER = "CgkI4vHs17ETEAIQHA";
     public static final String ACH_SPECIAL_CHAIN = "CgkI4vHs17ETEAIQHQ";
@@ -52,6 +55,7 @@ public class GpgsHelper {
     public static final String LEAD_MARATHON_GAMEPAD = "CgkI4vHs17ETEAIQCQ";
     public static final String LEAD_PRACTICE_MODE = "CgkI4vHs17ETEAIQPA";
     public static final String LEAD_SPRINT_MODE = "CgkI4vHs17ETEAIQQA";
+    public static final String LEAD_FREEZE_MODE = "CgkI4vHs17ETEAIQRA";
     public static final String EVENT_LOCAL_MULTIPLAYER_MATCH_STARTED = "CgkI4vHs17ETEAIQAg";
     public static final String EVENT_MULTIPLAYER_MATCH_WON = "CgkI4vHs17ETEAIQAQ";
     public static final String EVENT_MARATHON_STARTED = "CgkI4vHs17ETEAIQAw";
@@ -94,6 +98,8 @@ public class GpgsHelper {
             return LEAD_SPRINT_MODE;
         if (gameModelId.equalsIgnoreCase(RetroMarathonModel.MODEL_MARATHON_RETRO89))
             return LEAD_MARATHON_RETRO;
+        if (gameModelId.equalsIgnoreCase(ModernFreezeModel.MODEL_ID))
+            return LEAD_FREEZE_MODE;
 
         return null;
     }

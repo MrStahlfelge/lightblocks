@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.Replay;
 
@@ -62,6 +63,7 @@ public class ModernFreezeModel extends GameModel {
             freezeBonusMultiplier = freezeloadms >= MAX_FREEZEMS ? 2 : 1;
             freezedClearedLines = 0;
             userInterface.startFreezeMode();
+            gpgsUpdateAchievement(GpgsHelper.ACH_FREEZER);
         }
 
         return isFreezed;
@@ -149,6 +151,9 @@ public class ModernFreezeModel extends GameModel {
                     getScore().getClearedLinesScore(removedLinesNum, isTSpin));
             totalScore.addClearedLines(removedLinesNum);
             freezedClearedLines = fullLinesNum;
+
+            if (freezedClearedLines >= 10)
+                gpgsUpdateAchievement(GpgsHelper.ACH_SUPER_FREEZER);
         } else if (isTSpin)
             getScore().addTSpinBonus();
 
