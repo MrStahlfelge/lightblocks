@@ -42,12 +42,17 @@
     "bgpic": "",
     "bgpic_landscape": "",
     "scorecolor": "ffffff",
+    // Garbage indicator, time while freezed
     "emphasizecolor": "ff0000",
+    // Combo indicator, time when freeze charged completely or it's your turn in turn-based
+    "focussedcolor": "0000ff",
+    // the incoming label showing "Double", "Level x" and so on
     "achievementcolor": "ffffff",
     // set the achievement shadow color to the achievement color to deactivate the shadow
     "achievementshadowcolor": "000000",
     "titlecolor": "ffffff",
     "wallcolor": "ffffff",
+    // on screen buttoncolor - TODO
     "buttoncolor": "ffffff"
   },
   "blocks": {

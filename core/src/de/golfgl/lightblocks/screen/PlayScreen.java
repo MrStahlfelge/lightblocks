@@ -164,7 +164,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, La
         imGarbageIndicator.setX(imLine.getX());
         imGarbageIndicator.setY(imLine.getY());
         imGarbageIndicator.setHeight(NINE_PATCH_BORDER_SIZE * 2);
-        imGarbageIndicator.setColor(new Color(1, .2f, .2f, 1));
+        imGarbageIndicator.setColor(app.theme.emphasizeColor);
         imGarbageIndicator.setVisible(false);
         centerGroup.addActor(imGarbageIndicator);
 
@@ -178,7 +178,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, La
 
         imComboIndicator = new Image(line);
         imComboIndicator.setPosition(imLine.getX(), imLine.getY());
-        imComboIndicator.setColor(new Color(LightBlocksGame.COLOR_FOCUSSED_ACTOR));
+        imComboIndicator.setColor(new Color(app.theme.focussedColor));
         imComboIndicator.getColor().a = 0;
         centerGroup.addActor(imComboIndicator);
         showComboHeight(0);

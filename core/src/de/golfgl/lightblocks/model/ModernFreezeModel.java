@@ -338,8 +338,8 @@ public class ModernFreezeModel extends GameModel {
 
     @Override
     public Color getShownTimeColor() {
-        return isFreezed && freezeloadms > 100 ? LightBlocksGame.EMPHASIZE_COLOR :
-                freezeloadms >= MAX_FREEZEMS ? LightBlocksGame.COLOR_FOCUSSED_ACTOR : Color.WHITE;
+        return isFreezed && freezeloadms > 100 ? app.theme.emphasizeColor :
+                freezeloadms >= MAX_FREEZEMS ? app.theme.focussedColor : app.theme.getScoreColorOrWhite();
     }
 
     @Override

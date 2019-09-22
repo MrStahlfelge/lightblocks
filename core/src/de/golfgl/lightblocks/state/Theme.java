@@ -58,6 +58,7 @@ public class Theme {
     public Color achievementColor;
     public Color achievementShadowColor;
     public Color emphasizeColor;
+    public Color focussedColor;
     public Color titleColor;
     public Color wallColor;
 
@@ -174,6 +175,7 @@ public class Theme {
         bgColor = Color.BLACK;
         scoreColor = null;
         emphasizeColor = LightBlocksGame.EMPHASIZE_COLOR;
+        focussedColor = LightBlocksGame.COLOR_FOCUSSED_ACTOR;
         achievementColor = new Color(Color.WHITE);
         achievementShadowColor = new Color(Color.BLACK);
         wallColor = new Color(.8f, .8f, .8f, 1);
@@ -325,6 +327,12 @@ public class Theme {
             Color emphasizeColor = findOptionalColor(screenConfigNode, "emphasizecolor");
             if (emphasizeColor != null)
                 this.emphasizeColor = emphasizeColor;
+
+            Color focussedColor = findOptionalColor(screenConfigNode, "focussedcolor");
+            if (focussedColor != null)
+                this.focussedColor = focussedColor;
+
+            // TODO buttoncolor
 
             backgroundPic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic");
             backgroundLandscapePic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic_landscape");
@@ -494,8 +502,15 @@ public class Theme {
     }
 
     public void setScoreColor(Actor actor) {
-        if (app.theme.scoreColor != null)
+        if (scoreColor != null)
             actor.setColor(new Color(app.theme.scoreColor));
+    }
+
+    public Color getScoreColorOrWhite() {
+        if (scoreColor != null)
+            return scoreColor;
+        else
+            return Color.WHITE;
     }
 
     public void resetTheme() {

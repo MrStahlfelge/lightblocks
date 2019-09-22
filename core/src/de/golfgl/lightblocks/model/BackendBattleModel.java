@@ -81,7 +81,7 @@ public class BackendBattleModel extends GameModel {
 
     @Override
     public Color getShownTimeColor() {
-        return sendingGarbage ? LightBlocksGame.COLOR_FOCUSSED_ACTOR : Color.WHITE;
+        return sendingGarbage ? app.theme.focussedColor : app.theme.getScoreColorOrWhite();
     }
 
     @Override
