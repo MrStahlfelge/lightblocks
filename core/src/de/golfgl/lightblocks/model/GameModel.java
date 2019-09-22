@@ -1006,6 +1006,10 @@ public abstract class GameModel implements Json.Serializable {
         return null;
     }
 
+    public String getShownTimeButtonDescription() {
+        return null;
+    }
+
     public Color getShownTimeColor() {
         return null;
     }

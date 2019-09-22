@@ -298,6 +298,22 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, La
     }
 
     /**
+     * simuliert das Antippen des Zeitlabels und gibt ein optisches Feedback wenn es keine Reaktion gab
+     * @return
+     */
+    protected boolean touchTimeLabelWithWarning() {
+        boolean somethingDone = gameModel.onTimeLabelTouchedByPlayer();
+
+        if (!somethingDone && !timeLabel.hasActions()) {
+            Color oldColor = new Color(timeLabel.getColor());
+            timeLabel.setColor(app.theme.emphasizeColor);
+            timeLabel.addAction(Actions.color(oldColor, 1f));
+        }
+
+        return somethingDone;
+    }
+
+    /**
      * Constructs a new game and sets the screen to it.
      *
      * @param newGameParams null if game should be resumed.
@@ -1182,6 +1198,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, La
             int timeMs = gameModel.getShownTimeMs();
 
             if (Math.abs(timeMs - currentShownTime) >= 100) {
+                timeLabel.clearActions();
+
                 String timeDesc = gameModel.getShownTimeDescription();
                 Color timeLabelColor = gameModel.getShownTimeColor();
 

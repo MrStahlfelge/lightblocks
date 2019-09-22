@@ -348,6 +348,11 @@ public class ModernFreezeModel extends GameModel {
     }
 
     @Override
+    public String getShownTimeButtonDescription() {
+        return "FREEZE";
+    }
+
+    @Override
     public boolean isModernRotation() {
         return true;
     }

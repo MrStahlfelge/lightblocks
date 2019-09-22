@@ -19,9 +19,11 @@ public class LandscapeOnScreenButtons extends Group {
     private final Button rotateLeftButton;
     private final Button hardDropButton;
     private final PlayGesturesInput.HoldButton holdButton;
+    private PlayGesturesInput.FreezeButton freezeButton;
 
     public LandscapeOnScreenButtons(LightBlocksGame app, final PlayScreen playScreen,
-                                    ChangeListener touchPadListener, InputListener holdInputListener) {
+                                    ChangeListener touchPadListener, InputListener holdInputListener,
+                                    InputListener freezeButtonInputListener) {
         touchpad = new Touchpad(0, app.skin);
         touchpad.addListener(touchPadListener);
         addActor(touchpad);
@@ -65,7 +67,18 @@ public class LandscapeOnScreenButtons extends Group {
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
                 }
             });
+
+            String freezeButtonLabel = playScreen.gameModel.getShownTimeButtonDescription();
+            if (freezeButtonLabel != null) {
+                freezeButton = new PlayGesturesInput.FreezeButton(app, freezeButtonLabel,
+                        freezeButtonInputListener);
+            }
+
+        } else {
+            freezeButton = new PlayGesturesInput.FreezeButton(app, "FREEZE", freezeButtonInputListener);
         }
+        if (freezeButton != null)
+            addActor(freezeButton);
     }
 
     public void resize(IOnScreenButtonsScreen screen) {
@@ -82,6 +95,8 @@ public class LandscapeOnScreenButtons extends Group {
         hardDropButton.setPosition(rotateRightButton.getX() - size * .55f, rotateRightButton.getY());
 
         holdButton.resize(screen,20);
+        if (freezeButton != null)
+            freezeButton.resize(screen, 20);
     }
 
     public interface IOnScreenButtonsScreen {

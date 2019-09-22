@@ -213,7 +213,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     private void initLandscapeOnScreenControls() {
         if (landscapeOnScreenControls == null) {
             landscapeOnScreenControls = new LandscapeOnScreenButtons(playScreen.app, playScreen,
-                    new TouchpadChangeListener(), new HoldButtonInputListener());
+                    new TouchpadChangeListener(), new HoldButtonInputListener(), new FreezeButtonInputListener());
             landscapeOnScreenControls.setVisible(false);
             playScreen.stage.addActor(landscapeOnScreenControls);
         }
@@ -576,16 +576,61 @@ public class PlayGesturesInput extends PlayScreenInput {
     private class GestureOnScreenButtons extends Group {
         private static final int PADDING = 8;
         private final HoldButton holdButton;
+        private FreezeButton freezeButton;
 
         public GestureOnScreenButtons() {
             holdButton = new HoldButton(playScreen.app, playScreen, new HoldButtonInputListener());
             addActor(holdButton);
+            String freezeButtonLabel = playScreen.gameModel.getShownTimeButtonDescription();
+            if (freezeButtonLabel != null) {
+                freezeButton = new FreezeButton(playScreen.app, freezeButtonLabel,
+                        new FreezeButtonInputListener());
+                addActor(freezeButton);
+            }
         }
 
         public void resize() {
             holdButton.resize(playScreen, PADDING);
+            if (freezeButton != null)
+                freezeButton.resize(playScreen, PADDING);
         }
 
+    }
+
+    private class FreezeButtonInputListener extends InputListener {
+        @Override
+        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            if (!isPaused()) {
+                playScreen.touchTimeLabelWithWarning();
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public static class FreezeButton extends Button {
+        public FreezeButton(LightBlocksGame app, String label, InputListener inputListener) {
+            super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
+            Label buttonLabel = new Label(label, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            buttonLabel.setAlignment(Align.top);
+            buttonLabel.setFontScale(.8f);
+            add(buttonLabel).fill().expand();
+
+            setRotation(270);
+            setTransform(true);
+            addListener(inputListener);
+        }
+
+        public void resize(LandscapeOnScreenButtons.IOnScreenButtonsScreen screen, float padding) {
+            float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
+
+            setWidth(BlockActor.blockWidth * Tetromino.TETROMINO_BLOCKCOUNT);
+            setX(screen.getStage().getWidth() / 2 + gameboardWidth / 2 + 15);
+            setY(screen.getCenterGroup().getY() + screen.getBlockGroup().getY() +
+                    Gameboard.GAMEBOARD_NORMALROWS * BlockActor.blockWidth - getWidth() - padding);
+            setHeight(screen.getStage().getWidth() - padding - getX());
+
+        }
     }
 
     private class HoldButtonInputListener extends InputListener {
