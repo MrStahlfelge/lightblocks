@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -21,8 +20,7 @@ import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.scene2d.BlockActor;
-import de.golfgl.lightblocks.scene2d.BlockGroup;
-import de.golfgl.lightblocks.scene2d.MyStage;
+import de.golfgl.lightblocks.scene2d.LandscapeOnScreenButtons;
 
 /**
  * Jegliche Touchscreen-Kontrollen verarbeiten
@@ -409,78 +407,6 @@ public class PlayGesturesInput extends PlayScreenInput {
         }
     }
 
-    private static class LandscapeOnScreenButtons extends Group {
-        private final Touchpad touchpad;
-        private final Button rotateRightButton;
-        private final Button rotateLeftButton;
-        private final Button hardDropButton;
-        private final HoldButton holdButton;
-
-        public LandscapeOnScreenButtons(LightBlocksGame app, final PlayScreen playScreen,
-                                        ChangeListener touchPadListener, InputListener holdInputListener) {
-            touchpad = new Touchpad(0, app.skin);
-            touchpad.addListener(touchPadListener);
-            addActor(touchpad);
-
-            rotateRightButton = new ImageButton(app.skin, "rotateright");
-            addActor(rotateRightButton);
-
-            rotateLeftButton = new ImageButton(app.skin, "rotateleft");
-            addActor(rotateLeftButton);
-
-            hardDropButton = new ImageButton(app.skin, "harddrop");
-            addActor(hardDropButton);
-
-            holdButton = new HoldButton(app, playScreen, holdInputListener);
-            addActor(holdButton);
-
-            if (playScreen != null) {
-                rotateRightButton.addListener(new InputListener() {
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        playScreen.gameModel.setRotate(true);
-                        return true;
-                    }
-                });
-                rotateLeftButton.addListener(new InputListener() {
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        playScreen.gameModel.setRotate(false);
-                        return true;
-                    }
-                });
-                hardDropButton.addListener(new InputListener() {
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
-                        return true;
-                    }
-
-                    @Override
-                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
-                    }
-                });
-            }
-        }
-
-        public void resize(IOnScreenButtonsScreen screen) {
-            float size = Math.min(screen.getStage().getHeight() * .5f, screen.getCenterGroup().getX());
-            touchpad.setSize(size, size);
-            touchpad.setPosition(0, 0);
-            rotateRightButton.setSize(size * .4f, size * .4f);
-            rotateLeftButton.setSize(size * .4f, size * .4f);
-            hardDropButton.setSize(size * .4f, size * .4f);
-            rotateRightButton.setPosition(screen.getStage().getWidth() - size * .5f, size - rotateRightButton
-                    .getHeight());
-            rotateLeftButton.setPosition(rotateRightButton.getX() - size * .45f, (rotateRightButton.getY() -
-                    rotateRightButton.getHeight()) / 2);
-            hardDropButton.setPosition(rotateRightButton.getX() - size * .55f, rotateRightButton.getY());
-
-            holdButton.resize(screen,20);
-        }
-    }
-
     private class PortraitOnScreenButtons extends Group {
         private static final int PADDING = 8;
         private final PortraitButton rotateRight;
@@ -673,7 +599,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         }
     }
 
-    private static class HoldButton extends Button {
+    public static class HoldButton extends Button {
         public HoldButton(LightBlocksGame app, PlayScreen playScreen, InputListener inputListener) {
             super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
             Label buttonLabel = new Label("HOLD", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
@@ -691,7 +617,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             addListener(inputListener);
         }
 
-        public void resize(IOnScreenButtonsScreen screen, float padding) {
+        public void resize(LandscapeOnScreenButtons.IOnScreenButtonsScreen screen, float padding) {
             float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
 
             setX(screen.getStage().getWidth() / 2 + gameboardWidth / 2 + 15);
@@ -704,9 +630,4 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     }
 
-    public interface IOnScreenButtonsScreen {
-        MyStage getStage();
-        Group getCenterGroup();
-        BlockGroup getBlockGroup();
-    }
 }
