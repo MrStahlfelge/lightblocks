@@ -58,6 +58,7 @@ import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
 import de.golfgl.lightblocks.scene2d.MotivationLabel;
+import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.OverlayMessage;
 import de.golfgl.lightblocks.scene2d.ParticleEffectActor;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -76,7 +77,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 16.01.2017.
  */
 
-public class PlayScreen extends AbstractScreen implements IGameModelListener {
+public class PlayScreen extends AbstractScreen implements IGameModelListener, PlayGesturesInput.IOnScreenButtonsScreen {
 
     public static final float DURATION_TETRO_MOVE = 1 / 30f;
     public static final float DURATION_REMOVE_DELAY = .15f;
@@ -1338,6 +1339,21 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener {
                     && !isLandscape() || isLandscape() && requestedScreenOrientation.equals(Input.Orientation.Landscape)))
                 removeGameBlocker(usePortraitGameBlocker);
         }
+    }
+
+    @Override
+    public MyStage getStage() {
+        return stage;
+    }
+
+    @Override
+    public Group getCenterGroup() {
+        return centerGroup;
+    }
+
+    @Override
+    public BlockGroup getBlockGroup() {
+        return blockGroup;
     }
 
     public static class PlayScoreTable extends Table {
