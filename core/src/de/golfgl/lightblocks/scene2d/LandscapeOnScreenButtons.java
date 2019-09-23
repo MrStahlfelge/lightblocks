@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.scene2d;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -82,7 +83,7 @@ public class LandscapeOnScreenButtons extends Group {
     }
 
     public void resize(IOnScreenButtonsScreen screen) {
-        float size = Math.min(screen.getStage().getHeight() * .5f, screen.getCenterPosX());
+        float size = MathUtils.clamp(screen.getCenterPosX(), LightBlocksGame.nativeGameWidth * .45f, screen.getStage().getHeight() * .5f);
         touchpad.setSize(size, size);
         touchpad.setPosition(0, 0);
         rotateRightButton.setSize(size * .4f, size * .4f);
