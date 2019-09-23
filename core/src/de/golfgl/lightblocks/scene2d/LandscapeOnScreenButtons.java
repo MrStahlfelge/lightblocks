@@ -82,7 +82,7 @@ public class LandscapeOnScreenButtons extends Group {
     }
 
     public void resize(IOnScreenButtonsScreen screen) {
-        float size = Math.min(screen.getStage().getHeight() * .5f, screen.getCenterGroup().getX());
+        float size = Math.min(screen.getStage().getHeight() * .5f, screen.getCenterPosX());
         touchpad.setSize(size, size);
         touchpad.setPosition(0, 0);
         rotateRightButton.setSize(size * .4f, size * .4f);
@@ -101,7 +101,7 @@ public class LandscapeOnScreenButtons extends Group {
 
     public interface IOnScreenButtonsScreen {
         MyStage getStage();
-        Group getCenterGroup();
-        BlockGroup getBlockGroup();
+        float getCenterPosX();
+        float getGameboardTop();
     }
 }

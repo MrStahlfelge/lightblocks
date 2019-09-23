@@ -1366,13 +1366,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, La
     }
 
     @Override
-    public Group getCenterGroup() {
-        return centerGroup;
+    public float getCenterPosX() {
+        return centerGroup.getX();
     }
 
     @Override
-    public BlockGroup getBlockGroup() {
-        return blockGroup;
+    public float getGameboardTop() {
+        return centerGroup.getY() + blockGroup.getY() + Gameboard.GAMEBOARD_NORMALROWS * BlockActor.blockWidth;
     }
 
     public static class PlayScoreTable extends Table {

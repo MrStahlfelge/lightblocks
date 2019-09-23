@@ -626,8 +626,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
             setWidth(BlockActor.blockWidth * Tetromino.TETROMINO_BLOCKCOUNT);
             setX(screen.getStage().getWidth() / 2 + gameboardWidth / 2 + 15);
-            setY(screen.getCenterGroup().getY() + screen.getBlockGroup().getY() +
-                    Gameboard.GAMEBOARD_NORMALROWS * BlockActor.blockWidth - getWidth() - padding);
+            setY(screen.getGameboardTop() - getWidth() - padding);
             setHeight(screen.getStage().getWidth() - padding - getX());
 
         }
@@ -666,8 +665,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
 
             setX(screen.getStage().getWidth() / 2 + gameboardWidth / 2 + 15);
-            setY(screen.getCenterGroup().getY() + screen.getBlockGroup().getY() +
-                    Gameboard.GAMEBOARD_NORMALROWS * BlockActor.blockWidth);
+            setY(screen.getGameboardTop());
             setHeight(screen.getStage().getWidth() - padding - getX());
             setWidth(BlockActor.blockWidth * Tetromino.TETROMINO_BLOCKCOUNT);
 
