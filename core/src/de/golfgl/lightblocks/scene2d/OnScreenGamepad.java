@@ -14,7 +14,7 @@ import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
 
-public class LandscapeOnScreenButtons extends Group {
+public class OnScreenGamepad extends Group {
     private final Touchpad touchpad;
     private final Button rotateRightButton;
     private final Button rotateLeftButton;
@@ -22,9 +22,9 @@ public class LandscapeOnScreenButtons extends Group {
     private final PlayGesturesInput.HoldButton holdButton;
     private PlayGesturesInput.FreezeButton freezeButton;
 
-    public LandscapeOnScreenButtons(LightBlocksGame app, final PlayScreen playScreen,
-                                    ChangeListener touchPadListener, InputListener holdInputListener,
-                                    InputListener freezeButtonInputListener) {
+    public OnScreenGamepad(LightBlocksGame app, final PlayScreen playScreen,
+                           ChangeListener touchPadListener, InputListener holdInputListener,
+                           InputListener freezeButtonInputListener) {
         touchpad = new Touchpad(0, app.skin);
         touchpad.addListener(touchPadListener);
         addActor(touchpad);

@@ -20,7 +20,7 @@ import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.scene2d.BlockActor;
-import de.golfgl.lightblocks.scene2d.LandscapeOnScreenButtons;
+import de.golfgl.lightblocks.scene2d.OnScreenGamepad;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
@@ -58,7 +58,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     private Label rotationLabel;
     private boolean didHardDrop;
 
-    private LandscapeOnScreenButtons gamepadOnScreenControls;
+    private OnScreenGamepad gamepadOnScreenControls;
     private PortraitOnScreenButtons buttonOnScreenControls;
     private boolean tutorialMode;
     private GestureOnScreenButtons gestureOnScreenControls;
@@ -215,7 +215,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     private void initGamepadOnScreenControls() {
         if (gamepadOnScreenControls == null) {
-            gamepadOnScreenControls = new LandscapeOnScreenButtons(playScreen.app, playScreen,
+            gamepadOnScreenControls = new OnScreenGamepad(playScreen.app, playScreen,
                     new TouchpadChangeListener(), new HoldButtonInputListener(), new FreezeButtonInputListener());
             gamepadOnScreenControls.setVisible(false);
             playScreen.stage.addActor(gamepadOnScreenControls);
@@ -624,7 +624,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             addListener(inputListener);
         }
 
-        public void resize(LandscapeOnScreenButtons.IOnScreenButtonsScreen screen, float padding) {
+        public void resize(OnScreenGamepad.IOnScreenButtonsScreen screen, float padding) {
             float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
 
             setWidth(BlockActor.blockWidth * Tetromino.TETROMINO_BLOCKCOUNT);
@@ -664,7 +664,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             addListener(inputListener);
         }
 
-        public void resize(LandscapeOnScreenButtons.IOnScreenButtonsScreen screen, float padding) {
+        public void resize(OnScreenGamepad.IOnScreenButtonsScreen screen, float padding) {
             float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
 
             setX(screen.getStage().getWidth() / 2 + gameboardWidth / 2 + 15);
