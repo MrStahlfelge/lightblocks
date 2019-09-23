@@ -3,8 +3,8 @@ package de.golfgl.lightblocks.gpgs;
 import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
-import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
+import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
  * Created by Benjamin Schulte on 06.05.2018.
@@ -22,9 +22,9 @@ public class GaHelper {
             if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
                 app.gameAnalytics.submitDesignEvent("swipeUpSetting:" + app.localPrefs.getSwipeUpType());
                 app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());
-                app.gameAnalytics.submitDesignEvent("showOnScreenControls:" + (app.localPrefs.useOnScreenControls()
-                        ? (((AbstractScreen) app.getScreen()).isLandscape() ? "landscape" : "portrait")
-                        : "false"));
+                LocalPrefs.TouchControlType usedTouchControls = app.localPrefs.getUsedTouchControls();
+                app.gameAnalytics.submitDesignEvent("showOnScreenControls:" + (usedTouchControls == LocalPrefs.TouchControlType.gestures ? "false" :
+                        usedTouchControls == LocalPrefs.TouchControlType.onScreenButtonsGamepad ? "gamepad" : "buttons"));
             }
 
             String themeName = app.theme.isThemePresent() ? app.theme.getThemeName() : "none";

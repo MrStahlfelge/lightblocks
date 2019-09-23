@@ -151,7 +151,7 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
         contentTable.row();
         contentTable.add(controllerList);
 
-        if (app.localPrefs.useOnScreenControls() && PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
+        if (app.localPrefs.getUsedTouchControls().isOnScreenButtons() && PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
             contentTable.row().padTop(20);
             contentTable.add(checkHideOnScreenControls);
         }

@@ -32,7 +32,7 @@ public class LocalPrefs {
     private static final String KEY_SCREENSHOWNPREFIX = "versionShownScreen_";
     private static final String KEY_LASTSTARTEDVERSION = "lastStartedVersion";
     private static final String KEY_LASTSTARTTIME = "lastStartTime";
-    private static final String PREF_KEY_ONSCREENCONTROLS = "onScreenControls";
+    private static final String PREF_KEY_TOUCHCONTROLTYPE = "touchControlType";
     private static final String PREF_KEY_HIDEONSCREENCONTROLS = "hideOnScreenControls";
     private static final String TVREMOTE_HARDDROP = "tvremote_harddrop";
     private static final String TVREMOTE_HOLD = "tvremote_hold";
@@ -64,7 +64,7 @@ public class LocalPrefs {
     private Float gridIntensity;
     private Integer lastUsedVersion;
     private Integer daysSinceLastStart;
-    private Boolean useOnScreenControls;
+    private TouchControlType touchControlType;
     private Boolean hideOnScreenControlsWhenGamepad;
     private TvRemoteKeyConfig tvRemoteKeyConfig;
     private boolean suppressSounds;
@@ -237,16 +237,16 @@ public class LocalPrefs {
         prefs.flush();
     }
 
-    public boolean useOnScreenControls() {
-        if (useOnScreenControls == null)
-            useOnScreenControls = prefs.getBoolean(PREF_KEY_ONSCREENCONTROLS, false);
+    public TouchControlType getUsedTouchControls() {
+        if (touchControlType == null)
+            touchControlType = TouchControlType.fromInteger(prefs.getInteger(PREF_KEY_TOUCHCONTROLTYPE, 0));
 
-        return useOnScreenControls;
+        return touchControlType;
     }
 
-    public void setUseOnScreenControls(boolean useOnScreenControls) {
-        this.useOnScreenControls = useOnScreenControls;
-        prefs.putBoolean(PREF_KEY_ONSCREENCONTROLS, useOnScreenControls);
+    public void setUsedTouchControls(TouchControlType type) {
+        this.touchControlType = type;
+        prefs.putInteger(PREF_KEY_TOUCHCONTROLTYPE, type.toInteger());
         prefs.flush();
     }
 
@@ -590,6 +590,43 @@ public class LocalPrefs {
         prefs.flush();
 
         return retVal;
+    }
+
+    public enum TouchControlType {
+        gestures, onScreenButtonsGamepad, onScreenButtonsPortrait;
+
+        static TouchControlType fromInteger(int type) {
+            switch (type) {
+                case 1:
+                    return onScreenButtonsGamepad;
+                case 2:
+                    return onScreenButtonsPortrait;
+                default:
+                    return gestures;
+            }
+        }
+
+        int toInteger() {
+            switch (this) {
+                case gestures:
+                    return 0;
+                case onScreenButtonsGamepad:
+                    return 1;
+                case onScreenButtonsPortrait:
+                    return 2;
+            }
+            return -1;
+        }
+
+        public boolean isOnScreenButtons() {
+            switch (this) {
+                case onScreenButtonsGamepad:
+                case onScreenButtonsPortrait:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 
     public static class TvRemoteKeyConfig {
