@@ -65,7 +65,8 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     @Override
     public String getInputHelpText() {
-        return playScreen.app.TEXTS.get(isUsingOnScreenButtons() ? "inputOnScreenButtonHelp" : "inputGesturesHelp");
+        return playScreen.app.TEXTS.get(!isUsingOnScreenButtons() ? "inputGesturesHelp" :
+                gamepadOnScreenControls != null ? "inputOnScreenGamepadHelp" : "inputOnScreenButtonHelp");
     }
 
     @Override
