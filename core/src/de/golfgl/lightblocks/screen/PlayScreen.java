@@ -57,9 +57,9 @@ import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
-import de.golfgl.lightblocks.scene2d.OnScreenGamepad;
 import de.golfgl.lightblocks.scene2d.MotivationLabel;
 import de.golfgl.lightblocks.scene2d.MyStage;
+import de.golfgl.lightblocks.scene2d.OnScreenGamepad;
 import de.golfgl.lightblocks.scene2d.OverlayMessage;
 import de.golfgl.lightblocks.scene2d.ParticleEffectActor;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -298,22 +298,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     }
 
     /**
-     * simuliert das Antippen des Zeitlabels und gibt ein optisches Feedback wenn es keine Reaktion gab
-     * @return
-     */
-    protected boolean touchTimeLabelWithWarning() {
-        boolean somethingDone = gameModel.onTimeLabelTouchedByPlayer();
-
-        if (!somethingDone && !timeLabel.hasActions()) {
-            Color oldColor = new Color(timeLabel.getColor());
-            timeLabel.setColor(app.theme.emphasizeColor);
-            timeLabel.addAction(Actions.color(oldColor, 1f));
-        }
-
-        return somethingDone;
-    }
-
-    /**
      * Constructs a new game and sets the screen to it.
      *
      * @param newGameParams null if game should be resumed.
@@ -364,6 +348,23 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             throw new VetoException(app.TEXTS.format("errorInputNotAvail",
                     app.TEXTS.get(PlayScreenInput.getInputTypeName(inp.getInputKey()))));
         }
+    }
+
+    /**
+     * simuliert das Antippen des Zeitlabels und gibt ein optisches Feedback wenn es keine Reaktion gab
+     *
+     * @return
+     */
+    protected boolean touchTimeLabelWithWarning() {
+        boolean somethingDone = gameModel.onTimeLabelTouchedByPlayer();
+
+        if (!somethingDone && !timeLabel.hasActions()) {
+            Color oldColor = new Color(timeLabel.getColor());
+            timeLabel.setColor(app.theme.emphasizeColor);
+            timeLabel.addAction(Actions.color(oldColor, 1f));
+        }
+
+        return somethingDone;
     }
 
     protected void populateScoreTable(Table scoreTable) {
@@ -1002,16 +1003,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     @Override
     public void swapHoldAndActivePiece(Integer[][] newHoldPiecePositions, Integer[][] oldActivePiecePositions,
                                        Integer[][] newActivePiecePositions, int ghostPieceDistance, int holdBlockType) {
-        float offsetX = getNextPieceXPos();
-        float offsetY;
+        float offsetX;
+        float offsetY = getNextPieceYPos();
 
-        // Wenn das Next Piece schon rechts vom Gameboard dargestellt wird, dann Hold-Piece auch. Sonst mittig
         if (isLandscape())
-            offsetY = (Gameboard.GAMEBOARD_NORMALROWS - (gameModel.isModernRotation() ? 4 : 3)) * BlockActor.blockWidth;
-        else {
-            offsetX = offsetX - (Tetromino.TETROMINO_BLOCKCOUNT + .5f) * BlockActor.blockWidth;
-            offsetY = getNextPieceYPos();
-        }
+            offsetX = blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT + 1.5f) * BlockActor.blockWidth;
+        else
+            offsetX = getNextPieceXPos() - (Tetromino.TETROMINO_BLOCKCOUNT + .5f) * BlockActor.blockWidth;
 
         final BlockActor[] oldHoldTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
 

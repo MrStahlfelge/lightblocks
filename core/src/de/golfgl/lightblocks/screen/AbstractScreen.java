@@ -41,6 +41,7 @@ public abstract class AbstractScreen implements Screen {
         this.app = app;
         MyExtendViewport viewport = getNewViewport(LightBlocksGame.nativeGameWidth, LightBlocksGame.nativeGameHeight);
         stage = new MyStage(viewport);
+        isLandscapeOrientation = Gdx.graphics.getWidth() > Gdx.graphics.getHeight();
     }
 
     protected MyExtendViewport getNewViewport(float width, float height) {
