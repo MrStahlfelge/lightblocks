@@ -3,40 +3,6 @@ atlasData: {
 	atlasCurrent: true
 	drawables: [
 		{
-			file: "../fa-45.png"
-			bgColor: {
-				r: 0
-				g: 0
-				b: 0
-				a: 1
-			}
-			visible: false
-			tint: null
-			tintName: null
-			name: fa-45
-			tiled: false
-			minWidth: 0
-			minHeight: 0
-			customized: false
-		}
-		{
-			file: "../qs-25-bold.png"
-			bgColor: {
-				r: 0
-				g: 0
-				b: 0
-				a: 1
-			}
-			visible: false
-			tint: null
-			tintName: null
-			name: qs-25-bold
-			tiled: false
-			minWidth: 0
-			minHeight: 0
-			customized: false
-		}
-		{
 			file: "../slider.9.png"
 			bgColor: {
 				r: 1
@@ -44,14 +10,14 @@ atlasData: {
 				b: 1
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: slider
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../slider-knob.png"
@@ -61,14 +27,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: slider-knob
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../slider-knob-pressed.png"
@@ -78,14 +44,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: slider-knob-pressed
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../slider-knob.png"
@@ -95,14 +61,14 @@ atlasData: {
 				b: 1
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: disabled
 			name: slider-knob-disabled
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../slider-before.9.png"
@@ -112,14 +78,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: slider-before
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../scroll-horizontal.9.png"
@@ -129,14 +95,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: scroll-horizontal
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../scroll-vertical.9.png"
@@ -146,14 +112,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: scroll-vertical
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../block-deactivated.png"
@@ -163,14 +129,14 @@ atlasData: {
 				b: 1
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: block-deactivated
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../block-light.png"
@@ -180,14 +146,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: block-light
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../lineglow.png"
@@ -197,14 +163,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: lineglow
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../window.9.png"
@@ -214,14 +180,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: window
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../list.9.png"
@@ -231,14 +197,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: list
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../white.png"
@@ -248,14 +214,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: white
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../white.png"
@@ -265,14 +231,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: lightselection
 			name: selection
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../qs-60-bold.png"
@@ -282,48 +248,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: false
 			tint: null
 			tintName: null
 			name: qs-60-bold
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
-		}
-		{
-			file: "../qs-40-bold.png"
-			bgColor: {
-				r: 0
-				g: 0
-				b: 0
-				a: 1
-			}
-			visible: false
-			tint: null
-			tintName: null
-			name: qs-40-bold
-			tiled: false
-			minWidth: 0
-			minHeight: 0
-			customized: false
-		}
-		{
-			file: "../qs-25-reg.png"
-			bgColor: {
-				r: 0
-				g: 0
-				b: 0
-				a: 1
-			}
-			visible: false
-			tint: null
-			tintName: null
-			name: qs-25-reg
-			tiled: false
-			minWidth: 0
-			minHeight: 0
-			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../qs-60-boldglow.png"
@@ -333,14 +265,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: false
 			tint: null
 			tintName: null
 			name: qs-60-boldglow
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../window-bl.9.png"
@@ -350,14 +282,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: window-bl
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../white.png"
@@ -367,7 +299,6 @@ atlasData: {
 				b: 1
 				a: 1
 			}
-			visible: true
 			tint: {
 				r: 0
 				g: 0
@@ -377,26 +308,10 @@ atlasData: {
 			tintName: null
 			name: smoke
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
-		}
-		{
-			file: "../qs-40-boldglow.png"
-			bgColor: {
-				r: 0
-				g: 0
-				b: 0
-				a: 1
-			}
-			visible: false
-			tint: null
-			tintName: null
-			name: qs-40-boldglow
-			tiled: false
-			minWidth: 0
-			minHeight: 0
-			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_small_font.9.png"
@@ -406,14 +321,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: button_small_font
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_small_font_glow.9.png"
@@ -423,14 +338,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: button_small_font_glow
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_small_font_filled.9.png"
@@ -440,14 +355,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: button_small_font_filled
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../white.png"
@@ -457,14 +372,14 @@ atlasData: {
 				b: 1
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: black
 			name: black
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_round.9.png"
@@ -474,14 +389,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: button_round
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../white.png"
@@ -491,7 +406,6 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: {
 				r: 1
 				g: 1
@@ -501,9 +415,10 @@ atlasData: {
 			tintName: null
 			name: transparent
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../radio.png"
@@ -513,14 +428,14 @@ atlasData: {
 				b: 1
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: radio
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../radio-over.png"
@@ -530,14 +445,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: radio-over
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_small_font.9.png"
@@ -547,14 +462,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: disabled
 			name: button_small_font_disabled
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../touchpad.png"
@@ -564,14 +479,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: touchpad
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../touchpad_knob.png"
@@ -581,14 +496,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: touchpad_knob
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_rotateright.png"
@@ -598,14 +513,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: button_rotateright
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_rotateright.png"
@@ -615,14 +530,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: disabled
 			name: button_rotateright_pressed
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_rotateleft.png"
@@ -632,14 +547,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: button_rotateleft
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_rotateleft.png"
@@ -649,14 +564,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: disabled
 			name: button_rotateleft_pressed
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_harddrop.png"
@@ -666,14 +581,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: button_harddrop
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../button_harddrop.png"
@@ -683,14 +598,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: disabled
 			name: button_harddrop_pressed
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../block-ghost.png"
@@ -700,14 +615,14 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: null
 			name: block-ghost
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../white.png"
@@ -717,7 +632,6 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: {
 				r: 1
 				g: 1
@@ -727,9 +641,10 @@ atlasData: {
 			tintName: null
 			name: whitesmoke
 			tiled: false
-			minWidth: 0
-			minHeight: 0
+			minWidth: -1
+			minHeight: -1
 			customized: false
+			tenPatchData: null
 		}
 		{
 			file: "../window-bl.9.png"
@@ -739,14 +654,101 @@ atlasData: {
 				b: 0
 				a: 1
 			}
-			visible: true
 			tint: null
 			tintName: lightselection
 			name: focused-window-bl
 			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+		}
+	]
+	fontDrawables: [
+		{
+			file: "../fa-45.png"
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: fa-45
+			tiled: false
 			minWidth: 0
 			minHeight: 0
 			customized: false
+			tenPatchData: null
+		}
+		{
+			file: "../qs-25-bold.png"
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: qs-25-bold
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
+			tenPatchData: null
+		}
+		{
+			file: "../qs-25-reg.png"
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: qs-25-reg
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
+			tenPatchData: null
+		}
+		{
+			file: "../qs-40-bold.png"
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: qs-40-bold
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
+			tenPatchData: null
+		}
+		{
+			file: "../qs-40-boldglow.png"
+			bgColor: {
+				r: 0
+				g: 0
+				b: 0
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: qs-40-boldglow
+			tiled: false
+			minWidth: 0
+			minHeight: 0
+			customized: false
+			tenPatchData: null
 		}
 	]
 }
@@ -4126,4 +4128,5 @@ preferences: {
 	}
 }
 saveFile: "../skin/lb.scmp"
+version: 30
 }

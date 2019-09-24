@@ -6,19 +6,19 @@ filter: Linear,Linear
 repeat: none
 qs-40-bold
   rotate: false
+  xy: 1, 1029
+  size: 1024, 512
+  orig: 1024, 512
+  offset: 0, 0
+  index: -1
+qs-40-boldglow
+  rotate: false
   xy: 1, 515
   size: 1024, 512
   orig: 1024, 512
   offset: 0, 0
   index: -1
 qs-60-bold
-  rotate: false
-  xy: 1, 1029
-  size: 1024, 512
-  orig: 1024, 512
-  offset: 0, 0
-  index: -1
-qs-60-boldglow
   rotate: false
   xy: 1, 1
   size: 1024, 512
@@ -146,7 +146,7 @@ qs-25-reg
   orig: 512, 512
   offset: 0, 0
   index: -1
-qs-40-boldglow
+qs-60-boldglow
   rotate: false
   xy: 1, 1306
   size: 1024, 512
