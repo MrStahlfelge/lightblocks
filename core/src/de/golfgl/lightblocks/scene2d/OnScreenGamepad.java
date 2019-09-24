@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.scene2d;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -13,7 +14,7 @@ import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
 
-public class LandscapeOnScreenButtons extends Group {
+public class OnScreenGamepad extends Group {
     private final Touchpad touchpad;
     private final Button rotateRightButton;
     private final Button rotateLeftButton;
@@ -21,9 +22,9 @@ public class LandscapeOnScreenButtons extends Group {
     private final PlayGesturesInput.HoldButton holdButton;
     private PlayGesturesInput.FreezeButton freezeButton;
 
-    public LandscapeOnScreenButtons(LightBlocksGame app, final PlayScreen playScreen,
-                                    ChangeListener touchPadListener, InputListener holdInputListener,
-                                    InputListener freezeButtonInputListener) {
+    public OnScreenGamepad(LightBlocksGame app, final PlayScreen playScreen,
+                           ChangeListener touchPadListener, InputListener holdInputListener,
+                           InputListener freezeButtonInputListener) {
         touchpad = new Touchpad(0, app.skin);
         touchpad.addListener(touchPadListener);
         addActor(touchpad);
@@ -82,7 +83,7 @@ public class LandscapeOnScreenButtons extends Group {
     }
 
     public void resize(IOnScreenButtonsScreen screen) {
-        float size = Math.min(screen.getStage().getHeight() * .5f, screen.getCenterPosX());
+        float size = MathUtils.clamp(screen.getCenterPosX(), LightBlocksGame.nativeGameWidth * .45f, screen.getStage().getHeight() * .5f);
         touchpad.setSize(size, size);
         touchpad.setPosition(0, 0);
         rotateRightButton.setSize(size * .4f, size * .4f);

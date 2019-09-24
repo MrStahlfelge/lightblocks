@@ -19,7 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -36,8 +35,10 @@ import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
+import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.TouchableSlider;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
@@ -262,18 +263,20 @@ public class SettingsScreen extends AbstractMenuDialog {
         Group touchPanel;
         private Slider touchPanelSizeSlider;
         private Table gestureSettings;
-        private ScrollPane onScreenButtonSettings;
+        private Table onScreenGamepadSettings;
+        private Table onScreenButtonSettings;
 
         public TouchInputSettings() {
-            final FaRadioButton<Boolean> onScreenControlsButton = new FaRadioButton<Boolean>(app.skin,
+            final FaRadioButton<LocalPrefs.TouchControlType> onScreenControlsButton = new FaRadioButton<>(app.skin,
                     GlowLabelButton.FONT_SCALE_SUBMENU * 1.1f, false);
-            onScreenControlsButton.addEntry(false, "", app.TEXTS.get("menuUseGestureControls"));
-            onScreenControlsButton.addEntry(true, "", app.TEXTS.get("menuUseOnScreenControls"));
-            onScreenControlsButton.setValue(app.localPrefs.useOnScreenControls());
+            onScreenControlsButton.addEntry(LocalPrefs.TouchControlType.gestures, "", app.TEXTS.get("menuUseGestureControls"));
+            onScreenControlsButton.addEntry(LocalPrefs.TouchControlType.onScreenButtonsGamepad, "", app.TEXTS.get("menuUseOnScreenGamepad"));
+            onScreenControlsButton.addEntry(LocalPrefs.TouchControlType.onScreenButtonsPortrait, "", app.TEXTS.get("menuUseOnScreenButtons"));
+            onScreenControlsButton.setValue(app.localPrefs.getUsedTouchControls());
             onScreenControlsButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    app.localPrefs.setUseOnScreenControls(onScreenControlsButton.getValue());
+                    app.localPrefs.setUsedTouchControls(onScreenControlsButton.getValue());
                     setSettingsTableActor();
                 }
             });
@@ -359,23 +362,29 @@ public class SettingsScreen extends AbstractMenuDialog {
             gestureSettings.row();
             gestureSettings.add(swipeUp);
 
-            Table onScreenButtonSettings = new Table();
-            ScaledLabel onScreenButtonIntro = new ScaledLabel(app.TEXTS.get("inputOnScreenButtonIntro"),
-                    app.skin, LightBlocksGame.SKIN_FONT_TITLE, .6f);
-            onScreenButtonIntro.setWrap(true);
-            onScreenButtonIntro.setAlignment(Align.center);
-            onScreenButtonSettings.add(onScreenButtonIntro).fillX().expandX().padBottom(20);
+            Button osbHelp = new RoundedTextButton(app.TEXTS.get("buttonHowToPlay"), app.skin);
+            addFocusableActor(osbHelp);
+            osbHelp.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    new VetoDialog(app.TEXTS.get("inputOnScreenButtonHelp"), app.skin,
+                            .8f * LightBlocksGame.nativeGameWidth).show(getStage());
+                }
+            });
+            onScreenButtonSettings = new Table();
+            onScreenButtonSettings.add(new Image(app.trPreviewOsb));
             onScreenButtonSettings.row();
-            ScaledLabel onScreenButtonHelp = new ScaledLabel(app.TEXTS.get("inputOnScreenButtonHelp"), app.skin,
-                    LightBlocksGame.SKIN_FONT_BIG);
-            onScreenButtonHelp.setWrap(true);
-            onScreenButtonHelp.setAlignment(Align.center);
-            onScreenButtonSettings.add(onScreenButtonHelp).fillX().expandX();
+            onScreenButtonSettings.add(osbHelp).expandY().top();
             onScreenButtonSettings.validate();
-            ScrollPane helpScrollPane = new ScrollPane(onScreenButtonSettings, app.skin);
-            helpScrollPane.setScrollingDisabled(true, false);
-            helpScrollPane.setFadeScrollBars(false);
-            this.onScreenButtonSettings = helpScrollPane;
+
+            Button adjustGamepad = new RoundedTextButton(app.TEXTS.get("buttonAdjust"), app.skin);
+            addFocusableActor(adjustGamepad);
+            adjustGamepad.setDisabled(true);
+            onScreenGamepadSettings = new Table();
+            onScreenGamepadSettings.add(new Image(app.trPreviewOsg));
+            onScreenGamepadSettings.row().padTop(20);
+            onScreenGamepadSettings.add(adjustGamepad).expandY().top();
+            onScreenGamepadSettings.validate();
 
             row();
             settingsTableCell = add().height(gestureSettings.getPrefHeight()).fillX();
@@ -401,8 +410,18 @@ public class SettingsScreen extends AbstractMenuDialog {
         }
 
         protected void setSettingsTableActor() {
-            settingsTableCell.setActor(app.localPrefs.useOnScreenControls() ? onScreenButtonSettings :
-                    gestureSettings);
+            Actor actor;
+            switch (app.localPrefs.getUsedTouchControls()) {
+                case onScreenButtonsGamepad:
+                    actor = onScreenGamepadSettings;
+                    break;
+                case onScreenButtonsPortrait:
+                    actor = onScreenButtonSettings;
+                    break;
+                default:
+                    actor = gestureSettings;
+            }
+            settingsTableCell.setActor(actor);
         }
 
         protected void touchPanelSizeChanged() {

@@ -20,7 +20,8 @@ import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.scene2d.BlockActor;
-import de.golfgl.lightblocks.scene2d.LandscapeOnScreenButtons;
+import de.golfgl.lightblocks.scene2d.OnScreenGamepad;
+import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
  * Jegliche Touchscreen-Kontrollen verarbeiten
@@ -57,14 +58,15 @@ public class PlayGesturesInput extends PlayScreenInput {
     private Label rotationLabel;
     private boolean didHardDrop;
 
-    private LandscapeOnScreenButtons landscapeOnScreenControls;
-    private PortraitOnScreenButtons portraitOnScreenControls;
+    private OnScreenGamepad gamepadOnScreenControls;
+    private PortraitOnScreenButtons buttonOnScreenControls;
     private boolean tutorialMode;
     private GestureOnScreenButtons gestureOnScreenControls;
 
     @Override
     public String getInputHelpText() {
-        return playScreen.app.TEXTS.get(isUsingOnScreenButtons() ? "inputOnScreenButtonHelp" : "inputGesturesHelp");
+        return playScreen.app.TEXTS.get(!isUsingOnScreenButtons() ? "inputGesturesHelp" :
+                gamepadOnScreenControls != null ? "inputOnScreenGamepadHelp" : "inputOnScreenButtonHelp");
     }
 
     @Override
@@ -83,22 +85,24 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (playScreen.app.localPrefs.getShowTouchPanel() || tutorialMode)
             initializeTouchPanel(playScreen, dragThreshold);
 
-        if (isUsingOnScreenButtons()) {
-            initLandscapeOnScreenControls();
+        if (!isUsingOnScreenButtons()) {
+            initGestureOnScreenControls();
+        } else if (playScreen.app.localPrefs.getUsedTouchControls() == LocalPrefs.TouchControlType.onScreenButtonsPortrait) {
             initPortraitOnScreenControls();
         } else {
-            initGestureOnScreenControls();
+            initGamepadOnScreenControls();
         }
 
     }
 
     @Override
     public void doPoll(float delta) {
-        if (isUsingOnScreenButtons()) {
-            landscapeOnScreenControls.setVisible(playScreen.isLandscape() && !isPaused());
-            portraitOnScreenControls.setVisible(!playScreen.isLandscape() && !isPaused());
-        } else {
+        if (!isUsingOnScreenButtons()) {
             gestureOnScreenControls.setVisible(!isPaused());
+        } else if (gamepadOnScreenControls != null) {
+            gamepadOnScreenControls.setVisible(!isPaused());
+        } else if (buttonOnScreenControls != null) {
+            buttonOnScreenControls.setVisible(!isPaused());
         }
 
         if (touchDownValid)
@@ -143,7 +147,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     }
 
     protected boolean isUsingOnScreenButtons() {
-        return playScreen.app.localPrefs.useOnScreenControls() && !tutorialMode;
+        return playScreen.app.localPrefs.getUsedTouchControls().isOnScreenButtons() && !tutorialMode;
     }
 
     public Group initializeTouchPanel(AbstractScreen playScreen, int dragTrashold) {
@@ -202,22 +206,22 @@ public class PlayGesturesInput extends PlayScreenInput {
     }
 
     private void initPortraitOnScreenControls() {
-        if (portraitOnScreenControls == null) {
-            portraitOnScreenControls = new PortraitOnScreenButtons();
-            portraitOnScreenControls.setVisible(false);
-            playScreen.stage.addActor(portraitOnScreenControls);
+        if (buttonOnScreenControls == null) {
+            buttonOnScreenControls = new PortraitOnScreenButtons();
+            buttonOnScreenControls.setVisible(false);
+            playScreen.stage.addActor(buttonOnScreenControls);
         }
-        portraitOnScreenControls.resize();
+        buttonOnScreenControls.resize();
     }
 
-    private void initLandscapeOnScreenControls() {
-        if (landscapeOnScreenControls == null) {
-            landscapeOnScreenControls = new LandscapeOnScreenButtons(playScreen.app, playScreen,
+    private void initGamepadOnScreenControls() {
+        if (gamepadOnScreenControls == null) {
+            gamepadOnScreenControls = new OnScreenGamepad(playScreen.app, playScreen,
                     new TouchpadChangeListener(), new HoldButtonInputListener(), new FreezeButtonInputListener());
-            landscapeOnScreenControls.setVisible(false);
-            playScreen.stage.addActor(landscapeOnScreenControls);
+            gamepadOnScreenControls.setVisible(false);
+            playScreen.stage.addActor(gamepadOnScreenControls);
         }
-        landscapeOnScreenControls.resize(playScreen);
+        gamepadOnScreenControls.resize(playScreen);
     }
 
     public void setTouchPanel(int screenX, int screenY) {
@@ -621,7 +625,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             addListener(inputListener);
         }
 
-        public void resize(LandscapeOnScreenButtons.IOnScreenButtonsScreen screen, float padding) {
+        public void resize(OnScreenGamepad.IOnScreenButtonsScreen screen, float padding) {
             float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
 
             setWidth(BlockActor.blockWidth * Tetromino.TETROMINO_BLOCKCOUNT);
@@ -661,7 +665,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             addListener(inputListener);
         }
 
-        public void resize(LandscapeOnScreenButtons.IOnScreenButtonsScreen screen, float padding) {
+        public void resize(OnScreenGamepad.IOnScreenButtonsScreen screen, float padding) {
             float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
 
             setX(screen.getStage().getWidth() / 2 + gameboardWidth / 2 + 15);

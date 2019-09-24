@@ -57,7 +57,7 @@ import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
-import de.golfgl.lightblocks.scene2d.LandscapeOnScreenButtons;
+import de.golfgl.lightblocks.scene2d.OnScreenGamepad;
 import de.golfgl.lightblocks.scene2d.MotivationLabel;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.OverlayMessage;
@@ -78,7 +78,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 16.01.2017.
  */
 
-public class PlayScreen extends AbstractScreen implements IGameModelListener, LandscapeOnScreenButtons.IOnScreenButtonsScreen {
+public class PlayScreen extends AbstractScreen implements IGameModelListener, OnScreenGamepad.IOnScreenButtonsScreen {
 
     public static final float DURATION_TETRO_MOVE = 1 / 30f;
     public static final float DURATION_REMOVE_DELAY = .15f;
