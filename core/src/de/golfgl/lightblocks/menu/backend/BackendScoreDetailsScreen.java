@@ -162,7 +162,8 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
                 JsonValue current = params.child;
                 while (current != null) {
                     try {
-                        addRawLabelLine(getI18NIfExistant(current.name, "labelGameScoreParam_"), current.asString(),
+                        addRawLabelLine(getI18NIfExistant(current.name, "labelGameScoreParam_"),
+                                getI18NIfExistant(current.asString(), "labelGameScoreParam_" + score.gameMode + "_" + current.name + "_"),
                                 LightBlocksGame.SKIN_FONT_BIG, 5);
 
                     } catch (Throwable t) {
