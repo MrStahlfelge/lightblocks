@@ -100,6 +100,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     public TextureRegion trGhostBlock;
     public TextureRegion trBlockEnlightened;
     public TextureRegion trGlowingLine;
+    public TextureRegion trPreviewOsb;
+    public TextureRegion trPreviewOsg;
     public Sound dropSound;
     public Sound rotateSound;
     public Sound removeSound;
@@ -276,6 +278,8 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
         cleanFreezedSound = assetManager.get(getSoundAssetFilename("cleanfreeze"), Sound.class);
         freezeBeginSound = assetManager.get(getSoundAssetFilename("freezestart"), Sound.class);
         swoshSound = assetManager.get(getSoundAssetFilename("swosh"), Sound.class);
+        trPreviewOsb = skin.getRegion("playscreen-osb");
+        trPreviewOsg = skin.getRegion("playscreen-osg");
 
         COLOR_DISABLED = skin.getColor("disabled");
         COLOR_FOCUSSED_ACTOR = skin.getColor("lightselection");

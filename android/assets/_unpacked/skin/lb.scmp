@@ -663,6 +663,40 @@ atlasData: {
 			customized: false
 			tenPatchData: null
 		}
+		{
+			file: "../playscreen-osg.png"
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: playscreen-osg
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+		}
+		{
+			file: "../playscreen-osb.png"
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: playscreen-osb
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+		}
 	]
 	fontDrawables: [
 		{
@@ -4117,6 +4151,10 @@ preferences: {
 	maxUndos: {
 		class: java.lang.Integer
 		value: 30
+	}
+	last-import-export-path: {
+		class: java.lang.String
+		value: "../../skin/lb.json"
 	}
 	id: {
 		class: java.lang.Integer

@@ -35,8 +35,10 @@ import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
+import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.TouchableSlider;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
@@ -360,20 +362,28 @@ public class SettingsScreen extends AbstractMenuDialog {
             gestureSettings.row();
             gestureSettings.add(swipeUp);
 
+            Button osbHelp = new RoundedTextButton(app.TEXTS.get("buttonHowToPlay"), app.skin);
+            addFocusableActor(osbHelp);
+            osbHelp.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    new VetoDialog(app.TEXTS.get("inputOnScreenButtonHelp"), app.skin,
+                            .8f * LightBlocksGame.nativeGameWidth).show(getStage());
+                }
+            });
             onScreenButtonSettings = new Table();
-            ScaledLabel onScreenButtonHelp = new ScaledLabel(app.TEXTS.get("inputOnScreenButtonHelp"), app.skin,
-                    LightBlocksGame.SKIN_FONT_BIG);
-            onScreenButtonHelp.setWrap(true);
-            onScreenButtonHelp.setAlignment(Align.center);
-            onScreenButtonSettings.add(onScreenButtonHelp).fillX().expandX();
+            onScreenButtonSettings.add(new Image(app.trPreviewOsb));
+            onScreenButtonSettings.row();
+            onScreenButtonSettings.add(osbHelp).expandY().top();
             onScreenButtonSettings.validate();
 
+            Button adjustGamepad = new RoundedTextButton(app.TEXTS.get("buttonAdjust"), app.skin);
+            addFocusableActor(adjustGamepad);
+            adjustGamepad.setDisabled(true);
             onScreenGamepadSettings = new Table();
-            onScreenButtonHelp = new ScaledLabel(app.TEXTS.get("inputOnScreenGamepadHelp"), app.skin,
-                    LightBlocksGame.SKIN_FONT_BIG);
-            onScreenButtonHelp.setWrap(true);
-            onScreenButtonHelp.setAlignment(Align.center);
-            onScreenGamepadSettings.add(onScreenButtonHelp).fillX().expandX();
+            onScreenGamepadSettings.add(new Image(app.trPreviewOsg));
+            onScreenGamepadSettings.row().padTop(20);
+            onScreenGamepadSettings.add(adjustGamepad).expandY().top();
             onScreenGamepadSettings.validate();
 
             row();
