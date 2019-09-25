@@ -3,7 +3,6 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -25,7 +24,7 @@ public class OnScreenGamepadConfigscreen extends AbstractScreen implements OnScr
         gameboardTable = new Table();
         gameboardTable.setBackground(app.skin.getDrawable("whitesmoke"));
         gameboardTable.setSize(Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth, Gameboard.GAMEBOARD_ALLROWS * BlockActor.blockWidth);
-        gamepad = new OnScreenGamepad(app, null, new ClickListener(), new ClickListener(), new ClickListener());
+        gamepad = new OnScreenGamepad(app, null, null, null, null);
         stage.addActor(gameboardTable);
         stage.addActor(gamepad);
 

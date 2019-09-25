@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
@@ -27,7 +27,7 @@ public class OnScreenGamepad extends Group {
                            EventListener touchPadListener, InputListener holdInputListener,
                            InputListener freezeButtonInputListener) {
         touchpad = new Touchpad(0, app.skin);
-        touchpad.addListener(touchPadListener);
+        touchpad.addListener(touchPadListener != null ? touchPadListener : new MoveDragListener());
         addActor(touchpad);
 
         rotateRightButton = new ImageButton(app.skin, "rotateright");
@@ -39,7 +39,8 @@ public class OnScreenGamepad extends Group {
         hardDropButton = new ImageButton(app.skin, "harddrop");
         addActor(hardDropButton);
 
-        holdButton = new PlayGesturesInput.HoldButton(app, playScreen, holdInputListener);
+        holdButton = new PlayGesturesInput.HoldButton(app, playScreen,
+                holdInputListener != null ? holdInputListener : new MoveDragListener().rotateAxis());
         addActor(holdButton);
 
         if (playScreen != null) {
@@ -77,7 +78,10 @@ public class OnScreenGamepad extends Group {
             }
 
         } else {
-            freezeButton = new PlayGesturesInput.FreezeButton(app, "FREEZE", freezeButtonInputListener);
+            freezeButton = new PlayGesturesInput.FreezeButton(app, "FREEZE", new MoveDragListener().rotateAxis());
+            rotateLeftButton.addListener(new MoveDragListener());
+            rotateRightButton.addListener(new MoveDragListener());
+            hardDropButton.addListener(new MoveDragListener());
         }
         if (freezeButton != null)
             addActor(freezeButton);
@@ -96,14 +100,44 @@ public class OnScreenGamepad extends Group {
                 rotateRightButton.getHeight()) / 2);
         hardDropButton.setPosition(rotateRightButton.getX() - size * .55f, rotateRightButton.getY());
 
-        holdButton.resize(screen,20);
+        holdButton.resize(screen, 20);
         if (freezeButton != null)
             freezeButton.resize(screen, 20);
     }
 
     public interface IOnScreenButtonsScreen {
         MyStage getStage();
+
         float getCenterPosX();
+
         float getGameboardTop();
+    }
+
+
+    private class MoveDragListener extends DragListener {
+
+        private float dragStartX;
+        private float dragStartY;
+        private boolean rotated;
+
+        public MoveDragListener rotateAxis() {
+            rotated = true;
+            return this;
+        }
+
+        @Override
+        public void dragStart(InputEvent event, float x, float y, int pointer) {
+            dragStartX = x;
+            dragStartY = y;
+        }
+
+        @Override
+        public void drag(InputEvent event, float x, float y, int pointer) {
+            float moveX = x - dragStartX;
+            float moveY = y - dragStartY;
+
+            event.getListenerActor().setX(event.getListenerActor().getX() + (rotated ? moveY : moveX));
+            event.getListenerActor().setY(event.getListenerActor().getY() + (rotated ? -moveX : moveY));
+        }
     }
 }
