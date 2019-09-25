@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.scene2d;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -23,7 +24,7 @@ public class OnScreenGamepad extends Group {
     private PlayGesturesInput.FreezeButton freezeButton;
 
     public OnScreenGamepad(LightBlocksGame app, final PlayScreen playScreen,
-                           ChangeListener touchPadListener, InputListener holdInputListener,
+                           EventListener touchPadListener, InputListener holdInputListener,
                            InputListener freezeButtonInputListener) {
         touchpad = new Touchpad(0, app.skin);
         touchpad.addListener(touchPadListener);

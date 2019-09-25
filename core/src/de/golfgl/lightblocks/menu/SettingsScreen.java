@@ -41,6 +41,7 @@ import de.golfgl.lightblocks.scene2d.TouchableSlider;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.OnScreenGamepadConfigscreen;
 import de.golfgl.lightblocks.screen.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.state.LocalPrefs;
@@ -379,7 +380,12 @@ public class SettingsScreen extends AbstractMenuDialog {
 
             Button adjustGamepad = new RoundedTextButton(app.TEXTS.get("buttonAdjust"), app.skin);
             addFocusableActor(adjustGamepad);
-            adjustGamepad.setDisabled(true);
+            adjustGamepad.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.setScreen(new OnScreenGamepadConfigscreen(app));
+                }
+            });
             onScreenGamepadSettings = new Table();
             onScreenGamepadSettings.add(new Image(app.trPreviewOsg));
             onScreenGamepadSettings.row().padTop(20);
