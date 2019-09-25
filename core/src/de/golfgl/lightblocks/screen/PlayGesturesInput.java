@@ -348,6 +348,14 @@ public class PlayGesturesInput extends PlayScreenInput {
         return INPUT_KEY_GESTURES;
     }
 
+    @Override
+    public int getRequestedGameboardAlignment() {
+        if (isUsingOnScreenButtons() && gamepadOnScreenControls != null)
+            return Align.top;
+
+        return super.getRequestedGameboardAlignment();
+    }
+
     private class TouchpadChangeListener extends ChangeListener {
         boolean upPressed;
         boolean downPressed;

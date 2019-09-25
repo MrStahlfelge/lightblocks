@@ -125,4 +125,10 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
         else
             return touch.getScoreboardKey();
     }
+
+    @Override
+    public int getRequestedGameboardAlignment() {
+        // kann nur bei Touch verändert sein
+        return touch.getRequestedGameboardAlignment();
+    }
 }

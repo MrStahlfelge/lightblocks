@@ -129,8 +129,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         centerGroup = new Group();
         centerGroup.setTransform(false);
         stage.addActor(centerGroup);
-        centerGroup.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
-                (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
 
         ParticleEffect pweldEffect = new ParticleEffect();
         pweldEffect.load(Gdx.files.internal("raw/explode.p"), app.skin.getAtlas());
@@ -217,7 +215,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         });
         // Im Webbrowser ohne Tastatur den PauseButton anzeigen
         pauseButton.setVisible(LightBlocksGame.isWebAppOnMobileDevice() ||
-                Gdx.app.getType() == Application.ApplicationType.iOS);
+                Gdx.app.getType() == Application.ApplicationType.iOS || LightBlocksGame.GAME_DEVMODE);
 
         pauseDialog = new PauseDialog(app, this);
 
@@ -1309,6 +1307,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         super.resize(width, height);
 
         backgroundImage.setSize(stage.getWidth(), stage.getHeight());
+        backgroundImage.setPosition(0, 0);
         Drawable backgroundPic;
         if (isLandscape() && app.theme.backgroundLandscapePic != null)
             backgroundPic = app.theme.backgroundLandscapePic;
@@ -1327,14 +1326,22 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         centerGroup.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
                 (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
 
+        int gameboardAlignment = inputAdapter != null ? inputAdapter.getRequestedGameboardAlignment() : Align.center;
+
         // sobald Platz neben Spielfeld breiter ist als Scoretable, diese dann mittig positionieren
         // und dann auch langsam herunterschieben aber maximal zwei Zeilen
         scoreTable.validate();
         scoreTable.setX(Math.max(10 - centerGroup.getX() + scoreTable.getPrefWidth() / 2, -centerGroup.getX() / 2));
-        scoreTable.setY(stage.getHeight() - centerGroup.getY() * 1.2f
+        scoreTable.setY((gameboardAlignment == Align.top ? LightBlocksGame.nativeGameHeight : stage.getHeight() - centerGroup.getY() * 1.2f)
                 - MathUtils.clamp(centerGroup.getX() / 2 - scoreTable.getPrefWidth() / 2,
                 scoreTable.getPrefHeight() / 2 + 5, scoreTable.getLinePrefHeight() * 2 + scoreTable.getPrefHeight() /
                         2));
+
+        if (gameboardAlignment == Align.top) {
+            float deltaY = (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2;
+            centerGroup.setY(centerGroup.getY() + deltaY);
+            backgroundImage.setY(deltaY);
+        }
 
         pauseButton.getLabel().setFontScale(MathUtils.clamp((float) width / height, 1f, 2f));
         pauseButton.pack();

@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.controllers.Controllers;
+import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 
@@ -151,6 +152,10 @@ public abstract class PlayScreenInput extends InputAdapter {
      */
     public Input.Orientation getRequestedScreenOrientation() {
         return null;
+    }
+
+    public int getRequestedGameboardAlignment() {
+        return Align.center;
     }
 
     /**
