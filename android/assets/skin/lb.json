@@ -120,6 +120,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 		name: window-bl
 		color: lightselection
 	}
+	button_onscreen_pressed: {
+		name: button_onscreen
+		color: disabled
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 	round: {
@@ -238,13 +242,22 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 	}
 	welcome: {
 		font: qs-25-reg
+		fontColor: white
 		downFontColor: emphasize
 		disabledFontColor: disabled
 	}
 	big: {
 		font: qs-25-bold
+		fontColor: white
 		downFontColor: emphasize
 		disabledFontColor: disabled
+	}
+	gamepad: {
+		font: qs-40-bold
+		fontColor: white
+		downFontColor: disabled
+		up: button_onscreen
+		down: button_onscreen_pressed
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
