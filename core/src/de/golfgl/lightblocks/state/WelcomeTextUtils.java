@@ -137,6 +137,10 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        if (listChangesSince < 1927)
+            welcomes.add(new WelcomeButton.WelcomeText("New: Touch control settings extended with adjustable on screen buttons.",
+                    new ShowSettingsRunnable(app)));
+
         if (listChangesSince < 1923)
             welcomes.add(new WelcomeButton.WelcomeText("New game mode: Play the modern way, with freeze!",
                     new ShowSinglePlayerPageRunnable(app, SinglePlayerScreen.PAGEIDX_FREEZE)));

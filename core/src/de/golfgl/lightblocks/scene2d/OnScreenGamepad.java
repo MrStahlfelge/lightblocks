@@ -234,6 +234,26 @@ public class OnScreenGamepad extends Group {
             freezeButton.getLabel().setFontScale(fontScale * config.frzScale);
             freezeButton.setPosition(rrDefaultX - size * .55f + config.frzX, rrDefaultY + .5f * size + config.frzY);
         }
+
+        // Manche dürfen versteckt werden, aber nicht im config screen
+        if (sizeSlider != null) {
+            holdButton.getColor().a = config.holdScale < HIDE_TRESHOLD ? .5f : 1;
+            rotateRightButton.getColor().a = config.rrScale < HIDE_TRESHOLD ? .5f : 1;
+            rotateLeftButton.getColor().a = config.rlScale < HIDE_TRESHOLD ? .5f : 1;
+            hardDropButton.getColor().a = config.dropScale < HIDE_TRESHOLD ? .5f : 1;
+        } else {
+            if (config.holdScale < HIDE_TRESHOLD)
+                holdButton.setVisible(false);
+
+            if (config.rrScale < HIDE_TRESHOLD)
+                rotateRightButton.setVisible(false);
+
+            if (config.rlScale < HIDE_TRESHOLD)
+                rotateLeftButton.setVisible(false);
+
+            if (config.dropScale < HIDE_TRESHOLD)
+                hardDropButton.setVisible(false);
+        }
     }
 
     protected void saveConfig() {
