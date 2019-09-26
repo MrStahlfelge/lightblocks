@@ -356,6 +356,59 @@ public class PlayGesturesInput extends PlayScreenInput {
         return super.getRequestedGameboardAlignment();
     }
 
+    public static class FreezeButton extends Button {
+        public FreezeButton(LightBlocksGame app, String label, InputListener inputListener) {
+            super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
+            Label buttonLabel = new Label(label, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            buttonLabel.setAlignment(Align.top);
+            buttonLabel.setFontScale(.8f);
+            add(buttonLabel).fill().expand();
+
+            setRotation(270);
+            setTransform(true);
+            addListener(inputListener);
+        }
+
+        public void resize(OnScreenGamepad.IOnScreenButtonsScreen screen, float padding) {
+            float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
+
+            setWidth(BlockActor.blockWidth * Tetromino.TETROMINO_BLOCKCOUNT);
+            setX(screen.getStage().getWidth() / 2 + gameboardWidth / 2 + 15);
+            setY(screen.getGameboardTop() - getWidth() - padding);
+            setHeight(screen.getStage().getWidth() - padding - getX());
+
+        }
+    }
+
+    public static class HoldButton extends Button {
+        public HoldButton(LightBlocksGame app, PlayScreen playScreen, InputListener inputListener) {
+            super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
+            Label buttonLabel = new Label("HOLD", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            buttonLabel.setAlignment(Align.top);
+            buttonLabel.setFontScale(.8f);
+            add(buttonLabel).fill().expand();
+
+            setRotation(270);
+            setTransform(true);
+
+            if (playScreen != null) {
+                setVisible(playScreen.gameModel.isHoldMoveAllowedByModel());
+            }
+            addListener(inputListener);
+        }
+
+        public void resize(OnScreenGamepad.IOnScreenButtonsScreen screen, float padding) {
+            float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
+
+            setX(screen.getStage().getWidth() / 2 + gameboardWidth / 2 + 15);
+            setY(screen.getGameboardTop());
+            setHeight(screen.getStage().getWidth() - padding - getX());
+            setWidth(BlockActor.blockWidth * Tetromino.TETROMINO_BLOCKCOUNT);
+
+        }
+
+    }
+
     private class TouchpadChangeListener extends ChangeListener {
         boolean upPressed;
         boolean downPressed;
@@ -592,7 +645,9 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         public GestureOnScreenButtons() {
             holdButton = new HoldButton(playScreen.app, playScreen, new HoldButtonInputListener());
-            addActor(holdButton);
+            if (playScreen.app.localPrefs.isShowTouchHoldButton())
+                addActor(holdButton);
+
             String freezeButtonLabel = playScreen.gameModel.getShownTimeButtonDescription();
             if (freezeButtonLabel != null) {
                 freezeButton = new FreezeButton(playScreen.app, freezeButtonLabel,
@@ -620,30 +675,6 @@ public class PlayGesturesInput extends PlayScreenInput {
         }
     }
 
-    public static class FreezeButton extends Button {
-        public FreezeButton(LightBlocksGame app, String label, InputListener inputListener) {
-            super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
-            Label buttonLabel = new Label(label, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-            buttonLabel.setAlignment(Align.top);
-            buttonLabel.setFontScale(.8f);
-            add(buttonLabel).fill().expand();
-
-            setRotation(270);
-            setTransform(true);
-            addListener(inputListener);
-        }
-
-        public void resize(OnScreenGamepad.IOnScreenButtonsScreen screen, float padding) {
-            float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
-
-            setWidth(BlockActor.blockWidth * Tetromino.TETROMINO_BLOCKCOUNT);
-            setX(screen.getStage().getWidth() / 2 + gameboardWidth / 2 + 15);
-            setY(screen.getGameboardTop() - getWidth() - padding);
-            setHeight(screen.getStage().getWidth() - padding - getX());
-
-        }
-    }
-
     private class HoldButtonInputListener extends InputListener {
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -653,36 +684,6 @@ public class PlayGesturesInput extends PlayScreenInput {
             }
             return false;
         }
-    }
-
-    public static class HoldButton extends Button {
-        public HoldButton(LightBlocksGame app, PlayScreen playScreen, InputListener inputListener) {
-            super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
-            Label buttonLabel = new Label("HOLD", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-            buttonLabel.setAlignment(Align.top);
-            buttonLabel.setFontScale(.8f);
-            add(buttonLabel).fill().expand();
-
-            setRotation(270);
-            setTransform(true);
-
-            if (playScreen != null) {
-                setVisible(playScreen.gameModel.isHoldMoveAllowedByModel() && playScreen.app.localPrefs
-                        .isShowTouchHoldButton());
-            }
-            addListener(inputListener);
-        }
-
-        public void resize(OnScreenGamepad.IOnScreenButtonsScreen screen, float padding) {
-            float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
-
-            setX(screen.getStage().getWidth() / 2 + gameboardWidth / 2 + 15);
-            setY(screen.getGameboardTop());
-            setHeight(screen.getStage().getWidth() - padding - getX());
-            setWidth(BlockActor.blockWidth * Tetromino.TETROMINO_BLOCKCOUNT);
-
-        }
-
     }
 
 }

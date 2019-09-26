@@ -363,6 +363,17 @@ public class SettingsScreen extends AbstractMenuDialog {
             gestureSettings.row();
             gestureSettings.add(swipeUp);
 
+            gestureSettings.row().padTop(20);
+            final Button hideHoldCheckbox = new FaCheckbox(app.TEXTS.get("menuHideHoldButton"), app.skin);
+            hideHoldCheckbox.setChecked(!app.localPrefs.isShowTouchHoldButton());
+            hideHoldCheckbox.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.localPrefs.setShowTouchHoldButton(!hideHoldCheckbox.isChecked());
+                }
+            });
+            gestureSettings.add(hideHoldCheckbox);
+
             Button osbHelp = new RoundedTextButton(app.TEXTS.get("buttonHowToPlay"), app.skin);
             addFocusableActor(osbHelp);
             osbHelp.addListener(new ChangeListener() {
@@ -395,17 +406,6 @@ public class SettingsScreen extends AbstractMenuDialog {
             row();
             settingsTableCell = add().height(gestureSettings.getPrefHeight()).fillX();
             setSettingsTableActor();
-
-            row();
-            final Button hideHoldCheckbox = new FaCheckbox(app.TEXTS.get("menuHideHoldButton"), app.skin);
-            hideHoldCheckbox.setChecked(!app.localPrefs.isShowTouchHoldButton());
-            hideHoldCheckbox.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    app.localPrefs.setShowTouchHoldButton(!hideHoldCheckbox.isChecked());
-                }
-            });
-            add(hideHoldCheckbox);
 
             addFocusableActor(onScreenControlsButton);
             addFocusableActor(touchPanelButton);
