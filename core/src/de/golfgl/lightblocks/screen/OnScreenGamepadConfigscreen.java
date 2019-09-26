@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
@@ -15,6 +16,7 @@ import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.OnScreenGamepad;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.state.OnScreenGamepadConfig;
 
 public class OnScreenGamepadConfigscreen extends AbstractScreen implements OnScreenGamepad.IOnScreenButtonsScreen {
 
@@ -25,7 +27,7 @@ public class OnScreenGamepadConfigscreen extends AbstractScreen implements OnScr
         super(app);
 
         gameboardTable = new Table();
-        gameboardTable.setBackground(app.skin.getDrawable("whitesmoke"));
+        gameboardTable.setBackground(app.skin.getDrawable("window-bl"));
         gameboardTable.setSize(Gameboard.GAMEBOARD_COLUMNS * BlockActor.blockWidth, Gameboard.GAMEBOARD_ALLROWS * BlockActor.blockWidth);
         gamepad = new OnScreenGamepad(app, null, null, null, null);
         stage.addActor(gameboardTable);
@@ -47,11 +49,17 @@ public class OnScreenGamepadConfigscreen extends AbstractScreen implements OnScr
             }
         });
 
+        Slider sizeSlider = new Slider(OnScreenGamepadConfig.CONFIG_MIN_SCALE, 2, .1f, false, app.skin);
+        sizeSlider.setVisible(false);
+        gamepad.setSizeConfigSlider(sizeSlider, this);
+
         gameboardTable.add(label).fillX().expandX().pad(20);
         gameboardTable.row();
         gameboardTable.add(resetButton);
         gameboardTable.row().pad(20);
         gameboardTable.add(okButton);
+        gameboardTable.row().pad(20);
+        gameboardTable.add(sizeSlider).expand();
         gameboardTable.row();
         gameboardTable.add().expand();
     }

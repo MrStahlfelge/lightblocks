@@ -134,19 +134,17 @@ com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 	smoke: {
 		down: whitesmoke
 	}
-}
-com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
 	rotateright: {
-		imageUp: button_rotateright
-		imageDown: button_rotateright_pressed
-	}
-	rotateleft: {
-		imageUp: button_rotateleft
-		imageDown: button_rotateleft_pressed
+		up: button_rotateright
+		down: button_rotateright_pressed
 	}
 	harddrop: {
-		imageUp: button_harddrop
-		imageDown: button_harddrop_pressed
+		up: button_harddrop
+		down: button_harddrop_pressed
+	}
+	rotateleft: {
+		up: button_rotateleft
+		down: button_rotateleft_pressed
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
