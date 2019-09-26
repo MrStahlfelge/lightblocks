@@ -13,22 +13,32 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
-import de.golfgl.lightblocks.screen.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.state.OnScreenGamepadConfig;
 
 public class OnScreenGamepad extends Group {
     private final Touchpad touchpad;
+    private final LightBlocksGame app;
     private final Button rotateRightButton;
     private final Button rotateLeftButton;
     private final Button hardDropButton;
     private final TextButton holdButton;
+    boolean isLandscapeConfig;
     private TextButton freezeButton;
+    private OnScreenGamepadConfig config;
 
     public OnScreenGamepad(LightBlocksGame app, final PlayScreen playScreen,
                            EventListener touchPadListener, InputListener holdInputListener,
                            InputListener freezeButtonInputListener) {
         touchpad = new Touchpad(0, app.skin);
-        touchpad.addListener(touchPadListener != null ? touchPadListener : new MoveDragListener());
+        this.app = app;
+        touchpad.addListener(touchPadListener != null ? touchPadListener : new MoveDragListener() {
+            @Override
+            protected void savePosDelta(int deltaX, int deltaY) {
+                config.touchpadX = config.touchpadX + deltaX;
+                config.touchpadY = config.touchpadY + deltaY;
+            }
+        });
         addActor(touchpad);
 
         rotateRightButton = new ImageButton(app.skin, "rotateright");
@@ -82,38 +92,88 @@ public class OnScreenGamepad extends Group {
 
         } else {
             freezeButton = new TextButton("FREEZE", app.skin, LightBlocksGame.SKIN_BUTTON_GAMEPAD);
-            rotateLeftButton.addListener(new MoveDragListener());
-            rotateRightButton.addListener(new MoveDragListener());
-            hardDropButton.addListener(new MoveDragListener());
-            holdButton.addListener(new MoveDragListener());
-            freezeButton.addListener(new MoveDragListener());
+            rotateLeftButton.addListener(new MoveDragListener() {
+                @Override
+                protected void savePosDelta(int deltaX, int deltaY) {
+                    config.rlX += deltaX;
+                    config.rlY += deltaY;
+                }
+            });
+            rotateRightButton.addListener(new MoveDragListener() {
+                @Override
+                protected void savePosDelta(int deltaX, int deltaY) {
+                    config.rrX += deltaX;
+                    config.rlY += deltaY;
+                }
+            });
+            hardDropButton.addListener(new MoveDragListener() {
+                @Override
+                protected void savePosDelta(int deltaX, int deltaY) {
+                    config.dropX += deltaX;
+                    config.dropY += deltaY;
+                }
+            });
+            holdButton.addListener(new MoveDragListener() {
+                @Override
+                protected void savePosDelta(int deltaX, int deltaY) {
+                    config.holdX += deltaX;
+                    config.holdY += deltaY;
+                }
+            });
+            freezeButton.addListener(new MoveDragListener() {
+                @Override
+                protected void savePosDelta(int deltaX, int deltaY) {
+                    config.frzX += deltaX;
+                    config.frzY += deltaY;
+                }
+            });
         }
         if (freezeButton != null)
             addActor(freezeButton);
     }
 
     public void resize(IOnScreenButtonsScreen screen) {
+        isLandscapeConfig = screen.isLandscape();
+        config = isLandscapeConfig ? app.localPrefs.getGamepadConfigLandscape() : app.localPrefs.getGamepadConfigPortrait();
+
         float size = MathUtils.clamp(screen.getCenterPosX(), LightBlocksGame.nativeGameWidth * .45f, screen.getStage().getHeight() * .5f);
         float fontScale = size * .002f;
         touchpad.setSize(size, size);
-        touchpad.setPosition(0, 0);
-        rotateRightButton.setSize(size * .4f, size * .4f);
-        rotateLeftButton.setSize(size * .4f, size * .4f);
-        hardDropButton.setSize(size * .4f, size * .4f);
-        holdButton.setSize(size * .4f, size * .4f);
+        touchpad.setPosition(0 + config.touchpadX, 0 + config.touchpadY);
+        float buttonSize = size * .4f;
+        rotateRightButton.setSize(buttonSize, buttonSize);
+        rotateLeftButton.setSize(buttonSize, buttonSize);
+        hardDropButton.setSize(buttonSize, buttonSize);
+        holdButton.setSize(buttonSize, buttonSize);
         holdButton.getLabel().setFontScale(fontScale);
-        rotateRightButton.setPosition(screen.getStage().getWidth() - size * .5f, size - rotateRightButton
-                .getHeight());
-        rotateLeftButton.setPosition(rotateRightButton.getX() - size * .45f, (rotateRightButton.getY() -
-                rotateRightButton.getHeight()) / 2);
-        hardDropButton.setPosition(rotateRightButton.getX() - size * .55f, rotateRightButton.getY());
-        holdButton.setPosition(rotateRightButton.getX(), rotateRightButton.getY() + .5f * size);
+
+        float rrDefaultX = screen.getStage().getWidth() - size * .5f;
+        float rrDefaultY = size - buttonSize;
+        rotateRightButton.setPosition(rrDefaultX + config.rrX,
+                rrDefaultY + config.rrY);
+        rotateLeftButton.setPosition(rrDefaultX - size * .45f + config.rlX,
+                (rrDefaultY - buttonSize) / 2 + config.rlY);
+        hardDropButton.setPosition(rrDefaultX - size * .55f + config.dropX,
+                rrDefaultY + config.dropY);
+        holdButton.setPosition(rrDefaultX + config.holdX, rrDefaultY + .5f * size + config.holdY);
 
         if (freezeButton != null) {
-            freezeButton.setSize(size * .4f, size * .4f);
+            freezeButton.setSize(buttonSize, buttonSize);
             freezeButton.getLabel().setFontScale(fontScale);
-            freezeButton.setPosition(hardDropButton.getX(), holdButton.getY());
+            freezeButton.setPosition(rrDefaultX - size * .55f + config.frzX, rrDefaultY + .5f * size + config.frzY);
         }
+    }
+
+    protected void saveConfig() {
+        if (isLandscapeConfig)
+            app.localPrefs.saveGamepadConfigLandscape(config);
+        else
+            app.localPrefs.saveGamepadConfigPortrait(config);
+    }
+
+    public void resetConfig() {
+        config = new OnScreenGamepadConfig();
+        saveConfig();
     }
 
     public interface IOnScreenButtonsScreen {
@@ -122,27 +182,44 @@ public class OnScreenGamepad extends Group {
         float getCenterPosX();
 
         float getGameboardTop();
+
+        boolean isLandscape();
     }
 
-
-    private class MoveDragListener extends DragListener {
-
-        private float dragStartX;
-        private float dragStartY;
+    private abstract class MoveDragListener extends DragListener {
+        float dragStartPosX;
+        float dragStartPosY;
+        boolean landscapeStart;
 
         @Override
         public void dragStart(InputEvent event, float x, float y, int pointer) {
-            dragStartX = x;
-            dragStartY = y;
+            dragStartPosX = event.getListenerActor().getX();
+            dragStartPosY = event.getListenerActor().getY();
+            landscapeStart = isLandscapeConfig;
         }
 
         @Override
         public void drag(InputEvent event, float x, float y, int pointer) {
-            float moveX = x - dragStartX;
-            float moveY = y - dragStartY;
+            if (isLandscapeConfig != landscapeStart) {
+                cancel();
+                return;
+            }
+
+            float moveX = x - getDragStartX();
+            float moveY = y - getDragStartY();
 
             event.getListenerActor().setX(event.getListenerActor().getX() + moveX);
             event.getListenerActor().setY(event.getListenerActor().getY() + moveY);
         }
+
+        @Override
+        public void dragStop(InputEvent event, float x, float y, int pointer) {
+            if (isLandscapeConfig == landscapeStart) {
+                savePosDelta((int) (event.getListenerActor().getX() - dragStartPosX), (int) (event.getListenerActor().getY() - dragStartPosY));
+                saveConfig();
+            }
+        }
+
+        protected abstract void savePosDelta(int deltaX, int deltaY);
     }
 }

@@ -53,6 +53,8 @@ public class LocalPrefs {
     private static final String PREF_KEY_LAST_WELCOME_REQUEST = "lastWelcomeRequest";
     private static final String PREF_KEY_BATTLE_LEVEL = "battleLevel";
     private static final String PREF_KEY_PUSH_TOKEN = "pushToken";
+    private static final String PREF_KEY_OSG_LANDSCAPE = "osgLandscape";
+    private static final String PREF_KEY_OSG_PORTRAIT = "osgPortrait";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -75,6 +77,8 @@ public class LocalPrefs {
     private String nickName;
     private String pushToken;
     private boolean readPushToken;
+    private OnScreenGamepadConfig onScreenGamepadConfigLandscape;
+    private OnScreenGamepadConfig onScreenGamepadConfigPortrait;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -590,6 +594,37 @@ public class LocalPrefs {
         prefs.flush();
 
         return retVal;
+    }
+
+    public OnScreenGamepadConfig getGamepadConfigLandscape() {
+        if (onScreenGamepadConfigLandscape == null)
+            onScreenGamepadConfigLandscape = OnScreenGamepadConfig.fromJson(
+                    prefs.getString(PREF_KEY_OSG_LANDSCAPE, null));
+
+
+        return onScreenGamepadConfigLandscape;
+    }
+
+    public OnScreenGamepadConfig getGamepadConfigPortrait() {
+        if (onScreenGamepadConfigPortrait == null)
+            onScreenGamepadConfigPortrait = OnScreenGamepadConfig.fromJson(
+                    prefs.getString(PREF_KEY_OSG_PORTRAIT, null));
+
+        return onScreenGamepadConfigPortrait;
+    }
+
+    public void saveGamepadConfigLandscape(OnScreenGamepadConfig config) {
+        this.onScreenGamepadConfigLandscape = config;
+
+        prefs.putString(PREF_KEY_OSG_LANDSCAPE, config.toJson());
+        prefs.flush();
+    }
+
+    public void saveGamepadConfigPortrait(OnScreenGamepadConfig config) {
+        this.onScreenGamepadConfigPortrait = config;
+
+        prefs.putString(PREF_KEY_OSG_PORTRAIT, config.toJson());
+        prefs.flush();
     }
 
     public enum TouchControlType {
