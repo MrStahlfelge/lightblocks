@@ -90,7 +90,7 @@ public class OnScreenGamepadConfig {
     }
 
     private static int scaleToInt(float scale) {
-        return (int) scale * 10;
+        return (int) (scale * 10);
     }
 
     private static float intToScale(int scale) {

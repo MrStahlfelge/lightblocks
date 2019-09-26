@@ -59,7 +59,7 @@ public class OnScreenGamepadConfigscreen extends AbstractScreen implements OnScr
         gameboardTable.row().pad(20);
         gameboardTable.add(okButton);
         gameboardTable.row().pad(20);
-        gameboardTable.add(sizeSlider).expand();
+        gameboardTable.add(sizeSlider);
         gameboardTable.row();
         gameboardTable.add().expand();
     }
