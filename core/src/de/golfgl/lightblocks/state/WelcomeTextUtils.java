@@ -137,7 +137,7 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
-        if (listChangesSince < 1927)
+        if (listChangesSince < 1928)
             welcomes.add(new WelcomeButton.WelcomeText("New: Touch control settings extended with adjustable on screen buttons.",
                     new ShowSettingsRunnable(app)));
 
