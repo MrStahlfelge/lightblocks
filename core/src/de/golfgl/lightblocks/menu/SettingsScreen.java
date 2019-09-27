@@ -386,7 +386,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             onScreenButtonSettings = new Table();
             onScreenButtonSettings.add(new Image(app.trPreviewOsb));
             onScreenButtonSettings.row();
-            onScreenButtonSettings.add(osbHelp).expandY().top();
+            onScreenButtonSettings.add(osbHelp);
             onScreenButtonSettings.validate();
 
             Button adjustGamepad = new RoundedTextButton(app.TEXTS.get("buttonAdjust"), app.skin);
@@ -400,7 +400,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             onScreenGamepadSettings = new Table();
             onScreenGamepadSettings.add(new Image(app.trPreviewOsg));
             onScreenGamepadSettings.row().padTop(20);
-            onScreenGamepadSettings.add(adjustGamepad).expandY().top();
+            onScreenGamepadSettings.add(adjustGamepad);
             onScreenGamepadSettings.validate();
 
             row();
