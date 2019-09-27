@@ -21,6 +21,7 @@ import de.golfgl.lightblocks.state.OnScreenGamepadConfig;
 public class OnScreenGamepad extends Group {
     private static final float TOUCHPAD_MIN = LightBlocksGame.nativeGameWidth * .45f;
     private static final float HIDE_TRESHOLD = .45f;
+    public static final int GRID_SIZE = 5;
 
     private final Touchpad touchpad;
     private final LightBlocksGame app;
@@ -221,18 +222,19 @@ public class OnScreenGamepad extends Group {
 
         float rrDefaultX = screen.getStage().getWidth() - size * .5f;
         float rrDefaultY = size - buttonSize;
-        rotateRightButton.setPosition(rrDefaultX + config.rrX,
-                rrDefaultY + config.rrY);
-        rotateLeftButton.setPosition(rrDefaultX - size * .45f + config.rlX,
-                (rrDefaultY - buttonSize) / 2 + config.rlY);
-        hardDropButton.setPosition(rrDefaultX - size * .55f + config.dropX,
-                rrDefaultY + config.dropY);
-        holdButton.setPosition(rrDefaultX + config.holdX, rrDefaultY + .5f * size + config.holdY);
+        rotateRightButton.setPosition(snapToGrid(rrDefaultX + config.rrX),
+                snapToGrid(rrDefaultY + config.rrY));
+        rotateLeftButton.setPosition(snapToGrid(rrDefaultX - size * .45f + config.rlX),
+                snapToGrid((rrDefaultY - buttonSize) / 2 + config.rlY));
+        hardDropButton.setPosition(snapToGrid(rrDefaultX - size * .55f + config.dropX),
+                snapToGrid(rrDefaultY + config.dropY));
+        holdButton.setPosition(snapToGrid(rrDefaultX + config.holdX), snapToGrid(rrDefaultY + .5f * size + config.holdY));
 
         if (freezeButton != null) {
             freezeButton.setSize(buttonSize * config.frzScale, buttonSize * config.frzScale);
             freezeButton.getLabel().setFontScale(fontScale * config.frzScale);
-            freezeButton.setPosition(rrDefaultX - size * .55f + config.frzX, rrDefaultY + .5f * size + config.frzY);
+            freezeButton.setPosition(snapToGrid(rrDefaultX - size * .55f + config.frzX),
+                    snapToGrid(rrDefaultY + .5f * size + config.frzY));
         }
 
         // Manche dürfen versteckt werden, aber nicht im config screen
@@ -254,6 +256,11 @@ public class OnScreenGamepad extends Group {
             if (config.dropScale < HIDE_TRESHOLD)
                 hardDropButton.setVisible(false);
         }
+    }
+
+    private int snapToGrid(float pos) {
+        int intPos = (int) pos;
+        return intPos - (intPos % GRID_SIZE);
     }
 
     protected void saveConfig() {
