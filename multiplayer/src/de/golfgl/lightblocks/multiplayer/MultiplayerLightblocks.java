@@ -18,7 +18,6 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.menu.RtMultiplayerMenuScreen;
-import de.golfgl.lightblocks.menu.ThemeSettingsDialog;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.state.Theme;
 
@@ -139,9 +138,14 @@ public class MultiplayerLightblocks extends LightBlocksGame {
     }
 
     @Override
-    public void doInstallTheme(ThemeSettingsDialog themeSettingsDialog) {
-        if (canInstallTheme())
+    public void doInstallTheme(InputStream zipFile) {
+        if (!canInstallTheme())
+            return;
+
+        if (zipFile == null)
             chooseZipFile();
+        else
+            zipFileChosen(zipFile);
     }
 
     public void zipFileChosen(InputStream zipFile) {

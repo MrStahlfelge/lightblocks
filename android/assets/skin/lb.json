@@ -185,6 +185,12 @@ com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
 		selection: transparent
 	}
 }
+com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle: {
+	default-horizontal: {
+		background: slider
+		knobBefore: slider-before
+	}
+}
 com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
 	default: {
 		hScrollKnob: scroll-horizontal

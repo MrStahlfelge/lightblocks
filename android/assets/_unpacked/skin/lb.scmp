@@ -2355,7 +2355,7 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: background
 						optional: false
-						value: null
+						value: slider
 					}
 					disabledBackground: {
 						class: com.ray3k.skincomposer.data.StyleProperty
@@ -2383,7 +2383,7 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: knobBefore
 						optional: true
-						value: null
+						value: slider-before
 					}
 					knobAfter: {
 						class: com.ray3k.skincomposer.data.StyleProperty

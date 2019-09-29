@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.I18NBundle;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -492,7 +493,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
         return false;
     }
 
-    public void doInstallTheme(ThemeSettingsDialog themeSettingsDialog) {
+    public void doInstallTheme(InputStream zipFile) {
 
     }
 
