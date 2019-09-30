@@ -13,6 +13,7 @@ public class MyGameCenterClient extends GameCenterClient {
     private static final String LEAD_GRAVITY_MARATHON = "lead_gravity";
     private static final String LEAD_PRACTICE = "lead_practice";
     private static final String LEAD_SPRINT = "lead_sprint";
+    private static final String LEAD_MODERNFREEZE = " modernfreeze";
     private static final String ACH_FOUR_LINES = "fourlines";
     private static final String ACH_DOUBLE = "ach_double";
     private static final String ACH_TSPIN = "ach_tspin";
@@ -35,6 +36,8 @@ public class MyGameCenterClient extends GameCenterClient {
     private static final String ACH_GRAVITY50 = "ach_gravity50";
     private static final String ACH_RETRO120 = "ach_retro120k";
     private static final String ACH_SPRINT120 = "ach_sprint120";
+    private static final String ACH_FREEZER = "ach_freezer";
+    private static final String ACH_SUPERFREEZER = "ach_superfreezer";
     private static final String ACH_10TSPIN = "ach_10tspin";
     private static final String ACH_COMBINATOR = "ach_combinator";
     private static final String ACH_MARATHON_LVL16 = "ach_marathon_lvl16";
@@ -100,6 +103,8 @@ public class MyGameCenterClient extends GameCenterClient {
             return LEAD_PRACTICE;
         else if (leaderBoardId.equals(GpgsHelper.LEAD_SPRINT_MODE))
             return LEAD_SPRINT;
+        else if (leaderBoardId.equals(GpgsHelper.LEAD_FREEZE_MODE))
+            return LEAD_MODERNFREEZE;
 
         return null;
     }
@@ -159,6 +164,10 @@ public class MyGameCenterClient extends GameCenterClient {
             return ACH_MARATHON_LVL16;
         else if (achievementId.equals(GpgsHelper.ACH_ALL_MISSIONS_PERFECT))
             return ACH_MISSIONS_PERFECT;
+        else if (achievementId.equals(GpgsHelper.ACH_FREEZER))
+            return ACH_FREEZER;
+        else if (achievementId.equals(GpgsHelper.ACH_SUPER_FREEZER))
+            return ACH_SUPERFREEZER;
 
         return null;
     }
