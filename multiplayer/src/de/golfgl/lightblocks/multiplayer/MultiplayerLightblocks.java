@@ -192,7 +192,7 @@ public class MultiplayerLightblocks extends LightBlocksGame {
 
             if (!foundJson) {
                 theme.resetTheme();
-                throw new RuntimeException("This is not a Lightblocks' theme archive.");
+                throw new RuntimeException("This is not a Lightblocks theme archive file.");
             } else {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
