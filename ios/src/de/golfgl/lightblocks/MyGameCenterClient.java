@@ -13,7 +13,7 @@ public class MyGameCenterClient extends GameCenterClient {
     private static final String LEAD_GRAVITY_MARATHON = "lead_gravity";
     private static final String LEAD_PRACTICE = "lead_practice";
     private static final String LEAD_SPRINT = "lead_sprint";
-    private static final String LEAD_MODERNFREEZE = " modernfreeze";
+    private static final String LEAD_MODERNFREEZE = "modernfreeze";
     private static final String ACH_FOUR_LINES = "fourlines";
     private static final String ACH_DOUBLE = "ach_double";
     private static final String ACH_TSPIN = "ach_tspin";
