@@ -4,12 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -18,6 +19,7 @@ import javax.annotation.Nullable;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.Tetromino;
+import de.golfgl.lightblocks.scene2d.AnimatedDrawable;
 
 /**
  * Verwaltet das Theme, so eines installiert ist. Ansonsten werden die defaults initialisiert
@@ -27,6 +29,7 @@ public class Theme {
     public static final String FOLDER_NAME = "theme";
     public static final String ATLAS_FILE_NAME = FOLDER_NAME + ".atlas";
     public static final String THEME_FILE_NAME = FOLDER_NAME + ".json";
+    public static final int ANIMATION_FRAME_LENGTH_DEFAULT = 100;
     private final LightBlocksGame app;
     public Drawable blockNormalL;
     public Drawable blockNormalJ;
@@ -334,8 +337,8 @@ public class Theme {
 
             // TODO buttoncolor
 
-            backgroundPic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic");
-            backgroundLandscapePic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic_landscape");
+            backgroundPic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic", 0);
+            backgroundLandscapePic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic_landscape", 0);
         }
     }
 
@@ -347,27 +350,27 @@ public class Theme {
             if (normalNode != null) {
                 usesDefaultBlockPictures = false;
 
-                blockNormalL = findDrawableOrThrow(themeAtlas, normalNode.getString("l"));
-                blockNormalI = findDrawableOrThrow(themeAtlas, normalNode.getString("i"));
-                blockNormalJ = findDrawableOrThrow(themeAtlas, normalNode.getString("j"));
-                blockNormalZ = findDrawableOrThrow(themeAtlas, normalNode.getString("z"));
-                blockNormalS = findDrawableOrThrow(themeAtlas, normalNode.getString("s"));
-                blockNormalO = findDrawableOrThrow(themeAtlas, normalNode.getString("o"));
-                blockNormalT = findDrawableOrThrow(themeAtlas, normalNode.getString("t"));
-                blockNormalGarbage = findDrawableOrThrow(themeAtlas, normalNode.getString("garbage"));
-                blockGrid = findDrawableOrThrow(themeAtlas, normalNode.getString("grid"));
-                blockGhost = findDrawableOrThrow(themeAtlas, normalNode.getString("ghost"));
+                blockNormalL = findDrawableOrThrow(themeAtlas, normalNode.getString("l"), normalNode.getInt("speedl", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockNormalI = findDrawableOrThrow(themeAtlas, normalNode.getString("i"), normalNode.getInt("speedi", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockNormalJ = findDrawableOrThrow(themeAtlas, normalNode.getString("j"), normalNode.getInt("speedj", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockNormalZ = findDrawableOrThrow(themeAtlas, normalNode.getString("z"), normalNode.getInt("speedz", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockNormalS = findDrawableOrThrow(themeAtlas, normalNode.getString("s"), normalNode.getInt("speeds", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockNormalO = findDrawableOrThrow(themeAtlas, normalNode.getString("o"), normalNode.getInt("speedo", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockNormalT = findDrawableOrThrow(themeAtlas, normalNode.getString("t"), normalNode.getInt("speedt", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockNormalGarbage = findDrawableOrThrow(themeAtlas, normalNode.getString("garbage"), normalNode.getInt("speedgarbage", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockGrid = findDrawableOrThrow(themeAtlas, normalNode.getString("grid"), normalNode.getInt("speedgrid", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockGhost = findDrawableOrThrow(themeAtlas, normalNode.getString("ghost"), normalNode.getInt("speedghost", ANIMATION_FRAME_LENGTH_DEFAULT));
 
                 JsonValue activatedNode = blockNode.get("activated_pics");
 
-                blockActiveL = findOptionalDrawable(themeAtlas, activatedNode, "l");
-                blockActiveJ = findOptionalDrawable(themeAtlas, activatedNode, "j");
-                blockActiveI = findOptionalDrawable(themeAtlas, activatedNode, "i");
-                blockActiveZ = findOptionalDrawable(themeAtlas, activatedNode, "z");
-                blockActiveS = findOptionalDrawable(themeAtlas, activatedNode, "s");
-                blockActiveO = findOptionalDrawable(themeAtlas, activatedNode, "o");
-                blockActiveT = findOptionalDrawable(themeAtlas, activatedNode, "t");
-                blockActiveGarbage = findOptionalDrawable(themeAtlas, activatedNode, "garbage");
+                blockActiveL = findOptionalDrawable(themeAtlas, activatedNode, "l", normalNode.getInt("speedl", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockActiveJ = findOptionalDrawable(themeAtlas, activatedNode, "j", normalNode.getInt("speedj", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockActiveI = findOptionalDrawable(themeAtlas, activatedNode, "i", normalNode.getInt("speedi", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockActiveZ = findOptionalDrawable(themeAtlas, activatedNode, "z", normalNode.getInt("speedz", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockActiveS = findOptionalDrawable(themeAtlas, activatedNode, "s", normalNode.getInt("speeds", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockActiveO = findOptionalDrawable(themeAtlas, activatedNode, "o", normalNode.getInt("speedo", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockActiveT = findOptionalDrawable(themeAtlas, activatedNode, "t", normalNode.getInt("speedt", ANIMATION_FRAME_LENGTH_DEFAULT));
+                blockActiveGarbage = findOptionalDrawable(themeAtlas, activatedNode, "garbage", normalNode.getInt("speedgarbage", ANIMATION_FRAME_LENGTH_DEFAULT));
             }
 
             JsonValue tintNode = blockNode.get("tint");
@@ -449,11 +452,11 @@ public class Theme {
     }
 
     @Nullable
-    private Drawable findOptionalDrawable(TextureAtlas themeAtlas, JsonValue parentNode, String nodeName) {
+    private Drawable findOptionalDrawable(TextureAtlas themeAtlas, JsonValue parentNode, String nodeName, int animationSpeed) {
         if (parentNode != null && parentNode.has(nodeName)) {
             String regionName = parentNode.getString(nodeName);
             if (!regionName.isEmpty())
-                return findDrawableOrThrow(themeAtlas, regionName);
+                return findDrawableOrThrow(themeAtlas, regionName, animationSpeed);
             else
                 return null;
         } else
@@ -461,12 +464,19 @@ public class Theme {
     }
 
     @Nonnull
-    private Drawable findDrawableOrThrow(TextureAtlas themeAtlas, String name) {
-        TextureRegion region = themeAtlas.findRegion(name);
-        if (region == null)
+    private Drawable findDrawableOrThrow(TextureAtlas themeAtlas, String name, int animationSpeed) {
+        Array<TextureAtlas.AtlasRegion> regions = themeAtlas.findRegions(name);
+        if (regions == null || regions.isEmpty())
             throw new IllegalArgumentException("Picture for " + name + " not found");
 
-        if (region instanceof TextureAtlas.AtlasRegion && ((TextureAtlas.AtlasRegion) region).splits != null)
+        if (regions.size > 1 && animationSpeed > 0) {
+            Animation<TextureAtlas.AtlasRegion> animation = new Animation<>(((float) animationSpeed) / 1000f, regions);
+            animation.setPlayMode(Animation.PlayMode.LOOP);
+            return new AnimatedDrawable(animation);
+        }
+
+        TextureAtlas.AtlasRegion region = regions.first();
+        if (region.splits != null)
             return new NinePatchDrawable(themeAtlas.createPatch(name));
         else
             return new TextureRegionDrawable(region);
@@ -524,5 +534,32 @@ public class Theme {
 
         return (fileName.endsWith(".ogg") || fileName.endsWith(".mp3") || fileName.equals(THEME_FILE_NAME)
                 || fileName.equals(ATLAS_FILE_NAME) || fileName.endsWith(".png"));
+    }
+
+    public void updateAnimations(float delta) {
+        updateSingleAnimation(blockNormalL, delta);
+        updateSingleAnimation(blockNormalJ, delta);
+        updateSingleAnimation(blockNormalZ, delta);
+        updateSingleAnimation(blockNormalS, delta);
+        updateSingleAnimation(blockNormalO, delta);
+        updateSingleAnimation(blockNormalT, delta);
+        updateSingleAnimation(blockNormalI, delta);
+        updateSingleAnimation(blockNormalGarbage, delta);
+        updateSingleAnimation(blockGrid, delta);
+        updateSingleAnimation(blockGhost, delta);
+
+        updateSingleAnimation(blockActiveL, delta);
+        updateSingleAnimation(blockActiveJ, delta);
+        updateSingleAnimation(blockActiveZ, delta);
+        updateSingleAnimation(blockActiveS, delta);
+        updateSingleAnimation(blockActiveO, delta);
+        updateSingleAnimation(blockActiveT, delta);
+        updateSingleAnimation(blockActiveI, delta);
+        updateSingleAnimation(blockActiveGarbage, delta);
+    }
+
+    private void updateSingleAnimation(Drawable drawable, float delta) {
+        if (drawable instanceof AnimatedDrawable)
+            ((AnimatedDrawable) drawable).update(delta);
     }
 }
