@@ -442,7 +442,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         inputAdapter.doPoll(delta);
 
         music.act(delta);
-        app.theme.updateAnimations(delta);
+        app.theme.updateAnimations(delta, gameModel.getScore().getCurrentLevel());
 
         delta = Math.min(delta, 1 / 30f);
 

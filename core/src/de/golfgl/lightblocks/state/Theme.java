@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.scene2d.AnimatedDrawable;
+import de.golfgl.lightblocks.scene2d.LevelDependantDrawable;
 
 /**
  * Verwaltet das Theme, so eines installiert ist. Ansonsten werden die defaults initialisiert
@@ -335,8 +336,6 @@ public class Theme {
             if (focussedColor != null)
                 this.focussedColor = focussedColor;
 
-            // TODO buttoncolor
-
             backgroundPic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic", 0);
             backgroundLandscapePic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic_landscape", 0);
         }
@@ -469,10 +468,14 @@ public class Theme {
         if (regions == null || regions.isEmpty())
             throw new IllegalArgumentException("Picture for " + name + " not found");
 
-        if (regions.size > 1 && animationSpeed > 0) {
-            Animation<TextureAtlas.AtlasRegion> animation = new Animation<>(((float) animationSpeed) / 1000f, regions);
-            animation.setPlayMode(Animation.PlayMode.LOOP);
-            return new AnimatedDrawable(animation);
+        if (regions.size > 1) {
+            if (animationSpeed > 0) {
+                Animation<TextureAtlas.AtlasRegion> animation = new Animation<>(((float) animationSpeed) / 1000f, regions);
+                animation.setPlayMode(Animation.PlayMode.LOOP);
+                return new AnimatedDrawable(animation);
+            } else {
+                return new LevelDependantDrawable(regions);
+            }
         }
 
         TextureAtlas.AtlasRegion region = regions.first();
@@ -536,30 +539,38 @@ public class Theme {
                 || fileName.equals(ATLAS_FILE_NAME) || fileName.endsWith(".png"));
     }
 
-    public void updateAnimations(float delta) {
-        updateSingleAnimation(blockNormalL, delta);
-        updateSingleAnimation(blockNormalJ, delta);
-        updateSingleAnimation(blockNormalZ, delta);
-        updateSingleAnimation(blockNormalS, delta);
-        updateSingleAnimation(blockNormalO, delta);
-        updateSingleAnimation(blockNormalT, delta);
-        updateSingleAnimation(blockNormalI, delta);
-        updateSingleAnimation(blockNormalGarbage, delta);
-        updateSingleAnimation(blockGrid, delta);
-        updateSingleAnimation(blockGhost, delta);
+    public void updateAnimations(float delta, int level) {
+        updateSingleAnimation(blockNormalL, delta, level);
+        updateSingleAnimation(blockNormalJ, delta, level);
+        updateSingleAnimation(blockNormalZ, delta, level);
+        updateSingleAnimation(blockNormalS, delta, level);
+        updateSingleAnimation(blockNormalO, delta, level);
+        updateSingleAnimation(blockNormalT, delta, level);
+        updateSingleAnimation(blockNormalI, delta, level);
+        updateSingleAnimation(blockNormalGarbage, delta, level);
+        updateSingleAnimation(blockGrid, delta, level);
+        updateSingleAnimation(blockGhost, delta, level);
 
-        updateSingleAnimation(blockActiveL, delta);
-        updateSingleAnimation(blockActiveJ, delta);
-        updateSingleAnimation(blockActiveZ, delta);
-        updateSingleAnimation(blockActiveS, delta);
-        updateSingleAnimation(blockActiveO, delta);
-        updateSingleAnimation(blockActiveT, delta);
-        updateSingleAnimation(blockActiveI, delta);
-        updateSingleAnimation(blockActiveGarbage, delta);
+        updateSingleAnimation(blockActiveL, delta, level);
+        updateSingleAnimation(blockActiveJ, delta, level);
+        updateSingleAnimation(blockActiveZ, delta, level);
+        updateSingleAnimation(blockActiveS, delta, level);
+        updateSingleAnimation(blockActiveO, delta, level);
+        updateSingleAnimation(blockActiveT, delta, level);
+        updateSingleAnimation(blockActiveI, delta, level);
+        updateSingleAnimation(blockActiveGarbage, delta, level);
+
+        updateSingleAnimation(backgroundPic, delta, level);
+        updateSingleAnimation(backgroundLandscapePic, delta, level);
     }
 
-    private void updateSingleAnimation(Drawable drawable, float delta) {
+    private void updateSingleAnimation(Drawable drawable, float delta, int level) {
+        if (drawable == null)
+            return;
+
         if (drawable instanceof AnimatedDrawable)
             ((AnimatedDrawable) drawable).update(delta);
+        else if (drawable instanceof LevelDependantDrawable)
+            ((LevelDependantDrawable) drawable).setLevel(level);
     }
 }
