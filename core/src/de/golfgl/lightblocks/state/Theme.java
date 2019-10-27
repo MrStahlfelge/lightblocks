@@ -469,6 +469,8 @@ public class Theme {
             throw new IllegalArgumentException("Picture for " + name + " not found");
 
         if (regions.size > 1) {
+            regions = fillIndices(regions);
+
             if (animationSpeed > 0) {
                 Animation<TextureAtlas.AtlasRegion> animation = new Animation<>(((float) animationSpeed) / 1000f, regions);
                 animation.setPlayMode(Animation.PlayMode.LOOP);
@@ -483,6 +485,24 @@ public class Theme {
             return new NinePatchDrawable(themeAtlas.createPatch(name));
         else
             return new TextureRegionDrawable(region);
+    }
+
+    private Array<TextureAtlas.AtlasRegion> fillIndices(Array<TextureAtlas.AtlasRegion> regions) {
+        TextureAtlas.AtlasRegion lastRegion = regions.get(regions.size - 1);
+
+        // Es gibt keine Lücken zu füllen, also weg
+        if (lastRegion.index == regions.size - 1)
+            return regions;
+
+        Array<TextureAtlas.AtlasRegion> newRegions = new Array<>(lastRegion.index + 1);
+
+        for (int regionsIndex = 1; regionsIndex < regions.size; regionsIndex++) {
+            while (newRegions.size < regions.get(regionsIndex).index)
+                newRegions.add(regions.get(regionsIndex - 1));
+        }
+        newRegions.add(lastRegion);
+
+        return newRegions;
     }
 
     @Nonnull
