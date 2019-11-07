@@ -130,8 +130,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         centerGroup.setTransform(false);
         stage.addActor(centerGroup);
 
-        ParticleEffect pweldEffect = new ParticleEffect();
-        pweldEffect.load(Gdx.files.internal("raw/explode.p"), app.skin.getAtlas());
+        ParticleEffect pweldEffect = app.theme.getParticleEffect();
         weldEffect = new ParticleEffectActor(pweldEffect);
 
         blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ALLROWS];
@@ -759,7 +758,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             }
 
             // den Explosions-Effekt einfügen
-            if (special && app.theme.usesDefaultBlockPictures) {
+            if (special && app.theme.usesParticleEffect) {
                 weldEffect.setPosition(blockGroup.getX() + 5f * BlockActor.blockWidth, blockGroup.getY() +
                         (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth);
                 weldEffect.start();

@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -30,6 +31,7 @@ public class Theme {
     public static final String FOLDER_NAME = "theme";
     public static final String ATLAS_FILE_NAME = FOLDER_NAME + ".atlas";
     public static final String THEME_FILE_NAME = FOLDER_NAME + ".json";
+    public static final String PEFFECT_FILE_NAME = FOLDER_NAME + ".p";
     public static final int ANIMATION_FRAME_LENGTH_DEFAULT = 100;
     private final LightBlocksGame app;
     public Drawable blockNormalL;
@@ -44,7 +46,7 @@ public class Theme {
     public Drawable blockGhost;
     public boolean usesDefaultBlockPictures;
     public boolean usesDefaultSounds;
-
+    public boolean usesParticleEffect;
     public Drawable blockActiveL;
     public Drawable blockActiveJ;
     public Drawable blockActiveZ;
@@ -54,7 +56,6 @@ public class Theme {
     public Drawable blockActiveI;
     public Drawable blockActiveGarbage;
     public float activatedOverlayAlpha;
-
     public Drawable backgroundPic;
     public Drawable backgroundLandscapePic;
     public Color bgColor;
@@ -65,7 +66,6 @@ public class Theme {
     public Color focussedColor;
     public Color titleColor;
     public Color wallColor;
-
     public Sound dropSound;
     public Sound rotateSound;
     public Sound removeSound;
@@ -76,10 +76,9 @@ public class Theme {
     public Sound unlockedSound;
     public Sound garbageSound;
     public Sound horizontalMoveSound;
-
     public String slowMusicFilename;
     public String fastMusicFilename;
-
+    private ParticleEffect particleEffect;
     private boolean themePresent;
     private String themeName;
     private String themeAuthor;
@@ -172,6 +171,8 @@ public class Theme {
         blockActiveT = blockActiveI;
         blockActiveGarbage = blockActiveI;
         usesDefaultBlockPictures = true;
+        usesParticleEffect = true;
+        particleEffect = null;
         activatedOverlayAlpha = 0;
 
         backgroundPic = null;
@@ -241,6 +242,7 @@ public class Theme {
                     loadScreen(themeAtlas, themeConfigJson);
                     loadMusic(themeConfigJson);
                     loadSounds(themeConfigJson);
+                    loadParticleEffect(themeAtlas);
 
                     themePresent = true;
                 }
@@ -253,6 +255,14 @@ public class Theme {
             lastLoadThemeErrorMessage = t.getMessage();
         }
 
+    }
+
+    protected void loadParticleEffect(TextureAtlas themeAtlas) {
+        if (Gdx.files.local(FOLDER_NAME + "/" + PEFFECT_FILE_NAME).exists()) {
+            usesParticleEffect = true;
+            particleEffect = new ParticleEffect();
+            particleEffect.load(Gdx.files.local(FOLDER_NAME + "/" + PEFFECT_FILE_NAME), themeAtlas);
+        }
     }
 
     private void loadSounds(JsonValue themeConfigJson) {
@@ -270,6 +280,17 @@ public class Theme {
             garbageSound = loadOptionalSound(soundNode, "garbage", app.garbageSound);
             horizontalMoveSound = loadOptionalSound(soundNode, "horizontalmove", null);
         }
+    }
+
+    public ParticleEffect getParticleEffect() {
+        ParticleEffect particleEffect;
+        if (themePresent && this.particleEffect != null) {
+            particleEffect = this.particleEffect;
+        } else {
+            particleEffect = new ParticleEffect();
+            particleEffect.load(Gdx.files.internal("raw/explode.p"), app.skin.getAtlas());
+        }
+        return particleEffect;
     }
 
     private Sound loadOptionalSound(JsonValue parentNode, String nodeName, Sound defaultSound) {
@@ -348,6 +369,7 @@ public class Theme {
             JsonValue normalNode = blockNode.get("normal_pics");
             if (normalNode != null) {
                 usesDefaultBlockPictures = false;
+                usesParticleEffect = false;
 
                 blockNormalL = findDrawableOrThrow(themeAtlas, normalNode.getString("l"), normalNode.getInt("speedl", ANIMATION_FRAME_LENGTH_DEFAULT));
                 blockNormalI = findDrawableOrThrow(themeAtlas, normalNode.getString("i"), normalNode.getInt("speedi", ANIMATION_FRAME_LENGTH_DEFAULT));
