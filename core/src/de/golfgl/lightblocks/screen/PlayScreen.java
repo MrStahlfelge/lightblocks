@@ -953,7 +953,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
                     (i >= 2) ? 0 : LightBlocksGame.nativeGameHeight);
             nextTetro[i].setMoveAction(Actions.moveTo(offsetX + relativeBlockPositions[i][0] * BlockActor.blockWidth,
                     offsetY + relativeBlockPositions[i][1] * BlockActor.blockWidth, .5f, Interpolation.fade));
-            nextTetro[i].addAction(Actions.alpha(.5f, .5f, Interpolation.fade));
+            nextTetro[i].addAction(Actions.alpha(app.theme.nextPieceAlpha, .5f, Interpolation.fade));
             nextTetro[i].getColor().a = 0;
 
             blockGroup.addBlockAtBottom(nextTetro[i]);
@@ -1029,7 +1029,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
             holdTetro[i].setMoveAction(Actions.moveTo(offsetX + newHoldPiecePositions[i][0] * BlockActor.blockWidth,
                     offsetY + newHoldPiecePositions[i][1] * BlockActor.blockWidth, .1f, Interpolation.fade));
-            holdTetro[i].addAction(Actions.alpha(.5f, .5f, Interpolation.fade));
+            holdTetro[i].addAction(Actions.alpha(app.theme.nextPieceAlpha, .5f, Interpolation.fade));
             holdTetro[i].setEnlightened(false);
         }
 

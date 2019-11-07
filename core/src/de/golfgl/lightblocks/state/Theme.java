@@ -56,6 +56,7 @@ public class Theme {
     public Drawable blockActiveI;
     public Drawable blockActiveGarbage;
     public float activatedOverlayAlpha;
+    public float nextPieceAlpha;
     public Drawable backgroundPic;
     public Drawable backgroundLandscapePic;
     public Color bgColor;
@@ -174,6 +175,7 @@ public class Theme {
         usesParticleEffect = true;
         particleEffect = null;
         activatedOverlayAlpha = 0;
+        nextPieceAlpha = .5f;
 
         backgroundPic = null;
         backgroundLandscapePic = null;
@@ -359,6 +361,9 @@ public class Theme {
 
             backgroundPic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic", 0);
             backgroundLandscapePic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic_landscape", 0);
+
+            if (backgroundPic != null)
+                nextPieceAlpha = 1f;
         }
     }
 
@@ -370,6 +375,7 @@ public class Theme {
             if (normalNode != null) {
                 usesDefaultBlockPictures = false;
                 usesParticleEffect = false;
+                nextPieceAlpha = 1f;
 
                 blockNormalL = findDrawableOrThrow(themeAtlas, normalNode.getString("l"), normalNode.getInt("speedl", ANIMATION_FRAME_LENGTH_DEFAULT));
                 blockNormalI = findDrawableOrThrow(themeAtlas, normalNode.getString("i"), normalNode.getInt("speedi", ANIMATION_FRAME_LENGTH_DEFAULT));
