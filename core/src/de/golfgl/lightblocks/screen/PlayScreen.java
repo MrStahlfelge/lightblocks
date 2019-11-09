@@ -66,6 +66,7 @@ import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.state.InitGameParameters;
+import de.golfgl.lightblocks.state.Theme;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
@@ -133,6 +134,30 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         ParticleEffect pweldEffect = app.theme.getParticleEffect();
         weldEffect = new ParticleEffectActor(pweldEffect);
 
+        if (!app.theme.particleEffectOnTop)
+            centerGroup.addActor(weldEffect);
+
+        // nachdem die Blockgroup gesetzt ist eventuell den ParticleEffect positionieren
+        switch (app.theme.particleEffectPosition) {
+            case clear:
+                // nichts zu tun, da das erst bei einem clear ausgelöst wird. vorher wird gecentert
+            case center:
+                weldEffect.setPosition(LightBlocksGame.nativeGameWidth / 2 - app.theme.particleEffectWidth / 2,
+                        LightBlocksGame.nativeGameHeight / 2 - app.theme.particleEffectHeight / 2);
+                break;
+            case top:
+                weldEffect.setPosition(LightBlocksGame.nativeGameWidth / 2 - app.theme.particleEffectWidth / 2,
+                        LightBlocksGame.nativeGameHeight - app.theme.particleEffectHeight);
+                break;
+            case bottom:
+                weldEffect.setPosition(LightBlocksGame.nativeGameWidth / 2 - app.theme.particleEffectWidth / 2, 0);
+                break;
+        }
+
+
+        if (app.theme.particleEffectTrigger == Theme.EffectTrigger.always)
+            weldEffect.start();
+
         blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ALLROWS];
         nextTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
         holdTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
@@ -196,7 +221,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         populateScoreTable(scoreTable);
         // hinzufügen erst weiter unten (weil eventuell noch etwas dazu kommt)
 
-        centerGroup.addActor(weldEffect);
+        if (!weldEffect.hasParent())
+            centerGroup.addActor(weldEffect);
 
         labelGroup = new Group();
         labelGroup.setTransform(false);
@@ -758,9 +784,13 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             }
 
             // den Explosions-Effekt einfügen
-            if (special && app.theme.usesParticleEffect) {
-                weldEffect.setPosition(blockGroup.getX() + 5f * BlockActor.blockWidth, blockGroup.getY() +
-                        (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth);
+            if (app.theme.usesParticleEffect && (special && app.theme.particleEffectTrigger == Theme.EffectTrigger.specialClear
+                    || app.theme.particleEffectTrigger == Theme.EffectTrigger.lineClear)) {
+
+                if (app.theme.particleEffectPosition == Theme.EffectSpawnPosition.clear)
+                    weldEffect.setPosition(blockGroup.getX() + 5f * BlockActor.blockWidth - app.theme.particleEffectWidth / 2,
+                            blockGroup.getY() + (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth - app.theme.particleEffectHeight / 2);
+
                 weldEffect.start();
             }
         }

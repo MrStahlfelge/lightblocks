@@ -46,7 +46,14 @@ public class Theme {
     public Drawable blockGhost;
     public boolean usesDefaultBlockPictures;
     public boolean usesDefaultSounds;
+
     public boolean usesParticleEffect;
+    public boolean particleEffectOnTop;
+    public EffectTrigger particleEffectTrigger;
+    public EffectSpawnPosition particleEffectPosition;
+    public int particleEffectWidth;
+    public int particleEffectHeight;
+
     public Drawable blockActiveL;
     public Drawable blockActiveJ;
     public Drawable blockActiveZ;
@@ -173,6 +180,11 @@ public class Theme {
         blockActiveGarbage = blockActiveI;
         usesDefaultBlockPictures = true;
         usesParticleEffect = true;
+        particleEffectOnTop = true;
+        particleEffectTrigger = EffectTrigger.specialClear;
+        particleEffectPosition = EffectSpawnPosition.clear;
+        particleEffectWidth = 0;
+        particleEffectHeight = 0;
         particleEffect = null;
         activatedOverlayAlpha = 0;
         nextPieceAlpha = .5f;
@@ -244,7 +256,7 @@ public class Theme {
                     loadScreen(themeAtlas, themeConfigJson);
                     loadMusic(themeConfigJson);
                     loadSounds(themeConfigJson);
-                    loadParticleEffect(themeAtlas);
+                    loadParticleEffect(themeAtlas, themeConfigJson);
 
                     themePresent = true;
                 }
@@ -259,11 +271,44 @@ public class Theme {
 
     }
 
-    protected void loadParticleEffect(TextureAtlas themeAtlas) {
+    protected void loadParticleEffect(TextureAtlas themeAtlas, JsonValue themeConfigJson) {
         if (Gdx.files.local(FOLDER_NAME + "/" + PEFFECT_FILE_NAME).exists()) {
             usesParticleEffect = true;
             particleEffect = new ParticleEffect();
             particleEffect.load(Gdx.files.local(FOLDER_NAME + "/" + PEFFECT_FILE_NAME), themeAtlas);
+
+            JsonValue effectNode = themeConfigJson.get("effect");
+            if (effectNode != null) {
+                particleEffectOnTop = effectNode.getBoolean("onTop", true);
+                particleEffectWidth = effectNode.getInt("width", 0);
+                particleEffectHeight = effectNode.getInt("height", 0);
+
+                switch (effectNode.getString("trigger", "special")) {
+                    case "always":
+                        particleEffectTrigger = EffectTrigger.always;
+                        break;
+                    case "clear":
+                        particleEffectTrigger = EffectTrigger.lineClear;
+                        break;
+                    default:
+                        particleEffectTrigger = EffectTrigger.specialClear;
+                }
+
+                switch (effectNode.getString("position", "clear")) {
+                    case "top":
+                        particleEffectPosition = EffectSpawnPosition.top;
+                        break;
+                    case "bottom":
+                        particleEffectPosition = EffectSpawnPosition.bottom;
+                        break;
+                    case "center":
+                        particleEffectPosition = EffectSpawnPosition.center;
+                        break;
+                    default:
+                        particleEffectPosition = EffectSpawnPosition.clear;
+                }
+            }
+
         }
     }
 
@@ -620,5 +665,13 @@ public class Theme {
             ((AnimatedDrawable) drawable).update(delta);
         else if (drawable instanceof LevelDependantDrawable)
             ((LevelDependantDrawable) drawable).setLevel(level);
+    }
+
+    public enum EffectTrigger {
+        lineClear, specialClear, always
+    }
+
+    public enum EffectSpawnPosition {
+        top, bottom, center, clear
     }
 }
