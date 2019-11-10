@@ -53,6 +53,7 @@ public class Theme {
     public EffectSpawnPosition particleEffectPosition;
     public int particleEffectWidth;
     public int particleEffectHeight;
+    public boolean particleEffectReset;
 
     public Drawable blockActiveL;
     public Drawable blockActiveJ;
@@ -185,6 +186,7 @@ public class Theme {
         particleEffectPosition = EffectSpawnPosition.clear;
         particleEffectWidth = 0;
         particleEffectHeight = 0;
+        particleEffectReset = true;
         particleEffect = null;
         activatedOverlayAlpha = 0;
         nextPieceAlpha = .5f;
@@ -274,6 +276,7 @@ public class Theme {
     protected void loadParticleEffect(TextureAtlas themeAtlas, JsonValue themeConfigJson) {
         if (Gdx.files.local(FOLDER_NAME + "/" + PEFFECT_FILE_NAME).exists()) {
             usesParticleEffect = true;
+            particleEffectReset = false;
             particleEffect = new ParticleEffect();
             particleEffect.load(Gdx.files.local(FOLDER_NAME + "/" + PEFFECT_FILE_NAME), themeAtlas);
 
@@ -282,6 +285,7 @@ public class Theme {
                 particleEffectOnTop = effectNode.getBoolean("onTop", true);
                 particleEffectWidth = effectNode.getInt("width", 0);
                 particleEffectHeight = effectNode.getInt("height", 0);
+                particleEffectReset = effectNode.getBoolean("resetOnStart", false);
 
                 switch (effectNode.getString("trigger", "special")) {
                     case "always":

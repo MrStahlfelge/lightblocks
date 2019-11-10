@@ -10,14 +10,16 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  */
 
 public class ParticleEffectActor extends Actor {
+    private final boolean resetOnStart;
     ParticleEffect particleEffect;
     Vector2 acc = new Vector2();
 
     boolean isComplete;
 
-    public ParticleEffectActor(ParticleEffect particleEffect) {
+    public ParticleEffectActor(ParticleEffect particleEffect, boolean resetOnStart) {
         super();
         this.particleEffect = particleEffect;
+        this.resetOnStart = resetOnStart;
     }
 
     @Override
@@ -40,7 +42,8 @@ public class ParticleEffectActor extends Actor {
 
     public void start() {
         isComplete = false;
-        particleEffect.reset();
+        if (resetOnStart)
+            particleEffect.reset();
         particleEffect.start();
     }
 

@@ -36,7 +36,7 @@ public class AnimatedLightblocksLogo extends BlockGroup {
 
         ParticleEffect pweldEffect = new ParticleEffect();
         pweldEffect.load(Gdx.files.internal("raw/explode.p"), app.skin.getAtlas());
-        weldEffect = new ParticleEffectActor(pweldEffect);
+        weldEffect = new ParticleEffectActor(pweldEffect, true);
 
     }
 

@@ -132,7 +132,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         stage.addActor(centerGroup);
 
         ParticleEffect pweldEffect = app.theme.getParticleEffect();
-        weldEffect = new ParticleEffectActor(pweldEffect);
+        weldEffect = new ParticleEffectActor(pweldEffect, app.theme.particleEffectReset);
 
         if (!app.theme.particleEffectOnTop)
             centerGroup.addActor(weldEffect);
