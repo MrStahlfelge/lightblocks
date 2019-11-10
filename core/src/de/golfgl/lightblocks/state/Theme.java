@@ -633,6 +633,7 @@ public class Theme {
             return false;
 
         return (fileName.endsWith(".ogg") || fileName.endsWith(".mp3") || fileName.equals(THEME_FILE_NAME)
+                || fileName.equals(PEFFECT_FILE_NAME)
                 || fileName.equals(ATLAS_FILE_NAME) || fileName.endsWith(".png"));
     }
 
