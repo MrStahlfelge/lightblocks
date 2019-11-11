@@ -42,6 +42,7 @@ public class BlockGroup extends Group {
             for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++)
                 for (int y = 0; y < Gameboard.GAMEBOARD_NORMALROWS; y++) {
                     Image imGrid = useTheme ? new Image(app.theme.blockGrid) : new Image(app.trBlock);
+                    imGrid.setSize(BlockActor.BLOCK_IMAGE, BlockActor.BLOCK_IMAGE);
                     imGrid.setPosition(calcHorizontalPos(x), calcVerticalPos(y));
 
                     if (applyMask)
@@ -55,6 +56,7 @@ public class BlockGroup extends Group {
             ghostpiece = new Image[Tetromino.TETROMINO_BLOCKCOUNT];
             for (int i = 0; i < ghostpiece.length; i++) {
                 ghostpiece[i] = useTheme ? new Image(app.theme.blockGhost) : new Image(app.trGhostBlock);
+                ghostpiece[i].setSize(BlockActor.BLOCK_IMAGE, BlockActor.BLOCK_IMAGE);
                 ghostpiece[i].setColor(.5f, .5f, .5f, 1f);
                 grid.addActor(ghostpiece[i]);
             }

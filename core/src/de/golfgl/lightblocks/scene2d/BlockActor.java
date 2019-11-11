@@ -17,8 +17,10 @@ import de.golfgl.lightblocks.model.Tetromino;
  */
 
 public class BlockActor extends Actor {
-    public static final int blockWidth = 34;
+    public static final int BLOCK_CENTER = 32;
+    public static final int blockWidth = BLOCK_CENTER + 2;
     public static final int shapeSize = 20;
+    public static final int BLOCK_IMAGE = 2 * shapeSize + BLOCK_CENTER;
 
     public static final int COLOR_MODE_NONE = 0;
     public static final int COLOR_MODE_SHADEOFGREY = 1;
@@ -67,6 +69,8 @@ public class BlockActor extends Actor {
                 new TextureRegionDrawable(app.trBlock));
         imBlockEnlightened = new Image(useTheme ? app.theme.getBlockTextureEnlightened(blockType)
                 : new TextureRegionDrawable(app.trBlockEnlightened));
+        imBlock.setSize(BLOCK_IMAGE, BLOCK_IMAGE);
+        imBlockEnlightened.setSize(BLOCK_IMAGE, BLOCK_IMAGE);
 
         Color blockTypeColor;
 
