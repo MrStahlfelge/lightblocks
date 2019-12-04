@@ -1332,6 +1332,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         }
     }
 
+    public boolean showsOverlayMessage() {
+        return overlayWindow != null && overlayWindow.hasParent();
+    }
+
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);

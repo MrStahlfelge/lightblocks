@@ -71,8 +71,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     @Override
     public String getTutorialContinueText() {
-        return playScreen.app.TEXTS.get(isUsingOnScreenButtons() ? "tutorialContinueGamepad" :
-                "tutorialContinueGestures");
+        return playScreen.app.TEXTS.get("tutorialContinueGestures");
     }
 
     @Override
@@ -123,6 +122,9 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         touchDownValid = screenY > Gdx.graphics.getHeight() * SCREEN_BORDER_PERCENTAGE * (isPaused() ? 2 : 1)
                 && (!isUsingOnScreenButtons() || isPaused());
+
+        if (!touchDownValid && isUsingOnScreenButtons() && playScreen.showsOverlayMessage())
+            playScreen.gameModel.setRotate(true);
 
         if (!touchDownValid)
             return false;
