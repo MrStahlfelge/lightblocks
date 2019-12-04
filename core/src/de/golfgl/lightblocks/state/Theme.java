@@ -92,6 +92,7 @@ public class Theme {
     private String themeName;
     private String themeAuthor;
     private int themeVersion;
+    private int targetVersion;
     private String lastLoadThemeErrorMessage;
 
     public Theme(LightBlocksGame app) {
@@ -252,6 +253,7 @@ public class Theme {
 
                     themeAuthor = themeConfigJson.getString("author", null);
                     themeVersion = themeConfigJson.getInt("version", 0);
+                    targetVersion = themeConfigJson.getInt("targetBuildNumber", 0);
 
                     // Blöcke laden
                     loadBlocks(themeAtlas, themeConfigJson);
@@ -593,6 +595,10 @@ public class Theme {
      */
     public String getThemeName() {
         return themeName;
+    }
+
+    public int getTargetVersion() {
+        return targetVersion;
     }
 
     @Nullable

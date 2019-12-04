@@ -57,7 +57,10 @@ public class BlockGroup extends Group {
             for (int i = 0; i < ghostpiece.length; i++) {
                 ghostpiece[i] = useTheme ? new Image(app.theme.blockGhost) : new Image(app.trGhostBlock);
                 ghostpiece[i].setSize(BlockActor.BLOCK_IMAGE, BlockActor.BLOCK_IMAGE);
-                ghostpiece[i].setColor(.5f, .5f, .5f, 1f);
+
+                if (!useTheme || app.theme.usesDefaultBlockPictures || app.theme.getTargetVersion() <= 1932)
+                    ghostpiece[i].setColor(.5f, .5f, .5f, 1f);
+
                 grid.addActor(ghostpiece[i]);
             }
         }
