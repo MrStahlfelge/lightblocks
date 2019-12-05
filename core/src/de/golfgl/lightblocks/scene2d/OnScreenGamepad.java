@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -24,6 +25,7 @@ public class OnScreenGamepad extends Group {
     public static final int GRID_SIZE = 5;
 
     private final Touchpad touchpad;
+    private final Group touchpadContainer;
     private final LightBlocksGame app;
     private final Button rotateRightButton;
     private final Button rotateLeftButton;
@@ -39,26 +41,34 @@ public class OnScreenGamepad extends Group {
     public OnScreenGamepad(LightBlocksGame app, final PlayScreen playScreen,
                            EventListener touchPadListener, InputListener holdInputListener,
                            InputListener freezeButtonInputListener) {
-        touchpad = new Touchpad(0, app.skin);
         this.app = app;
-        touchpad.addListener(touchPadListener != null ? touchPadListener : new MoveDragListener() {
-            @Override
-            protected void savePosDelta(int deltaX, int deltaY) {
-                config.touchpadX = config.touchpadX + deltaX;
-                config.touchpadY = config.touchpadY + deltaY;
-            }
 
-            @Override
-            public float getScale() {
-                return config.touchpadScale;
-            }
+        touchpad = new Touchpad(0, app.skin);
+        touchpadContainer = new Group();
+        touchpadContainer.addActor(touchpad);
 
-            @Override
-            public void saveScale(float value) {
-                config.touchpadScale = value;
-            }
-        });
-        addActor(touchpad);
+        if (touchPadListener != null) {
+            touchpad.addListener(touchPadListener);
+            touchpadContainer.setTouchable(Touchable.childrenOnly);
+        } else
+            touchpadContainer.addListener(new MoveDragListener() {
+                @Override
+                protected void savePosDelta(int deltaX, int deltaY) {
+                    config.touchpadX = config.touchpadX + deltaX;
+                    config.touchpadY = config.touchpadY + deltaY;
+                }
+
+                @Override
+                public float getScale() {
+                    return config.touchpadScale;
+                }
+
+                @Override
+                public void saveScale(float value) {
+                    config.touchpadScale = value;
+                }
+            });
+        addActor(touchpadContainer);
 
         rotateRightButton = new Button(app.skin, "rotateright");
         addActor(rotateRightButton);
@@ -211,8 +221,16 @@ public class OnScreenGamepad extends Group {
         float size = MathUtils.clamp(screen.getCenterPosX(), TOUCHPAD_MIN, screen.getStage().getHeight() * .5f);
         float fontScale = size * .002f;
         float touchpadSize = Math.max(size * config.touchpadScale, TOUCHPAD_MIN);
+        float touchpadScaling = (size * config.touchpadScale) / TOUCHPAD_MIN;
         touchpad.setSize(touchpadSize, touchpadSize);
-        touchpad.setPosition(0 + config.touchpadX, 0 + config.touchpadY);
+        if (touchpadScaling < 1) {
+            touchpadContainer.setScale(touchpadScaling);
+            touchpadContainer.setTransform(true);
+        } else {
+            touchpadContainer.setScale(1);
+            touchpadContainer.setTransform(false);
+        }
+        touchpadContainer.setPosition(0 + config.touchpadX, 0 + config.touchpadY);
         float buttonSize = size * .4f;
         rotateRightButton.setSize(buttonSize * config.rrScale, buttonSize * config.rrScale);
         rotateLeftButton.setSize(buttonSize * config.rlScale, buttonSize * config.rlScale);
@@ -314,6 +332,7 @@ public class OnScreenGamepad extends Group {
     private abstract class MoveDragListener extends DragListener {
         float dragStartPosX;
         float dragStartPosY;
+        // abbrechen, wenn die Orientierung während des Drag gewechselt wird
         boolean landscapeStart;
 
         @Override
@@ -339,8 +358,9 @@ public class OnScreenGamepad extends Group {
             float moveX = x - getDragStartX();
             float moveY = y - getDragStartY();
 
-            event.getListenerActor().setX(event.getListenerActor().getX() + moveX);
-            event.getListenerActor().setY(event.getListenerActor().getY() + moveY);
+            Actor moveActor = event.getListenerActor();
+            moveActor.setX(moveActor.getX() + moveX * moveActor.getScaleX());
+            moveActor.setY(moveActor.getY() + moveY * moveActor.getScaleY());
         }
 
         @Override
