@@ -41,6 +41,8 @@
     "bgcolor": "94b13a",
     "bgpic": "",
     "bgpic_landscape": "",
+    // Background picture for Gameboard, since v1934
+    "gameboardpic": "gb",
     "scorecolor": "ffffff",
     // Garbage indicator, time while freezed
     "emphasizecolor": "ff0000",

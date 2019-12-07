@@ -162,6 +162,15 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         nextTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
         holdTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
 
+        // das Gameboard-Hintergrundbild
+        if (app.theme.gameboardPic != null) {
+            Image bgGb = new Image(app.theme.gameboardPic);
+            bgGb.setScaling(Scaling.none);
+            bgGb.pack();
+            bgGb.setPosition(LightBlocksGame.nativeGameWidth / 2 - 1, LightBlocksGame.nativeGameHeight / 2 - 1, Align.center);
+            centerGroup.addActor(bgGb);
+        }
+
         // Die Blockgroup nimmt die Steinanimation auf
         blockGroup = new BlockGroup(app, true);
         blockGroup.setTransform(false);

@@ -67,6 +67,7 @@ public class Theme {
     public float nextPieceAlpha;
     public Drawable backgroundPic;
     public Drawable backgroundLandscapePic;
+    public Drawable gameboardPic;
     public Color bgColor;
     public Color scoreColor;
     public Color achievementColor;
@@ -194,6 +195,7 @@ public class Theme {
 
         backgroundPic = null;
         backgroundLandscapePic = null;
+        gameboardPic = null;
         bgColor = Color.BLACK;
         scoreColor = null;
         emphasizeColor = LightBlocksGame.EMPHASIZE_COLOR;
@@ -412,6 +414,7 @@ public class Theme {
 
             backgroundPic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic", 0);
             backgroundLandscapePic = findOptionalDrawable(themeAtlas, screenConfigNode, "bgpic_landscape", 0);
+            gameboardPic = findOptionalDrawable(themeAtlas, screenConfigNode, "gameboardpic", 0);
 
             if (backgroundPic != null)
                 nextPieceAlpha = 1f;
@@ -666,6 +669,7 @@ public class Theme {
 
         updateSingleAnimation(backgroundPic, delta, level);
         updateSingleAnimation(backgroundLandscapePic, delta, level);
+        updateSingleAnimation(gameboardPic, delta, level);
     }
 
     private void updateSingleAnimation(Drawable drawable, float delta, int level) {
