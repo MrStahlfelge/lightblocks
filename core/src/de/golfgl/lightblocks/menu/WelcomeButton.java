@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.backend.BackendClient;
+import de.golfgl.lightblocks.backend.BackendWelcomeResponse;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.state.WelcomeTextUtils;
 
@@ -29,7 +29,7 @@ public class WelcomeButton extends FaTextButton {
     private int currentPage = -1;
     private float oneLineHeight;
     private float nextChange;
-    private BackendClient.WelcomeResponse shownResponse;
+    private BackendWelcomeResponse shownResponse;
     private float lastPrefHeight;
     private float resizeTimeLeft;
 

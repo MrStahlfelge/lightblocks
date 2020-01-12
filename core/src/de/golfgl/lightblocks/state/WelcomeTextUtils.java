@@ -7,8 +7,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.backend.BackendClient;
 import de.golfgl.lightblocks.backend.BackendMessage;
+import de.golfgl.lightblocks.backend.BackendWelcomeResponse;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.menu.SinglePlayerScreen;
 import de.golfgl.lightblocks.menu.WelcomeButton;
@@ -107,7 +107,7 @@ public class WelcomeTextUtils {
     }
 
     private static void listBackendMessages(final LightBlocksGame app, Array<WelcomeButton.WelcomeText> welcomes,
-                                            BackendClient.WelcomeResponse welcomeResponse) {
+                                            BackendWelcomeResponse welcomeResponse) {
         // Warnungen als erstes
         //TODO der sollte rot sein oder sowas
         if (welcomeResponse.warningMsg != null && !welcomeResponse.warningMsg.isEmpty())

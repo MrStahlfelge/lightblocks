@@ -44,7 +44,7 @@ public class BackendManager {
     private Array<MatchEntity> multiplayerMatchesList;
     private boolean authenticated;
     private BackendScore currentlySendingScore;
-    private BackendClient.WelcomeResponse lastWelcomeResponse;
+    private BackendWelcomeResponse lastWelcomeResponse;
     private boolean isFetchingWelcomes;
     private long fetchWelcomesSinceTime;
     private long multiplayerMatchesLastFetchMs;
@@ -129,7 +129,7 @@ public class BackendManager {
 
     public void setCompetitionActionRequiredFlag(boolean competitionActionRequired) {
         if (lastWelcomeResponse != null && lastWelcomeResponse.competitionActionRequired != competitionActionRequired) {
-            lastWelcomeResponse = new BackendClient.WelcomeResponse(lastWelcomeResponse, competitionActionRequired);
+            lastWelcomeResponse = new BackendWelcomeResponse(lastWelcomeResponse, competitionActionRequired);
         }
     }
 
@@ -149,7 +149,7 @@ public class BackendManager {
         return multiplayerLastFetchErrorConnectionProblem;
     }
 
-    public BackendClient.WelcomeResponse getLastWelcomeResponse() {
+    public BackendWelcomeResponse getLastWelcomeResponse() {
         return lastWelcomeResponse;
     }
 
@@ -288,7 +288,7 @@ public class BackendManager {
             isFetchingWelcomes = true;
             backendClient.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, platformString, osString,
                     drawnBlocks, donatorState, fetchWelcomesSinceTime, pushProviderId, pushToken,
-                    new BackendClient.IBackendResponse<BackendClient.WelcomeResponse>() {
+                    new BackendClient.IBackendResponse<BackendWelcomeResponse>() {
                         @Override
                         public void onFail(int statusCode, String errorMsg) {
                             // kann man nix machen
@@ -296,7 +296,7 @@ public class BackendManager {
                         }
 
                         @Override
-                        public void onSuccess(BackendClient.WelcomeResponse retrievedData) {
+                        public void onSuccess(BackendWelcomeResponse retrievedData) {
                             lastWelcomeResponse = retrievedData;
                             authenticated = lastWelcomeResponse.authenticated;
                             isFetchingWelcomes = false;

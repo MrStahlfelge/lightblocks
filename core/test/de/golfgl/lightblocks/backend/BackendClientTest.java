@@ -231,8 +231,8 @@ public class BackendClientTest {
         BackendClient backendClientNoAuth = new BackendClient();
 
         // anonyme Anfrage
-        WaitForResponseListener<BackendClient.WelcomeResponse> newMessagesResponse = new
-                WaitForResponseListener<BackendClient.WelcomeResponse>();
+        WaitForResponseListener<BackendWelcomeResponse> newMessagesResponse = new
+                WaitForResponseListener<BackendWelcomeResponse>();
         backendClientNoAuth.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1023, 1,
                 0, null, null, newMessagesResponse);
         waitWhileRequesting();
@@ -243,7 +243,7 @@ public class BackendClientTest {
         Assert.assertNull(newMessagesResponse.retrievedData.warningMsg);
 
         // veraltete Clientversion
-        newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
+        newMessagesResponse = new WaitForResponseListener<BackendWelcomeResponse>();
         backendClientNoAuth.fetchWelcomeMessages(1, "smarttv", "webgl", 1023, 1,
                 0, "FCM", "token", newMessagesResponse);
         waitWhileRequesting();
@@ -261,7 +261,7 @@ public class BackendClientTest {
         waitWhileRequesting();
         Assert.assertNotNull(createdResponse.retrievedData);
 
-        newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
+        newMessagesResponse = new WaitForResponseListener<BackendWelcomeResponse>();
         backendClientPlayer.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1024, 1,
                 0, null, null, newMessagesResponse);
         waitWhileRequesting();
@@ -271,7 +271,7 @@ public class BackendClientTest {
         Assert.assertNull(newMessagesResponse.retrievedData.warningMsg);
 
         // Anfrage mit falscher Authentifizierung
-        newMessagesResponse = new WaitForResponseListener<BackendClient.WelcomeResponse>();
+        newMessagesResponse = new WaitForResponseListener<BackendWelcomeResponse>();
         BackendClient noAuthPlayer = new BackendClient();
         noAuthPlayer.setUserId("----");
         noAuthPlayer.fetchWelcomeMessages(LightBlocksGame.GAME_VERSIONNUMBER, "smarttv", "webgl", 1024, 1,
