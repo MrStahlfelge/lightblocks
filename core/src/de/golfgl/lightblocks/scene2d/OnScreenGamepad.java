@@ -77,7 +77,8 @@ public class OnScreenGamepad extends Group {
         addActor(rotateLeftButton);
 
         hardDropButton = new Button(app.skin, "harddrop");
-        addActor(hardDropButton);
+        if (playScreen == null || app.localPrefs.isShowHardDropButtonOnScreenGamepad())
+            addActor(hardDropButton);
 
         holdButton = new TextButton("HOLD", app.skin, LightBlocksGame.SKIN_BUTTON_GAMEPAD);
         addActor(holdButton);

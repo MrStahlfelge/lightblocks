@@ -345,7 +345,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             touchPanelTable.row();
             touchPanelTable.add(touchPanelSizeSlider).minHeight(40).fill();
 
-            gestureSettings.row().padTop(20);
+            gestureSettings.row().padTop(10);
             gestureSettings.add(touchPanelTable).top();
 
             Table swipeUp = new Table();
@@ -358,12 +358,12 @@ public class SettingsScreen extends AbstractMenuDialog {
                 }
             });
             swipeUp.add(menuSwipeUpToLabel);
-            swipeUp.row();
+            swipeUp.row().padTop(-5);
             swipeUp.add(swipeUpButtons);
             gestureSettings.row();
             gestureSettings.add(swipeUp);
 
-            gestureSettings.row().padTop(20);
+            gestureSettings.row().padTop(10);
             final Button hideHoldCheckbox = new FaCheckbox(app.TEXTS.get("menuHideHoldButton"), app.skin);
             hideHoldCheckbox.setChecked(!app.localPrefs.isShowTouchHoldButton());
             hideHoldCheckbox.addListener(new ChangeListener() {
@@ -373,6 +373,18 @@ public class SettingsScreen extends AbstractMenuDialog {
                 }
             });
             gestureSettings.add(hideHoldCheckbox);
+
+            final Button invertRotationCheckbox = new FaCheckbox(app.TEXTS.get("menuGesturesInvertRotation"), app.skin);
+            invertRotationCheckbox.setChecked(app.localPrefs.isInvertGesturesRotation());
+            invertRotationCheckbox.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.localPrefs.setInvertGesturesRotation(invertRotationCheckbox.isChecked());
+                }
+            });
+
+            gestureSettings.row().padTop(-5);
+            gestureSettings.add(invertRotationCheckbox);
 
             Button osbHelp = new RoundedTextButton(app.TEXTS.get("buttonHowToPlay"), app.skin);
             addFocusableActor(osbHelp);
@@ -397,10 +409,20 @@ public class SettingsScreen extends AbstractMenuDialog {
                     app.setScreen(new OnScreenGamepadConfigscreen(app));
                 }
             });
+            final Button showOsgHardDropButtonCheckbox = new FaCheckbox(app.TEXTS.get("buttonOsgHardDropButton"), app.skin);
+            showOsgHardDropButtonCheckbox.setChecked(app.localPrefs.isShowHardDropButtonOnScreenGamepad());
+            showOsgHardDropButtonCheckbox.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.localPrefs.setShowHardDropButtonOnScreenGamepad(showOsgHardDropButtonCheckbox.isChecked());
+                }
+            });
             onScreenGamepadSettings = new Table();
             onScreenGamepadSettings.add(new Image(app.trPreviewOsg));
             onScreenGamepadSettings.row().padTop(20);
             onScreenGamepadSettings.add(adjustGamepad);
+            onScreenGamepadSettings.row().padTop(20);
+            onScreenGamepadSettings.add(showOsgHardDropButtonCheckbox);
             onScreenGamepadSettings.validate();
 
             row();
@@ -412,6 +434,8 @@ public class SettingsScreen extends AbstractMenuDialog {
             addFocusableActor(touchPanelSizeSlider);
             addFocusableActor(swipeUpButtons);
             addFocusableActor(hideHoldCheckbox);
+            addFocusableActor(invertRotationCheckbox);
+            addFocusableActor(showOsgHardDropButtonCheckbox);
             defaultFocusedButton = onScreenControlsButton;
         }
 

@@ -61,6 +61,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     private OnScreenGamepad gamepadOnScreenControls;
     private PortraitOnScreenButtons buttonOnScreenControls;
     private boolean tutorialMode;
+    private boolean invertRotation;
     private GestureOnScreenButtons gestureOnScreenControls;
 
     @Override
@@ -80,6 +81,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         dragThreshold = playScreen.app.localPrefs.getTouchPanelSize(playScreen.app.getDisplayDensityRatio());
         tutorialMode = playScreen.gameModel instanceof TutorialModel;
+        invertRotation = !tutorialMode && playScreen.app.localPrefs.isInvertGesturesRotation();
 
         if (playScreen.app.localPrefs.getShowTouchPanel() || tutorialMode)
             initializeTouchPanel(playScreen, dragThreshold);
@@ -235,7 +237,8 @@ public class PlayGesturesInput extends PlayScreenInput {
         playScreen.stage.getViewport().unproject(touchCoordinates);
         touchPanel.setPosition(touchCoordinates.x, touchCoordinates.y);
 
-        if (this.screenX >= Gdx.graphics.getWidth() / 2) {
+        boolean tappedRightScreenHalf = this.screenX >= Gdx.graphics.getWidth() / 2;
+        if (tappedRightScreenHalf && !invertRotation || !tappedRightScreenHalf && invertRotation) {
             setTouchPanelColor(rotateRightColor);
             rotationLabel.setText(FontAwesome.ROTATE_RIGHT);
         } else {
@@ -328,9 +331,11 @@ public class PlayGesturesInput extends PlayScreenInput {
             touchPanel.setVisible(false);
 
         if (!didSomething) {
-            if (!flippedMode)
-                playScreen.gameModel.setRotate(screenX >= Gdx.graphics.getWidth() / 2);
-            else
+            if (!flippedMode) {
+                boolean tappedRightScreenHalf = screenX >= Gdx.graphics.getWidth() / 2;
+                playScreen.gameModel.setRotate(tappedRightScreenHalf && !invertRotation
+                        || !tappedRightScreenHalf && invertRotation);
+            } else
                 playScreen.gameModel.doOneHorizontalMove(screenX <= Gdx.graphics.getWidth() / 2);
 
         } else
@@ -424,7 +429,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
             Touchpad touchpad = (Touchpad) actor;
 
-            boolean upNowPressed = touchpad.getKnobPercentY() > TOUCHPAD_DEAD_RADIUS;
+            boolean upNowPressed = touchpad.getKnobPercentY() > TOUCHPAD_DEAD_RADIUS * 1.8f;
             boolean downNowPressed = touchpad.getKnobPercentY() < -TOUCHPAD_DEAD_RADIUS;
             boolean rightNowPressed = touchpad.getKnobPercentX() > TOUCHPAD_DEAD_RADIUS;
             boolean leftNowPressed = touchpad.getKnobPercentX() < -TOUCHPAD_DEAD_RADIUS;
@@ -444,7 +449,14 @@ public class PlayGesturesInput extends PlayScreenInput {
             if (upPressed != upNowPressed) {
                 upPressed = upNowPressed;
 
-                // nix zu tun
+                // no dedicated hard drop button makes the up button work as hard drop
+                if (!playScreen.app.localPrefs.isShowHardDropButtonOnScreenGamepad()) {
+                    if (upPressed)
+                        playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
+                    else
+                        playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
+                }
+
             }
 
             if (downPressed != downNowPressed) {
@@ -452,7 +464,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 if (downPressed)
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
                 else
-                    playScreen.gameModel.setSoftDropFactor(0);
+                    playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
             }
 
             if (rightPressed != rightNowPressed) {

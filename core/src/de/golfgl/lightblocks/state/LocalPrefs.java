@@ -46,6 +46,8 @@ public class LocalPrefs {
     private static final String PREF_KEY_DONATIONREMINDER = "blocksNextReminder";
     private static final String KEY_SHOW_GHOSTPIECE = "showGhostpiece";
     private static final String PREF_KEY_SHOW_TOUCH_HOLD = "showTouchHold";
+    private static final String PREF_KEY_INVERT_GEST_ROTATION = "invertGesturesRotation";
+    private static final String PREF_KEY_OSG_HARDDROP_BUTTON = "showOsgHardDropButton";
     private static final String PREF_KEY_BACKEND_USERID = "backendUserId";
     private static final String PREF_KEY_BACKEND_PASS = "backendPassKey";
     private static final String PREF_KEY_BACKEND_NICK = "backendNickname";
@@ -74,11 +76,13 @@ public class LocalPrefs {
     private Long nextDonationReminder;
     private Boolean showGhostpiece;
     private Boolean showTouchHoldButton;
+    private Boolean invertGesturesRotation;
     private String nickName;
     private String pushToken;
     private boolean readPushToken;
     private OnScreenGamepadConfig onScreenGamepadConfigLandscape;
     private OnScreenGamepadConfig onScreenGamepadConfigPortrait;
+    private Boolean showHardDropButtonOnScreenGamepad;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -509,6 +513,36 @@ public class LocalPrefs {
         this.showTouchHoldButton = showTouchHoldButton;
 
         prefs.putBoolean(PREF_KEY_SHOW_TOUCH_HOLD, showTouchHoldButton);
+        prefs.flush();
+    }
+
+    public boolean isInvertGesturesRotation() {
+        if (invertGesturesRotation == null) {
+            invertGesturesRotation = prefs.getBoolean(PREF_KEY_INVERT_GEST_ROTATION, false);
+        }
+
+        return invertGesturesRotation;
+    }
+
+    public void setInvertGesturesRotation(Boolean invertGesturesRotation) {
+        this.invertGesturesRotation = invertGesturesRotation;
+
+        prefs.putBoolean(PREF_KEY_INVERT_GEST_ROTATION, invertGesturesRotation);
+        prefs.flush();
+    }
+
+    public Boolean isShowHardDropButtonOnScreenGamepad() {
+        if (showHardDropButtonOnScreenGamepad == null) {
+            showHardDropButtonOnScreenGamepad = prefs.getBoolean(PREF_KEY_OSG_HARDDROP_BUTTON, true);
+        }
+
+        return showHardDropButtonOnScreenGamepad;
+    }
+
+    public void setShowHardDropButtonOnScreenGamepad(boolean showHardDropButtonOnScreenGamepad) {
+        this.showHardDropButtonOnScreenGamepad = showHardDropButtonOnScreenGamepad;
+
+        prefs.putBoolean(PREF_KEY_OSG_HARDDROP_BUTTON, showHardDropButtonOnScreenGamepad);
         prefs.flush();
     }
 
