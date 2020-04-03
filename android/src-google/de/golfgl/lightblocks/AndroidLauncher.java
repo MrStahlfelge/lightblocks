@@ -8,14 +8,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.pay.android.googlebilling.PurchaseManagerGoogleBilling;
 
 import de.golfgl.gdxpushmessages.FcmMessageProvider;
-import de.golfgl.lightblocks.gpgs.GpgsMultiPlayerClient;
+import de.golfgl.lightblocks.gpgs.MyGpgsClient;
 
 public class AndroidLauncher extends GeneralAndroidLauncher {
     public static final int RC_SELECT_PLAYERS = 10000;
     public final static int RC_INVITATION_INBOX = 10001;
 
     //Google Play Games
-    GpgsMultiPlayerClient gpgsClient;
+    MyGpgsClient gpgsClient;
     private FcmMessageProvider fcm;
 
     @Override
@@ -24,7 +24,7 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
                 ".lightblocks&referrer=utm_source%3Dflb";
 
         // Create the Google Api Client with access to the Play Games services
-        gpgsClient = new GpgsMultiPlayerClient();
+        gpgsClient = new MyGpgsClient();
         gpgsClient.initialize(this, true);
 
         game.gpgsClient = gpgsClient;
@@ -63,12 +63,6 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
             return;
 
         gpgsClient.onGpgsActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RC_SELECT_PLAYERS && gpgsClient.getMultiPlayerRoom() != null)
-            gpgsClient.getMultiPlayerRoom().selectPlayersResult(resultCode, data);
-
-        else if (requestCode == RC_INVITATION_INBOX && gpgsClient.getMultiPlayerRoom() != null)
-            gpgsClient.getMultiPlayerRoom().selectInvitationResult(resultCode, data);
 
     }
 }
