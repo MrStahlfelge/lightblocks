@@ -24,7 +24,9 @@ jobs:
       run: chmod +x gradlew
     - name: Build desktop
       run: ./gradlew desktop:build
-#    - name: Build Android
-#      run: ./gradlew android:buildGenericDebug
+    - name: Setup Android build environment
+      uses: daveol/setup-android@v1      
+    - name: Build Android
+      run: ./gradlew android:buildGenericDebug --stacktrace
     - name: Build HTML
       run: ./gradlew html:compileGwt
