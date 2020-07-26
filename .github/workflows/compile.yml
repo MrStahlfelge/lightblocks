@@ -24,7 +24,7 @@ jobs:
       run: chmod +x gradlew
     - name: Build desktop
       run: ./gradlew desktop:build
-    - name: Build Android
-      run: ./gradlew android:buildGenericDebug
+#    - name: Build Android
+#      run: ./gradlew android:buildGenericDebug
     - name: Build HTML
       run: ./gradlew html:compileGwt
