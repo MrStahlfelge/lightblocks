@@ -19,6 +19,8 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.controllers.android.AndroidControllers;
 
+import org.opensource.lightblocks.R;
+
 import java.io.FileNotFoundException;
 
 import de.golfgl.gdxgameanalytics.AndroidGameAnalytics;
