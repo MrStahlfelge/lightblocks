@@ -19,7 +19,7 @@ to work.
 ## License
 
 * The assets in android/assets/ are licensed for your personal use only. You may not redistribute them.
-* Source code and all everything else is licensed under Apache License 2.0
+* Source code files and everything else in this repo is licensed under Apache License 2.0
 
 The intention behind this is to:
 
