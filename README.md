@@ -11,6 +11,8 @@ Falling Lightblocks is available on itch, GameJolt and the usual mobile app stor
 
 ## Build it
 
+![Compile desktop, android and gwt](https://github.com/MrStahlfelge/lightblocks/workflows/Compile%20desktop,%20android%20and%20gwt/badge.svg?branch=master&event=push)
+
 The game is implemented with [libGDX](https://github.com/libgdx/libgdx). Follow the docs to get it
 to work.
 
