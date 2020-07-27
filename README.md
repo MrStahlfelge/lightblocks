@@ -4,6 +4,8 @@
 
 Falling block game for Android (Mobile and TV), iOS, Web browsers. Works on desktops, too.
 
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/B0B51Z9YB)
+
 ## Try it
 
 Falling Lightblocks is available on itch, GameJolt and the usual mobile app stores.
@@ -31,7 +33,7 @@ to contribute to the project
 
 ## Contribute
 
-Contributions are welcome: bug fixes, enhancements, translations etc.
+Contributions are welcome: bug fixes, enhancements, translations, opening issues etc.
 
 ### Translations
 
