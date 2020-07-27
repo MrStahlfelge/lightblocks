@@ -31,7 +31,18 @@ to contribute to the project
 
 ## Contribute
 
-Contributions are welcome: bug fixes, enhancements, translations etc. Please be aware that
+Contributions are welcome: bug fixes, enhancements, translations etc.
+
+### Translations
+
+There's a single [resource bundle file](blob/master/android/assets/i18n/strings.properties) with
+all strings to be localized. Use it as a template for a new file strings_XX.properties with XX
+being the ISO language code.
+Please be aware that Falling Lightblocks can (so far) only display Latin based characters.
+
+### Enhancements
+
+Please be aware that
 Falling Lightblocks is designed with certain design principles in mind, so if you plan to make some
 more efforts, please open an issue to check if your ideas will fit the game.
 
@@ -41,6 +52,6 @@ Some principles the game and its evolvement is based on:
 * Changes must not affect scoring of existing game modes
 * Falling Lightblocks means classic gameplay, though it is okay if some game modes are guideline
 
-For everyone wanting to contribute: Sorry for all the German comments and commit messages that will
+For everyone viewing the source code: Sorry for all the German comments and commit messages that will
 make it more difficult for you. I didn't plan to open the source from the beginning, and I tend to
 write notes for myself in my native tongue.
