@@ -35,7 +35,7 @@ Contributions are welcome: bug fixes, enhancements, translations etc.
 
 ### Translations
 
-There's a single [resource bundle file](blob/master/android/assets/i18n/strings.properties) with
+There's a single [resource bundle file](android/assets/i18n/strings.properties) with
 all strings to be localized. Use it as a template for a new file strings_XX.properties with XX
 being the ISO language code.
 Please be aware that Falling Lightblocks can (so far) only display Latin based characters.
