@@ -58,6 +58,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     public static final String GAME_URL_SHORT = "http://bit.ly/2lrP1zq";
     public static final String GAME_EMAIL = "lightblocks@golfgl.de";
     public static final String GAME_URL = "https://www.golfgl.de/lightblocks/";
+    public static final String SOURCECODE_URL = "https://github.com/MrStahlfelge/lightblocks/";
     public static final String CONTROLLER_RECOMMENDATION_URL = "https://www.golfgl.de/lightblocks/#controller";
     // An den gleichen Eintrag im AndroidManifest und robovm.properties denken!!!
     public static final int GAME_VERSIONNUMBER = 2002;

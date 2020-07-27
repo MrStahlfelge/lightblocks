@@ -124,6 +124,21 @@ public class AboutScreen extends AbstractMenuDialog {
             menuTable.add(mailButton);
         }
 
+        menuTable.row().padTop(20);
+        menuTable.add(getWrapLabel(app.TEXTS.get("labelAbout4"))).fill();
+
+        Button mailButton = new RoundedTextButton(app.TEXTS.get("buttonOpenSource"), app.skin);
+        mailButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.net.openURI(LightBlocksGame.SOURCECODE_URL);
+            }
+        });
+        addFocusableActor(mailButton);
+
+        menuTable.row().padTop(10);
+        menuTable.add(mailButton);
+
         menuTable.row().padTop(40);
         menuTable.add(new ScaledLabel(app.TEXTS.get("labelContributors1"), app.skin, app.SKIN_FONT_TITLE));
         menuTable.row().padTop(10);
