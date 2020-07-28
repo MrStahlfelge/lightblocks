@@ -54,7 +54,7 @@
     "achievementshadowcolor": "000000",
     "titlecolor": "ffffff",
     "wallcolor": "ffffff",
-    // on screen buttoncolor - TODO
+    // on screen buttoncolor, since v2003
     "buttoncolor": "ffffff"
   },
   "blocks": {

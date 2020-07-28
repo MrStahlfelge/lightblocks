@@ -74,7 +74,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 /**
  * The main playing screen
  * <p>
- * Übernimmt auch den Adapter zwischen GameModel und Input/GUI
+ * Serves as adapter between GameModel and input/gui
  * <p>
  * Created by Benjamin Schulte on 16.01.2017.
  */
@@ -247,6 +247,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
                 switchPause(false);
             }
         });
+        pauseButton.getLabel().setColor(app.theme.buttonColor);
         // Im Webbrowser ohne Tastatur den PauseButton anzeigen
         pauseButton.setVisible(LightBlocksGame.isWebAppOnMobileDevice() ||
                 Gdx.app.getType() == Application.ApplicationType.iOS || LightBlocksGame.GAME_DEVMODE);

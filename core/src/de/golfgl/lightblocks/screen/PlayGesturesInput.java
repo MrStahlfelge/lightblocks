@@ -24,7 +24,7 @@ import de.golfgl.lightblocks.scene2d.OnScreenGamepad;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
- * Jegliche Touchscreen-Kontrollen verarbeiten
+ * This class controls touch input for gestures, on screen gamepad and on screen buttons
  * <p>
  * Created by Benjamin Schulte on 25.01.2017.
  */
@@ -370,6 +370,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             buttonLabel.setAlignment(Align.top);
             buttonLabel.setFontScale(.8f);
             add(buttonLabel).fill().expand();
+            buttonLabel.setColor(app.theme.buttonColor);
 
             setRotation(270);
             setTransform(true);
@@ -394,6 +395,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             buttonLabel.setAlignment(Align.top);
             buttonLabel.setFontScale(.8f);
             add(buttonLabel).fill().expand();
+            buttonLabel.setColor(app.theme.buttonColor);
 
             setRotation(270);
             setTransform(true);
@@ -642,6 +644,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 Label buttonLabel = new Label(label, playScreen.app.skin, FontAwesome.SKIN_FONT_FA);
                 buttonLabel.setAlignment(alignment);
                 buttonLabel.setFontScale(.8f);
+                buttonLabel.setColor(playScreen.app.theme.buttonColor);
                 add(buttonLabel).fill().expand();
             }
 

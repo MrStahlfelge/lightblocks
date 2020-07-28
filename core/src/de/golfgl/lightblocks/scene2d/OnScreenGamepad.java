@@ -84,6 +84,8 @@ public class OnScreenGamepad extends Group {
         addActor(holdButton);
 
         if (playScreen != null) {
+            // Real play mode
+
             holdButton.addListener(holdInputListener);
             setVisible(playScreen.gameModel.isHoldMoveAllowedByModel());
 
@@ -118,9 +120,20 @@ public class OnScreenGamepad extends Group {
             if (freezeButtonLabel != null) {
                 freezeButton = new TextButton(freezeButtonLabel, app.skin, LightBlocksGame.SKIN_BUTTON_GAMEPAD);
                 freezeButton.addListener(freezeButtonInputListener);
+                freezeButton.setColor(app.theme.buttonColor);
+                freezeButton.getLabel().setColor(app.theme.buttonColor);
             }
 
+            touchpad.setColor(app.theme.buttonColor);
+            rotateRightButton.setColor(app.theme.buttonColor);
+            rotateLeftButton.setColor(app.theme.buttonColor);
+            hardDropButton.setColor(app.theme.buttonColor);
+            holdButton.setColor(app.theme.buttonColor);
+            holdButton.getLabel().setColor(app.theme.buttonColor);
+
         } else {
+            // Configuration mode
+
             freezeButton = new TextButton("FREEZE", app.skin, LightBlocksGame.SKIN_BUTTON_GAMEPAD);
             rotateLeftButton.addListener(new MoveDragListener() {
                 @Override

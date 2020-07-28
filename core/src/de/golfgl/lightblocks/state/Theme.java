@@ -76,6 +76,7 @@ public class Theme {
     public Color focussedColor;
     public Color titleColor;
     public Color wallColor;
+    public Color buttonColor;
     public Sound dropSound;
     public Sound rotateSound;
     public Sound removeSound;
@@ -204,6 +205,7 @@ public class Theme {
         achievementShadowColor = new Color(Color.BLACK);
         wallColor = new Color(.8f, .8f, .8f, 1);
         titleColor = new Color(.7f, .7f, .7f, 1);
+        buttonColor = new Color(Color.WHITE);
 
         slowMusicFilename = null;
         fastMusicFilename = null;
@@ -387,6 +389,10 @@ public class Theme {
             Color wallColor = findOptionalColor(screenConfigNode, "wallcolor");
             if (wallColor != null)
                 this.wallColor = wallColor;
+
+            Color buttonColor = findOptionalColor(screenConfigNode, "buttoncolor");
+            if (buttonColor != null)
+                this.buttonColor = buttonColor;
 
             Color titleColor = findOptionalColor(screenConfigNode, "titlecolor");
             if (titleColor != null)
