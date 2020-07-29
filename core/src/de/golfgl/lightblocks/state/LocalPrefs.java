@@ -384,7 +384,7 @@ public class LocalPrefs {
     }
 
     /**
-     * Tastenmapping für TV-Fernbedienungen und inzwischen auch Tastatur
+     * Keymapping for tv remotes and keyboards
      */
     public TvRemoteKeyConfig getTvRemoteKeyConfig() {
         if (tvRemoteKeyConfig == null) {
@@ -422,6 +422,20 @@ public class LocalPrefs {
         prefs.putInteger(TVREMOTE_HOLD, tvRemoteKeyConfig.keyCodeHold);
         prefs.putInteger(TVREMOTE_FREEZE, tvRemoteKeyConfig.keyCodeFreeze);
         prefs.flush();
+    }
+
+    public void resetTvRemoteConfig() {
+        tvRemoteKeyConfig = null;
+        prefs.remove(TVREMOTE_HARDDROP);
+        prefs.remove(TVREMOTE_SOFTDROP);
+        prefs.remove(TVREMOTE_LEFT);
+        prefs.remove(TVREMOTE_RIGHT);
+        prefs.remove(TVREMOTE_ROTATE_CW);
+        prefs.remove(TVREMOTE_ROTATE_CC);
+        prefs.remove(TVREMOTE_HOLD);
+        prefs.remove(TVREMOTE_FREEZE);
+        prefs.flush();
+
     }
 
     public int getSupportLevel() {

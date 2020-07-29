@@ -15,6 +15,7 @@ import de.golfgl.lightblocks.menu.MusicButtonListener;
 import de.golfgl.lightblocks.screen.FontAwesome;
 
 /**
+ * FontAwesome TextButton, shows a FontAwesome Icon optionally.
  * Created by Benjamin Schulte on 03.03.2018.
  */
 

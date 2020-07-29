@@ -487,14 +487,13 @@ public class SettingsScreen extends AbstractMenuDialog {
     }
 
     private class TvRemoteSettings extends Table implements ISettingsGroup {
-        private final Button defaultFocusedButton;
+        private Button defaultFocusedButton;
         private LocalPrefs.TvRemoteKeyConfig tvRemoteKeyConfig;
         private int[] configKey;
 
 
         public TvRemoteSettings() {
-            tvRemoteKeyConfig = app.localPrefs.getTvRemoteKeyConfig();
-            convertConfigToArray();
+            loadAndConvertConfigToArray();
 
             pad(0, 20, 0, 20);
             defaults().expand().fillX();
@@ -502,7 +501,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             row();
             add(new ScaledLabel(app.TEXTS.get(Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard)
                     ? "menuSettingsKeyboard" : "menuSettingsTvRemote"),
-                    app.skin, app.SKIN_FONT_TITLE, .8f)).top().fill(false);
+                    app.skin, LightBlocksGame.SKIN_FONT_TITLE, .8f)).top().fill(false);
 
             row();
             ScaledLabel menuSettingsHelpTvRemote = new ScaledLabel(app.TEXTS.get("menuSettingsHelpTvRemote"), app
@@ -511,8 +510,29 @@ public class SettingsScreen extends AbstractMenuDialog {
             menuSettingsHelpTvRemote.setWrap(true);
             add(menuSettingsHelpTvRemote).fillX().expand();
 
-            Table buttonConfig = new Table();
-            buttonConfig.defaults().pad(3, 10, 3, 10);
+            final Table buttonConfig = new Table();
+            fillTvRemoteConfigTable(buttonConfig);
+
+            row();
+            add(buttonConfig).fillX().expand();
+
+            row();
+            Button resetConfig = new RoundedTextButton(app.TEXTS.get("buttonResetToDefaults"), app.skin);
+            addFocusableActor(resetConfig);
+            add(resetConfig).fill(false);
+            resetConfig.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.localPrefs.resetTvRemoteConfig();
+                    buttonConfig.clearChildren();
+                    loadAndConvertConfigToArray();
+                    fillTvRemoteConfigTable(buttonConfig);
+                }
+            });
+        }
+
+        private void fillTvRemoteConfigTable(Table buttonConfig) {
+            buttonConfig.defaults().pad(0, 10, 0, 10).expandY();
             defaultFocusedButton = addButtonRow(buttonConfig, 0, "configTvRemoteRight");
             addButtonRow(buttonConfig, 1, "configTvRemoteLeft");
             addButtonRow(buttonConfig, 2, "configTvRemoteRotateCw");
@@ -521,9 +541,6 @@ public class SettingsScreen extends AbstractMenuDialog {
             addButtonRow(buttonConfig, 5, "configTvRemoteHardDrop");
             addButtonRow(buttonConfig, 6, "configTvRemoteHold");
             addButtonRow(buttonConfig, 7, "configTvRemoteFreeze");
-
-            row();
-            add(buttonConfig).fillX().expand();
         }
 
         protected GlowLabelButton addButtonRow(Table buttonConfig, final int index, String description) {
@@ -543,7 +560,8 @@ public class SettingsScreen extends AbstractMenuDialog {
             return changeButton;
         }
 
-        protected void convertConfigToArray() {
+        protected void loadAndConvertConfigToArray() {
+            tvRemoteKeyConfig = app.localPrefs.getTvRemoteKeyConfig();
             configKey = new int[8];
             configKey[0] = tvRemoteKeyConfig.keyCodeRight;
             configKey[1] = tvRemoteKeyConfig.keyCodeLeft;
