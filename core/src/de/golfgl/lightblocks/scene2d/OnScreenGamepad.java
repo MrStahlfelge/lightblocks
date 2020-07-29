@@ -87,7 +87,7 @@ public class OnScreenGamepad extends Group {
             // Real play mode
 
             holdButton.addListener(holdInputListener);
-            setVisible(playScreen.gameModel.isHoldMoveAllowedByModel());
+            holdButton.setVisible(playScreen.gameModel.isHoldMoveAllowedByModel());
 
             rotateRightButton.addListener(new InputListener() {
                 @Override
