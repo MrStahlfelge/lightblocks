@@ -48,6 +48,7 @@ public class LocalPrefs {
     private static final String PREF_KEY_SHOW_TOUCH_HOLD = "showTouchHold";
     private static final String PREF_KEY_INVERT_GEST_ROTATION = "invertGesturesRotation";
     private static final String PREF_KEY_OSG_HARDDROP_BUTTON = "showOsgHardDropButton";
+    private static final String PREF_KEY_OSG_DPAD = "showOsgDpad";
     private static final String PREF_KEY_BACKEND_USERID = "backendUserId";
     private static final String PREF_KEY_BACKEND_PASS = "backendPassKey";
     private static final String PREF_KEY_BACKEND_NICK = "backendNickname";
@@ -83,6 +84,7 @@ public class LocalPrefs {
     private OnScreenGamepadConfig onScreenGamepadConfigLandscape;
     private OnScreenGamepadConfig onScreenGamepadConfigPortrait;
     private Boolean showHardDropButtonOnScreenGamepad;
+    private Boolean showDpadOnScreenGamepad;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -557,6 +559,21 @@ public class LocalPrefs {
         this.showHardDropButtonOnScreenGamepad = showHardDropButtonOnScreenGamepad;
 
         prefs.putBoolean(PREF_KEY_OSG_HARDDROP_BUTTON, showHardDropButtonOnScreenGamepad);
+        prefs.flush();
+    }
+
+    public Boolean isShowDpadOnScreenGamepad() {
+        if (showDpadOnScreenGamepad == null) {
+            showDpadOnScreenGamepad = prefs.getBoolean(PREF_KEY_OSG_DPAD, false);
+        }
+
+        return showDpadOnScreenGamepad;
+    }
+
+    public void setShowDpadButtonOnScreenGamepad(boolean showDpadButtonOnScreenGamepad) {
+        this.showDpadOnScreenGamepad = showDpadButtonOnScreenGamepad;
+
+        prefs.putBoolean(PREF_KEY_OSG_DPAD, showDpadButtonOnScreenGamepad);
         prefs.flush();
     }
 

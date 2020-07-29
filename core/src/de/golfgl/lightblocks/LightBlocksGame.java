@@ -67,6 +67,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     // auch dran denken das data-Verzeichnis beim release wegzunehmen!
     public static final boolean GAME_DEVMODE = true;
 
+    public static final String SKIN_DEFAULT = "default";
     public static final String SKIN_FONT_TITLE = "bigbigoutline";
     public static final String SKIN_EDIT_BIG = "editbig";
     public static final String SKIN_FONT_BIG = "big";
@@ -79,6 +80,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     public static final String SKIN_BUTTON_SMOKE = "smoke";
     public static final String SKIN_BUTTON_WELCOME = "welcome";
     public static final String SKIN_BUTTON_GAMEPAD = "gamepad";
+    public static final String SKIN_DPAD = "dpad";
     public static final String SKIN_STYLE_PAGER = "pager";
     public static final String SKIN_LIST = "list";
     public static final float LABEL_SCALING = .65f;

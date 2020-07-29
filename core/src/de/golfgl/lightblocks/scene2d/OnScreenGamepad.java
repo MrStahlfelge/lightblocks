@@ -43,7 +43,8 @@ public class OnScreenGamepad extends Group {
                            InputListener freezeButtonInputListener) {
         this.app = app;
 
-        touchpad = new Touchpad(0, app.skin);
+        touchpad = new Touchpad(0, app.skin, app.localPrefs.isShowDpadOnScreenGamepad()
+                ? LightBlocksGame.SKIN_DPAD : LightBlocksGame.SKIN_DEFAULT);
         touchpadContainer = new Group();
         touchpadContainer.addActor(touchpad);
 

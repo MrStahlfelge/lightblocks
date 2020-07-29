@@ -1,5 +1,5 @@
 {
-com.badlogic.gdx.graphics.g2d.BitmapFont: {
+BitmapFont: {
 	fa45: {
 		file: fa-45.fnt
 	}
@@ -22,7 +22,7 @@ com.badlogic.gdx.graphics.g2d.BitmapFont: {
 		file: qs-60-boldglow.fnt
 	}
 }
-com.badlogic.gdx.graphics.Color: {
+Color: {
 	black: {
 		r: 0
 		g: 0
@@ -60,7 +60,7 @@ com.badlogic.gdx.graphics.Color: {
 		a: 1
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
+TintedDrawable: {
 	slider-knob-disabled: {
 		name: slider-knob
 		color: disabled
@@ -125,7 +125,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 		color: disabled
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
+ButtonStyle: {
 	round: {
 		up: button_small_font
 		down: button_small_font_filled
@@ -147,7 +147,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 		down: button_rotateleft_pressed
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
+LabelStyle: {
 	default: {
 		font: qs-25-reg
 	}
@@ -177,7 +177,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 		background: window-bl
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
+ListStyle: {
 	default: {
 		font: qs-40-bold
 		fontColorSelected: white
@@ -185,13 +185,13 @@ com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
 		selection: transparent
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle: {
+ProgressBarStyle: {
 	default-horizontal: {
 		background: slider
 		knobBefore: slider-before
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
+ScrollPaneStyle: {
 	default: {
 		hScrollKnob: scroll-horizontal
 		vScrollKnob: scroll-vertical
@@ -206,7 +206,7 @@ com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
 		vScrollKnob: scroll-vertical
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
+SliderStyle: {
 	default-horizontal: {
 		knobOver: slider-knob-pressed
 		background: slider
@@ -215,7 +215,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
 		knobBefore: slider-before
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
+TextButtonStyle: {
 	default: {
 		font: qs-40-bold
 		fontColor: white
@@ -264,7 +264,7 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		down: button_onscreen_pressed
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
+TextFieldStyle: {
 	default: {
 		font: qs-40-bold
 		fontColor: white
@@ -277,18 +277,21 @@ com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
 		messageFontColor: emphasize
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle: {
+TextTooltipStyle: {
 	default: {
 		label: default
 	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.Touchpad$TouchpadStyle: {
+TouchpadStyle: {
 	default: {
 		background: touchpad
 		knob: touchpad_knob
 	}
+	dpad: {
+		background: dpad
+	}
 }
-com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
+WindowStyle: {
 	default: {
 		background: window-bl
 		titleFont: qs-25-bold

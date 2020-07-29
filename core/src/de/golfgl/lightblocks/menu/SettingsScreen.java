@@ -417,12 +417,24 @@ public class SettingsScreen extends AbstractMenuDialog {
                     app.localPrefs.setShowHardDropButtonOnScreenGamepad(showOsgHardDropButtonCheckbox.isChecked());
                 }
             });
+            final FaRadioButton<Boolean> visualizePadStyle = new FaRadioButton<>(app.skin, false);
+            visualizePadStyle.addEntry(false, "", app.TEXTS.get("buttonOsgNoDpad"));
+            visualizePadStyle.addEntry(true, "", app.TEXTS.get("buttonOsgDpad"));
+            visualizePadStyle.setValue(app.localPrefs.isShowDpadOnScreenGamepad());
+            visualizePadStyle.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.localPrefs.setShowDpadButtonOnScreenGamepad(visualizePadStyle.getValue());
+                }
+            });
             onScreenGamepadSettings = new Table();
             onScreenGamepadSettings.add(new Image(app.trPreviewOsg));
             onScreenGamepadSettings.row().padTop(20);
             onScreenGamepadSettings.add(adjustGamepad);
-            onScreenGamepadSettings.row().padTop(20);
+            onScreenGamepadSettings.row().padTop(10);
             onScreenGamepadSettings.add(showOsgHardDropButtonCheckbox);
+            onScreenGamepadSettings.row();
+            onScreenGamepadSettings.add(visualizePadStyle);
             onScreenGamepadSettings.validate();
 
             row();
@@ -436,6 +448,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             addFocusableActor(hideHoldCheckbox);
             addFocusableActor(invertRotationCheckbox);
             addFocusableActor(showOsgHardDropButtonCheckbox);
+            addFocusableActor(visualizePadStyle);
             defaultFocusedButton = onScreenControlsButton;
         }
 
