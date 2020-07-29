@@ -102,7 +102,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 acceptChallenge(true);
             }
         });
-        declineChallengeButton = new FaTextButton(app.TEXTS.get("labelDeclineChallenge"), app.skin, "default");
+        declineChallengeButton = new FaTextButton(app.TEXTS.get("labelDeclineChallenge"), app.skin, LightBlocksGame.SKIN_DEFAULT);
         addFocusableActor(declineChallengeButton);
         declineChallengeButton.addListener(new ChangeListener() {
             @Override
@@ -265,7 +265,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelTurnAgainst"), app.skin,
                 LightBlocksGame.SKIN_FONT_TITLE, .6f));
 
-        BackendUserLabel opponentLabel = new BackendUserLabel(match, app, "default");
+        BackendUserLabel opponentLabel = new BackendUserLabel(match, app, LightBlocksGame.SKIN_DEFAULT);
         opponentLabel.getLabel().setFontScale(1f);
         opponentLabel.setMaxLabelWidth(LightBlocksGame.nativeGameWidth - 50);
         matchDetailTable.row().padBottom(5);

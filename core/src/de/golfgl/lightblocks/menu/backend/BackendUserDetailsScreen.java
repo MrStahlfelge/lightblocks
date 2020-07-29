@@ -64,7 +64,7 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
 
     protected void fillUserDetails(PlayerDetails retrievedData) {
         Table mainTable = new Table();
-        BackendUserLabel userLabel = new BackendUserLabel(retrievedData, app, "default");
+        BackendUserLabel userLabel = new BackendUserLabel(retrievedData, app, LightBlocksGame.SKIN_DEFAULT);
         userLabel.setToLabelMode();
         userLabel.getLabel().setFontScale(1f);
         userLabel.setMaxLabelWidth(LightBlocksGame.nativeGameWidth - 50);

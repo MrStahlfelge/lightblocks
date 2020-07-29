@@ -360,7 +360,7 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
 
             super.fillParamsTable(app);
 
-            lockMessage = new FaTextButton(app.TEXTS.get("lockModelSprint"), app.skin, "default");
+            lockMessage = new FaTextButton(app.TEXTS.get("lockModelSprint"), app.skin, LightBlocksGame.SKIN_DEFAULT);
             lockMessage.getLabel().setWrap(true);
             menuScreen.addFocusableActor(lockMessage);
             switchLockedMode();

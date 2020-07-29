@@ -55,7 +55,7 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
 
         contentTable.row();
         final BackendUserLabel userLabel = new BackendUserLabel(playerInfo != null ? playerInfo : score, app,
-                "default");
+                LightBlocksGame.SKIN_DEFAULT);
         contentTable.add(userLabel);
         // Wenn man schon aus dem User kommt, nicht nochmal hin
         if (playerInfo != null)
@@ -76,7 +76,7 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
         if (score.replayUri != null || replay != null) {
             contentTable.row().pad(20);
             FaTextButton showReplayButton = new FaTextButton(FontAwesome.CIRCLE_PLAY, "Watch replay", app.skin,
-                    "default");
+                    LightBlocksGame.SKIN_DEFAULT);
             contentTable.add(showReplayButton);
             addFocusableActor(showReplayButton);
             showReplayButton.addListener(new ChangeListener() {

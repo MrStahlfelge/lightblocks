@@ -242,7 +242,7 @@ public class BackendScoreTable extends Table {
             if (app.backendManager.hasUserId() && score.getUserId().equalsIgnoreCase(app.backendManager.ownUserId()))
                 rankLabel.setColor(LightBlocksGame.COLOR_FOCUSSED_ACTOR);
             add(rankLabel).right().padLeft(0);
-            BackendUserLabel userButton = new BackendUserLabel(score, app, "default");
+            BackendUserLabel userButton = new BackendUserLabel(score, app, LightBlocksGame.SKIN_DEFAULT);
             userButton.getLabel().setFontScale(FONT_SCALE);
             userButton.setMaxLabelWidth(maxNicknameWidth);
             add(userButton).left().fillY();

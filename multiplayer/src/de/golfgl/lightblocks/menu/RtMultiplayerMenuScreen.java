@@ -712,7 +712,7 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
             addFocusableActor(joinRoomButton);
 
             if (getApp().netUtils.shouldShowAdvancedWifiSettings()) {
-                Button openWifiSettings = new FaTextButton("Open Wifi settings", app.skin, "default");
+                Button openWifiSettings = new FaTextButton("Open Wifi settings", app.skin, LightBlocksGame.SKIN_DEFAULT);
                 openWifiSettings.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {

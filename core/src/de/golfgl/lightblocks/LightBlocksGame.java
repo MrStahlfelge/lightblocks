@@ -80,7 +80,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     public static final String SKIN_BUTTON_SMOKE = "smoke";
     public static final String SKIN_BUTTON_WELCOME = "welcome";
     public static final String SKIN_BUTTON_GAMEPAD = "gamepad";
-    public static final String SKIN_DPAD = "dpad";
+    public static final String SKIN_TOUCHPAD_DPAD = "dpad";
     public static final String SKIN_STYLE_PAGER = "pager";
     public static final String SKIN_LIST = "list";
     public static final float LABEL_SCALING = .65f;
