@@ -224,6 +224,8 @@ public class OnScreenGamepad extends Group {
         }
         if (freezeButton != null)
             addActor(freezeButton);
+
+        getColor().a = app.localPrefs.getOnScreenGamepadOpacity() / 100f;
     }
 
     public void resize(IOnScreenButtonsScreen screen) {

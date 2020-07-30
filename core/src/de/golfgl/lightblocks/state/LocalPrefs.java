@@ -49,6 +49,7 @@ public class LocalPrefs {
     private static final String PREF_KEY_INVERT_GEST_ROTATION = "invertGesturesRotation";
     private static final String PREF_KEY_OSG_HARDDROP_BUTTON = "showOsgHardDropButton";
     private static final String PREF_KEY_OSG_DPAD = "showOsgDpad";
+    private static final String PREF_KEY_OSG_OPACITY = "osgOpacity";
     private static final String PREF_KEY_BACKEND_USERID = "backendUserId";
     private static final String PREF_KEY_BACKEND_PASS = "backendPassKey";
     private static final String PREF_KEY_BACKEND_NICK = "backendNickname";
@@ -85,6 +86,7 @@ public class LocalPrefs {
     private OnScreenGamepadConfig onScreenGamepadConfigPortrait;
     private Boolean showHardDropButtonOnScreenGamepad;
     private Boolean showDpadOnScreenGamepad;
+    private Integer onScreenGamepadOpacity;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -547,7 +549,7 @@ public class LocalPrefs {
         prefs.flush();
     }
 
-    public Boolean isShowHardDropButtonOnScreenGamepad() {
+    public boolean isShowHardDropButtonOnScreenGamepad() {
         if (showHardDropButtonOnScreenGamepad == null) {
             showHardDropButtonOnScreenGamepad = prefs.getBoolean(PREF_KEY_OSG_HARDDROP_BUTTON, true);
         }
@@ -562,7 +564,7 @@ public class LocalPrefs {
         prefs.flush();
     }
 
-    public Boolean isShowDpadOnScreenGamepad() {
+    public boolean isShowDpadOnScreenGamepad() {
         if (showDpadOnScreenGamepad == null) {
             showDpadOnScreenGamepad = prefs.getBoolean(PREF_KEY_OSG_DPAD, false);
         }
@@ -574,6 +576,20 @@ public class LocalPrefs {
         this.showDpadOnScreenGamepad = showDpadButtonOnScreenGamepad;
 
         prefs.putBoolean(PREF_KEY_OSG_DPAD, showDpadButtonOnScreenGamepad);
+        prefs.flush();
+    }
+
+    public int getOnScreenGamepadOpacity() {
+        if (onScreenGamepadOpacity == null) {
+            onScreenGamepadOpacity = prefs.getInteger(PREF_KEY_OSG_OPACITY, 100);
+        }
+
+        return onScreenGamepadOpacity;
+    }
+
+    public void setOnScreenGamepadOpacity(int onScreenGamepadOpacity) {
+        this.onScreenGamepadOpacity = onScreenGamepadOpacity;
+        prefs.putInteger(PREF_KEY_OSG_OPACITY, onScreenGamepadOpacity);
         prefs.flush();
     }
 

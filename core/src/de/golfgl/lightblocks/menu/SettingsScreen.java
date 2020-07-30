@@ -349,8 +349,8 @@ public class SettingsScreen extends AbstractMenuDialog {
             gestureSettings.add(touchPanelTable).top();
 
             Table swipeUp = new Table();
-            ScaledLabel menuSwipeUpToLabel = new ScaledLabel(app.TEXTS.get("menuSwipeUpTo"), app.skin, app
-                    .SKIN_FONT_TITLE);
+            ScaledLabel menuSwipeUpToLabel = new ScaledLabel(app.TEXTS.get("menuSwipeUpTo"), app.skin,
+                    LightBlocksGame.SKIN_FONT_TITLE);
             menuSwipeUpToLabel.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -401,7 +401,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             onScreenButtonSettings.add(osbHelp);
             onScreenButtonSettings.validate();
 
-            Button adjustGamepad = new RoundedTextButton(app.TEXTS.get("buttonAdjust"), app.skin);
+            Button adjustGamepad = new RoundedTextButton(app.TEXTS.get("buttonAdjustOsg"), app.skin);
             addFocusableActor(adjustGamepad);
             adjustGamepad.addListener(new ChangeListener() {
                 @Override
@@ -409,6 +409,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                     app.setScreen(new OnScreenGamepadConfigscreen(app));
                 }
             });
+
             final Button showOsgHardDropButtonCheckbox = new FaCheckbox(app.TEXTS.get("buttonOsgHardDropButton"), app.skin);
             showOsgHardDropButtonCheckbox.setChecked(app.localPrefs.isShowHardDropButtonOnScreenGamepad());
             showOsgHardDropButtonCheckbox.addListener(new ChangeListener() {
@@ -427,14 +428,34 @@ public class SettingsScreen extends AbstractMenuDialog {
                     app.localPrefs.setShowDpadButtonOnScreenGamepad(visualizePadStyle.getValue());
                 }
             });
+
+            Table opacitySettingTable = new Table();
+            final ScaledLabel labelOpacity = new ScaledLabel(app.TEXTS.get("labelOpacity"), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            opacitySettingTable.add(labelOpacity).padRight(20);
+            final TouchableSlider opacitySlider = new TouchableSlider(10, 100, 10, false, app.skin);
+            opacitySlider.setValue(app.localPrefs.getOnScreenGamepadOpacity());
+            labelOpacity.getColor().a =opacitySlider.getValue() / 100f;
+            opacitySettingTable.add(opacitySlider).expandX().fillX();
+            opacitySlider.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    float newOpacity = opacitySlider.getValue();
+                    labelOpacity.getColor().a = newOpacity / 100f;
+                    app.localPrefs.setOnScreenGamepadOpacity((int) newOpacity);
+                }
+            });
+
             onScreenGamepadSettings = new Table();
             onScreenGamepadSettings.add(new Image(app.trPreviewOsg));
-            onScreenGamepadSettings.row().padTop(20);
+            onScreenGamepadSettings.row().padBottom(10);
             onScreenGamepadSettings.add(adjustGamepad);
-            onScreenGamepadSettings.row().padTop(10);
-            onScreenGamepadSettings.add(showOsgHardDropButtonCheckbox);
             onScreenGamepadSettings.row();
-            onScreenGamepadSettings.add(visualizePadStyle);
+            float height = labelOpacity.getPrefHeight() * 1.2f;
+            onScreenGamepadSettings.add(showOsgHardDropButtonCheckbox).height(height);
+            onScreenGamepadSettings.row();
+            onScreenGamepadSettings.add(visualizePadStyle).height(height);
+            onScreenGamepadSettings.row();
+            onScreenGamepadSettings.add(opacitySettingTable).height(height);
             onScreenGamepadSettings.validate();
 
             row();
@@ -449,6 +470,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             addFocusableActor(invertRotationCheckbox);
             addFocusableActor(showOsgHardDropButtonCheckbox);
             addFocusableActor(visualizePadStyle);
+            addFocusableActor(opacitySlider);
             defaultFocusedButton = onScreenControlsButton;
         }
 
