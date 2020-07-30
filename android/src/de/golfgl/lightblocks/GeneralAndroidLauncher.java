@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
@@ -23,6 +21,8 @@ import org.opensource.lightblocks.R;
 
 import java.io.FileNotFoundException;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import de.golfgl.gdxgameanalytics.AndroidGameAnalytics;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.multiplayer.AndroidNetUtils;
@@ -30,7 +30,7 @@ import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
 import de.golfgl.lightblocks.multiplayer.NsdAdapter;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 
-public class GeneralAndroidLauncher extends AndroidApplication {
+abstract class GeneralAndroidLauncher extends AndroidApplication {
     public static final String NOTIF_CHANNEL_ID_MULTIPLAYER = "multiplayer";
     public static final int MULTIPLAYER_NOTIFICATION_ID = 4811;
     public static final int OPEN_ZIP_FILE = 4;
@@ -138,7 +138,7 @@ public class GeneralAndroidLauncher extends AndroidApplication {
         initFlavor(game);
 
         // Gerätemodell wird für den Spielernamen benötigt
-        game.modelNameRunningOn = Build.MODEL;
+        LightBlocksGame.modelNameRunningOn = Build.MODEL;
 
         // Network Serice Discovery
         this.nsdAdapter = new NsdAdapter(this);

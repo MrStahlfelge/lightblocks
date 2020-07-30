@@ -1,6 +1,6 @@
 android {
-    buildToolsVersion "28.0.3"
-    compileSdkVersion 28
+    buildToolsVersion "29.0.2"
+    compileSdkVersion 29
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -29,7 +29,7 @@ android {
     defaultConfig {
         applicationId "de.golfgl.lightblocks"
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 29
     }
 
     flavorDimensions "type"
@@ -53,8 +53,7 @@ repositories {
 }
 
 dependencies {
-    compile "com.android.support:support-core-utils:28.0.0"
-    compile "com.android.support:support-v4:28.0.0"
+    compile "androidx.appcompat:appcompat:1.1.0"
     googleCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamsvcsVersion"
     googleCompile "com.badlogicgames.gdxpay:gdx-pay-android-googlebilling:$gdxPayVersion"
     googleCompile "de.golfgl.gdxpushmessages:gdx-pushmessages-android-fcm:$pushMsgsVersion"
@@ -72,10 +71,10 @@ task copyAndroidNatives() {
     file("libs/x86_64/").mkdirs();
     file("libs/x86/").mkdirs();
 
-    configurations.natives.files.each { jar ->
+    configurations.getByName("natives").copy().files.each { jar ->
         def outputDir = null
         if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
-        if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")        
+        if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
         if(jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
         if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
         if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
