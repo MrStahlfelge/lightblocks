@@ -482,7 +482,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
         if (backendManager.hasUserId() && payload != null
                 && payload.startsWith(BackendManager.PUSH_PAYLOAD_MULTIPLAYER)) {
             backendManager.invalidateCachedMatches();
-            backendManager.setCompetitionActionRequiredFlag(true);
+            backendManager.setCompetitionNewsAvailableFlag(true);
         }
     }
 

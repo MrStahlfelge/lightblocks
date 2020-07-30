@@ -121,15 +121,15 @@ public class BackendManager {
     }
 
     public Array<MatchEntity> getMultiplayerMatchesList() {
-        // Aufforderung in Main-Screen "gelesen" markieren
-        setCompetitionActionRequiredFlag(false);
+        // Reset information about new multiplayer actions in main menu
+        setCompetitionNewsAvailableFlag(false);
 
         return multiplayerMatchesList;
     }
 
-    public void setCompetitionActionRequiredFlag(boolean competitionActionRequired) {
-        if (lastWelcomeResponse != null && lastWelcomeResponse.competitionActionRequired != competitionActionRequired) {
-            lastWelcomeResponse = new BackendWelcomeResponse(lastWelcomeResponse, competitionActionRequired);
+    public void setCompetitionNewsAvailableFlag(boolean competitionNewsAvailable) {
+        if (lastWelcomeResponse != null && lastWelcomeResponse.competitionNewsAvailable != competitionNewsAvailable) {
+            lastWelcomeResponse = new BackendWelcomeResponse(lastWelcomeResponse, competitionNewsAvailable);
         }
     }
 
@@ -300,9 +300,9 @@ public class BackendManager {
                             lastWelcomeResponse = retrievedData;
                             authenticated = lastWelcomeResponse.authenticated;
                             isFetchingWelcomes = false;
-                            // falls es offene Spiele gibt zurücksetzen, wann das letzte Mal die Liste der
-                            // Multiplayer-Matches gezogen wurde, um einen Refresh zu erzwingen
-                            if (lastWelcomeResponse.competitionActionRequired)
+                            // reset cached multiplayer matches to force a refresh if there are
+                            // actions required or news available
+                            if (lastWelcomeResponse.competitionNewsAvailable)
                                 invalidateCachedMatches();
                         }
                     });

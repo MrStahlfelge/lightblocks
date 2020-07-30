@@ -116,6 +116,9 @@ public class WelcomeTextUtils {
         if (welcomeResponse.competitionActionRequired)
             welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("labelCompetitionActions"),
                     new ShowMultiPlayerPageRunnable(app, 0)));
+        else if (welcomeResponse.competitionNewsAvailable)
+            welcomes.add(new WelcomeButton.WelcomeText(app.TEXTS.get("labelCompetitionNews"),
+                    new ShowMultiPlayerPageRunnable(app, 0)));
 
         for (final BackendMessage message : welcomeResponse.messageList) {
             if (BackendMessage.TYPE_WELCOME.equals(message.type)) {

@@ -14,18 +14,27 @@ public class BackendWelcomeResponse {
     public final String warningMsg;
     public final List<BackendMessage> messageList;
     public final boolean competitionActionRequired;
+    public final boolean competitionNewsAvailable;
 
     /**
-     * kopiert, setzt jedoch competitionActionRequired auf false
+     * sets competitionNewsFlag to read, if necessary
      */
-    public BackendWelcomeResponse(BackendWelcomeResponse template, boolean competitionActionRequired) {
+    public BackendWelcomeResponse(BackendWelcomeResponse template, boolean competitionNewsAvailable) {
         responseTime = template.responseTime;
         timeDelta = template.timeDelta;
         isBeta = template.isBeta;
         authenticated = template.authenticated;
         warningMsg = template.warningMsg;
         messageList = template.messageList;
-        this.competitionActionRequired = competitionActionRequired;
+        this.competitionNewsAvailable = competitionNewsAvailable;
+
+        // competitionActionRequired is never true if competitionNewsAvailable is false
+        // competitionNewsAvailable is always trtue if competitionActionRequired is true
+        if (competitionNewsAvailable) {
+            competitionActionRequired = template.competitionActionRequired;
+        } else {
+            competitionActionRequired = false;
+        }
     }
 
     public BackendWelcomeResponse(JsonValue fromJson) {
@@ -35,6 +44,7 @@ public class BackendWelcomeResponse {
         authenticated = fromJson.getBoolean("authenticated");
         warningMsg = fromJson.getString("warningMsg", null);
         competitionActionRequired = fromJson.getBoolean("competitionActionRequired", false);
+        competitionNewsAvailable = competitionActionRequired;
 
         messageList = new ArrayList<>();
         JsonValue messagesJson = fromJson.get("messages");
