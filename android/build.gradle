@@ -27,9 +27,11 @@ android {
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
     defaultConfig {
-        applicationId "de.golfgl.lightblocks"
+        applicationId "org.opensource.lightblocks"
         minSdkVersion 16
         targetSdkVersion 29
+        versionCode 2003
+        versionName "1.4.2003"
     }
 
     flavorDimensions "type"
