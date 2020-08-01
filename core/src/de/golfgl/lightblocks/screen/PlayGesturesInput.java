@@ -63,6 +63,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     private boolean tutorialMode;
     private boolean invertRotation;
     private GestureOnScreenButtons gestureOnScreenControls;
+    private boolean buttonsHidden;
 
     @Override
     public String getInputHelpText() {
@@ -99,11 +100,11 @@ public class PlayGesturesInput extends PlayScreenInput {
     @Override
     public void doPoll(float delta) {
         if (!isUsingOnScreenButtons()) {
-            gestureOnScreenControls.setVisible(!isPaused());
+            gestureOnScreenControls.setVisible(!isPaused() && !buttonsHidden);
         } else if (gamepadOnScreenControls != null) {
-            gamepadOnScreenControls.setVisible(!isPaused());
+            gamepadOnScreenControls.setVisible(!isPaused() && !buttonsHidden);
         } else if (buttonOnScreenControls != null) {
-            buttonOnScreenControls.setVisible(!isPaused());
+            buttonOnScreenControls.setVisible(!isPaused() && !buttonsHidden);
         }
 
         if (touchDownValid)
@@ -129,7 +130,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             playScreen.gameModel.setRotate(true);
 
         if (!touchDownValid)
-            return false;
+            return buttonsHidden;
 
         this.screenX = screenX;
         this.screenY = screenY;
@@ -361,6 +362,10 @@ public class PlayGesturesInput extends PlayScreenInput {
             return Align.top;
 
         return super.getRequestedGameboardAlignment();
+    }
+
+    void setButtonsHidden(boolean buttonsHidden) {
+        this.buttonsHidden = buttonsHidden;
     }
 
     public static class FreezeButton extends Button {

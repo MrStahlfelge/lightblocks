@@ -10,7 +10,7 @@ import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
- * Nicht nur Tastatur, sondern auch Controller/TV Remote
+ * Despite its name, this handles controller, keyboard and tv remote input
  * <p>
  * Created by Benjamin Schulte on 17.01.2017.
  */

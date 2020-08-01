@@ -34,10 +34,8 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
 
     private final Button closeButton;
     private final LightBlocksGame app;
-    private Button refreshButton;
-    private boolean runsOnChrome;
     private Actor defaultActor;
-    private FaCheckbox checkHideOnScreenControls;
+    private FaCheckbox checkDisableTouchControls;
 
     private int connectedControllersOnLastCheck;
     private float timeSinceLastControllerCheck;
@@ -51,7 +49,7 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
         closeButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
         button(closeButton);
 
-        refreshButton = new FaButton(FontAwesome.ROTATE_RELOAD, getSkin());
+        Button refreshButton = new FaButton(FontAwesome.ROTATE_RELOAD, getSkin());
         refreshButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -62,15 +60,15 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
         getButtonTable().add(refreshButton);
         addFocusableActor(refreshButton);
 
-        checkHideOnScreenControls = new FaCheckbox(app.TEXTS.get("configHideOnScreenControls"), app.skin, .3f);
-        checkHideOnScreenControls.setChecked(app.localPrefs.hideOnScreenControlsWhenGamepad());
-        checkHideOnScreenControls.addListener(new ChangeListener() {
+        checkDisableTouchControls = new FaCheckbox(app.TEXTS.get("configHideOnScreenControls"), app.skin, .3f);
+        checkDisableTouchControls.setChecked(app.localPrefs.isDisableTouchWhenGamepad());
+        checkDisableTouchControls.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                app.localPrefs.setHideOnScreenControlsWhenGamepad(checkHideOnScreenControls.isChecked());
+                app.localPrefs.setDisableTouchWhenGamepad(checkDisableTouchControls.isChecked());
             }
         });
-        addFocusableActor(checkHideOnScreenControls);
+        addFocusableActor(checkDisableTouchControls);
     }
 
     @Override
@@ -151,18 +149,13 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
         contentTable.row();
         contentTable.add(controllerList);
 
-        if (app.localPrefs.getUsedTouchControls().isOnScreenButtons() && PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
+        if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
             contentTable.row().padTop(20);
-            contentTable.add(checkHideOnScreenControls);
+            contentTable.add(checkDisableTouchControls);
         }
 
         contentTable.row().padTop(20);
-        Label hint = new ScaledLabel(app.TEXTS.get("configGamepadHelp") +
-                (Gdx.app.getType() == Application.ApplicationType.WebGL && runsOnChrome ?
-                        "\nIf you face problems with controllers on Chrome, press a button, reload the game, try " +
-                                "again" +
-                                ".\n" +
-                                "If that does not help, try Mozilla Firefox." : ""),
+        Label hint = new ScaledLabel(app.TEXTS.get("configGamepadHelp"),
                 getSkin(), LightBlocksGame.SKIN_FONT_BIG);
         hint.setWrap(true);
         hint.setAlignment(Align.center);

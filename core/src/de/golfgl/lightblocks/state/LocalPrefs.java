@@ -33,7 +33,7 @@ public class LocalPrefs {
     private static final String KEY_LASTSTARTEDVERSION = "lastStartedVersion";
     private static final String KEY_LASTSTARTTIME = "lastStartTime";
     private static final String PREF_KEY_TOUCHCONTROLTYPE = "touchControlType";
-    private static final String PREF_KEY_HIDEONSCREENCONTROLS = "hideOnScreenControls";
+    private static final String PREF_KEY_DISABLETOUCH = "hideOnScreenControls";
     private static final String TVREMOTE_HARDDROP = "tvremote_harddrop";
     private static final String TVREMOTE_HOLD = "tvremote_hold";
     private static final String TVREMOTE_FREEZE = "tvremote_freeze";
@@ -71,7 +71,7 @@ public class LocalPrefs {
     private Integer lastUsedVersion;
     private Integer daysSinceLastStart;
     private TouchControlType touchControlType;
-    private Boolean hideOnScreenControlsWhenGamepad;
+    private Boolean disableTouchWhenGamepad;
     private TvRemoteKeyConfig tvRemoteKeyConfig;
     private boolean suppressSounds;
     private Integer supportLevel;
@@ -262,16 +262,16 @@ public class LocalPrefs {
         prefs.flush();
     }
 
-    public Boolean hideOnScreenControlsWhenGamepad() {
-        if (hideOnScreenControlsWhenGamepad == null)
-            hideOnScreenControlsWhenGamepad = prefs.getBoolean(PREF_KEY_HIDEONSCREENCONTROLS, false);
+    public boolean isDisableTouchWhenGamepad() {
+        if (disableTouchWhenGamepad == null)
+            disableTouchWhenGamepad = prefs.getBoolean(PREF_KEY_DISABLETOUCH, false);
 
-        return hideOnScreenControlsWhenGamepad;
+        return disableTouchWhenGamepad;
     }
 
-    public void setHideOnScreenControlsWhenGamepad(Boolean hideOnScreenControlsWhenGamepad) {
-        this.hideOnScreenControlsWhenGamepad = hideOnScreenControlsWhenGamepad;
-        prefs.putBoolean(PREF_KEY_HIDEONSCREENCONTROLS, hideOnScreenControlsWhenGamepad);
+    public void setDisableTouchWhenGamepad(boolean disableTouchWhenGamepad) {
+        this.disableTouchWhenGamepad = disableTouchWhenGamepad;
+        prefs.putBoolean(PREF_KEY_DISABLETOUCH, disableTouchWhenGamepad);
         prefs.flush();
     }
 

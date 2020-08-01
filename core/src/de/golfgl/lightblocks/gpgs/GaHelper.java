@@ -18,7 +18,10 @@ public class GaHelper {
         if (app.gameAnalytics != null) {
             app.gameAnalytics.submitProgressionEvent(GameAnalytics.ProgressionStatus.Start,
                     gameModel.getIdentifier(), "", "");
-            app.gameAnalytics.submitDesignEvent("inputType:" + inputAdapter.getAnalyticsKey());
+            String analyticsKey = inputAdapter.getAnalyticsKey();
+            if (analyticsKey!= null) {
+                app.gameAnalytics.submitDesignEvent("inputType:" + analyticsKey);
+            }
             if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
                 app.gameAnalytics.submitDesignEvent("swipeUpSetting:" + app.localPrefs.getSwipeUpType());
                 app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());

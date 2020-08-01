@@ -30,8 +30,7 @@ public abstract class PlayScreenInput extends InputAdapter {
 
         switch (key) {
             case KEY_KEYORTOUCH:
-                if (Controllers.getControllers().size > 0 && app.localPrefs.getUsedTouchControls().isOnScreenButtons()
-                        && app.localPrefs.hideOnScreenControlsWhenGamepad())
+                if (Controllers.getControllers().size > 0 && app.localPrefs.isDisableTouchWhenGamepad())
                     return getPlayInput(KEY_KEYSORGAMEPAD, app);
                 if (isInputTypeAvailable(KEY_TOUCHSCREEN) && isInputTypeAvailable(KEY_KEYSORGAMEPAD))
                     return new PlayKeyOrTouchInput();

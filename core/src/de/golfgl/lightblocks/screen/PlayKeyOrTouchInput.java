@@ -1,15 +1,22 @@
 package de.golfgl.lightblocks.screen;
 
-import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Gdx;
 
 /**
+ * This input method is used when there is both touch or key/controller input available. Events are
+ * dispatched to the underlying gestures input and keyboard input.
+ *
  * Created by Benjamin Schulte on 19.03.2018.
  */
 
 public class PlayKeyOrTouchInput extends PlayScreenInput {
+    private static final int EVENT_COUNT_TOUCHPAD_HIDE = 10;
+    private static final int EVENT_COUNT_GA_SUBMISSION = 20;
     private final PlayKeyboardInput keyboard;
     private final PlayGesturesInput touch;
-    private boolean hadKeyStroke;
+    private int numKeyEvents;
+    private int numTouchEvents;
+    private int eventsSinceTouch;
 
     public PlayKeyOrTouchInput() {
         touch = new PlayGesturesInput();
@@ -33,15 +40,48 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
         touch.setGameOver();
     }
 
+    private void hadTouchEvent() {
+        // TODO Problem: touch events to scene2d buttons are not counted yet, therefore
+        // GA event and scoreboard key might be based on wrong data
+        numTouchEvents++;
+        if (eventsSinceTouch > 0) {
+            eventsSinceTouch = 0;
+            touch.setButtonsHidden(false);
+        }
+        hadEvent();
+    }
+
+    private void hadKeyEvent() {
+        numKeyEvents++;
+        eventsSinceTouch++;
+        if (eventsSinceTouch > EVENT_COUNT_TOUCHPAD_HIDE || numTouchEvents == 0) {
+            touch.setButtonsHidden(true);
+        }
+        hadEvent();
+    }
+
+    private void hadEvent() {
+        if (numKeyEvents + numTouchEvents == EVENT_COUNT_GA_SUBMISSION)
+            submitToGa();
+    }
+
+    private void submitToGa() {
+        if (playScreen != null && playScreen.app.gameAnalytics != null) {
+            String gaKey = numKeyEvents > numTouchEvents ? keyboard.getAnalyticsKey() : touch.getAnalyticsKey();
+            playScreen.app.gameAnalytics.submitDesignEvent("inputType:" + gaKey);
+        }
+    }
+
     @Override
     public boolean keyDown(int keycode) {
-        if (!hadKeyStroke && keycode != Input.Keys.BACK && keycode != Input.Keys.MENU)
-            hadKeyStroke = true;
-
-        if (keyboard.keyDown(keycode))
+        if (keyboard.keyDown(keycode)) {
+            hadKeyEvent();
             return true;
-        if (touch.keyDown(keycode))
+        }
+        if (touch.keyDown(keycode)) {
+            hadTouchEvent();
             return true;
+        }
         return super.keyDown(keycode);
     }
 
@@ -68,59 +108,78 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
 
     @Override
     public boolean keyUp(int keycode) {
-        if (keyboard.keyUp(keycode))
+        if (keyboard.keyUp(keycode)) {
+            hadKeyEvent();
             return true;
-        if (touch.keyUp(keycode))
+        }
+        if (touch.keyUp(keycode)) {
+            hadTouchEvent();
             return true;
+        }
         return super.keyUp(keycode);
     }
 
     @Override
     public boolean keyTyped(char character) {
-        if (keyboard.keyTyped(character))
+        if (keyboard.keyTyped(character)) {
+            hadKeyEvent();
             return true;
-        if (touch.keyTyped(character))
+        }
+        if (touch.keyTyped(character)) {
+            hadTouchEvent();
             return true;
+        }
         return super.keyTyped(character);
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (keyboard.touchDown(screenX, screenY, pointer, button))
+        if (keyboard.touchDown(screenX, screenY, pointer, button)) {
+            hadKeyEvent();
             return true;
-        if (touch.touchDown(screenX, screenY, pointer, button))
+        }
+        if (touch.touchDown(screenX, screenY, pointer, button)) {
+            hadTouchEvent();
             return true;
+        }
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (keyboard.touchUp(screenX, screenY, pointer, button))
+        if (keyboard.touchUp(screenX, screenY, pointer, button)) {
+            hadKeyEvent();
             return true;
-        if (touch.touchUp(screenX, screenY, pointer, button))
+        }
+        if (touch.touchUp(screenX, screenY, pointer, button)) {
+            hadTouchEvent();
             return true;
+        }
         return super.touchUp(screenX, screenY, pointer, button);
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if (keyboard.touchDragged(screenX, screenY, pointer))
+        if (keyboard.touchDragged(screenX, screenY, pointer)) {
+            hadKeyEvent();
             return true;
-        if (touch.touchDragged(screenX, screenY, pointer))
+        }
+        if (touch.touchDragged(screenX, screenY, pointer)) {
+            hadTouchEvent();
             return true;
+        }
         return super.touchDragged(screenX, screenY, pointer);
     }
 
     @Override
     public String getAnalyticsKey() {
-        return "keyOrTouch";
+        // return null to indicate that this handles event submission itself at a later point of time
+        return null;
     }
 
     @Override
     public String getScoreboardKey() {
-        // in Ermangelung einer besseren Variante schicken wir Controller/Keyboard Bedienung, wenn eine Taste
-        // gedrückt wurde. Sonst Touch (falls nur ein Controller verbunden war)
-        if (hadKeyStroke)
+        if (numKeyEvents > numTouchEvents)
             return keyboard.getScoreboardKey();
         else
             return touch.getScoreboardKey();
@@ -128,7 +187,7 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
 
     @Override
     public int getRequestedGameboardAlignment() {
-        // kann nur bei Touch verändert sein
+        // only touch based controls move the gameboard, call to keyboard is unneccessary
         return touch.getRequestedGameboardAlignment();
     }
 }
