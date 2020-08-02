@@ -129,12 +129,13 @@ public abstract class PlayScreenInput extends InputAdapter {
     }
 
     /**
-     * Subklassen können dies übersteuern, um durch Polling Events auszulösen
+     * Subclassess can override this to trigger events based on time
      *
-     * @param delta
+     * @param delta time gone
+     * @return true if an event was triggered
      */
-    public void doPoll(float delta) {
-
+    public boolean doPoll(float delta) {
+        return false;
     }
 
     /**
@@ -167,6 +168,9 @@ public abstract class PlayScreenInput extends InputAdapter {
         return playScreen.isPaused() || isGameOver;
     }
 
+    /**
+     * @return key to submit at game start. PlayKeyOrTouch returns null and handles submission itself
+     */
     public abstract String getAnalyticsKey();
 
     public String getScoreboardKey() {

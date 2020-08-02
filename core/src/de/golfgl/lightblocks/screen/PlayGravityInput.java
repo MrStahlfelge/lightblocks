@@ -69,15 +69,15 @@ public class PlayGravityInput extends PlayScreenInput {
     }
 
     @Override
-    public void doPoll(float delta) {
+    public boolean doPoll(float delta) {
 
         if (isGameOver)
-            return;
+            return false;
 
         deltaSum += delta;
 
         if (deltaSum < UPDATE_INTERVAL)
-            return;
+            return false;
 
         updateFromSensor(currentInputVector);
 
@@ -99,6 +99,8 @@ public class PlayGravityInput extends PlayScreenInput {
 
         deltaSum -= UPDATE_INTERVAL;
 
+        // this is not correct, but it does not matter - return value is not used for gravity input
+        return false;
     }
 
     /**

@@ -10,8 +10,8 @@ import com.badlogic.gdx.Gdx;
  */
 
 public class PlayKeyOrTouchInput extends PlayScreenInput {
-    private static final int EVENT_COUNT_TOUCHPAD_HIDE = 10;
-    private static final int EVENT_COUNT_GA_SUBMISSION = 20;
+    private static final int EVENT_COUNT_TOUCHPAD_HIDE = 5;
+    private static final int EVENT_COUNT_GA_SUBMISSION = 10;
     private final PlayKeyboardInput keyboard;
     private final PlayGesturesInput touch;
     private int numKeyEvents;
@@ -41,8 +41,6 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     }
 
     private void hadTouchEvent() {
-        // TODO Problem: touch events to scene2d buttons are not counted yet, therefore
-        // GA event and scoreboard key might be based on wrong data
         numTouchEvents++;
         if (eventsSinceTouch > 0) {
             eventsSinceTouch = 0;
@@ -86,10 +84,13 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     }
 
     @Override
-    public void doPoll(float delta) {
+    public boolean doPoll(float delta) {
         keyboard.doPoll(delta);
-        touch.doPoll(delta);
-        super.doPoll(delta);
+        boolean hadTouchButtonEvent = touch.doPoll(delta);
+        if (hadTouchButtonEvent)
+            hadTouchEvent();
+
+        return super.doPoll(delta);
     }
 
     @Override
@@ -109,11 +110,9 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     @Override
     public boolean keyUp(int keycode) {
         if (keyboard.keyUp(keycode)) {
-            hadKeyEvent();
             return true;
         }
         if (touch.keyUp(keycode)) {
-            hadTouchEvent();
             return true;
         }
         return super.keyUp(keycode);
@@ -122,11 +121,9 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     @Override
     public boolean keyTyped(char character) {
         if (keyboard.keyTyped(character)) {
-            hadKeyEvent();
             return true;
         }
         if (touch.keyTyped(character)) {
-            hadTouchEvent();
             return true;
         }
         return super.keyTyped(character);
@@ -148,11 +145,9 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         if (keyboard.touchUp(screenX, screenY, pointer, button)) {
-            hadKeyEvent();
             return true;
         }
         if (touch.touchUp(screenX, screenY, pointer, button)) {
-            hadTouchEvent();
             return true;
         }
         return super.touchUp(screenX, screenY, pointer, button);
@@ -161,11 +156,9 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if (keyboard.touchDragged(screenX, screenY, pointer)) {
-            hadKeyEvent();
             return true;
         }
         if (touch.touchDragged(screenX, screenY, pointer)) {
-            hadTouchEvent();
             return true;
         }
         return super.touchDragged(screenX, screenY, pointer);
@@ -179,7 +172,8 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
 
     @Override
     public String getScoreboardKey() {
-        if (numKeyEvents > numTouchEvents)
+        // send keyboard control if more than a third of actions where done by keyboard
+        if (numKeyEvents > numTouchEvents / 2)
             return keyboard.getScoreboardKey();
         else
             return touch.getScoreboardKey();

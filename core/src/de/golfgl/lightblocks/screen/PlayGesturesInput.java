@@ -57,6 +57,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     private Label toDrop;
     private Label rotationLabel;
     private boolean didHardDrop;
+    private boolean hadButtonEvent;
 
     private OnScreenGamepad gamepadOnScreenControls;
     private PortraitOnScreenButtons buttonOnScreenControls;
@@ -98,7 +99,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     }
 
     @Override
-    public void doPoll(float delta) {
+    public boolean doPoll(float delta) {
         if (!isUsingOnScreenButtons()) {
             gestureOnScreenControls.setVisible(!isPaused() && !buttonsHidden);
         } else if (gamepadOnScreenControls != null) {
@@ -112,6 +113,13 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         if (toDrop != null)
             toDrop.setVisible(beganSoftDrop || timeSinceTouchDown <= MAX_SOFTDROPBEGINNING_INTERVAL);
+
+        // return hadButtonEvent to PlayKeyOrTouchInput so it can count all touch events
+        if (hadButtonEvent) {
+            hadButtonEvent = false;
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -221,12 +229,21 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     private void initGamepadOnScreenControls() {
         if (gamepadOnScreenControls == null) {
-            gamepadOnScreenControls = new OnScreenGamepad(playScreen.app, playScreen,
-                    new TouchpadChangeListener(), new HoldButtonInputListener(), new FreezeButtonInputListener());
+            gamepadOnScreenControls = new OnScreenGamepad(playScreen.app, this,
+                    new TouchpadChangeListener(), new HoldButtonInputListener(),
+                    new FreezeButtonInputListener());
             gamepadOnScreenControls.setVisible(false);
             playScreen.stage.addActor(gamepadOnScreenControls);
         }
         gamepadOnScreenControls.resize(playScreen);
+    }
+
+    public PlayScreen getPlayScreen() {
+        return playScreen;
+    }
+
+    public void hadButtonEvent() {
+        hadButtonEvent = true;
     }
 
     public void setTouchPanel(int screenX, int screenY) {
@@ -458,9 +475,10 @@ public class PlayGesturesInput extends PlayScreenInput {
 
                 // no dedicated hard drop button makes the up button work as hard drop
                 if (!playScreen.app.localPrefs.isShowHardDropButtonOnScreenGamepad()) {
-                    if (upPressed)
+                    if (upPressed) {
+                        hadButtonEvent = true;
                         playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
-                    else
+                    } else
                         playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
                 }
 
@@ -468,25 +486,28 @@ public class PlayGesturesInput extends PlayScreenInput {
 
             if (downPressed != downNowPressed) {
                 downPressed = downNowPressed;
-                if (downPressed)
+                if (downPressed) {
+                    hadButtonEvent = true;
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
-                else
+                } else
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
             }
 
             if (rightPressed != rightNowPressed) {
                 rightPressed = rightNowPressed;
-                if (rightPressed)
+                if (rightPressed) {
+                    hadButtonEvent = true;
                     playScreen.gameModel.startMoveHorizontal(false);
-                else
+                } else
                     playScreen.gameModel.endMoveHorizontal(false);
             }
 
             if (leftPressed != leftNowPressed) {
                 leftPressed = leftNowPressed;
-                if (leftPressed)
+                if (leftPressed) {
+                    hadButtonEvent = true;
                     playScreen.gameModel.startMoveHorizontal(true);
-                else
+                } else
                     playScreen.gameModel.endMoveHorizontal(true);
             }
 
@@ -516,6 +537,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                     rightPressed = true;
                     rotateRight.isPressed = true;
                     checkSoftDrop();
+                    hadButtonEvent = true;
                     return true;
                 }
 
@@ -541,6 +563,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                     leftPressed = true;
                     rotateLeft.isPressed = true;
                     checkSoftDrop();
+                    hadButtonEvent = true;
                     return true;
                 }
 
@@ -565,6 +588,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     moveRight.isPressed = true;
                     playScreen.gameModel.startMoveHorizontal(false);
+                    hadButtonEvent = true;
                     return true;
                 }
 
@@ -586,6 +610,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     moveLeft.isPressed = true;
                     playScreen.gameModel.startMoveHorizontal(true);
+                    hadButtonEvent = true;
                     return true;
                 }
 
@@ -691,6 +716,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             if (!isPaused()) {
                 playScreen.touchTimeLabelWithWarning();
+                hadButtonEvent = true;
                 return true;
             }
             return false;
@@ -702,6 +728,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             if (!isPaused()) {
                 playScreen.gameModel.holdActiveTetromino();
+                hadButtonEvent = true;
                 return true;
             }
             return false;

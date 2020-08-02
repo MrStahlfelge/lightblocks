@@ -321,7 +321,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
         int numAllToShow = Math.min(2, playerGameboard.size());
         float leftx = (stage.getWidth() + blockGroup.getX() + blockGroup.getWidth()) / 2;
         boolean showsOnScreenControls = app.localPrefs.getUsedTouchControls().isOnScreenButtons() &&
-                inputAdapter.getAnalyticsKey().equals(PlayGesturesInput.INPUT_KEY_GESTURES);
+                (inputAdapter instanceof PlayGesturesInput);
 
         for (OtherPlayerGameboard playerGameboard : playerGameboard.values()) {
             playerGameboard.setScale(1);

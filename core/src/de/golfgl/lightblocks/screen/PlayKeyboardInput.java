@@ -110,13 +110,15 @@ public class PlayKeyboardInput extends PlayScreenInput {
     }
 
     @Override
-    public void doPoll(float delta) {
+    public boolean doPoll(float delta) {
         timeSinceLastControllerCheck = timeSinceLastControllerCheck + delta;
 
         if (timeSinceLastControllerCheck > .2f) {
             checkControllerConnections(false);
             timeSinceLastControllerCheck = 0;
         }
+
+        return false;
     }
 
     private void checkControllerConnections(boolean init) {
