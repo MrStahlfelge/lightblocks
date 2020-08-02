@@ -320,13 +320,11 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
         int currNum = 0;
         int numAllToShow = Math.min(2, playerGameboard.size());
         float leftx = (stage.getWidth() + blockGroup.getX() + blockGroup.getWidth()) / 2;
-        boolean showsOnScreenControls = app.localPrefs.getUsedTouchControls().isOnScreenButtons() &&
-                (inputAdapter instanceof PlayGesturesInput);
 
         for (OtherPlayerGameboard playerGameboard : playerGameboard.values()) {
             playerGameboard.setScale(1);
             // Landscape nur für 2 Gameboards und auch nicht, falls on Screen Controls aktiv
-            if (isLandscape() && currNum < numAllToShow && !showsOnScreenControls) {
+            if (isLandscape() && currNum < numAllToShow) {
                 playerGameboard.getColor().a = 1;
                 float scale = (stage.getWidth() - leftx - 20) / (playerGameboard.getWidth() * numAllToShow);
                 playerGameboard.setScale(Math.min(scale, .8f));
