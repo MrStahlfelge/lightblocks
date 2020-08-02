@@ -86,7 +86,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
             else if (keycode == tvRemoteKeyConfig.keyCodeRotateClockwise)
                 keycode = Input.Keys.SPACE;
             else if (keycode == tvRemoteKeyConfig.keyCodeRotateCounterclock)
-                keycode = Input.Keys.ALT_LEFT;
+                keycode = Input.Keys.CONTROL_LEFT;
             else if (keycode == tvRemoteKeyConfig.keyCodeHold)
                 keycode = Input.Keys.H;
             else if (keycode == tvRemoteKeyConfig.keyCodeFreeze)
@@ -199,7 +199,6 @@ public class PlayKeyboardInput extends PlayScreenInput {
                 return true;
 
             case Input.Keys.CONTROL_LEFT:
-            case Input.Keys.ALT_LEFT:
                 if (isPaused())
                     playScreen.switchPause(false);
                 else

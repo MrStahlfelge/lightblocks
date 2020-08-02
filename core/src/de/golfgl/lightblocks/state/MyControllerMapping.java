@@ -63,7 +63,7 @@ public class MyControllerMapping extends ControllerMappings {
         controllerToInputAdapter = new ControllerToInputAdapter(this);
 
         controllerToInputAdapter.addButtonMapping(BUTTON_ROTATE_CLOCKWISE, Input.Keys.SPACE);
-        controllerToInputAdapter.addButtonMapping(BUTTON_ROTATE_COUNTERCLOCK, Input.Keys.ALT_LEFT);
+        controllerToInputAdapter.addButtonMapping(BUTTON_ROTATE_COUNTERCLOCK, Input.Keys.CONTROL_LEFT);
         controllerToInputAdapter.addButtonMapping(BUTTON_START, Input.Keys.ENTER);
         controllerToInputAdapter.addButtonMapping(BUTTON_CANCEL, Input.Keys.ESCAPE);
         controllerToInputAdapter.addAxisMapping(AXIS_HORIZONTAL, Input.Keys.LEFT, Input.Keys.RIGHT);
