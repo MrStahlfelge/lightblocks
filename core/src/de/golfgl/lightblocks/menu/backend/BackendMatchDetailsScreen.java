@@ -52,7 +52,6 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         getButtonTable().defaults().pad(0, 30, 20, 30);
 
         playTurnButton = new PlayButton(app);
-//                =new RoundedTextButton("P", app.skin);
         playTurnButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -111,7 +110,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             }
         });
 
-        rematchButton = new GlowLabelButton(FontAwesome.ROTATE_RIGHT, "Rematch", app.skin);
+        rematchButton = new GlowLabelButton(FontAwesome.ROTATE_RIGHT, app.TEXTS.get("labelRematch"), app.skin);
         addFocusableActor(rematchButton);
         rematchButton.addListener(new ChangeListener() {
             @Override
@@ -150,7 +149,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     }
 
     public void startPlayingWithKey(String playKey, boolean paused) {
-        // das eigentliche Spiel beginnen
+        // begin the match turn
         InitGameParameters initGameParametersParams = new InitGameParameters();
         initGameParametersParams.setGameMode(InitGameParameters.GameMode.TurnbasedBattle);
         initGameParametersParams.setBeginningLevel(match.beginningLevel);
@@ -176,9 +175,9 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                     @Override
                     public void onRequestSuccess(MatchEntity retrievedData) {
                         super.onRequestSuccess(retrievedData);
-                        // zur Sicherheit einen zum Hochladen gespeicherten Turn vernichten. Das kann auch ein
-                        // anderes Spiel
-                        // treffen. Ist aber unwahrscheinlich und kann sogar genutzt werden
+                        // after resigning, reset turn to upload in queue and prefs if there is any.
+                        // It is highly unlikely there is one, but better delete it here to prevent
+                        // that the user is stuck in a dead lock having a turn that can't get uploaded
                         app.backendManager.resetTurnToUpload();
                         app.backendManager.updateMatchEntityInList(retrievedData);
                         fillMatchDetails(retrievedData);
@@ -300,7 +299,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         if (match.myTurn) {
             matchDetailTable.row();
             if (match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
-                // Ich bin aufgefordert
+                // I was challenged
 
                 matchDetailTable.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel"),
                         app.skin, LightBlocksGame.SKIN_FONT_BIG)).padTop(30);
@@ -314,6 +313,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 matchDetailTable.add(declineChallengeButton).padBottom(20);
                 toFocus = acceptChallengeButton;
             } else if (app.backendManager.hasTurnToUploadForMatch(match.uuid)) {
+                // there is a turn to upload
+
                 Button syncButton = new GlowLabelButton(FontAwesome.NET_CLOUDSAVE, "Sync with server", app.skin,
                         GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
                 syncButton.addListener(new ChangeListener() {
@@ -325,19 +326,17 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 addFocusableActor(syncButton);
                 matchDetailTable.add(syncButton).padTop(15).padBottom(20);
 
-                // es gibt noch einen zum hochladen
                 resignButton.setDisabled(true);
                 toFocus = syncButton;
             } else {
-                // okay, normaler Zustand zum Spielen
+                // normal state, ready to play
                 matchDetailTable.add(playTurnButton).padTop(15).padBottom(20);
                 resignButton.setDisabled(false);
                 toFocus = playTurnButton;
             }
         } else if (!match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_WAIT)
-                && !match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)
-                && match.turns.size() >= 1) {
-            // Match um => retry button
+                && !match.matchState.equalsIgnoreCase(MatchEntity.PLAYER_STATE_CHALLENGED)) {
+            // Match is done, or time is up - show rematch button
             matchDetailTable.row();
             matchDetailTable.add(rematchButton).padTop(15).padBottom(20);
             toFocus = rematchButton;
@@ -355,7 +354,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
     }
 
     private void scrollToActor(final Actor toFocus) {
-        // zeitlich verzögert wegen der Eingangsanimation
+        // delay because of the intro animation
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
@@ -377,7 +376,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
         super.act(delta);
 
         if (wasPlaying) {
-            // wieder zurückgekommen aus Playscreen
+            // user came back from the play screen
             wasPlaying = false;
             remindToDonate();
             reload();
@@ -438,7 +437,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                 if (turn.linesSent > 0)
                     linesSentYou = linesSentYou + turn.linesSent;
                 else if (turn.youPlayed)
-                    // nur zeigen, wenn bereits gespielt ist
+                    // hide the lines until the player played the turn
                     linesSentOpp = linesSentOpp - turn.linesSent;
 
                 yourScore = turn.yourScore;
