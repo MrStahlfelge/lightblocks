@@ -303,6 +303,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_DONOTHING, "", app.TEXTS.get("menuSwipeUpToNothing"));
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_PAUSE, "", app.TEXTS.get("menuSwipeUpToPause"));
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_HARDDROP, "", app.TEXTS.get("menuSwipeUpToHardDrop"));
+            swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_HOLD, "", app.TEXTS.get("menuSwipeUpToHold"));
 
             swipeUpButtons.setValue(app.localPrefs.getSwipeUpType());
             swipeUpButtons.addListener(new ChangeListener() {

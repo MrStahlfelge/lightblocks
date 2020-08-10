@@ -33,6 +33,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     public static final int SWIPEUP_DONOTHING = 0;
     public static final int SWIPEUP_PAUSE = 1;
     public static final int SWIPEUP_HARDDROP = 2;
+    public static final int SWIPEUP_HOLD = 3;
     private static final float TOUCHPAD_DEAD_RADIUS = .5f;
     private static final float MAX_SOFTDROPBEGINNING_INTERVAL = .3f;
 
@@ -318,13 +319,15 @@ public class PlayGesturesInput extends PlayScreenInput {
         }
 
         int swipeUpType = playScreen.app.localPrefs.getSwipeUpType();
-        int swipeUpTresholdFactor = swipeUpType == SWIPEUP_HARDDROP ? 3 : 4;
+        int swipeUpTresholdFactor = swipeUpType == SWIPEUP_PAUSE ? 4 : 3;
         if (screenY - this.screenY < -swipeUpTresholdFactor * dragThreshold && swipeUpType != SWIPEUP_DONOTHING) {
             if (swipeUpType == SWIPEUP_PAUSE && !isPaused())
                 playScreen.switchPause(false);
             else if (swipeUpType == SWIPEUP_HARDDROP && !didHardDrop && !beganHorizontalMove) {
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
                 didHardDrop = true;
+            } else if (swipeUpType == SWIPEUP_HOLD && !beganHorizontalMove) {
+                playScreen.gameModel.holdActiveTetromino();
             }
         }
 
