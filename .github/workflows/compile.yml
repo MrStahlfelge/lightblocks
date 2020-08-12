@@ -25,7 +25,7 @@ jobs:
     - name: Build desktop
       run: ./gradlew desktop:build
     - name: Setup Android build environment
-      uses: daveol/setup-android@v1      
+      uses: android-actions/setup-android@v1.0.0
     - name: Build Android
       run: ./gradlew android:buildGenericDebug --stacktrace
     - name: Build HTML
