@@ -119,6 +119,24 @@ public class BackendClient {
         });
     }
 
+    public void fetchSimilarStrengthMatchPlayersList(IBackendResponse<List<RankedPlayerDetails>> callback) {
+        final Net.HttpRequest httpRequest = buildRequest("v1/matches/similarStrengthPlayers/" + userId, null);
+        httpRequest.setMethod(Net.HttpMethods.GET);
+
+        Gdx.net.sendHttpRequest(httpRequest, new HttpResponseHandler<List<RankedPlayerDetails>>(callback) {
+            @Override
+            List<RankedPlayerDetails> parseJsonResponse(JsonValue json) {
+                List<RankedPlayerDetails> playersList = new ArrayList<>();
+
+                for (JsonValue player = json.child; player != null; player = player.next) {
+                    playersList.add(new RankedPlayerDetails(player));
+                }
+
+                return playersList;
+            }
+        });
+    }
+
     public void fetchLatestScores(String gameMode, IBackendResponse<List<ScoreListEntry>> callback) {
         fetchScores(gameMode, true, callback);
     }
