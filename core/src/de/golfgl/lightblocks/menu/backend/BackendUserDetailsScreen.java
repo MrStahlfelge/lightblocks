@@ -16,6 +16,7 @@ import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
+import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.TextInputDialog;
@@ -102,6 +103,8 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
                             new WaitForResponse<MatchEntity>(app, getStage()) {
                                 @Override
                                 protected void onSuccess() {
+                                    ((MyStage) getStage()).setFocusedActor(getConfiguredDefaultActor());
+                                    challengeButton.setText(app.TEXTS.get("mmturn_challenged"));
                                     challengeButton.setDisabled(true);
                                 }
                             });
