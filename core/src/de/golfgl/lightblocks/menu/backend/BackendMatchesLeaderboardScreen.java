@@ -35,12 +35,12 @@ public class BackendMatchesLeaderboardScreen extends WaitForBackendFetchDetailsS
                 LightBlocksGame.SKIN_FONT_TITLE, .8f));
 
         if (app.backendManager.hasUserId()) {
-            final FaButton switchButton = new FaButton(FontAwesome.NET_ADDPERSON, app.skin);
+            final FaButton switchButton = new FaButton(FontAwesome.NET_PERSON, app.skin);
             switchButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     centeredBoard = !centeredBoard;
-                    switchButton.setFaText(centeredBoard ? FontAwesome.NET_PEOPLE : FontAwesome.NET_ADDPERSON);
+                    switchButton.setFaText(centeredBoard ? FontAwesome.NET_PEOPLE : FontAwesome.NET_PERSON);
                     reload();
                 }
             });
