@@ -140,7 +140,16 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
-        if (listChangesSince < 1928)
+        if (listChangesSince < 2004 && app.backendManager.hasUserId())
+            welcomes.add(new WelcomeButton.WelcomeText("New: Global TB Battle leaderboard can switch to center your rank.",
+                    new ShowMultiPlayerPageRunnable(app, 0)));
+
+        if (listChangesSince < 2003 && touchAvailable &&
+                app.localPrefs.getUsedTouchControls() == LocalPrefs.TouchControlType.onScreenButtonsGamepad)
+            welcomes.add(new WelcomeButton.WelcomeText("New: On Screen Gamepad has new options for opacity and d-pad.",
+                    new ShowSettingsRunnable(app)));
+
+        if (listChangesSince < 1928 && touchAvailable)
             welcomes.add(new WelcomeButton.WelcomeText("New: Touch control settings extended with adjustable on screen buttons.",
                     new ShowSettingsRunnable(app)));
 
