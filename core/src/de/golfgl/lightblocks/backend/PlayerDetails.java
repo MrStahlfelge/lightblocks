@@ -19,6 +19,7 @@ public class PlayerDetails implements IPlayerInfo {
     public final String publicContact;
     public final List<ScoreListEntry> highscores;
     public final String passwordEmail;
+    public final boolean showChallengeButton;
     public final int donator;
     public final String country;
     public final int multiplayerMatchesCount;
@@ -43,6 +44,7 @@ public class PlayerDetails implements IPlayerInfo {
         multiplayerWinCount = fromJson.getInt("multiplayerWinCount", 0);
         multiplayerLinesSent = fromJson.getInt("multiplayerLinesSent", 0);
         multiplayerTurns = fromJson.getInt("multiplayerTurns", 0);
+        showChallengeButton = fromJson.getBoolean("canChallenge", false);
 
         highscores = new ArrayList<ScoreListEntry>();
         JsonValue highscorejson = fromJson.get("highscores");

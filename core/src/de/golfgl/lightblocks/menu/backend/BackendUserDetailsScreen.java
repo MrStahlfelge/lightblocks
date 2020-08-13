@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendManager;
+import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.backend.PlayerDetails;
 import de.golfgl.lightblocks.backend.ScoreListEntry;
 import de.golfgl.lightblocks.menu.ScoreTable;
@@ -62,7 +63,7 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
         });
     }
 
-    protected void fillUserDetails(PlayerDetails retrievedData) {
+    protected void fillUserDetails(final PlayerDetails retrievedData) {
         Table mainTable = new Table();
         BackendUserLabel userLabel = new BackendUserLabel(retrievedData, app, LightBlocksGame.SKIN_DEFAULT);
         userLabel.setToLabelMode();
@@ -90,6 +91,25 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
         mainTable.add(new ScaledLabel("Best scores", app.skin, LightBlocksGame.SKIN_FONT_TITLE));
         mainTable.row().padTop(10);
         mainTable.add(new HighscoresTable(retrievedData)).top().expand();
+
+        if (retrievedData.showChallengeButton && app.backendManager.hasUserId()) {
+            mainTable.row().padTop(30);
+            final RoundedTextButton challengeButton = new RoundedTextButton(app.TEXTS.get("buttonChallengeFromProfile"), app.skin);
+            challengeButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    app.backendManager.openNewMultiplayerMatch(retrievedData.uuid, app.localPrefs.getBattleBeginningLevel(),
+                            new WaitForResponse<MatchEntity>(app, getStage()) {
+                                @Override
+                                protected void onSuccess() {
+                                    challengeButton.setDisabled(true);
+                                }
+                            });
+                }
+            });
+            addFocusableActor(challengeButton);
+            mainTable.add(challengeButton);
+        }
 
         // ScrollPane hier
         contentCell.setActor(mainTable).fill().maxWidth(LightBlocksGame.nativeGameWidth - 50);

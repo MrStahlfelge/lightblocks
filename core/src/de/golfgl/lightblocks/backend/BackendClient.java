@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +59,11 @@ public class BackendClient {
 
     public void fetchPlayerDetails(String playerId, final IBackendResponse<PlayerDetails> callback) {
         Map<String, String> params = null;
+
+        if (hasUserId() && !playerId.equals(userId)) {
+            params = new HashMap<>();
+            params.put("myId", userId);
+        }
 
         final Net.HttpRequest httpRequest = buildRequest("v1/player/" + playerId, params);
         httpRequest.setMethod(Net.HttpMethods.GET);
