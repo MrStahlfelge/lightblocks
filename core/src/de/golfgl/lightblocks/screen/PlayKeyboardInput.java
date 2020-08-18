@@ -2,6 +2,8 @@ package de.golfgl.lightblocks.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.Controllers;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -28,7 +30,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     private boolean hardDropMapped;
 
     public PlayKeyboardInput() {
-        this.useTvRemoteControl = LightBlocksGame.isOnAndroidTV() && Controllers.getControllers().size == 0;
+        this.useTvRemoteControl = LightBlocksGame.isOnAndroidTV();
         Gdx.input.setCatchMenuKey(useTvRemoteControl);
     }
 
@@ -73,7 +75,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
         return Controllers.getControllers().size == 0 && useTvRemoteControl;
     }
 
-    private int mapTvRemoteKeys(int keycode) {
+    private int mapTvRemoteAndHardwareKeys(int keycode) {
         if (tvRemoteKeyConfig != null) {
             if (keycode == tvRemoteKeyConfig.keyCodeHarddrop)
                 keycode = Input.Keys.CONTROL_RIGHT;
@@ -94,14 +96,6 @@ public class PlayKeyboardInput extends PlayScreenInput {
         }
 
         return keycode;
-    }
-
-    /**
-     * auf Up-Button Hard Drop gdw an Hardware-Tastatur, oder auf allen angeschlossenen Controllern
-     * kein anderweitiger Button für Hard Drop konfiguriert wurde
-     */
-    protected boolean performHardDropOnUpButton() {
-        return !isOnTvRemote() && (isOnKeyboard() || !hardDropMapped);
     }
 
     protected boolean isOnKeyboard() {
@@ -159,13 +153,13 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public boolean keyDown(int keycode) {
+        if (!isPaused())
+            keycode = mapTvRemoteAndHardwareKeys(keycode);
 
-        // Spezialfall TV Remote: auf normale Tasten drehen
-        if (!isPaused() && (isOnTvRemote() || isOnKeyboard()))
-            keycode = mapTvRemoteKeys(keycode);
-        else if (!isPaused() && keycode == Input.Keys.UP && performHardDropOnUpButton())
-            keycode = Input.Keys.CONTROL_RIGHT;
+        return keyDownInternal(keycode);
+    }
 
+    private boolean keyDownInternal(int keycode) {
         switch (keycode) {
             case Input.Keys.DPAD_CENTER:
             case Input.Keys.ENTER:
@@ -220,12 +214,13 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public boolean keyUp(int keycode) {
-        // Spezialfall TV Remote: auf normale Tasten drehen
-        if (!isPaused() && (isOnTvRemote() || isOnKeyboard()))
-            keycode = mapTvRemoteKeys(keycode);
-        else if (!isPaused() && keycode == Input.Keys.UP && performHardDropOnUpButton())
-            keycode = Input.Keys.CONTROL_RIGHT;
+        if (!isPaused())
+            keycode = mapTvRemoteAndHardwareKeys(keycode);
 
+        return keyUpInternal(keycode);
+    }
+
+    private boolean keyUpInternal(int keycode) {
         if (keycode == Input.Keys.DOWN || keycode == Input.Keys.CONTROL_RIGHT) {
             playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
             return true;
@@ -247,5 +242,28 @@ public class PlayKeyboardInput extends PlayScreenInput {
     @Override
     public String getAnalyticsKey() {
         return isOnTvRemote() ? INPUT_KEY_TVREMOTE : isOnKeyboard() ? INPUT_KEY_KEYBOARD : INPUT_KEY_CONTROLLER;
+    }
+
+    @Override
+    public InputProcessor getControllerInputProcessor() {
+        return new ControllerInputAdapter();
+    }
+
+    private class ControllerInputAdapter extends InputAdapter {
+        @Override
+        public boolean keyDown(int keycode) {
+            if (!isPaused() && keycode == Input.Keys.UP && !hardDropMapped)
+                keycode = Input.Keys.CONTROL_RIGHT;
+
+            return keyDownInternal(keycode);
+        }
+
+        @Override
+        public boolean keyUp(int keycode) {
+            if (!isPaused() && keycode == Input.Keys.UP && !hardDropMapped)
+                keycode = Input.Keys.CONTROL_RIGHT;
+
+            return keyUpInternal(keycode);
+        }
     }
 }

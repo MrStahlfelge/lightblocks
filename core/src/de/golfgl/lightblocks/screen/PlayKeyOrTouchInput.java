@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.screen;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
 
 /**
  * This input method is used when there is both touch or key/controller input available. Events are
@@ -183,5 +184,34 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     public int getRequestedGameboardAlignment() {
         // only touch based controls move the gameboard, call to keyboard is unneccessary
         return touch.getRequestedGameboardAlignment();
+    }
+
+    @Override
+    public InputProcessor getControllerInputProcessor() {
+        return new ControllerInputAdapter(keyboard.getControllerInputProcessor());
+    }
+
+    private class ControllerInputAdapter extends InputAdapter {
+
+        private final InputProcessor controllerProcessor;
+
+        public ControllerInputAdapter(InputProcessor controllerInputProcessor) {
+            this.controllerProcessor = controllerInputProcessor;
+        }
+
+        @Override
+        public boolean keyDown(int keycode) {
+            if (controllerProcessor.keyDown(keycode)) {
+                hadKeyEvent();
+                return true;
+            }
+            
+            return false;
+        }
+
+        @Override
+        public boolean keyUp(int keycode) {
+            return controllerProcessor.keyUp(keycode);
+        }
     }
 }

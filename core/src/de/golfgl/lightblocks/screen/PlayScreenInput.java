@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.utils.Align;
 
@@ -175,5 +176,9 @@ public abstract class PlayScreenInput extends InputAdapter {
 
     public String getScoreboardKey() {
         return getAnalyticsKey();
+    }
+
+    public InputProcessor getControllerInputProcessor() {
+        return this;
     }
 }

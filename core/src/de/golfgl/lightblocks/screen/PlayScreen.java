@@ -497,11 +497,17 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     public void show() {
         Gdx.input.setCatchBackKey(true);
 
-        InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(stage);
-        multiplexer.addProcessor(inputAdapter);
-        Gdx.input.setInputProcessor(multiplexer);
-        app.controllerMappings.setInputProcessor(multiplexer);
+        InputMultiplexer keyboardmultiplexer = new InputMultiplexer();
+        keyboardmultiplexer.addProcessor(stage);
+        keyboardmultiplexer.addProcessor(inputAdapter);
+        Gdx.input.setInputProcessor(keyboardmultiplexer);
+
+        InputMultiplexer controllerMultiplexer = new InputMultiplexer();
+        controllerMultiplexer.addProcessor(stage);
+        controllerMultiplexer.addProcessor(inputAdapter.getControllerInputProcessor());
+
+        app.controllerMappings.setInputProcessor(controllerMultiplexer);
+
         swoshIn();
     }
 
