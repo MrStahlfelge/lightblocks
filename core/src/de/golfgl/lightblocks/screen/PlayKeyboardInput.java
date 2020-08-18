@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.Controllers;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
@@ -21,8 +20,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     public static final String INPUT_KEY_TVREMOTE = "tvremote";
     public static final String INPUT_KEY_KEYBOARD = "keyboard";
     public static final String INPUT_KEY_CONTROLLER = "controller";
-    protected GameBlocker.NoGamepadGameBlocker gamepadInputBlocker = new GameBlocker.NoGamepadGameBlocker();
-    private boolean useTvRemoteControl;
+    private boolean hadControllerEvent = false;
     private LocalPrefs.TvRemoteKeyConfig tvRemoteKeyConfig;
 
     private int connectedControllersOnLastCheck = 0;
@@ -30,33 +28,30 @@ public class PlayKeyboardInput extends PlayScreenInput {
     private boolean hardDropMapped;
 
     public PlayKeyboardInput() {
-        this.useTvRemoteControl = LightBlocksGame.isOnAndroidTV();
-        Gdx.input.setCatchMenuKey(useTvRemoteControl);
+        Gdx.input.setCatchMenuKey(LightBlocksGame.isOnAndroidTV());
     }
 
     @Override
     public String getInputHelpText() {
-        if (isOnTvRemote() || isOnKeyboard()) {
-            String helpText = playScreen.app.TEXTS.get(isOnTvRemote() ? "inputTvRemoteHelp" : "inputKeyboardHelp") + "\n";
+        if (!hadControllerEvent & tvRemoteKeyConfig != null) {
+            String helpText = playScreen.app.TEXTS.get(hasKeyboard() ? "inputKeyboardHelp" : "inputTvRemoteHelp") + "\n";
 
-            if (tvRemoteKeyConfig != null) {
-                helpText += playScreen.app.TEXTS.get("configTvRemoteRight") + ": "
-                        + Input.Keys.toString((int) tvRemoteKeyConfig.keyCodeRight);
-                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteLeft") + ": "
-                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeLeft);
-                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteRotateCw") + ": "
-                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeRotateClockwise);
-                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteRotateCc") + ": "
-                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeRotateCounterclock);
-                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteSoftDrop") + ": "
-                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeSoftDrop);
-                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteHardDrop") + ": "
-                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeHarddrop);
-                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteHold") + ": "
-                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeHold);
-                helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteFreeze") + ": "
-                        + Input.Keys.toString(tvRemoteKeyConfig.keyCodeFreeze);
-            }
+            helpText += playScreen.app.TEXTS.get("configTvRemoteRight") + ": "
+                    + Input.Keys.toString((int) tvRemoteKeyConfig.keyCodeRight);
+            helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteLeft") + ": "
+                    + Input.Keys.toString(tvRemoteKeyConfig.keyCodeLeft);
+            helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteRotateCw") + ": "
+                    + Input.Keys.toString(tvRemoteKeyConfig.keyCodeRotateClockwise);
+            helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteRotateCc") + ": "
+                    + Input.Keys.toString(tvRemoteKeyConfig.keyCodeRotateCounterclock);
+            helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteSoftDrop") + ": "
+                    + Input.Keys.toString(tvRemoteKeyConfig.keyCodeSoftDrop);
+            helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteHardDrop") + ": "
+                    + Input.Keys.toString(tvRemoteKeyConfig.keyCodeHarddrop);
+            helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteHold") + ": "
+                    + Input.Keys.toString(tvRemoteKeyConfig.keyCodeHold);
+            helpText += "\n" + playScreen.app.TEXTS.get("configTvRemoteFreeze") + ": "
+                    + Input.Keys.toString(tvRemoteKeyConfig.keyCodeFreeze);
             return helpText;
         } else
             return playScreen.app.TEXTS.get("inputGamepadHelp");
@@ -64,15 +59,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public String getTutorialContinueText() {
-        if (isOnTvRemote() || isOnKeyboard())
+        if (!hadControllerEvent)
             return playScreen.app.TEXTS.format("tutorialContinueTv",
                     Input.Keys.toString(tvRemoteKeyConfig.keyCodeRotateClockwise));
         else
             return playScreen.app.TEXTS.get("tutorialContinueGamepad");
-    }
-
-    protected boolean isOnTvRemote() {
-        return Controllers.getControllers().size == 0 && useTvRemoteControl;
     }
 
     private int mapTvRemoteAndHardwareKeys(int keycode) {
@@ -98,9 +89,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
         return keycode;
     }
 
-    protected boolean isOnKeyboard() {
-        return Controllers.getControllers().size == 0 && Gdx.input.isPeripheralAvailable(Input.Peripheral
-                .HardwareKeyboard);
+    protected boolean hasKeyboard() {
+        return Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard);
     }
 
     @Override
@@ -122,12 +112,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
             hardDropMapped = playScreen.app.controllerMappings.hasHardDropMapping();
 
         if (currentConnectedControllers <= 0 && connectedControllersOnLastCheck > 0
-                && !isOnKeyboard() && !isOnTvRemote())
-            playScreen.addGameBlocker(gamepadInputBlocker);
-
-        if (currentConnectedControllers == 1 && connectedControllersOnLastCheck < 1) {
-            playScreen.removeGameBlocker(gamepadInputBlocker);
-            useTvRemoteControl = false;
+                && hadControllerEvent && !isPaused()) {
+            playScreen.switchPause(false);
         }
 
         connectedControllersOnLastCheck = currentConnectedControllers;
@@ -141,7 +127,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
         connectedControllersOnLastCheck = 1;
         checkControllerConnections(true);
 
-        if (useTvRemoteControl || Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard))
+        if (LightBlocksGame.isOnAndroidTV() || Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard))
             tvRemoteKeyConfig = playScreen.app.localPrefs.getTvRemoteKeyConfig();
     }
 
@@ -241,7 +227,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public String getAnalyticsKey() {
-        return isOnTvRemote() ? INPUT_KEY_TVREMOTE : isOnKeyboard() ? INPUT_KEY_KEYBOARD : INPUT_KEY_CONTROLLER;
+        return hadControllerEvent ? INPUT_KEY_CONTROLLER :
+                hasKeyboard() ? INPUT_KEY_KEYBOARD : INPUT_KEY_TVREMOTE;
     }
 
     @Override
@@ -255,7 +242,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
             if (!isPaused() && keycode == Input.Keys.UP && !hardDropMapped)
                 keycode = Input.Keys.CONTROL_RIGHT;
 
-            return keyDownInternal(keycode);
+            boolean eventHandled = keyDownInternal(keycode);
+            if (eventHandled) {
+                hadControllerEvent = true;
+            }
+            return eventHandled;
         }
 
         @Override

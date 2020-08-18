@@ -26,13 +26,6 @@ public abstract class GameBlocker {
         }
     }
 
-    public static class NoGamepadGameBlocker extends GameBlocker {
-        @Override
-        public String getDescription(I18NBundle bundle) {
-            return bundle.get("labelNoGamepad");
-        }
-    }
-
     public static class OtherPlayerPausedGameBlocker extends GameBlocker {
         public String playerId;
 
