@@ -47,7 +47,7 @@ import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
- * Einstellungen
+ * Game settings
  * <p>
  * Created by Benjamin Schulte on 21.02.2017.
  */
@@ -55,9 +55,11 @@ import de.golfgl.lightblocks.state.LocalPrefs;
 public class SettingsScreen extends AbstractMenuDialog {
     public static final int TOUCHPANELSIZE_MIN = 25;
 
-    private PagedScrollPane groupPager;
+    private PagedScrollPane<Table> groupPager;
     private GeneralSettings generalGroup;
     private TouchInputSettings gesturesGroup;
+
+    private boolean showsKeyboardPage;
 
     public SettingsScreen(final LightBlocksGame app, Group toHide) {
         super(app, toHide);
@@ -66,16 +68,30 @@ public class SettingsScreen extends AbstractMenuDialog {
     }
 
     @Override
+    public void act(float delta) {
+        // keyboard config might change on Android and iOS, so recheck if a key was pressed
+        if (!showsKeyboardPage && Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY)) {
+            int currentPageIndex = groupPager.getCurrentPageIndex();
+            if (addKeyboardPageIfNeeded()) {
+                showsKeyboardPage = true;
+                groupPager.pageAdded();
+                groupPager.scrollToPage(currentPageIndex);
+            }
+        }
+
+        super.act(delta);
+    }
+
+    @Override
     protected void fillMenuTable(Table menuTable) {
         generalGroup = new GeneralSettings();
 
-        groupPager = new PagedScrollPane(app.skin, LightBlocksGame.SKIN_STYLE_PAGER);
+        groupPager = new PagedScrollPane<>(app.skin, LightBlocksGame.SKIN_STYLE_PAGER);
         groupPager.addPage(generalGroup);
         gesturesGroup = new TouchInputSettings();
         if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN))
             groupPager.addPage(gesturesGroup);
-        if (LightBlocksGame.isOnAndroidTV() || Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard))
-            groupPager.addPage(new TvRemoteSettings());
+        showsKeyboardPage = addKeyboardPageIfNeeded();
 
         groupPager.addListener(new ChangeListener() {
             @Override
@@ -89,6 +105,14 @@ public class SettingsScreen extends AbstractMenuDialog {
 
 
         menuTable.add(groupPager).fill().expand();
+    }
+
+    private boolean addKeyboardPageIfNeeded() {
+        if (LightBlocksGame.isOnAndroidTV() || Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard)) {
+            groupPager.addPage(new TvRemoteSettings());
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -204,7 +228,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             defaults().expandY();
 
             row();
-            add(new ScaledLabel(app.TEXTS.get("menuGeneral"), app.skin, app.SKIN_FONT_TITLE, .8f)).top();
+            add(new ScaledLabel(app.TEXTS.get("menuGeneral"), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .8f)).top();
 
             row();
             add(menuMusicButton);
@@ -213,7 +237,7 @@ public class SettingsScreen extends AbstractMenuDialog {
 
             Table gridIntensity = new Table();
             gridIntensity.defaults().fill();
-            gridIntensity.add(new ScaledLabel(app.TEXTS.get("menuGridIntensity"), app.skin, app.SKIN_FONT_TITLE))
+            gridIntensity.add(new ScaledLabel(app.TEXTS.get("menuGridIntensity"), app.skin, LightBlocksGame.SKIN_FONT_TITLE))
                     .colspan(2);
             gridIntensity.row();
             gridIntensity.add(gridPreview);
@@ -299,7 +323,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                     touchPanelSizeChanged();
                 }
             });
-            final FaRadioButton<Integer> swipeUpButtons = new FaRadioButton<Integer>(app.skin, false);
+            final FaRadioButton<Integer> swipeUpButtons = new FaRadioButton<>(app.skin, false);
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_DONOTHING, "", app.TEXTS.get("menuSwipeUpToNothing"));
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_PAUSE, "", app.TEXTS.get("menuSwipeUpToPause"));
             swipeUpButtons.addEntry(PlayGesturesInput.SWIPEUP_HARDDROP, "", app.TEXTS.get("menuSwipeUpToHardDrop"));
@@ -318,13 +342,13 @@ public class SettingsScreen extends AbstractMenuDialog {
             defaults().expand().fillX();
 
             row();
-            add(new ScaledLabel(app.TEXTS.get("menuInputGestures"), app.skin, app.SKIN_FONT_TITLE, .8f))
+            add(new ScaledLabel(app.TEXTS.get("menuInputGestures"), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .8f))
                     .top().fill(false);
 
             row();
             Table touchControlTypeTable = new Table();
             ScaledLabel menuControlTypeLabel = new ScaledLabel(app.TEXTS.get("menuTouchControlType") + ":", app.skin,
-                    app.SKIN_FONT_TITLE);
+                    LightBlocksGame.SKIN_FONT_TITLE);
             menuControlTypeLabel.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -341,7 +365,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             gestureSettings.add(touchPanelButton).bottom();
 
             Table touchPanelTable = new Table();
-            touchPanelTable.add(new ScaledLabel(app.TEXTS.get("menuSizeOfTouchPanel"), app.skin, app.SKIN_FONT_REG,
+            touchPanelTable.add(new ScaledLabel(app.TEXTS.get("menuSizeOfTouchPanel"), app.skin, LightBlocksGame.SKIN_FONT_REG,
                     .8f));
             touchPanelTable.row();
             touchPanelTable.add(touchPanelSizeSlider).minHeight(40).fill();

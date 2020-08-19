@@ -85,6 +85,14 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
         pages.add(page);
     }
 
+    /**
+     * call this when actors were added after toe PagedScrollPane was already shown
+     * is not called by addPage due to performance reasons
+     */
+    public void pageAdded() {
+        sizeChanged();
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
