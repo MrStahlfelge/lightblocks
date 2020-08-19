@@ -26,12 +26,12 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
 
     @Override
     public String getInputHelpText() {
-        return keyboard.getInputHelpText();
+        return eventsSinceTouch == 0 ? touch.getInputHelpText() : keyboard.getInputHelpText();
     }
 
     @Override
     public String getTutorialContinueText() {
-        return keyboard.getTutorialContinueText();
+        return eventsSinceTouch == 0 ? touch.getTutorialContinueText() : keyboard.getTutorialContinueText();
     }
 
     @Override

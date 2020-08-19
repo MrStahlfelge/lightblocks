@@ -20,20 +20,28 @@ public class PlayKeyboardInput extends PlayScreenInput {
     public static final String INPUT_KEY_TVREMOTE = "tvremote";
     public static final String INPUT_KEY_KEYBOARD = "keyboard";
     public static final String INPUT_KEY_CONTROLLER = "controller";
-    private boolean hadControllerEvent = false;
     private LocalPrefs.TvRemoteKeyConfig tvRemoteKeyConfig;
+
+    // this field increments for every controller event and decrements for every keyboard event
+    // this way, <= 0 means keyboard and > 0 means controller
+    private int controllerEventsVsKeyboardEvents;
 
     private int connectedControllersOnLastCheck = 0;
     private float timeSinceLastControllerCheck = 0f;
     private boolean hardDropMapped;
 
     public PlayKeyboardInput() {
+        controllerEventsVsKeyboardEvents = Controllers.getControllers().size > 0 ? 2 : 0;
         Gdx.input.setCatchMenuKey(LightBlocksGame.isOnAndroidTV());
+    }
+
+    private boolean playsWithController() {
+        return controllerEventsVsKeyboardEvents > 0;
     }
 
     @Override
     public String getInputHelpText() {
-        if (!hadControllerEvent & tvRemoteKeyConfig != null) {
+        if (!playsWithController() & tvRemoteKeyConfig != null) {
             String helpText = playScreen.app.TEXTS.get(hasKeyboard() ? "inputKeyboardHelp" : "inputTvRemoteHelp") + "\n";
 
             helpText += playScreen.app.TEXTS.get("configTvRemoteRight") + ": "
@@ -59,7 +67,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public String getTutorialContinueText() {
-        if (!hadControllerEvent)
+        if (!playsWithController())
             return playScreen.app.TEXTS.format("tutorialContinueTv",
                     Input.Keys.toString(tvRemoteKeyConfig.keyCodeRotateClockwise));
         else
@@ -112,7 +120,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
             hardDropMapped = playScreen.app.controllerMappings.hasHardDropMapping();
 
         if (currentConnectedControllers <= 0 && connectedControllersOnLastCheck > 0
-                && hadControllerEvent && !isPaused()) {
+                && playsWithController() && !isPaused()) {
             playScreen.switchPause(false);
         }
 
@@ -142,7 +150,11 @@ public class PlayKeyboardInput extends PlayScreenInput {
         if (!isPaused())
             keycode = mapTvRemoteAndHardwareKeys(keycode);
 
-        return keyDownInternal(keycode);
+        boolean handled = keyDownInternal(keycode);
+        if (handled) {
+            controllerEventsVsKeyboardEvents--;
+        }
+        return handled;
     }
 
     private boolean keyDownInternal(int keycode) {
@@ -227,7 +239,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public String getAnalyticsKey() {
-        return hadControllerEvent ? INPUT_KEY_CONTROLLER :
+        return playsWithController() ? INPUT_KEY_CONTROLLER :
                 hasKeyboard() ? INPUT_KEY_KEYBOARD : INPUT_KEY_TVREMOTE;
     }
 
@@ -244,7 +256,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
             boolean eventHandled = keyDownInternal(keycode);
             if (eventHandled) {
-                hadControllerEvent = true;
+                controllerEventsVsKeyboardEvents++;
             }
             return eventHandled;
         }
