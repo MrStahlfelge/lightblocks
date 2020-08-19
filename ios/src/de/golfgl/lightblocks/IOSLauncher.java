@@ -2,10 +2,13 @@ package de.golfgl.lightblocks;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.backends.iosrobovm.DefaultIOSInput;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
 import com.badlogic.gdx.backends.iosrobovm.IOSGraphics;
+import com.badlogic.gdx.backends.iosrobovm.IOSInput;
 import com.badlogic.gdx.backends.iosrobovm.MyAppDelegate;
+import com.badlogic.gdx.controllers.ICadeController;
 import com.badlogic.gdx.controllers.IosControllerManager;
 import com.badlogic.gdx.pay.ios.apple.PurchaseManageriOSApple;
 
@@ -22,6 +25,7 @@ import org.robovm.apple.uikit.UIDocumentPickerMode;
 import org.robovm.apple.uikit.UIDocumentPickerViewController;
 import org.robovm.apple.uikit.UIEdgeInsets;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
+import org.robovm.apple.uikit.UIKey;
 import org.robovm.apple.uikit.UIRectEdge;
 import org.robovm.apple.uikit.UIView;
 import org.robovm.apple.uikit.UIViewController;
@@ -170,6 +174,22 @@ public class IOSLauncher extends MyAppDelegate {
             @Override
             protected IOSGraphics.IOSUIViewController createUIViewController(IOSGraphics graphics) {
                 return new MyUIViewController(this, graphics);
+            }
+
+            @Override
+            protected IOSInput createInput() {
+                return new DefaultIOSInput(this) {
+                    @Override
+                    public boolean onKey(UIKey key, boolean down) {
+                        if (key != null && key.getCharactersIgnoringModifiers() != null) {
+                            String character = key.getCharactersIgnoringModifiers();
+                            if (character.length() == 1 && ICadeController.KEYS_TO_HANDLE.contains(character.substring(0, 1).toLowerCase()))
+                                return false;
+                        }
+
+                        return super.onKey(key, down);
+                    }
+                };
             }
         };
         return app;
