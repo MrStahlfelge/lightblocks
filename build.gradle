@@ -86,7 +86,7 @@ project(":ios") {
         compile project(":multiplayer")
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
-        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-robovm:master-SNAPSHOT"
+        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-robovm:1.910.2"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
 
         compile ("de.golfgl.gdxcontrollerutils:gdx-controllers-iosrvm:$cuversion") {
@@ -112,9 +112,9 @@ project(":html") {
 
     dependencies {
         compile project(":core")
-        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:master-SNAPSHOT"
+        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:1.910.2"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:master-SNAPSHOT:sources"
+        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:1.910.2:sources"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion:sources"
