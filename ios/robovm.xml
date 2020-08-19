@@ -5,7 +5,7 @@
   <arch>thumbv7</arch>
   <target>ios</target>
   <iosInfoPList>Info.plist.xml</iosInfoPList>
-  <iosEntitlementsPList>Entitlements.plist</iosEntitlementsPList>
+  <iosEntitlementsPList>Entitlements.plist.xml</iosEntitlementsPList>
   <resources>
     <resource>
       <directory>../android/assets</directory>
