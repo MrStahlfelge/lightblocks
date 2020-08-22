@@ -12,7 +12,6 @@ import com.badlogic.gdx.controllers.ICadeController;
 import com.badlogic.gdx.controllers.IosControllerManager;
 import com.badlogic.gdx.pay.ios.apple.PurchaseManageriOSApple;
 
-import org.robovm.apple.foundation.Foundation;
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSString;
@@ -23,11 +22,9 @@ import org.robovm.apple.uikit.UIDevice;
 import org.robovm.apple.uikit.UIDocumentPickerDelegateAdapter;
 import org.robovm.apple.uikit.UIDocumentPickerMode;
 import org.robovm.apple.uikit.UIDocumentPickerViewController;
-import org.robovm.apple.uikit.UIEdgeInsets;
 import org.robovm.apple.uikit.UIInterfaceOrientationMask;
 import org.robovm.apple.uikit.UIKey;
 import org.robovm.apple.uikit.UIRectEdge;
-import org.robovm.apple.uikit.UIView;
 import org.robovm.apple.uikit.UIViewController;
 import org.robovm.objc.Selector;
 
@@ -40,7 +37,6 @@ import de.golfgl.gdxpushmessages.ApnsMessageProvider;
 import de.golfgl.lightblocks.multiplayer.BonjourAdapter;
 import de.golfgl.lightblocks.multiplayer.GameCenterMultiplayerClient;
 import de.golfgl.lightblocks.multiplayer.MultiplayerLightblocks;
-import de.golfgl.lightblocks.scene2d.MyExtendViewport;
 
 public class IOSLauncher extends MyAppDelegate {
     public static void main(String[] argv) {
@@ -92,25 +88,6 @@ public class IOSLauncher extends MyAppDelegate {
                 // dm.xdpi / 320f
                 // IOSGraphics teilt bereits durch 160, also nur noch durch 2 teilen
                 return Gdx.graphics.getDensity() / 2f;
-            }
-
-            @Override
-            public void setScreenDeadZones(MyExtendViewport viewport) {
-                if (Foundation.getMajorSystemVersion() >= 11) {
-                    UIView view = UIApplication.getSharedApplication().getKeyWindow().getRootViewController().getView();
-                    UIEdgeInsets edgeInsets = view.getSafeAreaInsets();
-
-                    double top = edgeInsets.getTop() * view.getContentScaleFactor();
-                    double bottom = edgeInsets.getBottom() * view.getContentScaleFactor();
-                    double left = edgeInsets.getLeft() * view.getContentScaleFactor();
-                    double right = edgeInsets.getRight() * view.getContentScaleFactor();
-
-                    viewport.setDeadZones((int) top, (int) left, (int) bottom, (int) right);
-
-                    Gdx.app.debug("UI", "Dead Zones: " + top + ", " + bottom);
-                } else {
-                    super.setScreenDeadZones(viewport);
-                }
             }
 
             @Override

@@ -36,7 +36,6 @@ import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
-import de.golfgl.lightblocks.scene2d.MyExtendViewport;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -484,11 +483,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
             backendManager.invalidateCachedMatches();
             backendManager.setCompetitionNewsAvailableFlag(true);
         }
-    }
-
-    public void setScreenDeadZones(MyExtendViewport viewport) {
-        // for iPhoneX, for all others it's just 0
-        viewport.setDeadZones(0, 0, 0, 0);
     }
 
     public boolean canInstallTheme() {
