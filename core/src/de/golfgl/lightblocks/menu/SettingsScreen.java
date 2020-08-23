@@ -27,6 +27,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.input.PlayGesturesInput;
+import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
 import de.golfgl.lightblocks.scene2d.FaButton;
@@ -39,11 +41,8 @@ import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.TouchableSlider;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
-import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.OnScreenGamepadConfigscreen;
-import de.golfgl.lightblocks.screen.PlayGesturesInput;
-import de.golfgl.lightblocks.screen.PlayScreenInput;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
@@ -535,8 +534,7 @@ public class SettingsScreen extends AbstractMenuDialog {
 
             if (touchPanel != null && touchPanel.hasParent())
                 touchPanel.remove();
-            touchPanel = pgi.initializeTouchPanel((AbstractScreen) app.getScreen(),
-                    (int) touchPanelSizeSlider.getValue());
+            touchPanel = pgi.initializeTouchPanel(app, (int) touchPanelSizeSlider.getValue(), getStage());
             touchPanel.setVisible(true);
             touchPanel.setTouchable(Touchable.disabled);
 

@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
-import de.golfgl.lightblocks.screen.PlayGesturesInput;
+import de.golfgl.lightblocks.input.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.OnScreenGamepadConfig;
 

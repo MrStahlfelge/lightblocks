@@ -40,6 +40,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendScore;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.input.VibrationType;
 import de.golfgl.lightblocks.menu.PauseDialog;
 import de.golfgl.lightblocks.menu.RoundOverScoreScreen;
@@ -389,7 +390,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
      *
      * @return
      */
-    protected boolean touchTimeLabelWithWarning() {
+    public boolean touchTimeLabelWithWarning() {
         boolean somethingDone = gameModel.onTimeLabelTouchedByPlayer();
 
         if (!somethingDone && !timeLabel.hasActions()) {
@@ -451,7 +452,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
         // input initialisieren
         inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey, app);
-        inputAdapter.setPlayScreen(this);
+        inputAdapter.setPlayScreen(this, app);
         if (inputAdapter.getRequestedScreenOrientation() != null) {
             boolean rotated = app.lockOrientation(inputAdapter.getRequestedScreenOrientation());
             if (!rotated)
@@ -1420,7 +1421,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
         // GestureInput neues TouchPanel und Resize On Screen Controls
         if (inputAdapter != null) {
-            inputAdapter.setPlayScreen(this);
+            inputAdapter.setPlayScreen(this, app);
 
             // es gibt momentan nur Portrait Zwang, eigentlich usePortraitGameBlocker natürlich für Landscape falsch
             Input.Orientation requestedScreenOrientation = inputAdapter.getRequestedScreenOrientation();
@@ -1438,6 +1439,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     @Override
     public float getCenterPosX() {
         return centerGroup.getX();
+    }
+
+    public float getCenterPosY() {
+        return centerGroup.getY();
     }
 
     @Override

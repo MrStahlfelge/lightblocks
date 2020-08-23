@@ -40,7 +40,7 @@ import de.golfgl.lightblocks.scene2d.MyExtendViewport;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
-import de.golfgl.lightblocks.screen.PlayScreenInput;
+import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.GameStateHandler;
 import de.golfgl.lightblocks.state.LocalPrefs;

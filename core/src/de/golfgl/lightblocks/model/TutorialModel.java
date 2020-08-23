@@ -3,7 +3,7 @@ package de.golfgl.lightblocks.model;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-import de.golfgl.lightblocks.screen.PlayScreenInput;
+import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**

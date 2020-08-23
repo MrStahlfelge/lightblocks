@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import de.golfgl.lightblocks.screen.PlayScreenInput;
+import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.Player;
 

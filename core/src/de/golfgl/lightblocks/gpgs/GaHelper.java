@@ -3,7 +3,7 @@ package de.golfgl.lightblocks.gpgs;
 import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
-import de.golfgl.lightblocks.screen.PlayScreenInput;
+import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**

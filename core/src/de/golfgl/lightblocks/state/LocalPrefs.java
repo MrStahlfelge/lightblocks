@@ -12,7 +12,7 @@ import de.golfgl.lightblocks.backend.MatchTurnRequestInfo;
 import de.golfgl.lightblocks.menu.DonationDialog;
 import de.golfgl.lightblocks.menu.SettingsScreen;
 import de.golfgl.lightblocks.scene2d.BlockActor;
-import de.golfgl.lightblocks.screen.PlayGesturesInput;
+import de.golfgl.lightblocks.input.PlayGesturesInput;
 
 /**
  * Hält lokal gespeicherte Einstellungen
