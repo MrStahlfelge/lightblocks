@@ -24,10 +24,12 @@ public class GaHelper {
             }
             if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
                 app.gameAnalytics.submitDesignEvent("swipeUpSetting:" + app.localPrefs.getSwipeUpType());
-                app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());
                 LocalPrefs.TouchControlType usedTouchControls = app.localPrefs.getUsedTouchControls();
                 app.gameAnalytics.submitDesignEvent("showOnScreenControls:" + (usedTouchControls == LocalPrefs.TouchControlType.gestures ? "false" :
                         usedTouchControls == LocalPrefs.TouchControlType.onScreenButtonsGamepad ? "gamepad" : "buttons"));
+                if (usedTouchControls == LocalPrefs.TouchControlType.gestures) {
+                    app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());
+                }
             }
 
             String themeName = app.theme.isThemePresent() ? app.theme.getThemeName() : "none";
