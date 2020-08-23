@@ -1,7 +1,7 @@
 package de.golfgl.lightblocks.menu;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -35,7 +35,8 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
     private final Button closeButton;
     private final LightBlocksGame app;
     private Actor defaultActor;
-    private FaCheckbox checkDisableTouchControls;
+    private final FaCheckbox checkDisableTouchControls;
+    private final FaCheckbox checkEnableVibration;
 
     private int connectedControllersOnLastCheck;
     private float timeSinceLastControllerCheck;
@@ -45,7 +46,7 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
 
         this.app = app;
 
-        getButtonTable().defaults().pad(20, 40, 20, 40);
+        getButtonTable().defaults().pad(0, 40, 10, 40);
         closeButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
         button(closeButton);
 
@@ -69,6 +70,17 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
             }
         });
         addFocusableActor(checkDisableTouchControls);
+
+        checkEnableVibration = new FaCheckbox(app.TEXTS.get("labelEnableVibration"), app.skin);
+        checkEnableVibration.setChecked(app.localPrefs.getVibrationEnabled());
+        checkEnableVibration.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                app.localPrefs.setVibrationEnabled(checkEnableVibration.isChecked());
+            }
+        });
+        addFocusableActor(checkEnableVibration);
+
     }
 
     @Override
@@ -146,15 +158,23 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
                 ((MyStage) getStage()).addFocusableActor(recommendedControllers);
         }
 
-        contentTable.row();
+        contentTable.row().padBottom(20);
         contentTable.add(controllerList);
 
+        boolean addedCheckbox = false;
         if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
-            contentTable.row().padTop(20);
+            contentTable.row();
             contentTable.add(checkDisableTouchControls);
+            addedCheckbox = true;
         }
 
-        contentTable.row().padTop(20);
+        if (!Gdx.input.isPeripheralAvailable(Input.Peripheral.Vibrator)) {
+            contentTable.row();
+            contentTable.add(checkEnableVibration);
+            addedCheckbox = true;
+        }
+
+        contentTable.row().padTop(addedCheckbox ? 20 : 0);
         Label hint = new ScaledLabel(app.TEXTS.get("configGamepadHelp"),
                 getSkin(), LightBlocksGame.SKIN_FONT_BIG);
         hint.setWrap(true);

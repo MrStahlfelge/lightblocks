@@ -59,6 +59,9 @@ public class LocalPrefs {
     private static final String PREF_KEY_PUSH_TOKEN = "pushToken";
     private static final String PREF_KEY_OSG_LANDSCAPE = "osgLandscape";
     private static final String PREF_KEY_OSG_PORTRAIT = "osgPortrait";
+    private static final String PREF_KEY_VIB_HAPTICFEEDBACK = "vib_haptic";
+    private static final String PREF_KEY_VIB_ENABLED = "vib_enabled";
+    private static final String PREF_KEY_VIB_ONLYCONTROLLER = "vib_onlycontroller";
     private final Preferences prefs;
     private Boolean playMusic;
     private Boolean playSounds;
@@ -87,6 +90,9 @@ public class LocalPrefs {
     private Boolean showHardDropButtonOnScreenGamepad;
     private Boolean showDpadOnScreenGamepad;
     private Integer onScreenGamepadOpacity;
+    private Boolean vibrationEnabled;
+    private Boolean vibrationHaptic;
+    private Boolean vibrationOnlyController;
 
     public LocalPrefs(Preferences prefs) {
         this.prefs = prefs;
@@ -590,6 +596,48 @@ public class LocalPrefs {
     public void setOnScreenGamepadOpacity(int onScreenGamepadOpacity) {
         this.onScreenGamepadOpacity = onScreenGamepadOpacity;
         prefs.putInteger(PREF_KEY_OSG_OPACITY, onScreenGamepadOpacity);
+        prefs.flush();
+    }
+
+    public boolean getVibrationEnabled() {
+        if (vibrationEnabled == null) {
+            vibrationEnabled = prefs.getBoolean(PREF_KEY_VIB_ENABLED, false);
+        }
+
+        return vibrationEnabled;
+    }
+
+    public void setVibrationEnabled(boolean vibrationEnabled) {
+        this.vibrationEnabled = vibrationEnabled;
+        prefs.putBoolean(PREF_KEY_VIB_ENABLED, vibrationEnabled);
+        prefs.flush();
+    }
+
+    public boolean getVibrationHaptic() {
+        if (vibrationHaptic == null) {
+            vibrationHaptic = prefs.getBoolean(PREF_KEY_VIB_HAPTICFEEDBACK, false);
+        }
+
+        return vibrationHaptic;
+    }
+
+    public void setVibrationHaptic(boolean vibrationHaptic) {
+        this.vibrationHaptic = vibrationHaptic;
+        prefs.putBoolean(PREF_KEY_VIB_HAPTICFEEDBACK, vibrationHaptic);
+        prefs.flush();
+    }
+
+    public boolean getVibrationOnlyController() {
+        if (vibrationOnlyController == null) {
+            vibrationOnlyController = prefs.getBoolean(PREF_KEY_VIB_ONLYCONTROLLER, false);
+        }
+
+        return vibrationOnlyController;
+    }
+
+    public void setVibrationOnlyController(boolean vibrationOnlyController) {
+        this.vibrationOnlyController = vibrationOnlyController;
+        prefs.putBoolean(PREF_KEY_VIB_ONLYCONTROLLER, vibrationOnlyController);
         prefs.flush();
     }
 

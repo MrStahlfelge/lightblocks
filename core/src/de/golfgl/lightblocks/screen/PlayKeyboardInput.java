@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.controllers.AdvancedController;
 import com.badlogic.gdx.controllers.Controllers;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.input.VibrationType;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
@@ -111,6 +113,15 @@ public class PlayKeyboardInput extends PlayScreenInput {
         }
 
         return false;
+    }
+
+    @Override
+    public void vibrate(VibrationType vibrationType) {
+        if (vibrationEnabled && playsWithController()) {
+            // TODO #4 use the correct controller
+            AdvancedController advancedController = (AdvancedController) Controllers.getControllers().get(0);
+            advancedController.startVibration(vibrationType.getVibrationLength(), 1f);
+        }
     }
 
     private void checkControllerConnections(boolean init) {

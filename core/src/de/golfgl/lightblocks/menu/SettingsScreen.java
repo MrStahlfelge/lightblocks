@@ -213,6 +213,15 @@ public class SettingsScreen extends AbstractMenuDialog {
                 }
             });
 
+            GlowLabelButton vibrationButton = new GlowLabelButton(FontAwesome.DEVICE_MOBILEPHONE, app.TEXTS.get("menuVibrationConfig"), app.skin,
+                    GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
+            vibrationButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    new VibrationSettingsDialog(app).show(getStage());
+                }
+            });
+
             gridPreview = new Image(app.trBlock) {
                 @Override
                 public float getPrefHeight() {
@@ -259,7 +268,13 @@ public class SettingsScreen extends AbstractMenuDialog {
                 add(themeButton);
             }
 
+            if (Gdx.input.isPeripheralAvailable(Input.Peripheral.Vibrator) || LightBlocksGame.GAME_DEVMODE) {
+                row();
+                add(vibrationButton);
+            }
+
             addFocusableActor(menuMusicButton);
+            addFocusableActor(vibrationButton);
             addFocusableActor(gridIntensitySlider);
             addFocusableActor(colorModeCheck);
             addFocusableActor(showGhostpiece);

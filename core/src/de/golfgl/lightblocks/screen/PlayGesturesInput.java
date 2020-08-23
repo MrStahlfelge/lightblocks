@@ -14,7 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
+import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.input.VibrationType;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.Tetromino;
@@ -121,6 +123,25 @@ public class PlayGesturesInput extends PlayScreenInput {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void vibrate(VibrationType vibrationType) {
+        if (vibrationEnabled && !playScreen.app.localPrefs.getVibrationOnlyController()) {
+            try {
+                Gdx.input.vibrate(vibrationType.getVibrationLength());
+            } catch (Throwable throwable) {
+                // We catch here, just in case. There were some problems reported
+                playScreen.app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.warning,
+                        throwable.getMessage());
+            }
+        }
+    }
+
+    private void giveHapticFeedback() {
+        if (vibrationEnabled && playScreen.app.localPrefs.getVibrationHaptic()) {
+            vibrate(VibrationType.HAPTIC_FEEDBACK);
+        }
     }
 
     @Override
@@ -245,6 +266,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     public void hadButtonEvent() {
         hadButtonEvent = true;
+        giveHapticFeedback();
     }
 
     public void setTouchPanel(int screenX, int screenY) {
@@ -292,6 +314,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > currentHorizontalTreshold)) {
                     beganHorizontalMove = true;
                     playScreen.gameModel.startMoveHorizontal(screenX - this.screenX < 0);
+                    giveHapticFeedback();
                 }
                 if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < currentHorizontalTreshold)) {
                     playScreen.gameModel.endMoveHorizontal(true);
@@ -311,6 +334,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 && timeSinceTouchDown <= MAX_SOFTDROPBEGINNING_INTERVAL) {
             beganSoftDrop = true;
             playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
+            giveHapticFeedback();
         }
         // Soft Drop sofort beenden, wenn horizontal bewegt oder wieder hochgezogen
         if ((beganHorizontalMove || screenY - this.screenY < dragThreshold) && beganSoftDrop) {
@@ -325,9 +349,11 @@ public class PlayGesturesInput extends PlayScreenInput {
                 playScreen.switchPause(false);
             else if (swipeUpType == SWIPEUP_HARDDROP && !didHardDrop && !beganHorizontalMove) {
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
+                giveHapticFeedback();
                 didHardDrop = true;
             } else if (swipeUpType == SWIPEUP_HOLD && !beganHorizontalMove) {
                 playScreen.gameModel.holdActiveTetromino();
+                giveHapticFeedback();
             }
         }
 
@@ -356,6 +382,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 boolean tappedRightScreenHalf = screenX >= Gdx.graphics.getWidth() / 2;
                 playScreen.gameModel.setRotate(tappedRightScreenHalf && !invertRotation
                         || !tappedRightScreenHalf && invertRotation);
+                giveHapticFeedback();
             } else
                 playScreen.gameModel.doOneHorizontalMove(screenX <= Gdx.graphics.getWidth() / 2);
 
@@ -479,7 +506,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 // no dedicated hard drop button makes the up button work as hard drop
                 if (!playScreen.app.localPrefs.isShowHardDropButtonOnScreenGamepad()) {
                     if (upPressed) {
-                        hadButtonEvent = true;
+                        hadButtonEvent();
                         playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
                     } else
                         playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
@@ -490,7 +517,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             if (downPressed != downNowPressed) {
                 downPressed = downNowPressed;
                 if (downPressed) {
-                    hadButtonEvent = true;
+                    hadButtonEvent();
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
                 } else
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
@@ -499,7 +526,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             if (rightPressed != rightNowPressed) {
                 rightPressed = rightNowPressed;
                 if (rightPressed) {
-                    hadButtonEvent = true;
+                    hadButtonEvent();
                     playScreen.gameModel.startMoveHorizontal(false);
                 } else
                     playScreen.gameModel.endMoveHorizontal(false);
@@ -508,7 +535,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             if (leftPressed != leftNowPressed) {
                 leftPressed = leftNowPressed;
                 if (leftPressed) {
-                    hadButtonEvent = true;
+                    hadButtonEvent();
                     playScreen.gameModel.startMoveHorizontal(true);
                 } else
                     playScreen.gameModel.endMoveHorizontal(true);
@@ -549,8 +576,10 @@ public class PlayGesturesInput extends PlayScreenInput {
                     rightPressed = false;
                     rotateRight.isPressed = false;
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
-                    if (!didSoftDrop)
+                    if (!didSoftDrop) {
                         playScreen.gameModel.setRotate(true);
+                        giveHapticFeedback();
+                    }
                 }
             };
             rotateRight.addListener(rotateRightListener);
@@ -575,8 +604,10 @@ public class PlayGesturesInput extends PlayScreenInput {
                     leftPressed = false;
                     rotateLeft.isPressed = false;
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
-                    if (!didSoftDrop)
+                    if (!didSoftDrop) {
                         playScreen.gameModel.setRotate(false);
+                        giveHapticFeedback();
+                    }
                 }
             };
             rotateLeft.addListener(rotateLeftListener);
@@ -591,7 +622,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     moveRight.isPressed = true;
                     playScreen.gameModel.startMoveHorizontal(false);
-                    hadButtonEvent = true;
+                    hadButtonEvent();
                     return true;
                 }
 
@@ -613,7 +644,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     moveLeft.isPressed = true;
                     playScreen.gameModel.startMoveHorizontal(true);
-                    hadButtonEvent = true;
+                    hadButtonEvent();
                     return true;
                 }
 
@@ -635,8 +666,10 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         private void checkSoftDrop() {
             didSoftDrop = rightPressed && leftPressed;
-            if (didSoftDrop)
+            if (didSoftDrop) {
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
+                giveHapticFeedback();
+            }
         }
 
 
@@ -719,7 +752,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             if (!isPaused()) {
                 playScreen.touchTimeLabelWithWarning();
-                hadButtonEvent = true;
+                hadButtonEvent();
                 return true;
             }
             return false;
@@ -731,7 +764,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             if (!isPaused()) {
                 playScreen.gameModel.holdActiveTetromino();
-                hadButtonEvent = true;
+                hadButtonEvent();
                 return true;
             }
             return false;

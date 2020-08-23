@@ -3,6 +3,8 @@ package de.golfgl.lightblocks.screen;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 
+import de.golfgl.lightblocks.input.VibrationType;
+
 /**
  * This input method is used when there is both touch or key/controller input available. Events are
  * dispatched to the underlying gestures input and keyboard input.
@@ -92,6 +94,16 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
             hadTouchEvent();
 
         return super.doPoll(delta);
+    }
+
+    @Override
+    public void vibrate(VibrationType vibrationType) {
+        if (vibrationEnabled) {
+            if (eventsSinceTouch == 0)
+                touch.vibrate(vibrationType);
+            else
+                keyboard.vibrate(vibrationType);
+        }
     }
 
     @Override

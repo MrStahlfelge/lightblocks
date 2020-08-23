@@ -40,6 +40,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendScore;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.input.VibrationType;
 import de.golfgl.lightblocks.menu.PauseDialog;
 import de.golfgl.lightblocks.menu.RoundOverScoreScreen;
 import de.golfgl.lightblocks.menu.ScoreTable;
@@ -762,6 +763,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
                 else
                     app.theme.cleanSpecialSound.play(.8f);
             }
+            inputAdapter.vibrate(special ? VibrationType.SPECIAL_CLEAR : VibrationType.CLEAR);
 
             for (int i = linesToRemove.size - 1; i >= 0; i--) {
                 int y = linesToRemove.get(i);
@@ -868,6 +870,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         if (linesToInsert > 0) {
             if (app.localPrefs.isPlaySounds() && app.theme.garbageSound != null)
                 app.theme.garbageSound.play(.4f + linesToInsert * .2f);
+            inputAdapter.vibrate(VibrationType.GARBAGE);
             // nun die Referenz hochziehen
             for (int i = Gameboard.GAMEBOARD_ALLROWS - 1; i >= linesToInsert; i--)
                 for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
@@ -1100,6 +1103,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         if (app.localPrefs.isPlaySounds() && app.theme.dropSound != null)
             app.theme.dropSound.play();
 
+        inputAdapter.vibrate(VibrationType.DROP);
+
         for (Integer[] vAfterMove : currentBlockPositions) {
             BlockActor activePieceBlock = this.blockMatrix[vAfterMove[0]][vAfterMove[1]];
             activePieceBlock.setEnlightened(false);
@@ -1116,6 +1121,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     public void showMotivation(MotivationTypes achievement, @Nullable String extraMsg) {
 
         boolean playSound = true;
+        boolean vibrate = true;
         String text = "";
         float duration = 2;
 
@@ -1128,19 +1134,23 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
                 break;
             case doubleSpecial:
                 text = app.TEXTS.get("motivationDoubleSpecial");
+                vibrate = false;
                 break;
             case tenLinesCleared:
                 text = extraMsg + " " + app.TEXTS.get("labelLines");
                 playSound = false;
+                vibrate = false;
                 break;
             case boardCleared:
                 text = app.TEXTS.get("motivationCleanComplete");
+                vibrate = false;
                 break;
             case newHighscore:
                 text = app.TEXTS.get("motivationNewHighscore");
                 break;
             case hundredBlocksDropped:
                 text = app.TEXTS.format("motivationHundredBlocks", extraMsg);
+                vibrate = false;
                 playSound = false;
                 break;
             case playerOver:
@@ -1171,10 +1181,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             case bonusScore:
                 text = app.TEXTS.format("motivationBonusScore", extraMsg);
                 duration = 3;
+                vibrate = false;
                 break;
             case comboCount:
                 text = app.TEXTS.format("motivationComboCount", extraMsg);
                 duration = .5f;
+                vibrate = false;
                 break;
             case turnGarbage:
                 playSound = true;
@@ -1199,6 +1211,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
         if (playSound && app.localPrefs.isPlaySounds() && app.theme.unlockedSound != null)
             app.theme.unlockedSound.play();
+
+        if (vibrate)
+            inputAdapter.vibrate(VibrationType.MOTIVATION);
 
         if (!text.isEmpty())
             motivatorLabel.addMotivationText(text.toUpperCase(), duration);
