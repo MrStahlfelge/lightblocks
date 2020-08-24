@@ -1213,7 +1213,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         if (playSound && app.localPrefs.isPlaySounds() && app.theme.unlockedSound != null)
             app.theme.unlockedSound.play();
 
-        if (vibrate)
+        if (vibrate && inputAdapter != null)
             inputAdapter.vibrate(VibrationType.MOTIVATION);
 
         if (!text.isEmpty())
