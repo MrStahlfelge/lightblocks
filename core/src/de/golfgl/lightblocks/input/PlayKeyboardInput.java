@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.AdvancedController;
+import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -31,6 +32,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     private int connectedControllersOnLastCheck = 0;
     private float timeSinceLastControllerCheck = 0f;
     private boolean hardDropMapped;
+    private Controller lastControllerInUse;
 
     public PlayKeyboardInput() {
         controllerEventsVsKeyboardEvents = Controllers.getControllers().size > 0 ? 2 : 0;
@@ -117,10 +119,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public void vibrate(VibrationType vibrationType) {
-        if (vibrationEnabled && playsWithController()) {
-            // TODO #4 use the correct controller
-            AdvancedController advancedController = (AdvancedController) Controllers.getControllers().get(0);
-            advancedController.startVibration(vibrationType.getVibrationLength(), 1f);
+        if (vibrationEnabled && playsWithController() && lastControllerInUse != null) {
+            ((AdvancedController) lastControllerInUse).startVibration(vibrationType.getVibrationLength(), 1f);
         }
     }
 
@@ -262,6 +262,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
     private class ControllerInputAdapter extends InputAdapter {
         @Override
         public boolean keyDown(int keycode) {
+            lastControllerInUse = app.controllerMappings.getControllerInUse();
+
             if (!isPaused() && keycode == Input.Keys.UP && !hardDropMapped)
                 keycode = Input.Keys.CONTROL_RIGHT;
 
@@ -274,6 +276,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
         @Override
         public boolean keyUp(int keycode) {
+            lastControllerInUse = app.controllerMappings.getControllerInUse();
+
             if (!isPaused() && keycode == Input.Keys.UP && !hardDropMapped)
                 keycode = Input.Keys.CONTROL_RIGHT;
 

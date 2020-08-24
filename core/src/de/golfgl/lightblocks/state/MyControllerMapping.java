@@ -1,6 +1,5 @@
 package de.golfgl.lightblocks.state;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
@@ -20,7 +19,6 @@ import de.golfgl.lightblocks.LightBlocksGame;
 /**
  * Created by Benjamin Schulte on 05.11.2017.
  */
-
 public class MyControllerMapping extends ControllerMappings {
 
     public static final int BUTTON_ROTATE_CLOCKWISE = 0;
@@ -34,6 +32,8 @@ public class MyControllerMapping extends ControllerMappings {
     public static final int BUTTON_CANCEL = 5;
     public ControllerToInputAdapter controllerToInputAdapter;
     public boolean loadedSavedSettings;
+
+    private Controller controllerInUse;
 
     public MyControllerMapping(LightBlocksGame app) {
         super();
@@ -60,21 +60,16 @@ public class MyControllerMapping extends ControllerMappings {
             Gdx.app.error("Prefs", "Error reading saved controller mappings", t);
         }
 
-        controllerToInputAdapter = new ControllerToInputAdapter(this);
-
-        controllerToInputAdapter.addButtonMapping(BUTTON_ROTATE_CLOCKWISE, Input.Keys.SPACE);
-        controllerToInputAdapter.addButtonMapping(BUTTON_ROTATE_COUNTERCLOCK, Input.Keys.CONTROL_LEFT);
-        controllerToInputAdapter.addButtonMapping(BUTTON_START, Input.Keys.ENTER);
-        controllerToInputAdapter.addButtonMapping(BUTTON_CANCEL, Input.Keys.ESCAPE);
-        controllerToInputAdapter.addAxisMapping(AXIS_HORIZONTAL, Input.Keys.LEFT, Input.Keys.RIGHT);
-        controllerToInputAdapter.addAxisMapping(AXIS_VERTICAL, Input.Keys.UP, Input.Keys.DOWN);
-        controllerToInputAdapter.addButtonMapping(BUTTON_HARDDROP, Input.Keys.CONTROL_RIGHT);
-        controllerToInputAdapter.addButtonMapping(BUTTON_HOLD, Input.Keys.H);
-        controllerToInputAdapter.addButtonMapping(BUTTON_FREEZE, Input.Keys.F);
+        controllerToInputAdapter = new MyControllerToInputAdapter(this);
     }
 
     public void setInputProcessor(InputProcessor input) {
         controllerToInputAdapter.setInputProcessor(input);
+    }
+
+    public Controller getControllerInUse() {
+        // returns a controller currently in use while MyControllerToInputAdapter.sendKeyToTarget fires
+        return controllerInUse;
     }
 
     @Override
@@ -103,5 +98,47 @@ public class MyControllerMapping extends ControllerMappings {
 
         }
         return hasHardDropMapping;
+    }
+
+    /**
+     * this ControllerToInputAdapter registers its controller to keyboard mappings itself,
+     * but more important is that it saves
+     *
+     */
+    private class MyControllerToInputAdapter extends ControllerToInputAdapter {
+
+        public MyControllerToInputAdapter(ControllerMappings mappings) {
+            super(mappings);
+
+            addButtonMapping(BUTTON_ROTATE_CLOCKWISE, Input.Keys.SPACE);
+            addButtonMapping(BUTTON_ROTATE_COUNTERCLOCK, Input.Keys.CONTROL_LEFT);
+            addButtonMapping(BUTTON_START, Input.Keys.ENTER);
+            addButtonMapping(BUTTON_CANCEL, Input.Keys.ESCAPE);
+            addAxisMapping(AXIS_HORIZONTAL, Input.Keys.LEFT, Input.Keys.RIGHT);
+            addAxisMapping(AXIS_VERTICAL, Input.Keys.UP, Input.Keys.DOWN);
+            addButtonMapping(BUTTON_HARDDROP, Input.Keys.CONTROL_RIGHT);
+            addButtonMapping(BUTTON_HOLD, Input.Keys.H);
+            addButtonMapping(BUTTON_FREEZE, Input.Keys.F);
+        }
+
+        @Override
+        protected boolean sendKeyDownToTarget(int keycode, Controller inputSourceController) {
+            synchronized (this) {
+                controllerInUse = inputSourceController;
+                boolean handled = super.sendKeyDownToTarget(keycode, inputSourceController);
+                controllerInUse = null;
+                return handled;
+            }
+        }
+
+        @Override
+        protected boolean sendKeyUpToTarget(int keycode, Controller inputSourceController) {
+            synchronized (this) {
+                controllerInUse = inputSourceController;
+                boolean handled = super.sendKeyUpToTarget(keycode, inputSourceController);
+                controllerInUse = null;
+                return handled;
+            }
+        }
     }
 }
