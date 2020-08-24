@@ -8,6 +8,7 @@ import com.badlogic.gdx.controllers.AdvancedController;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 
+import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -120,7 +121,18 @@ public class PlayKeyboardInput extends PlayScreenInput {
     @Override
     public void vibrate(VibrationType vibrationType) {
         if (vibrationEnabled && playsWithController() && lastControllerInUse != null) {
-            ((AdvancedController) lastControllerInUse).startVibration(vibrationType.getVibrationLength(), 1f);
+            AdvancedController lastControllerInUse = (AdvancedController) this.lastControllerInUse;
+            if (lastControllerInUse.canVibrate()) {
+                lastControllerInUse.startVibration(vibrationType.getVibrationLength(), 1f);
+            } else if (!app.localPrefs.getVibrationOnlyController()) {
+                try {
+                    Gdx.input.vibrate(vibrationType.getVibrationLength());
+                } catch (Throwable throwable) {
+                    // We catch here, just in case. There were some problems reported
+                    app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.warning,
+                            throwable.getMessage());
+                }
+            }
         }
     }
 
