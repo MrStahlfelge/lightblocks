@@ -1,4 +1,4 @@
-package de.golfgl.lightblocks.screen;
+package de.golfgl.lightblocks.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -8,12 +8,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 
+import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.Gameboard;
@@ -21,6 +23,8 @@ import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.OnScreenGamepad;
+import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
@@ -69,29 +73,29 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     @Override
     public String getInputHelpText() {
-        return playScreen.app.TEXTS.get(!isUsingOnScreenButtons() ? "inputGesturesHelp" :
+        return app.TEXTS.get(!isUsingOnScreenButtons() ? "inputGesturesHelp" :
                 gamepadOnScreenControls != null ? "inputOnScreenGamepadHelp" : "inputOnScreenButtonHelp");
     }
 
     @Override
     public String getTutorialContinueText() {
-        return playScreen.app.TEXTS.get("tutorialContinueGestures");
+        return app.TEXTS.get("tutorialContinueGestures");
     }
 
     @Override
-    public void setPlayScreen(PlayScreen playScreen) {
-        super.setPlayScreen(playScreen);
+    public void setPlayScreen(PlayScreen playScreen, LightBlocksGame app) {
+        super.setPlayScreen(playScreen, app);
 
-        dragThreshold = playScreen.app.localPrefs.getTouchPanelSize(playScreen.app.getDisplayDensityRatio());
+        dragThreshold = app.localPrefs.getTouchPanelSize(app.getDisplayDensityRatio());
         tutorialMode = playScreen.gameModel instanceof TutorialModel;
-        invertRotation = !tutorialMode && playScreen.app.localPrefs.isInvertGesturesRotation();
+        invertRotation = !tutorialMode && app.localPrefs.isInvertGesturesRotation();
 
-        if (playScreen.app.localPrefs.getShowTouchPanel() || tutorialMode)
-            initializeTouchPanel(playScreen, dragThreshold);
+        if (app.localPrefs.getShowTouchPanel() || tutorialMode)
+            initializeTouchPanel(app, dragThreshold, playScreen.getStage());
 
         if (!isUsingOnScreenButtons()) {
             initGestureOnScreenControls();
-        } else if (playScreen.app.localPrefs.getUsedTouchControls() == LocalPrefs.TouchControlType.onScreenButtonsPortrait) {
+        } else if (app.localPrefs.getUsedTouchControls() == LocalPrefs.TouchControlType.onScreenButtonsPortrait) {
             initPortraitOnScreenControls();
         } else {
             initGamepadOnScreenControls();
@@ -121,6 +125,25 @@ public class PlayGesturesInput extends PlayScreenInput {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void vibrate(VibrationType vibrationType) {
+        if (vibrationEnabled && !app.localPrefs.getVibrationOnlyController()) {
+            try {
+                Gdx.input.vibrate(vibrationType.getVibrationLength());
+            } catch (Throwable throwable) {
+                // We catch here, just in case. There were some problems reported
+                app.gameAnalytics.submitErrorEvent(GameAnalytics.ErrorType.warning,
+                        throwable.getMessage());
+            }
+        }
+    }
+
+    private void giveHapticFeedback() {
+        if (vibrationEnabled && app.localPrefs.getVibrationHaptic()) {
+            vibrate(VibrationType.HAPTIC_FEEDBACK);
+        }
     }
 
     @Override
@@ -161,10 +184,10 @@ public class PlayGesturesInput extends PlayScreenInput {
     }
 
     protected boolean isUsingOnScreenButtons() {
-        return playScreen.app.localPrefs.getUsedTouchControls().isOnScreenButtons() && !tutorialMode;
+        return app.localPrefs.getUsedTouchControls().isOnScreenButtons() && !tutorialMode;
     }
 
-    public Group initializeTouchPanel(AbstractScreen playScreen, int dragTrashold) {
+    public Group initializeTouchPanel(LightBlocksGame app, int dragTrashold, Stage stage) {
         if (touchPanel != null)
             touchPanel.remove();
 
@@ -175,27 +198,27 @@ public class PlayGesturesInput extends PlayScreenInput {
         touchCoordinates1 = new Vector2(0, 0);
         touchCoordinates = new Vector2(dragTrashold, 0);
 
-        playScreen.stage.getViewport().unproject(touchCoordinates);
-        playScreen.stage.getViewport().unproject(touchCoordinates1);
+        stage.getViewport().unproject(touchCoordinates);
+        stage.getViewport().unproject(touchCoordinates1);
 
         float screenDragTreshold = Math.abs(touchCoordinates.x - touchCoordinates1.x);
 
         touchPanel.setVisible(false);
-        rotationLabel = new Label(FontAwesome.ROTATE_RIGHT, playScreen.app.skin, FontAwesome.SKIN_FONT_FA);
+        rotationLabel = new Label(FontAwesome.ROTATE_RIGHT, app.skin, FontAwesome.SKIN_FONT_FA);
 
         float scale = Math.min(1, screenDragTreshold * 1.9f / rotationLabel.getPrefWidth());
         rotationLabel.setFontScale(scale);
 
         rotationLabel.setPosition(-rotationLabel.getPrefWidth() / 2, -rotationLabel.getPrefHeight() / 2);
 
-        toTheRight = new Label(FontAwesome.CIRCLE_RIGHT, playScreen.app.skin, FontAwesome.SKIN_FONT_FA);
+        toTheRight = new Label(FontAwesome.CIRCLE_RIGHT, app.skin, FontAwesome.SKIN_FONT_FA);
         toTheRight.setFontScale(scale);
         toTheRight.setPosition(screenDragTreshold, -toTheRight.getPrefHeight() / 2);
-        toTheLeft = new Label(FontAwesome.CIRCLE_LEFT, playScreen.app.skin, FontAwesome.SKIN_FONT_FA);
+        toTheLeft = new Label(FontAwesome.CIRCLE_LEFT, app.skin, FontAwesome.SKIN_FONT_FA);
         toTheLeft.setFontScale(scale);
         toTheLeft.setPosition(-screenDragTreshold - toTheRight.getPrefWidth(), -toTheRight.getPrefHeight() / 2);
 
-        toDrop = new Label(FontAwesome.CIRCLE_DOWN, playScreen.app.skin, FontAwesome.SKIN_FONT_FA);
+        toDrop = new Label(FontAwesome.CIRCLE_DOWN, app.skin, FontAwesome.SKIN_FONT_FA);
         toDrop.setFontScale(scale);
         toDrop.setPosition(-toDrop.getPrefWidth() / 2, -screenDragTreshold - toDrop.getPrefHeight());
 
@@ -204,7 +227,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         touchPanel.addActor(toDrop);
         touchPanel.addActor(rotationLabel);
 
-        playScreen.stage.addActor(touchPanel);
+        stage.addActor(touchPanel);
 
         return touchPanel;
     }
@@ -214,7 +237,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (gestureOnScreenControls == null) {
             gestureOnScreenControls = new GestureOnScreenButtons();
             gestureOnScreenControls.setVisible(false);
-            playScreen.stage.addActor(gestureOnScreenControls);
+            playScreen.getStage().addActor(gestureOnScreenControls);
         }
         gestureOnScreenControls.resize();
     }
@@ -223,18 +246,18 @@ public class PlayGesturesInput extends PlayScreenInput {
         if (buttonOnScreenControls == null) {
             buttonOnScreenControls = new PortraitOnScreenButtons();
             buttonOnScreenControls.setVisible(false);
-            playScreen.stage.addActor(buttonOnScreenControls);
+            playScreen.getStage().addActor(buttonOnScreenControls);
         }
         buttonOnScreenControls.resize();
     }
 
     private void initGamepadOnScreenControls() {
         if (gamepadOnScreenControls == null) {
-            gamepadOnScreenControls = new OnScreenGamepad(playScreen.app, this,
+            gamepadOnScreenControls = new OnScreenGamepad(app, this,
                     new TouchpadChangeListener(), new HoldButtonInputListener(),
                     new FreezeButtonInputListener());
             gamepadOnScreenControls.setVisible(false);
-            playScreen.stage.addActor(gamepadOnScreenControls);
+            playScreen.getStage().addActor(gamepadOnScreenControls);
         }
         gamepadOnScreenControls.resize(playScreen);
     }
@@ -245,6 +268,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     public void hadButtonEvent() {
         hadButtonEvent = true;
+        giveHapticFeedback();
     }
 
     public void setTouchPanel(int screenX, int screenY) {
@@ -253,7 +277,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             return;
 
         touchCoordinates.set(screenX, screenY);
-        playScreen.stage.getViewport().unproject(touchCoordinates);
+        playScreen.getStage().getViewport().unproject(touchCoordinates);
         touchPanel.setPosition(touchCoordinates.x, touchCoordinates.y);
 
         boolean tappedRightScreenHalf = this.screenX >= Gdx.graphics.getWidth() / 2;
@@ -292,6 +316,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > currentHorizontalTreshold)) {
                     beganHorizontalMove = true;
                     playScreen.gameModel.startMoveHorizontal(screenX - this.screenX < 0);
+                    giveHapticFeedback();
                 }
                 if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < currentHorizontalTreshold)) {
                     playScreen.gameModel.endMoveHorizontal(true);
@@ -311,6 +336,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 && timeSinceTouchDown <= MAX_SOFTDROPBEGINNING_INTERVAL) {
             beganSoftDrop = true;
             playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
+            giveHapticFeedback();
         }
         // Soft Drop sofort beenden, wenn horizontal bewegt oder wieder hochgezogen
         if ((beganHorizontalMove || screenY - this.screenY < dragThreshold) && beganSoftDrop) {
@@ -318,16 +344,18 @@ public class PlayGesturesInput extends PlayScreenInput {
             playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
         }
 
-        int swipeUpType = playScreen.app.localPrefs.getSwipeUpType();
+        int swipeUpType = app.localPrefs.getSwipeUpType();
         int swipeUpTresholdFactor = swipeUpType == SWIPEUP_PAUSE ? 4 : 3;
         if (screenY - this.screenY < -swipeUpTresholdFactor * dragThreshold && swipeUpType != SWIPEUP_DONOTHING) {
             if (swipeUpType == SWIPEUP_PAUSE && !isPaused())
                 playScreen.switchPause(false);
             else if (swipeUpType == SWIPEUP_HARDDROP && !didHardDrop && !beganHorizontalMove) {
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
+                giveHapticFeedback();
                 didHardDrop = true;
             } else if (swipeUpType == SWIPEUP_HOLD && !beganHorizontalMove) {
                 playScreen.gameModel.holdActiveTetromino();
+                giveHapticFeedback();
             }
         }
 
@@ -356,6 +384,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 boolean tappedRightScreenHalf = screenX >= Gdx.graphics.getWidth() / 2;
                 playScreen.gameModel.setRotate(tappedRightScreenHalf && !invertRotation
                         || !tappedRightScreenHalf && invertRotation);
+                giveHapticFeedback();
             } else
                 playScreen.gameModel.doOneHorizontalMove(screenX <= Gdx.graphics.getWidth() / 2);
 
@@ -477,9 +506,9 @@ public class PlayGesturesInput extends PlayScreenInput {
                 upPressed = upNowPressed;
 
                 // no dedicated hard drop button makes the up button work as hard drop
-                if (!playScreen.app.localPrefs.isShowHardDropButtonOnScreenGamepad()) {
+                if (!app.localPrefs.isShowHardDropButtonOnScreenGamepad()) {
                     if (upPressed) {
-                        hadButtonEvent = true;
+                        hadButtonEvent();
                         playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
                     } else
                         playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
@@ -490,7 +519,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             if (downPressed != downNowPressed) {
                 downPressed = downNowPressed;
                 if (downPressed) {
-                    hadButtonEvent = true;
+                    hadButtonEvent();
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
                 } else
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
@@ -499,7 +528,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             if (rightPressed != rightNowPressed) {
                 rightPressed = rightNowPressed;
                 if (rightPressed) {
-                    hadButtonEvent = true;
+                    hadButtonEvent();
                     playScreen.gameModel.startMoveHorizontal(false);
                 } else
                     playScreen.gameModel.endMoveHorizontal(false);
@@ -508,7 +537,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             if (leftPressed != leftNowPressed) {
                 leftPressed = leftNowPressed;
                 if (leftPressed) {
-                    hadButtonEvent = true;
+                    hadButtonEvent();
                     playScreen.gameModel.startMoveHorizontal(true);
                 } else
                     playScreen.gameModel.endMoveHorizontal(true);
@@ -549,8 +578,10 @@ public class PlayGesturesInput extends PlayScreenInput {
                     rightPressed = false;
                     rotateRight.isPressed = false;
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
-                    if (!didSoftDrop)
+                    if (!didSoftDrop) {
                         playScreen.gameModel.setRotate(true);
+                        giveHapticFeedback();
+                    }
                 }
             };
             rotateRight.addListener(rotateRightListener);
@@ -575,8 +606,10 @@ public class PlayGesturesInput extends PlayScreenInput {
                     leftPressed = false;
                     rotateLeft.isPressed = false;
                     playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
-                    if (!didSoftDrop)
+                    if (!didSoftDrop) {
                         playScreen.gameModel.setRotate(false);
+                        giveHapticFeedback();
+                    }
                 }
             };
             rotateLeft.addListener(rotateLeftListener);
@@ -591,7 +624,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     moveRight.isPressed = true;
                     playScreen.gameModel.startMoveHorizontal(false);
-                    hadButtonEvent = true;
+                    hadButtonEvent();
                     return true;
                 }
 
@@ -613,7 +646,7 @@ public class PlayGesturesInput extends PlayScreenInput {
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     moveLeft.isPressed = true;
                     playScreen.gameModel.startMoveHorizontal(true);
-                    hadButtonEvent = true;
+                    hadButtonEvent();
                     return true;
                 }
 
@@ -629,14 +662,16 @@ public class PlayGesturesInput extends PlayScreenInput {
             moveLeftArea.addListener(moveLeftListener);
             addActor(moveLeftArea);
 
-            holdButton = new HoldButton(playScreen.app, playScreen, new HoldButtonInputListener());
+            holdButton = new HoldButton(app, playScreen, new HoldButtonInputListener());
             addActor(holdButton);
         }
 
         private void checkSoftDrop() {
             didSoftDrop = rightPressed && leftPressed;
-            if (didSoftDrop)
+            if (didSoftDrop) {
                 playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
+                giveHapticFeedback();
+            }
         }
 
 
@@ -644,12 +679,12 @@ public class PlayGesturesInput extends PlayScreenInput {
             float gameboardWidth = BlockActor.blockWidth * Gameboard.GAMEBOARD_COLUMNS;
             holdButton.resize(playScreen, PADDING);
 
-            rotateRight.setPosition(playScreen.stage.getWidth() / 2 + gameboardWidth / 2 + 2 * PADDING,
-                    PADDING * 3 + playScreen.centerGroup.getY());
-            rotateRight.setSize(playScreen.stage.getWidth() - rotateRight.getX() - PADDING,
-                    playScreen.stage.getHeight() * .4f - rotateRight.getY() - PADDING);
-            rotateRightArea.setPosition(playScreen.stage.getWidth() / 2, rotateRight.getY());
-            rotateRightArea.setSize(playScreen.stage.getWidth() / 2, rotateRight.getHeight());
+            rotateRight.setPosition(playScreen.getStage().getWidth() / 2 + gameboardWidth / 2 + 2 * PADDING,
+                    PADDING * 3 + playScreen.getCenterPosY());
+            rotateRight.setSize(playScreen.getStage().getWidth() - rotateRight.getX() - PADDING,
+                    playScreen.getStage().getHeight() * .4f - rotateRight.getY() - PADDING);
+            rotateRightArea.setPosition(playScreen.getStage().getWidth() / 2, rotateRight.getY());
+            rotateRightArea.setSize(playScreen.getStage().getWidth() / 2, rotateRight.getHeight());
 
             rotateLeft.setPosition(PADDING, rotateRight.getY());
             rotateLeft.setSize(rotateRight.getWidth(), rotateRight.getHeight());
@@ -673,11 +708,11 @@ public class PlayGesturesInput extends PlayScreenInput {
             boolean isPressed;
 
             public PortraitButton(String label, int alignment) {
-                super(playScreen.app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
-                Label buttonLabel = new Label(label, playScreen.app.skin, FontAwesome.SKIN_FONT_FA);
+                super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
+                Label buttonLabel = new Label(label, app.skin, FontAwesome.SKIN_FONT_FA);
                 buttonLabel.setAlignment(alignment);
                 buttonLabel.setFontScale(.8f);
-                buttonLabel.setColor(playScreen.app.theme.buttonColor);
+                buttonLabel.setColor(app.theme.buttonColor);
                 add(buttonLabel).fill().expand();
             }
 
@@ -694,13 +729,13 @@ public class PlayGesturesInput extends PlayScreenInput {
         private FreezeButton freezeButton;
 
         public GestureOnScreenButtons() {
-            holdButton = new HoldButton(playScreen.app, playScreen, new HoldButtonInputListener());
-            if (playScreen.app.localPrefs.isShowTouchHoldButton())
+            holdButton = new HoldButton(app, playScreen, new HoldButtonInputListener());
+            if (app.localPrefs.isShowTouchHoldButton())
                 addActor(holdButton);
 
             String freezeButtonLabel = playScreen.gameModel.getShownTimeButtonDescription();
             if (freezeButtonLabel != null) {
-                freezeButton = new FreezeButton(playScreen.app, freezeButtonLabel,
+                freezeButton = new FreezeButton(app, freezeButtonLabel,
                         new FreezeButtonInputListener());
                 addActor(freezeButton);
             }
@@ -719,7 +754,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             if (!isPaused()) {
                 playScreen.touchTimeLabelWithWarning();
-                hadButtonEvent = true;
+                hadButtonEvent();
                 return true;
             }
             return false;
@@ -731,7 +766,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             if (!isPaused()) {
                 playScreen.gameModel.holdActiveTetromino();
-                hadButtonEvent = true;
+                hadButtonEvent();
                 return true;
             }
             return false;

@@ -22,9 +22,9 @@ import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
-import de.golfgl.lightblocks.screen.PlayGesturesInput;
+import de.golfgl.lightblocks.input.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
-import de.golfgl.lightblocks.screen.PlayScreenInput;
+import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.InitGameParameters;
 

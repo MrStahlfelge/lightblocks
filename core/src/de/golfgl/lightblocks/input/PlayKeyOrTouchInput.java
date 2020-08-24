@@ -1,7 +1,10 @@
-package de.golfgl.lightblocks.screen;
+package de.golfgl.lightblocks.input;
 
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
+
+import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.screen.PlayScreen;
 
 /**
  * This input method is used when there is both touch or key/controller input available. Events are
@@ -65,9 +68,9 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     }
 
     private void submitToGa() {
-        if (playScreen != null && playScreen.app.gameAnalytics != null) {
+        if (playScreen != null && app.gameAnalytics != null) {
             String gaKey = numKeyEvents > numTouchEvents ? keyboard.getAnalyticsKey() : touch.getAnalyticsKey();
-            playScreen.app.gameAnalytics.submitDesignEvent("inputType:" + gaKey);
+            app.gameAnalytics.submitDesignEvent("inputType:" + gaKey);
         }
     }
 
@@ -95,10 +98,20 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     }
 
     @Override
-    public void setPlayScreen(PlayScreen playScreen) {
-        keyboard.setPlayScreen(playScreen);
-        touch.setPlayScreen(playScreen);
-        super.setPlayScreen(playScreen);
+    public void vibrate(VibrationType vibrationType) {
+        if (vibrationEnabled) {
+            if (eventsSinceTouch == 0)
+                touch.vibrate(vibrationType);
+            else
+                keyboard.vibrate(vibrationType);
+        }
+    }
+
+    @Override
+    public void setPlayScreen(PlayScreen playScreen, LightBlocksGame app) {
+        keyboard.setPlayScreen(playScreen, app);
+        touch.setPlayScreen(playScreen, app);
+        super.setPlayScreen(playScreen, app);
     }
 
     @Override

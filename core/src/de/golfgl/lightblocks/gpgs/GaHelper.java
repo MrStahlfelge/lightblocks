@@ -3,7 +3,7 @@ package de.golfgl.lightblocks.gpgs;
 import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
-import de.golfgl.lightblocks.screen.PlayScreenInput;
+import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
@@ -24,10 +24,12 @@ public class GaHelper {
             }
             if (PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN)) {
                 app.gameAnalytics.submitDesignEvent("swipeUpSetting:" + app.localPrefs.getSwipeUpType());
-                app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());
                 LocalPrefs.TouchControlType usedTouchControls = app.localPrefs.getUsedTouchControls();
                 app.gameAnalytics.submitDesignEvent("showOnScreenControls:" + (usedTouchControls == LocalPrefs.TouchControlType.gestures ? "false" :
                         usedTouchControls == LocalPrefs.TouchControlType.onScreenButtonsGamepad ? "gamepad" : "buttons"));
+                if (usedTouchControls == LocalPrefs.TouchControlType.gestures) {
+                    app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());
+                }
             }
 
             String themeName = app.theme.isThemePresent() ? app.theme.getThemeName() : "none";

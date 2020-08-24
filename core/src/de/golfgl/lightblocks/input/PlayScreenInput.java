@@ -1,4 +1,4 @@
-package de.golfgl.lightblocks.screen;
+package de.golfgl.lightblocks.input;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
@@ -9,6 +9,9 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.InputNotAvailableException;
+import de.golfgl.lightblocks.screen.PlayScreen;
 
 /**
  * Created by Benjamin Schulte on 25.01.2017.
@@ -22,7 +25,9 @@ public abstract class PlayScreenInput extends InputAdapter {
     public static final int KEY_KEYSORGAMEPAD = 3;
 
     protected boolean isGameOver;
-    PlayScreen playScreen;
+    protected boolean vibrationEnabled;
+    protected PlayScreen playScreen;
+    protected LightBlocksGame app;
 
     public static PlayScreenInput getPlayInput(int key, LightBlocksGame app) throws InputNotAvailableException {
 
@@ -144,8 +149,14 @@ public abstract class PlayScreenInput extends InputAdapter {
      *
      * @param playScreen
      */
-    public void setPlayScreen(PlayScreen playScreen) {
+    public void setPlayScreen(PlayScreen playScreen, LightBlocksGame app) {
         this.playScreen = playScreen;
+        this.app = app;
+        this.vibrationEnabled = app.localPrefs.getVibrationEnabled();
+    }
+
+    public void vibrate(VibrationType vibrationType) {
+
     }
 
     /**

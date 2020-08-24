@@ -1,4 +1,4 @@
-package de.golfgl.lightblocks.screen;
+package de.golfgl.lightblocks.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -6,7 +6,9 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameBlocker;
+import de.golfgl.lightblocks.screen.PlayScreen;
 
 /**
  * Created by Benjamin Schulte on 25.01.2017.
@@ -53,19 +55,19 @@ public class PlayGravityInput extends PlayScreenInput {
         if (isPaused())
             playScreen.switchPause(false);
         else
-            playScreen.gameModel.setRotate(screenX > playScreen.stage.getWidth() / 2);
+            playScreen.gameModel.setRotate(screenX > playScreen.getStage().getWidth() / 2);
 
         return true;
     }
 
     @Override
     public String getInputHelpText() {
-        return playScreen.app.TEXTS.get("inputGravityHelp");
+        return app.TEXTS.get("inputGravityHelp");
     }
 
     @Override
     public String getTutorialContinueText() {
-        return playScreen.app.TEXTS.get("tutorialContinueGestures");
+        return app.TEXTS.get("tutorialContinueGestures");
     }
 
     @Override
@@ -164,8 +166,8 @@ public class PlayGravityInput extends PlayScreenInput {
     }
 
     @Override
-    public void setPlayScreen(PlayScreen playScreen) {
-        super.setPlayScreen(playScreen);
+    public void setPlayScreen(PlayScreen playScreen, LightBlocksGame app) {
+        super.setPlayScreen(playScreen, app);
 
         if (!hasCalibration)
             playScreen.addGameBlocker(gravityInputBlocker);

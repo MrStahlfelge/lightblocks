@@ -15,7 +15,7 @@ import de.golfgl.gdx.controllers.IControllerScrollable;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
-import de.golfgl.lightblocks.screen.PlayScreenInput;
+import de.golfgl.lightblocks.input.PlayScreenInput;
 
 /**
  * Created by Benjamin Schulte on 20.03.2017.

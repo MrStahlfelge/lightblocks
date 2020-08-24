@@ -18,8 +18,8 @@ import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.screen.FontAwesome;
-import de.golfgl.lightblocks.screen.PlayGesturesInput;
-import de.golfgl.lightblocks.screen.PlayKeyboardInput;
+import de.golfgl.lightblocks.input.PlayGesturesInput;
+import de.golfgl.lightblocks.input.PlayKeyboardInput;
 import de.golfgl.lightblocks.state.Replay;
 
 /**
