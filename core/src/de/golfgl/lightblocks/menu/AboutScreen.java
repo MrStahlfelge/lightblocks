@@ -22,7 +22,6 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  */
 
 public class AboutScreen extends AbstractMenuDialog {
-    public static final String TWITTER_URL = "https://twitter.com/MrStahlfelge";
     private Cell widthDefiningCell;
     private Actor defaultActor;
 
@@ -127,17 +126,17 @@ public class AboutScreen extends AbstractMenuDialog {
         menuTable.row().padTop(20);
         menuTable.add(getWrapLabel(app.TEXTS.get("labelAbout4"))).fill();
 
-        Button mailButton = new RoundedTextButton(app.TEXTS.get("buttonOpenSource"), app.skin);
-        mailButton.addListener(new ChangeListener() {
+        Button openSourceButton = new RoundedTextButton(app.TEXTS.get("buttonOpenSource"), app.skin);
+        openSourceButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.net.openURI(LightBlocksGame.SOURCECODE_URL);
             }
         });
-        addFocusableActor(mailButton);
+        addFocusableActor(openSourceButton);
 
         menuTable.row().padTop(10);
-        menuTable.add(mailButton);
+        menuTable.add(openSourceButton);
 
         menuTable.row().padTop(40);
         menuTable.add(new ScaledLabel(app.TEXTS.get("labelContributors1"), app.skin, app.SKIN_FONT_TITLE));
@@ -168,17 +167,6 @@ public class AboutScreen extends AbstractMenuDialog {
     @Override
     protected void fillButtonTable(Table buttons) {
         super.fillButtonTable(buttons);
-
-        Button twitterButton = new FaButton(FontAwesome.NET_TWITTER, app.skin);
-        twitterButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                app.openOrShowUri(TWITTER_URL);
-            }
-        });
-        twitterButton.addListener(scrollOnKeyDownListener);
-        buttons.add(twitterButton);
-        addFocusableActor(twitterButton);
 
         ShareButton shareAppButton = new ShareButton(app);
         shareAppButton.addListener(scrollOnKeyDownListener);
