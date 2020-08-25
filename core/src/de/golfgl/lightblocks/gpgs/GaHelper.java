@@ -1,5 +1,8 @@
 package de.golfgl.lightblocks.gpgs;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+
 import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
@@ -30,6 +33,12 @@ public class GaHelper {
                 if (usedTouchControls == LocalPrefs.TouchControlType.gestures) {
                     app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());
                 }
+            }
+
+            if (Gdx.input.isPeripheralAvailable(Input.Peripheral.Vibrator)) {
+                boolean vibrationEnabled = app.localPrefs.getVibrationEnabled();
+                boolean hapticEnabled = vibrationEnabled && app.localPrefs.getVibrationHaptic();
+                app.gameAnalytics.submitDesignEvent("vibration:" + (hapticEnabled ? "haptic" : vibrationEnabled ? "on" : "off"));
             }
 
             String themeName = app.theme.isThemePresent() ? app.theme.getThemeName() : "none";
