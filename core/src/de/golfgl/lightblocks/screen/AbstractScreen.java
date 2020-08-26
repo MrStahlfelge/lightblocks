@@ -33,9 +33,9 @@ public abstract class AbstractScreen implements Screen {
     protected final LightBlocksGame app;
     protected MyStage stage;
     protected Screen backScreen;
+    protected Color bgColor = Color.BLACK;
     private boolean isLandscapeOrientation;
     private boolean isDisposed = false;
-    protected Color bgColor = Color.BLACK;
 
     public AbstractScreen(LightBlocksGame app) {
         this.app = app;
@@ -46,8 +46,15 @@ public abstract class AbstractScreen implements Screen {
 
     protected MyExtendViewport getNewViewport(float width, float height) {
         MyExtendViewport viewport = new MyExtendViewport(width, height);
-        app.setScreenDeadZones(viewport);
+        setScreenDeadZones(viewport);
         return viewport;
+    }
+
+    private void setScreenDeadZones(MyExtendViewport viewport) {
+        viewport.setDeadZones(Gdx.graphics.getSafeInsetTop(),
+                Gdx.graphics.getSafeInsetLeft(),
+                Gdx.graphics.getSafeInsetBottom(),
+                Gdx.graphics.getSafeInsetRight());
     }
 
     @Override
@@ -176,7 +183,7 @@ public abstract class AbstractScreen implements Screen {
      */
     protected void onOrientationChanged() {
         if (stage.getViewport() instanceof MyExtendViewport)
-            app.setScreenDeadZones((MyExtendViewport) stage.getViewport());
+            setScreenDeadZones((MyExtendViewport) stage.getViewport());
     }
 
     public static class RunnableDialog extends ControllerMenuDialog {

@@ -251,25 +251,25 @@ public class SettingsScreen extends AbstractMenuDialog {
             gridIntensity.add(gridPreview);
             gridIntensity.add(gridIntensitySlider).minHeight(40).fill(false, true)
                     .width(.5f * LightBlocksGame.nativeGameWidth).left();
-            add(gridIntensity);
+            add(gridIntensity).padTop(20);
 
             row();
             add(showGhostpiece);
 
             row();
-            add(colorModeCheck);
-
-            row();
-            add(gamePadButton);
+            add(colorModeCheck).padTop(-10).padBottom(20);
 
             if (app.canInstallTheme()) {
                 row();
                 add(themeButton);
             }
 
+            row();
+            add(gamePadButton).padTop(-5);
+
             if (Gdx.input.isPeripheralAvailable(Input.Peripheral.Vibrator) || LightBlocksGame.GAME_DEVMODE) {
                 row();
-                add(vibrationButton);
+                add(vibrationButton).padTop(-5);
             }
 
             addFocusableActor(menuMusicButton);

@@ -140,6 +140,10 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        if (listChangesSince < 2005 && Gdx.input.isPeripheralAvailable(Input.Peripheral.Vibrator))
+            welcomes.add(new WelcomeButton.WelcomeText("New: You can enable vibration and haptic feedback.",
+                    new ShowSettingsRunnable(app)));
+
         if (listChangesSince < 2004 && app.backendManager.hasUserId())
             welcomes.add(new WelcomeButton.WelcomeText("New: Global TB Battle leaderboard can switch to center your rank.",
                     new ShowMultiPlayerPageRunnable(app, 0)));

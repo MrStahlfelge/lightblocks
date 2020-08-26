@@ -21,13 +21,13 @@ allprojects {
     version = '1.0'
     ext {
         appName = "lightblocks"
-        gdxVersion = '1.9.10'
+        gdxVersion = '1.9.11'
         roboVMVersion = '2.3.10-SNAPSHOT'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
         gamsvcsVersion = '1.0.2'
-        cuversion = '1.0.1'
+        cuversion = '2.0.1'
         gaVersion = '0.1.4'
         gdxPayVersion = '1.2.0'
         pushMsgsVersion = '1.0.0'
@@ -86,7 +86,7 @@ project(":ios") {
         compile project(":multiplayer")
         compile "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         compile "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
-        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-robovm:1.910.2"
+        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-robovm:1.911.0"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
 
         compile ("de.golfgl.gdxcontrollerutils:gdx-controllers-iosrvm:$cuversion") {
@@ -112,9 +112,9 @@ project(":html") {
 
     dependencies {
         compile project(":core")
-        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:1.910.2"
+        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:1.911.0"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:1.910.2:sources"
+        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:1.911.0:sources"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion:sources"

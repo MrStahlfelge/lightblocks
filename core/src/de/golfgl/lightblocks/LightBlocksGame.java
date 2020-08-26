@@ -36,7 +36,6 @@ import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
-import de.golfgl.lightblocks.scene2d.MyExtendViewport;
 import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.MainMenuScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -61,7 +60,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     public static final String SOURCECODE_URL = "https://github.com/MrStahlfelge/lightblocks/";
     public static final String CONTROLLER_RECOMMENDATION_URL = "https://www.golfgl.de/lightblocks/#controller";
     // An den gleichen Eintrag im AndroidManifest und robovm.properties denken!!!
-    public static final int GAME_VERSIONNUMBER = 2004;
+    public static final int GAME_VERSIONNUMBER = 2007;
     public static final String GAME_VERSIONSTRING = "1.4." + GAME_VERSIONNUMBER;
     // Abstand für Git
     // auch dran denken das data-Verzeichnis beim release wegzunehmen!
@@ -484,11 +483,6 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
             backendManager.invalidateCachedMatches();
             backendManager.setCompetitionNewsAvailableFlag(true);
         }
-    }
-
-    public void setScreenDeadZones(MyExtendViewport viewport) {
-        // for iPhoneX, for all others it's just 0
-        viewport.setDeadZones(0, 0, 0, 0);
     }
 
     public boolean canInstallTheme() {
