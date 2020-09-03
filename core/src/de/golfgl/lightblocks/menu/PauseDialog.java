@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdx.controllers.ControllerMenuStage;
-import de.golfgl.gdx.controllers.IControllerScrollable;
+import de.golfgl.gdx.controllers.IControllerManageFocus;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.GlowLabelButton;
@@ -215,26 +215,20 @@ public class PauseDialog extends ControllerMenuDialog {
         }
     }
 
-    private class ThisPlayButton extends PlayButton implements IControllerScrollable {
+    private class ThisPlayButton extends PlayButton implements IControllerManageFocus {
         public ThisPlayButton(LightBlocksGame app) {
             super(app);
         }
 
         @Override
-        public boolean onControllerScroll(ControllerMenuStage.MoveFocusDirection direction) {
-            Actor buttonToFocus = null;
+        public Actor getNextFocusableActor(ControllerMenuStage.MoveFocusDirection direction) {
             switch (direction) {
                 case east:
-                    buttonToFocus = retryButton;
-                    break;
+                    return retryButton;
                 case west:
-                    buttonToFocus = exitButton;
-                    break;
+                    return exitButton;
             }
-            if (buttonToFocus != null && getStage() != null)
-                return ((ControllerMenuStage) getStage()).setFocusedActor(buttonToFocus);
-
-            return false;
+            return null;
         }
     }
 }

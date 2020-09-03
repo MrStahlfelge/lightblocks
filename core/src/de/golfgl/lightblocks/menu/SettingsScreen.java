@@ -174,6 +174,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                     gridIntensityChanged();
                 }
             });
+            menuMusicButton.focusToSouth = gridIntensitySlider;
 
             final Button colorModeCheck = new FaCheckbox(app.TEXTS.get("menuBlockColorShades"), app.skin);
             colorModeCheck.setChecked(app.localPrefs.getBlockColorMode() != BlockActor.COLOR_MODE_NONE);
@@ -185,7 +186,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                                        }
             );
 
-            final Button showGhostpiece = new FaCheckbox(app.TEXTS.get("menuGhostpiece"), app.skin);
+            final FaCheckbox showGhostpiece = new FaCheckbox(app.TEXTS.get("menuGhostpiece"), app.skin);
             showGhostpiece.setChecked(app.localPrefs.getShowGhostpiece());
             showGhostpiece.addListener(new ChangeListener() {
                 @Override
@@ -193,6 +194,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                     app.localPrefs.setShowGhostpiece(showGhostpiece.isChecked());
                 }
             });
+            showGhostpiece.focusToSouth =  colorModeCheck;
 
             Button gamePadButton = new GlowLabelButton(FontAwesome.DEVICE_GAMEPAD, app.TEXTS.get
                     ("menuGamepadConfig"), app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
@@ -211,6 +213,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                     new ThemeSettingsDialog(app).show(getStage());
                 }
             });
+            themeButton.focusToSouth = gamePadButton;
 
             GlowLabelButton vibrationButton = new GlowLabelButton(FontAwesome.DEVICE_MOBILEPHONE, app.TEXTS.get("menuVibrationConfig"), app.skin,
                     GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
@@ -220,6 +223,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                     new VibrationSettingsDialog(app).show(getStage());
                 }
             });
+            ((GlowLabelButton) gamePadButton).focusToSouth = vibrationButton;
 
             gridPreview = new Image(app.trBlock) {
                 @Override

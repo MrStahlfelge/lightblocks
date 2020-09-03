@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.scene2d;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.ScaleToAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
+import de.golfgl.gdx.controllers.IControllerManageFocus;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.ITouchActionButton;
 import de.golfgl.lightblocks.menu.MusicButtonListener;
@@ -21,10 +23,14 @@ import de.golfgl.lightblocks.screen.FontAwesome;
  * Created by Benjamin Schulte on 13.01.2018.
  */
 
-public class GlowLabelButton extends Button implements ITouchActionButton, MusicButtonListener.IMusicButton {
+public class GlowLabelButton extends Button implements ITouchActionButton, MusicButtonListener.IMusicButton,
+        IControllerManageFocus {
     public static final float SMALL_SCALE_MENU = .9f;
     public static final float FONT_SCALE_MENU = .6f;
     public static final float FONT_SCALE_SUBMENU = .45f;
+    // quick hack if automatic determination of next actor to south does not work
+    // often the case with GlowLabelButton because of its big padding
+    public Actor focusToSouth;
     private final float smallScaleFactor;
     private final GlowLabel labelGroup;
     private final Color disabledFontColor;
@@ -224,5 +230,18 @@ public class GlowLabelButton extends Button implements ITouchActionButton, Music
         faLabel.invalidate();
         faCell.width(faLabel.getPrefWidth()).height(faLabel.getPrefHeight());
         faLabel.setFontScale(labelGroup.getScaleX());
+    }
+
+    @Override
+    public Actor getNextFocusableActor(ControllerMenuStage.MoveFocusDirection direction) {
+        if (direction == ControllerMenuStage.MoveFocusDirection.south)
+            return focusToSouth;
+
+        return null;
+    }
+
+    @Override
+    public Actor getNextFocusableActor(boolean next) {
+        return null;
     }
 }

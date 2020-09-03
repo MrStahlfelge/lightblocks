@@ -81,6 +81,12 @@ public class MyStage extends ControllerMenuStage {
     }
 
     @Override
+    protected boolean moveFocusByList(boolean next) {
+        // not needed for lightblocks
+        return false;
+    }
+
+    @Override
     public boolean isDefaultActionKeyCode(int keyCode) {
         return super.isDefaultActionKeyCode(keyCode) || keyCode == Input.Keys.SPACE || keyCode == Input.Keys.CONTROL_LEFT;
     }
