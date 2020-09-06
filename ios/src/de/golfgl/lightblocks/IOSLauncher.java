@@ -158,6 +158,7 @@ public class IOSLauncher extends MyAppDelegate {
                 return new DefaultIOSInput(this) {
                     @Override
                     public boolean onKey(UIKey key, boolean down) {
+                        // suppress input keys used by iCade controllers
                         if (key != null && key.getCharactersIgnoringModifiers() != null) {
                             String character = key.getCharactersIgnoringModifiers();
                             if (character.length() == 1 && ICadeController.KEYS_TO_HANDLE.contains(character.substring(0, 1).toLowerCase()))
@@ -165,6 +166,18 @@ public class IOSLauncher extends MyAppDelegate {
                         }
 
                         return super.onKey(key, down);
+                    }
+
+                    @Override
+                    public void vibrate(int milliseconds) {
+                        // do nothing, iOS haptic feedback is not adaptable enough
+                    }
+
+                    @Override
+                    public boolean isPeripheralAvailable(Peripheral peripheral) {
+                        // pretend that the device has no vibrator to hide settings
+                        if (peripheral == Peripheral.Vibrator) return false;
+                        return super.isPeripheralAvailable(peripheral);
                     }
                 };
             }
