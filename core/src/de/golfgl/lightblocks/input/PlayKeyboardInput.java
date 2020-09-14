@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.controllers.AdvancedController;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 
@@ -121,7 +120,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     @Override
     public void vibrate(VibrationType vibrationType) {
         if (vibrationEnabled && playsWithController() && lastControllerInUse != null) {
-            AdvancedController lastControllerInUse = (AdvancedController) this.lastControllerInUse;
+            Controller lastControllerInUse = this.lastControllerInUse;
             if (lastControllerInUse.canVibrate()) {
                 lastControllerInUse.startVibration(vibrationType.getVibrationLength(), 1f);
             } else if (!app.localPrefs.getVibrationOnlyController()) {

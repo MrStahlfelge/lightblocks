@@ -3,7 +3,6 @@ package de.golfgl.lightblocks.state;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.controllers.AdvancedController;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerMapping;
 import com.badlogic.gdx.controllers.Controllers;
@@ -74,7 +73,7 @@ public class MyControllerMapping extends ControllerMappings {
 
     @Override
     public boolean getDefaultMapping(MappedInputs defaultMapping, Controller controller) {
-        ControllerMapping controllerMapping = ((AdvancedController) controller).getMapping();
+        ControllerMapping controllerMapping = controller.getMapping();
 
         defaultMapping.putMapping(new MappedInput(AXIS_VERTICAL, new ControllerAxis(controllerMapping.axisLeftY)));
         defaultMapping.putMapping(new MappedInput(AXIS_HORIZONTAL, new ControllerAxis(controllerMapping.axisLeftX)));

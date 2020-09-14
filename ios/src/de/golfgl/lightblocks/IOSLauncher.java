@@ -126,7 +126,6 @@ public class IOSLauncher extends MyAppDelegate {
             public void create() {
                 UIViewController uiViewController = ((IOSApplication) Gdx.app).getUIViewController();
                 gpgsClient = new GameCenterMultiplayerClient(uiViewController);
-                IosControllerManager.initializeIosControllers();
                 IosControllerManager.enableICade(uiViewController, Selector.register("keyPress:"));
                 super.create();
             }
@@ -140,7 +139,7 @@ public class IOSLauncher extends MyAppDelegate {
         game.nsdHelper = new BonjourAdapter();
 
         // Gerätemodell wird für den Spielernamen benötigt
-        game.modelNameRunningOn = UIDevice.getCurrentDevice().getModel();
+        LightBlocksGame.modelNameRunningOn = UIDevice.getCurrentDevice().getModel();
 
         // Für Bewertungen
         LightBlocksGame.gameStoreUrl = "https://itunes.apple.com/app/id1453041696";
@@ -189,7 +188,7 @@ public class IOSLauncher extends MyAppDelegate {
         @Override
         public void shareText(String message, String title) {
             NSString textShare = new NSString(message);
-            NSArray texttoshare = new NSArray(textShare);
+            NSArray<NSString> texttoshare = new NSArray<>(textShare);
             UIActivityViewController share = new UIActivityViewController(texttoshare, null);
             ((IOSApplication) Gdx.app).getUIViewController().presentViewController(share, true, null);
         }
