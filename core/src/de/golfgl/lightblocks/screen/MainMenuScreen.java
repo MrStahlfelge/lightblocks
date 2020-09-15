@@ -46,7 +46,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
     private final Button singlePlayerButton;
     private final WelcomeButton welcomeButton;
     private GlowLabelButton accountButton;
-    private Button resumeGameButton;
+    private GlowLabelButton resumeGameButton;
     private Group mainGroup;
     private PlayerAccountMenuScreen lastAccountScreen;
 
@@ -87,17 +87,23 @@ public class MainMenuScreen extends AbstractMenuScreen {
         buttonTable.row();
 
         // Resume the game
-        resumeGameButton = new GlowLabelButton(app.TEXTS.get("menuResumeGameButton"), app.skin,
+        resumeGameButton = new GlowLabelButton("", app.skin,
                 GlowLabelButton.FONT_SCALE_MENU, GlowLabelButton.SMALL_SCALE_MENU);
         resumeGameButton.addListener(new ChangeListener() {
                                          public void changed(ChangeEvent event, Actor actor) {
-                                             try {
-                                                 PlayScreen.gotoPlayScreen(app, null);
-                                             } catch (VetoException e) {
-                                                 showDialog(e.getMessage());
-                                             } catch (Throwable t) {
-                                                 Gdx.app.error("Gamestate", "Error loading game", t);
-                                                 showDialog("Error loading game.");
+                                             if (app.savegame.hasSavedGame()) {
+                                                 try {
+                                                     PlayScreen.gotoPlayScreen(app, null);
+                                                 } catch (VetoException e) {
+                                                     showDialog(e.getMessage());
+                                                 } catch (Throwable t) {
+                                                     Gdx.app.error("Gamestate", "Error loading game", t);
+                                                     showDialog("Error loading game.");
+                                                 }
+                                             } else {
+                                                 // open missions page
+                                                 SinglePlayerScreen sps = showSinglePlayerScreen();
+                                                 sps.showPage(SinglePlayerScreen.PAGEIDX_MISSION);
                                              }
                                          }
                                      }
@@ -231,7 +237,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
     }
 
     protected Button proposeFocussedActor() {
-        return resumeGameButton.hasParent() ? resumeGameButton : singlePlayerButton;
+        return resumeGameButton.hasParent() && app.savegame.hasSavedGame() ? resumeGameButton : singlePlayerButton;
     }
 
     public void refreshAccountInfo() {
@@ -256,8 +262,18 @@ public class MainMenuScreen extends AbstractMenuScreen {
         Gdx.input.setInputProcessor(stage);
         app.controllerMappings.setInputProcessor(stage);
         Gdx.input.setCatchBackKey(true);
-        resumeGameCell.setActor(app.savegame.hasSavedGame() ? resumeGameButton : null);
+
+        if (app.savegame.hasSavedGame()) {
+            resumeGameButton.setText(app.TEXTS.get("menuResumeGameButton"));
+            resumeGameCell.setActor(resumeGameButton);
+        } else if (!app.savegame.hasAllMissionsDone()) {
+            resumeGameButton.setText(app.TEXTS.get("menuResumeMissionsButton"));
+            resumeGameCell.setActor(resumeGameButton);
+        } else {
+            resumeGameCell.setActor(null);
+        }
         resumeGameCell.expand(true, resumeGameCell.hasActor());
+
         if (stage.getFocusedActor() == null || !stage.getFocusedActor().hasParent())
             stage.setFocusedActor(proposeFocussedActor());
 

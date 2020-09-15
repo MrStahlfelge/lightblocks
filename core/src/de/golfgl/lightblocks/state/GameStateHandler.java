@@ -12,6 +12,7 @@ import de.golfgl.gdxgamesvcs.gamestate.ISaveGameStateResponseListener;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.PlayerDetails;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
+import de.golfgl.lightblocks.model.Mission;
 
 /**
  * Die Klasse lädt oder speichert einen Json-String der den Spielstand abbildet
@@ -65,6 +66,16 @@ public class GameStateHandler {
             return Gdx.files.local(FILENAME_SAVEGAME).exists();
         else
             return prefs.contains(FILENAME_SAVEGAME);
+    }
+
+    public boolean hasAllMissionsDone() {
+        for (Mission mission : app.getMissionList()) {
+            final String uid = mission.getUniqueId();
+            int rating = getBestScore(uid).getRating();
+            if (rating <= 0)
+                return false;
+        }
+        return true;
     }
 
     public String loadGame() {
