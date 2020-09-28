@@ -1368,6 +1368,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         return overlayWindow != null && overlayWindow.hasParent();
     }
 
+    public boolean showsPauseButton() {
+        return pauseButton.isVisible();
+    }
+
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);

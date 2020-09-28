@@ -553,6 +553,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         private final PortraitButton moveRight;
         private final PortraitButton moveLeft;
         private final HoldButton holdButton;
+        private final FreezeButton hardDropButton;
         private final Actor rotateRightArea;
         private final Actor rotateLeftArea;
         private final Actor moveRightArea;
@@ -664,6 +665,18 @@ public class PlayGesturesInput extends PlayScreenInput {
 
             holdButton = new HoldButton(app, playScreen, new HoldButtonInputListener());
             addActor(holdButton);
+
+            // FreezeButton is an accurate fit for the Hard Drop Button
+            hardDropButton = new FreezeButton(app, "DROP", new InputListener() {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
+                    return true;
+                }
+            });
+            hardDropButton.setRotation(90);
+
+            addActor(hardDropButton);
         }
 
         private void checkSoftDrop() {
@@ -702,6 +715,10 @@ public class PlayGesturesInput extends PlayScreenInput {
             moveLeftArea.setPosition(rotateLeftArea.getX(), moveLeft.getY());
             moveLeftArea.setSize(rotateLeftArea.getWidth(), moveLeft.getHeight());
 
+            hardDropButton.setVisible(!playScreen.showsPauseButton());
+            hardDropButton.resize(playScreen, PADDING);
+            // resize() sets the position for a freeze button, this needs to be changed
+            hardDropButton.setPosition(PADDING + hardDropButton.getHeight(), holdButton.getY() - hardDropButton.getWidth());
         }
 
         private class PortraitButton extends Button {
