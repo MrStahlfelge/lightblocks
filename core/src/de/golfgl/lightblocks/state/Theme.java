@@ -439,7 +439,7 @@ public class Theme {
     private void constructOverlayWindowBackground() {
         Pixmap pixmap = new Pixmap(15, 15, Pixmap.Format.RGBA8888);
         pixmap.setColor(getScoreColorOrWhite());
-        pixmap.fillRectangle(0, 0, 15, 15);
+        pixmap.fill();
         pixmap.setColor(bgColor);
         pixmap.fillRectangle(2, 2, 11, 11);
         Texture texture = new Texture(pixmap);
