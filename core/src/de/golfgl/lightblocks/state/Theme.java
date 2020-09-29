@@ -4,7 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -68,6 +71,7 @@ public class Theme {
     public Drawable backgroundPic;
     public Drawable backgroundLandscapePic;
     public Drawable gameboardPic;
+    public NinePatchDrawable overlayWindow;
     public Color bgColor;
     public Color scoreColor;
     public Color achievementColor;
@@ -206,6 +210,7 @@ public class Theme {
         wallColor = new Color(.8f, .8f, .8f, 1);
         titleColor = new Color(.7f, .7f, .7f, 1);
         buttonColor = new Color(Color.WHITE);
+        overlayWindow = null;
 
         slowMusicFilename = null;
         fastMusicFilename = null;
@@ -424,7 +429,25 @@ public class Theme {
 
             if (backgroundPic != null)
                 nextPieceAlpha = 1f;
+
+            if (bgColor != null) {
+                constructOverlayWindowBackground();
+            }
         }
+    }
+
+    private void constructOverlayWindowBackground() {
+        Pixmap pixmap = new Pixmap(15, 15, Pixmap.Format.RGBA8888);
+        pixmap.setColor(getScoreColorOrWhite());
+        pixmap.fillRectangle(0, 0, 15, 15);
+        pixmap.setColor(bgColor);
+        pixmap.fillRectangle(2, 2, 11, 11);
+        Texture texture = new Texture(pixmap);
+        pixmap.dispose();
+
+        NinePatch ninePatch = new NinePatch(texture, 5, 5, 5, 5);
+        ninePatch.setPadding(4, 4, 4, 4);
+        overlayWindow = new NinePatchDrawable(ninePatch);
     }
 
     private void loadBlocks(TextureAtlas themeAtlas, JsonValue themeConfigJson) {

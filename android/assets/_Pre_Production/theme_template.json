@@ -38,11 +38,13 @@
   // background, all entries optional
   // Ninepatch pictures are supported here
   "screen": {
+    // back color of main play screen and pause dialog
     "bgcolor": "94b13a",
     "bgpic": "",
     "bgpic_landscape": "",
     // Background picture for Gameboard, since v1934
     "gameboardpic": "gb",
+    // for score labels and mission description text
     "scorecolor": "ffffff",
     // Garbage indicator, time while freezed
     "emphasizecolor": "ff0000",

@@ -46,6 +46,10 @@ public class PauseDialog extends ControllerMenuDialog {
     public PauseDialog(LightBlocksGame app, final PlayScreen playScreen) {
         super("", app.skin, LightBlocksGame.SKIN_WINDOW_OVERLAY);
 
+        if (app.theme.overlayWindow != null) {
+            setBackground(app.theme.overlayWindow);
+        }
+
         this.app = app;
         this.playScreen = playScreen;
 
@@ -57,6 +61,7 @@ public class PauseDialog extends ControllerMenuDialog {
                     playScreen.switchPause(false);
             }
         });
+        app.theme.setScoreColor(resumeButton);
         addFocusableActor(resumeButton);
 
         Table table = getContentTable();
@@ -64,10 +69,12 @@ public class PauseDialog extends ControllerMenuDialog {
         table.defaults();
         table.row();
         titleLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .8f);
+        app.theme.setScoreColor(titleLabel);
         table.add(titleLabel).pad(20, 20, 10, 20);
 
         table.row();
         textLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_BIG, .75f);
+        app.theme.setScoreColor(textLabel);
         textLabel.setWrap(true);
         textLabel.setAlignment(Align.center);
         table.add(textLabel).prefWidth
@@ -75,6 +82,7 @@ public class PauseDialog extends ControllerMenuDialog {
 
         table.row();
         inputMsgLabel = new ScaledLabel("\n \n", app.skin, LightBlocksGame.SKIN_FONT_BIG, .75f);
+        app.theme.setScoreColor(inputMsgLabel);
         inputMsgLabel.setWrap(true);
         inputMsgLabel.setAlignment(Align.center);
         resumeCell = table.add(resumeButton).prefWidth(LightBlocksGame.nativeGameWidth * .75f)
@@ -84,6 +92,7 @@ public class PauseDialog extends ControllerMenuDialog {
         getButtonTable();
         getButtonTable().defaults().uniform().padBottom(20).minWidth(80).fill();
         exitButton = new FaButton(FontAwesome.MISC_CROSS, app.skin);
+        app.theme.setScoreColor(exitButton);
         button(exitButton,
                 new Runnable() {
                     @Override
@@ -91,7 +100,9 @@ public class PauseDialog extends ControllerMenuDialog {
                         exitGame();
                     }
                 });
-        button(new GlowLabelButton("", "?", app.skin, GlowLabelButton.SMALL_SCALE_MENU),
+        GlowLabelButton helpButton = new GlowLabelButton("", "?", app.skin, GlowLabelButton.SMALL_SCALE_MENU);
+        app.theme.setScoreColor(helpButton);
+        button(helpButton,
                 new Runnable() {
                     @Override
                     public void run() {
@@ -99,10 +110,11 @@ public class PauseDialog extends ControllerMenuDialog {
                     }
                 });
         FaButton musicButton = new FaButton("", app.skin);
+        app.theme.setScoreColor(musicButton);
         musicButton.addListener(new MusicButtonListener(app, false, musicButton));
         button(musicButton);
 
-        // Modal wird ausgeschaltet, da sonst alle InputEvents weggeklaut werden
+        // don't use modal here, because we want to get input events on play screen
         setModal(false);
     }
 
@@ -195,18 +207,19 @@ public class PauseDialog extends ControllerMenuDialog {
     public void addRetryButton(final InitGameParameters retryParams) {
         if (retryParams != null) {
             retryButton = new FaButton(FontAwesome.ROTATE_RIGHT, app.skin);
+            app.theme.setScoreColor(retryButton);
             button(retryButton, new Runnable() {
                 @Override
                 public void run() {
-                    // erst sauber verlassen!
+                    // first exit the playscreen
                     playScreen.goBackToMenu();
-                    if (retryParams != null && playScreen != app.getScreen())
+                    if (playScreen != app.getScreen())
                         try {
                             app.localPrefs.setSuppressSounds(true);
                             PlayScreen ps = PlayScreen.gotoPlayScreen(app, retryParams);
                             ps.setBackScreen(playScreen.getBackScreen());
-                        } catch (VetoException e) {
-                            // nichts tun - eigentlich(tm) darf das eh nicht vorkommen
+                        } catch (VetoException ignored) {
+                            // may never happen
                         } finally {
                             app.localPrefs.setSuppressSounds(false);
                         }

@@ -1339,7 +1339,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     @Override
     public void showOverlayMessage(final String message, final float autoHide, final String... params) {
         if (overlayWindow == null)
-            overlayWindow = new OverlayMessage(app.skin, labelGroup.getWidth());
+            overlayWindow = new OverlayMessage(app, labelGroup.getWidth());
 
         if (message == null)
             overlayWindow.hide();

@@ -23,12 +23,17 @@ public class OverlayMessage extends Dialog {
     private final Label messageLabel;
     private final Cell messageImageCell;
 
-    public OverlayMessage(Skin skin, float width) {
-        super("", skin, "overlay");
+    public OverlayMessage(LightBlocksGame app, float width) {
+        super("", app.skin, LightBlocksGame.SKIN_WINDOW_OVERLAY);
+
+        if (app.theme.overlayWindow != null) {
+            setBackground(app.theme.overlayWindow);
+        }
 
         setModal(false);
 
-        messageLabel = new ScaledLabel("", skin, LightBlocksGame.SKIN_FONT_TITLE);
+        messageLabel = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+        app.theme.setScoreColor(messageLabel);
         messageLabel.setWrap(true);
         messageLabel.setAlignment(Align.center);
 
