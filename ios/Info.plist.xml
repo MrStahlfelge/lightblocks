@@ -27,6 +27,15 @@
     <string>????</string>
     <key>CFBundleVersion</key>
     <string>${app.build}</string>
+    <key>GCSupportedGameControllers</key>
+    <array>
+        <dict>
+            <key>ProfileName</key>
+            <string>ExtendedGamepad</string>
+        </dict>
+    </array>
+    <key>GCSupportsControllerUserInteraction</key>
+    <true/>
     <key>MinimumOSVersion</key>
     <string>9.0</string>
     <key>LSRequiresIPhoneOS</key>
