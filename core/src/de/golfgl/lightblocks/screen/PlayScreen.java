@@ -230,7 +230,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         // Score Labels
         scoreTable = new PlayScoreTable(app);
         populateScoreTable(scoreTable);
-        // hinzufügen erst weiter unten (weil eventuell noch etwas dazu kommt)
+        // don't add the score table now, it is not complete yet
 
         if (!weldEffect.hasParent())
             centerGroup.addActor(weldEffect);
@@ -250,7 +250,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             }
         });
         pauseButton.getLabel().setColor(app.theme.buttonColor);
-        // Im Webbrowser ohne Tastatur den PauseButton anzeigen
         pauseButton.setVisible(LightBlocksGame.isWebAppOnMobileDevice() ||
                 Gdx.app.getType() == Application.ApplicationType.iOS || LightBlocksGame.GAME_DEVMODE);
 
@@ -259,11 +258,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         motivatorLabel = new MotivationLabel(app.skin, labelGroup,
                 app.theme.achievementColor, app.theme.achievementShadowColor);
 
-        // hier wird eventuell auch schon die erste Tutorial-Meldung angezeigt. Alles, was nach diesem Aufruf
-        // auf die Stage kommt, liegt vor dem OverlayWindow!
+        // this will add tutorial messages to the screen - everything added to the Stage later than
+        // this, will overlay the OverlayWindow!
         initializeGameModel(initGameParametersParams);
 
-        // Score Table vervollständigen
+        // complete the Score Table
         if (gameModel.showBlocksScore()) {
             scoreTable.row();
             final Label labelBlocks = new ScaledLabel(app.TEXTS.get("labelBlocksScore").toUpperCase(), app.skin);
@@ -291,12 +290,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         scoreTable.setLinesToClear(gameModel.getLinesToClear());
         scoreTable.validate();
 
-        // nun die allerletzten Actor auf die Stage
+        // now add the very last Actors
         centerGroup.addActor(scoreTable);
         centerGroup.addActor(pauseButton);
 
         Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
-        String modelIdLabel = (mission != null ? app.TEXTS.format("labelMission", mission.getIndex())
+        String modelIdLabel = (mission != null ? app.TEXTS.format("labelMission", mission.getDisplayIndex())
                 : app.TEXTS.get(Mission.getLabelUid(gameModel.getIdentifier())));
 
         gameType.setText(modelIdLabel);
@@ -306,7 +305,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         if (goalDescription != null && !goalDescription.isEmpty()) {
             String[] goalParams = gameModel.getGoalParams();
             pauseDialog.setText(goalParams == null ? app.TEXTS.get(goalDescription)
-                    : app.TEXTS.format(goalDescription, (Object[]) goalParams));
+                    : app.TEXTS.format(goalDescription, goalParams));
         }
         refreshResumeFromPauseText();
 
@@ -316,11 +315,11 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         } else
             pauseDialog.show(stage);
 
-        // sollte das Tutorial nicht verfügbar sein und dies das allerste Spiel sein (aber nicht Multiplayer)
-        // dann dem Spieler die Eingabehilfe zeigen
+        // if the tutorial is not available and this is the very first game, but not multiplayer,
+        // we show a short help how to control the game
         if (!TutorialModel.tutorialAvailable() && gameModel.totalScore.getClearedLines() < 1
                 && (gameModel.beginPaused() || gameModel instanceof MissionModel)) {
-            // mit postRunnable arbeiten, da das OverlayWindow auch bereits damit trickst und sich sonst drüber legt
+            // postRunnable needed, because mission overly window uses it and would overlay the help
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {

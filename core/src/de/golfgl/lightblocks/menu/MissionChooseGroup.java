@@ -39,7 +39,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
 
     private final MissionsTable missionsTable;
     private final Label missionTitle;
-    boolean needsRefresh = false;
+    boolean needsRefresh;
     private List<Mission> missions;
     private SinglePlayerScreen menuScreen;
     private Button playButton;
@@ -66,7 +66,6 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
         missionTitle = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .95f);
         add(missionTitle).expand().top();
 
-        // Gleich wie bei Marathon, nochmal auslagern
         playButton = new PlayButton(app);
         playButton.addListener(new ChangeListener() {
                                    public void changed(ChangeEvent event, Actor actor) {
@@ -88,14 +87,13 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
         try {
             String modelId = getGameModelId();
 
-            PlayScreen ps;
             if (modelId.equals(TutorialModel.MODEL_ID)) {
-                ps = PlayScreen.gotoPlayScreen(app, TutorialModel.getTutorialInitParams());
+                PlayScreen ps = PlayScreen.gotoPlayScreen(app, TutorialModel.getTutorialInitParams());
                 ps.setShowScoresWhenGameOver(false);
             } else {
                 InitGameParameters igp = new InitGameParameters();
                 igp.setMissionId(modelId);
-                ps = PlayScreen.gotoPlayScreen(app, igp);
+                PlayScreen.gotoPlayScreen(app, igp);
             }
 
             needsRefresh = true;
@@ -138,13 +136,12 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
         private String[] titles;
         private Label[] ratingLabel;
         private boolean[] selectable;
-        private Table table;
         private int selectedIndex = -1;
         private int lastPossible;
 
         public MissionsTable() {
             super(null);
-            table = new Table();
+            Table table = new Table();
             setActor(table);
 
             //setFadeScrollBars(false);
@@ -160,7 +157,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
                 final int idx = mission.getIndex();
                 String lblUid = Mission.getLabelUid(uid);
 
-                idxLabel[idx] = new GlowLabel(Integer.toString(idx), app.skin, 1f);
+                idxLabel[idx] = new GlowLabel(Integer.toString(mission.getDisplayIndex()), app.skin, 1f);
                 idxLabel[idx].setAlignment(Align.center);
                 titles[idx] = app.TEXTS.get(lblUid);
                 ratingLabel[idx] = new ScaledLabel("", app.skin, FontAwesome.SKIN_FONT_FA, .5f);
@@ -177,7 +174,7 @@ public class MissionChooseGroup extends Table implements SinglePlayerScreen.IGam
                 ratingLabel[idx].addListener(idxEvent);
             }
 
-            table.add().uniform().width(LightBlocksGame.nativeGameWidth / 5);
+            table.add().uniform().width(LightBlocksGame.nativeGameWidth / 5f);
             for (int idx = 0; idx < missions.size(); idx++) {
                 table.add(idxLabel[idx]).uniform().fill();
             }

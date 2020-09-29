@@ -51,7 +51,6 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
     private String gameModelId;
     private BackendManager.CachedScoreboard latestScores;
     private InitGameParameters newGameParams;
-    private Button leaveButton;
     private Actor defaultActor;
 
     private boolean newHighscore;
@@ -63,8 +62,8 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
     public RoundOverScoreScreen(LightBlocksGame app) {
         super(app);
 
-        scoresToShow = new Array<IRoundScore>();
-        scoresToShowLabels = new Array<String>();
+        scoresToShow = new Array<>();
+        scoresToShowLabels = new Array<>();
     }
 
     protected static String getFARatingString(int rating) {
@@ -99,7 +98,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
         buttons.defaults().uniform().expandX().center();
 
         // Back button
-        leaveButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
+        Button leaveButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
         setBackButton(leaveButton);
         buttons.add(leaveButton);
         stage.addFocusableActor(leaveButton);
@@ -192,9 +191,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
     }
 
     /**
-     * Nur für Highscore Erkennung zu füllen - ansonsten null lassen!
-     *
-     * @param best
+     * Set this for automatic high score recognition
      */
     public void setBest(BestScore best) {
         this.best = best;
@@ -207,10 +204,8 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
 
     protected String getSubtitle() {
         Mission mission = app.getMissionFromUid(gameModelId);
-        String title = (mission != null ? app.TEXTS.format("labelMission", mission.getIndex())
+        return (mission != null ? app.TEXTS.format("labelMission", mission.getDisplayIndex())
                 : app.TEXTS.get(Mission.getLabelUid(gameModelId)));
-
-        return title;
     }
 
     protected String getTitle() {
@@ -242,7 +237,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
         }
 
         // SCORE
-        Array<Long> scores = new Array<Long>(scoresToShow.size);
+        Array<Long> scores = new Array<>(scoresToShow.size);
         for (int i = 0; i < scoresToShow.size; i++) {
             scores.add((long) scoresToShow.get(i).getScore());
 
@@ -266,7 +261,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
         scoreTable.addScoresLine("labelBlocks", 0, scores, (best != null ? best.getDrawnTetrominos() : 0));
 
         // TIME
-        Array<Integer> times = new Array<Integer>();
+        Array<Integer> times = new Array<>();
         for (int i = 0; i < scoresToShow.size; i++)
             times.add(scoresToShow.get(i).getTimeMs());
 
@@ -437,7 +432,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
     private void doRate() {
         app.localPrefs.setDontAskForRating(true);
 
-        if (app.isOnFireTv()) {
+        if (LightBlocksGame.isOnFireTv()) {
             showDialog(app.TEXTS.get("labelAskForRatingFire"));
         } else if (LightBlocksGame.gameStoreUrl != null)
             Gdx.net.openURI(LightBlocksGame.gameStoreUrl);
