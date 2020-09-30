@@ -7,7 +7,8 @@ buildscript {
         maven { url 'https://maven.google.com' }
     }
     dependencies {
-        classpath 'org.wisepersist:gwt-gradle-plugin:1.0.6'
+        classpath 'org.wisepersist:gwt-gradle-plugin:1.0.13'
+        classpath 'org.gretty:gretty:3.0.2'
         classpath 'com.android.tools.build:gradle:3.2.0'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.10'
         classpath 'com.google.gms:google-services:4.2.0' // google-services plugin
@@ -37,6 +38,7 @@ allprojects {
         mavenLocal()
         mavenCentral()
         maven { url "https://maven.google.com" }
+        jcenter()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "https://jitpack.io" }
@@ -108,13 +110,18 @@ project(":ios") {
 project(":html") {
     apply plugin: "gwt"
     apply plugin: "war"
+    apply plugin: "org.gretty"
 
 
     dependencies {
         compile project(":core")
-        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:1.911.0"
+        compile ("com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:1.911.0") {
+            exclude group: 'org.eclipse.jetty', module: 'apache-jsp'
+        }
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-        compile "com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:1.911.0:sources"
+        compile ("com.github.MrStahlfelge.gdx-backends:gdx-backend-gwt:1.911.0:sources")  {
+            exclude group: 'org.eclipse.jetty', module: 'apache-jsp'
+        }
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion:sources"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion"
         compile "de.golfgl.gdxcontrollerutils:gdx-controllers-gwt:$cuversion:sources"
