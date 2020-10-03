@@ -5,14 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -44,7 +39,6 @@ import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.input.VibrationType;
 import de.golfgl.lightblocks.menu.PauseDialog;
 import de.golfgl.lightblocks.menu.RoundOverScoreScreen;
-import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.model.BackendBattleModel;
 import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
@@ -54,16 +48,13 @@ import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.MissionModel;
 import de.golfgl.lightblocks.model.MultiplayerModel;
-import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scene2d.BlockActor;
 import de.golfgl.lightblocks.scene2d.BlockGroup;
-import de.golfgl.lightblocks.scene2d.MotivationLabel;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.OnScreenGamepad;
 import de.golfgl.lightblocks.scene2d.OverlayMessage;
-import de.golfgl.lightblocks.scene2d.ParticleEffectActor;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
@@ -86,35 +77,20 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     public static final float DURATION_TETRO_MOVE = 1 / 30f;
     public static final float DURATION_REMOVE_DELAY = .15f;
     public static final float DURATION_REMOVE_FADEOUT = .2f;
-    private static final int NINE_PATCH_BORDER_SIZE = 5;
     private static final float GAMEOVER_TOUCHFREEZE = 1.5f;
-    protected final Image imGarbageIndicator;
     protected final TextButton pauseButton;
-    protected final Group centerGroup;
-    protected final BlockGroup blockGroup;
-    private final Image imComboIndicator;
-    private final Group labelGroup;
-    private final BlockActor[][] blockMatrix;
-    private final BlockActor[] nextTetro;
-    private final BlockActor[] holdTetro;
-    private final MotivationLabel motivatorLabel;
-    private final ParticleEffectActor weldEffect;
-    private final PlayScoreTable scoreTable;
+    protected final PlayerArea playerArea;
     private final PlayMusic music;
     private final Image backgroundImage;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
     boolean noLineClearAnimation;
-    private ScoreLabel blocksLeft;
-    private ScaledLabel timeLabel;
-    private Label timeLabelDesc;
     private PauseDialog pauseDialog;
     private Dialog pauseMsgDialog;
     private boolean isPaused = true;
     private HashSet<GameBlocker> gameBlockers = new HashSet<GameBlocker>();
     private OverlayMessage overlayWindow;
     private boolean showScoresWhenGameOver = true;
-    private int currentShownTime;
     private float timeSinceGameOver = 0;
     private GameBlocker.UsePortraitGameBlocker usePortraitGameBlocker = new GameBlocker.UsePortraitGameBlocker();
 
@@ -129,118 +105,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         backgroundImage = new Image();
         stage.addActor(backgroundImage);
 
-        centerGroup = new Group();
-        centerGroup.setTransform(false);
-        stage.addActor(centerGroup);
-
-        // das Gameboard-Hintergrundbild
-        if (app.theme.gameboardPic != null) {
-            Image bgGb = new Image(app.theme.gameboardPic);
-            bgGb.setScaling(Scaling.none);
-            bgGb.pack();
-            bgGb.setPosition(LightBlocksGame.nativeGameWidth / 2 - 1, LightBlocksGame.nativeGameHeight / 2 - 1, Align.center);
-            centerGroup.addActor(bgGb);
-        }
-
-        ParticleEffect pweldEffect = app.theme.getParticleEffect();
-        weldEffect = new ParticleEffectActor(pweldEffect, app.theme.particleEffectReset);
-
-        if (!app.theme.particleEffectOnTop)
-            centerGroup.addActor(weldEffect);
-
-        // nachdem die Blockgroup gesetzt ist eventuell den ParticleEffect positionieren
-        switch (app.theme.particleEffectPosition) {
-            case clear:
-                // nichts zu tun, da das erst bei einem clear ausgelöst wird. vorher wird gecentert
-            case center:
-                weldEffect.setPosition(LightBlocksGame.nativeGameWidth / 2 - app.theme.particleEffectWidth / 2,
-                        LightBlocksGame.nativeGameHeight / 2 - app.theme.particleEffectHeight / 2);
-                break;
-            case top:
-                weldEffect.setPosition(LightBlocksGame.nativeGameWidth / 2 - app.theme.particleEffectWidth / 2,
-                        LightBlocksGame.nativeGameHeight - app.theme.particleEffectHeight);
-                break;
-            case bottom:
-                weldEffect.setPosition(LightBlocksGame.nativeGameWidth / 2 - app.theme.particleEffectWidth / 2, 0);
-                break;
-        }
-
-
-        if (app.theme.particleEffectTrigger == Theme.EffectTrigger.always)
-            weldEffect.start();
-
-        blockMatrix = new BlockActor[Gameboard.GAMEBOARD_COLUMNS][Gameboard.GAMEBOARD_ALLROWS];
-        nextTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
-        holdTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
-
-        // Die Blockgroup nimmt die Steinanimation auf
-        blockGroup = new BlockGroup(app, true);
-        blockGroup.setTransform(false);
-        blockGroup.getColor().a = .4f;
-
-        blockGroup.setPosition(LightBlocksGame.nativeGameWidth / 2, LightBlocksGame.nativeGameHeight / 2, Align.center);
-        centerGroup.addActor(blockGroup);
-
-        // Begrenzungen um die BlockGroup
-        NinePatch line = new NinePatch(app.trGlowingLine, NINE_PATCH_BORDER_SIZE, NINE_PATCH_BORDER_SIZE,
-                NINE_PATCH_BORDER_SIZE, NINE_PATCH_BORDER_SIZE);
-        Image imLine = new Image(line);
-
-        imLine.setX(blockGroup.getX() + blockGroup.getWidth());
-        imLine.setY(blockGroup.getY() - NINE_PATCH_BORDER_SIZE);
-        imLine.addAction(Actions.sizeTo(imLine.getWidth(), blockGroup.getGridHeight() +
-                2 * NINE_PATCH_BORDER_SIZE, 1f, Interpolation.circleOut));
-        imLine.setColor(app.theme.wallColor);
-        centerGroup.addActor(imLine);
-
-        imGarbageIndicator = new Image(line);
-        imGarbageIndicator.setX(imLine.getX());
-        imGarbageIndicator.setY(imLine.getY());
-        imGarbageIndicator.setHeight(NINE_PATCH_BORDER_SIZE * 2);
-        imGarbageIndicator.setColor(app.theme.emphasizeColor);
-        imGarbageIndicator.setVisible(false);
-        centerGroup.addActor(imGarbageIndicator);
-
-        imLine = new Image(line);
-        imLine.setY(blockGroup.getY() - NINE_PATCH_BORDER_SIZE);
-        imLine.setX(blockGroup.getX() - imLine.getWidth() - 2);
-        imLine.addAction(Actions.sizeTo(imLine.getWidth(), blockGroup.getGridHeight() +
-                2 * NINE_PATCH_BORDER_SIZE, 1f, Interpolation.circleOut));
-        imLine.setColor(app.theme.wallColor);
-        centerGroup.addActor(imLine);
-
-        imComboIndicator = new Image(line);
-        imComboIndicator.setPosition(imLine.getX(), imLine.getY());
-        imComboIndicator.setColor(new Color(app.theme.focussedColor));
-        imComboIndicator.getColor().a = 0;
-        centerGroup.addActor(imComboIndicator);
-        showComboHeight(0);
-
-        // Anzeige des Levelnamens - muss in Group, Rotation funktioniert direkt auf Label nicht
-        Group gameTypeLabels = new Group();
-        Label gameType = new ScaledLabel("", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        gameType.setColor(app.theme.titleColor);
-        //gameType.setFontScale(.9f);
-        gameTypeLabels.setPosition(imLine.getX(), blockGroup.getY());
-        gameTypeLabels.addActor(gameType);
-        gameTypeLabels.setRotation(90);
-
-        centerGroup.addActor(gameTypeLabels);
-
-        // Score Labels
-        scoreTable = new PlayScoreTable(app);
-        populateScoreTable(scoreTable);
-        // don't add the score table now, it is not complete yet
-
-        if (!weldEffect.hasParent())
-            centerGroup.addActor(weldEffect);
-
-        labelGroup = new Group();
-        labelGroup.setTransform(false);
-        labelGroup.setWidth(blockGroup.getWidth());
-        labelGroup.setHeight(blockGroup.getGridHeight() - 2);
-        labelGroup.setPosition(blockGroup.getX(), blockGroup.getY());
-        centerGroup.addActor(labelGroup);
+        playerArea = new PlayerArea(app, this);
+        stage.addActor(playerArea);
 
         pauseButton = new TextButton(FontAwesome.CIRCLE_PAUSE, app.skin, FontAwesome.SKIN_FONT_FA);
         pauseButton.addListener(new ChangeListener() {
@@ -255,50 +121,18 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
         pauseDialog = new PauseDialog(app, this);
 
-        motivatorLabel = new MotivationLabel(app.skin, labelGroup,
-                app.theme.achievementColor, app.theme.achievementShadowColor);
-
         // this will add tutorial messages to the screen - everything added to the Stage later than
         // this, will overlay the OverlayWindow!
         initializeGameModel(initGameParametersParams);
 
-        // complete the Score Table
-        if (gameModel.showBlocksScore()) {
-            scoreTable.row();
-            final Label labelBlocks = new ScaledLabel(app.TEXTS.get("labelBlocksScore").toUpperCase(), app.skin);
-            app.theme.setScoreColor(labelBlocks);
-            scoreTable.add(labelBlocks).right().bottom().padBottom(-2).spaceRight(3);
-            scoreTable.add(blocksLeft).left().colspan(3);
-        } else if (gameModel.showTime()) {
-            scoreTable.row();
-            String timeLabelDescString = gameModel.getShownTimeDescription();
-            if (timeLabelDescString == null)
-                timeLabelDescString = app.TEXTS.get("labelTime").toUpperCase();
-            timeLabelDesc = new ScaledLabel(timeLabelDescString, app.skin);
-            app.theme.setScoreColor(timeLabelDesc);
-            scoreTable.add(timeLabelDesc).right().bottom().padBottom(-2).spaceRight(3);
-            timeLabel = new ScaledLabel(ScoreTable.formatTimeString(0, 1), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-            app.theme.setScoreColor(timeLabel);
-            scoreTable.add(timeLabel).left().colspan(3);
-            timeLabel.addListener(new InputListener() {
-                @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    return gameModel.onTimeLabelTouchedByPlayer();
-                }
-            });
-        }
-        scoreTable.setLinesToClear(gameModel.getLinesToClear());
-        scoreTable.validate();
-
-        // now add the very last Actors
-        centerGroup.addActor(scoreTable);
-        centerGroup.addActor(pauseButton);
+        // TODO this shouldn't be added to playerarea
+        playerArea.addActor(pauseButton);
 
         Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
         String modelIdLabel = (mission != null ? app.TEXTS.format("labelMission", mission.getDisplayIndex())
                 : app.TEXTS.get(Mission.getLabelUid(gameModel.getIdentifier())));
 
-        gameType.setText(modelIdLabel);
+        playerArea.gameType.setText(modelIdLabel);
         pauseDialog.setTitle(modelIdLabel);
         pauseDialog.addRetryButton(gameModel.getInitParameters());
         final String goalDescription = gameModel.getGoalDescription();
@@ -384,27 +218,19 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         }
     }
 
-    /**
-     * simuliert das Antippen des Zeitlabels und gibt ein optisches Feedback wenn es keine Reaktion gab
-     *
-     * @return
-     */
-    public boolean touchTimeLabelWithWarning() {
+    public void touchTimeLabelWithWarning() {
         boolean somethingDone = gameModel.onTimeLabelTouchedByPlayer();
 
-        if (!somethingDone && !timeLabel.hasActions()) {
-            Color oldColor = new Color(timeLabel.getColor());
-            timeLabel.setColor(app.theme.emphasizeColor);
-            timeLabel.addAction(Actions.color(oldColor, 1f));
+        if (!somethingDone && !playerArea.timeLabel.hasActions()) {
+            Color oldColor = new Color(playerArea.timeLabel.getColor());
+            playerArea.timeLabel.setColor(app.theme.emphasizeColor);
+            playerArea.timeLabel.addAction(Actions.color(oldColor, 1f));
         }
 
-        return somethingDone;
     }
 
     protected void populateScoreTable(Table scoreTable) {
-        // in jedem Fall initialisieren, damit der beim ersten updateScore gefüllt wird
-        blocksLeft = new ScoreLabel(3, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
-        app.theme.setScoreColor(blocksLeft);
+        // for overriding purpose
     }
 
     /**
@@ -463,12 +289,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         //TODO das sollte ins GameModel
         gameModel.setBestScore(app.savegame.getBestScore(gameModel.getIdentifier()));
 
-        // erst nach dem Laden setzen, damit das noch ohne Animation läuft
-        scoreTable.setEmphasizeTresholds();
-
-        // ist Ghost erlaubt?
-        if (!gameModel.isGhostPieceAllowedByGameModel())
-            blockGroup.setGhostPieceVisibility(false);
+        playerArea.gameModelInitialized(gameModel);
     }
 
     @Override
@@ -488,7 +309,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         if (gameModel.isGameOver() && timeSinceGameOver < GAMEOVER_TOUCHFREEZE)
             timeSinceGameOver = timeSinceGameOver + delta;
 
-        updateTimeLabel();
+        playerArea.updateTimeLabel();
 
         super.render(delta);
 
@@ -543,7 +364,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             inputAdapter.dispose();
         music.dispose();
         app.unlockOrientation();
-        weldEffect.dispose();
+        playerArea.dispose();
         super.dispose();
     }
 
@@ -572,6 +393,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
             final float fadingInterval = immediately ? 0 : .2f;
 
+            BlockGroup blockGroup = playerArea.blockGroup;
             blockGroup.clearActions();
 
             if (!isPaused) {
@@ -620,10 +442,9 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
     @Override
     public void endFreezeMode(IntArray removedLines) {
-        // TODO sollte irgendeine ganz spezielle Animation sein/Sound wieder an, postprocessing aus
         int removedLineNum = removedLines.size;
         if (removedLineNum > 0) {
-            motivatorLabel.addMotivationText((String.valueOf(removedLineNum) + " " + app.TEXTS.get("labelLines")).toUpperCase(), 1.5f);
+            playerArea.motivatorLabel.addMotivationText((removedLineNum + " " + app.TEXTS.get("labelLines")).toUpperCase(), 1.5f);
             clearAndInsertLines(removedLines, removedLineNum >= 8, null);
         }
         music.play();
@@ -648,14 +469,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     @Override
     public void insertNewBlock(int x, int y, int blockType) {
         BlockActor block = new BlockActor(app, blockType, true);
-        insertBlock(x, y, block);
-    }
-
-    private void insertBlock(int x, int y, BlockActor block) {
-        block.setX(x * BlockActor.blockWidth);
-        block.setY(y * BlockActor.blockWidth);
-        blockGroup.addActor(block);
-        blockMatrix[x][y] = block;
+        playerArea.insertBlock(x, y, block);
     }
 
     @Override
@@ -674,8 +488,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
                 int y = v[i][1];
                 block.setMoveAction(Actions.moveTo((x + dx) * BlockActor.blockWidth, (y + dy) * BlockActor
                         .blockWidth, DURATION_TETRO_MOVE));
-                blockMatrix[x + dx][y + dy] = block;
-                blockGroup.setGhostPiecePosition(i, x + dx, y - ghostPieceDistance, ghostPieceDistance);
+                playerArea.blockMatrix[x + dx][y + dy] = block;
+                playerArea.blockGroup.setGhostPiecePosition(i, x + dx, y - ghostPieceDistance, ghostPieceDistance);
             }
         }
     }
@@ -683,6 +497,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     private Array<BlockActor> removeBlockActorsFromMatrix(Integer[][] v) {
         Array<BlockActor> blocks = new Array<BlockActor>(v.length);
 
+        BlockActor[][] blockMatrix = playerArea.blockMatrix;
         for (Integer[] xy : v) {
             if (blockMatrix[xy[0]][xy[1]] == null)
                 Gdx.app.error("BLOCKS", "Block null at " + xy[0].toString() + " " + xy[1].toString());
@@ -708,8 +523,8 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             int newy = vNew[i][1];
             block.setMoveAction(Actions.moveTo((newx) * BlockActor.blockWidth, (newy) * BlockActor.blockWidth, 1 /
                     20f));
-            blockMatrix[newx][newy] = block;
-            blockGroup.setGhostPiecePosition(i, newx, newy - ghostPieceDistance, ghostPieceDistance);
+            playerArea.blockMatrix[newx][newy] = block;
+            playerArea.blockGroup.setGhostPiecePosition(i, newx, newy - ghostPieceDistance, ghostPieceDistance);
         }
 
 
@@ -717,6 +532,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
     @Override
     public void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition) {
+        BlockActor[][] blockMatrix = playerArea.blockMatrix;;
 
         final float removeDelayTime = DURATION_REMOVE_DELAY;
         final float removeFadeOutTime = DURATION_REMOVE_FADEOUT;
@@ -732,8 +548,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             for (int i = linesToRemove.size - 1; i >= 0; i--) {
                 int y = linesToRemove.get(i);
 
-                // die zu entfernende Zeile durchgehen und alle Blöcke erleuchten
-                // und entfernen
+                // enlighten and remove all blocks from the line to be removed
                 for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
                     BlockActor block = blockMatrix[x][y];
                     blockMatrix[x][y] = null;
@@ -768,8 +583,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             for (int i = linesToRemove.size - 1; i >= 0; i--) {
                 int y = linesToRemove.get(i);
 
-                // die zu entfernende Zeile durchgehen und alle Blöcke erleuchten
-                // und entfernen
+                // enlighten and remove all blocks from the line to be removed
                 for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
                     BlockActor block = blockMatrix[x][y];
                     blockMatrix[x][y] = null;
@@ -806,10 +620,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
                     || app.theme.particleEffectTrigger == Theme.EffectTrigger.lineClear)) {
 
                 if (app.theme.particleEffectPosition == Theme.EffectSpawnPosition.clear)
-                    weldEffect.setPosition(blockGroup.getX() + 5f * BlockActor.blockWidth - app.theme.particleEffectWidth / 2,
-                            blockGroup.getY() + (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth - app.theme.particleEffectHeight / 2);
+                    playerArea.weldEffect.setPosition(playerArea.blockGroup.getX() + 5f * BlockActor.blockWidth - app.theme.particleEffectWidth / 2,
+                            playerArea.blockGroup.getY() + (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth - app.theme.particleEffectHeight / 2);
 
-                weldEffect.start();
+                playerArea.weldEffect.start();
             }
         }
 
@@ -891,7 +705,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
                         block.setEnlightened(true, true);
                         block.setMoveAction(Actions.sequence(Actions.moveTo((x) * BlockActor.blockWidth, y *
                                 BlockActor.blockWidth, moveActorsTime), Actions.run(block.getDislightenAction())));
-                        blockGroup.addActor(block);
+                        playerArea.blockGroup.addActor(block);
                         blockMatrix[x][y] = block;
                     }
                 }
@@ -902,6 +716,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
     @Override
     public void markAndMoveFreezedLines(boolean playSoundAndMove, IntArray movedLines, IntArray fullLines) {
+        BlockActor[][] blockMatrix = playerArea.blockMatrix;
 
         if (movedLines.size == 0 && fullLines.size == 0)
             return;
@@ -974,9 +789,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         if (app.localPrefs.isPlaySounds() && app.theme.gameOverSound != null)
             app.theme.gameOverSound.play();
         inputAdapter.setGameOver();
-        blockGroup.setGhostPieceVisibility(false);
-        // erzwingt die letzmalige Aktualisierung des Zeitlabels beim nächsten Render
-        currentShownTime = currentShownTime - 100;
+        playerArea.setGameOver();
         saveGameState();
         app.savegame.gpgsSaveGameState(null);
         pauseButton.setVisible(false);
@@ -988,114 +801,19 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
     @Override
     public void showNextTetro(Integer[][] relativeBlockPositions, int blockType) {
-        // ein neuer nächster-Stein wurde bestimmt. Wir zeigen ihn einfach über dem Spielfeld an
-        // Er wird der Blockgroup ganz unten hinzugefügt, damit er wenn er einfliegt keine Steine auf dem
-        // Spielfeld überlagert
-
-        final float offsetX = getNextPieceXPos();
-        final float offsetY = getNextPieceYPos();
-
-        for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
-            nextTetro[i] = new BlockActor(app, blockType, true);
-            nextTetro[i].setPosition((i == 0 || i == 2) ? -BlockActor.blockWidth : LightBlocksGame.nativeGameWidth +
-                            BlockActor.blockWidth,
-                    (i >= 2) ? 0 : LightBlocksGame.nativeGameHeight);
-            nextTetro[i].setMoveAction(Actions.moveTo(offsetX + relativeBlockPositions[i][0] * BlockActor.blockWidth,
-                    offsetY + relativeBlockPositions[i][1] * BlockActor.blockWidth, .5f, Interpolation.fade));
-            nextTetro[i].addAction(Actions.alpha(app.theme.nextPieceAlpha, .5f, Interpolation.fade));
-            nextTetro[i].getColor().a = 0;
-
-            blockGroup.addBlockAtBottom(nextTetro[i]);
-        }
-    }
-
-    protected float getNextPieceYPos() {
-        return (Gameboard.GAMEBOARD_NORMALROWS - (gameModel.isModernRotation() ? 1 : 0) + .3f) * BlockActor.blockWidth;
-    }
-
-    protected float getNextPieceXPos() {
-        return LightBlocksGame.nativeGameWidth - blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT -
-                .3f) * BlockActor.blockWidth + Math.min(centerGroup.getX() / 2, BlockActor.blockWidth * 2.5f);
+        playerArea.showNextTetro(relativeBlockPositions, blockType);
     }
 
     @Override
     public void activateNextTetro(Integer[][] boardBlockPositions, int blockType, int ghostPieceDistance) {
-
-        for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
-            // den bereits in nextTetro instantiierten Block ins Spielfeld an die gewünschte Stelle bringen
-            BlockActor block = nextTetro[i];
-
-            final int x = boardBlockPositions[i][0];
-            final int y = boardBlockPositions[i][1];
-
-            if (block == null) {
-                //beim Spielstart noch nicht gesetzt und die Animation macht auch keinen Sinn,
-                //dann gleich an Zielposition instanziieren
-                block = new BlockActor(app, blockType, true);
-                insertBlock(x, y, block);
-            } else {
-                nextTetro[i] = null;
-                blockMatrix[x][y] = block;
-                block.clearActions();
-                block.addAction(Actions.fadeIn(.1f));
-                block.setMoveAction(Actions.moveTo(x * BlockActor.blockWidth, y * BlockActor.blockWidth, .1f,
-                        Interpolation.fade));
-            }
-            block.setEnlightened(true);
-
-            blockGroup.setGhostPiecePosition(i, x, y - ghostPieceDistance, ghostPieceDistance);
-        }
+        playerArea.activateNextTetro(boardBlockPositions, blockType, ghostPieceDistance);
     }
 
     @Override
     public void swapHoldAndActivePiece(Integer[][] newHoldPiecePositions, Integer[][] oldActivePiecePositions,
                                        Integer[][] newActivePiecePositions, int ghostPieceDistance, int holdBlockType) {
-        float offsetX;
-        float offsetY = getNextPieceYPos();
-
-        if (isLandscape())
-            offsetX = blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT + 1.5f) * BlockActor.blockWidth;
-        else
-            offsetX = getNextPieceXPos() - (Tetromino.TETROMINO_BLOCKCOUNT + .5f) * BlockActor.blockWidth;
-
-        final BlockActor[] oldHoldTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
-
-        // aktiven Block nach Hold schieben
-        for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
-            oldHoldTetro[i] = holdTetro[i];
-
-            if (oldActivePiecePositions != null) {
-                final int oldX = oldActivePiecePositions[i][0];
-                final int oldY = oldActivePiecePositions[i][1];
-
-                holdTetro[i] = blockMatrix[oldX][oldY];
-                blockMatrix[oldX][oldY] = null;
-            } else {
-                // Beim Spielstand laden hinzufügen
-                holdTetro[i] = new BlockActor(app, holdBlockType, true);
-                blockGroup.addActor(holdTetro[i]);
-            }
-
-            holdTetro[i].setMoveAction(Actions.moveTo(offsetX + newHoldPiecePositions[i][0] * BlockActor.blockWidth,
-                    offsetY + newHoldPiecePositions[i][1] * BlockActor.blockWidth, .1f, Interpolation.fade));
-            holdTetro[i].addAction(Actions.alpha(app.theme.nextPieceAlpha, .5f, Interpolation.fade));
-            holdTetro[i].setEnlightened(false);
-        }
-
-        // und den Hold Block rausholen
-        for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
-            if (newActivePiecePositions != null) {
-                final int newX = newActivePiecePositions[i][0];
-                final int newY = newActivePiecePositions[i][1];
-                blockMatrix[newX][newY] = oldHoldTetro[i];
-                oldHoldTetro[i].addAction(Actions.fadeIn(.1f));
-                oldHoldTetro[i].setMoveAction(Actions.moveTo(newX * BlockActor.blockWidth, newY * BlockActor.blockWidth,
-                        .1f, Interpolation.fade));
-
-                blockGroup.setGhostPiecePosition(i, newX, newY - ghostPieceDistance, ghostPieceDistance);
-            }
-        }
-
+        playerArea.swapHoldAndActivePiece(newHoldPiecePositions, oldActivePiecePositions,
+                newActivePiecePositions, ghostPieceDistance, holdBlockType);
     }
 
     @Override
@@ -1106,14 +824,14 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         inputAdapter.vibrate(VibrationType.DROP);
 
         for (Integer[] vAfterMove : currentBlockPositions) {
-            BlockActor activePieceBlock = this.blockMatrix[vAfterMove[0]][vAfterMove[1]];
+            BlockActor activePieceBlock = playerArea.blockMatrix[vAfterMove[0]][vAfterMove[1]];
             activePieceBlock.setEnlightened(false);
         }
     }
 
     @Override
     public void markConflict(int x, int y) {
-        BlockActor block = blockMatrix[x][y];
+        BlockActor block = playerArea.blockMatrix[x][y];
         block.showConflictTouch();
     }
 
@@ -1216,62 +934,22 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             inputAdapter.vibrate(VibrationType.MOTIVATION);
 
         if (!text.isEmpty())
-            motivatorLabel.addMotivationText(text.toUpperCase(), duration);
+            playerArea.addMotivationText(text.toUpperCase(), duration);
     }
 
     @Override
     public void showGarbageAmount(int lines) {
-        imGarbageIndicator.setVisible(true);
-        imGarbageIndicator.clearActions();
-        imGarbageIndicator.addAction(Actions.sizeTo(imGarbageIndicator.getWidth(),
-                BlockActor.blockWidth * lines + NINE_PATCH_BORDER_SIZE * 2, .2f, Interpolation.fade));
+        playerArea.showGarbageAmount(lines);
     }
 
     @Override
     public void showComboHeight(int comboHeight) {
-        comboHeight = Math.max(0, comboHeight);
-        // TODO wie imGarbageIndicator
-
-        imComboIndicator.clearActions();
-        imComboIndicator.addAction(Actions.sizeTo(imGarbageIndicator.getWidth(),
-                BlockActor.blockWidth * comboHeight + NINE_PATCH_BORDER_SIZE * 2, .2f, Interpolation.fade));
-        imComboIndicator.addAction(comboHeight > 0 ? Actions.fadeIn(.1f, Interpolation.fade)
-                : Actions.fadeOut(.2f, Interpolation.fade));
+        playerArea.showComboHeight(comboHeight);
     }
 
     @Override
     public void updateScore(GameScore score, int gainedScore) {
-        scoreTable.setClearedLines(score.getClearedLines());
-        scoreTable.setCurrentLevel(score.getCurrentLevel());
-        scoreTable.setScore(score.getScore());
-
-        if (gameModel.showBlocksScore())
-            blocksLeft.setScore(gameModel.getMaxBlocksToUse() > 0 ?
-                    gameModel.getMaxBlocksToUse() - score.getDrawnTetrominos() : score.getDrawnTetrominos());
-    }
-
-    protected void updateTimeLabel() {
-        if (gameModel.showTime() && timeLabel != null) {
-            int timeMs = gameModel.getShownTimeMs();
-
-            if (Math.abs(timeMs - currentShownTime) >= 100) {
-                timeLabel.clearActions();
-
-                String timeDesc = gameModel.getShownTimeDescription();
-                Color timeLabelColor = gameModel.getShownTimeColor();
-
-                String formattedTime = ScoreTable.formatTimeString(timeMs, 1);
-
-                if (timeDesc != null)
-                    timeLabelDesc.setText(timeDesc);
-
-                if (timeLabelColor != null && !timeLabel.getColor().equals(timeLabelColor))
-                    timeLabel.setColor(timeLabelColor);
-
-                timeLabel.setText(formattedTime);
-                currentShownTime = timeMs;
-            }
-        }
+        playerArea.updateScore(score);
     }
 
     @Override
@@ -1339,7 +1017,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     @Override
     public void showOverlayMessage(final String message, final float autoHide, final String... params) {
         if (overlayWindow == null)
-            overlayWindow = new OverlayMessage(app, labelGroup.getWidth());
+            overlayWindow = new OverlayMessage(app, playerArea.labelGroup.getWidth());
 
         if (message == null)
             overlayWindow.hide();
@@ -1392,23 +1070,24 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
                 backgroundImage.setScaling(Scaling.none);
         }
 
-        centerGroup.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
+        playerArea.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
                 (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
 
         int gameboardAlignment = inputAdapter != null ? inputAdapter.getRequestedGameboardAlignment() : Align.center;
 
         // sobald Platz neben Spielfeld breiter ist als Scoretable, diese dann mittig positionieren
         // und dann auch langsam herunterschieben aber maximal zwei Zeilen
+        PlayScoreTable scoreTable = playerArea.scoreTable;
         scoreTable.validate();
-        scoreTable.setX(Math.max(10 - centerGroup.getX() + scoreTable.getPrefWidth() / 2, -centerGroup.getX() / 2));
-        scoreTable.setY((gameboardAlignment == Align.top ? LightBlocksGame.nativeGameHeight : stage.getHeight() - centerGroup.getY() * 1.2f)
-                - MathUtils.clamp(centerGroup.getX() / 2 - scoreTable.getPrefWidth() / 2,
+        scoreTable.setX(Math.max(10 - playerArea.getX() + scoreTable.getPrefWidth() / 2, -playerArea.getX() / 2));
+        scoreTable.setY((gameboardAlignment == Align.top ? LightBlocksGame.nativeGameHeight : stage.getHeight() - playerArea.getY() * 1.2f)
+                - MathUtils.clamp(playerArea.getX() / 2 - scoreTable.getPrefWidth() / 2,
                 scoreTable.getPrefHeight() / 2 + 5, scoreTable.getLinePrefHeight() * 2 + scoreTable.getPrefHeight() /
                         2));
 
         if (gameboardAlignment == Align.top) {
             float deltaY = (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2;
-            centerGroup.setY(centerGroup.getY() + deltaY);
+            playerArea.setY(playerArea.getY() + deltaY);
             backgroundImage.setY(deltaY);
         }
 
@@ -1416,7 +1095,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         pauseButton.pack();
         pauseButton.setSize(pauseButton.getWidth() * 1.2f, pauseButton.getHeight() * 1.2f);
 
-        if ((scoreTable.getX() + centerGroup.getX() - scoreTable.getPrefWidth() / 2) > pauseButton.getWidth())
+        if ((scoreTable.getX() + playerArea.getX() - scoreTable.getPrefWidth() / 2) > pauseButton.getWidth())
             pauseButton.setPosition(scoreTable.getX() - scoreTable.getPrefWidth() / 2 - pauseButton.getWidth(),
                     (scoreTable.getHeight() - pauseButton.getHeight()) / 2 + scoreTable.getY());
         else
@@ -1441,16 +1120,16 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
 
     @Override
     public float getCenterPosX() {
-        return centerGroup.getX();
+        return playerArea.getX();
     }
 
     public float getCenterPosY() {
-        return centerGroup.getY();
+        return playerArea.getY();
     }
 
     @Override
     public float getGameboardTop() {
-        return centerGroup.getY() + blockGroup.getY() + Gameboard.GAMEBOARD_NORMALROWS * BlockActor.blockWidth;
+        return playerArea.getY() + playerArea.blockGroup.getY() + Gameboard.GAMEBOARD_NORMALROWS * BlockActor.blockWidth;
     }
 
     public static class PlayScoreTable extends Table {

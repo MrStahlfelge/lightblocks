@@ -23,7 +23,8 @@ import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
- * Playscren für Multiplayerspiele um die Dinge einfach zu halten
+ * PlayScreen for real time multiplayer games, to get this very special code out of PlayScreen.
+ * Turn based battle mode does not use this.
  * <p>
  * Created by Benjamin Schulte on 01.03.2017.
  */
@@ -41,7 +42,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
             InputNotAvailableException, VetoException {
         super(app, initGameParametersParams);
 
-        imGarbageIndicator.setVisible(true);
+        playerArea.imGarbageIndicator.setVisible(true);
 
         // Blocker bis alle initialisiert sind
         addGameBlocker(initializeBlocker);
@@ -319,7 +320,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
         // Die sind für Landscape Hilfen
         int currNum = 0;
         int numAllToShow = Math.min(2, playerGameboard.size());
-        float leftx = (stage.getWidth() + blockGroup.getX() + blockGroup.getWidth()) / 2;
+        float leftx = (stage.getWidth() + playerArea.blockGroup.getX() + playerArea.blockGroup.getWidth()) / 2;
 
         for (OtherPlayerGameboard playerGameboard : playerGameboard.values()) {
             playerGameboard.setScale(1);
@@ -331,7 +332,7 @@ public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
                 playerGameboard.setX((stage.getWidth() - leftx) / 2 + leftx
                         - playerGameboard.getWidth() * ((float) numAllToShow / 2 - currNum));
-                playerGameboard.setY(blockGroup.getY());
+                playerGameboard.setY(playerArea.blockGroup.getY());
             } else {
                 playerGameboard.getColor().a = 0;
                 playerGameboard.setX(stage.getWidth() / 2 - playerGameboard.getWidth() / 2);

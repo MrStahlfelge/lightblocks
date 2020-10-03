@@ -347,7 +347,7 @@ public class Theme {
     public ParticleEffect getParticleEffect() {
         ParticleEffect particleEffect;
         if (themePresent && this.particleEffect != null) {
-            particleEffect = this.particleEffect;
+            particleEffect = new ParticleEffect(this.particleEffect);
         } else {
             particleEffect = new ParticleEffect();
             particleEffect.load(Gdx.files.internal("raw/explode.p"), app.skin.getAtlas());
@@ -616,15 +616,14 @@ public class Theme {
         return newRegions;
     }
 
-    @Nonnull
     public boolean isThemePresent() {
         return themePresent;
     }
 
-    @Nullable
     /**
      * @return null nur, wenn kein Thema vorhanden. Sonst garantiert gefüllt
      */
+    @Nullable
     public String getThemeName() {
         return themeName;
     }
