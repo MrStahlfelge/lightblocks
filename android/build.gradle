@@ -30,8 +30,8 @@ android {
         applicationId "org.opensource.lightblocks"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 2007
-        versionName "1.4.2007"
+        versionCode 2008
+        versionName "1.4.2008"
     }
 
     flavorDimensions "type"
