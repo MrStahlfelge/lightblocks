@@ -8,9 +8,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Queue;
 
-import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.backend.MatchTurnRequestInfo;
+import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.Replay;
 
@@ -60,10 +60,10 @@ public class BackendBattleModel extends GameModel {
     }
 
     @Override
-    public void setUserInterface(IGameModelListener userInterface) {
-        super.setUserInterface(userInterface);
+    public void setUserInterface(PlayScreen playScreen, IGameModelListener uiGameboard) {
+        super.setUserInterface(playScreen, uiGameboard);
         if (!beginPaused)
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.prepare, null);
+            uiGameboard.showMotivation(IGameModelListener.MotivationTypes.prepare, null);
         else
             // Hack: es muss über 0 sein. siehe update()
             prepareForGameDelay = 0.02f;
@@ -259,7 +259,7 @@ public class BackendBattleModel extends GameModel {
             if (prepareForGameDelay > 0)
                 return;
 
-            userInterface.showMotivation(sendingGarbage ? IGameModelListener.MotivationTypes.turnGarbage
+            uiGameboard.showMotivation(sendingGarbage ? IGameModelListener.MotivationTypes.turnGarbage
                     : IGameModelListener.MotivationTypes.turnSurvive, matchEntity.opponentNick);
         }
 
@@ -277,7 +277,7 @@ public class BackendBattleModel extends GameModel {
             if (!lastTurnOnServer.opponentDroppedOut) {
                 //TODO Stärker Anzeigen in Spielfeld
                 sendingGarbage = true;
-                userInterface.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, matchEntity.opponentNick);
+                uiGameboard.showMotivation(IGameModelListener.MotivationTypes.turnGarbage, matchEntity.opponentNick);
                 setCurrentTurnString(lastTurnSequenceNum + 2);
             } else {
                 // beenden, falls der Gegner bereits beendet hat

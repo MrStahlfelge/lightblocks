@@ -5,11 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -20,31 +18,23 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.Timer;
 
 import java.util.HashSet;
 import java.util.Iterator;
-
-import javax.annotation.Nullable;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.BackendScore;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.input.PlayScreenInput;
-import de.golfgl.lightblocks.input.VibrationType;
 import de.golfgl.lightblocks.menu.PauseDialog;
 import de.golfgl.lightblocks.menu.RoundOverScoreScreen;
-import de.golfgl.lightblocks.model.BackendBattleModel;
 import de.golfgl.lightblocks.model.GameBlocker;
 import de.golfgl.lightblocks.model.GameModel;
-import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Gameboard;
-import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.Mission;
 import de.golfgl.lightblocks.model.MissionModel;
 import de.golfgl.lightblocks.model.MultiplayerModel;
@@ -59,10 +49,6 @@ import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.ScoreLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.state.InitGameParameters;
-import de.golfgl.lightblocks.state.Theme;
-
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 /**
  * The main playing screen
@@ -72,11 +58,8 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * Created by Benjamin Schulte on 16.01.2017.
  */
 
-public class PlayScreen extends AbstractScreen implements IGameModelListener, OnScreenGamepad.IOnScreenButtonsScreen {
+public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScreenButtonsScreen {
 
-    public static final float DURATION_TETRO_MOVE = 1 / 30f;
-    public static final float DURATION_REMOVE_DELAY = .15f;
-    public static final float DURATION_REMOVE_FADEOUT = .2f;
     private static final float GAMEOVER_TOUCHFREEZE = 1.5f;
     protected final TextButton pauseButton;
     protected final PlayerArea playerArea;
@@ -84,11 +67,10 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
     private final Image backgroundImage;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
-    boolean noLineClearAnimation;
     private PauseDialog pauseDialog;
     private Dialog pauseMsgDialog;
     private boolean isPaused = true;
-    private HashSet<GameBlocker> gameBlockers = new HashSet<GameBlocker>();
+    private HashSet<GameBlocker> gameBlockers = new HashSet<>();
     private OverlayMessage overlayWindow;
     private boolean showScoresWhenGameOver = true;
     private float timeSinceGameOver = 0;
@@ -273,7 +255,7 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         }
 
         gameModel.app = app;
-        gameModel.setUserInterface(this);
+        gameModel.setUserInterface(this, playerArea);
 
         // input initialisieren
         inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey, app);
@@ -428,24 +410,21 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         }
     }
 
-    @Override
     public void setGameboardCriticalFill(boolean critical) {
         music.setFastPlay(critical);
     }
 
-    @Override
     public void startFreezeMode() {
         music.pause();
         if (app.localPrefs.isPlaySounds() && app.theme.freezeBeginSound != null)
             app.theme.freezeBeginSound.play();
     }
 
-    @Override
     public void endFreezeMode(IntArray removedLines) {
         int removedLineNum = removedLines.size;
         if (removedLineNum > 0) {
             playerArea.motivatorLabel.addMotivationText((removedLineNum + " " + app.TEXTS.get("labelLines")).toUpperCase(), 1.5f);
-            clearAndInsertLines(removedLines, removedLineNum >= 8, null);
+            playerArea.clearAndInsertLines(removedLines, removedLineNum >= 8, null);
         }
         music.play();
     }
@@ -466,324 +445,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         this.dispose();
     }
 
-    @Override
-    public void insertNewBlock(int x, int y, int blockType) {
-        BlockActor block = new BlockActor(app, blockType, true);
-        playerArea.insertBlock(x, y, block);
-    }
-
-    @Override
-    public void moveTetro(Integer[][] v, int dx, int dy, int ghostPieceDistance) {
-        if (dx != 0 && app.localPrefs.isPlaySounds() && app.theme.horizontalMoveSound != null)
-            app.theme.horizontalMoveSound.play();
-
-        if (dx != 0 || dy != 0) {
-            // erst alle vom Spielbrett einsammeln...
-            Array<BlockActor> blocks = removeBlockActorsFromMatrix(v);
-
-            //... und dann neu ablegen
-            for (int i = 0; i < v.length; i++) {
-                BlockActor block = blocks.get(i);
-                int x = v[i][0];
-                int y = v[i][1];
-                block.setMoveAction(Actions.moveTo((x + dx) * BlockActor.blockWidth, (y + dy) * BlockActor
-                        .blockWidth, DURATION_TETRO_MOVE));
-                playerArea.blockMatrix[x + dx][y + dy] = block;
-                playerArea.blockGroup.setGhostPiecePosition(i, x + dx, y - ghostPieceDistance, ghostPieceDistance);
-            }
-        }
-    }
-
-    private Array<BlockActor> removeBlockActorsFromMatrix(Integer[][] v) {
-        Array<BlockActor> blocks = new Array<BlockActor>(v.length);
-
-        BlockActor[][] blockMatrix = playerArea.blockMatrix;
-        for (Integer[] xy : v) {
-            if (blockMatrix[xy[0]][xy[1]] == null)
-                Gdx.app.error("BLOCKS", "Block null at " + xy[0].toString() + " " + xy[1].toString());
-
-            blocks.add(blockMatrix[xy[0]][xy[1]]);
-            blockMatrix[xy[0]][xy[1]] = null;
-        }
-        return blocks;
-    }
-
-    @Override
-    public void rotateTetro(Integer[][] vOld, Integer[][] vNew, int ghostPieceDistance) {
-        if (app.localPrefs.isPlaySounds() && app.theme.rotateSound != null)
-            app.theme.rotateSound.play();
-
-        // erst alle vom Spielbrett einsammeln...
-        Array<BlockActor> blocks = removeBlockActorsFromMatrix(vOld);
-
-        //... und dann neu ablegen
-        for (int i = 0; i < vOld.length; i++) {
-            BlockActor block = blocks.get(i);
-            int newx = vNew[i][0];
-            int newy = vNew[i][1];
-            block.setMoveAction(Actions.moveTo((newx) * BlockActor.blockWidth, (newy) * BlockActor.blockWidth, 1 /
-                    20f));
-            playerArea.blockMatrix[newx][newy] = block;
-            playerArea.blockGroup.setGhostPiecePosition(i, newx, newy - ghostPieceDistance, ghostPieceDistance);
-        }
-
-
-    }
-
-    @Override
-    public void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition) {
-        BlockActor[][] blockMatrix = playerArea.blockMatrix;;
-
-        final float removeDelayTime = DURATION_REMOVE_DELAY;
-        final float removeFadeOutTime = DURATION_REMOVE_FADEOUT;
-        final float moveActorsTime = .1f;
-
-        int linesToInsert = (garbageHolePosition == null ? 0 : garbageHolePosition.length);
-
-        if (linesToRemove.size <= 0 && linesToInsert <= 0)
-            return;
-
-        if (noLineClearAnimation) {
-            // nur volle Reihen beleuchten und fertig
-            for (int i = linesToRemove.size - 1; i >= 0; i--) {
-                int y = linesToRemove.get(i);
-
-                // enlighten and remove all blocks from the line to be removed
-                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                    BlockActor block = blockMatrix[x][y];
-                    blockMatrix[x][y] = null;
-                    block.setEnlightened(true);
-
-                    block.addAction(sequence(Actions.delay(5), Actions.fadeOut(2),
-                            Actions.removeActor()));
-                    //block.addAction(Actions.moveBy((BlockActor.blockWidth / 2) * (x - 5), 0, 2 + 5));
-                }
-            }
-
-            return;
-        }
-
-        gameModel.setFreezeInterval(removeDelayTime);
-
-        // Vorbereitung zum Heraussuchen der Zeilen, die welche ersetzen
-        IntArray lineMove = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
-        for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++)
-            lineMove.add(i);
-
-
-        if (linesToRemove.size > 0) {
-            if (app.localPrefs.isPlaySounds() && app.theme.removeSound != null) {
-                if (!special || app.theme.cleanSpecialSound == null)
-                    app.theme.removeSound.play(.4f + linesToRemove.size * .2f);
-                else
-                    app.theme.cleanSpecialSound.play(.8f);
-            }
-            inputAdapter.vibrate(special ? VibrationType.SPECIAL_CLEAR : VibrationType.CLEAR);
-
-            for (int i = linesToRemove.size - 1; i >= 0; i--) {
-                int y = linesToRemove.get(i);
-
-                // enlighten and remove all blocks from the line to be removed
-                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                    BlockActor block = blockMatrix[x][y];
-                    blockMatrix[x][y] = null;
-                    block.setEnlightened(true);
-
-
-                    if (special)
-                        // Spezialeffekt: Verdichtung auf einen Block
-                        block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(0) - .5f +
-                                linesToRemove.size / 2) * BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
-                    else if (linesToRemove.size >= 3)
-                        // ab 3 Zeilen alle zeilenweise zusammen schieben
-                        block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(i)) *
-                                BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
-                    // else if (y == i && linesToInsert == 0) - entfernt wegen anhaltendem Ärger!
-                    // die untersten zusammenhängenden Zeilen rausschieben
-                    //block.setMoveAction(Actions.moveBy(0, -2 * BlockActor.blockWidth, moveActorsTime),
-                    //        removeDelayTime);
-
-                    block.addAction(sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
-                            Actions.removeActor()));
-                }
-
-                // heraussuchen durch welche Zeile diese hier ersetzt wird (linesToInsert hier noch nicht beachtet)
-                for (int higherY = y; higherY < Gameboard.GAMEBOARD_ALLROWS; higherY++)
-                    if (higherY < Gameboard.GAMEBOARD_ALLROWS - 1)
-                        lineMove.set(higherY, lineMove.get(higherY + 1));
-                    else
-                        lineMove.set(higherY, -1);
-            }
-
-            // den Explosions-Effekt einfügen
-            if (app.theme.usesParticleEffect && (special && app.theme.particleEffectTrigger == Theme.EffectTrigger.specialClear
-                    || app.theme.particleEffectTrigger == Theme.EffectTrigger.lineClear)) {
-
-                if (app.theme.particleEffectPosition == Theme.EffectSpawnPosition.clear)
-                    playerArea.weldEffect.setPosition(playerArea.blockGroup.getX() + 5f * BlockActor.blockWidth - app.theme.particleEffectWidth / 2,
-                            playerArea.blockGroup.getY() + (linesToRemove.size / 2 + linesToRemove.get(0)) * BlockActor.blockWidth - app.theme.particleEffectHeight / 2);
-
-                playerArea.weldEffect.start();
-            }
-        }
-
-        // bis hier gilt: i = Zeile; lineMove.get(i): Zeile durch die i ersetzt wird ohne Garbage (oder -1 für keine)
-        for (int i = 0; i < lineMove.size; i++) {
-            int replaceLineIwith = lineMove.get(i);
-            int destinationY = i + linesToInsert;
-            if (replaceLineIwith >= 0) {
-                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                    // hier die Garbage ebenfalls noch nicht einrechnen... in der Matrix erst im nächsten Schritt
-                    // hochziehen
-                    BlockActor block = blockMatrix[x][replaceLineIwith];
-                    blockMatrix[x][replaceLineIwith] = null;
-                    blockMatrix[x][i] = block;
-
-                    // verschieben des Actors... hier wird aber die Garbage schon beachtet!
-                    // falls gar keine Bewegung da, dann auch nix machen
-                    if (block != null && destinationY != replaceLineIwith) {
-                        float delay = 0;
-
-                        // jetzt eine grundsätzliche Unterscheidung: wird die Zeile hochgeschoben oder runterbewegt?
-                        // wenn hoch, dann kein delay
-                        final SequenceAction moveSequence = Actions.action(SequenceAction.class);
-
-                        if (destinationY <= replaceLineIwith)
-                            delay = removeDelayTime;
-
-                        moveSequence.addAction(Actions.moveTo((x) * BlockActor.blockWidth, (destinationY) *
-                                BlockActor.blockWidth, moveActorsTime));
-
-                        // wenn Block durch insert rausgeschoben wird, dann weg
-                        // in der moveAction eigentlich nicht ganz korrekt, aber der Fall tritt sehr selten auf
-                        // und der Block wird sowieso nicht nochmal angefasst werden
-                        if (destinationY >= Gameboard.GAMEBOARD_ALLROWS) {
-                            moveSequence.addAction(Actions.fadeOut(removeFadeOutTime));
-                            moveSequence.addAction(removeActor());
-                        }
-
-                        if (delay > 0) {
-                            final BlockActor timedBlock = block;
-
-                            Timer.schedule(new Timer.Task() {
-                                @Override
-                                public void run() {
-                                    timedBlock.setMoveAction(moveSequence);
-                                }
-                            }, delay);
-
-                        } else
-                            block.setMoveAction(moveSequence);
-                    }
-
-                }
-
-            }
-        }
-
-        if (linesToInsert > 0) {
-            if (app.localPrefs.isPlaySounds() && app.theme.garbageSound != null)
-                app.theme.garbageSound.play(.4f + linesToInsert * .2f);
-            inputAdapter.vibrate(VibrationType.GARBAGE);
-            // nun die Referenz hochziehen
-            for (int i = Gameboard.GAMEBOARD_ALLROWS - 1; i >= linesToInsert; i--)
-                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                    BlockActor block = blockMatrix[x][i - linesToInsert];
-                    blockMatrix[x][i - linesToInsert] = null;
-                    blockMatrix[x][i] = block;
-                }
-
-            // und zu guter letzt die neuen Blöcke einfügen
-            for (int y = linesToInsert - 1; y >= 0; y--) {
-                int holePos = garbageHolePosition[linesToInsert - 1 - y];
-
-                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                    if (x != holePos) {
-                        BlockActor block = new BlockActor(app, Gameboard.SQUARE_GARBAGE, true);
-                        block.setX(x * BlockActor.blockWidth);
-                        block.setY((y - linesToInsert) * BlockActor.blockWidth);
-                        block.setEnlightened(true, true);
-                        block.setMoveAction(Actions.sequence(Actions.moveTo((x) * BlockActor.blockWidth, y *
-                                BlockActor.blockWidth, moveActorsTime), Actions.run(block.getDislightenAction())));
-                        playerArea.blockGroup.addActor(block);
-                        blockMatrix[x][y] = block;
-                    }
-                }
-            }
-
-        }
-    }
-
-    @Override
-    public void markAndMoveFreezedLines(boolean playSoundAndMove, IntArray movedLines, IntArray fullLines) {
-        BlockActor[][] blockMatrix = playerArea.blockMatrix;
-
-        if (movedLines.size == 0 && fullLines.size == 0)
-            return;
-
-        if (playSoundAndMove && app.localPrefs.isPlaySounds() && app.theme.cleanFreezedSound != null)
-            app.theme.cleanFreezedSound.play();
-
-        // volle Reihen erleuchten
-        for (int i = 0; i < fullLines.size; i++) {
-            int y = fullLines.get(i);
-            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                BlockActor block = blockMatrix[x][y];
-                block.setEnlightened(true);
-            }
-
-        }
-        // zu verschiebende Reihen verschieben
-        BlockActor[] lineBlocks = new BlockActor[Gameboard.GAMEBOARD_COLUMNS];
-        for (int movedLineNum = 0; movedLineNum < movedLines.size; movedLineNum++) {
-
-            int y = movedLines.get(movedLineNum);
-
-            // die Reihe aufnehmen
-            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                lineBlocks[x] = blockMatrix[x][y];
-                lineBlocks[x].setEnlightened(true);
-            }
-
-            // nun die Referenzen weiter unten schieben
-            for (int i = y; i > movedLineNum; i--)
-                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                    BlockActor block = blockMatrix[x][i - 1];
-                    blockMatrix[x][i - 1] = null;
-                    blockMatrix[x][i] = block;
-                }
-
-            // und die eigentliche Reihe dann ablegen
-            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++)
-                blockMatrix[x][movedLineNum] = lineBlocks[x];
-        }
-
-        // die Blockmatrix zeigt jetzt den korrekten Stand der Dinge an, also jetzt auch in der
-        // GUI verschieben
-        if (movedLines.size > 0 && playSoundAndMove)
-            for (int y = 0; y <= movedLines.get(movedLines.size - 1); y++) {
-                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-                    final BlockActor block = blockMatrix[x][y];
-                    final int xf = x;
-                    final int yf = y;
-
-                    if (block != null) {
-                        // der kleine Delay ist nötig, da bei Hard Drop der aktive nicht immer schon
-                        // da ist
-                        Timer.schedule(new Timer.Task() {
-                            @Override
-                            public void run() {
-                                block.setMoveAction(Actions.moveTo(xf * BlockActor.blockWidth, yf *
-                                        BlockActor.blockWidth, .3f));
-                            }
-                        }, .05f);
-                    }
-                }
-            }
-
-    }
-
-    @Override
     public void setGameOver() {
         music.stop();
         if (app.localPrefs.isPlaySounds() && app.theme.gameOverSound != null)
@@ -799,167 +460,12 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
                 gameModel.getScoreboardParameters(), gameModel.getReplay()));
     }
 
-    @Override
-    public void showNextTetro(Integer[][] relativeBlockPositions, int blockType) {
-        playerArea.showNextTetro(relativeBlockPositions, blockType);
-    }
-
-    @Override
-    public void activateNextTetro(Integer[][] boardBlockPositions, int blockType, int ghostPieceDistance) {
-        playerArea.activateNextTetro(boardBlockPositions, blockType, ghostPieceDistance);
-    }
-
-    @Override
-    public void swapHoldAndActivePiece(Integer[][] newHoldPiecePositions, Integer[][] oldActivePiecePositions,
-                                       Integer[][] newActivePiecePositions, int ghostPieceDistance, int holdBlockType) {
-        playerArea.swapHoldAndActivePiece(newHoldPiecePositions, oldActivePiecePositions,
-                newActivePiecePositions, ghostPieceDistance, holdBlockType);
-    }
-
-    @Override
-    public void pinTetromino(Integer[][] currentBlockPositions) {
-        if (app.localPrefs.isPlaySounds() && app.theme.dropSound != null)
-            app.theme.dropSound.play();
-
-        inputAdapter.vibrate(VibrationType.DROP);
-
-        for (Integer[] vAfterMove : currentBlockPositions) {
-            BlockActor activePieceBlock = playerArea.blockMatrix[vAfterMove[0]][vAfterMove[1]];
-            activePieceBlock.setEnlightened(false);
-        }
-    }
-
-    @Override
-    public void markConflict(int x, int y) {
-        BlockActor block = playerArea.blockMatrix[x][y];
-        block.showConflictTouch();
-    }
-
-    @Override
-    public void showMotivation(MotivationTypes achievement, @Nullable String extraMsg) {
-
-        boolean playSound = true;
-        boolean vibrate = true;
-        String text = "";
-        float duration = 2;
-
-        switch (achievement) {
-            case newLevel:
-                text = app.TEXTS.get("labelLevel") + " " + extraMsg;
-                break;
-            case tSpin:
-                text = app.TEXTS.get("motivationTSpin");
-                break;
-            case doubleSpecial:
-                text = app.TEXTS.get("motivationDoubleSpecial");
-                vibrate = false;
-                break;
-            case tenLinesCleared:
-                text = extraMsg + " " + app.TEXTS.get("labelLines");
-                playSound = false;
-                vibrate = false;
-                break;
-            case boardCleared:
-                text = app.TEXTS.get("motivationCleanComplete");
-                vibrate = false;
-                break;
-            case newHighscore:
-                text = app.TEXTS.get("motivationNewHighscore");
-                break;
-            case hundredBlocksDropped:
-                text = app.TEXTS.format("motivationHundredBlocks", extraMsg);
-                vibrate = false;
-                playSound = false;
-                break;
-            case playerOver:
-                if (extraMsg == null)
-                    extraMsg = "Other player";
-                else if (extraMsg.length() >= 12)
-                    extraMsg = extraMsg.substring(0, 10) + "...";
-                text = app.TEXTS.format("motivationPlayerOver", extraMsg);
-                break;
-            case gameOver:
-                text = app.TEXTS.format("motivationGameOver");
-                duration = 10;
-                playSound = false;
-                break;
-            case gameWon:
-                text = app.TEXTS.format("motivationGameWon");
-                duration = 10;
-                playSound = false;
-                break;
-            case gameSuccess:
-                text = app.TEXTS.format("motivationGameSuccess");
-                duration = 10;
-                playSound = false;
-
-                // keine weiteren Animationen zu abgebauten Reihen
-                noLineClearAnimation = true;
-                break;
-            case bonusScore:
-                text = app.TEXTS.format("motivationBonusScore", extraMsg);
-                duration = 3;
-                vibrate = false;
-                break;
-            case comboCount:
-                text = app.TEXTS.format("motivationComboCount", extraMsg);
-                duration = .5f;
-                vibrate = false;
-                break;
-            case turnGarbage:
-                playSound = true;
-                if (extraMsg.length() >= 12)
-                    extraMsg = extraMsg.substring(0, 10) + "...";
-                text = app.TEXTS.format("motivationTurnGarbage", extraMsg);
-                break;
-            case turnOver:
-                text = app.TEXTS.format("motivationTurnOver");
-                break;
-            case turnSurvive:
-                if (extraMsg.length() >= 12)
-                    extraMsg = extraMsg.substring(0, 10) + "...";
-                text = app.TEXTS.format("motivationSurvive", extraMsg);
-                duration = .75f;
-                break;
-            case prepare:
-                text = app.TEXTS.format("motivationPrepare");
-                duration = BackendBattleModel.PREPARE_TIME_SECONDS;
-                break;
-        }
-
-        if (playSound && app.localPrefs.isPlaySounds() && app.theme.unlockedSound != null)
-            app.theme.unlockedSound.play();
-
-        if (vibrate && inputAdapter != null)
-            inputAdapter.vibrate(VibrationType.MOTIVATION);
-
-        if (!text.isEmpty())
-            playerArea.addMotivationText(text.toUpperCase(), duration);
-    }
-
-    @Override
-    public void showGarbageAmount(int lines) {
-        playerArea.showGarbageAmount(lines);
-    }
-
-    @Override
-    public void showComboHeight(int comboHeight) {
-        playerArea.showComboHeight(comboHeight);
-    }
-
-    @Override
-    public void updateScore(GameScore score, int gainedScore) {
-        playerArea.updateScore(score);
-    }
-
-    @Override
     public void playersInGameChanged(MultiPlayerObjects.PlayerInGame pig) {
-        // Das passiert nur beim Multiplayer daher hier nichts
+        // only used on multiplayer
     }
 
-    @Override
     public void playersGameboardChanged(MultiPlayerObjects.ChatMessage gameboardInfo) {
-        // Das passiert nur beim Multiplayer daher hier nichts
+        // only used on multiplayer
     }
 
     public void showInputHelp() {
@@ -978,7 +484,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         return dialog;
     }
 
-    @Override
     public void addGameBlocker(GameBlocker e) {
         gameBlockers.add(e);
         refreshResumeFromPauseText();
@@ -988,7 +493,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
             switchPause(false);
     }
 
-    @Override
     public void removeGameBlocker(GameBlocker e) {
         gameBlockers.remove(e);
         refreshResumeFromPauseText();
@@ -1014,7 +518,6 @@ public class PlayScreen extends AbstractScreen implements IGameModelListener, On
         pauseDialog.setEmphasizeInputMsg(!gameBlockers.isEmpty());
     }
 
-    @Override
     public void showOverlayMessage(final String message, final float autoHide, final String... params) {
         if (overlayWindow == null)
             overlayWindow = new OverlayMessage(app, playerArea.labelGroup.getWidth());

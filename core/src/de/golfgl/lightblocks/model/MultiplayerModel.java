@@ -15,6 +15,7 @@ import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.screen.MultiplayerPlayScreen;
+import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.MultiplayerMatch;
 
@@ -89,7 +90,7 @@ public class MultiplayerModel extends GameModel {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    userInterface.showGarbageAmount(waitingGarbageLinesNum);
+                    uiGameboard.showGarbageAmount(waitingGarbageLinesNum);
                 }
             });
         }
@@ -337,7 +338,7 @@ public class MultiplayerModel extends GameModel {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    userInterface.showGarbageAmount(waitingGarbageLinesNum);
+                    uiGameboard.showGarbageAmount(waitingGarbageLinesNum);
                 }
             });
         }
@@ -426,7 +427,7 @@ public class MultiplayerModel extends GameModel {
                             sp.playerId = null;
                             sp.nowPaused = false;
                             playerRoom.sendToAllPlayers(sp);
-                            ((MultiplayerPlayScreen) userInterface).multiPlayerGotModelMessage(sp);
+                            ((MultiplayerPlayScreen) playScreen).multiPlayerGotModelMessage(sp);
                         }
                     }
 
@@ -459,7 +460,7 @@ public class MultiplayerModel extends GameModel {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        userInterface.playersInGameChanged(pig);
+                        playScreen.playersInGameChanged(pig);
                     }
                 });
 
@@ -475,7 +476,7 @@ public class MultiplayerModel extends GameModel {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    userInterface.playersGameboardChanged(gameboardInfo);
+                    playScreen.playersGameboardChanged(gameboardInfo);
                 }
             });
         }
@@ -489,7 +490,7 @@ public class MultiplayerModel extends GameModel {
                 // Highscores updaten
                 bestScore.setBestScores(getScore());
                 totalScore.addScore(score);
-                userInterface.updateScore(getScore(), score);
+                uiGameboard.updateScore(getScore(), score);
             }
         });
     }
@@ -511,10 +512,10 @@ public class MultiplayerModel extends GameModel {
             Gdx.app.postRunnable(new Runnable() {
                 @Override
                 public void run() {
-                    userInterface.playersInGameChanged(pig);
+                    playScreen.playersInGameChanged(pig);
 
                     if (!isGameOver())
-                        userInterface.showMotivation(IGameModelListener.MotivationTypes.playerOver, playerId);
+                        uiGameboard.showMotivation(IGameModelListener.MotivationTypes.playerOver, playerId);
                 }
             });
 
@@ -571,12 +572,12 @@ public class MultiplayerModel extends GameModel {
     }
 
     @Override
-    public void setUserInterface(IGameModelListener userInterface) {
-        super.setUserInterface(userInterface);
+    public void setUserInterface(PlayScreen playScreen, IGameModelListener uiGameboard) {
+        super.setUserInterface(playScreen, uiGameboard);
 
         synchronized (playerInGame) {
             for (MultiPlayerObjects.PlayerInGame pig : playerInGame.values())
-                userInterface.playersInGameChanged(pig);
+                this.playScreen.playersInGameChanged(pig);
         }
 
     }

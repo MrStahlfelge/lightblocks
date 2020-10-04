@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.JsonWriter;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.Replay;
@@ -40,7 +41,8 @@ public abstract class GameModel implements Json.Serializable {
     protected BestScore bestScore;
     // wieviel ist der aktuelle Stein schon ungerundet gefallen
     protected float currentSpeed;
-    protected IGameModelListener userInterface;
+    protected PlayScreen playScreen;
+    protected IGameModelListener uiGameboard;
     protected TetrominoDrawyer drawyer;
     protected Replay replay;
     private GameScore score;
@@ -170,7 +172,7 @@ public abstract class GameModel implements Json.Serializable {
 
         if (maxDistance > 0) {
             int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
-            userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), 0, -maxDistance,
+            uiGameboard.moveTetro(activeTetromino.getCurrentBlockPositions(), 0, -maxDistance,
                     ghostPieceDistance);
             activeTetromino.getPosition().y -= maxDistance;
             activeTetromino.setLastMovementType(0);
@@ -201,7 +203,7 @@ public abstract class GameModel implements Json.Serializable {
         Replay.ReplayStep replayStep = replay.addDropStep(score.getTimeMs(), activeTetromino);
         activeTetrominoWillDrop();
         gameboard.pinTetromino(activeTetromino);
-        userInterface.pinTetromino(activeTetromino.getCurrentBlockPositions());
+        uiGameboard.pinTetromino(activeTetromino.getCurrentBlockPositions());
         noDropSinceHoldMove = false;
 
         // T-Spin? 1. T, 2. letzte Bewegung ist Drehung, 3. drei Felder um Rotationszentrum sind belegt
@@ -229,10 +231,10 @@ public abstract class GameModel implements Json.Serializable {
 
         if (isComboScoreAllowedByModel()) {
             int comboHeight = score.setComboCounter(removedLines > 0);
-            userInterface.showComboHeight(comboHeight);
+            uiGameboard.showComboHeight(comboHeight);
             boolean newMaxCombo = totalScore.setMaxComboCount(comboHeight);
             if (newMaxCombo && comboHeight >= 3 || comboHeight >= 5)
-                userInterface.showMotivation(IGameModelListener.MotivationTypes.comboCount,
+                uiGameboard.showMotivation(IGameModelListener.MotivationTypes.comboCount,
                         String.valueOf(comboHeight));
             if (newMaxCombo)
                 totalScore.checkAchievements(app.gpgsClient);
@@ -246,10 +248,10 @@ public abstract class GameModel implements Json.Serializable {
 
         if (tSpin && removedLines < 2)
             // T-Spin nur zeigen, wenn nicht eh schon die Explosion erfolgt
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.tSpin, null);
+            uiGameboard.showMotivation(IGameModelListener.MotivationTypes.tSpin, null);
 
         int gameboardFill = gameboard.calcGameboardFill();
-        userInterface.setGameboardCriticalFill(isGameboardCriticalFill(gameboardFill));
+        playScreen.setGameboardCriticalFill(isGameboardCriticalFill(gameboardFill));
 
         if (removedLines > 0)
             achievementsClearedLines(levelBeforeRemove, removedLines, gameboardFill);
@@ -257,7 +259,7 @@ public abstract class GameModel implements Json.Serializable {
         // Oder vielleicht x100 Tetrominos?
         final int drawnTetrominos = score.getDrawnTetrominos();
         if (Math.floor(drawnTetrominos / 100) > Math.floor((drawnTetrominos - 1) / 100))
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.hundredBlocksDropped, Integer.toString(
+            uiGameboard.showMotivation(IGameModelListener.MotivationTypes.hundredBlocksDropped, Integer.toString(
                     drawnTetrominos));
 
         // Alle 10 Tetros auch Ereignis an GPGS melden
@@ -268,7 +270,7 @@ public abstract class GameModel implements Json.Serializable {
         if (bestScore.setBestScores(score)) {
             // nur einmal rausgeben - und auch nur wenn nicht trivial
             if (!isBestScore)
-                userInterface.showMotivation(IGameModelListener.MotivationTypes.newHighscore, null);
+                uiGameboard.showMotivation(IGameModelListener.MotivationTypes.newHighscore, null);
             isBestScore = true;
         }
         totalScore.addScore(gainedScore);
@@ -279,7 +281,7 @@ public abstract class GameModel implements Json.Serializable {
         if (tSpin)
             achievementTSpin();
 
-        userInterface.updateScore(score, gainedScore);
+        uiGameboard.updateScore(score, gainedScore);
         if (gainedScore > 0)
             achievementsScore(gainedScore);
 
@@ -287,7 +289,7 @@ public abstract class GameModel implements Json.Serializable {
         activeTetrominoDropped();
 
         // jetzt auch im UI abbilden. Nicht früher, damit evtl. bei Spielende anders reagiert werden kann
-        userInterface.clearAndInsertLines(this.removedLines, removeWasSpecial, garbageLines);
+        uiGameboard.clearAndInsertLines(this.removedLines, removeWasSpecial, garbageLines);
 
         // nicht mehr weiter machen wenn bereits geschafft
         if (!isGameOver()) {
@@ -335,12 +337,12 @@ public abstract class GameModel implements Json.Serializable {
 
         // Level hoch? Super!
         if (score.getCurrentLevel() != levelBeforeRemove)
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.newLevel, Integer.toString(score
+            uiGameboard.showMotivation(IGameModelListener.MotivationTypes.newLevel, Integer.toString(score
                     .getCurrentLevel()));
 
             // Wenn kein Level hoch, dann 10 Reihen geschafft?
         else if (Math.floor(clearedLines / 10) > Math.floor((clearedLines - removedLines) / 10))
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, Integer.toString((int)
+            uiGameboard.showMotivation(IGameModelListener.MotivationTypes.tenLinesCleared, Integer.toString((int)
                     Math.floor(clearedLines / 10) * 10));
 
         if (clearedLines >= 100 && clearedLines - removedLines < 100)
@@ -350,7 +352,7 @@ public abstract class GameModel implements Json.Serializable {
             gpgsUpdateAchievement(GpgsHelper.ACH_CLEAN_COMPLETE);
 
             if (score.addPerfectClear())
-                userInterface.showMotivation(IGameModelListener.MotivationTypes.boardCleared, null);
+                uiGameboard.showMotivation(IGameModelListener.MotivationTypes.boardCleared, null);
         }
 
         float fTotalClearedLines = totalScore.getClearedLines();
@@ -440,7 +442,7 @@ public abstract class GameModel implements Json.Serializable {
         if (doubleSpecial) {
             specialRowChainNum++;
             totalScore.incDoubles();
-            userInterface.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
+            uiGameboard.showMotivation(IGameModelListener.MotivationTypes.doubleSpecial, null);
 
             if (specialRowChainNum == 5)
                 gpgsUpdateAchievement(GpgsHelper.ACH_SPECIAL_CHAIN);
@@ -478,7 +480,7 @@ public abstract class GameModel implements Json.Serializable {
 
         if (maxDistance != 0) {
             int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, maxDistance);
-            userInterface.moveTetro(activeTetromino.getCurrentBlockPositions(), maxDistance, 0,
+            uiGameboard.moveTetro(activeTetromino.getCurrentBlockPositions(), maxDistance, 0,
                     ghostPieceDistance);
             activeTetromino.getPosition().x += maxDistance;
             activeTetromino.setLastMovementType(0);
@@ -492,7 +494,7 @@ public abstract class GameModel implements Json.Serializable {
 
             for (Integer[] coord : activeTetromino.getCurrentBlockPositions()) {
                 if (gameboard.isValidCoordinate(coord[0] + signum, coord[1]) == 1)
-                    userInterface.markConflict(coord[0] + signum, coord[1]);
+                    uiGameboard.markConflict(coord[0] + signum, coord[1]);
             }
         }
 
@@ -525,7 +527,7 @@ public abstract class GameModel implements Json.Serializable {
             activeTetromino.setRotation(newRotation);
 
             int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
-            userInterface.rotateTetro(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions(),
+            uiGameboard.rotateTetro(oldBlockPositionsNewArray, activeTetromino.getCurrentBlockPositions(),
                     ghostPieceDistance);
             lastMovementMs = score.getTimeMs();
             activeTetromino.incLockDelayCount(1);
@@ -566,7 +568,7 @@ public abstract class GameModel implements Json.Serializable {
         if (onHoldTetromino < 0) {
             // Der erste durchgeführte Hold
             onHoldTetromino = activeTetromino.getTetrominoType();
-            userInterface.swapHoldAndActivePiece(newHoldPositions, oldActivePositions, null, 0,
+            uiGameboard.swapHoldAndActivePiece(newHoldPositions, oldActivePositions, null, 0,
                     onHoldTetromino);
 
             activateNextTetromino();
@@ -577,7 +579,7 @@ public abstract class GameModel implements Json.Serializable {
             onHoldTetromino = tmp.getTetrominoType();
             checkActiveTetroPosBeforeUiInformed();
             int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
-            userInterface.swapHoldAndActivePiece(newHoldPositions, oldActivePositions,
+            uiGameboard.swapHoldAndActivePiece(newHoldPositions, oldActivePositions,
                     activeTetromino.getCurrentBlockPositions(), ghostPieceDistance, onHoldTetromino);
 
             resetMovementsAndCheckActiveTetroPos();
@@ -589,8 +591,8 @@ public abstract class GameModel implements Json.Serializable {
 
         noDropSinceHoldMove = true;
         int comboHeight = score.redrawOnHold();
-        userInterface.showComboHeight(comboHeight);
-        userInterface.updateScore(score, 0);
+        uiGameboard.showComboHeight(comboHeight);
+        uiGameboard.updateScore(score, 0);
 
         return true;
     }
@@ -610,15 +612,15 @@ public abstract class GameModel implements Json.Serializable {
         checkActiveTetroPosBeforeUiInformed();
 
         // ins Display mit beiden
-        if (userInterface != null)
+        if (uiGameboard != null)
             fireUserInterfaceTetrominoSwap();
 
         resetMovementsAndCheckActiveTetroPos();
 
         if (!isGameOver) {
             score.incDrawnTetrominos();
-            if (userInterface != null)
-                userInterface.updateScore(score, 0);
+            if (uiGameboard != null)
+                uiGameboard.updateScore(score, 0);
             replay.addNextPieceStep(score.getTimeMs(), gameboard, activeTetromino);
         }
     }
@@ -645,8 +647,8 @@ public abstract class GameModel implements Json.Serializable {
      */
     protected void setGameOverBoardFull() {
         isGameOver = true;
-        userInterface.showMotivation(IGameModelListener.MotivationTypes.gameOver, null);
-        userInterface.setGameOver();
+        uiGameboard.showMotivation(IGameModelListener.MotivationTypes.gameOver, null);
+        playScreen.setGameOver();
 
         submitGameEnded(false);
     }
@@ -657,8 +659,8 @@ public abstract class GameModel implements Json.Serializable {
 
     protected void setGameOverWon(IGameModelListener.MotivationTypes type) {
         isGameOver = true;
-        userInterface.showMotivation(type, null);
-        userInterface.setGameOver();
+        uiGameboard.showMotivation(type, null);
+        playScreen.setGameOver();
 
         submitGameEnded(true);
     }
@@ -681,9 +683,9 @@ public abstract class GameModel implements Json.Serializable {
      */
     protected void fireUserInterfaceTetrominoSwap() {
         int ghostPieceDistance = gameboard.getGhostPieceDistance(activeTetromino, 0);
-        userInterface.activateNextTetro(activeTetromino.getCurrentBlockPositions(), activeTetromino.getTetrominoType(),
+        uiGameboard.activateNextTetro(activeTetromino.getCurrentBlockPositions(), activeTetromino.getTetrominoType(),
                 ghostPieceDistance);
-        userInterface.showNextTetro(nextTetromino.getRelativeBlockPositions(), nextTetromino.getTetrominoType());
+        uiGameboard.showNextTetro(nextTetromino.getRelativeBlockPositions(), nextTetromino.getTetrominoType());
     }
 
     public boolean isGameOver() {
@@ -771,8 +773,9 @@ public abstract class GameModel implements Json.Serializable {
         return null;
     }
 
-    public void setUserInterface(IGameModelListener userInterface) {
-        this.userInterface = userInterface;
+    public void setUserInterface(PlayScreen userInterface, IGameModelListener uiGameboard) {
+        this.playScreen = userInterface;
+        this.uiGameboard = uiGameboard;
 
         // Und dann das UI mal aufbauen
 
@@ -782,16 +785,16 @@ public abstract class GameModel implements Json.Serializable {
         for (int y = 0; y < blockSquares.length; y++)
             for (int x = 0; x < blockSquares[y].length; x++)
                 if (blockSquares[y][x] != Gameboard.SQUARE_EMPTY)
-                    userInterface.insertNewBlock(x, y, blockSquares[y][x]);
+                    uiGameboard.insertNewBlock(x, y, blockSquares[y][x]);
 
         // und auch die aktiven Tetrominos
         fireUserInterfaceTetrominoSwap();
         if (this.onHoldTetromino >= 0)
-            userInterface.swapHoldAndActivePiece(new Tetromino(onHoldTetromino, isModernRotation()).getRelativeBlockPositions(),
+            uiGameboard.swapHoldAndActivePiece(new Tetromino(onHoldTetromino, isModernRotation()).getRelativeBlockPositions(),
                     null, null, 0, onHoldTetromino);
 
         // Score
-        userInterface.updateScore(score, 0);
+        uiGameboard.updateScore(score, 0);
     }
 
     /**

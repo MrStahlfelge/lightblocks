@@ -7,8 +7,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
-import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.Replay;
 
@@ -62,7 +62,7 @@ public class ModernFreezeModel extends GameModel {
             isFreezed = true;
             freezeBonusMultiplier = freezeloadms >= MAX_FREEZEMS ? 2 : 1;
             freezedClearedLines = 0;
-            userInterface.startFreezeMode();
+            playScreen.startFreezeMode();
             gpgsUpdateAchievement(GpgsHelper.ACH_FREEZER);
         }
 
@@ -140,7 +140,7 @@ public class ModernFreezeModel extends GameModel {
             getGameboard().insertLines(garbageLines);
         }
 
-        userInterface.markAndMoveFreezedLines(freezeloadms > 0, removedLines, fullLines);
+        uiGameboard.markAndMoveFreezedLines(freezeloadms > 0, removedLines, fullLines);
 
         if (fullLinesNum > freezedClearedLines) {
             if (fullLinesNum >= 8 && freezedClearedLines < 8)
@@ -216,7 +216,7 @@ public class ModernFreezeModel extends GameModel {
 
             setFreezeInterval(LINE_FREEZE_END_DELAY * removedLineNum);
         }
-        userInterface.endFreezeMode(removedLines);
+        playScreen.endFreezeMode(removedLines);
 
         setCurrentSpeed();
 
@@ -298,8 +298,8 @@ public class ModernFreezeModel extends GameModel {
     }
 
     @Override
-    public void setUserInterface(IGameModelListener userInterface) {
-        super.setUserInterface(userInterface);
+    public void setUserInterface(PlayScreen playScreen, IGameModelListener uiGameboard) {
+        super.setUserInterface(playScreen, uiGameboard);
 
         if (isFreezed) {
             // volle reihen wieder markieren
@@ -310,7 +310,7 @@ public class ModernFreezeModel extends GameModel {
                 }
             }
 
-            userInterface.markAndMoveFreezedLines(false, new IntArray(), fullLines);
+            uiGameboard.markAndMoveFreezedLines(false, new IntArray(), fullLines);
         }
     }
 

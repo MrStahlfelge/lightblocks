@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 import de.golfgl.lightblocks.input.PlayScreenInput;
+import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
@@ -34,10 +35,10 @@ public class TutorialModel extends GameModel {
         tutorialStep++;
 
         if (tutorialStep <= 14)
-            userInterface.showOverlayMessage("tutorialStep" + Integer.toString(tutorialStep), 0);
+            playScreen.showOverlayMessage("tutorialStep" + Integer.toString(tutorialStep), 0);
         else {
             // Eigentliches Spiel beginnen
-            userInterface.showOverlayMessage(null, 0);
+            playScreen.showOverlayMessage(null, 0);
             setCurrentSpeed();
         }
     }
@@ -162,8 +163,8 @@ public class TutorialModel extends GameModel {
     }
 
     @Override
-    public void setUserInterface(IGameModelListener userInterface) {
-        super.setUserInterface(userInterface);
+    public void setUserInterface(PlayScreen playScreen, IGameModelListener uiGameboard) {
+        super.setUserInterface(playScreen, uiGameboard);
         nextTutorialStep();
     }
 

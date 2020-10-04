@@ -45,29 +45,13 @@ public interface IGameModelListener {
 
     void updateScore(GameScore score, int gainedScore);
 
-    void playersInGameChanged(MultiPlayerObjects.PlayerInGame pig);
-
-    void playersGameboardChanged(MultiPlayerObjects.ChatMessage gameboardInfo);
-
     void markConflict(int x, int y);
 
     void showMotivation(MotivationTypes achievement, @Nullable String extra);
 
-    void showOverlayMessage(String message, float autoHide, String... params);
-
     void showGarbageAmount(int lines);
 
     void showComboHeight(int comboHeight);
-
-    void addGameBlocker(GameBlocker e);
-
-    void removeGameBlocker(GameBlocker e);
-
-    void setGameboardCriticalFill(boolean critical);
-
-    void startFreezeMode();
-
-    void endFreezeMode(IntArray removedLines);
 
     enum MotivationTypes {
         newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,

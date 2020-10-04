@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.Tetromino;
-import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.screen.PlayerArea;
 import de.golfgl.lightblocks.state.Replay;
 
 /**
@@ -89,7 +89,7 @@ public class ReplayGameboard extends BlockGroup {
         // remove cleared actors
         for (BlockActor actor : actorsToRemove) {
             actor.clearActions();
-            actor.addAction(Actions.sequence(Actions.fadeOut(PlayScreen.DURATION_TETRO_MOVE), Actions.removeActor()));
+            actor.addAction(Actions.sequence(Actions.fadeOut(PlayerArea.DURATION_TETRO_MOVE), Actions.removeActor()));
         }
         actorsToRemove.clear();
 
@@ -207,9 +207,9 @@ public class ReplayGameboard extends BlockGroup {
                 for (int col = 0; col < Gameboard.GAMEBOARD_COLUMNS && rowIsFull; col++) {
                     int pos = getIntFromRowAndCol(row - linesCleared, col);
                     if (currentShownBlocks[pos] != null) {
-                        currentShownBlocks[pos].addAction(Actions.forever(Actions.sequence(Actions.alpha(.2f, PlayScreen
+                        currentShownBlocks[pos].addAction(Actions.forever(Actions.sequence(Actions.alpha(.2f, PlayerArea
                                         .DURATION_REMOVE_DELAY, Interpolation.fade),
-                                Actions.fadeIn(PlayScreen.DURATION_REMOVE_DELAY, Interpolation.fade))));
+                                Actions.fadeIn(PlayerArea.DURATION_REMOVE_DELAY, Interpolation.fade))));
                         actorsToRemove.add(currentShownBlocks[pos]);
                     }
 
@@ -230,7 +230,7 @@ public class ReplayGameboard extends BlockGroup {
         }
 
         if (linesCleared > 0)
-            addAditionalDelayTimeInternal(PlayScreen.DURATION_REMOVE_DELAY + PlayScreen.DURATION_REMOVE_FADEOUT);
+            addAditionalDelayTimeInternal(PlayerArea.DURATION_REMOVE_DELAY + PlayerArea.DURATION_REMOVE_FADEOUT);
 
         return linesCleared > 0;
     }
@@ -255,7 +255,7 @@ public class ReplayGameboard extends BlockGroup {
         if (immediately)
             actor.setPosition(posX, posY);
         else if (actor.getX() != posX || actor.getY() != posY)
-            actor.setMoveAction(Actions.moveTo(posX, posY, PlayScreen.DURATION_TETRO_MOVE));
+            actor.setMoveAction(Actions.moveTo(posX, posY, PlayerArea.DURATION_TETRO_MOVE));
     }
 
     private int getRowFromInt(int newXY) {
