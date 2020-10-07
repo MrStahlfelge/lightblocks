@@ -107,7 +107,6 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         // this, will overlay the OverlayWindow!
         initializeGameModel(initGameParametersParams);
 
-        // TODO this shouldn't be added to playerarea
         playerArea.addActor(pauseButton);
 
         Mission mission = app.getMissionFromUid(gameModel.getIdentifier());
@@ -578,15 +577,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
 
         int gameboardAlignment = inputAdapter != null ? inputAdapter.getRequestedGameboardAlignment() : Align.center;
 
-        // sobald Platz neben Spielfeld breiter ist als Scoretable, diese dann mittig positionieren
-        // und dann auch langsam herunterschieben aber maximal zwei Zeilen
-        PlayScoreTable scoreTable = playerArea.scoreTable;
-        scoreTable.validate();
-        scoreTable.setX(Math.max(10 - playerArea.getX() + scoreTable.getPrefWidth() / 2, -playerArea.getX() / 2));
-        scoreTable.setY((gameboardAlignment == Align.top ? LightBlocksGame.nativeGameHeight : stage.getHeight() - playerArea.getY() * 1.2f)
-                - MathUtils.clamp(playerArea.getX() / 2 - scoreTable.getPrefWidth() / 2,
-                scoreTable.getPrefHeight() / 2 + 5, scoreTable.getLinePrefHeight() * 2 + scoreTable.getPrefHeight() /
-                        2));
+        playerArea.setScoreTablePosition(gameboardAlignment, stage.getWidth());
 
         if (gameboardAlignment == Align.top) {
             float deltaY = (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2;
@@ -598,17 +589,17 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         pauseButton.pack();
         pauseButton.setSize(pauseButton.getWidth() * 1.2f, pauseButton.getHeight() * 1.2f);
 
+        PlayScoreTable scoreTable = playerArea.scoreTable;
         if ((scoreTable.getX() + playerArea.getX() - scoreTable.getPrefWidth() / 2) > pauseButton.getWidth())
             pauseButton.setPosition(scoreTable.getX() - scoreTable.getPrefWidth() / 2 - pauseButton.getWidth(),
                     (scoreTable.getHeight() - pauseButton.getHeight()) / 2 + scoreTable.getY());
         else
             pauseButton.setPosition(scoreTable.getX() - scoreTable.getPrefWidth() / 2, scoreTable.getY() - 2f * pauseButton.getHeight());
 
-        // GestureInput neues TouchPanel und Resize On Screen Controls
         if (inputAdapter != null) {
             inputAdapter.setPlayScreen(this, app);
 
-            // es gibt momentan nur Portrait Zwang, eigentlich usePortraitGameBlocker natürlich für Landscape falsch
+            // this is named PortraitGameBlocker, because there is only portrait modus forced for gravity input
             Input.Orientation requestedScreenOrientation = inputAdapter.getRequestedScreenOrientation();
             if (requestedScreenOrientation != null && (requestedScreenOrientation.equals(Input.Orientation.Portrait)
                     && !isLandscape() || isLandscape() && requestedScreenOrientation.equals(Input.Orientation.Landscape)))

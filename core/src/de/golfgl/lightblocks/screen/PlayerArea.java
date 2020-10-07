@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -843,5 +844,18 @@ public class PlayerArea extends Group implements IGameModelListener {
         blockGroup.setGhostPieceVisibility(false);
         // forces a last refresh on next render() call
         currentShownTime = currentShownTime - 100;
+    }
+
+    public void setScoreTablePosition(int gameboardAlignment, float areaMaxWidth) {
+        // if space next to the gameboard is wider than the scoretable, position the table centered
+        // and move it down, but not more than two lines
+        float xPosInArea = (areaMaxWidth - getWidth()) / 2;
+
+        scoreTable.validate();
+        scoreTable.setX(Math.max(10 - xPosInArea + scoreTable.getPrefWidth() / 2, -xPosInArea / 2));
+        scoreTable.setY((gameboardAlignment == Align.top ? LightBlocksGame.nativeGameHeight : getStage().getHeight() - getY() * 1.2f)
+                - MathUtils.clamp(xPosInArea / 2 - scoreTable.getPrefWidth() / 2,
+                scoreTable.getPrefHeight() / 2 + 5, scoreTable.getLinePrefHeight() * 2 + scoreTable.getPrefHeight() /
+                        2));
     }
 }
