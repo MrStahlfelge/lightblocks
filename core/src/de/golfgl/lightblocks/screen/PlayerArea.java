@@ -53,19 +53,20 @@ public class PlayerArea extends Group implements IGameModelListener {
     private static final int NINE_PATCH_BORDER_SIZE = 5;
     protected final Image imGarbageIndicator;
     protected final BlockGroup blockGroup;
-    final ParticleEffectActor weldEffect;
-    final Image imComboIndicator;
+    private final ParticleEffectActor weldEffect;
+    private final Image imComboIndicator;
     final Group labelGroup;
-    final BlockActor[][] blockMatrix;
-    final BlockActor[] nextTetro;
-    final BlockActor[] holdTetro;
-    final MotivationLabel motivatorLabel;
+    private final BlockActor[][] blockMatrix;
+    private final BlockActor[] nextTetro;
+    private final BlockActor[] holdTetro;
+    private final MotivationLabel motivatorLabel;
     final PlayScreen.PlayScoreTable scoreTable;
     final Label gameType;
     private final LightBlocksGame app;
     private final PlayScreen playScreen;
-    ScaledLabel timeLabel;
-    boolean noLineClearAnimation;
+    GameModel gameModel;
+    private ScaledLabel timeLabel;
+    private boolean noLineClearAnimation;
     private ScoreLabel blocksLeft;
     private Label timeLabelDesc;
     private int currentShownTime;
@@ -191,7 +192,7 @@ public class PlayerArea extends Group implements IGameModelListener {
 
     }
 
-    void gameModelInitialized(GameModel gameModel) {
+    void gameModelInitialized() {
         // this has to be set after game model is loaded, so that any preset scores don't
         // trigger any animations
         scoreTable.setEmphasizeTresholds();
@@ -220,7 +221,7 @@ public class PlayerArea extends Group implements IGameModelListener {
             timeLabel.addListener(new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    return playScreen.gameModel.onTimeLabelTouchedByPlayer();
+                    return gameModel.onTimeLabelTouchedByPlayer();
                 }
             });
         }
@@ -337,7 +338,7 @@ public class PlayerArea extends Group implements IGameModelListener {
             return;
         }
 
-        playScreen.gameModel.setFreezeInterval(removeDelayTime);
+        gameModel.setFreezeInterval(removeDelayTime);
 
         // Prepare to identify the rows that should get replaced
         IntArray lineMove = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
@@ -550,6 +551,24 @@ public class PlayerArea extends Group implements IGameModelListener {
     }
 
     @Override
+    public void endFreezeMode(IntArray removedLines) {
+        int removedLineNum = removedLines.size;
+        if (removedLineNum > 0) {
+            motivatorLabel.addMotivationText((removedLineNum + " " + app.TEXTS.get("labelLines")).toUpperCase(), 1.5f);
+            clearAndInsertLines(removedLines, removedLineNum >= 8, null);
+        }
+    }
+
+    @Override
+    public void emphasizeTimeLabel() {
+        if (!timeLabel.hasActions()) {
+            Color oldColor = new Color(timeLabel.getColor());
+            timeLabel.setColor(app.theme.emphasizeColor);
+            timeLabel.addAction(Actions.color(oldColor, 1f));
+        }
+    }
+
+    @Override
     public void showGarbageAmount(int lines) {
         imGarbageIndicator.setVisible(true);
         imGarbageIndicator.clearActions();
@@ -592,7 +611,7 @@ public class PlayerArea extends Group implements IGameModelListener {
     }
 
     protected float getNextPieceYPos() {
-        return (Gameboard.GAMEBOARD_NORMALROWS - (playScreen.gameModel.isModernRotation() ? 1 : 0) + .3f) * BlockActor.blockWidth;
+        return (Gameboard.GAMEBOARD_NORMALROWS - (gameModel.isModernRotation() ? 1 : 0) + .3f) * BlockActor.blockWidth;
     }
 
     protected float getNextPieceXPos() {
@@ -688,7 +707,6 @@ public class PlayerArea extends Group implements IGameModelListener {
         scoreTable.setCurrentLevel(score.getCurrentLevel());
         scoreTable.setScore(score.getScore());
 
-        GameModel gameModel = playScreen.gameModel;
         if (gameModel.showBlocksScore())
             blocksLeft.setScore(gameModel.getMaxBlocksToUse() > 0 ?
                     gameModel.getMaxBlocksToUse() - score.getDrawnTetrominos() : score.getDrawnTetrominos());
@@ -816,7 +834,6 @@ public class PlayerArea extends Group implements IGameModelListener {
     }
 
     protected void updateTimeLabel() {
-        GameModel gameModel = playScreen.gameModel;
         if (gameModel.showTime() && timeLabel != null) {
             int timeMs = gameModel.getShownTimeMs();
 

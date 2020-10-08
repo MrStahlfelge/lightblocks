@@ -66,6 +66,10 @@ public class ModernFreezeModel extends GameModel {
             gpgsUpdateAchievement(GpgsHelper.ACH_FREEZER);
         }
 
+        if (!isFreezed) {
+            uiGameboard.emphasizeTimeLabel();
+        }
+
         return isFreezed;
     }
 
@@ -216,7 +220,8 @@ public class ModernFreezeModel extends GameModel {
 
             setFreezeInterval(LINE_FREEZE_END_DELAY * removedLineNum);
         }
-        playScreen.endFreezeMode(removedLines);
+        uiGameboard.endFreezeMode(removedLines);
+        playScreen.endFreezeMode();
 
         setCurrentSpeed();
 

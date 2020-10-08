@@ -199,17 +199,6 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         }
     }
 
-    public void touchTimeLabelWithWarning() {
-        boolean somethingDone = gameModel.onTimeLabelTouchedByPlayer();
-
-        if (!somethingDone && !playerArea.timeLabel.hasActions()) {
-            Color oldColor = new Color(playerArea.timeLabel.getColor());
-            playerArea.timeLabel.setColor(app.theme.emphasizeColor);
-            playerArea.timeLabel.addAction(Actions.color(oldColor, 1f));
-        }
-
-    }
-
     protected void populateScoreTable(Table scoreTable) {
         // for overriding purpose
     }
@@ -254,6 +243,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         }
 
         gameModel.app = app;
+        playerArea.gameModel = gameModel;
         gameModel.setUserInterface(this, playerArea);
 
         // input initialisieren
@@ -270,7 +260,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         //TODO das sollte ins GameModel
         gameModel.setBestScore(app.savegame.getBestScore(gameModel.getIdentifier()));
 
-        playerArea.gameModelInitialized(gameModel);
+        playerArea.gameModelInitialized();
     }
 
     @Override
@@ -419,12 +409,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
             app.theme.freezeBeginSound.play();
     }
 
-    public void endFreezeMode(IntArray removedLines) {
-        int removedLineNum = removedLines.size;
-        if (removedLineNum > 0) {
-            playerArea.motivatorLabel.addMotivationText((removedLineNum + " " + app.TEXTS.get("labelLines")).toUpperCase(), 1.5f);
-            playerArea.clearAndInsertLines(removedLines, removedLineNum >= 8, null);
-        }
+    public void endFreezeMode() {
         music.play();
     }
 

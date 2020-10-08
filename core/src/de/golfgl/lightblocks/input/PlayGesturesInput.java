@@ -770,7 +770,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             if (!isPaused()) {
-                playScreen.touchTimeLabelWithWarning();
+                playScreen.gameModel.onTimeLabelTouchedByPlayer();
                 hadButtonEvent();
                 return true;
             }
