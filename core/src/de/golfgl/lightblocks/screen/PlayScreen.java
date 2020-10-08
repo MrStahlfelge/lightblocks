@@ -4,10 +4,8 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -18,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Scaling;
 
@@ -41,7 +38,7 @@ import de.golfgl.lightblocks.model.MultiplayerModel;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
 import de.golfgl.lightblocks.scene2d.BlockActor;
-import de.golfgl.lightblocks.scene2d.BlockGroup;
+import de.golfgl.lightblocks.scene2d.MyExtendViewport;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.OnScreenGamepad;
 import de.golfgl.lightblocks.scene2d.OverlayMessage;
@@ -63,6 +60,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
     private static final float GAMEOVER_TOUCHFREEZE = 1.5f;
     protected final TextButton pauseButton;
     protected final PlayerArea playerArea;
+    private PlayerArea secondPlayer;
     private final PlayMusic music;
     private final Image backgroundImage;
     public GameModel gameModel;
@@ -257,8 +255,15 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
 
         // Highscores
         gameModel.totalScore = app.savegame.getTotalScore();
-        //TODO das sollte ins GameModel
+        //TODO would be better in game model, but game model can't access the saved states
         gameModel.setBestScore(app.savegame.getBestScore(gameModel.getIdentifier()));
+
+        if (gameModel.hasSecondGameboard()) {
+            secondPlayer = new PlayerArea(app, this);
+            stage.getRoot().addActorAfter(playerArea, secondPlayer);
+        }
+
+        ((MyExtendViewport) stage.getViewport()).setMinWorldWidth((gameModel.hasSecondGameboard() ? 2 : 1) * LightBlocksGame.nativeGameWidth);
 
         playerArea.gameModelInitialized();
     }
@@ -362,20 +367,13 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         } else if (!isPaused || gameBlockers.isEmpty()) {
             isPaused = !isPaused;
 
-            final float fadingInterval = immediately ? 0 : .2f;
-
-            BlockGroup blockGroup = playerArea.blockGroup;
-            blockGroup.clearActions();
+            if (!gameModel.hasSecondGameboard()) {
+                playerArea.switchedPause(immediately, isPaused);
+            }
 
             if (!isPaused) {
-
                 music.setPlayingMusic(app.localPrefs.isPlayMusic());
                 music.play();
-                if (blockGroup.getColor().a < 1) {
-                    blockGroup.addAction(Actions.fadeIn(fadingInterval));
-                    gameModel.setFreezeInterval(fadingInterval);
-                }
-
                 pauseDialog.hide(null);
                 if (pauseMsgDialog != null && pauseMsgDialog.hasParent())
                     pauseMsgDialog.hide();
@@ -386,7 +384,6 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
                 //inform the game model that there was a pause
                 gameModel.fromPause();
             } else {
-                blockGroup.addAction(Actions.fadeOut(fadingInterval));
                 music.pause();
 
                 // Spielstand speichern
@@ -557,17 +554,24 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
                 backgroundImage.setScaling(Scaling.none);
         }
 
-        playerArea.setPosition((stage.getWidth() - LightBlocksGame.nativeGameWidth) / 2,
+        float maxWidthPerGameboard = gameModel.hasSecondGameboard() ? stage.getWidth() / 2 : stage.getWidth();
+
+        playerArea.setPosition((maxWidthPerGameboard - LightBlocksGame.nativeGameWidth) / 2,
                 (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
 
         int gameboardAlignment = inputAdapter != null ? inputAdapter.getRequestedGameboardAlignment() : Align.center;
 
-        playerArea.setScoreTablePosition(gameboardAlignment, stage.getWidth());
+        playerArea.setScoreTablePosition(gameboardAlignment, maxWidthPerGameboard);
 
         if (gameboardAlignment == Align.top) {
             float deltaY = (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2;
             playerArea.setY(playerArea.getY() + deltaY);
             backgroundImage.setY(deltaY);
+        }
+
+        if (gameModel.hasSecondGameboard()) {
+            secondPlayer.setPosition(maxWidthPerGameboard + playerArea.getX(), playerArea.getY());
+            secondPlayer.setScoreTablePosition(gameboardAlignment, maxWidthPerGameboard);
         }
 
         pauseButton.getLabel().setFontScale(MathUtils.clamp((float) width / height, 1f, 2f));

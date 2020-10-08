@@ -1035,4 +1035,8 @@ public abstract class GameModel implements Json.Serializable {
     public String getExitWarningMessage() {
         return null;
     }
+
+    public boolean hasSecondGameboard() {
+        return false;
+    }
 }

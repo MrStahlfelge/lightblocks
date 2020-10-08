@@ -875,4 +875,19 @@ public class PlayerArea extends Group implements IGameModelListener {
                 scoreTable.getPrefHeight() / 2 + 5, scoreTable.getLinePrefHeight() * 2 + scoreTable.getPrefHeight() /
                         2));
     }
+
+    public void switchedPause(boolean immediately, boolean isPaused) {
+        final float fadingInterval = immediately ? 0 : .2f;
+
+        blockGroup.clearActions();
+
+        if (!isPaused) {
+            if (blockGroup.getColor().a < 1) {
+                blockGroup.addAction(Actions.fadeIn(fadingInterval));
+                gameModel.setFreezeInterval(fadingInterval);
+            }
+        } else {
+            blockGroup.addAction(Actions.fadeOut(fadingInterval));
+        }
+    }
 }
