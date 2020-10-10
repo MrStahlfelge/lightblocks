@@ -11,6 +11,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.screen.PlayerArea;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.Replay;
@@ -289,7 +290,7 @@ public abstract class GameModel implements Json.Serializable {
         activeTetrominoDropped();
 
         // jetzt auch im UI abbilden. Nicht früher, damit evtl. bei Spielende anders reagiert werden kann
-        uiGameboard.clearAndInsertLines(this.removedLines, removeWasSpecial, garbageLines);
+        clearAndInsertLines(this.removedLines, removeWasSpecial, garbageLines);
 
         // nicht mehr weiter machen wenn bereits geschafft
         if (!isGameOver()) {
@@ -301,6 +302,13 @@ public abstract class GameModel implements Json.Serializable {
 
             // Game Over kann hier erfolgt sein!
         }
+    }
+
+    protected void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition) {
+        if (linesToRemove.size > 0 || garbageHolePosition != null && garbageHolePosition.length > 0) {
+            setFreezeInterval(PlayerArea.DURATION_REMOVE_DELAY);
+        }
+        uiGameboard.clearAndInsertLines(linesToRemove, special, garbageHolePosition);
     }
 
     protected boolean isGameboardCriticalFill(int gameboardFill) {

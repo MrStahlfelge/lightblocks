@@ -219,8 +219,10 @@ public class ModernFreezeModel extends GameModel {
             }
 
             setFreezeInterval(LINE_FREEZE_END_DELAY * removedLineNum);
+
+            uiGameboard.showMotivation(IGameModelListener.MotivationTypes.endFreezeMode, String.valueOf(removedLineNum));
+            clearAndInsertLines(removedLines, removedLineNum >= 8, null);
         }
-        uiGameboard.endFreezeMode(removedLines);
         playScreen.endFreezeMode();
 
         setCurrentSpeed();

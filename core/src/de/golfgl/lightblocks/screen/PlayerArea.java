@@ -309,8 +309,6 @@ public class PlayerArea extends Group implements IGameModelListener {
 
     @Override
     public void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition) {
-        final float removeDelayTime = DURATION_REMOVE_DELAY;
-        final float removeFadeOutTime = DURATION_REMOVE_FADEOUT;
         final float moveActorsTime = .1f;
 
         int linesToInsert = (garbageHolePosition == null ? 0 : garbageHolePosition.length);
@@ -337,8 +335,6 @@ public class PlayerArea extends Group implements IGameModelListener {
 
             return;
         }
-
-        gameModel.setFreezeInterval(removeDelayTime);
 
         // Prepare to identify the rows that should get replaced
         IntArray lineMove = new IntArray(Gameboard.GAMEBOARD_ALLROWS);
@@ -368,13 +364,13 @@ public class PlayerArea extends Group implements IGameModelListener {
                     if (special)
                         // Special effect: move all blocks to a single point
                         block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(0) - .5f +
-                                linesToRemove.size / 2f) * BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
+                                linesToRemove.size / 2f) * BlockActor.blockWidth, DURATION_REMOVE_DELAY, Interpolation.fade));
                     else if (linesToRemove.size >= 3)
                         // for 3 lines removed, the blocks are moved on a single point per line
                         block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(i)) *
-                                BlockActor.blockWidth, removeDelayTime, Interpolation.fade));
+                                BlockActor.blockWidth, DURATION_REMOVE_DELAY, Interpolation.fade));
 
-                    block.addAction(sequence(Actions.delay(removeDelayTime), Actions.fadeOut(removeFadeOutTime),
+                    block.addAction(sequence(Actions.delay(DURATION_REMOVE_DELAY), Actions.fadeOut(DURATION_REMOVE_FADEOUT),
                             Actions.removeActor()));
                 }
 
@@ -420,7 +416,7 @@ public class PlayerArea extends Group implements IGameModelListener {
                         final SequenceAction moveSequence = Actions.action(SequenceAction.class);
 
                         if (destinationY <= replaceLineIwith)
-                            delay = removeDelayTime;
+                            delay = DURATION_REMOVE_DELAY;
 
                         moveSequence.addAction(Actions.moveTo((x) * BlockActor.blockWidth, (destinationY) *
                                 BlockActor.blockWidth, moveActorsTime));
@@ -429,7 +425,7 @@ public class PlayerArea extends Group implements IGameModelListener {
                         // done here is not 100% correct, but the case happens very rarely and the block will
                         // never get touched again
                         if (destinationY >= Gameboard.GAMEBOARD_ALLROWS) {
-                            moveSequence.addAction(Actions.fadeOut(removeFadeOutTime));
+                            moveSequence.addAction(Actions.fadeOut(DURATION_REMOVE_FADEOUT));
                             moveSequence.addAction(Actions.removeActor());
                         }
 
@@ -548,15 +544,6 @@ public class PlayerArea extends Group implements IGameModelListener {
                 }
             }
 
-    }
-
-    @Override
-    public void endFreezeMode(IntArray removedLines) {
-        int removedLineNum = removedLines.size;
-        if (removedLineNum > 0) {
-            motivatorLabel.addMotivationText((removedLineNum + " " + app.TEXTS.get("labelLines")).toUpperCase(), 1.5f);
-            clearAndInsertLines(removedLines, removedLineNum >= 8, null);
-        }
     }
 
     @Override
@@ -820,6 +807,12 @@ public class PlayerArea extends Group implements IGameModelListener {
             case prepare:
                 text = app.TEXTS.format("motivationPrepare");
                 duration = BackendBattleModel.PREPARE_TIME_SECONDS;
+                break;
+            case endFreezeMode:
+                playSound = false;
+                vibrate = false;
+                duration = 1.5f;
+                text = extraMsg + " " + app.TEXTS.get("labelLines");
                 break;
         }
 

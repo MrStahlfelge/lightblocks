@@ -53,13 +53,11 @@ public interface IGameModelListener {
 
     void showComboHeight(int comboHeight);
 
-    void endFreezeMode(IntArray removedLines);
-
     void emphasizeTimeLabel();
 
     enum MotivationTypes {
         newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
         boardCleared, newHighscore, gameOver, gameWon, gameSuccess, playerOver,
-        bonusScore, comboCount, turnOver, turnGarbage, prepare, turnSurvive
+        bonusScore, comboCount, turnOver, turnGarbage, prepare, endFreezeMode, turnSurvive
     }
 }
