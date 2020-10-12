@@ -4,14 +4,25 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
+import javax.annotation.Nullable;
+
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.menu.backend.BackendMatchesMenuPage;
+import de.golfgl.lightblocks.model.PracticeModel;
+import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
+import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.screen.VetoException;
+import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
  * Created by Benjamin Schulte on 18.11.2018.
@@ -79,6 +90,10 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
 
         modePager.addPage(new BackendMatchesMenuPage(app, this));
 
+        if (LightBlocksGame.GAME_DEVMODE) {
+            modePager.addPage(new LocalDeviceMultiplayerPage());
+        }
+
         mainCell = menuTable.add(modePager).fill().expand();
     }
 
@@ -93,6 +108,79 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
 
     public interface IMultiplayerModePage {
         Actor getDefaultActor();
+
+        @Nullable
         Actor getSecondMenuButton();
+    }
+
+    private class LocalDeviceMultiplayerPage extends Table implements IMultiplayerModePage {
+        private final PlayButton playButton;
+        private final BeginningLevelChooser beginningLevelSlider;
+        private final FaRadioButton<Integer> modeType;
+
+        public LocalDeviceMultiplayerPage() {
+            Label lanHelp = new ScaledLabel(app.TEXTS.get("multiplayerDeviceHelp"), app.skin,
+                    LightBlocksGame.SKIN_FONT_REG, .75f);
+            lanHelp.setWrap(true);
+
+            playButton = new PlayButton(app);
+            playButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    beginNewGame();
+                }
+            });
+            addFocusableActor(playButton);
+
+            beginningLevelSlider = new BeginningLevelChooser(app, 0, 9) {
+                @Override
+                protected void onControllerDefaultKeyDown() {
+                    ((MyStage) getStage()).setFocusedActor(playButton);
+                }
+            };
+            addFocusableActor(beginningLevelSlider.getSlider());
+
+            modeType = new FaRadioButton<>(app.skin, false);
+            modeType.setShowIndicator(false);
+            modeType.addEntry(PracticeModel.TYPE_CLASSIC, "", app.TEXTS.get("modeTypeClassic"));
+            modeType.addEntry(PracticeModel.TYPE_MODERN, "", app.TEXTS.get("modeTypeModern"));
+            modeType.setValue(app.localPrefs.getLastUsedModeType());
+            addFocusableActor(modeType);
+
+            add(new ScaledLabel(app.TEXTS.get("labelMultiplayerDevice"), app.skin, LightBlocksGame
+                    .SKIN_FONT_TITLE, .8f));
+            row();
+            add(lanHelp).fill().expandX().pad(10, 20, 10, 20);
+            row();
+            add(modeType).expand().fill();
+            row();
+            add(beginningLevelSlider).expand();
+            row();
+            add(playButton).expandY();
+        }
+
+        @Override
+        public Actor getDefaultActor() {
+            return playButton;
+        }
+
+        @Override
+        public Actor getSecondMenuButton() {
+            return null;
+        }
+
+        private void beginNewGame() {
+            InitGameParameters initGameParametersParams = new InitGameParameters();
+            initGameParametersParams.setGameMode(InitGameParameters.GameMode.DeviceMultiplayer);
+            initGameParametersParams.setBeginningLevel(beginningLevelSlider.getValue());
+            initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYSORGAMEPAD);
+            initGameParametersParams.setModeType(modeType.getValue());
+
+            try {
+                PlayScreen.gotoPlayScreen(app, initGameParametersParams);
+            } catch (VetoException e) {
+                new VetoDialog(e.getMessage(), app.skin, LightBlocksGame.nativeGameWidth * .75f).show(getStage());
+            }
+        }
     }
 }

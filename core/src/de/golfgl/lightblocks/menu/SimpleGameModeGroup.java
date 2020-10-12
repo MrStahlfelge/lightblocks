@@ -34,7 +34,6 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 
 public abstract class SimpleGameModeGroup extends Table implements SinglePlayerScreen.IGameModeGroup {
     protected Table params;
-    protected Cell choseInputCell;
     protected SinglePlayerScreen menuScreen;
     protected BeginningLevelChooser beginningLevelSlider;
     protected Button playButton;

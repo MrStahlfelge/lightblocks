@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.state;
 
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.model.BackendBattleModel;
+import de.golfgl.lightblocks.model.DeviceMultiplayerModel;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.ModernFreezeModel;
@@ -128,9 +129,11 @@ public class InitGameParameters {
                 return new BackendBattleModel();
             case ModernFreeze:
                 return new ModernFreezeModel();
+            case DeviceMultiplayer:
+                return new DeviceMultiplayerModel();
         }
         throw new IllegalStateException("Unsupported game mode");
     }
 
-    public enum GameMode {Multiplayer, Marathon, Tutorial, Sprint, MarathonRetro89, Practice, TurnbasedBattle, ModernFreeze}
+    public enum GameMode {Multiplayer, Marathon, Tutorial, Sprint, MarathonRetro89, Practice, TurnbasedBattle, ModernFreeze, DeviceMultiplayer}
 }
