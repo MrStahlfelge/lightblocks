@@ -369,6 +369,10 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
 
             if (!gameModel.hasSecondGameboard()) {
                 playerArea.switchedPause(immediately, isPaused);
+            } else if (!isPaused) {
+                // for second gameboard, we fade in immediately (no freeze interval supported)
+                // and we don't fade out
+                playerArea.switchedPause(true, isPaused);
             }
 
             if (!isPaused) {
