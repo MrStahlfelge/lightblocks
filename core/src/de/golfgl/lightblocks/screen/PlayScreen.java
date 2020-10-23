@@ -261,6 +261,9 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         if (gameModel.hasSecondGameboard()) {
             secondPlayer = new PlayerArea(app, this);
             stage.getRoot().addActorAfter(playerArea, secondPlayer);
+            secondPlayer.gameModel = gameModel.getSecondGameModel();
+            secondPlayer.gameModel.setUserInterface(this, secondPlayer);
+            secondPlayer.gameModelInitialized();
         }
 
         ((MyExtendViewport) stage.getViewport()).setMinWorldWidth((gameModel.hasSecondGameboard() ? 2 : 1) * LightBlocksGame.nativeGameWidth);
@@ -373,6 +376,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
                 // for second gameboard, we fade in immediately (no freeze interval supported)
                 // and we don't fade out
                 playerArea.switchedPause(true, isPaused);
+                secondPlayer.switchedPause(true, isPaused);
             }
 
             if (!isPaused) {

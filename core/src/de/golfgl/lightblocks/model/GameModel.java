@@ -1047,4 +1047,11 @@ public abstract class GameModel implements Json.Serializable {
     public boolean hasSecondGameboard() {
         return false;
     }
+
+    /**
+     * @return GameModel for second gameboard if second gameboard is supported, otherwise null
+     */
+    public GameModel getSecondGameModel() {
+        return null;
+    }
 }
