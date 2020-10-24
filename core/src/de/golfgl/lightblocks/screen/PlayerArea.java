@@ -70,6 +70,7 @@ public class PlayerArea extends Group implements IGameModelListener {
     private ScoreLabel blocksLeft;
     private Label timeLabelDesc;
     private int currentShownTime;
+    private boolean isLandscapeArrangement;
 
     public PlayerArea(LightBlocksGame app, PlayScreen playScreen) {
         this.app = app;
@@ -640,7 +641,7 @@ public class PlayerArea extends Group implements IGameModelListener {
         float offsetX;
         float offsetY = getNextPieceYPos();
 
-        if (playScreen.isLandscape())
+        if (isLandscapeArrangement)
             offsetX = blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT + 1.5f) * BlockActor.blockWidth;
         else
             offsetX = getNextPieceXPos() - (Tetromino.TETROMINO_BLOCKCOUNT + .5f) * BlockActor.blockWidth;
@@ -867,6 +868,8 @@ public class PlayerArea extends Group implements IGameModelListener {
                 - MathUtils.clamp(xPosInArea / 2 - scoreTable.getPrefWidth() / 2,
                 scoreTable.getPrefHeight() / 2 + 5, scoreTable.getLinePrefHeight() * 2 + scoreTable.getPrefHeight() /
                         2));
+
+        isLandscapeArrangement = areaMaxWidth > getHeight();
     }
 
     public void switchedPause(boolean immediately, boolean isPaused) {
