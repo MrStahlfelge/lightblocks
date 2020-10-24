@@ -240,9 +240,8 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
             gameModel.startNewGame(initGameParametersParams);
         }
 
-        gameModel.app = app;
         playerArea.gameModel = gameModel;
-        gameModel.setUserInterface(this, playerArea);
+        gameModel.setUserInterface(app, this, playerArea);
 
         // input initialisieren
         inputAdapter = PlayScreenInput.getPlayInput(gameModel.inputTypeKey, app);
@@ -262,7 +261,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
             secondPlayer = new PlayerArea(app, this);
             stage.getRoot().addActorAfter(playerArea, secondPlayer);
             secondPlayer.gameModel = gameModel.getSecondGameModel();
-            secondPlayer.gameModel.setUserInterface(this, secondPlayer);
+            secondPlayer.gameModel.setUserInterface(app, this, secondPlayer);
             secondPlayer.gameModelInitialized();
         }
 

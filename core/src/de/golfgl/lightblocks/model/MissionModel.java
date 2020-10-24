@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.model;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
@@ -108,8 +109,8 @@ public abstract class MissionModel extends GameModel {
     }
 
     @Override
-    public void setUserInterface(PlayScreen playScreen, IGameModelListener uiGameboard) {
-        super.setUserInterface(playScreen, uiGameboard);
+    public void setUserInterface(LightBlocksGame app, PlayScreen playScreen, IGameModelListener uiGameboard) {
+        super.setUserInterface(app, playScreen, uiGameboard);
         if (welcomeMsgNum > 0)
             showNextWelcomeMsg();
     }

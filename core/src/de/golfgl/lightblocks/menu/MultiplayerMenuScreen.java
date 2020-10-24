@@ -177,7 +177,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
             initGameParametersParams.setModeType(modeType.getValue());
 
             try {
-                PlayScreen.gotoPlayScreen(app, initGameParametersParams);
+                PlayScreen ps = PlayScreen.gotoPlayScreen(app, initGameParametersParams);
+                ps.setShowScoresWhenGameOver(false);
             } catch (VetoException e) {
                 new VetoDialog(e.getMessage(), app.skin, LightBlocksGame.nativeGameWidth * .75f).show(getStage());
             }

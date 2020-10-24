@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Queue;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.backend.MatchTurnRequestInfo;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -60,8 +61,8 @@ public class BackendBattleModel extends GameModel {
     }
 
     @Override
-    public void setUserInterface(PlayScreen playScreen, IGameModelListener uiGameboard) {
-        super.setUserInterface(playScreen, uiGameboard);
+    public void setUserInterface(LightBlocksGame app, PlayScreen playScreen, IGameModelListener uiGameboard) {
+        super.setUserInterface(app, playScreen, uiGameboard);
         if (!beginPaused)
             uiGameboard.showMotivation(IGameModelListener.MotivationTypes.prepare, null);
         else

@@ -30,14 +30,32 @@ public class DeviceMultiplayerModel extends GameModel {
     @Override
     public void startNewGame(InitGameParameters newGameParams) {
         modeType = newGameParams.getModeType();
-        super.startNewGame(newGameParams);
-
         if (modelConnector == null) {
             secondGameModel = new DeviceMultiplayerModel();
-            modelConnector = new ModelConnector();
+        }
+
+        super.startNewGame(newGameParams);
+
+        if (isFirstPlayer()) {
             secondGameModel.modelConnector = this.modelConnector;
             secondGameModel.startNewGame(newGameParams);
         }
+    }
+
+    @Override
+    protected void initDrawyer() {
+        if (isFirstPlayer()) {
+            super.initDrawyer();
+            modelConnector = new ModelConnector(drawyer);
+        } else {
+            drawyer = modelConnector.secondDrawer;
+        }
+    }
+
+    @Override
+    protected void activeTetrominoDropped() {
+        super.activeTetrominoDropped();
+        modelConnector.syncDrawers();
     }
 
     @Override
@@ -99,10 +117,35 @@ public class DeviceMultiplayerModel extends GameModel {
     }
 
     /**
-     * Shared connector between game model of the two players. Manages the tetromino drawer,
+     * Shared connector between game model of the two players. Manages the tetromino drawers,
      * sent lines and end of game
      */
     private static class ModelConnector {
+        private final TetrominoDrawyer firstDrawer;
+        private final TetrominoDrawyer secondDrawer;
 
+        public ModelConnector(TetrominoDrawyer drawer) {
+            this.firstDrawer = drawer;
+            this.secondDrawer = new TetrominoDrawyer();
+            firstDrawer.determineNextTetrominos();
+            secondDrawer.queueNextTetrominos(firstDrawer.getDrawyerQueue().toArray());
+        }
+
+        private void syncDrawers() {
+            if (firstDrawer.drawyer.size < 5 || secondDrawer.drawyer.size < 5) {
+                // time to get the next tetros. We always use the first drawer
+                int offset = firstDrawer.drawyer.size;
+                firstDrawer.determineNextTetrominos();
+                int drawnTetros = firstDrawer.drawyer.size - offset;
+
+                int[] nextTetrominos = new int[drawnTetros];
+
+                for (int i = 0; i < drawnTetros; i++) {
+                    nextTetrominos[i] = firstDrawer.drawyer.get(i + offset);
+                }
+
+                secondDrawer.queueNextTetrominos(nextTetrominos);
+            }
+        }
     }
 }

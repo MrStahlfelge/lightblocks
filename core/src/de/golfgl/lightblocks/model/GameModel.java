@@ -34,7 +34,7 @@ public abstract class GameModel implements Json.Serializable {
     private static final float MAX_DROP_SCORE = 2f;
     // Speicherhaltung
     public TotalScore totalScore;
-    public LightBlocksGame app;
+    protected LightBlocksGame app;
     /**
      * hier am GameModel verwaltet, da die Eingabemethode mit dem Modell ins Savegame kommt (und von dort geladen wird)
      */
@@ -781,7 +781,8 @@ public abstract class GameModel implements Json.Serializable {
         return null;
     }
 
-    public void setUserInterface(PlayScreen userInterface, IGameModelListener uiGameboard) {
+    public void setUserInterface(LightBlocksGame app, PlayScreen userInterface, IGameModelListener uiGameboard) {
+        this.app = app;
         this.playScreen = userInterface;
         this.uiGameboard = uiGameboard;
 

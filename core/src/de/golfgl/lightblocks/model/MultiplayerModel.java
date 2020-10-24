@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
@@ -572,8 +573,8 @@ public class MultiplayerModel extends GameModel {
     }
 
     @Override
-    public void setUserInterface(PlayScreen playScreen, IGameModelListener uiGameboard) {
-        super.setUserInterface(playScreen, uiGameboard);
+    public void setUserInterface(LightBlocksGame app, PlayScreen playScreen, IGameModelListener uiGameboard) {
+        super.setUserInterface(app, playScreen, uiGameboard);
 
         synchronized (playerInGame) {
             for (MultiPlayerObjects.PlayerInGame pig : playerInGame.values())

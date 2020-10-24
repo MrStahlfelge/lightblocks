@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.JsonValue;
  */
 
 class TetrominoDrawyer implements Json.Serializable {
-    protected IntArray drawyer = new IntArray();
+    protected final IntArray drawyer = new IntArray();
 
     /**
      * returns the next tetromino

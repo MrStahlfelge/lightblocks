@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
+import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.InitGameParameters;
@@ -305,8 +306,8 @@ public class ModernFreezeModel extends GameModel {
     }
 
     @Override
-    public void setUserInterface(PlayScreen playScreen, IGameModelListener uiGameboard) {
-        super.setUserInterface(playScreen, uiGameboard);
+    public void setUserInterface(LightBlocksGame app, PlayScreen playScreen, IGameModelListener uiGameboard) {
+        super.setUserInterface(app, playScreen, uiGameboard);
 
         if (isFreezed) {
             // volle reihen wieder markieren
