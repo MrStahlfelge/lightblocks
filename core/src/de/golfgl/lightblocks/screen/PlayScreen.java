@@ -73,6 +73,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
     private boolean showScoresWhenGameOver = true;
     private float timeSinceGameOver = 0;
     private GameBlocker.UsePortraitGameBlocker usePortraitGameBlocker = new GameBlocker.UsePortraitGameBlocker();
+    private boolean isGameOver = false;
 
     public PlayScreen(LightBlocksGame app, InitGameParameters initGameParametersParams) throws
             InputNotAvailableException, VetoException {
@@ -434,11 +435,17 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
     }
 
     public void setGameOver() {
+        // might get called twice, avoid unnecessary operations
+        if (isGameOver) {
+            return;
+        }
+
+        isGameOver = true;
+
         music.stop();
         if (app.localPrefs.isPlaySounds() && app.theme.gameOverSound != null)
             app.theme.gameOverSound.play();
         inputAdapter.setGameOver();
-        playerArea.setGameOver();
         saveGameState();
         app.savegame.gpgsSaveGameState(null);
         pauseButton.setVisible(false);

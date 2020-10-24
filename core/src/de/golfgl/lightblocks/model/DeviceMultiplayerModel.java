@@ -1,14 +1,20 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.math.MathUtils;
+
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class DeviceMultiplayerModel extends GameModel {
     public static final String MODEL_ID = "deviceMultiplayer";
+    private static final int GARBAGEGAP_CHANGECOUNT = 9;
 
     private int modeType;
     private DeviceMultiplayerModel secondGameModel;
     private ModelConnector modelConnector;
+
+    private int currentGarbageGapPosIndex = 0;
+    private int currentGarbageGapPosUsed = 0;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -114,6 +120,54 @@ public class DeviceMultiplayerModel extends GameModel {
         if (isFirstPlayer()) {
             secondGameModel.update(delta);
         }
+        uiGameboard.showGarbageAmount(modelConnector.getWaitingGarbage(isFirstPlayer()));
+        if (!isGameOver() && modelConnector.isGameWon(isFirstPlayer())) {
+            setGameOverWon();
+        }
+    }
+
+    @Override
+    protected void submitGameEnded(boolean success) {
+        // don't submit game ended twice, so only do it for the first player
+        if (isFirstPlayer()) {
+            super.submitGameEnded(success);
+        }
+    }
+
+    @Override
+    protected int[] drawGarbageLines() {
+        // Garbage gap is defined by model connector (both players share the very same).
+        // 9 lines will get the same gap, then we switch over to the next
+
+        int numOfLines = modelConnector.getGarbage(isFirstPlayer());
+
+        int[] retVal = new int[numOfLines];
+
+        for (int garbageLine = 0; garbageLine < numOfLines; garbageLine++) {
+            retVal[garbageLine] = modelConnector.garbageGapPos[currentGarbageGapPosIndex];
+            currentGarbageGapPosUsed++;
+
+            if (currentGarbageGapPosUsed >= GARBAGEGAP_CHANGECOUNT) {
+                currentGarbageGapPosUsed = 0;
+                currentGarbageGapPosIndex++;
+
+                if (currentGarbageGapPosIndex >= modelConnector.garbageGapPos.length)
+                    currentGarbageGapPosIndex = 0;
+            }
+        }
+
+        return retVal;
+    }
+
+    @Override
+    protected void linesRemoved(int lineCount, boolean isSpecial, boolean doubleSpecial) {
+        modelConnector.linesRemoved(isFirstPlayer(), lineCount, isSpecial, doubleSpecial);
+    }
+
+    @Override
+    protected void setGameOverBoardFull() {
+        modelConnector.setBoardFull(isFirstPlayer());
+        super.setGameOverBoardFull();
     }
 
     /**
@@ -123,12 +177,21 @@ public class DeviceMultiplayerModel extends GameModel {
     private static class ModelConnector {
         private final TetrominoDrawyer firstDrawer;
         private final TetrominoDrawyer secondDrawer;
+        private final int[] garbageGapPos;
+
+        private boolean isGameOver = false;
+        private boolean firstPlayerWon = false;
 
         public ModelConnector(TetrominoDrawyer drawer) {
             this.firstDrawer = drawer;
             this.secondDrawer = new TetrominoDrawyer();
             firstDrawer.determineNextTetrominos();
             secondDrawer.queueNextTetrominos(firstDrawer.getDrawyerQueue().toArray());
+
+            garbageGapPos = new int[10];
+            for (byte i = 0; i < garbageGapPos.length; i++) {
+                garbageGapPos[i] = MathUtils.random(0, Gameboard.GAMEBOARD_COLUMNS - 1);
+            }
         }
 
         private void syncDrawers() {
@@ -145,6 +208,29 @@ public class DeviceMultiplayerModel extends GameModel {
                 }
 
                 secondDrawer.queueNextTetrominos(nextTetrominos);
+            }
+        }
+
+        public int getGarbage(boolean firstPlayer) {
+            return 0;
+        }
+
+        public int getWaitingGarbage(boolean firstPlayer) {
+            return 0;
+        }
+
+        public void linesRemoved(boolean firstPlayer, int lineCount, boolean isSpecial, boolean doubleSpecial) {
+
+        }
+
+        public boolean isGameWon(boolean firstPlayer) {
+            return isGameOver && (firstPlayer ? firstPlayerWon : !firstPlayerWon);
+        }
+
+        public void setBoardFull(boolean firstPlayer) {
+            if (!isGameOver) {
+                isGameOver = true;
+                firstPlayerWon = !firstPlayer;
             }
         }
     }

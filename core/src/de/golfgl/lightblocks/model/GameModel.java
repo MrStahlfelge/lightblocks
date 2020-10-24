@@ -656,6 +656,7 @@ public abstract class GameModel implements Json.Serializable {
     protected void setGameOverBoardFull() {
         isGameOver = true;
         uiGameboard.showMotivation(IGameModelListener.MotivationTypes.gameOver, null);
+        uiGameboard.setGameOver();
         playScreen.setGameOver();
 
         submitGameEnded(false);
@@ -668,6 +669,7 @@ public abstract class GameModel implements Json.Serializable {
     protected void setGameOverWon(IGameModelListener.MotivationTypes type) {
         isGameOver = true;
         uiGameboard.showMotivation(type, null);
+        uiGameboard.setGameOver();
         playScreen.setGameOver();
 
         submitGameEnded(true);
