@@ -230,7 +230,7 @@ public class BackendBattleModel extends GameModel {
     }
 
     @Override
-    protected int[] drawGarbageLines() {
+    protected int[] drawGarbageLines(int removedLines) {
         if (waitingGarbage.size > 0 && waitingGarbage.first().timeMs <= getScore().getTimeMs()) {
             WaitingGarbage garbageToAdd = this.waitingGarbage.removeFirst();
 

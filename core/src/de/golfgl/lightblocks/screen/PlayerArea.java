@@ -71,6 +71,7 @@ public class PlayerArea extends Group implements IGameModelListener {
     private Label timeLabelDesc;
     private int currentShownTime;
     private boolean isLandscapeArrangement;
+    private int shownGarbageAmount;
 
     public PlayerArea(LightBlocksGame app, PlayScreen playScreen) {
         this.app = app;
@@ -558,10 +559,13 @@ public class PlayerArea extends Group implements IGameModelListener {
 
     @Override
     public void showGarbageAmount(int lines) {
-        imGarbageIndicator.setVisible(true);
-        imGarbageIndicator.clearActions();
-        imGarbageIndicator.addAction(Actions.sizeTo(imGarbageIndicator.getWidth(),
-                BlockActor.blockWidth * lines + NINE_PATCH_BORDER_SIZE * 2, .2f, Interpolation.fade));
+        if (shownGarbageAmount != lines) {
+            shownGarbageAmount = lines;
+            imGarbageIndicator.setVisible(true);
+            imGarbageIndicator.clearActions();
+            imGarbageIndicator.addAction(Actions.sizeTo(imGarbageIndicator.getWidth(),
+                    BlockActor.blockWidth * lines + NINE_PATCH_BORDER_SIZE * 2, .2f, Interpolation.fade));
+        }
     }
 
     @Override

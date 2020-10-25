@@ -52,7 +52,7 @@ public class DeviceMultiplayerModel extends GameModel {
     protected void initDrawyer() {
         if (isFirstPlayer()) {
             super.initDrawyer();
-            modelConnector = new ModelConnector(drawyer);
+            modelConnector = new ModelConnector(modeType, drawyer);
         } else {
             drawyer = modelConnector.secondDrawer;
         }
@@ -135,11 +135,11 @@ public class DeviceMultiplayerModel extends GameModel {
     }
 
     @Override
-    protected int[] drawGarbageLines() {
+    protected int[] drawGarbageLines(int removedLines) {
         // Garbage gap is defined by model connector (both players share the very same).
         // 9 lines will get the same gap, then we switch over to the next
 
-        int numOfLines = modelConnector.getGarbage(isFirstPlayer());
+        int numOfLines = modelConnector.removeGarbage(isFirstPlayer(), removedLines);
 
         int[] retVal = new int[numOfLines];
 
@@ -175,14 +175,18 @@ public class DeviceMultiplayerModel extends GameModel {
      * sent lines and end of game
      */
     private static class ModelConnector {
+        private final int modeType;
         private final TetrominoDrawyer firstDrawer;
         private final TetrominoDrawyer secondDrawer;
         private final int[] garbageGapPos;
+        private int secondPlayerWaitingGarbage = 0;
+        private int firstPlayerWaitingGarbage = 0;
 
         private boolean isGameOver = false;
         private boolean firstPlayerWon = false;
 
-        public ModelConnector(TetrominoDrawyer drawer) {
+        public ModelConnector(int modeType, TetrominoDrawyer drawer) {
+            this.modeType = modeType;
             this.firstDrawer = drawer;
             this.secondDrawer = new TetrominoDrawyer();
             firstDrawer.determineNextTetrominos();
@@ -211,20 +215,60 @@ public class DeviceMultiplayerModel extends GameModel {
             }
         }
 
-        public int getGarbage(boolean firstPlayer) {
-            return 0;
+        public int removeGarbage(boolean firstPlayer, int removedLines) {
+            if (modeType == PracticeModel.TYPE_MODERN && removedLines > 0) {
+                // modern mode: insert garbage is postponed on every clear
+                return 0;
+            } else {
+                int waitingGarbage = getWaitingGarbage(firstPlayer);
+                addWaitingGarbage(firstPlayer, -waitingGarbage);
+                return waitingGarbage;
+            }
         }
 
         public int getWaitingGarbage(boolean firstPlayer) {
-            return 0;
+            if (firstPlayer) {
+                return firstPlayerWaitingGarbage;
+            } else {
+                return secondPlayerWaitingGarbage;
+            }
         }
 
-        public void linesRemoved(boolean firstPlayer, int lineCount, boolean isSpecial, boolean doubleSpecial) {
+        private void addWaitingGarbage(boolean firstPlayer, int toAdd) {
+            if (!firstPlayer) {
+                secondPlayerWaitingGarbage = secondPlayerWaitingGarbage + toAdd;
+            } else {
+                firstPlayerWaitingGarbage = firstPlayerWaitingGarbage + toAdd;
+            }
+        }
 
+        public void linesRemoved(boolean firstPlayer, int linesRemoved, boolean isSpecial, boolean doubleSpecial) {
+            if (linesRemoved == 0) {
+                return;
+            }
+
+            int garbageToSend = isSpecial ? 4 : linesRemoved - 1;
+
+            // modern: double adds one more, garbage is removed from own waiting garbage,
+            // garbage is postponed on each line clear
+            if (modeType == PracticeModel.TYPE_MODERN) {
+
+                if (doubleSpecial) {
+                    garbageToSend++;
+                }
+
+                int waitingGarbage = getWaitingGarbage(firstPlayer);
+                int removeFromWaiting = Math.min(waitingGarbage, garbageToSend);
+                addWaitingGarbage(firstPlayer, -removeFromWaiting);
+                garbageToSend = garbageToSend - removeFromWaiting;
+            }
+
+            // add garbage to other players waiting queue
+            addWaitingGarbage(!firstPlayer, garbageToSend);
         }
 
         public boolean isGameWon(boolean firstPlayer) {
-            return isGameOver && (firstPlayer ? firstPlayerWon : !firstPlayerWon);
+            return isGameOver && (firstPlayer == firstPlayerWon);
         }
 
         public void setBoardFull(boolean firstPlayer) {

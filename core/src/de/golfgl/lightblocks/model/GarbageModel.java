@@ -30,7 +30,7 @@ public class GarbageModel extends MissionModel {
     }
 
     @Override
-    protected int[] drawGarbageLines() {
+    protected int[] drawGarbageLines(int removedLines) {
         int[] retVal = null;
 
         if (MathUtils.randomBoolean(garbageChance)) {

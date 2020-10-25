@@ -7,6 +7,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
+import javax.annotation.Nullable;
+
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
@@ -411,9 +413,9 @@ public abstract class GameModel implements Json.Serializable {
             }
         }
 
-        garbageLines = drawGarbageLines();
-
         int removeLinesCount = removedLines.size;
+        garbageLines = drawGarbageLines(removeLinesCount);
+
         int insertLinesCount = (garbageLines == null ? 0 : garbageLines.length);
         removeWasSpecial = (removeLinesCount == 4) || (removeLinesCount >= 2 && isTSpin);
 
@@ -462,9 +464,11 @@ public abstract class GameModel implements Json.Serializable {
     }
 
     /**
-     * Ermittelt für die Garbage wo das Loch sein muss und gibt ein Array für jede Zeile zurück.
+     * @param removedLines how many lines are to be removed with the current block drop
+     * @return array defining garbage lines. each array element is a garbage line with the value defining the gap position
      */
-    protected int[] drawGarbageLines() {
+    @Nullable
+    protected int[] drawGarbageLines(int removedLines) {
         return null;
     }
 

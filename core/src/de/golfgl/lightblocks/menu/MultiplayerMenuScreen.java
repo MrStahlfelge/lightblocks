@@ -176,6 +176,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
             initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYSORGAMEPAD);
             initGameParametersParams.setModeType(modeType.getValue());
 
+            app.localPrefs.saveLastUsedModeType(modeType.getValue());
+
             try {
                 PlayScreen ps = PlayScreen.gotoPlayScreen(app, initGameParametersParams);
                 ps.setShowScoresWhenGameOver(false);

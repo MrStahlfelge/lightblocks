@@ -74,7 +74,7 @@ public class MultiplayerModel extends GameModel {
     }
 
     @Override
-    protected int[] drawGarbageLines() {
+    protected int[] drawGarbageLines(int removedLines) {
         // Das Loch in der Garbage wird über das Array definiert. Es ist mit Zufallszahlen gefüllt.
         // Immer 9 Reihen werden mit dem definierten Loch gefüllt. Dann wird currentGarbageHolePosIndex
         // weiter gesetzt. currentGarbageHolePosUsed ist der Merker wieviele Reihen schon für den
