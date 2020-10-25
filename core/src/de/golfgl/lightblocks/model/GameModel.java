@@ -1063,4 +1063,12 @@ public abstract class GameModel implements Json.Serializable {
     public GameModel getSecondGameModel() {
         return null;
     }
+
+    /**
+     * @return InputIdentifier if this game model has a fixed input, null otherwise
+     */
+    @Nullable
+    public InputIdentifier getFixedInputId() {
+        return null;
+    }
 }

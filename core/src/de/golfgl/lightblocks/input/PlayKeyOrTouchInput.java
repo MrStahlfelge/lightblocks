@@ -98,12 +98,12 @@ public class PlayKeyOrTouchInput extends PlayScreenInput {
     }
 
     @Override
-    public void vibrate(VibrationType vibrationType) {
+    public void vibrate(VibrationType vibrationType, InputIdentifier fixedInput) {
         if (vibrationEnabled) {
             if (eventsSinceTouch == 0)
-                touch.vibrate(vibrationType);
+                touch.vibrate(vibrationType, fixedInput);
             else
-                keyboard.vibrate(vibrationType);
+                keyboard.vibrate(vibrationType, fixedInput);
         }
     }
 

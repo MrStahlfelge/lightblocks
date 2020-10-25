@@ -352,7 +352,7 @@ public class PlayerArea extends Group implements IGameModelListener {
                 else
                     app.theme.cleanSpecialSound.play(.8f);
             }
-            playScreen.inputAdapter.vibrate(special ? VibrationType.SPECIAL_CLEAR : VibrationType.CLEAR);
+            playScreen.inputAdapter.vibrate(special ? VibrationType.SPECIAL_CLEAR : VibrationType.CLEAR, gameModel.getFixedInputId());
 
             for (int i = linesToRemove.size - 1; i >= 0; i--) {
                 int y = linesToRemove.get(i);
@@ -454,7 +454,7 @@ public class PlayerArea extends Group implements IGameModelListener {
         if (linesToInsert > 0) {
             if (app.localPrefs.isPlaySounds() && app.theme.garbageSound != null)
                 app.theme.garbageSound.play(.4f + linesToInsert * .2f);
-            playScreen.inputAdapter.vibrate(VibrationType.GARBAGE);
+            playScreen.inputAdapter.vibrate(VibrationType.GARBAGE, gameModel.getFixedInputId());
             // move up the reference
             for (int i = Gameboard.GAMEBOARD_ALLROWS - 1; i >= linesToInsert; i--)
                 for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
@@ -710,7 +710,7 @@ public class PlayerArea extends Group implements IGameModelListener {
         if (app.localPrefs.isPlaySounds() && app.theme.dropSound != null)
             app.theme.dropSound.play();
 
-        playScreen.inputAdapter.vibrate(VibrationType.DROP);
+        playScreen.inputAdapter.vibrate(VibrationType.DROP, gameModel.getFixedInputId());
 
         for (Integer[] vAfterMove : currentBlockPositions) {
             BlockActor activePieceBlock = blockMatrix[vAfterMove[0]][vAfterMove[1]];
@@ -826,7 +826,7 @@ public class PlayerArea extends Group implements IGameModelListener {
             app.theme.unlockedSound.play();
 
         if (vibrate && playScreen.inputAdapter != null)
-            playScreen.inputAdapter.vibrate(VibrationType.MOTIVATION);
+            playScreen.inputAdapter.vibrate(VibrationType.MOTIVATION, gameModel.getFixedInputId());
 
         if (!text.isEmpty())
             addMotivationText(text.toUpperCase(), duration);

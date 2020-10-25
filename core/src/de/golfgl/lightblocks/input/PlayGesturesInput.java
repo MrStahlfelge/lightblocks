@@ -130,8 +130,8 @@ public class PlayGesturesInput extends PlayScreenInput {
     }
 
     @Override
-    public void vibrate(VibrationType vibrationType) {
-        if (vibrationEnabled && !app.localPrefs.getVibrationOnlyController()) {
+    public void vibrate(VibrationType vibrationType, InputIdentifier fixedInput) {
+        if (vibrationEnabled && !app.localPrefs.getVibrationOnlyController() && (fixedInput == null || fixedInput.isSameInput(inputId))) {
             try {
                 Gdx.input.vibrate(vibrationType.getVibrationLength());
             } catch (Throwable throwable) {
@@ -144,7 +144,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     private void giveHapticFeedback() {
         if (vibrationEnabled && app.localPrefs.getVibrationHaptic()) {
-            vibrate(VibrationType.HAPTIC_FEEDBACK);
+            vibrate(VibrationType.HAPTIC_FEEDBACK, inputId);
         }
     }
 

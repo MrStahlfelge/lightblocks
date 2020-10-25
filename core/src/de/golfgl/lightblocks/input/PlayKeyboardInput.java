@@ -125,12 +125,23 @@ public class PlayKeyboardInput extends PlayScreenInput {
     }
 
     @Override
-    public void vibrate(VibrationType vibrationType) {
-        // TODO #10 with two players, vibrate only for the correct one, not the last one (and ignore playsWithController)
-        if (vibrationEnabled && playsWithController() && lastControllerInUse != null) {
-            AdvancedController lastControllerInUse = (AdvancedController) this.lastControllerInUse;
-            if (lastControllerInUse.canVibrate()) {
-                lastControllerInUse.startVibration(vibrationType.getVibrationLength(), 1f);
+    public void vibrate(VibrationType vibrationType, InputIdentifier fixedInput) {
+        if (!vibrationEnabled) {
+            return;
+        }
+
+        AdvancedController controllerToVibrate;
+        if (fixedInput == null && playsWithController()) {
+            controllerToVibrate = (AdvancedController) lastControllerInUse;
+        } else if (fixedInput instanceof InputIdentifier.GameControllerInput) {
+            controllerToVibrate = ((InputIdentifier.GameControllerInput) fixedInput).lastControllerRef;
+        } else {
+            controllerToVibrate = null;
+        }
+
+        if (controllerToVibrate != null) {
+            if (controllerToVibrate.canVibrate()) {
+                controllerToVibrate.startVibration(vibrationType.getVibrationLength(), 1f);
             } else if (!app.localPrefs.getVibrationOnlyController()) {
                 try {
                     Gdx.input.vibrate(vibrationType.getVibrationLength());

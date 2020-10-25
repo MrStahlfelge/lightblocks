@@ -2,6 +2,8 @@ package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.math.MathUtils;
 
+import javax.annotation.Nullable;
+
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -115,6 +117,12 @@ public class DeviceMultiplayerModel extends GameModel {
         }
 
         return myInputId.isSameInput(inputId);
+    }
+
+    @Nullable
+    @Override
+    public InputIdentifier getFixedInputId() {
+        return myInputId;
     }
 
     @Override

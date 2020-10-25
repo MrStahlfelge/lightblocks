@@ -155,7 +155,7 @@ public abstract class PlayScreenInput extends InputAdapter {
         this.vibrationEnabled = app.localPrefs.getVibrationEnabled();
     }
 
-    public void vibrate(VibrationType vibrationType) {
+    public void vibrate(VibrationType vibrationType, InputIdentifier fixedInput) {
 
     }
 
