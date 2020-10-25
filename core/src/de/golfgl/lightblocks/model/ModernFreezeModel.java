@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.JsonWriter;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.Replay;
@@ -58,7 +59,7 @@ public class ModernFreezeModel extends GameModel {
     }
 
     @Override
-    public boolean onTimeLabelTouchedByPlayer() {
+    public boolean inputTimelabelTouched(InputIdentifier inputId) {
         if (!isFreezed && freezeloadms > 0) {
             isFreezed = true;
             freezeBonusMultiplier = freezeloadms >= MAX_FREEZEMS ? 2 : 1;

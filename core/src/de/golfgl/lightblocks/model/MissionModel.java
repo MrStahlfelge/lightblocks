@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
@@ -81,17 +82,17 @@ public abstract class MissionModel extends GameModel {
     }
 
     @Override
-    public void setSoftDropFactor(float newVal) {
+    public void inputSetSoftDropFactor(InputIdentifier inputId, float newVal) {
         if (!hasMoreWelcomeMsgs())
-            super.setSoftDropFactor(newVal);
+            super.inputSetSoftDropFactor(inputId, newVal);
     }
 
     @Override
-    public void setRotate(boolean clockwise) {
+    public void inputRotate(InputIdentifier inputId, boolean clockwise) {
         if (hasMoreWelcomeMsgs())
             showNextWelcomeMsg();
         else
-            super.setRotate(clockwise);
+            super.inputRotate(inputId, clockwise);
     }
 
     protected boolean hasMoreWelcomeMsgs() {

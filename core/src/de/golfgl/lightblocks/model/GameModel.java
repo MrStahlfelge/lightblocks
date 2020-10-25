@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.PlayerArea;
 import de.golfgl.lightblocks.state.BestScore;
@@ -570,7 +571,7 @@ public abstract class GameModel implements Json.Serializable {
         inputFreezeCountdown = time;
     }
 
-    public boolean holdActiveTetromino() {
+    public boolean inputHoldActiveTetromino(InputIdentifier inputId) {
         if (!isHoldMoveAllowedByModel() || noDropSinceHoldMove || isGameOver)
             return false;
 
@@ -706,21 +707,22 @@ public abstract class GameModel implements Json.Serializable {
         return isGameOver;
     }
 
-    public void setSoftDropFactor(float newVal) {
+    public void inputSetSoftDropFactor(InputIdentifier inputId, float newVal) {
         softDropFactor = newVal;
     }
 
-    public void setRotate(boolean clockwise) {
+    public void inputRotate(InputIdentifier inputId, boolean clockwise) {
         isInputRotate = (clockwise ? 1 : -1);
     }
 
-    public boolean onTimeLabelTouchedByPlayer() {
+    public boolean inputTimelabelTouched(InputIdentifier inputId) {
         return false;
     }
+
     /**
-     * beginnt Horizontalbewegung. Classicmode wie bei NES mit DAS. Sonst mit allgemeinem Inputfreeze-Delay
+     * starts horizontal movement. Classic with DAS
      */
-    public void startMoveHorizontal(boolean isLeft) {
+    public void inputStartMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
         if (isLeft)
             isInputMovingLeft = 2;
         else
@@ -728,12 +730,12 @@ public abstract class GameModel implements Json.Serializable {
         movingCountdown = REPEAT_START_OFFSET;
     }
 
-    public void doOneHorizontalMove(boolean isLeft) {
+    public void inputDoOneHorizontalMove(InputIdentifier inputId, boolean isLeft) {
         isInputMovingLeft = isLeft ? 3 : 0;
         isInputMovingRight = isLeft ? 0 : 3;
     }
 
-    public void endMoveHorizontal(boolean isLeft) {
+    public void inputEndMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
         if (isLeft)
             isInputMovingLeft = 0;
         else

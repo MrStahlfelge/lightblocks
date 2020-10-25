@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.math.MathUtils;
 
+import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -77,6 +78,10 @@ public class DeviceMultiplayerModel extends GameModel {
 
     private boolean isFirstPlayer() {
         return secondGameModel != null;
+    }
+
+    private boolean isOtherPlayerInput(InputIdentifier inputId) {
+        return false;
     }
 
     @Override
@@ -168,6 +173,69 @@ public class DeviceMultiplayerModel extends GameModel {
     protected void setGameOverBoardFull() {
         modelConnector.setBoardFull(isFirstPlayer());
         super.setGameOverBoardFull();
+    }
+
+    @Override
+    public boolean inputHoldActiveTetromino(InputIdentifier inputId) {
+        if (isOtherPlayerInput(inputId)) {
+            return secondGameModel.inputHoldActiveTetromino(inputId);
+        } else {
+            return super.inputHoldActiveTetromino(inputId);
+        }
+    }
+
+    @Override
+    public void inputSetSoftDropFactor(InputIdentifier inputId, float newVal) {
+        if (isOtherPlayerInput(inputId)) {
+            secondGameModel.inputSetSoftDropFactor(inputId, newVal);
+        } else {
+            super.inputSetSoftDropFactor(inputId, newVal);
+        }
+    }
+
+    @Override
+    public void inputRotate(InputIdentifier inputId, boolean clockwise) {
+        if (isOtherPlayerInput(inputId)) {
+            secondGameModel.inputRotate(inputId, clockwise);
+        } else {
+            super.inputRotate(inputId, clockwise);
+        }
+    }
+
+    @Override
+    public boolean inputTimelabelTouched(InputIdentifier inputId) {
+        if (isOtherPlayerInput(inputId)) {
+            return secondGameModel.inputTimelabelTouched(inputId);
+        } else {
+            return super.inputTimelabelTouched(inputId);
+        }
+    }
+
+    @Override
+    public void inputStartMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
+        if (isOtherPlayerInput(inputId)) {
+            secondGameModel.inputStartMoveHorizontal(inputId, isLeft);
+        } else {
+            super.inputStartMoveHorizontal(inputId, isLeft);
+        }
+    }
+
+    @Override
+    public void inputDoOneHorizontalMove(InputIdentifier inputId, boolean isLeft) {
+        if (isOtherPlayerInput(inputId)) {
+            secondGameModel.inputDoOneHorizontalMove(inputId, isLeft);
+        } else {
+            super.inputDoOneHorizontalMove(inputId, isLeft);
+        }
+    }
+
+    @Override
+    public void inputEndMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
+        if (isOtherPlayerInput(inputId)) {
+            secondGameModel.inputEndMoveHorizontal(inputId, isLeft);
+        } else {
+            super.inputEndMoveHorizontal(inputId, isLeft);
+        }
     }
 
     /**

@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.input.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -25,6 +26,7 @@ public class OnScreenGamepad extends Group {
     private static final float HIDE_TRESHOLD = .45f;
     public static final int GRID_SIZE = 5;
 
+    private final InputIdentifier inputId;
     private final Touchpad touchpad;
     private final Group touchpadContainer;
     private final LightBlocksGame app;
@@ -43,6 +45,7 @@ public class OnScreenGamepad extends Group {
                            EventListener touchPadListener, InputListener holdInputListener,
                            InputListener freezeButtonInputListener) {
         this.app = app;
+        this.inputId = new InputIdentifier.TouchscreenInput();
 
         touchpad = new Touchpad(0, app.skin, app.localPrefs.isShowDpadOnScreenGamepad()
                 ? LightBlocksGame.SKIN_TOUCHPAD_DPAD : LightBlocksGame.SKIN_DEFAULT);
@@ -96,7 +99,7 @@ public class OnScreenGamepad extends Group {
             rotateRightButton.addListener(new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    playScreen.gameModel.setRotate(true);
+                    playScreen.gameModel.inputRotate(inputId, true);
                     playScreenInput.hadButtonEvent();
                     return true;
                 }
@@ -104,7 +107,7 @@ public class OnScreenGamepad extends Group {
             rotateLeftButton.addListener(new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    playScreen.gameModel.setRotate(false);
+                    playScreen.gameModel.inputRotate(inputId, false);
                     playScreenInput.hadButtonEvent();
                     return true;
                 }
@@ -112,14 +115,14 @@ public class OnScreenGamepad extends Group {
             hardDropButton.addListener(new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
+                    playScreen.gameModel.inputSetSoftDropFactor(inputId, GameModel.FACTOR_HARD_DROP);
                     playScreenInput.hadButtonEvent();
                     return true;
                 }
 
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                    playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
+                    playScreen.gameModel.inputSetSoftDropFactor(inputId, GameModel.FACTOR_NO_DROP);
                 }
             });
 

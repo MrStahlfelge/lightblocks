@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.model;
 
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
+import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
@@ -36,10 +37,9 @@ public class RetroMarathonModel extends MarathonModel {
     }
 
     @Override
-    public void setSoftDropFactor(float newVal) {
-        // Hard Drop nicht zulässig
-        // Testen!
-        super.setSoftDropFactor(Math.min(newVal, FACTOR_SOFT_DROP));
+    public void inputSetSoftDropFactor(InputIdentifier inputId, float newVal) {
+        // hard drop not allowed here
+        super.inputSetSoftDropFactor(inputId, Math.min(newVal, FACTOR_SOFT_DROP));
     }
 
     @Override

@@ -24,6 +24,8 @@ public class PlayGravityInput extends PlayScreenInput {
     // öfter wird nicht ausgelesen
     private static final float UPDATE_INTERVAL = .05f;
 
+    private final InputIdentifier inputId;
+
     final Vector3 currentInputVector;
     final Vector3 calibrationVector;
     private float calibrationSuitableTime;
@@ -36,6 +38,7 @@ public class PlayGravityInput extends PlayScreenInput {
     private GameBlocker.CallibrationGameBlocker gravityInputBlocker = new GameBlocker.CallibrationGameBlocker();
 
     public PlayGravityInput() {
+        inputId = new InputIdentifier.TouchscreenInput();
         currentInputVector = new Vector3();
         calibrationVector = new Vector3();
         updateFromSensor(calibrationVector);
@@ -55,7 +58,7 @@ public class PlayGravityInput extends PlayScreenInput {
         if (isPaused())
             playScreen.switchPause(false);
         else
-            playScreen.gameModel.setRotate(screenX > playScreen.getStage().getWidth() / 2);
+            playScreen.gameModel.inputRotate(inputId, screenX > playScreen.getStage().getWidth() / 2);
 
         return true;
     }
@@ -111,12 +114,12 @@ public class PlayGravityInput extends PlayScreenInput {
      * z=10 gibt.
      */
     private void doControl(float delta, Vector3 inputVector) {
-        playScreen.gameModel.setSoftDropFactor(inputVector.y >= 0 ? (inputVector.y - GRADIENT_TRESHOLD) /
+        playScreen.gameModel.inputSetSoftDropFactor(inputId, inputVector.y >= 0 ? (inputVector.y - GRADIENT_TRESHOLD) /
                 GRADIENT_BASE : 0);
 
         // die zuletzt gemachte Bewegung beenden
-        playScreen.gameModel.endMoveHorizontal(false);
-        playScreen.gameModel.endMoveHorizontal(true);
+        playScreen.gameModel.inputEndMoveHorizontal(inputId, false);
+        playScreen.gameModel.inputEndMoveHorizontal(inputId, true);
 
         deltaSinceLastMove += delta;
         if (Math.abs(inputVector.x) >= GRADIENT_TRESHOLD) {
@@ -130,7 +133,7 @@ public class PlayGravityInput extends PlayScreenInput {
             if (1 / ((Math.abs(inputVector.x) - GRADIENT_TRESHOLD) * GRADIENT_BASE) < deltaSinceLastMove) {
                 deltaSinceLastMove = 0;
                 lastMoveWasToRight = inputVector.x > 0;
-                playScreen.gameModel.startMoveHorizontal(lastMoveWasToRight);
+                playScreen.gameModel.inputStartMoveHorizontal(inputId, lastMoveWasToRight);
             }
         }
     }

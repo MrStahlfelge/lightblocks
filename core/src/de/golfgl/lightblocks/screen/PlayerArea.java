@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Timer;
 import javax.annotation.Nullable;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.input.VibrationType;
 import de.golfgl.lightblocks.menu.ScoreTable;
 import de.golfgl.lightblocks.model.BackendBattleModel;
@@ -223,7 +224,7 @@ public class PlayerArea extends Group implements IGameModelListener {
             timeLabel.addListener(new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    return gameModel.onTimeLabelTouchedByPlayer();
+                    return gameModel.inputTimelabelTouched(new InputIdentifier.TouchscreenInput());
                 }
             });
         }

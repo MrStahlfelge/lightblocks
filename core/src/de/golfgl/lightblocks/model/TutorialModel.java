@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.state.InitGameParameters;
@@ -71,7 +72,7 @@ public class TutorialModel extends GameModel {
     }
 
     @Override
-    public void setRotate(boolean clockwise) {
+    public void inputRotate(InputIdentifier inputId, boolean clockwise) {
         // es wurde geklickt... darauf reagieren.
         switch (tutorialStep) {
             case 0:
@@ -89,30 +90,30 @@ public class TutorialModel extends GameModel {
                 break;
             case 6:
                 if (clockwise) {
-                    super.setRotate(clockwise);
+                    super.inputRotate(inputId, clockwise);
                     nextTutorialStep();
                 }
                 break;
             case 7:
                 if (!clockwise) {
-                    super.setRotate(clockwise);
+                    super.inputRotate(inputId, clockwise);
                     nextTutorialStep();
                 }
                 break;
             default:
-                super.setRotate(clockwise);
+                super.inputRotate(inputId, clockwise);
         }
     }
 
     @Override
-    public void startMoveHorizontal(boolean isLeft) {
+    public void inputStartMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
         if (tutorialStep == 9 || tutorialStep == 10 || tutorialStep > 14)
-            super.startMoveHorizontal(isLeft);
+            super.inputStartMoveHorizontal(inputId, isLeft);
     }
 
     @Override
-    public void endMoveHorizontal(boolean isLeft) {
-        super.endMoveHorizontal(isLeft);
+    public void inputEndMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
+        super.inputEndMoveHorizontal(inputId, isLeft);
 
         if (tutorialStep == 9 && getGameboard().checkPossibleMoveDistance(true, 1, getActiveTetromino()) == 0
                 || tutorialStep == 10 && getGameboard().checkPossibleMoveDistance(true, -1, getActiveTetromino()) == 0)
@@ -120,9 +121,9 @@ public class TutorialModel extends GameModel {
     }
 
     @Override
-    public void setSoftDropFactor(float newVal) {
+    public void inputSetSoftDropFactor(InputIdentifier inputId, float newVal) {
         if (tutorialStep > 14)
-            super.setSoftDropFactor(newVal);
+            super.inputSetSoftDropFactor(inputId, newVal);
     }
 
     @Override

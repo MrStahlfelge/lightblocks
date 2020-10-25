@@ -8,6 +8,9 @@ import com.badlogic.gdx.controllers.AdvancedController;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
@@ -24,6 +27,8 @@ public class PlayKeyboardInput extends PlayScreenInput {
     public static final String INPUT_KEY_TVREMOTE = "tvremote";
     public static final String INPUT_KEY_KEYBOARD = "keyboard";
     public static final String INPUT_KEY_CONTROLLER = "controller";
+    // TODO #10 support keyboard mappings for second player
+    private final InputIdentifier.KeyboardInput keyboardFirstPlayerId;
     private LocalPrefs.TvRemoteKeyConfig tvRemoteKeyConfig;
 
     // this field increments for every controller event and decrements for every keyboard event
@@ -38,6 +43,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
     public PlayKeyboardInput() {
         controllerEventsVsKeyboardEvents = Controllers.getControllers().size > 0 ? 2 : 0;
         Gdx.input.setCatchMenuKey(LightBlocksGame.isOnAndroidTV());
+        keyboardFirstPlayerId = new InputIdentifier.KeyboardInput(0);
     }
 
     private boolean playsWithController() {
@@ -120,6 +126,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     @Override
     public void vibrate(VibrationType vibrationType) {
+        // TODO #10 with two players, vibrate only for the correct one, not the last one (and ignore playsWithController)
         if (vibrationEnabled && playsWithController() && lastControllerInUse != null) {
             AdvancedController lastControllerInUse = (AdvancedController) this.lastControllerInUse;
             if (lastControllerInUse.canVibrate()) {
@@ -173,14 +180,14 @@ public class PlayKeyboardInput extends PlayScreenInput {
         if (!isPaused())
             keycode = mapTvRemoteAndHardwareKeys(keycode);
 
-        boolean handled = keyDownInternal(keycode);
+        boolean handled = keyDownInternal(keyboardFirstPlayerId, keycode);
         if (handled) {
             controllerEventsVsKeyboardEvents--;
         }
         return handled;
     }
 
-    private boolean keyDownInternal(int keycode) {
+    private boolean keyDownInternal(InputIdentifier inputId, int keycode) {
         switch (keycode) {
             case Input.Keys.DPAD_CENTER:
             case Input.Keys.ENTER:
@@ -188,43 +195,43 @@ public class PlayKeyboardInput extends PlayScreenInput {
                 return true;
 
             case Input.Keys.DOWN:
-                playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_SOFT_DROP);
+                playScreen.gameModel.inputSetSoftDropFactor(inputId, GameModel.FACTOR_SOFT_DROP);
                 return true;
 
             case Input.Keys.CONTROL_RIGHT:
-                playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_HARD_DROP);
+                playScreen.gameModel.inputSetSoftDropFactor(inputId, GameModel.FACTOR_HARD_DROP);
                 return true;
 
             case Input.Keys.LEFT:
-                playScreen.gameModel.startMoveHorizontal(true);
+                playScreen.gameModel.inputStartMoveHorizontal(inputId, true);
                 return true;
 
             case Input.Keys.RIGHT:
-                playScreen.gameModel.startMoveHorizontal(false);
+                playScreen.gameModel.inputStartMoveHorizontal(inputId, false);
                 return true;
 
             case Input.Keys.H:
                 if (!isPaused())
-                    playScreen.gameModel.holdActiveTetromino();
+                    playScreen.gameModel.inputHoldActiveTetromino(inputId);
                 return true;
 
             case Input.Keys.F:
                 if (!isPaused())
-                    playScreen.gameModel.onTimeLabelTouchedByPlayer();
+                    playScreen.gameModel.inputTimelabelTouched(inputId);
                 return true;
 
             case Input.Keys.CONTROL_LEFT:
                 if (isPaused())
                     playScreen.switchPause(false);
                 else
-                    playScreen.gameModel.setRotate(false);
+                    playScreen.gameModel.inputRotate(inputId, false);
                 return true;
 
             case Input.Keys.SPACE:
                 if (isPaused())
                     playScreen.switchPause(false);
                 else
-                    playScreen.gameModel.setRotate(true);
+                    playScreen.gameModel.inputRotate(inputId, true);
                 return true;
 
             default:
@@ -238,22 +245,22 @@ public class PlayKeyboardInput extends PlayScreenInput {
         if (!isPaused())
             keycode = mapTvRemoteAndHardwareKeys(keycode);
 
-        return keyUpInternal(keycode);
+        return keyUpInternal(keyboardFirstPlayerId, keycode);
     }
 
-    private boolean keyUpInternal(int keycode) {
+    private boolean keyUpInternal(InputIdentifier inputId, int keycode) {
         if (keycode == Input.Keys.DOWN || keycode == Input.Keys.CONTROL_RIGHT) {
-            playScreen.gameModel.setSoftDropFactor(GameModel.FACTOR_NO_DROP);
+            playScreen.gameModel.inputSetSoftDropFactor(inputId, GameModel.FACTOR_NO_DROP);
             return true;
         }
 
         if (keycode == Input.Keys.LEFT) {
-            playScreen.gameModel.endMoveHorizontal(true);
+            playScreen.gameModel.inputEndMoveHorizontal(inputId, true);
             return true;
         }
 
         if (keycode == Input.Keys.RIGHT) {
-            playScreen.gameModel.endMoveHorizontal(false);
+            playScreen.gameModel.inputEndMoveHorizontal(inputId, false);
             return true;
         }
 
@@ -272,14 +279,17 @@ public class PlayKeyboardInput extends PlayScreenInput {
     }
 
     private class ControllerInputAdapter extends InputAdapter {
+        private final List<InputIdentifier.GameControllerInput> inputIds = new ArrayList<>(2);
+
         @Override
         public boolean keyDown(int keycode) {
             lastControllerInUse = app.controllerMappings.getControllerInUse();
+            InputIdentifier.GameControllerInput inputId = getInputId(lastControllerInUse);
 
             if (!isPaused() && keycode == Input.Keys.UP && !hardDropMapped)
                 keycode = Input.Keys.CONTROL_RIGHT;
 
-            boolean eventHandled = keyDownInternal(keycode);
+            boolean eventHandled = keyDownInternal(inputId, keycode);
             if (eventHandled) {
                 controllerEventsVsKeyboardEvents++;
             }
@@ -289,11 +299,31 @@ public class PlayKeyboardInput extends PlayScreenInput {
         @Override
         public boolean keyUp(int keycode) {
             lastControllerInUse = app.controllerMappings.getControllerInUse();
+            InputIdentifier.GameControllerInput inputId = getInputId(lastControllerInUse);
 
             if (!isPaused() && keycode == Input.Keys.UP && !hardDropMapped)
                 keycode = Input.Keys.CONTROL_RIGHT;
 
-            return keyUpInternal(keycode);
+            return keyUpInternal(inputId, keycode);
+        }
+
+        private InputIdentifier.GameControllerInput getInputId(Controller controller) {
+            AdvancedController advancedController = (AdvancedController) controller;
+            String controllerId = advancedController.getUniqueId();
+            // there are typically one or two inputs, so I hope this list is more leightweight and
+            // as fast as using a HashMap. Prove me wrong.
+            for (InputIdentifier.GameControllerInput inputIdentifier : inputIds) {
+                if (controllerId.equals(inputIdentifier.getGameControllerId())) {
+                    inputIdentifier.lastControllerRef = advancedController;
+                    return inputIdentifier;
+                }
+            }
+
+            // not found, add it
+            InputIdentifier.GameControllerInput inputIdentifier = new InputIdentifier.GameControllerInput(advancedController);
+            inputIds.add(inputIdentifier);
+
+            return inputIdentifier;
         }
     }
 }
