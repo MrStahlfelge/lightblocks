@@ -19,7 +19,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
  */
 
 public class OverlayMessage extends Dialog {
-
+    public static final int POS_Y = 20;
     private final Label messageLabel;
     private final Cell messageImageCell;
 
@@ -73,7 +73,7 @@ public class OverlayMessage extends Dialog {
     @Override
     public Dialog show(Stage stage) {
         super.show(stage);
-        setPosition(Math.round((stage.getWidth() - getWidth()) / 2), 20);
+        setPosition(Math.round((stage.getWidth() - getWidth()) / 2), POS_Y);
         return this;
     }
 

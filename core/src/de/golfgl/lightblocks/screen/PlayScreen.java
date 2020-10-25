@@ -513,23 +513,23 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         pauseDialog.setEmphasizeInputMsg(!gameBlockers.isEmpty());
     }
 
-    public void showOverlayMessage(final String message, final float autoHide, final String... params) {
+    public void showOverlayMessage(final String message, final String... params) {
         if (overlayWindow == null)
             overlayWindow = new OverlayMessage(app, playerArea.labelGroup.getWidth());
 
         if (message == null)
             overlayWindow.hide();
         else {
-            String localizedMessage = app.TEXTS.format(message, (Object) params);
+            String localizedMessage = app.TEXTS.format(message, (Object[]) params);
             if (localizedMessage.contains("_CONTINUE_")) {
                 if (inputAdapter != null)
                     localizedMessage = localizedMessage.replace("_CONTINUE_", inputAdapter.getTutorialContinueText());
                 else {
-                    // => eine Schleife nach hinten schieben, da noch nicht initialisiert ist
+                    // => not yet initialized completely, postpone running the code for later
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
                         public void run() {
-                            showOverlayMessage(message, autoHide, params);
+                            showOverlayMessage(message, params);
                         }
                     });
                     return;
@@ -550,6 +550,10 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
+
+        if (overlayWindow != null) {
+            overlayWindow.setY(OverlayMessage.POS_Y);
+        }
 
         backgroundImage.setSize(stage.getWidth(), stage.getHeight());
         backgroundImage.setPosition(0, 0);

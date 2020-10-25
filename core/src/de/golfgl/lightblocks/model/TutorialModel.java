@@ -37,10 +37,10 @@ public class TutorialModel extends GameModel {
         tutorialStep++;
 
         if (tutorialStep <= 14)
-            playScreen.showOverlayMessage("tutorialStep" + Integer.toString(tutorialStep), 0);
+            playScreen.showOverlayMessage("tutorialStep" + Integer.toString(tutorialStep));
         else {
             // Eigentliches Spiel beginnen
-            playScreen.showOverlayMessage(null, 0);
+            playScreen.showOverlayMessage(null);
             setCurrentSpeed();
         }
     }
