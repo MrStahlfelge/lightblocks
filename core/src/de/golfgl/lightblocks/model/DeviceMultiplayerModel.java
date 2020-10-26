@@ -36,6 +36,9 @@ public class DeviceMultiplayerModel extends GameModel {
         retVal.setInputKey(inputTypeKey);
         retVal.setGameMode(InitGameParameters.GameMode.DeviceMultiplayer);
         retVal.setModeType(modeType);
+        if (isFirstPlayer()) {
+            retVal.setPlayerInputIds(myInputId, secondGameModel.myInputId);
+        }
 
         return retVal;
     }
@@ -65,6 +68,10 @@ public class DeviceMultiplayerModel extends GameModel {
         super.startNewGame(newGameParams);
 
         if (isFirstPlayer()) {
+            if (newGameParams.getFirstPlayerInputId() != null && newGameParams.getSecondPlayerInputId() != null) {
+                myInputId = newGameParams.getFirstPlayerInputId();
+                secondGameModel.myInputId = newGameParams.getSecondPlayerInputId();
+            }
             secondGameModel.modelConnector = this.modelConnector;
             secondGameModel.startNewGame(newGameParams);
         }
@@ -83,7 +90,7 @@ public class DeviceMultiplayerModel extends GameModel {
     @Override
     public void setUserInterface(LightBlocksGame app, PlayScreen userInterface, IGameModelListener uiGameboard) {
         super.setUserInterface(app, userInterface, uiGameboard);
-        if (isFirstPlayer()) {
+        if (isFirstPlayer() && myInputId == null) {
             playScreen.showOverlayMessage("labelDevMultiChooseDevice", String.valueOf(1));
         }
     }

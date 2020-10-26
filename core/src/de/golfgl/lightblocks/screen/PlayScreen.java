@@ -60,11 +60,11 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
     private static final float GAMEOVER_TOUCHFREEZE = 1.5f;
     protected final TextButton pauseButton;
     protected final PlayerArea playerArea;
-    private PlayerArea secondPlayer;
     private final PlayMusic music;
     private final Image backgroundImage;
     public GameModel gameModel;
     PlayScreenInput inputAdapter;
+    private PlayerArea secondPlayer;
     private PauseDialog pauseDialog;
     private Dialog pauseMsgDialog;
     private boolean isPaused = true;
@@ -423,9 +423,15 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
 
         RoundOverScoreScreen scoreScreen = new RoundOverScoreScreen(app);
         scoreScreen.setGameModelId(gameModel.getIdentifier());
-        scoreScreen.addScoreToShow(gameModel.getScore(), app.TEXTS.get("labelRoundScore"));
-        scoreScreen.setBest(gameModel.getBestScore());
-        scoreScreen.addScoreToShow(gameModel.getBestScore(), app.TEXTS.get("labelBestScore"));
+        if (gameModel.hasSecondGameboard()) {
+            scoreScreen.addScoreToShow(gameModel.getScore(), "Player 1");
+            scoreScreen.addScoreToShow(gameModel.getSecondGameModel().getScore(), "Player 2");
+            scoreScreen.setSecondReplay(gameModel.getSecondGameModel().getReplay());
+        } else {
+            scoreScreen.addScoreToShow(gameModel.getScore(), app.TEXTS.get("labelRoundScore"));
+            scoreScreen.setBest(gameModel.getBestScore());
+            scoreScreen.addScoreToShow(gameModel.getBestScore(), app.TEXTS.get("labelBestScore"));
+        }
         scoreScreen.setNewGameParams(gameModel.getInitParameters());
         scoreScreen.setBackScreen(this.backScreen);
         scoreScreen.setReplay(gameModel.getReplay());

@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.state;
 
 import de.golfgl.lightblocks.backend.MatchEntity;
+import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.model.BackendBattleModel;
 import de.golfgl.lightblocks.model.DeviceMultiplayerModel;
 import de.golfgl.lightblocks.model.GameModel;
@@ -14,7 +15,7 @@ import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
 
 /**
- * This class defines new games.
+ * This class defines new games parameters.
  * <p>
  * Created by Benjamin Schulte on 21.02.2017.
  */
@@ -29,10 +30,12 @@ public class InitGameParameters {
     private GameMode gameMode;
     private int modeType;
 
-    // für Multiplayer
+    // for Multiplayer
     private AbstractMultiplayerRoom multiplayerRoom;
+    private InputIdentifier firstPlayerInputId;
+    private InputIdentifier secondPlayerInputId;
 
-    // für Battle
+    // for Turn Based Battle
     private MatchEntity matchEntity;
     private String playKey;
     private boolean startPaused;
@@ -79,6 +82,19 @@ public class InitGameParameters {
 
     public void setMultiplayerRoom(AbstractMultiplayerRoom multiplayerRoom) {
         this.multiplayerRoom = multiplayerRoom;
+    }
+
+    public InputIdentifier getFirstPlayerInputId() {
+        return firstPlayerInputId;
+    }
+
+    public InputIdentifier getSecondPlayerInputId() {
+        return secondPlayerInputId;
+    }
+
+    public void setPlayerInputIds(InputIdentifier firstPlayerInputId, InputIdentifier secondPlayerInputId) {
+        this.firstPlayerInputId = firstPlayerInputId;
+        this.secondPlayerInputId = secondPlayerInputId;
     }
 
     public MatchEntity getMatchEntity() {

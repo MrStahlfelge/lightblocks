@@ -58,6 +58,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
     private Cell<Label> titleIconCell;
     private Cell<Table> scoreTableCell;
     private Replay replay;
+    private Replay secondReplay;
 
     public RoundOverScoreScreen(LightBlocksGame app) {
         super(app);
@@ -306,6 +307,9 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     ReplayDialog dialog = new ReplayDialog(app, replay, getSubtitle(), null);
+                    if (secondReplay != null) {
+                        dialog.addSecondReplay(secondReplay, "Player 2", true);
+                    }
                     dialog.show(stage);
                 }
             });
@@ -459,5 +463,10 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
     public void setReplay(Replay replay) {
         if (replay != null && replay.isValid())
             this.replay = replay;
+    }
+
+    public void setSecondReplay(Replay replay) {
+        if (replay != null && replay.isValid())
+            this.secondReplay = replay;
     }
 }
