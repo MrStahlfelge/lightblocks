@@ -286,8 +286,8 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
             row();
             modeType = new FaRadioButton<>(app.skin, false);
             modeType.setShowIndicator(false);
-            modeType.addEntry(PracticeModel.TYPE_CLASSIC, "", app.TEXTS.get("modeTypeClassic"));
-            modeType.addEntry(PracticeModel.TYPE_MODERN, "", app.TEXTS.get("modeTypeModern"));
+            modeType.addEntry(InitGameParameters.TYPE_CLASSIC, "", app.TEXTS.get("modeTypeClassic"));
+            modeType.addEntry(InitGameParameters.TYPE_MODERN, "", app.TEXTS.get("modeTypeModern"));
             modeType.setValue(app.localPrefs.getLastUsedModeType());
 
             add(modeType).expandX().fill();

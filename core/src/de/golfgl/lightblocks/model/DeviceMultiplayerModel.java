@@ -171,12 +171,12 @@ public class DeviceMultiplayerModel extends GameModel {
 
     @Override
     public boolean isModernRotation() {
-        return modeType == PracticeModel.TYPE_MODERN;
+        return modeType == InitGameParameters.TYPE_MODERN;
     }
 
     @Override
     protected int getLockDelayMs() {
-        return modeType == PracticeModel.TYPE_MODERN ? ModernFreezeModel.LOCK_DELAY : super.getLockDelayMs();
+        return modeType == InitGameParameters.TYPE_MODERN ? ModernFreezeModel.LOCK_DELAY : super.getLockDelayMs();
     }
 
     @Override
@@ -357,7 +357,7 @@ public class DeviceMultiplayerModel extends GameModel {
         }
 
         public int removeGarbage(boolean firstPlayer, int removedLines) {
-            if (modeType == PracticeModel.TYPE_MODERN && removedLines > 0) {
+            if (modeType == InitGameParameters.TYPE_MODERN && removedLines > 0) {
                 // modern mode: insert garbage is postponed on every clear
                 return 0;
             } else {
@@ -392,7 +392,7 @@ public class DeviceMultiplayerModel extends GameModel {
 
             // modern: double adds one more, garbage is removed from own waiting garbage,
             // garbage is postponed on each line clear
-            if (modeType == PracticeModel.TYPE_MODERN) {
+            if (modeType == InitGameParameters.TYPE_MODERN) {
 
                 if (doubleSpecial) {
                     garbageToSend++;

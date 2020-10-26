@@ -13,7 +13,6 @@ import javax.annotation.Nullable;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.menu.backend.BackendMatchesMenuPage;
-import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.PagedScrollPane;
@@ -142,8 +141,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
 
             modeType = new FaRadioButton<>(app.skin, false);
             modeType.setShowIndicator(false);
-            modeType.addEntry(PracticeModel.TYPE_CLASSIC, "", app.TEXTS.get("modeTypeClassic"));
-            modeType.addEntry(PracticeModel.TYPE_MODERN, "", app.TEXTS.get("modeTypeModern"));
+            modeType.addEntry(InitGameParameters.TYPE_CLASSIC, "", app.TEXTS.get("modeTypeClassic"));
+            modeType.addEntry(InitGameParameters.TYPE_MODERN, "", app.TEXTS.get("modeTypeModern"));
             modeType.setValue(app.localPrefs.getLastUsedModeType());
             addFocusableActor(modeType);
 

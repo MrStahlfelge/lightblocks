@@ -20,6 +20,8 @@ import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
  */
 
 public class InitGameParameters {
+    public static final int TYPE_CLASSIC = 0;
+    public static final int TYPE_MODERN = 1;
 
     private int inputKey;
     private int beginningLevel;

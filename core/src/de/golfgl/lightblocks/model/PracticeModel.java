@@ -17,8 +17,6 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class PracticeModel extends GameModel {
     public static final String MODEL_PRACTICE_ID = "practice";
-    public static final int TYPE_CLASSIC = 0;
-    public static final int TYPE_MODERN = 1;
 
     private int modeType;
 
@@ -100,17 +98,17 @@ public class PracticeModel extends GameModel {
 
     @Override
     public boolean isModernRotation() {
-        return modeType == TYPE_MODERN;
+        return modeType == InitGameParameters.TYPE_MODERN;
     }
 
     @Override
     protected int getLockDelayMs() {
-        return modeType == TYPE_MODERN ? ModernFreezeModel.LOCK_DELAY : super.getLockDelayMs();
+        return modeType == InitGameParameters.TYPE_MODERN ? ModernFreezeModel.LOCK_DELAY : super.getLockDelayMs();
     }
 
     @Override
     public void read(Json json, JsonValue jsonData) {
-        modeType = jsonData.getInt("modeType", TYPE_CLASSIC);
+        modeType = jsonData.getInt("modeType", InitGameParameters.TYPE_CLASSIC);
         super.read(json, jsonData);
     }
 
