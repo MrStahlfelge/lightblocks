@@ -122,7 +122,7 @@ public class DeviceMultiplayerModel extends GameModel {
         }
 
         if (secondGameModel.myInputId == null) {
-            if (!inputId.isSameInput(myInputId)) {
+            if (!inputId.isSameInput(myInputId) && !playScreen.isPaused()) {
                 secondGameModel.myInputId = inputId;
                 playScreen.showOverlayMessage(null);
             }
@@ -134,10 +134,12 @@ public class DeviceMultiplayerModel extends GameModel {
 
     private boolean isMyInput(InputIdentifier inputId) {
         if (myInputId == null) {
-            // input not set yet, set it now
-            myInputId = inputId;
-            if (isFirstPlayer()) {
-                playScreen.showOverlayMessage("labelDevMultiChooseDevice", String.valueOf(2));
+            if (!playScreen.isPaused()) {
+                // input not set yet, set it now
+                myInputId = inputId;
+                if (isFirstPlayer()) {
+                    playScreen.showOverlayMessage("labelDevMultiChooseDevice", String.valueOf(2));
+                }
             }
             return false;
         }
