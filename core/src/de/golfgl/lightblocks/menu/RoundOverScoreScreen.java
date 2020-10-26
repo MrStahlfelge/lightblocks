@@ -45,8 +45,8 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
 
     private static final int MAX_COUNTING_TIME = 2;
     private static final int TETRO_COUNT_RATINGREMINDER = 1000;
-    private Array<IRoundScore> scoresToShow;
-    private Array<String> scoresToShowLabels;
+    private final Array<IRoundScore> scoresToShow;
+    private final Array<String> scoresToShowLabels;
     private BestScore best;
     private String gameModelId;
     private BackendManager.CachedScoreboard latestScores;
@@ -394,10 +394,16 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
                     }
                 })));
             else if (app.canDonate() && app.localPrefs.getSupportLevel() == 0
-                    && app.savegame.getTotalScore().getDrawnTetrominos() >= app.localPrefs.getNextDonationReminder()) {
+                    && (app.savegame.getTotalScore().getDrawnTetrominos() >= app.localPrefs.getNextDonationReminder()
+                    || isDeviceMultiplayer())) {
                 new DonationDialog(app).setForcedMode().show(stage);
             }
         }
+    }
+
+    private boolean isDeviceMultiplayer() {
+        return newGameParams != null && newGameParams.getGameMode() == InitGameParameters.GameMode.DeviceMultiplayer
+                && scoresToShow.notEmpty() && scoresToShow.get(0).getTimeMs() > 1000L * 60;
     }
 
     private void askIfEnjoyingTheGame() {

@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 
 import javax.annotation.Nullable;
 
@@ -88,10 +89,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
         });
 
         modePager.addPage(new BackendMatchesMenuPage(app, this));
-
-        if (LightBlocksGame.GAME_DEVMODE) {
-            modePager.addPage(new LocalDeviceMultiplayerPage());
-        }
+        modePager.addPage(new LocalDeviceMultiplayerPage());
 
         mainCell = menuTable.add(modePager).fill().expand();
     }
@@ -118,9 +116,10 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
         private final FaRadioButton<Integer> modeType;
 
         public LocalDeviceMultiplayerPage() {
-            Label lanHelp = new ScaledLabel(app.TEXTS.get("multiplayerDeviceHelp"), app.skin,
+            Label playmodeInfo = new ScaledLabel(app.TEXTS.get("multiplayerDeviceHelp"), app.skin,
                     LightBlocksGame.SKIN_FONT_REG, .75f);
-            lanHelp.setWrap(true);
+            playmodeInfo.setWrap(true);
+            playmodeInfo.setAlignment(Align.center);
 
             playButton = new PlayButton(app);
             playButton.addListener(new ChangeListener() {
@@ -131,6 +130,8 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
             });
             addFocusableActor(playButton);
 
+            Table paramsTable = new Table();
+            paramsTable.add(new ScaledLabel(app.TEXTS.get("labelBeginningLevel"), app.skin, LightBlocksGame.SKIN_FONT_BIG)).left();
             beginningLevelSlider = new BeginningLevelChooser(app, 0, 9) {
                 @Override
                 protected void onControllerDefaultKeyDown() {
@@ -138,22 +139,30 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
                 }
             };
             addFocusableActor(beginningLevelSlider.getSlider());
+            paramsTable.row();
+            paramsTable.add(beginningLevelSlider);
 
+            Table typeTable = new Table();
+            ScaledLabel typeLabel = new ScaledLabel(app.TEXTS.get("marathonChooseTypeLabel"),
+                    app.skin, LightBlocksGame.SKIN_FONT_BIG);
             modeType = new FaRadioButton<>(app.skin, false);
             modeType.setShowIndicator(false);
             modeType.addEntry(InitGameParameters.TYPE_CLASSIC, "", app.TEXTS.get("modeTypeClassic"));
             modeType.addEntry(InitGameParameters.TYPE_MODERN, "", app.TEXTS.get("modeTypeModern"));
             modeType.setValue(app.localPrefs.getLastUsedModeType());
             addFocusableActor(modeType);
+            typeTable.add(typeLabel);
+            typeTable.row();
+            typeTable.add(modeType);
 
             add(new ScaledLabel(app.TEXTS.get("labelMultiplayerDevice"), app.skin, LightBlocksGame
                     .SKIN_FONT_TITLE, .8f));
             row();
-            add(lanHelp).fill().expandX().pad(10, 20, 10, 20);
+            add(playmodeInfo).fill().expandX().pad(10, 20, 10, 20);
             row();
-            add(modeType).expand().fill();
+            add(typeTable).expand().fill();
             row();
-            add(beginningLevelSlider).expand();
+            add(paramsTable).expand();
             row();
             add(playButton).expandY();
         }
