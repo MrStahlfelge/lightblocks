@@ -15,6 +15,7 @@ import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.PlayerArea;
+import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 import de.golfgl.lightblocks.state.Replay;
@@ -92,6 +93,13 @@ public abstract class GameModel implements Json.Serializable {
         isGameOver = false;
 
         replay = new Replay();
+    }
+
+    /**
+     * called right after constructor
+     * @throws VetoException if game might not be started
+     */
+    public void checkPrerequisites(LightBlocksGame app) throws VetoException {
     }
 
     protected Tetromino getActiveTetromino() {

@@ -238,6 +238,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
             } catch (Exception e) {
                 throw new IllegalArgumentException("Given game model class is not appropriate.", e);
             }
+            gameModel.checkPrerequisites(app);
             gameModel.startNewGame(initGameParametersParams);
         }
 

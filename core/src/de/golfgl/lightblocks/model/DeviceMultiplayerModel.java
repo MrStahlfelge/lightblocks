@@ -1,12 +1,17 @@
 package de.golfgl.lightblocks.model;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.math.MathUtils;
 
 import javax.annotation.Nullable;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.input.InputIdentifier;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -38,6 +43,16 @@ public class DeviceMultiplayerModel extends GameModel {
     @Override
     public String getIdentifier() {
         return MODEL_ID;
+    }
+
+    @Override
+    public void checkPrerequisites(LightBlocksGame app) throws VetoException {
+        int inputDevices = Controllers.getControllers().size +
+                ((Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard)) ? 1 : 0);
+
+        if (!((AbstractScreen) app.getScreen()).isLandscape() || inputDevices < 2) {
+            throw new VetoException(app.TEXTS.get("messageDevMultiPrerequisites"));
+        }
     }
 
     @Override
@@ -100,8 +115,11 @@ public class DeviceMultiplayerModel extends GameModel {
         }
 
         if (secondGameModel.myInputId == null) {
-            secondGameModel.myInputId = inputId;
-            playScreen.showOverlayMessage(null);
+            if (!inputId.isSameInput(myInputId)) {
+                secondGameModel.myInputId = inputId;
+                playScreen.showOverlayMessage(null);
+            }
+            return false;
         }
 
         return secondGameModel.myInputId.isSameInput(inputId);
@@ -114,6 +132,7 @@ public class DeviceMultiplayerModel extends GameModel {
             if (isFirstPlayer()) {
                 playScreen.showOverlayMessage("labelDevMultiChooseDevice", String.valueOf(2));
             }
+            return false;
         }
 
         return myInputId.isSameInput(inputId);
