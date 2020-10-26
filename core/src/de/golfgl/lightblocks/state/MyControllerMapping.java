@@ -6,8 +6,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.AdvancedController;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerMapping;
-import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -89,15 +87,8 @@ public class MyControllerMapping extends ControllerMappings {
         return true;
     }
 
-    public boolean hasHardDropMapping() {
-        boolean hasHardDropMapping = false;
-        Array<Controller> controllers = Controllers.getControllers();
-        for (int i = 0; i < controllers.size; i++) {
-            hasHardDropMapping = hasHardDropMapping ||
-                    getControllerMapping(controllers.get(i)).getMappedInput(BUTTON_HARDDROP) != null;
-
-        }
-        return hasHardDropMapping;
+    public boolean hasHardDropMapping(Controller controller) {
+        return getControllerMapping(controller).getMappedInput(BUTTON_HARDDROP) != null;
     }
 
     /**

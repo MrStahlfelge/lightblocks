@@ -103,6 +103,11 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
         modePager.scrollToPage(idx);
     }
 
+    @Override
+    protected Actor getConfiguredDefaultActor() {
+        return ((IMultiplayerModePage) modePager.getCurrentPage()).getDefaultActor();
+    }
+
     public interface IMultiplayerModePage {
         Actor getDefaultActor();
 

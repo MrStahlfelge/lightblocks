@@ -576,11 +576,6 @@ public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IR
         ((AbstractScreen) app.getScreen()).showDialog(message);
     }
 
-    @Override
-    protected Actor getConfiguredDefaultActor() {
-        return ((IMultiplayerModePage) modePager.getCurrentPage()).getDefaultActor();
-    }
-
     private class RoomTable extends Table {
         private Actor defaultActor;
 

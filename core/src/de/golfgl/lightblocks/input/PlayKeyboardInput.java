@@ -37,7 +37,6 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     private int connectedControllersOnLastCheck = 0;
     private float timeSinceLastControllerCheck = 0f;
-    private boolean hardDropMapped;
     private Controller lastControllerInUse;
 
     public PlayKeyboardInput() {
@@ -156,9 +155,6 @@ public class PlayKeyboardInput extends PlayScreenInput {
 
     private void checkControllerConnections(boolean init) {
         int currentConnectedControllers = Controllers.getControllers().size;
-
-        if (init || currentConnectedControllers != connectedControllersOnLastCheck)
-            hardDropMapped = app.controllerMappings.hasHardDropMapping();
 
         if (currentConnectedControllers <= 0 && connectedControllersOnLastCheck > 0
                 && playsWithController() && !isPaused()) {
@@ -297,7 +293,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
             lastControllerInUse = app.controllerMappings.getControllerInUse();
             InputIdentifier.GameControllerInput inputId = getInputId(lastControllerInUse);
 
-            if (!isPaused() && keycode == Input.Keys.UP && !hardDropMapped)
+            if (!isPaused() && keycode == Input.Keys.UP && !app.controllerMappings.hasHardDropMapping(lastControllerInUse))
                 keycode = Input.Keys.CONTROL_RIGHT;
 
             boolean eventHandled = keyDownInternal(inputId, keycode);
@@ -312,7 +308,7 @@ public class PlayKeyboardInput extends PlayScreenInput {
             lastControllerInUse = app.controllerMappings.getControllerInUse();
             InputIdentifier.GameControllerInput inputId = getInputId(lastControllerInUse);
 
-            if (!isPaused() && keycode == Input.Keys.UP && !hardDropMapped)
+            if (!isPaused() && keycode == Input.Keys.UP && !app.controllerMappings.hasHardDropMapping(lastControllerInUse))
                 keycode = Input.Keys.CONTROL_RIGHT;
 
             return keyUpInternal(inputId, keycode);
