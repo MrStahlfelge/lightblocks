@@ -140,6 +140,10 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        if (listChangesSince < 2009)
+            welcomes.add(new WelcomeButton.WelcomeText("New: On device split screen multiplayer mode.",
+                    new ShowMultiPlayerPageRunnable(app, 0)));
+
         if (listChangesSince < 2005 && Gdx.input.isPeripheralAvailable(Input.Peripheral.Vibrator))
             welcomes.add(new WelcomeButton.WelcomeText("New: You can enable vibration and haptic feedback.",
                     new ShowSettingsRunnable(app)));

@@ -403,7 +403,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
 
     private boolean isDeviceMultiplayer() {
         return newGameParams != null && newGameParams.getGameMode() == InitGameParameters.GameMode.DeviceMultiplayer
-                && scoresToShow.notEmpty() && scoresToShow.get(0).getTimeMs() > 1000L * 60;
+                && scoresToShow.notEmpty() && scoresToShow.get(0).getTimeMs() > 1000L * 60 * 3;
     }
 
     private void askIfEnjoyingTheGame() {
