@@ -155,6 +155,10 @@ public class Tetromino {
         return rotation;
     }
 
+    public boolean hasRotation(int rotation) {
+        return rotation == normalizeRotation(rotation);
+    }
+
     public int getCurrentRotation() {
         return currentRotation;
     }

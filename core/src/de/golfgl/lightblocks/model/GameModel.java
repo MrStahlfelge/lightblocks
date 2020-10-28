@@ -13,6 +13,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.input.InputIdentifier;
+import de.golfgl.lightblocks.multiplayer.ai.AiAcessibleGameModel;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.PlayerArea;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -25,7 +26,7 @@ import de.golfgl.lightblocks.state.TotalScore;
  * Created by Benjamin Schulte on 23.01.2017.
  */
 
-public abstract class GameModel implements Json.Serializable {
+public abstract class GameModel implements Json.Serializable, AiAcessibleGameModel {
     // das Spielgeschehen
     public static final String GAMEMODEL_VERSION = "1.0.0";
     // Für die Steuerung
@@ -106,6 +107,7 @@ public abstract class GameModel implements Json.Serializable {
         return activeTetromino;
     }
 
+    @Override
     public Tetromino getNextTetromino() {
         return nextTetromino;
     }
@@ -120,7 +122,7 @@ public abstract class GameModel implements Json.Serializable {
         if (inputFreezeCountdown > 0)
             inputFreezeCountdown -= delta;
 
-        if (freezeCountdown > 0 || inputFreezeCountdown > 0)
+        if (isFrozen())
             return;
 
         if (isInputRotate != 0) {
@@ -169,6 +171,10 @@ public abstract class GameModel implements Json.Serializable {
         distanceRemainder += delta * speed;
         if (distanceRemainder >= 1.0f)
             moveDown((int) distanceRemainder);
+    }
+
+    protected boolean isFrozen() {
+        return freezeCountdown > 0 || inputFreezeCountdown > 0;
     }
 
     /**
@@ -326,6 +332,7 @@ public abstract class GameModel implements Json.Serializable {
         return gameboardFill * 100 / (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS) >= 70;
     }
 
+    @Override
     public boolean isHoldMoveAllowedByModel() {
         // Normalfall: Hold darf gemacht werden
         return true;
@@ -336,6 +343,7 @@ public abstract class GameModel implements Json.Serializable {
         return true;
     }
 
+    @Override
     public boolean isComboScoreAllowedByModel() {
         return true;
     }
@@ -579,6 +587,7 @@ public abstract class GameModel implements Json.Serializable {
         inputFreezeCountdown = time;
     }
 
+    @Override
     public boolean inputHoldActiveTetromino(InputIdentifier inputId) {
         if (!isHoldMoveAllowedByModel() || noDropSinceHoldMove || isGameOver)
             return false;
@@ -711,18 +720,22 @@ public abstract class GameModel implements Json.Serializable {
         uiGameboard.showNextTetro(nextTetromino.getRelativeBlockPositions(), nextTetromino.getTetrominoType());
     }
 
+    @Override
     public boolean isGameOver() {
         return isGameOver;
     }
 
+    @Override
     public void inputSetSoftDropFactor(InputIdentifier inputId, float newVal) {
         softDropFactor = newVal;
     }
 
+    @Override
     public void inputRotate(InputIdentifier inputId, boolean clockwise) {
         isInputRotate = (clockwise ? 1 : -1);
     }
 
+    @Override
     public boolean inputTimelabelTouched(InputIdentifier inputId) {
         return false;
     }
@@ -730,6 +743,7 @@ public abstract class GameModel implements Json.Serializable {
     /**
      * starts horizontal movement. Classic with DAS
      */
+    @Override
     public void inputStartMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
         if (isLeft)
             isInputMovingLeft = 2;
@@ -738,11 +752,13 @@ public abstract class GameModel implements Json.Serializable {
         movingCountdown = REPEAT_START_OFFSET;
     }
 
+    @Override
     public void inputDoOneHorizontalMove(InputIdentifier inputId, boolean isLeft) {
         isInputMovingLeft = isLeft ? 3 : 0;
         isInputMovingRight = isLeft ? 0 : 3;
     }
 
+    @Override
     public void inputEndMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
         if (isLeft)
             isInputMovingLeft = 0;
@@ -991,6 +1007,7 @@ public abstract class GameModel implements Json.Serializable {
         return true;
     }
 
+    @Override
     public boolean isModernRotation() {
         return false;
     }
@@ -999,10 +1016,12 @@ public abstract class GameModel implements Json.Serializable {
         return null;
     }
 
+    @Override
     public int getLinesToClear() {
         return 0;
     }
 
+    @Override
     public int getMaxBlocksToUse() {
         return maxBlocksToUse;
     }
@@ -1061,6 +1080,7 @@ public abstract class GameModel implements Json.Serializable {
         return null;
     }
 
+    @Override
     public boolean hasSecondGameboard() {
         return false;
     }
