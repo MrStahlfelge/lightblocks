@@ -338,6 +338,11 @@ public abstract class GameModel implements Json.Serializable, AiAcessibleGameMod
         return true;
     }
 
+    @Override
+    public Tetromino getHoldTetromino() {
+        return onHoldTetromino >= 0 ? new Tetromino(onHoldTetromino, isModernRotation()) : null;
+    }
+
     public boolean isGhostPieceAllowedByGameModel() {
         // Normalfall: Ghost Piece darf gezeigt werden
         return true;

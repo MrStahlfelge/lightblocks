@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.multiplayer.ai;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 
 import de.golfgl.lightblocks.model.GameModel;
@@ -20,6 +21,7 @@ public class ArtificialPlayer {
 
     private final Vector2 tempPos = new Vector2();
     private final Queue<Movement> movementArrayList = new Queue<>();
+    private final Queue<Movement> holdArrayList = new Queue<>();
     private float slowDown;
 
     public ArtificialPlayer(AiAcessibleGameModel aiGameModel, AiAcessibleGameModel opponentGameModel) {
@@ -31,38 +33,87 @@ public class ArtificialPlayer {
         // we have a new active piece. check how to place it best and add the needed movements to
         // the movement queue
         // future:
-        // - take next piece into account
-        // - hold I piece or pieces over a certain treshold and take hold piece into account
-        // - always hold beginning Z or S
         // - take waiting garbage into account by adding it to height, but not for clears (when modern)
         // - keep the center over row 15 free
+        // - adapt to player speed
 
 
         float bestScore = Float.NEGATIVE_INFINITY;
-        int bestRotation = 0;
-        int bestHorizontalMove = 0;
 
         Tetromino nextPiece = aiGameModel.getNextTetromino();
+
+        Array<Tetromino> nextPieces = new Array<>();
+        nextPieces.add(activePiece);
+        nextPieces.add(nextPiece);
+
+        bestScore = checkAllRotationsAndDropPlaces(new AiGameboard(gameboard), nextPieces, 0, bestScore, movementArrayList);
+
+        if (aiGameModel.isHoldMoveAllowedByModel()) {
+            // compare found best movement with hold piece
+            Tetromino holdTetromino = aiGameModel.getHoldTetromino();
+
+            nextPieces.clear();
+            if (holdTetromino != null) {
+                nextPieces.add(holdTetromino);
+            }
+            nextPieces.add(nextPiece);
+
+            float holdMoveScore = checkAllRotationsAndDropPlaces(new AiGameboard(gameboard), nextPieces, 0, bestScore, holdArrayList);
+
+            if (holdMoveScore > bestScore) {
+                Gdx.app.log("AI", "Hold the piece");
+                movementArrayList.clear();
+                movementArrayList.addFirst(Movement.HOLD);
+                while (holdArrayList.notEmpty())
+                    movementArrayList.addLast(holdArrayList.removeFirst());
+            }
+        }
+        slowDown = .2f;
+    }
+
+    private float checkAllRotationsAndDropPlaces(AiGameboard gameboard, Array<Tetromino> nextPieces, int depth, float overallBestScore, Queue<Movement> movementArrayList) {
+        Tetromino activePiece = nextPieces.get(depth);
+        int bestRotation = 0;
+        int bestHorizontalMove = 0;
+        float bestScore = Float.NEGATIVE_INFINITY;
 
         // check all rotations and all drop places
         for (int rotation = 0; rotation < 4; rotation++) {
             if (activePiece.hasRotation(rotation)) {
                 for (int horizontalMove = -Gameboard.GAMEBOARD_COLUMNS; horizontalMove <= Gameboard.GAMEBOARD_COLUMNS; horizontalMove++) {
+                    AiGameboard aiGameboard = new AiGameboard(gameboard);
                     int dropVerticalMove = -1;
 
                     for (int verticalMove = 0; verticalMove <= Gameboard.GAMEBOARD_ALLROWS &&
                             dropVerticalMove + 1 == verticalMove; verticalMove++) {
                         tempPos.set(activePiece.getPosition().x + horizontalMove,
                                 activePiece.getPosition().y - verticalMove);
-                        if (gameboard.isValidPosition(activePiece, tempPos, rotation)) {
+                        if (aiGameboard.isValidPosition(activePiece, tempPos, rotation)) {
                             dropVerticalMove = verticalMove;
                         }
                     }
 
                     if (dropVerticalMove >= 0) {
                         // we have found the drop position for the current rotation
-                        float score = calculateScoreOfPosition(new AiGameboard(gameboard), activePiece, nextPiece, horizontalMove, dropVerticalMove, rotation);
-                        if (score > bestScore) {
+                        // and pretend to pin the tetromino here
+                        for (Vector2 coord : activePiece.getRotationVectors(rotation)) {
+                            int x = (int) activePiece.getPosition().x + (int) coord.x + horizontalMove;
+                            int y = (int) activePiece.getPosition().y + (int) coord.y - dropVerticalMove;
+                            aiGameboard.setPosition(x, y, true);
+                        }
+
+                        float score;
+                        if (depth == nextPieces.size - 1) {
+                            score = calculateScoreOfPosition(aiGameboard);
+                        } else {
+                            score = checkAllRotationsAndDropPlaces(aiGameboard, nextPieces, depth + 1, 0, null);
+                        }
+
+                        if (score > bestScore ||
+                                // if we found an equal score, use it to prevent a left-hang
+                                MathUtils.isEqual(score, bestScore) && MathUtils.randomBoolean()
+                                        // but avoid unnecessary rotations
+                                        && bestHorizontalMove != horizontalMove) {
                             bestRotation = rotation;
                             bestHorizontalMove = horizontalMove;
                             bestScore = score;
@@ -73,40 +124,36 @@ public class ArtificialPlayer {
             }
         }
 
-        Gdx.app.log("AI", "Move: h " + bestHorizontalMove + ", rotate " + bestRotation);
 
         // now we found the best position, add the necessary movements to the queue
-        movementArrayList.clear();
+        if (movementArrayList != null && bestScore > overallBestScore) {
+            Gdx.app.log("AI", "Move: h " + bestHorizontalMove + ", rotate " + bestRotation);
+            movementArrayList.clear();
 
-        switch (bestRotation) {
-            case 2:
-                movementArrayList.addLast(Movement.ROTATE_RIGHT);
-                movementArrayList.addLast(Movement.ROTATE_RIGHT);
-                break;
-            case 1:
-                movementArrayList.addLast(Movement.ROTATE_RIGHT);
-                break;
-            case 3:
-                movementArrayList.addLast(Movement.ROTATE_LEFT);
-                break;
+            switch (bestRotation) {
+                case 2:
+                    movementArrayList.addLast(Movement.ROTATE_RIGHT);
+                    movementArrayList.addLast(Movement.ROTATE_RIGHT);
+                    break;
+                case 1:
+                    movementArrayList.addLast(Movement.ROTATE_RIGHT);
+                    break;
+                case 3:
+                    movementArrayList.addLast(Movement.ROTATE_LEFT);
+                    break;
+            }
+
+            for (int i = 0; i < Math.abs(bestHorizontalMove); i++) {
+                movementArrayList.addLast(bestHorizontalMove < 0 ? Movement.MOVE_LEFT : Movement.MOVE_RIGHT);
+            }
+
+            movementArrayList.addLast(Movement.DROP);
         }
 
-        for (int i = 0; i < Math.abs(bestHorizontalMove); i++) {
-            movementArrayList.addLast(bestHorizontalMove < 0 ? Movement.MOVE_LEFT : Movement.MOVE_RIGHT);
-        }
-
-        movementArrayList.addLast(Movement.DROP);
+        return bestScore;
     }
 
-    private float calculateScoreOfPosition(AiGameboard gameboard, Tetromino activePiece, Tetromino nextPiece,
-                                           int horizontalMove, int verticalMove, int rotation) {
-
-        // and pretend to pin the tetromino here
-        for (Vector2 coord : activePiece.getRotationVectors(rotation)) {
-            int x = (int) activePiece.getPosition().x + (int) coord.x + horizontalMove;
-            int y = (int) activePiece.getPosition().y + (int) coord.y - verticalMove;
-            gameboard.setPosition(x, y, true);
-        }
+    private float calculateScoreOfPosition(AiGameboard gameboard) {
 
         // calculate the different dimensions
         int completedLines = gameboard.clearFullLines();
@@ -205,19 +252,21 @@ public class ArtificialPlayer {
                 case DROP:
                     aiGameModel.inputSetSoftDropFactor(null, GameModel.FACTOR_HARD_DROP);
                     break;
+                case HOLD:
+                    aiGameModel.inputHoldActiveTetromino(null);
+                    break;
             }
 
             slowDown = .2f;
         }
     }
 
-    enum Movement {MOVE_LEFT, MOVE_RIGHT, ROTATE_LEFT, ROTATE_RIGHT, DROP}
+    enum Movement {MOVE_LEFT, MOVE_RIGHT, ROTATE_LEFT, ROTATE_RIGHT, DROP, HOLD}
 
     class AiGameboard {
         final boolean[][] fullSquares = new boolean[Gameboard.GAMEBOARD_ALLROWS][Gameboard.GAMEBOARD_COLUMNS];
 
         AiGameboard(Gameboard gameboard) {
-            // we need to get the actual gameboard
             int[][] gameboardSquares = gameboard.getGameboardSquares();
             for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
                 for (int j = 0; j < Gameboard.GAMEBOARD_COLUMNS; j++) {
@@ -226,8 +275,41 @@ public class ArtificialPlayer {
             }
         }
 
+        AiGameboard(AiGameboard gameboard) {
+            for (int y = 0; y < Gameboard.GAMEBOARD_ALLROWS; y++) {
+                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                    fullSquares[y][x] = gameboard.isPositionFull(x, y);
+                }
+            }
+        }
+
         boolean isPositionFull(int x, int y) {
             return fullSquares[y][x];
+        }
+
+        boolean isValidCoordinate(int x, int y) {
+            if (x < 0 || x >= Gameboard.GAMEBOARD_COLUMNS) {
+                return false;
+            }
+
+            if (y < 0 || y >= Gameboard.GAMEBOARD_ALLROWS) {
+                return false;
+            }
+
+            return (!isPositionFull(x, y));
+        }
+
+        public boolean isValidPosition(Tetromino tetromino, Vector2 testPosition, int testRotation) {
+            for (Vector2 v : tetromino.getRotationVectors(testRotation)) {
+                int posX = ((int) v.x + (int) testPosition.x);
+                int posY = ((int) v.y + (int) testPosition.y);
+
+                if (!isValidCoordinate(posX, posY)) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         void setPosition(int x, int y, boolean full) {

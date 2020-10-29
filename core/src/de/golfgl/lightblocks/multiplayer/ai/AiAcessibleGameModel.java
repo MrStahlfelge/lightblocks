@@ -6,6 +6,8 @@ import de.golfgl.lightblocks.model.Tetromino;
 public interface AiAcessibleGameModel {
     Tetromino getNextTetromino();
 
+    Tetromino getHoldTetromino();
+
     boolean isHoldMoveAllowedByModel();
 
     boolean isComboScoreAllowedByModel();
