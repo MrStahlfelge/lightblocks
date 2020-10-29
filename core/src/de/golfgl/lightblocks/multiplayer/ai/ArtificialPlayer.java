@@ -1,5 +1,7 @@
 package de.golfgl.lightblocks.multiplayer.ai;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Queue;
 
@@ -28,11 +30,19 @@ public class ArtificialPlayer {
     public void onNextPiece(Gameboard gameboard, Tetromino activePiece) {
         // we have a new active piece. check how to place it best and add the needed movements to
         // the movement queue
-        // future: take next piece into account
+        // future:
+        // - take next piece into account
+        // - hold I piece or pieces over a certain treshold and take hold piece into account
+        // - always hold beginning Z or S
+        // - take waiting garbage into account by adding it to height, but not for clears (when modern)
+        // - keep the center over row 15 free
 
-        float bestScore = Float.MAX_VALUE * -1;
+
+        float bestScore = Float.NEGATIVE_INFINITY;
         int bestRotation = 0;
         int bestHorizontalMove = 0;
+
+        Tetromino nextPiece = aiGameModel.getNextTetromino();
 
         // check all rotations and all drop places
         for (int rotation = 0; rotation < 4; rotation++) {
@@ -51,7 +61,7 @@ public class ArtificialPlayer {
 
                     if (dropVerticalMove >= 0) {
                         // we have found the drop position for the current rotation
-                        float score = calculateScoreOfPosition(gameboard, activePiece, horizontalMove, dropVerticalMove, rotation);
+                        float score = calculateScoreOfPosition(new AiGameboard(gameboard), activePiece, nextPiece, horizontalMove, dropVerticalMove, rotation);
                         if (score > bestScore) {
                             bestRotation = rotation;
                             bestHorizontalMove = horizontalMove;
@@ -62,6 +72,8 @@ public class ArtificialPlayer {
                 }
             }
         }
+
+        Gdx.app.log("AI", "Move: h " + bestHorizontalMove + ", rotate " + bestRotation);
 
         // now we found the best position, add the necessary movements to the queue
         movementArrayList.clear();
@@ -86,44 +98,48 @@ public class ArtificialPlayer {
         movementArrayList.addLast(Movement.DROP);
     }
 
-    private float calculateScoreOfPosition(Gameboard gameboard, Tetromino activePiece, int horizontalMove, int verticalMove, int rotation) {
-        // we need to get the actual gameboard
-        int[][] gameboardSquares = gameboard.getGameboardSquares();
-        boolean[][] fullSquares = new boolean[Gameboard.GAMEBOARD_ALLROWS][Gameboard.GAMEBOARD_COLUMNS];
-        for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
-            for (int j = 0; j < Gameboard.GAMEBOARD_COLUMNS; j++) {
-                fullSquares[i][j] = gameboardSquares[i][j] != Gameboard.SQUARE_EMPTY;
-            }
-        }
+    private float calculateScoreOfPosition(AiGameboard gameboard, Tetromino activePiece, Tetromino nextPiece,
+                                           int horizontalMove, int verticalMove, int rotation) {
 
         // and pretend to pin the tetromino here
         for (Vector2 coord : activePiece.getRotationVectors(rotation)) {
             int x = (int) activePiece.getPosition().x + (int) coord.x + horizontalMove;
             int y = (int) activePiece.getPosition().y + (int) coord.y - verticalMove;
-            fullSquares[y][x] = true;
+            gameboard.setPosition(x, y, true);
         }
 
-        // new calculate the different dimensions
-        int aggregatedHeight = aggregateHeight(fullSquares);
-        int completedLines = completedLines(fullSquares);
-        int countHoles = countHoles(fullSquares);
-        int bumpiness = computeBumpiness(fullSquares);
+        // calculate the different dimensions
+        int completedLines = gameboard.clearFullLines();
 
-        return -5.1f * aggregatedHeight + 7.6f * completedLines - 3.66f * countHoles - 51f * bumpiness;
+        float completedLinesVal;
+        if (completedLines == 1) {
+            // we don't want to go for single lines, but they are rewared because of lower height
+            // of 10. So counterbalance this here
+            completedLinesVal = -10;
+        } else {
+            completedLinesVal = Math.max(0, (completedLines - 1) * (completedLines - 1));
+        }
+
+        int aggregatedHeight = aggregateHeight(gameboard);
+        float countHoles = countHoles(gameboard);
+        int bumpiness = computeBumpiness(gameboard);
+
+        // 0.510066, 0.760666, 0.35663, 0.184483
+        return -5.1f * aggregatedHeight + 7.6f * completedLinesVal - 3.66f * countHoles - 1.8f * bumpiness;
     }
 
-    private int computeBumpiness(boolean[][] fullSquares) {
+    private int computeBumpiness(AiGameboard gameboard) {
         int bumpiness = 0;
         int lastHeight = 0;
 
         for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
             int y = Gameboard.GAMEBOARD_ALLROWS;
 
-            while (y > 0 && !fullSquares[y - 1][x])
+            while (y > 0 && !gameboard.isPositionFull(x, y - 1))
                 y--;
 
             if (x > 0)
-                bumpiness = Math.abs(y - lastHeight);
+                bumpiness = bumpiness + Math.abs(y - lastHeight);
 
             lastHeight = y;
         }
@@ -131,45 +147,32 @@ public class ArtificialPlayer {
         return bumpiness;
     }
 
-    private int countHoles(boolean[][] fullSquares) {
-        int holes = 0;
+    private float countHoles(AiGameboard gameboard) {
+        float holes = 0;
         for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-            boolean hadFull = false;
+            // multiply holes with the number of blocks above the holes
+            // this takes into account that it is more difficult to fill them the more to clear there is
+            int numFull = 0;
 
             for (int y = Gameboard.GAMEBOARD_ALLROWS - 1; y >= 0; y--) {
-                if (fullSquares[y][x])
-                    hadFull = true;
+                if (gameboard.isPositionFull(x, y))
+                    numFull++;
 
-                if (hadFull && !fullSquares[y][x])
-                    holes++;
+                if (!gameboard.isPositionFull(x, y) && numFull > 0)
+                    holes = holes + 1 + (MathUtils.log2(numFull));
             }
         }
 
-        return 0;
+        return holes;
     }
 
-    private int completedLines(boolean[][] fullSquares) {
-        int fullLines = 0;
-        for (int y = 0; y < Gameboard.GAMEBOARD_ALLROWS; y++) {
-            boolean hasBlank = false;
-            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS && !hasBlank; x++) {
-                if (!fullSquares[y][x])
-                    hasBlank = true;
-            }
-            if (!hasBlank)
-                fullLines++;
-        }
-
-        return fullLines;
-    }
-
-    private int aggregateHeight(boolean[][] fullSquares) {
+    private int aggregateHeight(AiGameboard gameboard) {
         int aggregateHeight = 0;
 
         for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
             int y = Gameboard.GAMEBOARD_ALLROWS;
 
-            while (y > 0 && !fullSquares[y - 1][x])
+            while (y > 0 && !gameboard.isPositionFull(x, y - 1))
                 y--;
 
             aggregateHeight = aggregateHeight + y;
@@ -209,4 +212,54 @@ public class ArtificialPlayer {
     }
 
     enum Movement {MOVE_LEFT, MOVE_RIGHT, ROTATE_LEFT, ROTATE_RIGHT, DROP}
+
+    class AiGameboard {
+        final boolean[][] fullSquares = new boolean[Gameboard.GAMEBOARD_ALLROWS][Gameboard.GAMEBOARD_COLUMNS];
+
+        AiGameboard(Gameboard gameboard) {
+            // we need to get the actual gameboard
+            int[][] gameboardSquares = gameboard.getGameboardSquares();
+            for (int i = 0; i < Gameboard.GAMEBOARD_ALLROWS; i++) {
+                for (int j = 0; j < Gameboard.GAMEBOARD_COLUMNS; j++) {
+                    fullSquares[i][j] = gameboardSquares[i][j] != Gameboard.SQUARE_EMPTY;
+                }
+            }
+        }
+
+        boolean isPositionFull(int x, int y) {
+            return fullSquares[y][x];
+        }
+
+        void setPosition(int x, int y, boolean full) {
+            fullSquares[y][x] = full;
+        }
+
+        int clearFullLines() {
+            int fullLines = 0;
+            for (int y = Gameboard.GAMEBOARD_ALLROWS - 1; y >= 0; y--) {
+                boolean hasBlank = false;
+                for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS && !hasBlank; x++) {
+                    if (!isPositionFull(x, y))
+                        hasBlank = true;
+                }
+                if (!hasBlank) {
+                    fullLines++;
+
+                    // move everything down
+                    for (int y2 = y; y2 < Gameboard.GAMEBOARD_ALLROWS; y2++) {
+                        for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                            if (y2 < Gameboard.GAMEBOARD_ALLROWS - 1) {
+                                fullSquares[y2][x] = fullSquares[y2 + 1][x];
+                            } else {
+                                fullSquares[y2][x] = false;
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            return fullLines;
+        }
+    }
 }
