@@ -22,20 +22,33 @@ public class ArtificialPlayer {
     private final Vector2 tempPos = new Vector2();
     private final Queue<Movement> movementArrayList = new Queue<>();
     private final Queue<Movement> holdArrayList = new Queue<>();
+
     private float slowDown;
+
+    private final float heightFactor;
+    private final float completeLinesFactor;
+    private final float holesFactor;
+    private final float bumpinessFactor;
 
     public ArtificialPlayer(AiAcessibleGameModel aiGameModel, AiAcessibleGameModel opponentGameModel) {
         this.aiGameModel = aiGameModel;
         this.opponentGameModel = opponentGameModel;
+
+        // 0.510066, 0.760666, 0.35663, 0.184483
+        heightFactor = 5.1f;
+        completeLinesFactor = 7.6f;
+        holesFactor = 3.66f;
+        bumpinessFactor = 1.8f;
     }
 
     public void onNextPiece(Gameboard gameboard, Tetromino activePiece) {
         // we have a new active piece. check how to place it best and add the needed movements to
         // the movement queue
         // future:
-        // - take waiting garbage into account by adding it to height, but not for clears (when modern)
-        // - keep the center over row 15 free
-        // - adapt to player speed
+        // - take waiting garbage into account by adding it to board for next piece, but not for clears (when modern)
+        // - adapt to player speed and level speed
+        // - go for singles after a certain height is reached
+        // - at the moment, line clears are not considered on their own but for all next pieces together - improve
 
 
         float bestScore = Float.NEGATIVE_INFINITY;
@@ -160,19 +173,18 @@ public class ArtificialPlayer {
 
         float completedLinesVal;
         if (completedLines == 1) {
-            // we don't want to go for single lines, but they are rewared because of lower height
+            // we don't want to go for single lines, but they are rewarded because of lower height
             // of 10. So counterbalance this here
             completedLinesVal = -10;
         } else {
             completedLinesVal = Math.max(0, (completedLines - 1) * (completedLines - 1));
         }
 
-        int aggregatedHeight = aggregateHeight(gameboard);
+        float aggregatedHeight = aggregateWeightedHeight(gameboard);
         float countHoles = countHoles(gameboard);
         int bumpiness = computeBumpiness(gameboard);
 
-        // 0.510066, 0.760666, 0.35663, 0.184483
-        return -5.1f * aggregatedHeight + 7.6f * completedLinesVal - 3.66f * countHoles - 1.8f * bumpiness;
+        return -heightFactor * aggregatedHeight + completeLinesFactor * completedLinesVal - holesFactor * countHoles - bumpinessFactor * bumpiness;
     }
 
     private int computeBumpiness(AiGameboard gameboard) {
@@ -180,10 +192,7 @@ public class ArtificialPlayer {
         int lastHeight = 0;
 
         for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-            int y = Gameboard.GAMEBOARD_ALLROWS;
-
-            while (y > 0 && !gameboard.isPositionFull(x, y - 1))
-                y--;
+            int y = gameboard.getColumnHeight(x);
 
             if (x > 0)
                 bumpiness = bumpiness + Math.abs(y - lastHeight);
@@ -217,12 +226,23 @@ public class ArtificialPlayer {
         int aggregateHeight = 0;
 
         for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
-            int y = Gameboard.GAMEBOARD_ALLROWS;
-
-            while (y > 0 && !gameboard.isPositionFull(x, y - 1))
-                y--;
-
+            int y = gameboard.getColumnHeight(x);
             aggregateHeight = aggregateHeight + y;
+        }
+
+        return aggregateHeight;
+    }
+
+    private float aggregateWeightedHeight(AiGameboard gameboard) {
+        float aggregateHeight = 0;
+
+        for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+            // pos weight 0123454321 => 1.0, 1.07, 1.14, ...
+            // the more the column is centered, the more it is avoided drop pieces
+            float posWeight = 1f + Math.abs(Math.abs(x - (Gameboard.GAMEBOARD_COLUMNS / 2f)) - Gameboard.GAMEBOARD_COLUMNS / 2f) / 15f;
+            int y = gameboard.getColumnHeight(x);
+
+            aggregateHeight = aggregateHeight + y * posWeight;
         }
 
         return aggregateHeight;
@@ -263,7 +283,7 @@ public class ArtificialPlayer {
 
     enum Movement {MOVE_LEFT, MOVE_RIGHT, ROTATE_LEFT, ROTATE_RIGHT, DROP, HOLD}
 
-    class AiGameboard {
+    static class AiGameboard {
         final boolean[][] fullSquares = new boolean[Gameboard.GAMEBOARD_ALLROWS][Gameboard.GAMEBOARD_COLUMNS];
 
         AiGameboard(Gameboard gameboard) {
@@ -342,6 +362,13 @@ public class ArtificialPlayer {
             }
 
             return fullLines;
+        }
+
+        public int getColumnHeight(int x) {
+            int y = Gameboard.GAMEBOARD_ALLROWS;
+            while (y > 0 && !isPositionFull(x, y - 1))
+                y--;
+            return y;
         }
     }
 }
