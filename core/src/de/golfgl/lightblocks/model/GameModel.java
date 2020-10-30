@@ -940,6 +940,7 @@ public abstract class GameModel implements Json.Serializable, AiAcessibleGameMod
 
     public abstract String getGoalDescription();
 
+    @Override
     public GameScore getScore() {
         return this.score;
     }

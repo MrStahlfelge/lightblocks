@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.multiplayer.ai;
 
 import de.golfgl.lightblocks.input.InputIdentifier;
+import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.Tetromino;
 
 public interface AiAcessibleGameModel {
@@ -35,4 +36,6 @@ public interface AiAcessibleGameModel {
     int getMaxBlocksToUse();
 
     boolean hasSecondGameboard();
+
+    GameScore getScore();
 }

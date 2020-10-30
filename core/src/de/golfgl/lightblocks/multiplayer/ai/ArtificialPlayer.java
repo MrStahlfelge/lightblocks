@@ -22,13 +22,11 @@ public class ArtificialPlayer {
     private final Vector2 tempPos = new Vector2();
     private final Queue<Movement> movementArrayList = new Queue<>();
     private final Queue<Movement> holdArrayList = new Queue<>();
-
-    private float slowDown;
-
     private final float heightFactor;
     private final float completeLinesFactor;
     private final float holesFactor;
     private final float bumpinessFactor;
+    private float slowDown;
 
     public ArtificialPlayer(AiAcessibleGameModel aiGameModel, AiAcessibleGameModel opponentGameModel) {
         this.aiGameModel = aiGameModel;
@@ -44,12 +42,11 @@ public class ArtificialPlayer {
     public void onNextPiece(Gameboard gameboard, Tetromino activePiece) {
         // we have a new active piece. check how to place it best and add the needed movements to
         // the movement queue
-        // future:
+
+        // future AI improvement possibilities:
         // - take waiting garbage into account by adding it to board for next piece, but not for clears (when modern)
-        // - adapt to player speed and level speed
         // - go for singles after a certain height is reached
         // - at the moment, line clears are not considered on their own but for all next pieces together - improve
-
 
         float bestScore = Float.NEGATIVE_INFINITY;
 
@@ -270,14 +267,18 @@ public class ArtificialPlayer {
                     aiGameModel.inputRotate(null, false);
                     break;
                 case DROP:
-                    aiGameModel.inputSetSoftDropFactor(null, GameModel.FACTOR_HARD_DROP);
+                    // wait for the human
+                    if (opponentGameModel.getScore().getDrawnTetrominos() + 10 >= aiGameModel.getScore().getDrawnTetrominos())
+                        aiGameModel.inputSetSoftDropFactor(null, GameModel.FACTOR_HARD_DROP);
+                    else
+                        movementArrayList.addFirst(movement);
                     break;
                 case HOLD:
                     aiGameModel.inputHoldActiveTetromino(null);
                     break;
             }
 
-            slowDown = .2f;
+            slowDown = .1f;
         }
     }
 
