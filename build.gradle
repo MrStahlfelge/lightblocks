@@ -149,6 +149,17 @@ project(":multiplayer") {
     }
 }
 
+project(":server") {
+    apply plugin: "java"
+
+    dependencies {
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+        implementation "org.java-websocket:Java-WebSocket:1.4.0"
+        implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+}
+
 project(":core") {
     apply plugin: "java"
 
