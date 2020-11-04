@@ -5,8 +5,6 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonWriter;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -16,12 +14,12 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
-import de.golfgl.lightblocks.server.model.Handshake;
+import de.golfgl.lightblocks.server.model.ServerInfo;
 
 public class LightblocksServer extends WebSocketServer implements ApplicationListener {
 
-    private final Handshake handshake = new Handshake();
-    private final Json json = new Json();
+    private final ServerInfo serverInfo = new ServerInfo();
+    private final Serializer serializer = new Serializer();
 
     public LightblocksServer(InetSocketAddress address) {
         super(address);
@@ -45,12 +43,10 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         Gdx.app.log("Server", "Starting, binding on port " + getPort());
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
 
-        handshake.authRequired = false;
-        handshake.name = "Lightblocks Server";
-        handshake.owner = "me";
-        handshake.version = 1;
-
-        json.setOutputType(JsonWriter.OutputType.json);
+        serverInfo.authRequired = false;
+        serverInfo.name = "Lightblocks Server";
+        serverInfo.owner = "me";
+        serverInfo.version = 1;
     }
 
     @Override
@@ -90,8 +86,9 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        synchronized (json) {
-            conn.send(json.toJson(this.handshake)); //This method sends a message to the new client
+        synchronized (serializer) {
+            conn.setAttachment(new Player(conn));
+            conn.send(serializer.serialize(this.serverInfo)); //This method sends a message to the new client
             Gdx.app.debug("Server", "new connection to " + conn.getRemoteSocketAddress());
         }
     }
@@ -99,11 +96,22 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         Gdx.app.debug("Server", "closed " + conn.getRemoteSocketAddress() + " with exit code " + code + " additional info: " + reason);
+        if (conn.getAttachment() != null) {
+            conn.<Player>getAttachment().disconnected();
+        }
     }
 
     @Override
     public void onMessage(WebSocket conn, String message) {
         Gdx.app.debug("Server", "received message from " + conn.getRemoteSocketAddress() + ": " + message);
+        if (conn.getAttachment() != null) {
+            Object object = serializer.deserialize(message);
+            try {
+                conn.<Player>getAttachment().onMessage(object);
+            } catch (Player.UnexpectedException e) {
+                Gdx.app.error("Server", "Unexpected message for player: " + message);
+            }
+        }
     }
 
     @Override
