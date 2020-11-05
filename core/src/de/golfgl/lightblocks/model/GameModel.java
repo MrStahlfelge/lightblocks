@@ -15,7 +15,6 @@ import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.multiplayer.ai.AiAcessibleGameModel;
 import de.golfgl.lightblocks.screen.PlayScreen;
-import de.golfgl.lightblocks.screen.PlayerArea;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.BestScore;
 import de.golfgl.lightblocks.state.InitGameParameters;
@@ -29,6 +28,7 @@ import de.golfgl.lightblocks.state.TotalScore;
 public abstract class GameModel implements Json.Serializable, AiAcessibleGameModel {
     // das Spielgeschehen
     public static final String GAMEMODEL_VERSION = "1.0.0";
+    public static final float DURATION_REMOVE_DELAY = .15f;
     // Für die Steuerung
     public static final float FACTOR_SOFT_DROP = 1f;
     public static final float FACTOR_HARD_DROP = 100f;
@@ -323,7 +323,7 @@ public abstract class GameModel implements Json.Serializable, AiAcessibleGameMod
 
     protected void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition) {
         if (linesToRemove.size > 0 || garbageHolePosition != null && garbageHolePosition.length > 0) {
-            setFreezeInterval(PlayerArea.DURATION_REMOVE_DELAY);
+            setFreezeInterval(DURATION_REMOVE_DELAY);
         }
         uiGameboard.clearAndInsertLines(linesToRemove, special, garbageHolePosition);
     }

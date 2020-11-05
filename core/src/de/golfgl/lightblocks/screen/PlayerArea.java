@@ -49,7 +49,6 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  */
 public class PlayerArea extends Group implements IGameModelListener {
     public static final float DURATION_TETRO_MOVE = 1 / 30f;
-    public static final float DURATION_REMOVE_DELAY = .15f;
     public static final float DURATION_REMOVE_FADEOUT = .2f;
     private static final int NINE_PATCH_BORDER_SIZE = 5;
     protected final Image imGarbageIndicator;
@@ -367,13 +366,13 @@ public class PlayerArea extends Group implements IGameModelListener {
                     if (special)
                         // Special effect: move all blocks to a single point
                         block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(0) - .5f +
-                                linesToRemove.size / 2f) * BlockActor.blockWidth, DURATION_REMOVE_DELAY, Interpolation.fade));
+                                linesToRemove.size / 2f) * BlockActor.blockWidth, GameModel.DURATION_REMOVE_DELAY, Interpolation.fade));
                     else if (linesToRemove.size >= 3)
                         // for 3 lines removed, the blocks are moved on a single point per line
                         block.setMoveAction(Actions.moveTo(4.5f * BlockActor.blockWidth, (linesToRemove.get(i)) *
-                                BlockActor.blockWidth, DURATION_REMOVE_DELAY, Interpolation.fade));
+                                BlockActor.blockWidth, GameModel.DURATION_REMOVE_DELAY, Interpolation.fade));
 
-                    block.addAction(sequence(Actions.delay(DURATION_REMOVE_DELAY), Actions.fadeOut(DURATION_REMOVE_FADEOUT),
+                    block.addAction(sequence(Actions.delay(GameModel.DURATION_REMOVE_DELAY), Actions.fadeOut(DURATION_REMOVE_FADEOUT),
                             Actions.removeActor()));
                 }
 
@@ -419,7 +418,7 @@ public class PlayerArea extends Group implements IGameModelListener {
                         final SequenceAction moveSequence = Actions.action(SequenceAction.class);
 
                         if (destinationY <= replaceLineIwith)
-                            delay = DURATION_REMOVE_DELAY;
+                            delay = GameModel.DURATION_REMOVE_DELAY;
 
                         moveSequence.addAction(Actions.moveTo((x) * BlockActor.blockWidth, (destinationY) *
                                 BlockActor.blockWidth, moveActorsTime));

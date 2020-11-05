@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.screen.PlayerArea;
@@ -207,9 +208,9 @@ public class ReplayGameboard extends BlockGroup {
                 for (int col = 0; col < Gameboard.GAMEBOARD_COLUMNS && rowIsFull; col++) {
                     int pos = getIntFromRowAndCol(row - linesCleared, col);
                     if (currentShownBlocks[pos] != null) {
-                        currentShownBlocks[pos].addAction(Actions.forever(Actions.sequence(Actions.alpha(.2f, PlayerArea
+                        currentShownBlocks[pos].addAction(Actions.forever(Actions.sequence(Actions.alpha(.2f, GameModel
                                         .DURATION_REMOVE_DELAY, Interpolation.fade),
-                                Actions.fadeIn(PlayerArea.DURATION_REMOVE_DELAY, Interpolation.fade))));
+                                Actions.fadeIn(GameModel.DURATION_REMOVE_DELAY, Interpolation.fade))));
                         actorsToRemove.add(currentShownBlocks[pos]);
                     }
 
@@ -230,7 +231,7 @@ public class ReplayGameboard extends BlockGroup {
         }
 
         if (linesCleared > 0)
-            addAditionalDelayTimeInternal(PlayerArea.DURATION_REMOVE_DELAY + PlayerArea.DURATION_REMOVE_FADEOUT);
+            addAditionalDelayTimeInternal(GameModel.DURATION_REMOVE_DELAY + PlayerArea.DURATION_REMOVE_FADEOUT);
 
         return linesCleared > 0;
     }

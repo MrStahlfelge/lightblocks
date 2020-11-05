@@ -23,6 +23,7 @@ public class DeviceMultiplayerModel extends AbstractMultiplayerModel {
     @Override
     public InitGameParameters getInitParameters() {
         InitGameParameters retVal = super.getInitParameters();
+        retVal.setGameMode(InitGameParameters.GameMode.DeviceMultiplayer);
 
         if (isFirstPlayer()) {
             retVal.setPlayerInputIds(myInputId, getSecondGameModel().myInputId);

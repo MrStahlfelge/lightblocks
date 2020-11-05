@@ -22,7 +22,6 @@ public abstract class AbstractMultiplayerModel extends GameModel {
 
         retVal.setBeginningLevel(getScore().getStartingLevel());
         retVal.setInputKey(inputTypeKey);
-        retVal.setGameMode(InitGameParameters.GameMode.DeviceMultiplayer);
         retVal.setModeType(modeType);
 
         return retVal;

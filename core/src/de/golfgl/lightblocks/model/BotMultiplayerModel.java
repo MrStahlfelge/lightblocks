@@ -8,6 +8,13 @@ public class BotMultiplayerModel extends AbstractMultiplayerModel {
     private ArtificialPlayer aiPlayer;
 
     @Override
+    public InitGameParameters getInitParameters() {
+        InitGameParameters retVal = super.getInitParameters();
+        // TODO retVal.setGameMode(InitGameParameters.GameMode.DeviceMultiplayer);
+        return retVal;
+    }
+
+    @Override
     protected AbstractMultiplayerModel createSecondGameModel(InitGameParameters newGameParams) {
         BotMultiplayerModel botMultiplayerModel = new BotMultiplayerModel();
         botMultiplayerModel.aiPlayer = new ArtificialPlayer(botMultiplayerModel, this);
