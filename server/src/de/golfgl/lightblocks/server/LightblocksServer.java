@@ -5,6 +5,8 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -17,9 +19,10 @@ import java.nio.ByteBuffer;
 import de.golfgl.lightblocks.server.model.ServerInfo;
 
 public class LightblocksServer extends WebSocketServer implements ApplicationListener {
-
+    private static final int MAX_THREAD_NUM = 10;
     private final ServerInfo serverInfo = new ServerInfo();
     private final Serializer serializer = new Serializer();
+    private boolean running = true;
 
     public LightblocksServer(InetSocketAddress address) {
         super(address);
@@ -29,8 +32,55 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
         int port = 8887;
 
-        LightblocksServer server = new LightblocksServer(new InetSocketAddress(port));
-        new HeadlessApplication(server, config);
+        final LightblocksServer server = new LightblocksServer(new InetSocketAddress(port));
+        new HeadlessApplication(server, config) {
+            @Override
+            public void exit() {
+                server.running = false;
+                super.exit();
+            }
+        };
+
+        // start up the other threads
+        final long renderInterval = config.renderInterval > 0 ? (long) (config.renderInterval * 1000000000f) : (config.renderInterval < 0 ? -1 : 0);
+        for (int i = 1; i < MAX_THREAD_NUM; i++) {
+            final int threadNum = i;
+            new Thread("Render" + i) {
+                @Override
+                public void run() {
+                    try {
+                        long lastTime = TimeUtils.nanoTime();
+                        long nextTime = TimeUtils.nanoTime() + renderInterval;
+                        if (renderInterval >= 0f) {
+                            while (server.running) {
+                                final long n = TimeUtils.nanoTime();
+                                if (nextTime > n) {
+                                    try {
+                                        long sleep = nextTime - n;
+                                        Thread.sleep(sleep / 1000000, (int) (sleep % 1000000));
+                                    } catch (InterruptedException ignored) {
+                                    }
+                                    nextTime = nextTime + renderInterval;
+                                } else {
+                                    nextTime = n + renderInterval;
+                                }
+
+                                long now = System.nanoTime();
+                                float deltaTime = (now - lastTime) / 1000000000.0f;
+                                lastTime = now;
+
+                                server.renderThread(threadNum, deltaTime);
+                            }
+                        }
+                    } catch (Throwable t) {
+                        if (t instanceof RuntimeException)
+                            throw (RuntimeException) t;
+                        else
+                            throw new GdxRuntimeException(t);
+                    }
+                }
+            }.start();
+        }
 
         // this will block when successful, so don't do it inside create()
         server.run();
@@ -62,6 +112,11 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     @Override
     public void render() {
         // update game state here
+        renderThread(0, Gdx.graphics.getDeltaTime());
+    }
+
+    public void renderThread(int thread, float delta) {
+        // update corresponding game model
     }
 
     @Override
