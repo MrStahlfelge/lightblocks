@@ -156,6 +156,7 @@ project(":server") {
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "org.java-websocket:Java-WebSocket:1.4.0"
         implementation "com.fasterxml.jackson.core:jackson-databind:2.11.2"
+        implementation "com.google.code.findbugs:jsr305:3.0.2"
         implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }

@@ -19,20 +19,24 @@ import java.nio.ByteBuffer;
 import de.golfgl.lightblocks.server.model.ServerInfo;
 
 public class LightblocksServer extends WebSocketServer implements ApplicationListener {
-    private static final int MAX_THREAD_NUM = 10;
     private final ServerInfo serverInfo = new ServerInfo();
     private final Serializer serializer = new Serializer();
+    private final ServerConfiguration serverConfig;
+    private final Match[] matches;
     private boolean running = true;
 
-    public LightblocksServer(InetSocketAddress address) {
+    public LightblocksServer(InetSocketAddress address, ServerConfiguration serverConfiguration) {
         super(address);
+        this.serverConfig = serverConfiguration;
+        this.matches = new Match[serverConfig.threadNum];
     }
 
     public static void main(String[] arg) {
         HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
+        ServerConfiguration serverConfig = new ServerConfiguration();
         int port = 8887;
 
-        final LightblocksServer server = new LightblocksServer(new InetSocketAddress(port));
+        final LightblocksServer server = new LightblocksServer(new InetSocketAddress(port), serverConfig);
         new HeadlessApplication(server, config) {
             @Override
             public void exit() {
@@ -41,10 +45,20 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
             }
         };
 
-        // start up the other threads
-        final long renderInterval = config.renderInterval > 0 ? (long) (config.renderInterval * 1000000000f) : (config.renderInterval < 0 ? -1 : 0);
-        for (int i = 1; i < MAX_THREAD_NUM; i++) {
+        server.startThreads(config.renderInterval);
+
+        // this will block when successful, so don't do it inside create()
+        server.run();
+
+        Gdx.app.exit();
+    }
+
+    private void startThreads(float configRenderInterval) {
+        // thread 1 was started by HeadlessApplication - start up the other threads
+        final long renderInterval = configRenderInterval > 0 ? (long) (configRenderInterval * 1000000000f) : (configRenderInterval < 0 ? -1 : 0);
+        for (int i = 1; i < serverConfig.threadNum; i++) {
             final int threadNum = i;
+            matches[i] = new Match();
             new Thread("Render" + i) {
                 @Override
                 public void run() {
@@ -52,7 +66,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
                         long lastTime = TimeUtils.nanoTime();
                         long nextTime = TimeUtils.nanoTime() + renderInterval;
                         if (renderInterval >= 0f) {
-                            while (server.running) {
+                            while (running) {
                                 final long n = TimeUtils.nanoTime();
                                 if (nextTime > n) {
                                     try {
@@ -69,7 +83,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
                                 float deltaTime = (now - lastTime) / 1000000000.0f;
                                 lastTime = now;
 
-                                server.renderThread(threadNum, deltaTime);
+                                renderThread(threadNum, deltaTime);
                             }
                         }
                     } catch (Throwable t) {
@@ -81,17 +95,14 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
                 }
             }.start();
         }
-
-        // this will block when successful, so don't do it inside create()
-        server.run();
-
-        Gdx.app.exit();
     }
 
     @Override
     public void create() {
         Gdx.app.log("Server", "Starting, binding on port " + getPort());
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
+
+        matches[0] = new Match();
 
         serverInfo.authRequired = false;
         serverInfo.name = "Lightblocks Server";
@@ -117,6 +128,19 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
 
     public void renderThread(int thread, float delta) {
         // update corresponding game model
+        // Gdx.app.debug("Match" + thread, "update with delta " + delta);
+        matches[thread].update(delta);
+    }
+
+    public synchronized Match findMatchForPlayer(Player player) {
+        for (int i = 0; i < serverConfig.threadNum; i++) {
+            if (matches[i].connectPlayer(player)) {
+                Gdx.app.debug("Server", "Connected player to match " + i);
+                return matches[i];
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -142,7 +166,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         synchronized (serializer) {
-            conn.setAttachment(new Player(conn));
+            conn.setAttachment(new Player(this, conn));
             conn.send(serializer.serialize(this.serverInfo)); //This method sends a message to the new client
             Gdx.app.debug("Server", "new connection to " + conn.getRemoteSocketAddress());
         }
