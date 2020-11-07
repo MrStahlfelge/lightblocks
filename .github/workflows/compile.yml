@@ -24,6 +24,8 @@ jobs:
       run: chmod +x gradlew
     - name: Build desktop
       run: ./gradlew desktop:build
+    - name: Build server
+      run: ./gradlew server:build
     - name: Setup Android build environment
       uses: android-actions/setup-android@v1.0.0
     - name: Build Android
