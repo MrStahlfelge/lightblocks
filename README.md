@@ -57,3 +57,8 @@ Some principles the game and its evolvement is based on:
 For everyone viewing the source code: Sorry for all the German comments and commit messages that will
 make it more difficult for you. I didn't plan to open the source from the beginning, and I tend to
 write notes for myself in my native tongue.
+
+## Server
+Deploy to Heroku or dokku with
+
+     git subtree push --prefix server remotename master

@@ -1,15 +1,53 @@
 apply plugin: "java"
 
+// needs to be defined here again for Heroku filter
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://maven.google.com" }
+    jcenter()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    maven { url "https://jitpack.io" }
+}
+
+ext {
+    gdxVersionServer = '1.9.12'
+    mainClassNameServer = "de.golfgl.lightblocks.server.LightblocksServer"
+}
+
 sourceCompatibility = 1.7
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
+dependencies {
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersionServer"
+    implementation "org.java-websocket:Java-WebSocket:1.4.0"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.11.2"
+    implementation "com.google.code.findbugs:jsr305:3.0.2"
+    implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersionServer"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersionServer:natives-desktop"
+}
+
 task run(dependsOn: classes, type: JavaExec) {
-    main = "de.golfgl.lightblocks.server.LightblocksServer"
+    main = mainClassNameServer
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = new File("../android/assets")
     ignoreExitValue = true
 }
 
+// for Heroku
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
+jar {
+    archiveBaseName = "server"
+    manifest {
+        attributes 'Main-Class': mainClassNameServer
+    }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
