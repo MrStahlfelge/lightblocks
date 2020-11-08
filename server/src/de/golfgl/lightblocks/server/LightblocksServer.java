@@ -33,10 +33,9 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
 
     public static void main(String[] arg) {
         HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-        ServerConfiguration serverConfig = new ServerConfiguration();
-        int port = 8887;
+        ServerConfiguration serverConfig = new ServerConfiguration(arg);
 
-        final LightblocksServer server = new LightblocksServer(new InetSocketAddress(port), serverConfig);
+        final LightblocksServer server = new LightblocksServer(new InetSocketAddress(serverConfig.port), serverConfig);
         new HeadlessApplication(server, config) {
             @Override
             public void exit() {
@@ -99,8 +98,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
 
     @Override
     public void create() {
-        Gdx.app.log("Server", "Starting, binding on port " + getPort());
-        Gdx.app.setLogLevel(Application.LOG_DEBUG);
+        Gdx.app.setLogLevel(serverConfig.loglevel);
 
         matches[0] = new Match();
 
