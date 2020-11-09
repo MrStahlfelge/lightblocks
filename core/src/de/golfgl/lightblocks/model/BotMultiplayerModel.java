@@ -3,7 +3,7 @@ package de.golfgl.lightblocks.model;
 import de.golfgl.lightblocks.multiplayer.ai.ArtificialPlayer;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
-public class BotMultiplayerModel extends AbstractMultiplayerModel {
+public class BotMultiplayerModel extends AbstractMultiplayerModel<BotMultiplayerModel> {
     public static final String MODEL_ID = "botMultiplayer";
     private ArtificialPlayer aiPlayer;
 
@@ -15,7 +15,7 @@ public class BotMultiplayerModel extends AbstractMultiplayerModel {
     }
 
     @Override
-    protected AbstractMultiplayerModel createSecondGameModel(InitGameParameters newGameParams) {
+    protected BotMultiplayerModel createSecondGameModel(InitGameParameters newGameParams) {
         BotMultiplayerModel botMultiplayerModel = new BotMultiplayerModel();
         botMultiplayerModel.aiPlayer = new ArtificialPlayer(botMultiplayerModel, this);
         return botMultiplayerModel;

@@ -16,7 +16,7 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 /**
  * On device multiplayer mode
  */
-public class DeviceMultiplayerModel extends AbstractMultiplayerModel {
+public class DeviceMultiplayerModel extends AbstractMultiplayerModel<DeviceMultiplayerModel> {
     public static final String MODEL_ID = "deviceMultiplayer";
     private InputIdentifier myInputId;
 
@@ -48,7 +48,7 @@ public class DeviceMultiplayerModel extends AbstractMultiplayerModel {
     }
 
     @Override
-    protected AbstractMultiplayerModel createSecondGameModel(InitGameParameters newGameParams) {
+    protected DeviceMultiplayerModel createSecondGameModel(InitGameParameters newGameParams) {
         DeviceMultiplayerModel deviceMultiplayerModel = new DeviceMultiplayerModel();
         if (newGameParams.getFirstPlayerInputId() != null && newGameParams.getSecondPlayerInputId() != null) {
             myInputId = newGameParams.getFirstPlayerInputId();
@@ -105,11 +105,6 @@ public class DeviceMultiplayerModel extends AbstractMultiplayerModel {
     @Override
     public String getGoalDescription() {
         return "goalModelMultiplayer";
-    }
-
-    @Override
-    public DeviceMultiplayerModel getSecondGameModel() {
-        return (DeviceMultiplayerModel) secondGameModel;
     }
 
     @Override

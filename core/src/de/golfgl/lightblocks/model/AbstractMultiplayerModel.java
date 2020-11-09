@@ -8,11 +8,11 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 /**
  * Superclass for every (future) two player multiplayer mode, to keep things clean and separated
  */
-public abstract class AbstractMultiplayerModel extends GameModel {
+public abstract class AbstractMultiplayerModel<T extends AbstractMultiplayerModel> extends GameModel {
     private static final int GARBAGEGAP_CHANGECOUNT = 9;
     protected int modeType;
-    protected AbstractMultiplayerModel secondGameModel;
-    private ModelConnector modelConnector;
+    protected T secondGameModel;
+    protected ModelConnector modelConnector;
     private int currentGarbageGapPosIndex = 0;
     private int currentGarbageGapPosUsed = 0;
 
@@ -42,7 +42,7 @@ public abstract class AbstractMultiplayerModel extends GameModel {
         }
     }
 
-    protected abstract AbstractMultiplayerModel createSecondGameModel(InitGameParameters newGameParams);
+    protected abstract T createSecondGameModel(InitGameParameters newGameParams);
 
     @Override
     protected void initDrawyer() {
@@ -87,7 +87,7 @@ public abstract class AbstractMultiplayerModel extends GameModel {
     }
 
     @Override
-    public GameModel getSecondGameModel() {
+    public T getSecondGameModel() {
         return secondGameModel;
     }
 
