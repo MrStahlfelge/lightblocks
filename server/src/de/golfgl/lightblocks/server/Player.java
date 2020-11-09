@@ -63,6 +63,11 @@ public class Player {
             throw new UnexpectedException();
     }
 
+    public void send(String string) {
+        if (conn.isOpen())
+            conn.send(string);
+    }
+
     enum ConnectionState {CONNECTING, CONNECTED, PLAYING, DISCONNECTED}
 
     static class UnexpectedException extends Exception {

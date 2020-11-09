@@ -1,6 +1,5 @@
 package de.golfgl.lightblocks.server;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
@@ -19,9 +18,9 @@ import java.nio.ByteBuffer;
 import de.golfgl.lightblocks.server.model.ServerInfo;
 
 public class LightblocksServer extends WebSocketServer implements ApplicationListener {
+    final ServerConfiguration serverConfig;
     private final ServerInfo serverInfo = new ServerInfo();
     private final Serializer serializer = new Serializer();
-    private final ServerConfiguration serverConfig;
     private final Match[] matches;
     private boolean running = true;
 
@@ -57,7 +56,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         final long renderInterval = configRenderInterval > 0 ? (long) (configRenderInterval * 1000000000f) : (configRenderInterval < 0 ? -1 : 0);
         for (int i = 1; i < serverConfig.threadNum; i++) {
             final int threadNum = i;
-            matches[i] = new Match();
+            matches[i] = new Match(this);
             new Thread("Render" + i) {
                 @Override
                 public void run() {
@@ -100,7 +99,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     public void create() {
         Gdx.app.setLogLevel(serverConfig.loglevel);
 
-        matches[0] = new Match();
+        matches[0] = new Match(this);
 
         serverInfo.authRequired = false;
         serverInfo.name = "Lightblocks Server";
@@ -183,10 +182,14 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         Gdx.app.debug("Server", "received message from " + conn.getRemoteSocketAddress() + ": " + message);
         if (conn.getAttachment() != null) {
             Object object = serializer.deserialize(message);
-            try {
+            if (object != null) try {
                 conn.<Player>getAttachment().onMessage(object);
             } catch (Player.UnexpectedException e) {
                 Gdx.app.error("Server", "Unexpected message for player: " + message);
+                conn.close(4101, "Message unexpected.");
+            }
+            else {
+                conn.close(4101, "Message illegible.");
             }
         }
     }

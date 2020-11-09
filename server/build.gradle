@@ -36,6 +36,8 @@ task run(dependsOn: classes, type: JavaExec) {
     standardInput = System.in
     workingDir = new File("../android/assets")
     ignoreExitValue = true
+    // sets some configuration options good for development
+    argsString = "--server.threads=2 --verbosity=3"
 }
 
 // for Heroku

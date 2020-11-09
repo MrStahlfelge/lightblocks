@@ -4,11 +4,15 @@ import com.badlogic.gdx.Application;
 
 import javax.annotation.Nullable;
 
+import de.golfgl.lightblocks.state.InitGameParameters;
+
 public class ServerConfiguration {
     private final String[] args;
     public int threadNum = 10;
     public int port = 8887;
     public int loglevel = Application.LOG_INFO;
+    public int beginningLevel = 0;
+    public int modeType = InitGameParameters.TYPE_MIX;
 
     public ServerConfiguration(String[] arg) {
         this.args = arg;
