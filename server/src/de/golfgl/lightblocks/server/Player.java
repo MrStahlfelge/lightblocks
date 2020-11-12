@@ -35,6 +35,7 @@ public class Player {
         if (match != null) {
             Gdx.app.log("Player", "Successfully connected " + nickName + "/" + userId);
             state = ConnectionState.CONNECTED;
+            match.sendFullInformation();
         } else {
             conn.close(4100, "No match found for you.");
         }

@@ -120,7 +120,11 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     @Override
     public void render() {
         // update game state here
-        renderThread(0, Gdx.graphics.getDeltaTime());
+        try {
+            renderThread(0, Gdx.graphics.getDeltaTime());
+        } catch (Throwable t) {
+            Gdx.app.error("Server", "Uncaught error ", t);
+        }
     }
 
     public void renderThread(int thread, float delta) {
