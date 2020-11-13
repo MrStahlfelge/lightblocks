@@ -8,16 +8,20 @@ import javax.annotation.Nullable;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.ServerMultiplayerModel;
+import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.multiplayer.ai.ArtificialPlayer;
+import de.golfgl.lightblocks.server.model.MatchInfo;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class Match {
     private final InitGameParameters gameParams;
+    private final LightblocksServer server;
     private Player player1;
     private Player player2;
     private ServerMultiplayerModel gameModel;
 
     public Match(LightblocksServer server) {
+        this.server = server;
         gameParams = new InitGameParameters();
         gameParams.setBeginningLevel(server.serverConfig.beginningLevel);
         int modeType = server.serverConfig.modeType;
@@ -88,7 +92,53 @@ public class Match {
     }
 
     public void sendFullInformation() {
-        // TODO send the full match information to the players after a connect or disconnect
+        if (gameModel == null || getConnectedPlayerNum() == 0)
+            return;
+
+        // send the full match information to the players after a connect or disconnect
+        // gameboard, score, nick names, ...
+        MatchInfo matchInfo1 = new MatchInfo();
+        MatchInfo matchInfo2 = new MatchInfo();
+
+        MatchInfo.PlayerInfo player1 = new MatchInfo.PlayerInfo();
+        MatchInfo.PlayerInfo player2 = new MatchInfo.PlayerInfo();
+        matchInfo1.player1 = player1;
+        matchInfo1.player2 = player2;
+        matchInfo2.player1 = player2;
+        matchInfo2.player2 = player1;
+
+        player1.score = new MatchInfo.ScoreInfo(gameModel.getScore());
+        player2.score = new MatchInfo.ScoreInfo(gameModel.getSecondGameModel().getScore());
+
+        player1.nickname = this.player1 != null ? this.player1.nickName : "AI";
+        player2.nickname = this.player2 != null ? this.player2.nickName : "AI";
+
+        player1.gameboard = gameModel.getSerializedGameboard();
+        player2.gameboard = gameModel.getSecondGameModel().getSerializedGameboard();
+
+        player1.holdPiece = serializeTetromino(gameModel.getHoldTetromino(), true);
+        player2.holdPiece = serializeTetromino(gameModel.getSecondGameModel().getHoldTetromino(), true);
+
+        player1.activePiece = serializeTetromino(gameModel.getActiveTetromino(), false);
+        player2.activePiece = serializeTetromino(gameModel.getSecondGameModel().getActiveTetromino(), false);
+
+        player1.nextPiece = serializeTetromino(gameModel.getNextTetromino(), true);
+        player2.nextPiece = serializeTetromino(gameModel.getSecondGameModel().getNextTetromino(), true);
+
+        if (this.player1 != null)
+            this.player1.send(server.serializer.serialize(matchInfo1));
+        if (this.player2 != null)
+            this.player2.send(server.serializer.serialize(matchInfo2));
+    }
+
+    protected String serializeTetromino(Tetromino tetromino, boolean relative) {
+        if (tetromino == null)
+            return null;
+
+        StringBuilder builder = new StringBuilder();
+        sendPiecePositions(relative ? tetromino.getRelativeBlockPositions() : tetromino.getCurrentBlockPositions(), builder);
+        builder.append(tetromino.getTetrominoType());
+        return builder.toString();
     }
 
     protected void sendPiecePositions(Integer[][] piecePos, StringBuilder builder) {
@@ -101,6 +151,7 @@ public class Match {
         private final int idx;
         private final ServerMultiplayerModel gameModel;
         private int lastGarbageAmountReported = 0;
+        private String lastSentScore;
 
         public Listener(int idx, ServerMultiplayerModel gameModel) {
             this.idx = idx;
@@ -226,7 +277,14 @@ public class Match {
 
         @Override
         public void updateScore(GameScore score, int gainedScore) {
-            // TODO serialize
+            if (hasPlayer()) {
+                MatchInfo.ScoreInfo scoreInfo = new MatchInfo.ScoreInfo(score);
+                String serialized = server.serializer.serialize(scoreInfo);
+                if (!serialized.equals(lastSentScore)) {
+                    lastSentScore = serialized;
+                    sendPlayer(serialized);
+                }
+            }
         }
 
         @Override

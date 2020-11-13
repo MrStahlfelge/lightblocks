@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.golfgl.lightblocks.server.model.MatchInfo;
 import de.golfgl.lightblocks.server.model.PlayerInfo;
 import de.golfgl.lightblocks.server.model.ServerInfo;
 
@@ -41,6 +42,10 @@ public class Serializer {
     private String getPrefixFromObject(Object object) {
         if (object instanceof ServerInfo)
             return ID_SERVERINFO;
+        else if (object instanceof MatchInfo)
+            return "MCH";
+        else if (object instanceof MatchInfo.ScoreInfo)
+            return "SCO";
 
         return "";
     }

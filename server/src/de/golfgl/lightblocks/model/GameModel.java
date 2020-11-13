@@ -77,7 +77,7 @@ public abstract class GameModel implements AiAcessibleGameModel {
         isGameOver = false;
     }
 
-    protected Tetromino getActiveTetromino() {
+    public Tetromino getActiveTetromino() {
         return activeTetromino;
     }
 

@@ -131,6 +131,25 @@ public abstract class AbstractMultiplayerModel<T extends AbstractMultiplayerMode
         super.setGameOverBoardFull();
     }
 
+    public String getSerializedGameboard() {
+        int[][] gameboardSquares = getGameboard().getGameboardSquares();
+        char[] gameboardChars = new char[Gameboard.GAMEBOARD_ALLROWS * Gameboard.GAMEBOARD_COLUMNS];
+        int lastChar = 0;
+        for (byte row = 0; row < Gameboard.GAMEBOARD_ALLROWS; row++) {
+            for (byte column = 0; column < Gameboard.GAMEBOARD_COLUMNS; column++) {
+                int pos = row * Gameboard.GAMEBOARD_COLUMNS + column;
+                gameboardChars[pos] = Gameboard.gameboardSquareToChar
+                        (gameboardSquares[row][column]);
+                if (gameboardSquares[row][column] != Gameboard.SQUARE_EMPTY)
+                    lastChar = pos;
+            }
+        }
+        String message = new String(gameboardChars);
+        if (lastChar < message.length())
+            message = message.substring(0, lastChar + 1);
+        return message;
+    }
+
     /**
      * Shared connector between game model of the two players. Manages the tetromino drawers,
      * sent lines and end of game

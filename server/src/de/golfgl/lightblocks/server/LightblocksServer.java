@@ -19,8 +19,8 @@ import de.golfgl.lightblocks.server.model.ServerInfo;
 
 public class LightblocksServer extends WebSocketServer implements ApplicationListener {
     final ServerConfiguration serverConfig;
+    final Serializer serializer = new Serializer();
     private final ServerInfo serverInfo = new ServerInfo();
-    private final Serializer serializer = new Serializer();
     private final Match[] matches;
     private boolean running = true;
 
