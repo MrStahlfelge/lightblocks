@@ -64,6 +64,7 @@ public class DesktopLauncher {
         };
         game.gpgsClient = new MyTestClient();
         game.purchaseManager = new MyTestPurchaseManager();
+        game.nsdHelper = new DesktopNsdHelper();
         new LwjglApplication(game, config);
     }
 
