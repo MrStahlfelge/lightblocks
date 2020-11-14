@@ -13,6 +13,8 @@ public class ServerConfiguration {
     public int loglevel = Application.LOG_INFO;
     public int beginningLevel = 0;
     public int modeType = InitGameParameters.TYPE_MIX;
+    public String name = "Lighblocks Server";
+    public boolean enableNsd;
 
     public ServerConfiguration(String[] arg) {
         this.args = arg;
@@ -38,6 +40,8 @@ public class ServerConfiguration {
         } else {
             System.out.println("Set log verbosity with --verbosity={0,1,2,3}");
         }
+
+        enableNsd = 0 != findInt("enableNsd", 1);
     }
 
     protected int findInt(String name, int defaultVal) {

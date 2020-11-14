@@ -1,1 +1,1 @@
-web: java -jar build/libs/server.jar --server.port=$PORT
+web: java -jar build/libs/server.jar --server.port=$PORT --enableNsd=0

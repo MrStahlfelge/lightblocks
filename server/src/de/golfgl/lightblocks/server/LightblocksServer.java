@@ -12,8 +12,12 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceInfo;
 
 import de.golfgl.lightblocks.server.model.ServerInfo;
 
@@ -23,6 +27,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     private final ServerInfo serverInfo = new ServerInfo();
     private final Match[] matches;
     private boolean running = true;
+    private JmDNS jmdns;
 
     public LightblocksServer(InetSocketAddress address, ServerConfiguration serverConfiguration) {
         super(address);
@@ -39,6 +44,10 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
             @Override
             public void exit() {
                 server.running = false;
+                // Unregister all services
+                if (server.jmdns != null) {
+                    server.jmdns.unregisterAllServices();
+                }
                 super.exit();
             }
         };
@@ -110,6 +119,18 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     @Override
     public void onStart() {
         Gdx.app.log("Server", "server started successfully, listening on port " + getPort());
+
+        if (serverConfig.enableNsd) {
+            try {
+                jmdns = JmDNS.create(InetAddress.getLocalHost());
+                // Register a service
+                ServiceInfo serviceInfo = ServiceInfo.create("_lightblocks._tcp.local.", "lbserver-" + serverConfig.name, getPort(), "");
+                jmdns.registerService(serviceInfo);
+                Gdx.app.log("Server", "Registered for service discovery " + jmdns.getInetAddress());
+            } catch (IOException e) {
+                Gdx.app.error("Server", "Could not register for service discovery.", e);
+            }
+        }
     }
 
     @Override

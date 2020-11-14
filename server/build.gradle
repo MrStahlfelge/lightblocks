@@ -24,6 +24,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 dependencies {
     implementation "com.badlogicgames.gdx:gdx:$gdxVersionServer"
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
+    implementation 'org.jmdns:jmdns:3.5.6'
     implementation "com.fasterxml.jackson.core:jackson-databind:2.11.2"
     implementation "com.google.code.findbugs:jsr305:3.0.2"
     implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersionServer"
