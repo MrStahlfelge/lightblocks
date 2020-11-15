@@ -6,6 +6,7 @@
   <target>ios</target>
   <iosInfoPList>Info.plist.xml</iosInfoPList>
   <iosEntitlementsPList>Entitlements.plist.xml</iosEntitlementsPList>
+  <treeShaker>conservative</treeShaker>
   <resources>
     <resource>
       <directory>../android/assets</directory>
