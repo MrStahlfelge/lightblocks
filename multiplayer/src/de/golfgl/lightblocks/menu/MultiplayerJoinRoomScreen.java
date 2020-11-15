@@ -166,7 +166,7 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
 
                 if (lastSelectedRoom != null && lastSelectedRoom instanceof KryonetRoomLocation) {
                     // Desktop hat Darstellungsfehler, aber unter Android ist es ok
-                    proposal = ((KryonetRoomLocation) lastSelectedRoom).address.getHostAddress();
+                    proposal = lastSelectedRoom.getRoomAddress();
                 }
 
                 TextInputDialog.getTextInput(new Input.TextInputListener() {

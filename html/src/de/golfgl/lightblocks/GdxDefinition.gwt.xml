@@ -8,6 +8,8 @@
     <inherits name="de.golfgl.gdxgameanalytics.gdxgameanalytics"/>
 	<inherits name="com.badlogic.gdx.pay_client"/>
 	<inherits name="de.golfgl.gdxpushmessages.gdx_pushmsgs_gwt" />
+	<inherits name='com.github.czyzby.websocket.GdxWebSocket' />
+	<inherits name='com.github.czyzby.websocket.GdxWebSocketGwt' />
 
 	<inherits name='LightBlocksGame' />
 	<entry-point class='de.golfgl.lightblocks.client.HtmlLauncher' />

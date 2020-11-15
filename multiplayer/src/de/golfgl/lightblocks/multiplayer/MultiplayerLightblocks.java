@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Timer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.minlog.Log;
+import com.github.czyzby.websocket.CommonWebSockets;
 
 import java.io.BufferedOutputStream;
 import java.io.InputStream;
@@ -73,6 +74,8 @@ public class MultiplayerLightblocks extends LightBlocksGame {
     public void create() {
         if (!GAME_DEVMODE)
             Log.set(Log.LEVEL_WARN);
+
+        CommonWebSockets.initiate();
 
         super.create();
     }

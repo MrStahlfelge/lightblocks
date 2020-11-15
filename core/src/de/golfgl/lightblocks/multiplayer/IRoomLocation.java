@@ -12,6 +12,7 @@ public interface IRoomLocation {
      * returns name of the room
      *
      */
-    public String getRoomName();
+    String getRoomName();
 
+    String getRoomAddress();
 }

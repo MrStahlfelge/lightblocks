@@ -6,6 +6,7 @@ import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.badlogic.gdx.backends.gwt.GwtGraphics;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader;
+import com.github.czyzby.websocket.GwtWebSockets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ResizeEvent;
@@ -45,6 +46,8 @@ public class HtmlLauncher extends GwtApplication {
 
     @Override
     public ApplicationListener createApplicationListener() {
+        GwtWebSockets.initiate();
+
         LightBlocksGame lightBlocksGame = new LightBlocksGame() {
             @Override
             protected boolean shouldGoToReplay() {
