@@ -205,7 +205,9 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     @Override
     public void onMessage(WebSocket conn, String message) {
         Gdx.app.debug("Server", "received message from " + conn.getRemoteSocketAddress() + ": " + message);
-        if (conn.getAttachment() != null) {
+        if (message.equals("PING") || message.isEmpty()) {
+            conn.send("PONG");
+        } else if (conn.getAttachment() != null) {
             Object object = serializer.deserialize(message);
             if (object != null) try {
                 conn.<Player>getAttachment().onMessage(object);

@@ -178,9 +178,7 @@ public class Match {
 
         @Override
         public void insertNewBlock(int x, int y, int blockType) {
-            if (hasPlayer()) {
-                sendPlayer("INS-" + x + "-" + y + "-" + blockType);
-            }
+            // only used on game start, sendFullInformation will handle this
         }
 
         @Override
