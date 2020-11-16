@@ -27,7 +27,7 @@ jobs:
     - name: Build server
       run: ./gradlew server:build
     - name: Setup Android build environment
-      uses: android-actions/setup-android@v1.0.0
+      uses: android-actions/setup-android@v2.0.2
     - name: Build Android
       run: ./gradlew android:buildGenericDebug --stacktrace
     - name: Build HTML
