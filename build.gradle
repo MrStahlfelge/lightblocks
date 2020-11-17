@@ -32,7 +32,7 @@ allprojects {
         gaVersion = '0.1.4'
         gdxPayVersion = '1.3.1'
         pushMsgsVersion = '1.0.0'
-        wsVersion = '1.9.1.9.6'
+        wsVersion = '1.9.10.0'
     }
 
     repositories {
@@ -139,9 +139,9 @@ project(":html") {
         compile "com.badlogicgames.gdxpay:gdx-pay:$gdxPayVersion:sources"
         compile "com.badlogicgames.gdxpay:gdx-pay-client:$gdxPayVersion:sources"
         compile "de.golfgl.gdxpushmessages:gdx-pushmessages-core:$pushMsgsVersion:sources"
-        compile "com.github.czyzby:gdx-websocket:$wsVersion:sources"
-        compile "com.github.czyzby:gdx-websocket-gwt:$wsVersion"
-        compile "com.github.czyzby:gdx-websocket-gwt:$wsVersion:sources"
+        compile "com.github.MrStahlfelge.gdx-websockets:core:$wsVersion:sources"
+        compile "com.github.MrStahlfelge.gdx-websockets:html:$wsVersion"
+        compile "com.github.MrStahlfelge.gdx-websockets:html:$wsVersion:sources"
     }
 }
 
@@ -151,7 +151,7 @@ project(":multiplayer") {
     dependencies {
         compile project(":core")
         compile "com.esotericsoftware:kryonet:2.22.0-RC1"
-        compile "com.github.czyzby:gdx-websocket-common:$wsVersion"
+        compile "com.github.MrStahlfelge.gdx-websockets:common:$wsVersion"
     }
 }
 
@@ -168,7 +168,7 @@ project(":core") {
         compile "de.golfgl.gdxgameanalytics:gdx-gameanalytics-core:$gaVersion"
         compile "com.badlogicgames.gdxpay:gdx-pay-client:$gdxPayVersion"
         compile "de.golfgl.gdxpushmessages:gdx-pushmessages-core:$pushMsgsVersion"
-        compile "com.github.czyzby:gdx-websocket:$wsVersion"
+        compile "com.github.MrStahlfelge.gdx-websockets:core:$wsVersion"
 
         testCompile "junit:junit:4.12"
         testCompile "org.mockito:mockito-core:2.2.7"
