@@ -1,4 +1,4 @@
-package de.golfgl.lightblocks.menu;
+package de.golfgl.lightblocks.menu.multiplayer;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -7,22 +7,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
-import com.github.czyzby.websocket.WebSocket;
-import com.github.czyzby.websocket.WebSockets;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.gdx.controllers.ControllerScrollPane;
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
-import de.golfgl.lightblocks.multiplayer.ServerMultiplayerManager;
+import de.golfgl.lightblocks.multiplayer.ServerAddress;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.TextInputDialog;
 import de.golfgl.lightblocks.scene2d.TouchableList;
-import de.golfgl.lightblocks.scene2d.VetoDialog;
 
-class ServerMultiplayerPage extends Table implements MultiplayerMenuScreen.IMultiplayerModePage {
+public class ServerMultiplayerPage extends Table implements MultiplayerMenuScreen.IMultiplayerModePage {
     private final TouchableList<IRoomLocation> hostList;
     private final ControllerScrollPane hostListScrollPane;
     private final RoundedTextButton enterManually;
@@ -128,15 +126,7 @@ class ServerMultiplayerPage extends Table implements MultiplayerMenuScreen.IMult
     }
 
     private void roomSelect(IRoomLocation address) {
-        WebSocket socket = WebSockets.newSocket(address.getRoomAddress());
-        socket.setSendGracefully(true);
-        socket.addListener(new ServerMultiplayerManager());
-        try {
-            //TODO not on main thread, waiting dialog
-            socket.connect();
-        } catch (Throwable t) {
-            new VetoDialog(t.getMessage(), app.skin, LightBlocksGame.nativeGameWidth * .9f).show(getStage());
-        }
+        new ServerLobbyScreen(app, address.getRoomAddress()).show(getStage());
     }
 
     @Override
@@ -149,50 +139,4 @@ class ServerMultiplayerPage extends Table implements MultiplayerMenuScreen.IMult
         return null;
     }
 
-    static class ServerAddress implements IRoomLocation {
-        private final String name;
-        private final String address;
-
-        ServerAddress(String name, String address) {
-            this.name = name;
-            this.address = address;
-        }
-
-        ServerAddress(String address) {
-            int dotSlashPos = address.indexOf("://");
-
-            if (dotSlashPos > 0) {
-                this.name = address.substring(dotSlashPos + 3);
-                this.address = address;
-            } else {
-                int colonPos = address.indexOf(':');
-                int port = 0;
-                if (colonPos > 0) {
-                    this.name = address.substring(0, colonPos);
-                    try {
-                        port = Integer.parseInt(address.substring(colonPos + 1));
-                    } catch (Throwable ignored) {
-                    }
-                } else {
-                    this.name = address;
-                }
-                this.address = WebSockets.toWebSocketUrl(this.name, port != 0 ? port : 8887);
-            }
-        }
-
-        @Override
-        public String getRoomName() {
-            return name;
-        }
-
-        @Override
-        public String getRoomAddress() {
-            return address;
-        }
-
-        @Override
-        public String toString() {
-            return getRoomName();
-        }
-    }
 }
