@@ -54,15 +54,4 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
                 || getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK_ONLY); //NON-NLS
 
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (gpgsClient == null)
-            return;
-
-        gpgsClient.onGpgsActivityResult(requestCode, resultCode, data);
-
-    }
 }
