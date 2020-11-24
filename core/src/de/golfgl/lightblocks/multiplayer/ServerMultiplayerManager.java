@@ -26,6 +26,7 @@ public class ServerMultiplayerManager {
 
     public void connect(String address) {
         if (isClosed()) {
+            lastErrorMsg = null;
             this.socket = WebSockets.newSocket(address);
             socket.setSendGracefully(true);
             socket.addListener(new SocketListener());
@@ -78,6 +79,11 @@ public class ServerMultiplayerManager {
         public boolean onClose(WebSocket webSocket, WebSocketCloseCode code, String reason) {
             Gdx.app.debug("WS", "Closed: " + webSocket.getUrl());
             clear();
+
+            if (code == WebSocketCloseCode.ABNORMAL) {
+                lastErrorMsg = "Could not connect to server " + webSocket.getUrl();
+            }
+
             return false;
         }
 
