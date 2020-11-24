@@ -12,7 +12,7 @@ public class Player {
     public String nickName;
     public String userId;
     public String token;
-    public ConnectionState state = ConnectionState.CONNECTING;
+    public ConnectionState state = ConnectionState.CONNECTED;
     private Match match;
 
     public Player(LightblocksServer server, WebSocket conn) {
@@ -21,7 +21,7 @@ public class Player {
     }
 
     private void connected(PlayerInfo playerInfo) {
-        if (playerInfo.nickName == null || state != ConnectionState.CONNECTING) {
+        if (playerInfo.nickName == null || state != ConnectionState.CONNECTED) {
             // client error => just return;
             return;
         }
@@ -34,7 +34,7 @@ public class Player {
 
         if (match != null) {
             Gdx.app.log("Player", "Successfully connected " + nickName + "/" + userId);
-            state = ConnectionState.CONNECTED;
+            state = ConnectionState.PLAYING;
             match.sendFullInformation();
         } else {
             conn.close(4100, "No match found for you.");
@@ -42,7 +42,7 @@ public class Player {
     }
 
     public void disconnected() {
-        if (state != ConnectionState.CONNECTING) {
+        if (state != ConnectionState.CONNECTED) {
             Gdx.app.log("Player", "Disconnect: " + nickName + "/" + userId);
         }
         state = ConnectionState.DISCONNECTED;
@@ -53,10 +53,10 @@ public class Player {
     }
 
     public void onMessage(Object object) throws UnexpectedException {
-        if (object instanceof PlayerInfo && state == ConnectionState.CONNECTING) {
+        if (object instanceof PlayerInfo && state == ConnectionState.CONNECTED) {
             connected((PlayerInfo) object);
 
-            if (state != ConnectionState.CONNECTED && conn.isOpen()) {
+            if (state != ConnectionState.PLAYING && conn.isOpen()) {
                 // if connection was not successfully established, disconnect the player
                 conn.close();
             }
@@ -69,7 +69,7 @@ public class Player {
             conn.send(string);
     }
 
-    enum ConnectionState {CONNECTING, CONNECTED, PLAYING, DISCONNECTED}
+    enum ConnectionState {CONNECTED, PLAYING, DISCONNECTED}
 
     static class UnexpectedException extends Exception {
 

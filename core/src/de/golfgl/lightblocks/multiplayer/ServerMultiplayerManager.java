@@ -1,6 +1,8 @@
 package de.golfgl.lightblocks.multiplayer;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.czyzby.websocket.WebSocket;
 import com.github.czyzby.websocket.WebSocketListener;
@@ -8,11 +10,16 @@ import com.github.czyzby.websocket.WebSockets;
 import com.github.czyzby.websocket.data.WebSocketCloseCode;
 
 public class ServerMultiplayerManager {
+    public static final String ID_SERVERINFO = "HSH";
+    public static final String ID_PLAYERINFO = "PIN";
+
     private WebSocket socket;
     private long startTimePing;
     private int pingMs = -1;
     private PlayState state;
     private String lastErrorMsg;
+    private JsonReader json = new JsonReader();
+    private ServerModels.ServerInfo serverInfo;
 
     public ServerMultiplayerManager() {
         clear();
@@ -56,6 +63,10 @@ public class ServerMultiplayerManager {
         return lastErrorMsg;
     }
 
+    public ServerModels.ServerInfo getServerInfo() {
+        return serverInfo;
+    }
+
     public boolean isConnecting() {
         return state == PlayState.CONNECTING;
     }
@@ -64,14 +75,39 @@ public class ServerMultiplayerManager {
         return state == PlayState.LOBBY || state == PlayState.IN_GAME;
     }
 
+    protected void doPing() {
+        pingMs = -1;
+        startTimePing = TimeUtils.millis();
+        socket.sendKeepAlivePacket();
+    }
+
+    protected void handlePong() {
+        pingMs = (int) (TimeUtils.millis() - startTimePing);
+        Gdx.app.log("WS", "Connected to " + socket.getUrl() + " with a ping of " + pingMs);
+    }
+
+    private void handleServerInfo(String json) {
+        JsonValue jsonValue = this.json.parse(json);
+
+        serverInfo = new ServerModels.ServerInfo();
+        serverInfo.authRequired = jsonValue.getBoolean("authRequired");
+        serverInfo.name = jsonValue.getString("name");
+        serverInfo.owner = jsonValue.getString("owner", null);
+        serverInfo.version = jsonValue.getInt("version");
+
+        state = PlayState.LOBBY;
+        doPing();
+    }
+
+    public int getLastPingTime() {
+        return pingMs;
+    }
+
     public enum PlayState {CONNECTING, LOBBY, IN_GAME, CLOSED}
 
     private class SocketListener implements WebSocketListener {
         @Override
         public boolean onOpen(WebSocket webSocket) {
-            state = PlayState.LOBBY;
-            startTimePing = TimeUtils.millis();
-            webSocket.sendKeepAlivePacket();
             return true;
         }
 
@@ -91,9 +127,16 @@ public class ServerMultiplayerManager {
         public boolean onMessage(WebSocket webSocket, String packet) {
             Gdx.app.debug("WS", "Received: " + packet);
 
-            if (pingMs < 0) {
-                pingMs = (int) (TimeUtils.millis() - startTimePing);
-                Gdx.app.log("WS", "Connected to " + webSocket.getUrl() + " with a ping of " + pingMs);
+            try {
+                if (pingMs < 0 && packet.equals("PONG")) {
+                    handlePong();
+                }
+
+                if (packet.startsWith(ID_SERVERINFO)) {
+                    handleServerInfo(packet.substring(ID_SERVERINFO.length()));
+                }
+            } catch (Throwable t) {
+                Gdx.app.error("Server", "Error handling message: " + packet, t);
             }
 
             return true;

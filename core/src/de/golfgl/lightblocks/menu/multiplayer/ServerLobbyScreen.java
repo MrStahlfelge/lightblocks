@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Align;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
+import de.golfgl.lightblocks.multiplayer.ServerModels;
 import de.golfgl.lightblocks.multiplayer.ServerMultiplayerManager;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -58,12 +59,11 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             connecting = false;
         } else if (connecting && serverMultiplayerManager.isConnected()) {
             connecting = false;
-            contentCell.setActor(null); // TODO
+            contentCell.setActor(new LobbyTable());
         }
     }
 
-    protected Table fillErrorScreen(String errorMessage) {
-        // TODO on GWT, improve error message here
+    protected void fillErrorScreen(String errorMessage) {
         Table errorTable = new Table();
         Label errorMsgLabel = new ScaledLabel(errorMessage, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
         float noWrapHeight = errorMsgLabel.getPrefHeight();
@@ -73,8 +73,6 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
                 .minWidth(LightBlocksGame.nativeGameWidth - 50);
 
         contentCell.setActor(errorTable).fillX();
-
-        return errorTable;
     }
 
     @Override
@@ -82,6 +80,37 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
         super.setParent(parent);
         if (parent == null && serverMultiplayerManager.isConnected()) {
             serverMultiplayerManager.disconnect();
+        }
+    }
+
+    private class LobbyTable extends Table {
+
+        private final Cell<Label> pingCell;
+
+        public LobbyTable() {
+
+            Table serverInfoTable = new Table(app.skin);
+
+            ServerModels.ServerInfo serverInfo = serverMultiplayerManager.getServerInfo();
+
+            serverInfoTable.defaults().padRight(5).padLeft(5);
+            serverInfoTable.add("Server: ").right();
+            serverInfoTable.add(serverInfo.name); // TODO ellipsis
+            serverInfoTable.row();
+            serverInfoTable.add("Version: ").right();
+            serverInfoTable.add(String.valueOf(serverInfo.version)).left();
+            serverInfoTable.row();
+            serverInfoTable.add("Ping: ").right();
+            pingCell = serverInfoTable.add("-").left();
+
+            add(serverInfoTable);
+        }
+
+        @Override
+        public void act(float delta) {
+            super.act(delta);
+            int lastPingTime = serverMultiplayerManager.getLastPingTime();
+            pingCell.getActor().setText(lastPingTime < 0 ? "" : String.valueOf(lastPingTime));
         }
     }
 }
