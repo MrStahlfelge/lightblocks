@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
@@ -21,7 +22,8 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
     protected final ProgressDialog.WaitRotationImage waitRotationImage;
     protected final Cell contentCell;
     private final ServerMultiplayerManager serverMultiplayerManager;
-    private boolean connecting = true;
+    private boolean connecting;
+    private long lastDoPingTime;
 
     public ServerLobbyScreen(LightBlocksGame app, String roomAddress) {
         super(app);
@@ -59,6 +61,7 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             connecting = false;
         } else if (connecting && serverMultiplayerManager.isConnected()) {
             connecting = false;
+            lastDoPingTime = TimeUtils.millis();
             contentCell.setActor(new LobbyTable());
         }
     }
@@ -101,7 +104,7 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             serverInfoTable.add(String.valueOf(serverInfo.version)).left();
             serverInfoTable.row();
             serverInfoTable.add("Ping: ").right();
-            pingCell = serverInfoTable.add("-").left();
+            pingCell = serverInfoTable.add("").left();
 
             add(serverInfoTable);
         }
@@ -109,8 +112,15 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
         @Override
         public void act(float delta) {
             super.act(delta);
-            int lastPingTime = serverMultiplayerManager.getLastPingTime();
-            pingCell.getActor().setText(lastPingTime < 0 ? "" : String.valueOf(lastPingTime));
+            int lastPing = serverMultiplayerManager.getLastPingTime();
+            if (lastPing >= 0) {
+                pingCell.getActor().setText(String.valueOf(lastPing));
+
+                if (TimeUtils.millis() - lastDoPingTime >= 5000) {
+                    lastDoPingTime = TimeUtils.millis();
+                    serverMultiplayerManager.doPing();
+                }
+            }
         }
     }
 }

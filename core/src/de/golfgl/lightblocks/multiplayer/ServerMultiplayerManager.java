@@ -75,15 +75,17 @@ public class ServerMultiplayerManager {
         return state == PlayState.LOBBY || state == PlayState.IN_GAME;
     }
 
-    protected void doPing() {
-        pingMs = -1;
-        startTimePing = TimeUtils.millis();
-        socket.sendKeepAlivePacket();
+    public void doPing() {
+        if (isConnected()) {
+            pingMs = -1;
+            startTimePing = TimeUtils.millis();
+            socket.sendKeepAlivePacket();
+        }
     }
 
     protected void handlePong() {
         pingMs = (int) (TimeUtils.millis() - startTimePing);
-        Gdx.app.log("WS", "Connected to " + socket.getUrl() + " with a ping of " + pingMs);
+        Gdx.app.log("WS", "Ping from " + socket.getUrl() + ": " + pingMs);
     }
 
     private void handleServerInfo(String json) {
