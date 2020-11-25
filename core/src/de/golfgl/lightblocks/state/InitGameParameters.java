@@ -13,6 +13,8 @@ import de.golfgl.lightblocks.model.RetroMarathonModel;
 import de.golfgl.lightblocks.model.SprintModel;
 import de.golfgl.lightblocks.model.TutorialModel;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
+import de.golfgl.lightblocks.multiplayer.ServerMultiplayerManager;
+import de.golfgl.lightblocks.multiplayer.ServerMultiplayerModel;
 
 /**
  * This class defines new games parameters.
@@ -34,6 +36,7 @@ public class InitGameParameters {
     private AbstractMultiplayerRoom multiplayerRoom;
     private InputIdentifier firstPlayerInputId;
     private InputIdentifier secondPlayerInputId;
+    private ServerMultiplayerManager serverMultiplayerManager;
 
     // for Turn Based Battle
     private MatchEntity matchEntity;
@@ -82,6 +85,14 @@ public class InitGameParameters {
 
     public void setMultiplayerRoom(AbstractMultiplayerRoom multiplayerRoom) {
         this.multiplayerRoom = multiplayerRoom;
+    }
+
+    public ServerMultiplayerManager getServerMultiplayerManager() {
+        return serverMultiplayerManager;
+    }
+
+    public void setServerMultiplayerManager(ServerMultiplayerManager serverMultiplayerManager) {
+        this.serverMultiplayerManager = serverMultiplayerManager;
     }
 
     public InputIdentifier getFirstPlayerInputId() {
@@ -149,9 +160,11 @@ public class InitGameParameters {
                 return new ModernFreezeModel();
             case DeviceMultiplayer:
                 return new DeviceMultiplayerModel();
+            case ServerMultiplayer:
+                return new ServerMultiplayerModel();
         }
         throw new IllegalStateException("Unsupported game mode");
     }
 
-    public enum GameMode {Multiplayer, Marathon, Tutorial, Sprint, MarathonRetro89, Practice, TurnbasedBattle, ModernFreeze, DeviceMultiplayer}
+    public enum GameMode {Multiplayer, Marathon, Tutorial, Sprint, MarathonRetro89, Practice, TurnbasedBattle, ModernFreeze, ServerMultiplayer, DeviceMultiplayer}
 }

@@ -3,25 +3,30 @@ package de.golfgl.lightblocks.multiplayer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.czyzby.websocket.WebSocket;
 import com.github.czyzby.websocket.WebSocketListener;
 import com.github.czyzby.websocket.WebSockets;
 import com.github.czyzby.websocket.data.WebSocketCloseCode;
 
+import de.golfgl.lightblocks.LightBlocksGame;
+
 public class ServerMultiplayerManager {
     public static final String ID_SERVERINFO = "HSH";
     public static final String ID_PLAYERINFO = "PIN";
+    private final LightBlocksGame app;
 
     private WebSocket socket;
     private long startTimePing;
     private int pingMs = -1;
     private PlayState state;
     private String lastErrorMsg;
-    private JsonReader json = new JsonReader();
+    private JsonReader jsonReader = new JsonReader();
     private ServerModels.ServerInfo serverInfo;
 
-    public ServerMultiplayerManager() {
+    public ServerMultiplayerManager(LightBlocksGame app) {
+        this.app = app;
         clear();
     }
 
@@ -83,13 +88,24 @@ public class ServerMultiplayerManager {
         }
     }
 
+    public void doStartGame() {
+        // starting the game by sending player information
+        JsonValue playerInfo = new JsonValue(JsonValue.ValueType.object);
+        playerInfo.addChild("nickName", new JsonValue(app.player.getName()));
+        if (app.backendManager.hasUserId()) {
+            playerInfo.addChild("userId", new JsonValue(app.backendManager.ownUserId()));
+        }
+
+        socket.send(ID_PLAYERINFO + playerInfo.toJson(JsonWriter.OutputType.json));
+    }
+
     protected void handlePong() {
         pingMs = (int) (TimeUtils.millis() - startTimePing);
         Gdx.app.log("WS", "Ping from " + socket.getUrl() + ": " + pingMs);
     }
 
     private void handleServerInfo(String json) {
-        JsonValue jsonValue = this.json.parse(json);
+        JsonValue jsonValue = this.jsonReader.parse(json);
 
         serverInfo = new ServerModels.ServerInfo();
         serverInfo.authRequired = jsonValue.getBoolean("authRequired");

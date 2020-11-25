@@ -1,19 +1,27 @@
 package de.golfgl.lightblocks.menu.multiplayer;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
+import de.golfgl.lightblocks.menu.PlayButton;
 import de.golfgl.lightblocks.multiplayer.ServerModels;
 import de.golfgl.lightblocks.multiplayer.ServerMultiplayerManager;
+import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
+import de.golfgl.lightblocks.screen.PlayScreen;
+import de.golfgl.lightblocks.screen.VetoException;
+import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
  * Shows lobby of a multiplayer server
@@ -24,6 +32,7 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
     private final ServerMultiplayerManager serverMultiplayerManager;
     private boolean connecting;
     private long lastDoPingTime;
+    private PlayButton playButton;
 
     public ServerLobbyScreen(LightBlocksGame app, String roomAddress) {
         super(app);
@@ -37,7 +46,7 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
         contentCell = contentTable.add().minHeight(waitRotationImage.getHeight() * 3);
 
         reload();
-        serverMultiplayerManager = new ServerMultiplayerManager();
+        serverMultiplayerManager = new ServerMultiplayerManager(app);
         serverMultiplayerManager.connect(roomAddress);
         connecting = true;
     }
@@ -63,6 +72,7 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             connecting = false;
             lastDoPingTime = TimeUtils.millis();
             contentCell.setActor(new LobbyTable());
+            ((MyStage) getStage()).setFocusedActor(playButton);
         }
     }
 
@@ -86,6 +96,23 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
         }
     }
 
+    @Override
+    protected Actor getConfiguredDefaultActor() {
+        return playButton != null ? playButton : super.getConfiguredDefaultActor();
+    }
+
+    private void startGame() {
+        try {
+            InitGameParameters igp = new InitGameParameters();
+            igp.setGameMode(InitGameParameters.GameMode.ServerMultiplayer);
+            igp.setServerMultiplayerManager(serverMultiplayerManager);
+            PlayScreen.gotoPlayScreen(app, igp);
+
+        } catch (VetoException e) {
+            new VetoDialog(e.getMessage(), app.skin, LightBlocksGame.nativeGameWidth * .75f).show(getStage());
+        }
+    }
+
     private class LobbyTable extends Table {
 
         private final Cell<Label> pingCell;
@@ -106,7 +133,18 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             serverInfoTable.add("Ping: ").right();
             pingCell = serverInfoTable.add("").left();
 
-            add(serverInfoTable);
+            add(serverInfoTable).expand();
+
+            playButton = new PlayButton(app);
+            row();
+            add(playButton);
+            addFocusableActor(playButton);
+            playButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    startGame();
+                }
+            });
         }
 
         @Override
