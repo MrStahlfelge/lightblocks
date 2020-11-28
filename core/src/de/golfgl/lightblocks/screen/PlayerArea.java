@@ -241,7 +241,7 @@ public class PlayerArea extends Group implements IGameModelListener {
 
     @Override
     public void mergeFullInformation(int[][] gameboard, Integer[][] activePiecePos, int activePieceType, Integer[][] nextPiecePos,
-                                     int nextPieceType, Integer[][] holdPiecePos, int holdPieceType) {
+                                     int nextPieceType, Integer[][] holdPiecePos, int holdPieceType, String gameTypeLabel) {
         for (int y = 0; y < Gameboard.GAMEBOARD_ALLROWS; y++) {
             for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
                 BlockActor block = blockMatrix[x][y];
@@ -259,7 +259,29 @@ public class PlayerArea extends Group implements IGameModelListener {
             }
         }
 
-        // TODO handle other info, and score/nickname, too
+        // add active piece
+        for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
+            int x = activePiecePos[i][0];
+            int y = activePiecePos[i][1];
+            insertNewBlock(x, y, activePieceType);
+            blockMatrix[x][y].setEnlightened(true);
+
+            // remove next and hold piece
+            if (nextTetro[i] != null) {
+                nextTetro[i].remove();
+            }
+            if (holdTetro[i] != null) {
+                holdTetro[i].remove();
+            }
+        }
+
+        showNextTetro(nextPiecePos, nextPieceType);
+        if (holdPiecePos != null) {
+            swapHoldAndActivePiece(holdPiecePos, null, null, 0, holdPieceType);
+        }
+
+        gameType.setText(gameTypeLabel);
+        updateScore(gameModel.getScore(), 0);
     }
 
     @Override

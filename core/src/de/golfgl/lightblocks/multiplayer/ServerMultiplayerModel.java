@@ -91,7 +91,7 @@ public class ServerMultiplayerModel extends GameModel {
         final int activePieceType = parsePieceString(playerJson.getString("activePiece"), activePiecePos);
 
         final Integer[][] nextPiecePos = new Integer[Tetromino.TETROMINO_BLOCKCOUNT][2];
-        final int nextPieceType = parsePieceString(playerJson.getString("nextPiece"), activePiecePos);
+        final int nextPieceType = parsePieceString(playerJson.getString("nextPiece"), nextPiecePos);
 
         final Integer[][] holdPiecePos;
         final int holdPieceType;
@@ -120,7 +120,7 @@ public class ServerMultiplayerModel extends GameModel {
             @Override
             public void run() {
                 uiGameboard.mergeFullInformation(gameboard, activePiecePos, activePieceType, nextPiecePos, nextPieceType,
-                        holdPiecePos, holdPieceType);
+                        holdPiecePos, holdPieceType, nickName);
             }
         });
     }
