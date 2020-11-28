@@ -129,6 +129,10 @@ public class BlockActor extends Actor {
         }
     }
 
+    public int getBlockType() {
+        return blockType;
+    }
+
     /**
      * accessor for getting enlightenment action (Main menu)
      */

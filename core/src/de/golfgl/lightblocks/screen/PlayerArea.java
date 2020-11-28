@@ -240,6 +240,29 @@ public class PlayerArea extends Group implements IGameModelListener {
     }
 
     @Override
+    public void mergeFullInformation(int[][] gameboard, Integer[][] activePiecePos, int activePieceType, Integer[][] nextPiecePos,
+                                     int nextPieceType, Integer[][] holdPiecePos, int holdPieceType) {
+        for (int y = 0; y < Gameboard.GAMEBOARD_ALLROWS; y++) {
+            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                BlockActor block = blockMatrix[x][y];
+
+                // actor is wrong? remove it
+                if (block != null && gameboard[y][x] != block.getBlockType()) {
+                    block.remove();
+                    blockMatrix[x][y] = null;
+                }
+
+                // actor not present, but should? add it
+                if (block == null && gameboard[y][x] != Gameboard.SQUARE_EMPTY) {
+                    insertNewBlock(x, y, gameboard[y][x]);
+                }
+            }
+        }
+
+        // TODO handle other info, and score/nickname, too
+    }
+
+    @Override
     public void insertNewBlock(int x, int y, int blockType) {
         BlockActor block = new BlockActor(app, blockType, true);
         insertBlock(x, y, block);

@@ -55,6 +55,8 @@ public interface IGameModelListener {
 
     void emphasizeTimeLabel();
 
+    void mergeFullInformation(int[][] gameboard, Integer[][] activePiecePos, int activePieceType, Integer[][] nextPiecePos, int nextPieceType, Integer[][] holdPiecePos, int holdPieceType);
+
     enum MotivationTypes {
         newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
         boardCleared, newHighscore, gameOver, gameWon, gameSuccess, playerOver,

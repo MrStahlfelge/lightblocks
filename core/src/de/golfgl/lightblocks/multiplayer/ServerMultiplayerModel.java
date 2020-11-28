@@ -1,11 +1,14 @@
 package de.golfgl.lightblocks.multiplayer;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
+import de.golfgl.lightblocks.model.Gameboard;
 import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -15,6 +18,7 @@ public class ServerMultiplayerModel extends GameModel {
     public static final String MODEL_ID = "serverMultiplayer";
     private ServerMultiplayerManager serverMultiplayerManager;
     private ServerScore serverScore;
+    private String nickName;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -72,7 +76,59 @@ public class ServerMultiplayerModel extends GameModel {
     }
 
     void handleMatchInfo(String matchInfo) {
-        // TODO MCH{"player1":{"gameboard":" ","score":{"score":0,"level":0,"lines":0},"nickname":"Benni","activePiece":"3-19-4-19-5-19-6-19-0","holdPiece":null,"nextPiece":"0-0-1-0-1-1-2-1-5"},"player2":{"gameboard":" ","score":{"score":0,"level":0,"lines":0},"nickname":"AI","activePiece":"3-19-4-19-5-19-6-19-0","holdPiece":null,"nextPiece":"0-0-1-0-1-1-2-1-5"}}
+        JsonValue json = new JsonReader().parse(matchInfo);
+
+        this.parsePlayerInformation(json.get("player1"));
+        //TODO secondModel.parsePlayerInformation(json.get("player2"));
+    }
+
+    private void parsePlayerInformation(JsonValue playerJson) {
+        // {"gameboard":"AA D  F DD ","score":...,"nickname":"Benni","activePiece":"3-19-4-19-5-19-6-19-0","holdPiece":null,"nextPiece":"0-0-1-0-1-1-2-1-5"}
+        serverScore.setScoreInformation(playerJson.get("score"));
+        nickName = playerJson.getString("nickname");
+
+        final Integer[][] activePiecePos = new Integer[Tetromino.TETROMINO_BLOCKCOUNT][2];
+        final int activePieceType = parsePieceString(playerJson.getString("activePiece"), activePiecePos);
+
+        final Integer[][] nextPiecePos = new Integer[Tetromino.TETROMINO_BLOCKCOUNT][2];
+        final int nextPieceType = parsePieceString(playerJson.getString("nextPiece"), activePiecePos);
+
+        final Integer[][] holdPiecePos;
+        final int holdPieceType;
+        String holdPieceString = playerJson.getString("holdPiece", null);
+        if (holdPieceString != null) {
+            holdPiecePos = new Integer[Tetromino.TETROMINO_BLOCKCOUNT][2];
+            holdPieceType = parsePieceString(holdPieceString, holdPiecePos);
+        } else {
+            holdPiecePos = null;
+            holdPieceType = 0;
+        }
+
+        final int[][] gameboard = new int[Gameboard.GAMEBOARD_ALLROWS][Gameboard.GAMEBOARD_COLUMNS];
+        String gameboardString = playerJson.getString("gameboard");
+        for (int y = 0; y < Gameboard.GAMEBOARD_ALLROWS; y++) {
+            for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
+                int pos = y * Gameboard.GAMEBOARD_COLUMNS + x;
+                if (gameboardString.length() > pos)
+                    gameboard[y][x] = Gameboard.gameboardCharToSquare(gameboardString.charAt(pos));
+                else
+                    gameboard[y][x] = Gameboard.SQUARE_EMPTY;
+            }
+        }
+
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                uiGameboard.mergeFullInformation(gameboard, activePiecePos, activePieceType, nextPiecePos, nextPieceType,
+                        holdPiecePos, holdPieceType);
+            }
+        });
+    }
+
+    private int parsePieceString(String pieceString, Integer[][] boardBlockPositions) {
+        int pos = parseBlockPositions(pieceString, 0, boardBlockPositions);
+        final String strBlockType = parseUntilNext(pieceString, pos, "-");
+        return Integer.parseInt(strBlockType);
     }
 
     void handleRotateTetro(boolean other, String payload) {
@@ -154,5 +210,15 @@ public class ServerMultiplayerModel extends GameModel {
     }
 
     private static class ServerScore extends GameScore {
+        int score;
+        int level;
+        int lines;
+
+        public void setScoreInformation(JsonValue scoreJson) {
+            // {"score":0,"level":0,"lines":0}
+            score = scoreJson.getInt("score", 0);
+            level = scoreJson.getInt("level", 0);
+            lines = scoreJson.getInt("lines", 0);
+        }
     }
 }
