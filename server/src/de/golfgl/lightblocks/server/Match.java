@@ -1,7 +1,9 @@
 package de.golfgl.lightblocks.server;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Queue;
 
 import javax.annotation.Nullable;
 
@@ -10,6 +12,7 @@ import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.ServerMultiplayerModel;
 import de.golfgl.lightblocks.model.Tetromino;
 import de.golfgl.lightblocks.multiplayer.ai.ArtificialPlayer;
+import de.golfgl.lightblocks.server.model.InGameMessage;
 import de.golfgl.lightblocks.server.model.MatchInfo;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
@@ -17,6 +20,8 @@ public class Match {
     public static final float WAIT_TIME_GAME_OVER = 5f;
     private final InitGameParameters gameParams;
     private final LightblocksServer server;
+    private final Queue<InGameMessage> p1Queue = new Queue<>();
+    private final Queue<InGameMessage> p2Queue = new Queue<>();
     private Player player1;
     private Player player2;
     private ServerMultiplayerModel gameModel;
@@ -44,6 +49,23 @@ public class Match {
             sendFullInformation();
         }
 
+        gameModel.setAiEnabled(player1 == null);
+        gameModel.getSecondGameModel().setAiEnabled(player2 == null);
+
+        // process the queues
+        synchronized (p1Queue) {
+            if (player1 == null)
+                p1Queue.clear();
+            else
+                processQueue(gameModel, p1Queue);
+        }
+        synchronized (p2Queue) {
+            if (player2 == null)
+                p2Queue.clear();
+            else
+                processQueue(gameModel.getSecondGameModel(), p2Queue);
+        }
+
         gameModel.update(delta);
 
         if (gameModel.isGameOver()) {
@@ -56,17 +78,36 @@ public class Match {
         }
     }
 
+    private void processQueue(ServerMultiplayerModel gameModel, Queue<InGameMessage> queue) {
+        while (!queue.isEmpty()) {
+            InGameMessage igm = queue.removeFirst();
+            switch (igm.message) {
+                case "SML":
+                    gameModel.inputStartMoveHorizontal(null, true);
+                    break;
+                case "SMR":
+                    gameModel.inputStartMoveHorizontal(null, false);
+                    break;
+                case "SMH":
+                    gameModel.inputEndMoveHorizontal(null, true);
+                    gameModel.inputEndMoveHorizontal(null, false);
+                    break;
+                default:
+                    Gdx.app.log("Match", "Unrecognized game message: " + igm.message);
+            }
+        }
+    }
+
     private void initGameModel() {
         gameModel = new ServerMultiplayerModel();
         gameModel.startNewGame(gameParams);
         ServerMultiplayerModel secondGameModel = gameModel.getSecondGameModel();
 
-        // set two AI players, for now
         gameModel.setAiPlayer(new ArtificialPlayer(gameModel, secondGameModel));
         secondGameModel.setAiPlayer(new ArtificialPlayer(secondGameModel, gameModel));
 
-        gameModel.setUserInterface(new Listener(0, gameModel));
-        secondGameModel.setUserInterface(new Listener(1, secondGameModel));
+        gameModel.setUserInterface(new Listener(true));
+        secondGameModel.setUserInterface(new Listener(false));
     }
 
     public boolean connectPlayer(Player player) {
@@ -156,19 +197,28 @@ public class Match {
         }
     }
 
+    public void gotMessage(Player player, InGameMessage igm) {
+        if (player == player1)
+            synchronized (p1Queue) {
+                p1Queue.addLast(igm);
+            }
+        else if (player == player2)
+            synchronized (p2Queue) {
+                p2Queue.addLast(igm);
+            }
+    }
+
     private class Listener implements IGameModelListener {
-        private final int idx;
-        private final ServerMultiplayerModel gameModel;
+        private final boolean first;
         private int lastGarbageAmountReported = 0;
         private String lastSentScore;
 
-        public Listener(int idx, ServerMultiplayerModel gameModel) {
-            this.idx = idx;
-            this.gameModel = gameModel;
+        public Listener(boolean first) {
+            this.first = first;
         }
 
         private void sendPlayer(String msg) {
-            if (idx == 0) {
+            if (first) {
                 if (player1 != null)
                     player1.send("Y" + msg);
                 if (player2 != null)

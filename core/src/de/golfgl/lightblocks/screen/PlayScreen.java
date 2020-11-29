@@ -528,7 +528,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         if (message == null)
             overlayWindow.hide();
         else {
-            String localizedMessage = app.TEXTS.format(message, (Object[]) params);
+            String localizedMessage = message.isEmpty() ? params[0] : app.TEXTS.format(message, (Object[]) params);
             if (localizedMessage.contains("_CONTINUE_")) {
                 if (inputAdapter != null)
                     localizedMessage = localizedMessage.replace("_CONTINUE_", inputAdapter.getTutorialContinueText());

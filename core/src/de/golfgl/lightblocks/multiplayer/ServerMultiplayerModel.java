@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Queue;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
@@ -27,6 +28,7 @@ public class ServerMultiplayerModel extends GameModel {
     private boolean gameOver;
     private boolean isFirst;
     private boolean isModern;
+    private boolean isClosed;
 
     public ServerMultiplayerModel() {
         this(true);
@@ -92,11 +94,23 @@ public class ServerMultiplayerModel extends GameModel {
                 }
             }
         }
+
+        if (!isClosed && !serverMultiplayerManager.isConnected()) {
+            isClosed = true;
+            if (serverMultiplayerManager.getLastErrorMsg() != null)
+                playScreen.showOverlayMessage("", serverMultiplayerManager.getLastErrorMsg());
+            playScreen.setGameOver();
+        }
     }
 
     @Override
     public boolean beginPaused() {
         return false;
+    }
+
+    @Override
+    public boolean isGameOver() {
+        return isClosed;
     }
 
     @Override
@@ -154,6 +168,16 @@ public class ServerMultiplayerModel extends GameModel {
 
         isModern = json.getBoolean("isModern");
         secondModel.isModern = isModern;
+    }
+
+    @Override
+    public void inputStartMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
+        serverMultiplayerManager.doSendGameMessage("SM" + (isLeft ? "L" : "R"));
+    }
+
+    @Override
+    public void inputEndMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
+        serverMultiplayerManager.doSendGameMessage("SMH");
     }
 
     private void parsePlayerInformation(JsonValue playerJson) {

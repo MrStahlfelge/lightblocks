@@ -9,6 +9,7 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 public class ServerMultiplayerModel extends AbstractMultiplayerModel<ServerMultiplayerModel> {
     public static final String MODEL_ID = "servermultiplayer";
     private ArtificialPlayer aiPlayer;
+    private boolean aiEnabled = true;
 
     @Override
     protected ServerMultiplayerModel createSecondGameModel(InitGameParameters newGameParams) {
@@ -22,7 +23,7 @@ public class ServerMultiplayerModel extends AbstractMultiplayerModel<ServerMulti
     @Override
     public void update(float delta) {
         super.update(delta);
-        if (!isGameOver() && !isFrozen() && aiPlayer != null) {
+        if (!isGameOver() && !isFrozen() && aiPlayer != null && aiEnabled) {
             // do the precalculated pathwork here
             aiPlayer.update(delta, getActiveTetromino());
         }
@@ -45,5 +46,20 @@ public class ServerMultiplayerModel extends AbstractMultiplayerModel<ServerMulti
     @Override
     public String getGoalDescription() {
         return null;
+    }
+
+    public boolean isAiEnabled() {
+        return aiEnabled;
+    }
+
+    public void setAiEnabled(boolean aiEnabled) {
+        if (this.aiEnabled == aiEnabled)
+            return;
+
+        this.aiEnabled = aiEnabled;
+
+        if (aiEnabled && aiPlayer != null) {
+            aiPlayer.onNextPiece(getGameboard(), getActiveTetromino());
+        }
     }
 }

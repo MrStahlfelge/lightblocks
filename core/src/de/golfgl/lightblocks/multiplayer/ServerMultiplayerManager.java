@@ -11,8 +11,6 @@ import com.github.czyzby.websocket.WebSockets;
 import com.github.czyzby.websocket.data.WebSocketCloseCode;
 
 import de.golfgl.lightblocks.LightBlocksGame;
-import de.golfgl.lightblocks.model.IGameModelListener;
-import de.golfgl.lightblocks.screen.PlayScreen;
 
 public class ServerMultiplayerManager {
     public static final String ID_SERVERINFO = "HSH";
@@ -102,11 +100,14 @@ public class ServerMultiplayerManager {
         }
 
         socket.send(ID_PLAYERINFO + playerInfo.toJson(JsonWriter.OutputType.json));
+        state = PlayState.IN_GAME;
     }
 
     public void doStopGame() {
         this.gameModel = null;
-        socket.close();
+        if (isConnected()) {
+            socket.close();
+        }
     }
 
     protected void handlePong() {
@@ -131,6 +132,12 @@ public class ServerMultiplayerManager {
         return pingMs;
     }
 
+    public void doSendGameMessage(String message) {
+        if (state == PlayState.IN_GAME) {
+            socket.send("IGM" + message);
+        }
+    }
+
     public enum PlayState {CONNECTING, LOBBY, IN_GAME, CLOSED}
 
     private class SocketListener implements WebSocketListener {
@@ -144,7 +151,9 @@ public class ServerMultiplayerManager {
             Gdx.app.debug("WS", "Closed: " + webSocket.getUrl());
             clear();
 
-            if (code == WebSocketCloseCode.ABNORMAL) {
+            if (code != WebSocketCloseCode.NORMAL && reason != null) {
+                lastErrorMsg = "Server closed connection: " + reason;
+            } else if (code == WebSocketCloseCode.ABNORMAL) {
                 lastErrorMsg = "Could not connect to server " + webSocket.getUrl();
             }
 

@@ -84,6 +84,10 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             hide(parallel(Actions.scaleTo(1, 0, AbstractMenuDialog.TIME_SWOSHIN, Interpolation.circleIn),
                     Actions.fadeOut(AbstractMenuDialog.TIME_SWOSHIN, Interpolation.fade)));
         }
+
+        if (playButton != null) {
+            playButton.setVisible(serverMultiplayerManager.isConnected());
+        }
     }
 
     protected void fillErrorScreen(String errorMessage) {

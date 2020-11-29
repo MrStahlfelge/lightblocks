@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 
 import org.java_websocket.WebSocket;
 
+import de.golfgl.lightblocks.server.model.InGameMessage;
 import de.golfgl.lightblocks.server.model.PlayerInfo;
 
 public class Player {
@@ -60,6 +61,8 @@ public class Player {
                 // if connection was not successfully established, disconnect the player
                 conn.close();
             }
+        } else if (object instanceof InGameMessage && state == ConnectionState.PLAYING) {
+            match.gotMessage(this, (InGameMessage) object);
         } else
             throw new UnexpectedException();
     }
