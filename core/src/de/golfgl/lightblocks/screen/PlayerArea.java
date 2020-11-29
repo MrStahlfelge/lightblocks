@@ -762,6 +762,9 @@ public class PlayerArea extends Group implements IGameModelListener {
         float duration = 2;
 
         switch (achievement) {
+            case freeText:
+                text = extraMsg;
+                break;
             case newLevel:
                 text = app.TEXTS.get("labelLevel") + " " + extraMsg;
                 break;

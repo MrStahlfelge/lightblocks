@@ -5,6 +5,7 @@ import de.golfgl.lightblocks.model.GameScore;
 public class MatchInfo {
     public PlayerInfo player1;
     public PlayerInfo player2;
+    public boolean isModern;
 
     public static class PlayerInfo {
         public String gameboard;

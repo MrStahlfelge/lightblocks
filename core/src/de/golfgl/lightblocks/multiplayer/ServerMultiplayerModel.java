@@ -26,6 +26,7 @@ public class ServerMultiplayerModel extends GameModel {
     private Integer[][] activePiecePos;
     private boolean gameOver;
     private boolean isFirst;
+    private boolean isModern;
 
     public ServerMultiplayerModel() {
         this(true);
@@ -57,7 +58,14 @@ public class ServerMultiplayerModel extends GameModel {
 
     @Override
     public String saveGameModel() {
+        // TODO no pause allowed
+        // TODO disconnect on leave
         return null;
+    }
+
+    @Override
+    public boolean isModernRotation() {
+        return isModern;
     }
 
     @Override
@@ -134,6 +142,9 @@ public class ServerMultiplayerModel extends GameModel {
 
         this.parsePlayerInformation(json.get("player1"));
         secondModel.parsePlayerInformation(json.get("player2"));
+
+        isModern = json.getBoolean("isModern");
+        secondModel.isModern = isModern;
     }
 
     private void parsePlayerInformation(JsonValue playerJson) {
@@ -316,7 +327,7 @@ public class ServerMultiplayerModel extends GameModel {
     }
 
     private void handleMotivation(String payload) {
-        // TODO
+        uiGameboard.showMotivation(IGameModelListener.MotivationTypes.freeText, payload.substring(1));
     }
 
     private void handleConflict(String payload) {

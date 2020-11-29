@@ -14,11 +14,13 @@ import de.golfgl.lightblocks.server.model.MatchInfo;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class Match {
+    public static final float WAIT_TIME_GAME_OVER = 5f;
     private final InitGameParameters gameParams;
     private final LightblocksServer server;
     private Player player1;
     private Player player2;
     private ServerMultiplayerModel gameModel;
+    private float waitGameOver = WAIT_TIME_GAME_OVER;
 
     public Match(LightblocksServer server) {
         this.server = server;
@@ -45,7 +47,12 @@ public class Match {
         gameModel.update(delta);
 
         if (gameModel.isGameOver()) {
-            gameModel = null;
+            if (waitGameOver > 0)
+                waitGameOver = waitGameOver - delta;
+            else {
+                gameModel = null;
+                waitGameOver = WAIT_TIME_GAME_OVER;
+            }
         }
     }
 
@@ -104,8 +111,10 @@ public class Match {
         MatchInfo.PlayerInfo player2 = new MatchInfo.PlayerInfo();
         matchInfo1.player1 = player1;
         matchInfo1.player2 = player2;
+        matchInfo1.isModern = gameModel.isModernRotation();
         matchInfo2.player1 = player2;
         matchInfo2.player2 = player1;
+        matchInfo2.isModern = gameModel.isModernRotation();
 
         player1.score = new MatchInfo.ScoreInfo(gameModel.getScore());
         player2.score = new MatchInfo.ScoreInfo(gameModel.getSecondGameModel().getScore());
@@ -297,7 +306,28 @@ public class Match {
 
         @Override
         public void showMotivation(MotivationTypes achievement, @Nullable String extra) {
-            // TODO send full message text leading "MTV-"
+            String motivationMessage;
+            switch (achievement) {
+                case tSpin:
+                    motivationMessage = "T-Spin";
+                    break;
+                case boardCleared:
+                    motivationMessage = "Clean Complete";
+                    break;
+                case gameOver:
+                    motivationMessage = "Game over";
+                    break;
+                case gameWon:
+                    motivationMessage = "Won!";
+                    break;
+                case prepare:
+                    motivationMessage = "Prepare to play!";
+                    break;
+                default:
+                    motivationMessage = null;
+            }
+            if (motivationMessage != null)
+                sendPlayer("MTV-" + motivationMessage);
         }
 
         @Override
