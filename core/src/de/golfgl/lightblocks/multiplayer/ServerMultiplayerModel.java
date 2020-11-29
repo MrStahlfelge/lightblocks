@@ -19,11 +19,26 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 public class ServerMultiplayerModel extends GameModel {
     public static final String MODEL_ID = "serverMultiplayer";
     private final Queue<String> messageQueue = new Queue<>();
+    private final ServerMultiplayerModel secondModel;
     private ServerMultiplayerManager serverMultiplayerManager;
     private ServerScore serverScore;
     private String nickName;
     private Integer[][] activePiecePos;
     private boolean gameOver;
+    private boolean isFirst;
+
+    public ServerMultiplayerModel() {
+        this(true);
+    }
+
+    public ServerMultiplayerModel(boolean isFirst) {
+        this.isFirst = isFirst;
+        if (isFirst) {
+            secondModel = new ServerMultiplayerModel(false);
+        } else {
+            secondModel = null;
+        }
+    }
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -72,6 +87,10 @@ public class ServerMultiplayerModel extends GameModel {
         serverMultiplayerManager = newGameParams.getServerMultiplayerManager();
         inputTypeKey = PlayScreenInput.KEY_KEYORTOUCH;
         serverScore = new ServerScore();
+
+        if (isFirst) {
+            secondModel.startNewGame(newGameParams);
+        }
     }
 
     @Override
@@ -85,10 +104,12 @@ public class ServerMultiplayerModel extends GameModel {
         this.playScreen = userInterface;
         this.uiGameboard = uiGameboard;
 
-        serverMultiplayerManager.doStartGame(this, userInterface, uiGameboard);
+        if (isFirst) {
+            serverMultiplayerManager.doStartGame(this);
+        }
     }
 
-    void handleTetroMoved(final boolean other, String payload) {
+    private void handleTetroMoved(String payload) {
         // YMOV|-1|0|18
         final String sdx = parseUntilNext(payload, 1, "|");
         final String sdy = parseUntilNext(payload, 1 + sdx.length() + 1, "|");
@@ -97,7 +118,7 @@ public class ServerMultiplayerModel extends GameModel {
         final int dx = Integer.parseInt(sdx);
         final int dy = Integer.parseInt(sdy);
 
-        if (!other && !gameOver) {
+        if (!gameOver) {
             uiGameboard.moveTetro(ServerMultiplayerModel.this.activePiecePos, dx, dy, ghostPieceDistance);
 
             for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
@@ -112,7 +133,7 @@ public class ServerMultiplayerModel extends GameModel {
         JsonValue json = new JsonReader().parse(matchInfo);
 
         this.parsePlayerInformation(json.get("player1"));
-        //TODO secondModel.parsePlayerInformation(json.get("player2"));
+        secondModel.parsePlayerInformation(json.get("player2"));
     }
 
     private void parsePlayerInformation(JsonValue playerJson) {
@@ -161,20 +182,20 @@ public class ServerMultiplayerModel extends GameModel {
         return Integer.parseInt(strBlockType);
     }
 
-    void handleRotateTetro(final boolean other, String payload) {
+    private void handleRotateTetro(String payload) {
         // YROT-3-19-4-19-5-19-6-19-18
         final Integer[][] boardBlockPositions = new Integer[Tetromino.TETROMINO_BLOCKCOUNT][2];
         int pos = parseBlockPositions(payload, 1, boardBlockPositions);
         final String strGhostDis = parseUntilNext(payload, pos, "-");
         final int ghostPieceDistance = Integer.parseInt(strGhostDis);
 
-        if (!other && !gameOver) {
+        if (!gameOver) {
             uiGameboard.rotateTetro(ServerMultiplayerModel.this.activePiecePos, boardBlockPositions, ghostPieceDistance);
             ServerMultiplayerModel.this.activePiecePos = boardBlockPositions;
         }
     }
 
-    void handleClearInsert(final boolean other, String payload) {
+    private void handleClearInsert(String payload) {
         // OCLR--N|6|6
         final String clearLinesString = parseUntilNext(payload, 1, "-");
         final String specialString = parseUntilNext(payload, 1 + clearLinesString.length() + 1, "|");
@@ -191,7 +212,7 @@ public class ServerMultiplayerModel extends GameModel {
             gapPos = new IntArray();
         }
 
-        if (!other && !gameOver) {
+        if (!gameOver) {
             uiGameboard.clearAndInsertLines(linesToRemove, isSpecial, gapPos.toArray());
         }
     }
@@ -207,26 +228,24 @@ public class ServerMultiplayerModel extends GameModel {
         return retVal;
     }
 
-    void handleGameOver(boolean other) {
-        if (!other) {
-            gameOver = true;
-        }
+    private void handleGameOver() {
+        gameOver = true;
     }
 
-    void handleNextTetro(final boolean other, String payload) {
+    private void handleNextTetro(String payload) {
         // YNXT-0-0-1-0-1-1-2-1-5
         final Integer[][] boardBlockPositions = new Integer[Tetromino.TETROMINO_BLOCKCOUNT][2];
         int pos = parseBlockPositions(payload, 1, boardBlockPositions);
         final String blockTypeString = parseUntilNext(payload, pos, "-");
         final int blockType = Integer.parseInt(blockTypeString);
 
-        if (!other && !gameOver) {
+        if (!gameOver) {
             uiGameboard.showNextTetro(boardBlockPositions, blockType);
         }
 
     }
 
-    void handleActivateNextTetro(final boolean other, final String payload) {
+    private void handleActivateNextTetro(final String payload) {
         final Integer[][] boardBlockPositions = new Integer[Tetromino.TETROMINO_BLOCKCOUNT][2];
         int pos = parseBlockPositions(payload, 1, boardBlockPositions);
         final String strBlockType = parseUntilNext(payload, pos, "-");
@@ -234,7 +253,7 @@ public class ServerMultiplayerModel extends GameModel {
         final String strGhostDis = parseUntilNext(payload, pos + strBlockType.length() + 1, "-");
         final int ghostPieceDistance = Integer.parseInt(strGhostDis);
 
-        if (!other && !gameOver) {
+        if (!gameOver) {
             ServerMultiplayerModel.this.activePiecePos = boardBlockPositions;
             uiGameboard.activateNextTetro(boardBlockPositions, blockType, ghostPieceDistance);
         }
@@ -260,7 +279,7 @@ public class ServerMultiplayerModel extends GameModel {
         return payload.substring(startpos, nextDelimiter >= startpos ? nextDelimiter : payload.length());
     }
 
-    void handleSwapHoldAndActive(final boolean other, String payload) {
+    private void handleSwapHoldAndActive(String payload) {
         // OHLD-0-1-1-1-2-1-3-1-3-19-4-19-5-19-6-19-0-0
         final Integer[][] holdPiecePos = new Integer[Tetromino.TETROMINO_BLOCKCOUNT][2];
         int pos = parseBlockPositions(payload, 1, holdPiecePos);
@@ -274,38 +293,41 @@ public class ServerMultiplayerModel extends GameModel {
             activePiecePos = null;
         }
 
-        if (!other && !gameOver) {
+        if (!gameOver) {
             uiGameboard.swapHoldAndActivePiece(holdPiecePos, ServerMultiplayerModel.this.activePiecePos, activePiecePos,
                     ghostPieceDistance, 0);
             ServerMultiplayerModel.this.activePiecePos = activePiecePos;
         }
     }
 
-    void handlePinTetro(final boolean other) {
-        if (!other && !gameOver) {
+    private void handlePinTetro() {
+        if (!gameOver) {
             uiGameboard.pinTetromino(ServerMultiplayerModel.this.activePiecePos);
             ServerMultiplayerModel.this.activePiecePos = null;
         }
 
     }
 
-    void handleScore(boolean other, final String payload) {
-        if (!other && !gameOver) {
+    private void handleScore(final String payload) {
+        if (!gameOver) {
             serverScore.setScoreInformation(new JsonReader().parse(payload));
             uiGameboard.updateScore(serverScore, 0);
         }
     }
 
-    void handleMotivation(boolean other, String payload) {
+    private void handleMotivation(String payload) {
         // TODO
     }
 
-    public void handleConflict(boolean other, String payload) {
+    private void handleConflict(String payload) {
         // TODO
     }
 
-    public void handleGarbageAmount(boolean other, String payload) {
-        // TODO
+    private void handleGarbageAmount(String payload) {
+        // GBG-5
+        final String gbgAmountStr = parseUntilNext(payload, 1, "-");
+        final int gbgAmount = Integer.parseInt(gbgAmountStr);
+        uiGameboard.showGarbageAmount(gbgAmount);
     }
 
     public void queueMessage(String packet) {
@@ -321,47 +343,67 @@ public class ServerMultiplayerModel extends GameModel {
             return true;
         } else if (packet.startsWith("Y") || packet.startsWith("O")) {
             boolean other = packet.startsWith("O");
+
+            String type = packet.substring(1, 4);
             String payload = packet.substring(4);
-            switch (packet.substring(1, 4)) {
-                case "MOV":
-                    handleTetroMoved(other, payload);
-                    return true;
-                case "ROT":
-                    handleRotateTetro(other, payload);
-                    return true;
-                case "CLR":
-                    handleClearInsert(other, payload);
-                    return true;
-                case "GOV":
-                    handleGameOver(other);
-                    return true;
-                case "NXT":
-                    handleNextTetro(other, payload);
-                    return true;
-                case "ANT":
-                    handleActivateNextTetro(other, payload);
-                    return true;
-                case "HLD":
-                    handleSwapHoldAndActive(other, payload);
-                    return true;
-                case "PIN":
-                    handlePinTetro(other);
-                    return true;
-                case "SCO":
-                    handleScore(other, payload);
-                    return true;
-                case "CNF":
-                    handleConflict(other, payload);
-                    return true;
-                case "MTV":
-                    handleMotivation(other, payload);
-                    return true;
-                case "GBG":
-                    handleGarbageAmount(other, payload);
-                    return true;
-            }
+            if (!other) {
+                return processModelMessage(type, payload);
+            } else
+                return secondModel.processModelMessage(type, payload);
         }
         return false;
+    }
+
+    private boolean processModelMessage(String type, String payload) {
+        switch (type) {
+            case "MOV":
+                handleTetroMoved(payload);
+                return true;
+            case "ROT":
+                handleRotateTetro(payload);
+                return true;
+            case "CLR":
+                handleClearInsert(payload);
+                return true;
+            case "GOV":
+                handleGameOver();
+                return true;
+            case "NXT":
+                handleNextTetro(payload);
+                return true;
+            case "ANT":
+                handleActivateNextTetro(payload);
+                return true;
+            case "HLD":
+                handleSwapHoldAndActive(payload);
+                return true;
+            case "PIN":
+                handlePinTetro();
+                return true;
+            case "SCO":
+                handleScore(payload);
+                return true;
+            case "CNF":
+                handleConflict(payload);
+                return true;
+            case "MTV":
+                handleMotivation(payload);
+                return true;
+            case "GBG":
+                handleGarbageAmount(payload);
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasSecondGameboard() {
+        return secondModel != null;
+    }
+
+    @Override
+    public GameModel getSecondGameModel() {
+        return secondModel;
     }
 
     private static class ServerScore extends GameScore {

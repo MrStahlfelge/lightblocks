@@ -92,7 +92,7 @@ public class ServerMultiplayerManager {
         }
     }
 
-    public void doStartGame(ServerMultiplayerModel serverMultiplayerModel, PlayScreen userInterface, IGameModelListener uiGameboard) {
+    public void doStartGame(ServerMultiplayerModel serverMultiplayerModel) {
         this.gameModel = serverMultiplayerModel;
         // starting the game by sending player information
         JsonValue playerInfo = new JsonValue(JsonValue.ValueType.object);
