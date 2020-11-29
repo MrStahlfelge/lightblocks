@@ -104,6 +104,11 @@ public class ServerMultiplayerManager {
         socket.send(ID_PLAYERINFO + playerInfo.toJson(JsonWriter.OutputType.json));
     }
 
+    public void doStopGame() {
+        this.gameModel = null;
+        socket.close();
+    }
+
     protected void handlePong() {
         pingMs = (int) (TimeUtils.millis() - startTimePing);
         Gdx.app.log("WS", "Ping from " + socket.getUrl() + ": " + pingMs);

@@ -1105,4 +1105,12 @@ public abstract class GameModel implements Json.Serializable, AiAcessibleGameMod
     public InputIdentifier getFixedInputId() {
         return null;
     }
+
+    public boolean canPause() {
+        return true;
+    }
+
+    public void dispose() {
+
+    }
 }

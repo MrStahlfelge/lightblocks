@@ -1,7 +1,9 @@
 package de.golfgl.lightblocks.menu.multiplayer;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -11,6 +13,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
+import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.PlayButton;
 import de.golfgl.lightblocks.multiplayer.ServerModels;
 import de.golfgl.lightblocks.multiplayer.ServerMultiplayerManager;
@@ -22,6 +25,8 @@ import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
 import de.golfgl.lightblocks.state.InitGameParameters;
+
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
 
 /**
  * Shows lobby of a multiplayer server
@@ -73,6 +78,11 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             lastDoPingTime = TimeUtils.millis();
             contentCell.setActor(new LobbyTable());
             ((MyStage) getStage()).setFocusedActor(playButton);
+        } else if (!connecting && !serverMultiplayerManager.isConnected() && serverMultiplayerManager.getLastErrorMsg() == null) {
+            // hide without sound
+            setOrigin(getWidth() / 2, getHeight() / 2);
+            hide(parallel(Actions.scaleTo(1, 0, AbstractMenuDialog.TIME_SWOSHIN, Interpolation.circleIn),
+                    Actions.fadeOut(AbstractMenuDialog.TIME_SWOSHIN, Interpolation.fade)));
         }
     }
 

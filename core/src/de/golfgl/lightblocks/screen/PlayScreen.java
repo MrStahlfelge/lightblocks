@@ -283,7 +283,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
 
         delta = Math.min(delta, 1 / 30f);
 
-        if (!isPaused)
+        if (!isPaused || !gameModel.canPause())
             gameModel.update(delta);
 
         if (gameModel.isGameOver() && timeSinceGameOver < GAMEOVER_TOUCHFREEZE)
@@ -345,6 +345,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         music.dispose();
         app.unlockOrientation();
         playerArea.dispose();
+        gameModel.dispose();
         super.dispose();
     }
 

@@ -58,14 +58,23 @@ public class ServerMultiplayerModel extends GameModel {
 
     @Override
     public String saveGameModel() {
-        // TODO no pause allowed
-        // TODO disconnect on leave
         return null;
+    }
+
+    @Override
+    public boolean canPause() {
+        return false;
     }
 
     @Override
     public boolean isModernRotation() {
         return isModern;
+    }
+
+    @Override
+    public void dispose() {
+        // playscreen was left, end connection
+        serverMultiplayerManager.doStopGame();
     }
 
     @Override
