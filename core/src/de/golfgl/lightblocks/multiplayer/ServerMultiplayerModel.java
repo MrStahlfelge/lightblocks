@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.multiplayer;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
@@ -178,6 +179,32 @@ public class ServerMultiplayerModel extends GameModel {
     @Override
     public void inputEndMoveHorizontal(InputIdentifier inputId, boolean isLeft) {
         serverMultiplayerManager.doSendGameMessage("SMH");
+    }
+
+    @Override
+    public boolean inputHoldActiveTetromino(InputIdentifier inputId) {
+        serverMultiplayerManager.doSendGameMessage("HAT");
+        return false;
+    }
+
+    @Override
+    public boolean isHoldMoveAllowedByModel() {
+        return true;
+    }
+
+    @Override
+    public void inputRotate(InputIdentifier inputId, boolean clockwise) {
+        serverMultiplayerManager.doSendGameMessage(clockwise ? "ROR" : "ROL");
+    }
+
+    @Override
+    public void inputSetSoftDropFactor(InputIdentifier inputId, float newVal) {
+        if (MathUtils.isEqual(GameModel.FACTOR_NO_DROP, newVal))
+            serverMultiplayerManager.doSendGameMessage("DRN");
+        else if (MathUtils.isEqual(GameModel.FACTOR_SOFT_DROP, newVal))
+            serverMultiplayerManager.doSendGameMessage("DRS");
+        else if (MathUtils.isEqual(GameModel.FACTOR_HARD_DROP, newVal))
+            serverMultiplayerManager.doSendGameMessage("DRH");
     }
 
     private void parsePlayerInformation(JsonValue playerJson) {

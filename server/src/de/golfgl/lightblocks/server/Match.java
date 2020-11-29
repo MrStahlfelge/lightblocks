@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Queue;
 
 import javax.annotation.Nullable;
 
+import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.GameScore;
 import de.golfgl.lightblocks.model.IGameModelListener;
 import de.golfgl.lightblocks.model.ServerMultiplayerModel;
@@ -91,6 +92,24 @@ public class Match {
                 case "SMH":
                     gameModel.inputEndMoveHorizontal(null, true);
                     gameModel.inputEndMoveHorizontal(null, false);
+                    break;
+                case "HAT":
+                    gameModel.inputHoldActiveTetromino(null);
+                    break;
+                case "ROR":
+                    gameModel.inputRotate(null, true);
+                    break;
+                case "ROL":
+                    gameModel.inputRotate(null, false);
+                    break;
+                case "DRN":
+                    gameModel.inputSetSoftDropFactor(null, GameModel.FACTOR_NO_DROP);
+                    break;
+                case "DRS":
+                    gameModel.inputSetSoftDropFactor(null, GameModel.FACTOR_SOFT_DROP);
+                    break;
+                case "DRH":
+                    gameModel.inputSetSoftDropFactor(null, GameModel.FACTOR_HARD_DROP);
                     break;
                 default:
                     Gdx.app.log("Match", "Unrecognized game message: " + igm.message);
