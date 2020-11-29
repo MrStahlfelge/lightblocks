@@ -117,4 +117,9 @@ public class BlockGroup extends Group {
                 ghostpiece[i].setVisible(visible);
         }
     }
+
+    public void removeAllBlocks() {
+        clearChildren();
+        addActor(grid);
+    }
 }

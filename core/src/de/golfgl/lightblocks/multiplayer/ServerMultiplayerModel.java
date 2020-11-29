@@ -23,6 +23,7 @@ public class ServerMultiplayerModel extends GameModel {
     private ServerScore serverScore;
     private String nickName;
     private Integer[][] activePiecePos;
+    private boolean gameOver;
 
     @Override
     public InitGameParameters getInitParameters() {
@@ -96,7 +97,7 @@ public class ServerMultiplayerModel extends GameModel {
         final int dx = Integer.parseInt(sdx);
         final int dy = Integer.parseInt(sdy);
 
-        if (!other) {
+        if (!other && !gameOver) {
             uiGameboard.moveTetro(ServerMultiplayerModel.this.activePiecePos, dx, dy, ghostPieceDistance);
 
             for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
@@ -151,7 +152,7 @@ public class ServerMultiplayerModel extends GameModel {
         ServerMultiplayerModel.this.activePiecePos = activePiecePos;
         uiGameboard.mergeFullInformation(gameboard, activePiecePos, activePieceType, nextPiecePos, nextPieceType,
                 holdPiecePos, holdPieceType, nickName);
-
+        gameOver = false;
     }
 
     private int parsePieceString(String pieceString, Integer[][] boardBlockPositions) {
@@ -167,7 +168,7 @@ public class ServerMultiplayerModel extends GameModel {
         final String strGhostDis = parseUntilNext(payload, pos, "-");
         final int ghostPieceDistance = Integer.parseInt(strGhostDis);
 
-        if (!other) {
+        if (!other && !gameOver) {
             uiGameboard.rotateTetro(ServerMultiplayerModel.this.activePiecePos, boardBlockPositions, ghostPieceDistance);
             ServerMultiplayerModel.this.activePiecePos = boardBlockPositions;
         }
@@ -190,7 +191,7 @@ public class ServerMultiplayerModel extends GameModel {
             gapPos = new IntArray();
         }
 
-        if (!other) {
+        if (!other && !gameOver) {
             uiGameboard.clearAndInsertLines(linesToRemove, isSpecial, gapPos.toArray());
         }
     }
@@ -207,7 +208,9 @@ public class ServerMultiplayerModel extends GameModel {
     }
 
     void handleGameOver(boolean other) {
-        // TODO
+        if (!other) {
+            gameOver = true;
+        }
     }
 
     void handleNextTetro(final boolean other, String payload) {
@@ -217,7 +220,7 @@ public class ServerMultiplayerModel extends GameModel {
         final String blockTypeString = parseUntilNext(payload, pos, "-");
         final int blockType = Integer.parseInt(blockTypeString);
 
-        if (!other) {
+        if (!other && !gameOver) {
             uiGameboard.showNextTetro(boardBlockPositions, blockType);
         }
 
@@ -231,7 +234,7 @@ public class ServerMultiplayerModel extends GameModel {
         final String strGhostDis = parseUntilNext(payload, pos + strBlockType.length() + 1, "-");
         final int ghostPieceDistance = Integer.parseInt(strGhostDis);
 
-        if (!other) {
+        if (!other && !gameOver) {
             ServerMultiplayerModel.this.activePiecePos = boardBlockPositions;
             uiGameboard.activateNextTetro(boardBlockPositions, blockType, ghostPieceDistance);
         }
@@ -271,7 +274,7 @@ public class ServerMultiplayerModel extends GameModel {
             activePiecePos = null;
         }
 
-        if (!other) {
+        if (!other && !gameOver) {
             uiGameboard.swapHoldAndActivePiece(holdPiecePos, ServerMultiplayerModel.this.activePiecePos, activePiecePos,
                     ghostPieceDistance, 0);
             ServerMultiplayerModel.this.activePiecePos = activePiecePos;
@@ -279,7 +282,7 @@ public class ServerMultiplayerModel extends GameModel {
     }
 
     void handlePinTetro(final boolean other) {
-        if (!other) {
+        if (!other && !gameOver) {
             uiGameboard.pinTetromino(ServerMultiplayerModel.this.activePiecePos);
             ServerMultiplayerModel.this.activePiecePos = null;
         }
@@ -287,7 +290,7 @@ public class ServerMultiplayerModel extends GameModel {
     }
 
     void handleScore(boolean other, final String payload) {
-        if (!other) {
+        if (!other && !gameOver) {
             serverScore.setScoreInformation(new JsonReader().parse(payload));
             uiGameboard.updateScore(serverScore, 0);
         }
@@ -371,6 +374,19 @@ public class ServerMultiplayerModel extends GameModel {
             score = scoreJson.getInt("score", 0);
             level = scoreJson.getInt("level", 0);
             lines = scoreJson.getInt("lines", 0);
+        }
+
+        @Override
+        public int getScore() {
+            return score;
+        }
+
+        public int getLevel() {
+            return level;
+        }
+
+        public int getLines() {
+            return lines;
         }
     }
 }
