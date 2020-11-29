@@ -193,7 +193,7 @@ public class Match {
             if (hasPlayer()) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("ROT-");
-                sendPiecePositions(vOld, builder);
+                sendPiecePositions(vNew, builder);
                 builder.append(ghostPieceDistance);
                 sendPlayer(builder.toString());
             }
@@ -201,6 +201,10 @@ public class Match {
 
         @Override
         public void clearAndInsertLines(IntArray linesToRemove, boolean special, int[] garbageHolePosition) {
+            int linesToInsert = (garbageHolePosition == null ? 0 : garbageHolePosition.length);
+            if (linesToRemove.size <= 0 && linesToInsert <= 0)
+                return;
+
             if (hasPlayer()) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("CLR-");
@@ -211,7 +215,7 @@ public class Match {
                 }
                 builder.append('-').append(special ? 'S' : 'N');
                 for (int gap : garbageHolePosition) {
-                    builder.append(gap).append('|');
+                    builder.append('|').append(gap);
                 }
                 sendPlayer(builder.toString());
             }
@@ -257,11 +261,10 @@ public class Match {
                 StringBuilder builder = new StringBuilder();
                 builder.append("HLD-");
                 sendPiecePositions(newHoldPiecePositions, builder);
-                sendPiecePositions(oldActivePiecePositions, builder);
+                builder.append(ghostPieceDistance).append('-');
                 if (newActivePiecePositions != null) {
                     sendPiecePositions(newActivePiecePositions, builder);
                 }
-                builder.append(ghostPieceDistance).append('-').append(holdBlockType);
                 sendPlayer(builder.toString());
             }
         }
@@ -294,7 +297,7 @@ public class Match {
 
         @Override
         public void showMotivation(MotivationTypes achievement, @Nullable String extra) {
-            // TODO send full message text
+            // TODO send full message text leading "MTV-"
         }
 
         @Override

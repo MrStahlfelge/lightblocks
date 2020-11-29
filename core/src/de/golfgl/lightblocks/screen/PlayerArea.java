@@ -249,12 +249,15 @@ public class PlayerArea extends Group implements IGameModelListener {
                 // actor is wrong? remove it
                 if (block != null && gameboard[y][x] != block.getBlockType()) {
                     block.remove();
+                    block = null;
                     blockMatrix[x][y] = null;
                 }
 
                 // actor not present, but should? add it
                 if (block == null && gameboard[y][x] != Gameboard.SQUARE_EMPTY) {
                     insertNewBlock(x, y, gameboard[y][x]);
+                } else if (block != null) {
+                    block.setEnlightened(false);
                 }
             }
         }

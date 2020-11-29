@@ -159,50 +159,9 @@ public class ServerMultiplayerManager {
                 if (packet.startsWith(ID_SERVERINFO)) {
                     handleServerInfo(packet.substring(ID_SERVERINFO.length()));
                     return true;
-                } else if (packet.startsWith(ID_MATCHINFO)) {
-                    gameModel.handleMatchInfo(packet.substring(ID_MATCHINFO.length()));
+                } else if (gameModel != null) {
+                    gameModel.queueMessage(packet);
                     return true;
-                } else if (packet.startsWith("Y") || packet.startsWith("O")) {
-                    boolean other = packet.startsWith("O");
-                    String payload = packet.substring(4);
-                    switch (packet.substring(1, 4)) {
-                        case "MOV":
-                            gameModel.handleTetroMoved(other, payload);
-                            return true;
-                        case "ROT":
-                            gameModel.handleRotateTetro(other, payload);
-                            return true;
-                        case "CLR":
-                            gameModel.handleClearInsert(other, payload);
-                            return true;
-                        case "GOV":
-                            gameModel.handleGameOver(other);
-                            return true;
-                        case "NXT":
-                            gameModel.handleNextTetro(other, payload);
-                            return true;
-                        case "ANT":
-                            gameModel.handleActivateNextTetro(other, payload);
-                            return true;
-                        case "HLD":
-                            gameModel.handleSwapHoldAndActive(other, payload);
-                            return true;
-                        case "PIN":
-                            gameModel.handlePinTetro(other);
-                            return true;
-                        case "SCO":
-                            gameModel.handleScore(other, payload);
-                            return true;
-                        case "CNF":
-                            gameModel.handleConflict(other, payload);
-                            return true;
-                        case "MTV":
-                            gameModel.handleMotivation(other, payload);
-                            return true;
-                        case "GBG":
-                            gameModel.handleGarbageAmount(other, payload);
-                            return true;
-                    }
                 }
                 Gdx.app.error("Server", "Unhandled message message: " + packet);
             } catch (Throwable t) {
