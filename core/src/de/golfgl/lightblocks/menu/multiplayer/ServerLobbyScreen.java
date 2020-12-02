@@ -1,10 +1,12 @@
 package de.golfgl.lightblocks.menu.multiplayer;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -21,6 +23,7 @@ import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
+import de.golfgl.lightblocks.screen.AbstractScreen;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
 import de.golfgl.lightblocks.screen.VetoException;
@@ -156,7 +159,19 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             playButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    startGame();
+                    if (serverMultiplayerManager.getLastPingTime() > 60) {
+                        Dialog dialog = new AbstractScreen.RunnableDialog(app.skin, app.TEXTS.get("highPingWarning"), new Runnable() {
+                            @Override
+                            public void run() {
+                                startGame();
+                            }
+                        }, null,
+                                app.TEXTS.get("menuYes"),
+                                app.TEXTS.get("menuNo"));
+                        dialog.show(getStage());
+                    } else {
+                        startGame();
+                    }
                 }
             });
         }
@@ -167,6 +182,7 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             int lastPing = serverMultiplayerManager.getLastPingTime();
             if (lastPing >= 0) {
                 pingCell.getActor().setText(String.valueOf(lastPing));
+                pingCell.getActor().setColor(lastPing > 50 ? LightBlocksGame.EMPHASIZE_COLOR : Color.WHITE);
 
                 if (TimeUtils.millis() - lastDoPingTime >= 5000) {
                     lastDoPingTime = TimeUtils.millis();

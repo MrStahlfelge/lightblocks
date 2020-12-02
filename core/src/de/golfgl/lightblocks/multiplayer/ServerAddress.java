@@ -6,30 +6,31 @@ public class ServerAddress implements IRoomLocation {
     private final String name;
     private final String address;
 
-    public ServerAddress(String name, String address) {
-        this.name = name;
-        this.address = address;
+    public ServerAddress(String address) {
+        this(null, address);
     }
 
-    public ServerAddress(String address) {
+    public ServerAddress(String name, String address) {
         int dotSlashPos = address.indexOf("://");
 
         if (dotSlashPos > 0) {
-            this.name = address.substring(dotSlashPos + 3);
+            this.name = name != null ? name : address.substring(dotSlashPos + 3);
             this.address = address;
         } else {
             int colonPos = address.indexOf(':');
+            String addressWithoutPort;
             int port = 0;
             if (colonPos > 0) {
-                this.name = address.substring(0, colonPos);
+                addressWithoutPort = address.substring(0, colonPos);
                 try {
                     port = Integer.parseInt(address.substring(colonPos + 1));
                 } catch (Throwable ignored) {
                 }
             } else {
-                this.name = address;
+                addressWithoutPort = address;
             }
-            this.address = WebSockets.toWebSocketUrl(this.name, port != 0 ? port : 8887);
+            this.address = WebSockets.toWebSocketUrl(addressWithoutPort, port != 0 ? port : 8887);
+            this.name = name != null ? name : addressWithoutPort;
         }
     }
 

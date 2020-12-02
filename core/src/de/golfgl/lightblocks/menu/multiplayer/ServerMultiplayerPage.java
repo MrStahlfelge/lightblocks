@@ -120,7 +120,8 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
         // TODO only for testing at the moment
         Array<IRoomLocation> servers = new Array<>();
         servers.add(new ServerAddress("localhost"));
-        servers.add(new ServerAddress("lightblocks-server.herokuapp.com:80"));
+        servers.add(new ServerAddress("Heroku (US)", "lightblocks-server.herokuapp.com:80"));
+        servers.add(new ServerAddress("Volume6 (DE)", "volume6.de:8080"));
 
         hostList.setItems(servers);
     }
