@@ -391,7 +391,10 @@ public class ServerMultiplayerModel extends GameModel {
     }
 
     private void handleConflict(String payload) {
-        // TODO
+        // CNF-8-1
+        final String xStr = parseUntilNext(payload, 1, "-");
+        final String yStr = parseUntilNext(payload, 1 + xStr.length() + 1, "-");
+        uiGameboard.markConflict(Integer.parseInt(xStr), Integer.parseInt(yStr));
     }
 
     private void handleGarbageAmount(String payload) {
