@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +20,12 @@ import javax.jmdns.ServiceListener;
 import de.golfgl.lightblocks.multiplayer.INsdHelper;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
 import de.golfgl.lightblocks.multiplayer.KryonetRoomLocation;
+import de.golfgl.lightblocks.multiplayer.ServerAddress;
 
 public class DesktopNsdHelper implements INsdHelper {
     public static final String HTTP = "_http._tcp.local.";
     final Map<String, InetAddress> currentServices = new ConcurrentHashMap<>();
+    final Map<String, ServerAddress> multiplayerServers = new ConcurrentHashMap<>();
     MyListener listener = new MyListener();
     private JmDNS jmdns;
 
@@ -51,13 +54,16 @@ public class DesktopNsdHelper implements INsdHelper {
     }
 
     @Override
-    public void startDiscovery() {
+    public void startDiscovery(boolean legacy) {
         try {
             if (jmdns == null) {
                 jmdns = JmDNS.create(InetAddress.getLocalHost());
             }
             // Add a service listener
-            jmdns.addServiceListener(HTTP, listener);
+            if (legacy)
+                jmdns.addServiceListener(HTTP, listener);
+            else
+                jmdns.addServiceListener(LIGHTBLOCKS_TYPE_NAME + ".local.", listener);
         } catch (IOException e) {
             Gdx.app.error("Client", "Could not start service discovery.", e);
         }
@@ -70,7 +76,7 @@ public class DesktopNsdHelper implements INsdHelper {
     }
 
     @Override
-    public List<IRoomLocation> getDiscoveredServices() {
+    public List<IRoomLocation> getDiscoveredLegacyServices() {
         List<IRoomLocation> retVal = new LinkedList<>();
 
         synchronized (currentServices) {
@@ -80,6 +86,13 @@ public class DesktopNsdHelper implements INsdHelper {
         }
 
         return retVal;
+    }
+
+    @Override
+    public List<ServerAddress> getDiscoveredMultiplayerServers() {
+        synchronized (multiplayerServers) {
+            return new ArrayList<>(multiplayerServers.values());
+        }
     }
 
     private class MyListener implements ServiceListener {
@@ -95,6 +108,11 @@ public class DesktopNsdHelper implements INsdHelper {
                     currentServices.remove(info.getName().substring(SERVICE_NAME.length() + 1));
                 }
             }
+            if (info != null && info.getType().startsWith(LIGHTBLOCKS_TYPE_NAME)) {
+                synchronized (multiplayerServers) {
+                    multiplayerServers.remove(info.getName());
+                }
+            }
         }
 
         @Override
@@ -108,6 +126,11 @@ public class DesktopNsdHelper implements INsdHelper {
                     }
                 } catch (UnknownHostException e) {
                     // eat
+                }
+            }
+            if (info != null && info.getType().startsWith(LIGHTBLOCKS_TYPE_NAME)) {
+                synchronized (multiplayerServers) {
+                    multiplayerServers.put(info.getName(), new ServerAddress(info.getName(), info.getHostAddress() + ":" + info.getPort()));
                 }
             }
         }

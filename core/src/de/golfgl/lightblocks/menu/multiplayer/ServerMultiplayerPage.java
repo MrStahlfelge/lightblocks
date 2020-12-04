@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.menu.multiplayer;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -26,6 +27,7 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
     private final RoundedTextButton enterManually;
     private final LightBlocksGame app;
     private TextButton joinRoomButton;
+    private float timeSinceRefresh;
 
     public ServerMultiplayerPage(final LightBlocksGame app, MultiplayerMenuScreen parent) {
         this.app = app;
@@ -116,14 +118,33 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
         // TODO link How to add a server man page
     }
 
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        timeSinceRefresh = timeSinceRefresh + delta;
+
+        if (timeSinceRefresh > 1f) {
+            fillHostList();
+        }
+    }
+
     private void fillHostList() {
+        Array<ServerAddress> servers = new Array<>();
+
+        if (app.nsdHelper != null) {
+            for (ServerAddress discoveredMultiplayerServer : app.nsdHelper.getDiscoveredMultiplayerServers()) {
+                servers.add(discoveredMultiplayerServer);
+            }
+        }
+
         // TODO only for testing at the moment
-        Array<IRoomLocation> servers = new Array<>();
-        servers.add(new ServerAddress("localhost"));
         servers.add(new ServerAddress("Heroku (US)", "lightblocks-server.herokuapp.com:80"));
         servers.add(new ServerAddress("Volume6 (DE)", "volume6.de:8080"));
 
         hostList.setItems(servers);
+
+        timeSinceRefresh = 0;
     }
 
     private void roomSelect(IRoomLocation address) {
@@ -140,4 +161,17 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
         return null;
     }
 
+    @Override
+    protected void setParent(Group parent) {
+        if (parent != getParent() && app.nsdHelper != null) {
+            // FIXME - stop is not fired at all because page is not removed
+            if (parent != null) {
+                app.nsdHelper.startDiscovery(false);
+            } else {
+                app.nsdHelper.stopDiscovery();
+            }
+        }
+
+        super.setParent(parent);
+    }
 }

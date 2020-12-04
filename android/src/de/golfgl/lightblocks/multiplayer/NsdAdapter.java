@@ -10,6 +10,7 @@ import com.rafakob.nsdhelper.NsdType;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NsdAdapter implements INsdHelper, NsdListener {
 
     final Map<String, InetAddress> currentServices;
+    final Map<String, ServerAddress> multiplayerServers;
     private NsdHelper nsdHelper;
 
     public NsdAdapter(Context context) {
@@ -34,6 +36,7 @@ public class NsdAdapter implements INsdHelper, NsdListener {
         nsdHelper.setDiscoveryTimeout(300);
 
         currentServices = new ConcurrentHashMap<String, InetAddress>();
+        multiplayerServers = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -48,7 +51,7 @@ public class NsdAdapter implements INsdHelper, NsdListener {
 
     @Override
     public void onNsdServiceFound(NsdService nsdService) {
-        if (nsdService.getName().startsWith(SERVICE_NAME))
+        if (nsdService.getName().startsWith(SERVICE_NAME) || nsdService.getType().contains(LIGHTBLOCKS_TYPE_NAME))
             nsdHelper.resolveService(nsdService);
 
     }
@@ -65,6 +68,11 @@ public class NsdAdapter implements INsdHelper, NsdListener {
                 // eat
             }
         }
+        if (nsdService.getType().contains(LIGHTBLOCKS_TYPE_NAME)) {
+            synchronized (multiplayerServers) {
+                multiplayerServers.put(nsdService.getName(), new ServerAddress(nsdService.getName(), nsdService.getHostName() + ":" + nsdService.getPort()));
+            }
+        }
 
     }
 
@@ -74,6 +82,11 @@ public class NsdAdapter implements INsdHelper, NsdListener {
             synchronized (currentServices) {
                 currentServices.remove(nsdService.getName().substring(SERVICE_NAME.length() + 1));
             }
+        if (nsdService.getType().contains(LIGHTBLOCKS_TYPE_NAME)) {
+            synchronized (multiplayerServers) {
+                multiplayerServers.remove(nsdService.getName());
+            }
+        }
 
     }
 
@@ -96,10 +109,13 @@ public class NsdAdapter implements INsdHelper, NsdListener {
     }
 
     @Override
-    public void startDiscovery() {
+    public void startDiscovery(boolean legacy) {
         currentServices.clear();
-        nsdHelper.startDiscovery(NsdType.HTTP);
-
+        if (legacy)
+            nsdHelper.startDiscovery(NsdType.HTTP);
+        else
+            nsdHelper.startDiscovery(LIGHTBLOCKS_TYPE_NAME + ".");
+        // strangely discovered services will be pf type "." + LIGHTBLOCKS_TYPE_NAME
     }
 
     @Override
@@ -108,7 +124,7 @@ public class NsdAdapter implements INsdHelper, NsdListener {
     }
 
     @Override
-    public List<IRoomLocation> getDiscoveredServices() {
+    public List<IRoomLocation> getDiscoveredLegacyServices() {
 
         List<IRoomLocation> retVal = new LinkedList<>();
 
@@ -119,5 +135,12 @@ public class NsdAdapter implements INsdHelper, NsdListener {
         }
 
         return retVal;
+    }
+
+    @Override
+    public List<ServerAddress> getDiscoveredMultiplayerServers() {
+        synchronized (multiplayerServers) {
+            return new ArrayList<>(multiplayerServers.values());
+        }
     }
 }

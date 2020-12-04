@@ -10,12 +10,13 @@ import java.util.List;
 
 public interface INsdHelper {
     String SERVICE_NAME = "Lightblocks";
+    String LIGHTBLOCKS_TYPE_NAME = "_lightblocks._tcp";
 
     void registerService();
 
     void unregisterService();
 
-    void startDiscovery();
+    void startDiscovery(boolean legacy);
 
     void stopDiscovery();
 
@@ -24,6 +25,7 @@ public interface INsdHelper {
      *
      * @return Copy of the list at the time the method is called
      */
-    List<IRoomLocation> getDiscoveredServices();
+    List<IRoomLocation> getDiscoveredLegacyServices();
 
+    List<ServerAddress> getDiscoveredMultiplayerServers();
 }

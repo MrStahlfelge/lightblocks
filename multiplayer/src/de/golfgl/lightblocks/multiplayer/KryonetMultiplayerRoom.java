@@ -253,7 +253,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
         vetoIfConnected();
 
         if (nsdHelper != null)
-            nsdHelper.startDiscovery();
+            nsdHelper.startDiscovery(true);
         else {
 
             // nur unter Windows...
@@ -291,7 +291,7 @@ public class KryonetMultiplayerRoom extends AbstractMultiplayerRoom {
                 return udpPollReply;
             }
         } else {
-            return nsdHelper.getDiscoveredServices();
+            return nsdHelper.getDiscoveredLegacyServices();
         }
     }
 

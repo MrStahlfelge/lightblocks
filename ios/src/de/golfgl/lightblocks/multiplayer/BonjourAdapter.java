@@ -12,15 +12,11 @@ import org.robovm.apple.uikit.UIDevice;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import de.golfgl.lightblocks.multiplayer.INsdHelper;
-import de.golfgl.lightblocks.multiplayer.IRoomLocation;
-import de.golfgl.lightblocks.multiplayer.KryonetMultiplayerRoom;
-import de.golfgl.lightblocks.multiplayer.KryonetRoomLocation;
 
 
 public class BonjourAdapter implements INsdHelper {
@@ -29,11 +25,13 @@ public class BonjourAdapter implements INsdHelper {
     public static final String TAG = "NSD";
     private final NSNetServiceBrowser browser;
     private final ConcurrentHashMap<String, InetAddress> currentServices;
+    private final ConcurrentHashMap<String, ServerAddress> multiplayerServers;
     private final MyNetServiceDelegate myNetServiceDelegate;
     private NSNetService service;
 
     public BonjourAdapter() {
         currentServices = new ConcurrentHashMap<String, InetAddress>();
+        multiplayerServers = new ConcurrentHashMap<String, ServerAddress>();
 
         myNetServiceDelegate = new MyNetServiceDelegate();
 
@@ -41,7 +39,7 @@ public class BonjourAdapter implements INsdHelper {
         browser.setDelegate(new NSNetServiceBrowserDelegateAdapter() {
             @Override
             public void didFindService(NSNetServiceBrowser nsNetServiceBrowser, NSNetService nsNetService, boolean b) {
-                if (nsNetService.getName().startsWith(SERVICE_NAME)) {
+                if (nsNetService.getName().startsWith(SERVICE_NAME) || nsNetService.getType().contains(LIGHTBLOCKS_TYPE_NAME)) {
                     Gdx.app.debug(TAG, "Service found: " + nsNetService.getName());
                     nsNetService.retain();
                     nsNetService.setDelegate(myNetServiceDelegate);
@@ -56,6 +54,12 @@ public class BonjourAdapter implements INsdHelper {
                         Gdx.app.debug(TAG, "Service lost: " + nsNetService.getName());
                         currentServices.remove(nsNetService.getName().substring(SERVICE_NAME.length() + 1));
                     }
+                if (nsNetService.getType().contains(LIGHTBLOCKS_TYPE_NAME)) {
+                    synchronized (currentServices) {
+                        Gdx.app.debug(TAG, "Service lost: " + nsNetService.getName());
+                        multiplayerServers.remove(nsNetService.getName());
+                    }
+                }
             }
         });
     }
@@ -79,8 +83,11 @@ public class BonjourAdapter implements INsdHelper {
     }
 
     @Override
-    public void startDiscovery() {
-        browser.searchForServices(HTTP_SERVICE, "");
+    public void startDiscovery(boolean legacy) {
+        if (legacy)
+            browser.searchForServices(HTTP_SERVICE, "");
+        else
+            browser.searchForServices(LIGHTBLOCKS_TYPE_NAME, "");
     }
 
     @Override
@@ -89,7 +96,7 @@ public class BonjourAdapter implements INsdHelper {
     }
 
     @Override
-    public List<IRoomLocation> getDiscoveredServices() {
+    public List<IRoomLocation> getDiscoveredLegacyServices() {
         List<IRoomLocation> retVal = new LinkedList<>();
 
         synchronized (currentServices) {
@@ -99,6 +106,13 @@ public class BonjourAdapter implements INsdHelper {
         }
 
         return retVal;
+    }
+
+    @Override
+    public List<ServerAddress> getDiscoveredMultiplayerServers() {
+        synchronized (multiplayerServers) {
+            return new ArrayList<>(multiplayerServers.values());
+        }
     }
 
     private class MyNetServiceDelegate extends NSNetServiceDelegateAdapter {
@@ -124,6 +138,15 @@ public class BonjourAdapter implements INsdHelper {
                     nsNetService.release();
                 } catch (UnknownHostException e) {
                     // eat
+                }
+
+                if (nsNetService.getType().contains(LIGHTBLOCKS_TYPE_NAME)) {
+                    synchronized (multiplayerServers) {
+                        Gdx.app.debug(TAG, "Service resolved: " + nsNetService.getHostName());
+                        multiplayerServers.put(nsNetService.getName(), new ServerAddress(nsNetService.getName(),
+                                nsNetService.getHostName() + ":" + nsNetService.getPort()));
+                    }
+                    nsNetService.release();
                 }
             }
         }

@@ -124,7 +124,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
             try {
                 jmdns = JmDNS.create(InetAddress.getLocalHost());
                 // Register a service
-                ServiceInfo serviceInfo = ServiceInfo.create("_lightblocks._tcp.local.", "lbserver-" + serverConfig.name, getPort(), "");
+                ServiceInfo serviceInfo = ServiceInfo.create("_lightblocks._tcp.local.", serverConfig.name, getPort(), "");
                 jmdns.registerService(serviceInfo);
                 Gdx.app.log("Server", "Registered for service discovery " + jmdns.getInetAddress());
             } catch (IOException e) {
