@@ -41,6 +41,7 @@ public class Match {
 
     public void update(float delta) {
         if (getConnectedPlayerNum() == 0) {
+            gameModel = null;
             return;
         }
 

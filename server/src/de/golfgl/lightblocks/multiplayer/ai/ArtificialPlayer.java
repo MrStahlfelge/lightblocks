@@ -27,6 +27,7 @@ public class ArtificialPlayer {
     private final float holesFactor;
     private final float bumpinessFactor;
     private float slowDown;
+    private int drawnTetrominoBaseDifference;
 
     public ArtificialPlayer(AiAcessibleGameModel aiGameModel, AiAcessibleGameModel opponentGameModel) {
         this.aiGameModel = aiGameModel;
@@ -37,6 +38,8 @@ public class ArtificialPlayer {
         completeLinesFactor = 7.6f;
         holesFactor = 3.66f;
         bumpinessFactor = 1.8f;
+
+        setDrawnTetrominoBaseDiff();
     }
 
     public void onNextPiece(Gameboard gameboard, Tetromino activePiece) {
@@ -268,7 +271,7 @@ public class ArtificialPlayer {
                     break;
                 case DROP:
                     // wait for the human
-                    if (opponentGameModel.getScore().getDrawnTetrominos() + 10 >= aiGameModel.getScore().getDrawnTetrominos())
+                    if (opponentGameModel.getScore().getDrawnTetrominos() + drawnTetrominoBaseDifference >= aiGameModel.getScore().getDrawnTetrominos())
                         aiGameModel.inputSetSoftDropFactor(null, GameModel.FACTOR_HARD_DROP);
                     else
                         movementArrayList.addFirst(movement);
@@ -280,6 +283,10 @@ public class ArtificialPlayer {
 
             slowDown = .1f;
         }
+    }
+
+    public void setDrawnTetrominoBaseDiff() {
+        drawnTetrominoBaseDifference = 10 + aiGameModel.getScore().getDrawnTetrominos() - opponentGameModel.getScore().getDrawnTetrominos();
     }
 
     enum Movement {MOVE_LEFT, MOVE_RIGHT, ROTATE_LEFT, ROTATE_RIGHT, DROP, HOLD}

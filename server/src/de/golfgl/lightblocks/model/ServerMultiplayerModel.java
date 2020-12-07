@@ -59,6 +59,7 @@ public class ServerMultiplayerModel extends AbstractMultiplayerModel<ServerMulti
         this.aiEnabled = aiEnabled;
 
         if (aiEnabled && aiPlayer != null) {
+            aiPlayer.setDrawnTetrominoBaseDiff();
             aiPlayer.onNextPiece(getGameboard(), getActiveTetromino());
         }
     }
