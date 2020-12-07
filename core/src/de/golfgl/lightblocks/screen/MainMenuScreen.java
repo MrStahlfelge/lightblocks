@@ -46,7 +46,7 @@ public class MainMenuScreen extends AbstractMenuScreen {
     private final Button singlePlayerButton;
     private final WelcomeButton welcomeButton;
     private GlowLabelButton accountButton;
-    private GlowLabelButton resumeGameButton;
+    private final GlowLabelButton resumeGameButton;
     private Group mainGroup;
     private PlayerAccountMenuScreen lastAccountScreen;
 
@@ -362,6 +362,14 @@ public class MainMenuScreen extends AbstractMenuScreen {
     public SinglePlayerScreen showSinglePlayerScreen() {
         SinglePlayerScreen singlePlayerScreen = new SinglePlayerScreen(app, mainGroup);
         singlePlayerScreen.show(stage);
+
+        // if "Resume missions" is shown and target screen is missions as well, we transition to
+        // game modes overview menu instead
+        if (app.localPrefs.getLastSinglePlayerMenuPage() == SinglePlayerScreen.PAGEIDX_MISSION &&
+                resumeGameButton.hasParent() && !app.savegame.hasSavedGame()) {
+            singlePlayerScreen.showPage(SinglePlayerScreen.PAGEIDX_OVERVIEW);
+        }
+
         return singlePlayerScreen;
     }
 
