@@ -9,6 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.golfgl.gdx.controllers.ControllerMenuStage;
 import de.golfgl.gdx.controllers.ControllerScrollPane;
 import de.golfgl.lightblocks.LightBlocksGame;
@@ -22,7 +25,7 @@ import de.golfgl.lightblocks.scene2d.TextInputDialog;
 import de.golfgl.lightblocks.scene2d.TouchableList;
 
 public class ServerMultiplayerPage extends Table implements MultiplayerMenuScreen.IMultiplayerModePage {
-    private final TouchableList<IRoomLocation> hostList;
+    private final TouchableList<ServerAddress> hostList;
     private final ControllerScrollPane hostListScrollPane;
     private final RoundedTextButton enterManually;
     private final LightBlocksGame app;
@@ -35,7 +38,7 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
                 LightBlocksGame.SKIN_FONT_REG, .75f);
         serverHelp.setWrap(true);
 
-        hostList = new TouchableList<IRoomLocation>(app.skin) {
+        hostList = new TouchableList<ServerAddress>(app.skin) {
             @Override
             public boolean onControllerDefaultKeyDown() {
                 ((MyStage) getStage()).setFocusedActor(joinRoomButton);
@@ -132,17 +135,24 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
     private void fillHostList() {
         Array<ServerAddress> servers = new Array<>();
 
-        if (app.nsdHelper != null) {
-            for (ServerAddress discoveredMultiplayerServer : app.nsdHelper.getDiscoveredMultiplayerServers()) {
-                servers.add(discoveredMultiplayerServer);
-            }
-        }
+        ServerAddress selected = hostList.getSelected();
+        int selectedIndex = hostList.getSelectedIndex();
+
+        List<ServerAddress> discoveredMultiplayerServers = (app.nsdHelper != null) ?
+                app.nsdHelper.getDiscoveredMultiplayerServers() : new ArrayList<ServerAddress>();
 
         // TODO only for testing at the moment
-        servers.add(new ServerAddress("Heroku (US)", "lightblocks-server.herokuapp.com:80"));
-        servers.add(new ServerAddress("Volume6 (DE)", "volume6.de:8080"));
+        discoveredMultiplayerServers.add(new ServerAddress("Heroku (US)", "lightblocks-server.herokuapp.com:80"));
+        discoveredMultiplayerServers.add(new ServerAddress("Volume6 (DE)", "volume6.de:8080"));
 
+        for (ServerAddress discoveredMultiplayerServer : discoveredMultiplayerServers) {
+            servers.add(discoveredMultiplayerServer);
+            if (discoveredMultiplayerServer.equals(selected))
+                selectedIndex = servers.size - 1;
+        }
         hostList.setItems(servers);
+        if (selectedIndex >= 0)
+            hostList.setSelectedIndex(selectedIndex);
 
         timeSinceRefresh = 0;
     }
