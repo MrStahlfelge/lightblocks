@@ -1091,6 +1091,10 @@ public abstract class GameModel implements Json.Serializable, AiAcessibleGameMod
         return false;
     }
 
+    public boolean isSecondGameboardOptional() {
+        return true;
+    }
+
     /**
      * @return GameModel for second gameboard if second gameboard is supported, otherwise null
      */

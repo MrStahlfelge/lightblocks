@@ -265,9 +265,14 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
             secondPlayer.gameModel = gameModel.getSecondGameModel();
             secondPlayer.gameModel.setUserInterface(app, this, secondPlayer);
             secondPlayer.gameModelInitialized();
+
+            if (gameModel.isSecondGameboardOptional()) {
+                secondPlayer.setSoundVolumeFactor(.5f);
+            }
         }
 
-        ((MyExtendViewport) stage.getViewport()).setMinWorldWidth((gameModel.hasSecondGameboard() ? 2 : 1) * LightBlocksGame.nativeGameWidth);
+        ((MyExtendViewport) stage.getViewport()).setMinWorldWidth((gameModel.hasSecondGameboard()
+                && !gameModel.isSecondGameboardOptional() ? 2 : 1) * LightBlocksGame.nativeGameWidth);
 
         playerArea.gameModelInitialized();
     }
@@ -580,7 +585,8 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
                 backgroundImage.setScaling(Scaling.none);
         }
 
-        float maxWidthPerGameboard = gameModel.hasSecondGameboard() ? stage.getWidth() / 2 : stage.getWidth();
+        float maxWidthPerGameboard = Math.max(gameModel.hasSecondGameboard() ? stage.getWidth() / 2 : stage.getWidth(),
+                LightBlocksGame.nativeGameWidth);
 
         playerArea.setPosition((maxWidthPerGameboard - LightBlocksGame.nativeGameWidth) / 2,
                 (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);

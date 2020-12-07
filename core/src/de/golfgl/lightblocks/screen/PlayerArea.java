@@ -72,6 +72,7 @@ public class PlayerArea extends Group implements IGameModelListener {
     private int currentShownTime;
     private boolean isLandscapeArrangement;
     private int shownGarbageAmount;
+    private float volumeFactor = 1f;
 
     public PlayerArea(LightBlocksGame app, PlayScreen playScreen) {
         this.app = app;
@@ -285,7 +286,7 @@ public class PlayerArea extends Group implements IGameModelListener {
     @Override
     public void moveTetro(Integer[][] v, int dx, int dy, int ghostPieceDistance) {
         if (dx != 0 && app.localPrefs.isPlaySounds() && app.theme.horizontalMoveSound != null)
-            app.theme.horizontalMoveSound.play();
+            app.theme.horizontalMoveSound.play(volumeFactor);
 
         if (dx != 0 || dy != 0) {
             // remove every block from gameboard at first...
@@ -320,7 +321,7 @@ public class PlayerArea extends Group implements IGameModelListener {
     @Override
     public void rotateTetro(Integer[][] vOld, Integer[][] vNew, int ghostPieceDistance) {
         if (app.localPrefs.isPlaySounds() && app.theme.rotateSound != null)
-            app.theme.rotateSound.play();
+            app.theme.rotateSound.play(volumeFactor);
 
         // remove every block from gameboard at first...
         Array<BlockActor> blocks = removeBlockActorsFromMatrix(vOld);
@@ -377,9 +378,9 @@ public class PlayerArea extends Group implements IGameModelListener {
         if (linesToRemove.size > 0) {
             if (app.localPrefs.isPlaySounds() && app.theme.removeSound != null) {
                 if (!special || app.theme.cleanSpecialSound == null)
-                    app.theme.removeSound.play(.4f + linesToRemove.size * .2f);
+                    app.theme.removeSound.play((.4f + linesToRemove.size * .2f) * volumeFactor);
                 else
-                    app.theme.cleanSpecialSound.play(.8f);
+                    app.theme.cleanSpecialSound.play(.8f * volumeFactor);
             }
             playScreen.inputAdapter.vibrate(special ? VibrationType.SPECIAL_CLEAR : VibrationType.CLEAR, gameModel.getFixedInputId());
 
@@ -482,7 +483,7 @@ public class PlayerArea extends Group implements IGameModelListener {
 
         if (linesToInsert > 0) {
             if (app.localPrefs.isPlaySounds() && app.theme.garbageSound != null)
-                app.theme.garbageSound.play(.4f + linesToInsert * .2f);
+                app.theme.garbageSound.play((.4f + linesToInsert * .2f) * volumeFactor);
             playScreen.inputAdapter.vibrate(VibrationType.GARBAGE, gameModel.getFixedInputId());
             // move up the reference
             for (int i = Gameboard.GAMEBOARD_ALLROWS - 1; i >= linesToInsert; i--)
@@ -519,7 +520,7 @@ public class PlayerArea extends Group implements IGameModelListener {
             return;
 
         if (playSoundAndMove && app.localPrefs.isPlaySounds() && app.theme.cleanFreezedSound != null)
-            app.theme.cleanFreezedSound.play();
+            app.theme.cleanFreezedSound.play(volumeFactor);
 
         // enlighten full rows
         for (int i = 0; i < fullLines.size; i++) {
@@ -737,7 +738,7 @@ public class PlayerArea extends Group implements IGameModelListener {
     @Override
     public void pinTetromino(Integer[][] currentBlockPositions) {
         if (app.localPrefs.isPlaySounds() && app.theme.dropSound != null)
-            app.theme.dropSound.play();
+            app.theme.dropSound.play(volumeFactor);
 
         playScreen.inputAdapter.vibrate(VibrationType.DROP, gameModel.getFixedInputId());
 
@@ -855,7 +856,7 @@ public class PlayerArea extends Group implements IGameModelListener {
         }
 
         if (playSound && app.localPrefs.isPlaySounds() && app.theme.unlockedSound != null)
-            app.theme.unlockedSound.play();
+            app.theme.unlockedSound.play(volumeFactor);
 
         if (vibrate && playScreen.inputAdapter != null)
             playScreen.inputAdapter.vibrate(VibrationType.MOTIVATION, gameModel.getFixedInputId());
@@ -922,5 +923,9 @@ public class PlayerArea extends Group implements IGameModelListener {
         } else {
             blockGroup.addAction(Actions.fadeOut(fadingInterval));
         }
+    }
+
+    public void setSoundVolumeFactor(float volumeFactor) {
+        this.volumeFactor = volumeFactor;
     }
 }

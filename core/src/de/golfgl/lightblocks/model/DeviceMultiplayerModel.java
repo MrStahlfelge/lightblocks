@@ -122,6 +122,11 @@ public class DeviceMultiplayerModel extends AbstractMultiplayerModel<DeviceMulti
     }
 
     @Override
+    public boolean isSecondGameboardOptional() {
+        return false;
+    }
+
+    @Override
     public boolean inputHoldActiveTetromino(InputIdentifier inputId) {
         if (isMyInput(inputId)) {
             return super.inputHoldActiveTetromino(inputId);
