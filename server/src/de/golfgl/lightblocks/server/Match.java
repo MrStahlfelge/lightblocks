@@ -44,7 +44,8 @@ public class Match {
 
     public void update(float delta) {
         if (getConnectedPlayerNum() == 0) {
-            gameModel = null;
+            if (server.serverConfig.resetEmptyRooms)
+                gameModel = null;
             return;
         }
 
@@ -112,7 +113,8 @@ public class Match {
     }
 
     protected boolean shouldShowWaitMessage(float delta, float waitTime) {
-        return waitTime <= 0 || (MathUtils.floor(waitTime) != MathUtils.floor(waitTime - delta));
+        return (waitTime <= 0 || (MathUtils.floor(waitTime) != MathUtils.floor(waitTime - delta)))
+                && (gameModel == null || !gameModel.isGameOver());
     }
 
     protected String getWaitTimeMsg(float waitTime) {

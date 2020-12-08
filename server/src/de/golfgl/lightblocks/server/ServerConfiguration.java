@@ -15,6 +15,7 @@ public class ServerConfiguration {
     public int modeType = InitGameParameters.TYPE_MIX;
     public String name = "Lighblocks Server";
     public boolean enableNsd;
+    public boolean resetEmptyRooms = true;
 
     public ServerConfiguration(String[] arg) {
         this.args = arg;
