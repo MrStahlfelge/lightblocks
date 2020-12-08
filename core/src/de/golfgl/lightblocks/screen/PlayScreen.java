@@ -526,6 +526,22 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         pauseDialog.setEmphasizeInputMsg(!gameBlockers.isEmpty());
     }
 
+    public void showFreeTextMessage(final String message) {
+        if (overlayWindow == null)
+            overlayWindow = new OverlayMessage(app, playerArea.labelGroup.getWidth());
+
+        if (message == null)
+            overlayWindow.hide();
+        else {
+            overlayWindow.showOrChangeText(stage, message);
+        }
+    }
+
+    /**
+     * shows an overlay message. if changed, window disappears and reappears again
+     * @param message message i18n key, or null to hide the window
+     * @param params
+     */
     public void showOverlayMessage(final String message, final String... params) {
         if (overlayWindow == null)
             overlayWindow = new OverlayMessage(app, playerArea.labelGroup.getWidth());
@@ -533,7 +549,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         if (message == null)
             overlayWindow.hide();
         else {
-            String localizedMessage = message.isEmpty() ? params[0] : app.TEXTS.format(message, (Object[]) params);
+            String localizedMessage = app.TEXTS.format(message, (Object[]) params);
             if (localizedMessage.contains("_CONTINUE_")) {
                 if (inputAdapter != null)
                     localizedMessage = localizedMessage.replace("_CONTINUE_", inputAdapter.getTutorialContinueText());

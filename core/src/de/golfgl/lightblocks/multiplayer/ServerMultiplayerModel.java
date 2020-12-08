@@ -99,7 +99,7 @@ public class ServerMultiplayerModel extends GameModel {
         if (!isClosed && !serverMultiplayerManager.isConnected()) {
             isClosed = true;
             if (serverMultiplayerManager.getLastErrorMsg() != null)
-                playScreen.showOverlayMessage("", serverMultiplayerManager.getLastErrorMsg());
+                playScreen.showFreeTextMessage(serverMultiplayerManager.getLastErrorMsg());
             playScreen.setGameOver();
         }
     }
@@ -466,11 +466,17 @@ public class ServerMultiplayerModel extends GameModel {
             case "GBG":
                 handleGarbageAmount(payload);
                 return true;
+            case "MSG":
+                handleMessage(payload);
         }
         return false;
     }
 
-    @Override
+     private void handleMessage(String payload) {
+         playScreen.showFreeTextMessage(payload.isEmpty() ? null : payload);
+     }
+
+     @Override
     public boolean hasSecondGameboard() {
         return secondModel != null;
     }

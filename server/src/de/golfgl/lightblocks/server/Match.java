@@ -18,13 +18,16 @@ import de.golfgl.lightblocks.server.model.MatchInfo;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class Match {
-    public static final float WAIT_TIME_GAME_OVER = 5f;
+    public static final float WAIT_TIME_GAME_OVER = 4f;
+    public static final float WAIT_TIME_START_PLAYNG = 3f;
     private final InitGameParameters gameParams;
     private final LightblocksServer server;
     private final Queue<InGameMessage> p1Queue = new Queue<>();
     private final Queue<InGameMessage> p2Queue = new Queue<>();
     private Player player1;
+    private float player1WaitTime;
     private Player player2;
+    private float player2WaitTime;
     private ServerMultiplayerModel gameModel;
     private float waitGameOver = WAIT_TIME_GAME_OVER;
 
@@ -45,24 +48,43 @@ public class Match {
             return;
         }
 
+        boolean sendWaitMessageP1 = false;
+        boolean sendWaitMessageP2 = false;
+        if (player1WaitTime > 0 && player1 != null) {
+            sendWaitMessageP1 = shouldShowWaitMessage(delta, player1WaitTime);
+            player1WaitTime = player1WaitTime - delta;
+        }
+        if (player2WaitTime > 0) {
+            sendWaitMessageP2 = shouldShowWaitMessage(delta, player2WaitTime);
+            player2WaitTime = player2WaitTime - delta;
+        }
+
         // update game model
         if (gameModel == null) {
             initGameModel();
             sendFullInformation();
+            sendWaitMessageP1 = true;
+            sendWaitMessageP2 = true;
         }
+        if (sendWaitMessageP1)
+            sendMessageToPlayer(getWaitTimeMsg(player1WaitTime), player1);
+        if (sendWaitMessageP2)
+            sendMessageToPlayer(getWaitTimeMsg(player2WaitTime), player2);
 
-        gameModel.setAiEnabled(player1 == null);
-        gameModel.getSecondGameModel().setAiEnabled(player2 == null);
+        boolean player1Disabled = player1 == null || player1WaitTime > 0;
+        boolean player2Disabled = player2 == null || player2WaitTime > 0;
+        gameModel.setAiEnabled(player1Disabled);
+        gameModel.getSecondGameModel().setAiEnabled(player2Disabled);
 
         // process the queues
         synchronized (p1Queue) {
-            if (player1 == null)
+            if (player1Disabled)
                 p1Queue.clear();
             else
                 processQueue(gameModel, p1Queue);
         }
         synchronized (p2Queue) {
-            if (player2 == null)
+            if (player2Disabled)
                 p2Queue.clear();
             else
                 processQueue(gameModel.getSecondGameModel(), p2Queue);
@@ -71,13 +93,35 @@ public class Match {
         gameModel.update(delta);
 
         if (gameModel.isGameOver()) {
-            if (waitGameOver > 0)
+            boolean sendMessage;
+            if (waitGameOver > 0) {
+                sendMessage = (MathUtils.floor(waitGameOver) != MathUtils.floor(waitGameOver - delta));
                 waitGameOver = waitGameOver - delta;
-            else {
+            } else {
                 gameModel = null;
                 waitGameOver = WAIT_TIME_GAME_OVER;
+                sendMessage = true;
+            }
+
+            if (sendMessage) {
+                String msg = "Stand by " + MathUtils.round(waitGameOver) + "";
+                sendMessageToPlayer(msg, player1);
+                sendMessageToPlayer(msg, player2);
             }
         }
+    }
+
+    protected boolean shouldShowWaitMessage(float delta, float waitTime) {
+        return waitTime <= 0 || (MathUtils.floor(waitTime) != MathUtils.floor(waitTime - delta));
+    }
+
+    protected String getWaitTimeMsg(float waitTime) {
+        return waitTime > 0 ? "Prepare " + Math.round(waitTime) + "" : "";
+    }
+
+    private void sendMessageToPlayer(String s, Player player) {
+        if (player != null)
+            player.send("YMSG" + s);
     }
 
     private void processQueue(ServerMultiplayerModel gameModel, Queue<InGameMessage> queue) {
@@ -128,16 +172,24 @@ public class Match {
 
         gameModel.setUserInterface(new Listener(true));
         secondGameModel.setUserInterface(new Listener(false));
+
+        gameModel.setFreezeInterval(WAIT_TIME_START_PLAYNG);
+        secondGameModel.setFreezeInterval(WAIT_TIME_START_PLAYNG);
+        player1WaitTime = WAIT_TIME_START_PLAYNG;
+        player2WaitTime = WAIT_TIME_START_PLAYNG;
+
     }
 
     public boolean connectPlayer(Player player) {
         synchronized (this) {
             if (player1 == null) {
                 player1 = player;
+                player1WaitTime = WAIT_TIME_START_PLAYNG;
                 return true;
             }
             if (player2 == null) {
                 player2 = player;
+                player2WaitTime = WAIT_TIME_START_PLAYNG;
                 return true;
             }
             return false;

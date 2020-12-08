@@ -50,6 +50,19 @@ public class OverlayMessage extends Dialog {
     }
 
     public void showText(Stage stage, String message) {
+        setText(message);
+        show(stage);
+    }
+
+    public void showOrChangeText(Stage stage, String message) {
+        setText(message);
+        if (!hasParent())
+            show(stage);
+        else
+            setPerfectPosition(stage);
+    }
+
+    protected void setText(String message) {
         if (message.startsWith("_IMG_")) {
             message = message.substring(5);
 
@@ -62,7 +75,6 @@ public class OverlayMessage extends Dialog {
             messageImageCell.clearActor();
 
         messageLabel.setText(message);
-        show(stage);
     }
 
     @Override
@@ -73,8 +85,12 @@ public class OverlayMessage extends Dialog {
     @Override
     public Dialog show(Stage stage) {
         super.show(stage);
-        setPosition(Math.round((stage.getWidth() - getWidth()) / 2), POS_Y);
+        setPerfectPosition(stage);
         return this;
+    }
+
+    protected void setPerfectPosition(Stage stage) {
+        setPosition(Math.round((stage.getWidth() - getWidth()) / 2), POS_Y);
     }
 
     @Override
