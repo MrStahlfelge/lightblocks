@@ -258,7 +258,7 @@ public class PlayerArea extends Group implements IGameModelListener {
             int x = activePiecePos[i][0];
             int y = activePiecePos[i][1];
             insertNewBlock(x, y, activePieceType);
-            blockMatrix[x][y].setEnlightened(true);
+            blockMatrix[x][y].setEnlightened(true, true);
         }
 
         showNextTetro(nextPiecePos, nextPieceType);
@@ -687,21 +687,24 @@ public class PlayerArea extends Group implements IGameModelListener {
         for (int i = 0; i < Tetromino.TETROMINO_BLOCKCOUNT; i++) {
             oldHoldTetro[i] = holdTetro[i];
 
+            float fadeOutDuration;
             if (oldActivePiecePositions != null) {
                 final int oldX = oldActivePiecePositions[i][0];
                 final int oldY = oldActivePiecePositions[i][1];
 
                 holdTetro[i] = blockMatrix[oldX][oldY];
                 blockMatrix[oldX][oldY] = null;
+                fadeOutDuration = .5f;
             } else {
                 // add when game state is loaded
                 holdTetro[i] = new BlockActor(app, holdBlockType, true);
                 blockGroup.addActor(holdTetro[i]);
+                fadeOutDuration = 0f;
             }
 
             holdTetro[i].setMoveAction(Actions.moveTo(offsetX + newHoldPiecePositions[i][0] * BlockActor.blockWidth,
                     offsetY + newHoldPiecePositions[i][1] * BlockActor.blockWidth, .1f, Interpolation.fade));
-            holdTetro[i].addAction(Actions.alpha(app.theme.nextPieceAlpha, .5f, Interpolation.fade));
+            holdTetro[i].addAction(Actions.alpha(app.theme.nextPieceAlpha, fadeOutDuration, Interpolation.fade));
             holdTetro[i].setEnlightened(false);
         }
 

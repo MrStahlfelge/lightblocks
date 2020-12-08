@@ -58,8 +58,10 @@ public class OverlayMessage extends Dialog {
         setText(message);
         if (!hasParent())
             show(stage);
-        else
+        else {
+            pack();
             setPerfectPosition(stage);
+        }
     }
 
     protected void setText(String message) {
