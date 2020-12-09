@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import org.java_websocket.WebSocket;
@@ -26,6 +27,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     final Serializer serializer = new Serializer();
     private final ServerInfo serverInfo = new ServerInfo();
     private final Match[] matches;
+    private final Queue<Player> playerToConnectQueue = new Queue<>();
     private boolean running = true;
     private JmDNS jmdns;
 
@@ -142,6 +144,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     public void render() {
         // update game state here
         try {
+            connectWaitingPlayers();
             renderThread(0, Gdx.graphics.getDeltaTime());
         } catch (Throwable t) {
             Gdx.app.error("Server", "Uncaught error ", t);
@@ -154,15 +157,32 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         matches[thread].update(delta);
     }
 
-    public synchronized Match findMatchForPlayer(Player player) {
-        for (int i = 0; i < serverConfig.threadNum; i++) {
-            if (matches[i].connectPlayer(player)) {
-                Gdx.app.debug("Server", "Connected player to match " + i);
-                return matches[i];
-            }
+    public void findMatchForPlayer(Player player) {
+        synchronized (playerToConnectQueue) {
+            // not found, enqueue the player to the waitlist
+            playerToConnectQueue.addLast(player);
+            player.sendMessageToPlayer("Matchmaking...");
         }
+    }
 
-        return null;
+    public void connectWaitingPlayers() {
+        synchronized (playerToConnectQueue) {
+            if (playerToConnectQueue.isEmpty())
+                return;
+
+            Player first = playerToConnectQueue.first();
+            boolean connected = false;
+            for (int i = 0; i < serverConfig.threadNum; i++) {
+                if (!connected && matches[i].connectPlayer(first)) {
+                    Gdx.app.debug("Server", "Connected player to match " + i);
+                    first.addPlayerToMatch(matches[i]);
+                    connected = true;
+                }
+            }
+
+            if (connected)
+                playerToConnectQueue.removeFirst();
+        }
     }
 
     @Override

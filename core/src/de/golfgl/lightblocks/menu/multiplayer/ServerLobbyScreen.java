@@ -81,11 +81,15 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             lastDoPingTime = TimeUtils.millis();
             contentCell.setActor(new LobbyTable());
             ((MyStage) getStage()).setFocusedActor(playButton);
-        } else if (!connecting && !serverMultiplayerManager.isConnected() && serverMultiplayerManager.getLastErrorMsg() == null) {
-            // hide without sound
-            setOrigin(getWidth() / 2, getHeight() / 2);
-            hide(parallel(Actions.scaleTo(1, 0, AbstractMenuDialog.TIME_SWOSHIN, Interpolation.circleIn),
-                    Actions.fadeOut(AbstractMenuDialog.TIME_SWOSHIN, Interpolation.fade)));
+        } else if (!connecting && !serverMultiplayerManager.isConnected()) {
+            if (serverMultiplayerManager.getLastErrorMsg() == null) {
+                // hide without sound
+                setOrigin(getWidth() / 2, getHeight() / 2);
+                hide(parallel(Actions.scaleTo(1, 0, AbstractMenuDialog.TIME_SWOSHIN, Interpolation.circleIn),
+                        Actions.fadeOut(AbstractMenuDialog.TIME_SWOSHIN, Interpolation.fade)));
+            } else {
+                fillErrorScreen(serverMultiplayerManager.getLastErrorMsg());
+            }
         }
 
         if (playButton != null) {

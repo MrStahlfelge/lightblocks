@@ -21,7 +21,7 @@ public class Player {
         this.conn = conn;
     }
 
-    private void connected(PlayerInfo playerInfo) {
+    private void doConnect(PlayerInfo playerInfo) {
         if (playerInfo.nickName == null || state != ConnectionState.CONNECTED) {
             // client error => just return;
             return;
@@ -31,14 +31,17 @@ public class Player {
         userId = playerInfo.userId;
         token = playerInfo.token;
 
-        match = server.findMatchForPlayer(this);
+        state = ConnectionState.WAITING;
+        // this will call addPlayerToMatch eventually
+        server.findMatchForPlayer(this);
+    }
 
-        if (match != null) {
+    void addPlayerToMatch(Match match) {
+        if (match != null && this.match == null) {
             Gdx.app.log("Player", "Successfully connected " + nickName + "/" + userId);
+            this.match = match;
             state = ConnectionState.PLAYING;
             match.sendFullInformation();
-        } else {
-            conn.close(4100, "No match found for you.");
         }
     }
 
@@ -55,11 +58,11 @@ public class Player {
 
     public void onMessage(Object object) throws UnexpectedException {
         if (object instanceof PlayerInfo && state == ConnectionState.CONNECTED) {
-            connected((PlayerInfo) object);
+            doConnect((PlayerInfo) object);
 
-            if (state != ConnectionState.PLAYING && conn.isOpen()) {
-                // if connection was not successfully established, disconnect the player
-                conn.close();
+            if (state != ConnectionState.PLAYING && state != ConnectionState.WAITING && conn.isOpen()) {
+                // if connection was not successfully established and player does not wait, disconnect the player
+                conn.close(4101, "Could not add you to a match");
             }
         } else if (object instanceof InGameMessage && state == ConnectionState.PLAYING) {
             match.gotMessage(this, (InGameMessage) object);
@@ -72,7 +75,13 @@ public class Player {
             conn.send(string);
     }
 
-    enum ConnectionState {CONNECTED, PLAYING, DISCONNECTED}
+    public void sendMessageToPlayer(String s) {
+        if (state != ConnectionState.DISCONNECTED) {
+            send("YMSG" + s);
+        }
+    }
+
+    enum ConnectionState {CONNECTED, WAITING, PLAYING, DISCONNECTED}
 
     static class UnexpectedException extends Exception {
 

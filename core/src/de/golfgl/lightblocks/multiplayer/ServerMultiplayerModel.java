@@ -88,7 +88,7 @@ public class ServerMultiplayerModel extends GameModel {
                 try {
                     boolean processed = processMessage(packet);
                     if (!processed) {
-                        Gdx.app.error("Server", "Unhandled message message: " + packet);
+                        Gdx.app.error("Server", "Unhandled message: " + packet);
                     }
                 } catch (Throwable t) {
                     Gdx.app.error("Server", "Error handling message: " + packet, t);
@@ -138,6 +138,7 @@ public class ServerMultiplayerModel extends GameModel {
 
         if (isFirst) {
             serverMultiplayerManager.doStartGame(this);
+            playScreen.showFreeTextMessage("Connecting...");
         }
     }
 
@@ -468,6 +469,7 @@ public class ServerMultiplayerModel extends GameModel {
                 return true;
             case "MSG":
                 handleMessage(payload);
+                return true;
         }
         return false;
     }

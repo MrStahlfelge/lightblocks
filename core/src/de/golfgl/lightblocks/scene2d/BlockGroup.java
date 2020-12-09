@@ -63,6 +63,12 @@ public class BlockGroup extends Group {
 
                 grid.addActor(ghostpiece[i]);
             }
+
+            // set a nice start position for multiplayer
+            ghostpiece[0].setPosition(calcHorizontalPos(5), calcVerticalPos(9));
+            ghostpiece[1].setPosition(calcHorizontalPos(4), calcVerticalPos(9));
+            ghostpiece[2].setPosition(calcHorizontalPos(4), calcVerticalPos(10));
+            ghostpiece[3].setPosition(calcHorizontalPos(4), calcVerticalPos(11));
         }
 
         addActor(grid);

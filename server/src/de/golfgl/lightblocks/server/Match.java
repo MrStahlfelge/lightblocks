@@ -123,7 +123,7 @@ public class Match {
 
     private void sendMessageToPlayer(String s, Player player) {
         if (player != null)
-            player.send("YMSG" + s);
+            player.sendMessageToPlayer(s);
     }
 
     private void processQueue(ServerMultiplayerModel gameModel, Queue<InGameMessage> queue) {
