@@ -127,18 +127,32 @@ public class Match {
     }
 
     private void processQueue(ServerMultiplayerModel gameModel, Queue<InGameMessage> queue) {
+        // ensure to make a single column move for movements that ended in same processing cycle
+        boolean rightMoveStartedBefore = false;
+        boolean leftMoveStartedBefore = false;
+
         while (!queue.isEmpty()) {
             InGameMessage igm = queue.removeFirst();
             switch (igm.message) {
                 case "SML":
                     gameModel.inputStartMoveHorizontal(null, true);
+                    leftMoveStartedBefore = true;
                     break;
                 case "SMR":
                     gameModel.inputStartMoveHorizontal(null, false);
+                    rightMoveStartedBefore = true;
                     break;
                 case "SMH":
                     gameModel.inputEndMoveHorizontal(null, true);
                     gameModel.inputEndMoveHorizontal(null, false);
+                    if (leftMoveStartedBefore) {
+                        leftMoveStartedBefore = false;
+                        gameModel.inputDoOneHorizontalMove(null, true);
+                    }
+                    if (rightMoveStartedBefore) {
+                        rightMoveStartedBefore = false;
+                        gameModel.inputDoOneHorizontalMove(null, false);
+                    }
                     break;
                 case "HAT":
                     gameModel.inputHoldActiveTetromino(null);
