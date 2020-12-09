@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.0.13'
         classpath 'org.gretty:gretty:3.0.2'
-        classpath 'com.android.tools.build:gradle:3.5.4'
+        classpath 'com.android.tools.build:gradle:4.0.2'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.12-SNAPSHOT'
         classpath 'com.google.gms:google-services:4.2.0' // google-services plugin
     }
