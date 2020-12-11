@@ -148,13 +148,18 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             serverInfoTable.add("Server: ").right();
             serverInfoTable.add(serverInfo.name); // TODO ellipsis
             serverInfoTable.row();
-            serverInfoTable.add("Version: ").right();
-            serverInfoTable.add(String.valueOf(serverInfo.version)).left();
-            serverInfoTable.row();
             serverInfoTable.add("Ping: ").right();
             pingCell = serverInfoTable.add("").left();
 
             add(serverInfoTable).expand();
+
+            if (serverInfo.description != null) {
+                Label description = new Label(serverInfo.description, app.skin, LightBlocksGame.SKIN_FONT_REG);
+                description.setWrap(true);
+                description.setAlignment(Align.center);
+                row().expand().padTop(20).padBottom(20);
+                add(description).colspan(2).fill();
+            }
 
             playButton = new PlayButton(app);
             row();

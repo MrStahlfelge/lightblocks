@@ -1,9 +1,14 @@
 package de.golfgl.lightblocks.server;
 
 import com.badlogic.gdx.Application;
+import com.badlogic.gdx.backends.headless.HeadlessPreferences;
+import com.badlogic.gdx.files.FileHandle;
+
+import java.io.File;
 
 import javax.annotation.Nullable;
 
+import de.golfgl.lightblocks.server.model.ServerInfo;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class ServerConfiguration {
@@ -57,8 +62,7 @@ public class ServerConfiguration {
 
     protected String findString(String name, @Nullable String defaultVal) {
         // first check for system property
-        String retVal = defaultVal;
-        retVal = System.getProperty(name, defaultVal);
+        String retVal = System.getProperty(name, defaultVal);
 
         // and check for command line argument, too
         for (String arg : args) {
@@ -68,5 +72,27 @@ public class ServerConfiguration {
         }
 
         return retVal;
+    }
+
+    public ServerInfo getServerInfo() {
+        FileHandle file = new FileHandle(new File( "server.xml"));
+
+        HeadlessPreferences prefs = new HeadlessPreferences(file);
+
+        ServerInfo serverInfo = new ServerInfo();
+        serverInfo.authRequired = false;
+        serverInfo.name = prefs.getString("name", "Lightblocks Server");
+        serverInfo.owner = prefs.getString("owner", "undefined");
+        serverInfo.description = prefs.getString("description", "No server description given.");
+        if (!file.exists()) {
+            System.out.println("You can set server information by editing server.xml file in the current working directory.");
+            prefs.putString("name", serverInfo.name);
+            prefs.putString("owner", "");
+            prefs.putString("description", "");
+            prefs.flush();
+        }
+        serverInfo.version = LightblocksServer.SERVER_VERSION;
+
+        return serverInfo;
     }
 }

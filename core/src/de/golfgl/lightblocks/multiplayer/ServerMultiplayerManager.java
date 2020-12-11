@@ -122,6 +122,7 @@ public class ServerMultiplayerManager {
         serverInfo.authRequired = jsonValue.getBoolean("authRequired");
         serverInfo.name = jsonValue.getString("name");
         serverInfo.owner = jsonValue.getString("owner", null);
+        serverInfo.description = jsonValue.getString("description", null);
         serverInfo.version = jsonValue.getInt("version");
 
         state = PlayState.LOBBY;

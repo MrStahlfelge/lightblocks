@@ -23,9 +23,11 @@ import javax.jmdns.ServiceInfo;
 import de.golfgl.lightblocks.server.model.ServerInfo;
 
 public class LightblocksServer extends WebSocketServer implements ApplicationListener {
+    public static final int SERVER_VERSION = 1; // reported to the clients, don't mess with it
+
     final ServerConfiguration serverConfig;
     final Serializer serializer = new Serializer();
-    private final ServerInfo serverInfo = new ServerInfo();
+    private final ServerInfo serverInfo;
     private final Match[] matches;
     private final Queue<Player> playerToConnectQueue = new Queue<>();
     private boolean running = true;
@@ -34,6 +36,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     public LightblocksServer(InetSocketAddress address, ServerConfiguration serverConfiguration) {
         super(address);
         this.serverConfig = serverConfiguration;
+        this.serverInfo = serverConfiguration.getServerInfo();
         this.matches = new Match[serverConfig.threadNum];
     }
 
@@ -111,11 +114,6 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         Gdx.app.setLogLevel(serverConfig.loglevel);
 
         matches[0] = new Match(this);
-
-        serverInfo.authRequired = false;
-        serverInfo.name = "Lightblocks Server";
-        serverInfo.owner = "me";
-        serverInfo.version = 1;
     }
 
     @Override
