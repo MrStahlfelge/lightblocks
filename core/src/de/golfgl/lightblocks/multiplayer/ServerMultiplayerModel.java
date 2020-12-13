@@ -165,11 +165,11 @@ public class ServerMultiplayerModel extends GameModel {
     void handleMatchInfo(String matchInfo) {
         JsonValue json = new JsonReader().parse(matchInfo);
 
-        this.parsePlayerInformation(json.get("player1"));
-        secondModel.parsePlayerInformation(json.get("player2"));
-
         isModern = json.getBoolean("isModern");
         secondModel.isModern = isModern;
+
+        this.parsePlayerInformation(json.get("player1"));
+        secondModel.parsePlayerInformation(json.get("player2"));
     }
 
     @Override
