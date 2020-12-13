@@ -12,10 +12,12 @@ import com.badlogic.gdx.controllers.ICadeController;
 import com.badlogic.gdx.controllers.IosControllerManager;
 import com.badlogic.gdx.pay.ios.apple.PurchaseManageriOSApple;
 
+import org.robovm.apple.foundation.Foundation;
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSString;
 import org.robovm.apple.foundation.NSURL;
+import org.robovm.apple.gamecontroller.GCKeyboard;
 import org.robovm.apple.uikit.UIActivityViewController;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
@@ -127,7 +129,9 @@ public class IOSLauncher extends MyAppDelegate {
                 UIViewController uiViewController = ((IOSApplication) Gdx.app).getUIViewController();
                 gpgsClient = new GameCenterMultiplayerClient(uiViewController);
                 IosControllerManager.initializeIosControllers();
-                IosControllerManager.enableICade(uiViewController, Selector.register("keyPress:"));
+                if (shouldEnableIcade()) {
+                    IosControllerManager.enableICade(uiViewController, Selector.register("keyPress:"));
+                }
                 super.create();
             }
         };
@@ -159,7 +163,7 @@ public class IOSLauncher extends MyAppDelegate {
                     @Override
                     public boolean onKey(UIKey key, boolean down) {
                         // suppress input keys used by iCade controllers
-                        if (key != null && key.getCharactersIgnoringModifiers() != null) {
+                        if (key != null && key.getCharactersIgnoringModifiers() != null && shouldEnableIcade()) {
                             String character = key.getCharactersIgnoringModifiers();
                             if (character.length() == 1 && ICadeController.KEYS_TO_HANDLE.contains(character.substring(0, 1).toLowerCase()))
                                 return false;
@@ -177,12 +181,18 @@ public class IOSLauncher extends MyAppDelegate {
                     public boolean isPeripheralAvailable(Peripheral peripheral) {
                         // pretend that the device has no vibrator to hide settings
                         if (peripheral == Peripheral.Vibrator) return false;
+                        if (peripheral == Peripheral.HardwareKeyboard && Foundation.getMajorSystemVersion() >= 14)
+                            return GCKeyboard.getCoalescedKeyboard() != null;
                         return super.isPeripheralAvailable(peripheral);
                     }
                 };
             }
         };
         return app;
+    }
+
+    protected boolean shouldEnableIcade() {
+        return Foundation.getMajorSystemVersion() < 14;
     }
 
     private static class IosShareHandler extends ShareHandler {
