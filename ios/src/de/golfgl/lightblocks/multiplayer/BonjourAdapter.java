@@ -144,7 +144,7 @@ public class BonjourAdapter implements INsdHelper {
                     synchronized (multiplayerServers) {
                         Gdx.app.debug(TAG, "Service resolved: " + nsNetService.getHostName());
                         multiplayerServers.put(nsNetService.getName(), new ServerAddress(nsNetService.getName(),
-                                nsNetService.getHostName() + ":" + nsNetService.getPort()));
+                                nsNetService.getHostName(), (int) nsNetService.getPort(), false));
                     }
                     nsNetService.release();
                 }

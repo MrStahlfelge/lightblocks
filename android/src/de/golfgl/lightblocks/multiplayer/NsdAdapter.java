@@ -70,7 +70,7 @@ public class NsdAdapter implements INsdHelper, NsdListener {
         }
         if (nsdService.getType().contains(LIGHTBLOCKS_TYPE_NAME)) {
             synchronized (multiplayerServers) {
-                multiplayerServers.put(nsdService.getName(), new ServerAddress(nsdService.getName(), nsdService.getHostName() + ":" + nsdService.getPort()));
+                multiplayerServers.put(nsdService.getName(), new ServerAddress(nsdService.getName(), nsdService.getHostName(), nsdService.getPort(), false));
             }
         }
 
