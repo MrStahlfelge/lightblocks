@@ -7,10 +7,10 @@ public class ServerAddress implements IRoomLocation {
     private final String address;
 
     public ServerAddress(String address) {
-        this(null, address);
+        this(null, address, 0, false);
     }
 
-    public ServerAddress(String name, String address) {
+    public ServerAddress(String name, String address, int port, boolean secure) {
         int dotSlashPos = address.indexOf("://");
 
         if (dotSlashPos > 0) {
@@ -19,7 +19,6 @@ public class ServerAddress implements IRoomLocation {
         } else {
             int colonPos = address.indexOf(':');
             String addressWithoutPort;
-            int port = 0;
             if (colonPos > 0) {
                 addressWithoutPort = address.substring(0, colonPos);
                 try {
@@ -29,7 +28,10 @@ public class ServerAddress implements IRoomLocation {
             } else {
                 addressWithoutPort = address;
             }
-            this.address = WebSockets.toWebSocketUrl(addressWithoutPort, port != 0 ? port : 8887);
+            if (secure)
+                this.address = WebSockets.toSecureWebSocketUrl(addressWithoutPort, port != 0 ? port : 443);
+            else
+                this.address = WebSockets.toWebSocketUrl(addressWithoutPort, port != 0 ? port : 80);
             this.name = name != null ? name : addressWithoutPort;
         }
     }

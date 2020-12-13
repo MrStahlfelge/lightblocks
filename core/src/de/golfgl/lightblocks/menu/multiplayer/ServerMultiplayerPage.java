@@ -142,8 +142,8 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
                 app.nsdHelper.getDiscoveredMultiplayerServers() : new ArrayList<ServerAddress>();
 
         // TODO only for testing at the moment
-        discoveredMultiplayerServers.add(new ServerAddress("Heroku (US)", "lightblocks-server.herokuapp.com:80"));
-        discoveredMultiplayerServers.add(new ServerAddress("Volume6 (DE)", "volume6.de:8080"));
+        discoveredMultiplayerServers.add(new ServerAddress("Heroku (US)", "lightblocks-server.herokuapp.com", 0, true));
+        discoveredMultiplayerServers.add(new ServerAddress("Volume6 (DE)", "volume6.de", 8080, false));
 
         for (ServerAddress discoveredMultiplayerServer : discoveredMultiplayerServers) {
             servers.add(discoveredMultiplayerServer);

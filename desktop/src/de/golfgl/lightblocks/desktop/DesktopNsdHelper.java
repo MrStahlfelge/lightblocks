@@ -130,7 +130,7 @@ public class DesktopNsdHelper implements INsdHelper {
             }
             if (info != null && info.getType().startsWith(LIGHTBLOCKS_TYPE_NAME)) {
                 synchronized (multiplayerServers) {
-                    multiplayerServers.put(info.getName(), new ServerAddress(info.getName(), info.getHostAddress() + ":" + info.getPort()));
+                    multiplayerServers.put(info.getName(), new ServerAddress(info.getName(), info.getHostAddress(), info.getPort(), false));
                 }
             }
         }
