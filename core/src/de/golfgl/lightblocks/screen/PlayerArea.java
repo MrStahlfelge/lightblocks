@@ -70,7 +70,6 @@ public class PlayerArea extends Group implements IGameModelListener {
     private ScoreLabel blocksLeft;
     private Label timeLabelDesc;
     private int currentShownTime;
-    private boolean isLandscapeArrangement;
     private int shownGarbageAmount;
     private float volumeFactor = 1f;
 
@@ -676,9 +675,8 @@ public class PlayerArea extends Group implements IGameModelListener {
         float offsetX;
         float offsetY = getNextPieceYPos();
 
-        if (isLandscapeArrangement)
-            offsetX = blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT + 1.5f) * BlockActor.blockWidth;
-        else
+        offsetX = blockGroup.getX() - (Tetromino.TETROMINO_BLOCKCOUNT + 1.5f) * BlockActor.blockWidth;
+        if (offsetX < scoreTable.getX() + scoreTable.getWidth())
             offsetX = getNextPieceXPos() - (Tetromino.TETROMINO_BLOCKCOUNT + .5f) * BlockActor.blockWidth;
 
         final BlockActor[] oldHoldTetro = new BlockActor[Tetromino.TETROMINO_BLOCKCOUNT];
@@ -909,8 +907,6 @@ public class PlayerArea extends Group implements IGameModelListener {
                 - MathUtils.clamp(xPosInArea / 2 - scoreTable.getPrefWidth() / 2,
                 scoreTable.getPrefHeight() / 2 + 5, scoreTable.getLinePrefHeight() * 2 + scoreTable.getPrefHeight() /
                         2));
-
-        isLandscapeArrangement = areaMaxWidth > getHeight();
     }
 
     public void switchedPause(boolean immediately, boolean isPaused) {
