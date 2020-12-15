@@ -17,6 +17,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.MultiplayerMenuScreen;
 import de.golfgl.lightblocks.multiplayer.IRoomLocation;
 import de.golfgl.lightblocks.multiplayer.ServerAddress;
+import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -26,7 +27,7 @@ import de.golfgl.lightblocks.scene2d.TouchableList;
 public class ServerMultiplayerPage extends Table implements MultiplayerMenuScreen.IMultiplayerModePage {
     private final TouchableList<ServerAddress> hostList;
     private final ControllerScrollPane hostListScrollPane;
-    private final RoundedTextButton enterManually;
+    private final FaTextButton enterManually;
     private final LightBlocksGame app;
     private TextButton joinRoomButton;
 
@@ -62,7 +63,8 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
             }
         };
         parent.addFocusableActor(hostList);
-        enterManually = new RoundedTextButton(app.TEXTS.get("multiplayerJoinManually"), app.skin);
+        enterManually = new FaTextButton(app.TEXTS.get("multiplayerJoinManually"), app.skin,
+                LightBlocksGame.SKIN_BUTTON_CHECKBOX);
         enterManually.getLabel().setFontScale(LightBlocksGame.LABEL_SCALING);
         parent.addFocusableActor(enterManually);
 
@@ -87,7 +89,8 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
             }
         });
 
-        RoundedTextButton detectLocalServersButton = new RoundedTextButton(app.TEXTS.get("multiplayerSearchLocal"), app.skin);
+        FaTextButton detectLocalServersButton = new FaTextButton(app.TEXTS.get("multiplayerSearchLocal"), app.skin,
+                LightBlocksGame.SKIN_BUTTON_CHECKBOX);
         detectLocalServersButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -113,12 +116,12 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
             }
         });
         serverButtons.row();
-        serverButtons.add(joinRoomButton);
-        serverButtons.row().padTop(10);
-        serverButtons.add(enterManually);
+        serverButtons.add(joinRoomButton).expandX();
+        serverButtons.add(enterManually).right().expandX();
         if (app.nsdHelper != null) {
             serverButtons.row();
-            serverButtons.add(detectLocalServersButton);
+            serverButtons.add();
+            serverButtons.add(detectLocalServersButton).right();
         }
         parent.addFocusableActor(joinRoomButton);
         parent.addFocusableActor(detectLocalServersButton);
@@ -131,21 +134,15 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
         add(hostListScrollPane).minWidth(LightBlocksGame.nativeGameWidth * .75f).minHeight(LightBlocksGame
                 .nativeGameHeight * .15f).pad(5).expand().fill();
         row();
-        add(serverButtons);
+        add(serverButtons).fill().padLeft(20).padRight(20).expandX();
 
-        fillHostList(null);
-
-        // TODO link How to add a server man page
+        fillHostList();
     }
 
-    private void fillHostList(ServerAddress extraServerAddress) {
+    private void fillHostList() {
         Array<ServerAddress> servers = new Array<>();
 
         List<ServerAddress> multiplayerServers = new ArrayList<>();
-
-        if (extraServerAddress != null) {
-            multiplayerServers.add(extraServerAddress);
-        }
 
         // TODO only for testing at the moment
         multiplayerServers.add(new ServerAddress("Heroku (US)", "lightblocks-server.herokuapp.com", 0, true));
