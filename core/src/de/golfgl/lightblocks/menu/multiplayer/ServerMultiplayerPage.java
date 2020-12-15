@@ -2,7 +2,6 @@ package de.golfgl.lightblocks.menu.multiplayer;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -30,7 +29,6 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
     private final RoundedTextButton enterManually;
     private final LightBlocksGame app;
     private TextButton joinRoomButton;
-    private float timeSinceRefresh;
 
     public ServerMultiplayerPage(final LightBlocksGame app, MultiplayerMenuScreen parent) {
         this.app = app;
@@ -77,7 +75,7 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
                     @Override
                     public void input(String text) {
                         ServerAddress newServer = new ServerAddress(text);
-                        roomSelect(newServer);
+                        connectToServer(newServer);
                         ((MyStage) getStage()).setFocusedActor(joinRoomButton);
                     }
 
@@ -89,6 +87,20 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
             }
         });
 
+        RoundedTextButton detectLocalServersButton = new RoundedTextButton(app.TEXTS.get("multiplayerSearchLocal"), app.skin);
+        detectLocalServersButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                new DetectLocalServersDialog(app) {
+
+                    @Override
+                    protected void joinRoom(ServerAddress lastSelectedRoom) {
+                        connectToServer(lastSelectedRoom);
+                    }
+                }.show(getStage());
+            }
+        });
+
         Table serverButtons = new Table();
         joinRoomButton = new RoundedTextButton(app.TEXTS.get("labelMultiplayerJoinRoom"),
                 app.skin);
@@ -97,14 +109,19 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
             public void changed(ChangeEvent event, Actor actor) {
                 IRoomLocation selected = hostList.getSelected();
                 if (selected != null)
-                    roomSelect(selected);
+                    connectToServer(selected);
             }
         });
         serverButtons.row();
         serverButtons.add(joinRoomButton);
-        serverButtons.row();
+        serverButtons.row().padTop(10);
         serverButtons.add(enterManually);
+        if (app.nsdHelper != null) {
+            serverButtons.row();
+            serverButtons.add(detectLocalServersButton);
+        }
         parent.addFocusableActor(joinRoomButton);
+        parent.addFocusableActor(detectLocalServersButton);
 
         add(new ScaledLabel(app.TEXTS.get("labelMultiplayerServer"), app.skin,
                 LightBlocksGame.SKIN_FONT_TITLE, .8f));
@@ -116,48 +133,32 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
         row();
         add(serverButtons);
 
-        fillHostList();
+        fillHostList(null);
 
         // TODO link How to add a server man page
     }
 
-    @Override
-    public void act(float delta) {
-        super.act(delta);
-
-        timeSinceRefresh = timeSinceRefresh + delta;
-
-        if (timeSinceRefresh > 1f) {
-            fillHostList();
-        }
-    }
-
-    private void fillHostList() {
+    private void fillHostList(ServerAddress extraServerAddress) {
         Array<ServerAddress> servers = new Array<>();
 
-        ServerAddress selected = hostList.getSelected();
-        int selectedIndex = hostList.getSelectedIndex();
+        List<ServerAddress> multiplayerServers = new ArrayList<>();
 
-        List<ServerAddress> discoveredMultiplayerServers = (app.nsdHelper != null) ?
-                app.nsdHelper.getDiscoveredMultiplayerServers() : new ArrayList<ServerAddress>();
+        if (extraServerAddress != null) {
+            multiplayerServers.add(extraServerAddress);
+        }
 
         // TODO only for testing at the moment
-        discoveredMultiplayerServers.add(new ServerAddress("Heroku (US)", "lightblocks-server.herokuapp.com", 0, true));
-        discoveredMultiplayerServers.add(new ServerAddress("Volume6 (DE)", "volume6.de", 8080, false));
+        multiplayerServers.add(new ServerAddress("Heroku (US)", "lightblocks-server.herokuapp.com", 0, true));
+        multiplayerServers.add(new ServerAddress("Heroku (EU)", "lightblocks-server-eu.herokuapp.com", 0, true));
+        multiplayerServers.add(new ServerAddress("Volume6 (DE)", "volume6.de", 8080, false));
 
-        for (ServerAddress discoveredMultiplayerServer : discoveredMultiplayerServers) {
+        for (ServerAddress discoveredMultiplayerServer : multiplayerServers) {
             servers.add(discoveredMultiplayerServer);
-            if (discoveredMultiplayerServer.equals(selected))
-                selectedIndex = servers.size - 1;
         }
         hostList.setItems(servers);
-        if (selectedIndex >= 0)
-            hostList.setSelectedIndex(selectedIndex);
-
-        timeSinceRefresh = 0;
     }
 
-    private void roomSelect(IRoomLocation address) {
+    private void connectToServer(IRoomLocation address) {
         new ServerLobbyScreen(app, address.getRoomAddress()).show(getStage());
     }
 
@@ -169,19 +170,5 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
     @Override
     public Actor getSecondMenuButton() {
         return null;
-    }
-
-    @Override
-    protected void setParent(Group parent) {
-        if (parent != getParent() && app.nsdHelper != null) {
-            // FIXME - stop is not fired at all because page is not removed
-            if (parent != null) {
-                app.nsdHelper.startDiscovery(false);
-            } else {
-                app.nsdHelper.stopDiscovery();
-            }
-        }
-
-        super.setParent(parent);
     }
 }
