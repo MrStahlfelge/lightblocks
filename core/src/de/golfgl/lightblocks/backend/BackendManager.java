@@ -20,6 +20,7 @@ import de.golfgl.lightblocks.model.ModernFreezeModel;
 import de.golfgl.lightblocks.model.PracticeModel;
 import de.golfgl.lightblocks.model.RetroMarathonModel;
 import de.golfgl.lightblocks.model.SprintModel;
+import de.golfgl.lightblocks.multiplayer.ServerAddress;
 import de.golfgl.lightblocks.state.LocalPrefs;
 
 /**
@@ -55,6 +56,7 @@ public class BackendManager {
     private MatchTurnRequestInfo playedTurnToUpload;
     private boolean uploadingPlayedTurn;
     private boolean fetchingFullMatchInfo;
+    private List<ServerAddress> serverAddressList;
 
     public BackendManager(LocalPrefs prefs) {
         backendClient = new BackendClient();
@@ -151,6 +153,10 @@ public class BackendManager {
 
     public BackendWelcomeResponse getLastWelcomeResponse() {
         return lastWelcomeResponse;
+    }
+
+    public List<ServerAddress> getMultiplayerServerAddressList() {
+        return serverAddressList;
     }
 
     public boolean hasLastWelcomeResponse() {
@@ -291,8 +297,8 @@ public class BackendManager {
                     new BackendClient.IBackendResponse<BackendWelcomeResponse>() {
                         @Override
                         public void onFail(int statusCode, String errorMsg) {
-                            // kann man nix machen
                             isFetchingWelcomes = false;
+                            fetchMultiplayerServerList();
                         }
 
                         @Override
@@ -304,9 +310,25 @@ public class BackendManager {
                             // actions required or news available
                             if (lastWelcomeResponse.competitionNewsAvailable)
                                 invalidateCachedMatches();
+
+                            fetchMultiplayerServerList();
                         }
                     });
         }
+    }
+
+    private void fetchMultiplayerServerList() {
+        backendClient.fetchMultiplayerServers(osString, new BackendClient.IBackendResponse<List<ServerAddress>>() {
+            @Override
+            public void onFail(int statusCode, String errorMsg) {
+                // do nothing
+            }
+
+            @Override
+            public void onSuccess(List<ServerAddress> retrievedData) {
+                serverAddressList = retrievedData;
+            }
+        });
     }
 
     /**

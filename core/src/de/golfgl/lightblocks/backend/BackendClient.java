@@ -15,6 +15,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import de.golfgl.lightblocks.multiplayer.ServerAddress;
+
 /**
  * Created by Benjamin Schulte on 12.09.2018.
  * <p>
@@ -185,6 +187,32 @@ public class BackendClient {
             }
         }).cancelled();
 
+    }
+
+    public void fetchMultiplayerServers(String platform, IBackendResponse<List<ServerAddress>> callback) {
+        Map<String, String> params = new HashMap<>();
+        params.put("platform", platform);
+
+        if (hasUserId()) {
+            params.put("userId", userId);
+        }
+
+        final Net.HttpRequest httpRequest = buildRequest("v1/listservers", params);
+        httpRequest.setMethod(Net.HttpMethods.GET);
+
+        Gdx.net.sendHttpRequest(httpRequest, new HttpResponseHandler<List<ServerAddress>>(callback) {
+            @Override
+            List<ServerAddress> parseJsonResponse(JsonValue json) {
+                List<ServerAddress> serverList = new ArrayList<>();
+                JsonValue list = json.get("serverList");
+
+                for (JsonValue serverAdress = list.child; serverAdress != null; serverAdress = serverAdress.next) {
+                    serverList.add(new ServerAddress(serverAdress.getString("name"), serverAdress.getString("address")));
+                }
+
+                return serverList;
+            }
+        });
     }
 
     public void postScore(BackendScore score, IBackendResponse<Void> callback) {

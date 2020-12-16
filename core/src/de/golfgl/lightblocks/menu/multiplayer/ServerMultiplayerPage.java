@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.golfgl.gdx.controllers.ControllerMenuStage;
@@ -142,16 +141,14 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
     private void fillHostList() {
         Array<ServerAddress> servers = new Array<>();
 
-        List<ServerAddress> multiplayerServers = new ArrayList<>();
+        List<ServerAddress> multiplayerServers = app.backendManager.getMultiplayerServerAddressList();
 
-        // TODO only for testing at the moment
-        multiplayerServers.add(new ServerAddress("Heroku (US)", "lightblocks-server.herokuapp.com", 0, true));
-        multiplayerServers.add(new ServerAddress("Heroku (EU)", "lightblocks-server-eu.herokuapp.com", 0, true));
-        multiplayerServers.add(new ServerAddress("Volume6 (DE)", "volume6.de", 8080, false));
-
-        for (ServerAddress discoveredMultiplayerServer : multiplayerServers) {
-            servers.add(discoveredMultiplayerServer);
+        if (multiplayerServers != null) {
+            for (ServerAddress discoveredMultiplayerServer : multiplayerServers) {
+                servers.add(discoveredMultiplayerServer);
+            }
         }
+
         hostList.setItems(servers);
     }
 

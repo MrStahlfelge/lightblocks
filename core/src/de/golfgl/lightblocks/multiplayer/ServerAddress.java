@@ -36,6 +36,11 @@ public class ServerAddress implements IRoomLocation {
         }
     }
 
+    public ServerAddress(String name, String adressUrl) {
+        this.name = name;
+        this.address = adressUrl;
+    }
+
     @Override
     public String getRoomName() {
         return name;
