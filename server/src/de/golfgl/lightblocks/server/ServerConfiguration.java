@@ -4,6 +4,9 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.backends.headless.HeadlessPreferences;
 import com.badlogic.gdx.files.FileHandle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 
 import javax.annotation.Nullable;
@@ -21,30 +24,53 @@ public class ServerConfiguration {
     public String name = "Lighblocks Server";
     public boolean enableNsd;
     public boolean resetEmptyRooms = true;
+    private final Logger logger;
 
     public ServerConfiguration(String[] arg) {
         this.args = arg;
+
+        int loglevel = findInt("verbosity", -1);
+        if (loglevel >= 0) {
+            this.loglevel = Math.min(loglevel, Application.LOG_DEBUG);
+            String sl4jLevel;
+            switch (loglevel) {
+                case 0:
+                    sl4jLevel = "off";
+                    break;
+                case 1:
+                    sl4jLevel = "error";
+                    break;
+                case 2:
+                    sl4jLevel = "info";
+                    break;
+                case 3:
+                    sl4jLevel = "debug";
+                    break;
+                default:
+                    sl4jLevel = "trace";
+                    break;
+            }
+            System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, sl4jLevel);
+        } else {
+            // logger not initialized
+            System.out.println("Set log verbosity with --verbosity={0,1,2,3,4}");
+        }
+
+        logger = LoggerFactory.getLogger(ServerConfiguration.class);
         int configPort = findInt("server.port", 0);
 
         if (configPort > 0) {
             port = configPort;
         } else {
-            System.out.println("No port configured, using default port " + port + ". Set a port with --server.port=xxxx");
+            logger.info("No port configured, using default port " + port + ". Set a port with --server.port=xxxx");
         }
 
         int threadNum = findInt("server.threads", 0);
         if (threadNum > 0) {
             this.threadNum = threadNum;
-            System.out.println("Using " + this.threadNum + " thread(s).");
+            logger.info("Using " + this.threadNum + " thread(s).");
         } else {
-            System.out.println("Using " + this.threadNum + " threads. Configure with --server.threads=xxxx");
-        }
-
-        int loglevel = findInt("verbosity", -1);
-        if (loglevel >= 0) {
-            this.loglevel = loglevel;
-        } else {
-            System.out.println("Set log verbosity with --verbosity={0,1,2,3}");
+            logger.info("Using " + this.threadNum + " threads. Configure with --server.threads=xxxx");
         }
 
         enableNsd = 0 != findInt("enableNsd", 1);
@@ -85,7 +111,7 @@ public class ServerConfiguration {
         serverInfo.owner = prefs.getString("owner", "undefined");
         serverInfo.description = prefs.getString("description", "No server description given.");
         if (!file.exists()) {
-            System.out.println("You can set server information by editing server.xml file in the current working directory.");
+            logger.info("You can set server information by editing server.xml file in the current working directory.");
             prefs.putString("name", serverInfo.name);
             prefs.putString("owner", "");
             prefs.putString("description", "");
