@@ -129,9 +129,9 @@ public class PlayKeyboardInput extends PlayScreenInput {
             return;
         }
 
-        AdvancedController controllerToVibrate;
+        Controller controllerToVibrate;
         if (fixedInput == null && playsWithController()) {
-            controllerToVibrate = (AdvancedController) lastControllerInUse;
+            controllerToVibrate = lastControllerInUse;
         } else if (fixedInput instanceof InputIdentifier.GameControllerInput) {
             controllerToVibrate = ((InputIdentifier.GameControllerInput) fixedInput).lastControllerRef;
         } else {
