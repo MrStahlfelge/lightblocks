@@ -131,7 +131,7 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
         add(serverHelp).fill().expandX().pad(10, 20, 10, 20);
         row();
         add(hostListScrollPane).minWidth(LightBlocksGame.nativeGameWidth * .75f).minHeight(LightBlocksGame
-                .nativeGameHeight * .15f).pad(5).expand().fill();
+                .nativeGameHeight * .15f).pad(5).expand().fillY();
         row();
         add(serverButtons).fill().padLeft(20).padRight(20).expandX();
 
