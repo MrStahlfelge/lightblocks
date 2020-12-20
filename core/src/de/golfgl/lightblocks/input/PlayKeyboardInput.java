@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.controllers.AdvancedController;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 
@@ -315,19 +314,18 @@ public class PlayKeyboardInput extends PlayScreenInput {
         }
 
         private InputIdentifier.GameControllerInput getInputId(Controller controller) {
-            AdvancedController advancedController = (AdvancedController) controller;
-            String controllerId = advancedController.getUniqueId();
+            String controllerId = controller.getUniqueId();
             // there are typically one or two inputs, so I hope this list is more leightweight and
             // as fast as using a HashMap. Prove me wrong.
             for (InputIdentifier.GameControllerInput inputIdentifier : inputIds) {
                 if (controllerId.equals(inputIdentifier.getGameControllerId())) {
-                    inputIdentifier.lastControllerRef = advancedController;
+                    inputIdentifier.lastControllerRef = controller;
                     return inputIdentifier;
                 }
             }
 
             // not found, add it
-            InputIdentifier.GameControllerInput inputIdentifier = new InputIdentifier.GameControllerInput(advancedController);
+            InputIdentifier.GameControllerInput inputIdentifier = new InputIdentifier.GameControllerInput(controller);
             inputIds.add(inputIdentifier);
 
             return inputIdentifier;

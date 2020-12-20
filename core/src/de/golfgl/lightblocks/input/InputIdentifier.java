@@ -1,6 +1,6 @@
 package de.golfgl.lightblocks.input;
 
-import com.badlogic.gdx.controllers.AdvancedController;
+import com.badlogic.gdx.controllers.Controller;
 
 /**
  * Class helping to identify a certain input for device two player game
@@ -10,9 +10,9 @@ public interface InputIdentifier {
 
     class GameControllerInput implements InputIdentifier {
         private final String gameControllerId;
-        public AdvancedController lastControllerRef;
+        public Controller lastControllerRef;
 
-        public GameControllerInput(AdvancedController controller) {
+        public GameControllerInput(Controller controller) {
             this.gameControllerId = controller.getUniqueId();
             this.lastControllerRef = controller;
         }
