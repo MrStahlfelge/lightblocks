@@ -140,6 +140,11 @@ public class WelcomeTextUtils {
                                           LightBlocksGame app, int listChangesSince) {
         boolean touchAvailable = PlayScreenInput.isInputTypeAvailable(PlayScreenInput.KEY_TOUCHSCREEN);
 
+        if (listChangesSince < 2010)
+            welcomes.add(new WelcomeButton.WelcomeText("We improved some internals regarding game controllers, " +
+                    "maybe you need to renew your custom button mappings.",
+                    new ShowSettingsRunnable(app)));
+
         if (listChangesSince < 2009)
             welcomes.add(new WelcomeButton.WelcomeText("New: On device split screen multiplayer mode.",
                     new ShowMultiPlayerPageRunnable(app, 0)));
