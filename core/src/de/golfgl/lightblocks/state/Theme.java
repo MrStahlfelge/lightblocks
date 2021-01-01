@@ -592,7 +592,7 @@ public class Theme {
         }
 
         TextureAtlas.AtlasRegion region = regions.first();
-        if (region.splits != null)
+        if (region.findValue("split") != null)
             return new NinePatchDrawable(themeAtlas.createPatch(name));
         else
             return new TextureRegionDrawable(region);

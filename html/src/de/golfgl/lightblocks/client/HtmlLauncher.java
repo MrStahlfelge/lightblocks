@@ -23,25 +23,9 @@ import de.golfgl.lightblocks.menu.backend.OnlyReplayScreen;
 
 public class HtmlLauncher extends GwtApplication {
 
-    // padding is to avoid scrolling in iframes, set to 20 if you have problems
-    private static final int PADDING = LightBlocksGame.GAME_DEVMODE ? 100 : 10;
-    private GwtApplicationConfiguration cfg;
-
     @Override
     public GwtApplicationConfiguration getConfig() {
-        int w = Window.getClientWidth() - PADDING;
-        int h = Window.getClientHeight() - PADDING;
-        cfg = new GwtApplicationConfiguration(w, h);
-
-        cfg.usePhysicalPixels = true;
-        double density = GwtGraphics.getNativeScreenDensity();
-        cfg.width = (int) (cfg.width * density);
-        cfg.height = (int) (cfg.height * density);
-
-        Window.enableScrolling(false);
-        Window.setMargin("0");
-        Window.addResizeHandler(new ResizeListener());
-        return cfg;
+        return new GwtApplicationConfiguration(true);
     }
 
     @Override
@@ -103,23 +87,6 @@ public class HtmlLauncher extends GwtApplication {
         meterPanelStyle.setProperty("boxShadow", "none");
         meterStyle.setProperty("backgroundColor", "#ffffff");
         meterStyle.setProperty("backgroundImage", "none");
-    }
-
-    class ResizeListener implements ResizeHandler {
-        @Override
-        public void onResize(ResizeEvent event) {
-            int width = event.getWidth() - PADDING;
-            int height = event.getHeight() - PADDING;
-            getRootPanel().setWidth("" + width + "px");
-            getRootPanel().setHeight("" + height + "px");
-            if (cfg.usePhysicalPixels) {
-                double density = GwtGraphics.getNativeScreenDensity();
-                width = (int) (width * density);
-                height = (int) (height * density);
-            }
-            getApplicationListener().resize(width, height);
-            Gdx.graphics.setWindowedMode(width, height);
-        }
     }
 
 }

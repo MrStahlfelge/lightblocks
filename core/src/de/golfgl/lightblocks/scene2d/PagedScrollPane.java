@@ -57,6 +57,7 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
         pages = new Array<T>();
         setActor(content);
         setScrollingDisabled(false, true);
+        setScrollbarsOnTop(true);
         setOverscroll(true, false);
         setFlingTime(.5f);
         removeMouseScrollListener();
