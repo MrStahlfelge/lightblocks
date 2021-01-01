@@ -255,13 +255,13 @@ public class SettingsScreen extends AbstractMenuDialog {
             gridIntensity.add(gridPreview);
             gridIntensity.add(gridIntensitySlider).minHeight(40).fill(false, true)
                     .width(.5f * LightBlocksGame.nativeGameWidth).left();
-            add(gridIntensity).padTop(20);
+            add(gridIntensity).padTop(12);
 
             row();
             add(showGhostpiece);
 
             row();
-            add(colorModeCheck).padTop(-10).padBottom(20);
+            add(colorModeCheck).padTop(-10).padBottom(12);
 
             if (app.canInstallTheme()) {
                 row();
@@ -388,7 +388,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             touchPanelTable.row();
             touchPanelTable.add(touchPanelSizeSlider).minHeight(40).fill();
 
-            gestureSettings.row().padTop(10);
+            gestureSettings.row().padTop(5);
             gestureSettings.add(touchPanelTable).top();
 
             Table swipeUp = new Table();
@@ -406,7 +406,7 @@ public class SettingsScreen extends AbstractMenuDialog {
             gestureSettings.row();
             gestureSettings.add(swipeUp);
 
-            gestureSettings.row().padTop(10);
+            gestureSettings.row().padTop(5);
             final Button hideHoldCheckbox = new FaCheckbox(app.TEXTS.get("menuHideHoldButton"), app.skin);
             hideHoldCheckbox.setChecked(!app.localPrefs.isShowTouchHoldButton());
             hideHoldCheckbox.addListener(new ChangeListener() {
@@ -426,7 +426,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                 }
             });
 
-            gestureSettings.row().padTop(-5);
+            gestureSettings.row().padTop(-10);
             gestureSettings.add(invertRotationCheckbox);
 
             Button osbHelp = new RoundedTextButton(app.TEXTS.get("buttonHowToPlay"), app.skin);
