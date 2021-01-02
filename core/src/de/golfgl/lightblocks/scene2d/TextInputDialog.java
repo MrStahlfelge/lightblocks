@@ -76,7 +76,7 @@ public class TextInputDialog extends ControllerMenuDialog {
     }
 
     public static void getTextInput(Input.TextInputListener textInputListener, String inputBoxTitle, String
-            defaultText, Skin skin, Stage stage) {
+            defaultText, Skin skin, Stage stage, Input.OnscreenKeyboardType type) {
         boolean useOwnDialog;
 
         switch (Gdx.app.getType()) {
@@ -91,7 +91,7 @@ public class TextInputDialog extends ControllerMenuDialog {
         if (useOwnDialog)
             new TextInputDialog(inputBoxTitle, defaultText, skin, textInputListener).show(stage);
         else
-            Gdx.input.getTextInput(textInputListener, inputBoxTitle, defaultText, "");
+            Gdx.input.getTextInput(textInputListener, inputBoxTitle, defaultText, "", type);
     }
 
     @Override

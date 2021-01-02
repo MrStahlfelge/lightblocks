@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -94,7 +95,8 @@ public class BackendNewMatchDialog extends ControllerMenuDialog {
         contentTable.row().padTop(10);
         nicknameEditable = new EditableLabel(new ScaledLabel("", app.skin, LightBlocksGame
                 .SKIN_EDIT_BIG),
-                new FaButton(FontAwesome.SETTING_PENCIL, app.skin), app.skin, "Nickname") {
+                new FaButton(FontAwesome.SETTING_PENCIL, app.skin), app.skin, "Nickname",
+                Input.OnscreenKeyboardType.Default) {
             @Override
             protected void onNewTextSet(String newText) {
                 searchForFriendNick(newText);

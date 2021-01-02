@@ -275,7 +275,7 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
                         public void canceled() {
 
                         }
-                    }, labelChangeNickname, playerDetails.nickName, app.skin, getStage());
+                    }, labelChangeNickname, playerDetails.nickName, app.skin, getStage(), Input.OnscreenKeyboardType.Default);
                 }
             });
 
@@ -328,7 +328,7 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
                         public void canceled() {
 
                         }
-                    }, labelSetRecoveryAddress, myEmailAddress, app.skin, getStage());
+                    }, labelSetRecoveryAddress, myEmailAddress, app.skin, getStage(), Input.OnscreenKeyboardType.Email);
                 }
             });
             emailaddress.getLabel().setFontScale(.55f);

@@ -23,13 +23,15 @@ public class EditableLabel extends Table implements ITouchActionButton, IControl
     private final Button editButton;
     private final Skin skin;
     private String inputBoxTitle;
+    private Input.OnscreenKeyboardType inputBoxType;
 
-    public EditableLabel(final Label label, Button editButton, Skin skin, String inputBoxTitle) {
+    public EditableLabel(final Label label, Button editButton, Skin skin, String inputBoxTitle, Input.OnscreenKeyboardType inputBoxType) {
         super();
         this.label = label;
         this.editButton = editButton;
         this.skin = skin;
         this.inputBoxTitle = inputBoxTitle;
+        this.inputBoxType = inputBoxType;
         add(label).fill().expandX();
         add(editButton);
 
@@ -59,7 +61,7 @@ public class EditableLabel extends Table implements ITouchActionButton, IControl
             public void canceled() {
                 onEditCancel();
             }
-        }, inputBoxTitle, label.getText().toString(), skin, getStage());
+        }, inputBoxTitle, label.getText().toString(), skin, getStage(), inputBoxType);
     }
 
     public Label getLabel() {

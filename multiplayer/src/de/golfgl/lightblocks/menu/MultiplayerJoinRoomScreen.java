@@ -186,7 +186,7 @@ public class MultiplayerJoinRoomScreen extends ControllerMenuDialog implements I
                     public void canceled() {
                         //nix
                     }
-                }, app.TEXTS.get("multiplayerJoinManually"), proposal, app.skin, getStage());
+                }, app.TEXTS.get("multiplayerJoinManually"), proposal, app.skin, getStage(), Input.OnscreenKeyboardType.Default);
             }
         });
 

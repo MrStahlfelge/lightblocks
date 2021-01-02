@@ -84,7 +84,7 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
                     public void canceled() {
                         // do nothing
                     }
-                }, app.TEXTS.get("multiplayerJoinManually"), "", app.skin, getStage());
+                }, app.TEXTS.get("multiplayerJoinManually"), "", app.skin, getStage(), Input.OnscreenKeyboardType.Default);
             }
         });
 

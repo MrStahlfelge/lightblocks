@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.net.HttpStatus;
@@ -219,7 +220,7 @@ public class ThemeSettingsDialog extends ControllerMenuDialog {
             ScaledLabel label = new ScaledLabel(Gdx.app.getClipboard().getContents(), app.skin, LightBlocksGame.SKIN_EDIT_BIG);
             FaButton editButton = new FaButton(FontAwesome.SETTING_PENCIL, app.skin);
             final EditableLabel nickNameEditTable = new EditableLabel(label, editButton, app.skin,
-                    "URL") {
+                    "URL", Input.OnscreenKeyboardType.Default) {
                 @Override
                 protected void onNewTextSet(String newText) {
                     super.onNewTextSet(newText);

@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.menu.backend;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -85,7 +86,7 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
         nickNameLabel.setEllipsis(true);
         FaButton editNicknameButton = new FaButton(FontAwesome.SETTING_PENCIL, app.skin);
         Table nickNameEditTable = new EditableLabel(nickNameLabel, editNicknameButton, app.skin,
-                createProfileNickNameLabel) {
+                createProfileNickNameLabel, Input.OnscreenKeyboardType.Default) {
             @Override
             protected void onNewTextSet(String newText) {
                 setNewNickname(newText);
@@ -198,7 +199,8 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
             row();
             nicknameEditable = new EditableLabel(new ScaledLabel("", app.skin, LightBlocksGame
                     .SKIN_EDIT_BIG),
-                    new FaButton(FontAwesome.SETTING_PENCIL, app.skin), app.skin, "Nickname");
+                    new FaButton(FontAwesome.SETTING_PENCIL, app.skin), app.skin, "Nickname",
+                    Input.OnscreenKeyboardType.Default);
             add(nicknameEditable);
             nicknameEditable.setWidth(EDITABLE_WIDTH);
             nicknameEditable.getLabel().setEllipsis(true);
@@ -209,7 +211,8 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
                     LightBlocksGame.SKIN_FONT_REG)).fill();
             row();
             mailEditable = new EditableLabel(new ScaledLabel("", app.skin, LightBlocksGame.SKIN_EDIT_BIG),
-                    new FaButton(FontAwesome.SETTING_PENCIL, app.skin), app.skin, "E-Mail");
+                    new FaButton(FontAwesome.SETTING_PENCIL, app.skin), app.skin, "E-Mail",
+                    Input.OnscreenKeyboardType.Email);
             add(mailEditable);
             mailEditable.setWidth(EDITABLE_WIDTH);
             mailEditable.getLabel().setEllipsis(true);
@@ -233,7 +236,8 @@ public class CreateNewAccountDialog extends ControllerMenuDialog {
             row();
             activationEditable = new EditableLabel(new ScaledLabel("", app.skin, LightBlocksGame
                     .SKIN_EDIT_BIG),
-                    new FaButton(FontAwesome.SETTING_PENCIL, app.skin), app.skin, "Activation code");
+                    new FaButton(FontAwesome.SETTING_PENCIL, app.skin), app.skin, "Activation code",
+                    Input.OnscreenKeyboardType.NumberPad);
             add(activationEditable);
             activationEditable.setWidth(EDITABLE_WIDTH);
             activationEditable.getLabel().setEllipsis(true);
