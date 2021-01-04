@@ -15,16 +15,22 @@ import de.golfgl.lightblocks.server.model.ServerInfo;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class ServerConfiguration {
+    public static final String KEY_XML_SERVER_NAME = "name";
+    public static final String KEY_XML_SERVER_OWNER = "owner";
+    public static final String KEY_XML_SERVER_DESC = "description";
+    public static final String KEY_XML_GAMEMODES = "gamemodes";
+
     private final String[] args;
+    private final Logger logger;
     public int threadNum = 10;
     public int port = 8887;
     public int loglevel = Application.LOG_INFO;
     public int beginningLevel = 0;
-    public int modeType = InitGameParameters.TYPE_MIX;
+    public int modeType;
     public String name = "Lighblocks Server";
     public boolean enableNsd;
     public boolean resetEmptyRooms = true;
-    private final Logger logger;
+    private ServerInfo serverInfo;
 
     public ServerConfiguration(String[] arg) {
         this.args = arg;
@@ -74,6 +80,8 @@ public class ServerConfiguration {
         }
 
         enableNsd = 0 != findInt("enableNsd", 1);
+
+        readXml();
     }
 
     protected int findInt(String name, int defaultVal) {
@@ -100,25 +108,32 @@ public class ServerConfiguration {
         return retVal;
     }
 
-    public ServerInfo getServerInfo() {
-        FileHandle file = new FileHandle(new File( "server.xml"));
-
+    private void readXml() {
+        FileHandle file = new FileHandle(new File("server.xml"));
+        boolean xmlExisted = file.exists();
         HeadlessPreferences prefs = new HeadlessPreferences(file);
 
-        ServerInfo serverInfo = new ServerInfo();
+        serverInfo = new ServerInfo();
         serverInfo.authRequired = false;
-        serverInfo.name = prefs.getString("name", "Lightblocks Server");
-        serverInfo.owner = prefs.getString("owner", "undefined");
-        serverInfo.description = prefs.getString("description", "No server description given.");
-        if (!file.exists()) {
-            logger.info("You can set server information by editing server.xml file in the current working directory.");
-            prefs.putString("name", serverInfo.name);
-            prefs.putString("owner", "");
-            prefs.putString("description", "");
-            prefs.flush();
-        }
+        serverInfo.name = prefs.getString(KEY_XML_SERVER_NAME, "Lightblocks Server");
+        serverInfo.owner = prefs.getString(KEY_XML_SERVER_OWNER, "undefined");
+        serverInfo.description = prefs.getString(KEY_XML_SERVER_DESC, "No server description given.");
         serverInfo.version = LightblocksServer.SERVER_VERSION;
 
+        modeType = prefs.getInteger(KEY_XML_GAMEMODES, InitGameParameters.TYPE_MIX);
+
+        if (!xmlExisted) {
+            logger.info("You can set server information by editing server.xml file in the current working directory.");
+            prefs.putString(KEY_XML_SERVER_NAME, serverInfo.name);
+            prefs.putString(KEY_XML_SERVER_OWNER, serverInfo.owner);
+            prefs.putString(KEY_XML_SERVER_DESC, serverInfo.description);
+            prefs.putInteger(KEY_XML_GAMEMODES, modeType);
+            prefs.flush();
+        }
+
+    }
+
+    public ServerInfo getServerInfo() {
         return serverInfo;
     }
 }
