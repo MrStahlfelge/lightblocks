@@ -60,7 +60,7 @@ public class LightBlocksGame extends Game implements IGameServiceListener, IPush
     public static final String SOURCECODE_URL = "https://github.com/MrStahlfelge/lightblocks/";
     public static final String CONTROLLER_RECOMMENDATION_URL = "https://www.golfgl.de/lightblocks/#controller";
     // An den gleichen Eintrag im AndroidManifest und robovm.properties denken!!!
-    public static final int GAME_VERSIONNUMBER = 2009;
+    public static final int GAME_VERSIONNUMBER = 2101;
     public static final String GAME_VERSIONSTRING = "1.5." + GAME_VERSIONNUMBER;
     // Abstand für Git
     // auch dran denken das data-Verzeichnis beim release wegzunehmen!
