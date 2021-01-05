@@ -15,6 +15,8 @@ import android.view.View;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.badlogic.gdx.backends.android.AndroidAudio;
+import com.badlogic.gdx.backends.android.AsynchronousAndroidAudio;
 import com.badlogic.gdx.controllers.android.AndroidControllers;
 
 import org.opensource.lightblocks.R;
@@ -158,6 +160,11 @@ abstract class GeneralAndroidLauncher extends AndroidApplication {
                 }
             });
 
+    }
+
+    @Override
+    public AndroidAudio createAudio(Context context, AndroidApplicationConfiguration config) {
+        return new AsynchronousAndroidAudio(context, config);
     }
 
     protected void initFlavor(LightBlocksGame game) {
