@@ -2,15 +2,13 @@ package de.golfgl.lightblocks.client;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.badlogic.gdx.backends.gwt.GwtGraphics;
 import com.badlogic.gdx.backends.gwt.preloader.Preloader;
 import com.github.czyzby.websocket.GwtWebSockets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Panel;
 
@@ -43,6 +41,23 @@ public class HtmlLauncher extends GwtApplication {
                     return true;
                 } else
                     return false;
+            }
+
+            @Override
+            public void create() {
+                Gdx.input.setCatchKey(Input.Keys.SPACE, true);
+                Gdx.input.setCatchKey(Input.Keys.CONTROL_LEFT , true);
+                Gdx.input.setCatchKey(Input.Keys.CONTROL_RIGHT , true);
+                Gdx.input.setCatchKey(Input.Keys.ALT_LEFT , true);
+                Gdx.input.setCatchKey(Input.Keys.ALT_RIGHT , true);
+                Gdx.input.setCatchKey(Input.Keys.ESCAPE , true);
+                Gdx.input.setCatchKey(Input.Keys.LEFT , true);
+                Gdx.input.setCatchKey(Input.Keys.RIGHT , true);
+                Gdx.input.setCatchKey(Input.Keys.UP , true);
+                Gdx.input.setCatchKey(Input.Keys.DOWN , true);
+                Gdx.input.setCatchKey(Input.Keys.F1 , true);
+                Gdx.input.setCatchKey(Input.Keys.F2 , true);
+                super.create();
             }
         };
 
