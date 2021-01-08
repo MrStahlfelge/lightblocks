@@ -90,4 +90,16 @@ public class MyStage extends ControllerMenuStage {
     public boolean isDefaultActionKeyCode(int keyCode) {
         return super.isDefaultActionKeyCode(keyCode) || keyCode == Input.Keys.SPACE || keyCode == Input.Keys.CONTROL_LEFT;
     }
+
+    @Override
+    public boolean isEscapeActionKeyCode(int keyCode) {
+        switch (keyCode) {
+            case Input.Keys.BACK:
+            case Input.Keys.BACKSPACE:
+            case Input.Keys.ESCAPE:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
