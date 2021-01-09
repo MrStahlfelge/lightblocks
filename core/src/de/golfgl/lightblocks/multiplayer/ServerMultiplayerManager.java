@@ -97,6 +97,9 @@ public class ServerMultiplayerManager {
         playerInfo.addChild("nickName", new JsonValue(app.player.getName()));
         if (app.backendManager.hasUserId()) {
             playerInfo.addChild("userId", new JsonValue(app.backendManager.ownUserId()));
+            if (serverInfo.authRequired) {
+                playerInfo.addChild("authToken", new JsonValue(app.backendManager.getToken()));
+            }
         }
 
         socket.send(ID_PLAYERINFO + playerInfo.toJson(JsonWriter.OutputType.json));

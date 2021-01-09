@@ -106,6 +106,11 @@ public class BackendManager {
         return authenticated;
     }
 
+    @Nullable
+    public String getToken() {
+        return lastWelcomeResponse != null ? lastWelcomeResponse.token : null;
+    }
+
     public String ownUserId() {
         return backendClient.getUserId();
     }

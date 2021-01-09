@@ -11,6 +11,7 @@ public class BackendWelcomeResponse {
     public final long timeDelta;
     public final boolean isBeta;
     public final boolean authenticated;
+    public final String token;
     public final String warningMsg;
     public final List<BackendMessage> messageList;
     public final boolean competitionActionRequired;
@@ -24,6 +25,7 @@ public class BackendWelcomeResponse {
         timeDelta = template.timeDelta;
         isBeta = template.isBeta;
         authenticated = template.authenticated;
+        token = template.token;
         warningMsg = template.warningMsg;
         messageList = template.messageList;
         this.competitionNewsAvailable = competitionNewsAvailable;
@@ -42,6 +44,7 @@ public class BackendWelcomeResponse {
         timeDelta = responseTime - TimeUtils.millis();
         isBeta = fromJson.getBoolean("yoursIsBeta");
         authenticated = fromJson.getBoolean("authenticated");
+        token = fromJson.getString("authToken", null);
         warningMsg = fromJson.getString("warningMsg", null);
         competitionActionRequired = fromJson.getBoolean("competitionActionRequired", false);
         competitionNewsAvailable = competitionActionRequired;
