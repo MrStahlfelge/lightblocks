@@ -29,7 +29,7 @@ public class Player {
 
         nickName = playerInfo.nickName;
         userId = playerInfo.userId;
-        token = playerInfo.token;
+        token = playerInfo.authToken;
 
         state = ConnectionState.WAITING;
         // this will call addPlayerToMatch eventually
