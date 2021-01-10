@@ -10,6 +10,7 @@ public class BackendWelcomeResponse {
     public final long responseTime;
     public final long timeDelta;
     public final boolean isBeta;
+    public final boolean serverMultiplayerUnlocked;
     public final boolean authenticated;
     public final String token;
     public final String warningMsg;
@@ -24,6 +25,7 @@ public class BackendWelcomeResponse {
         responseTime = template.responseTime;
         timeDelta = template.timeDelta;
         isBeta = template.isBeta;
+        serverMultiplayerUnlocked = template.serverMultiplayerUnlocked;
         authenticated = template.authenticated;
         token = template.token;
         warningMsg = template.warningMsg;
@@ -43,6 +45,7 @@ public class BackendWelcomeResponse {
         responseTime = fromJson.getLong("responseTime");
         timeDelta = responseTime - TimeUtils.millis();
         isBeta = fromJson.getBoolean("yoursIsBeta");
+        serverMultiplayerUnlocked = fromJson.getBoolean("serverMultiplayerUnlocked", false);
         authenticated = fromJson.getBoolean("authenticated");
         token = fromJson.getString("authToken", null);
         warningMsg = fromJson.getString("warningMsg", null);

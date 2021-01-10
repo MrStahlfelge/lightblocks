@@ -30,10 +30,10 @@ import de.golfgl.lightblocks.state.InitGameParameters;
  */
 
 public class MultiplayerMenuScreen extends AbstractMenuDialog {
-    protected Cell mainCell;
+    protected Cell<? extends Actor> mainCell;
     protected Button shareAppButton;
-    protected PagedScrollPane modePager;
-    protected PagedScrollPane.PageIndicator pageIndicator;
+    protected PagedScrollPane<Table> modePager;
+    protected PagedScrollPane<Table>.PageIndicator pageIndicator;
     private Cell<Button> shareButtonCell;
 
     public MultiplayerMenuScreen(LightBlocksGame app, Group actorToHide) {
@@ -76,7 +76,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
 
     @Override
     protected void fillMenuTable(Table menuTable) {
-        modePager = new PagedScrollPane(app.skin, LightBlocksGame.SKIN_STYLE_PAGER);
+        modePager = new PagedScrollPane<>(app.skin, LightBlocksGame.SKIN_STYLE_PAGER);
         modePager.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -90,7 +90,7 @@ public class MultiplayerMenuScreen extends AbstractMenuDialog {
         });
 
         modePager.addPage(new BackendMatchesMenuPage(app, this));
-        if (LightBlocksGame.GAME_DEVMODE)
+        if (LightBlocksGame.GAME_DEVMODE || app.backendManager.isServerMultiplayerUnlocked())
             modePager.addPage(new ServerMultiplayerPage(app, this));
         modePager.addPage(new LocalDeviceMultiplayerPage());
 

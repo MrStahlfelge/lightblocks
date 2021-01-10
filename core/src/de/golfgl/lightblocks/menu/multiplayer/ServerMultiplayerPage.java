@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.List;
@@ -35,6 +36,12 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
         Label serverHelp = new ScaledLabel(app.TEXTS.get("multiplayerServerHelp"), app.skin,
                 LightBlocksGame.SKIN_FONT_REG, .75f);
         serverHelp.setWrap(true);
+
+        Label betaFeature = new ScaledLabel(app.TEXTS.get("labelBetaFeature"), app.skin,
+                LightBlocksGame.SKIN_FONT_REG);
+        betaFeature.setWrap(true);
+        betaFeature.setAlignment(Align.center);
+        betaFeature.setColor(LightBlocksGame.EMPHASIZE_COLOR);
 
         hostList = new TouchableList<ServerAddress>(app.skin) {
             @Override
@@ -127,6 +134,8 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
 
         add(new ScaledLabel(app.TEXTS.get("labelMultiplayerServer"), app.skin,
                 LightBlocksGame.SKIN_FONT_TITLE, .8f));
+        row();
+        add(betaFeature).fill().expandX().padLeft(10).padRight(10);
         row();
         add(serverHelp).fill().expandX().pad(10, 20, 10, 20);
         row();

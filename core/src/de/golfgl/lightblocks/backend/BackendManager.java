@@ -111,6 +111,10 @@ public class BackendManager {
         return lastWelcomeResponse != null ? lastWelcomeResponse.token : null;
     }
 
+    public boolean isServerMultiplayerUnlocked() {
+        return lastWelcomeResponse != null && lastWelcomeResponse.serverMultiplayerUnlocked;
+    }
+
     public String ownUserId() {
         return backendClient.getUserId();
     }
