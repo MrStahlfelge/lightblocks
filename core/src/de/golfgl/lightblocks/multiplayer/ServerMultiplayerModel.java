@@ -505,11 +505,13 @@ public class ServerMultiplayerModel extends GameModel {
             return score;
         }
 
-        public int getLevel() {
+        @Override
+        public int getCurrentLevel() {
             return level;
         }
 
-        public int getLines() {
+        @Override
+        public int getClearedLines() {
             return lines;
         }
     }
