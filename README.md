@@ -59,6 +59,12 @@ make it more difficult for you. I didn't plan to open the source from the beginn
 write notes for myself in my native tongue.
 
 ## Server
-Deploy to Heroku or dokku with
+To set up a multiplayer server with a vserver, you can deploy to Heroku or dokku with
 
      git subtree push --prefix server remotename master
+
+For local play or other setups, you can build a jar file with
+
+     gradlew server:build
+
+OpenJDK8 for building and using recommended.

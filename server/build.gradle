@@ -46,7 +46,7 @@ task run(dependsOn: classes, type: JavaExec) {
 task stage(dependsOn: ['build', 'clean'])
 build.mustRunAfter clean
 jar {
-    archiveBaseName = "server"
+    archiveFileName.set("server.jar")
     manifest {
         attributes 'Main-Class': mainClassNameServer
     }

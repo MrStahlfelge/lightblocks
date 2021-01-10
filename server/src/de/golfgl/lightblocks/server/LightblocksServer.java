@@ -23,7 +23,7 @@ import javax.jmdns.ServiceInfo;
 import de.golfgl.lightblocks.server.model.ServerInfo;
 
 public class LightblocksServer extends WebSocketServer implements ApplicationListener {
-    public static final int SERVER_VERSION = 1; // reported to the clients, don't mess with it
+    public static final int SERVER_VERSION = 2102; // reported to the clients, don't mess with it
 
     final ServerConfiguration serverConfig;
     final Serializer serializer = new Serializer();
@@ -131,6 +131,8 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
                 Gdx.app.error("Server", "Could not register for service discovery.", e);
             }
         }
+
+        Gdx.app.log("Server", "Server version: " + SERVER_VERSION);
     }
 
     @Override
