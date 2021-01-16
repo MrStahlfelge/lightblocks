@@ -399,6 +399,11 @@ public class BackendClient {
                         errorMsg = "Connection problem";
                     }
 
+                    // TODO: Filter HTML
+                    if (errorMsg.length() > 200) {
+                        errorMsg = errorMsg.substring(0, 200);
+                    }
+
                     callback.onFail(statusCode, errorMsg);
                 }
             }
