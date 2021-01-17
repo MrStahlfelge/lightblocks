@@ -30,6 +30,7 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
     private final FaTextButton enterManually;
     private final LightBlocksGame app;
     private TextButton joinRoomButton;
+    private String lastManualAddress;
 
     public ServerMultiplayerPage(final LightBlocksGame app, MultiplayerMenuScreen parent) {
         this.app = app;
@@ -82,6 +83,7 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
                 TextInputDialog.getTextInput(new Input.TextInputListener() {
                     @Override
                     public void input(String text) {
+                        lastManualAddress = text;
                         ServerAddress newServer = new ServerAddress(text);
                         connectToServer(newServer);
                         ((MyStage) getStage()).setFocusedActor(joinRoomButton);
@@ -91,7 +93,8 @@ public class ServerMultiplayerPage extends Table implements MultiplayerMenuScree
                     public void canceled() {
                         // do nothing
                     }
-                }, app.TEXTS.get("multiplayerJoinManually"), "", app.skin, getStage(), Input.OnscreenKeyboardType.Default);
+                }, app.TEXTS.get("multiplayerJoinManually"), lastManualAddress != null ? lastManualAddress : "",
+                        app.skin, getStage(), Input.OnscreenKeyboardType.Default);
             }
         });
 
