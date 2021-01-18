@@ -68,9 +68,9 @@ public class Match {
             sendWaitMessageP2 = true;
         }
         if (sendWaitMessageP1)
-            sendGeneralMessageToPlayer(getWaitTimeMsg(player1WaitTime), player1);
+            sendGeneralMessageToPlayer(getWaitTimeMsg(player1WaitTime, player2), player1);
         if (sendWaitMessageP2)
-            sendGeneralMessageToPlayer(getWaitTimeMsg(player2WaitTime), player2);
+            sendGeneralMessageToPlayer(getWaitTimeMsg(player2WaitTime, player1), player2);
 
         boolean player1Disabled = player1 == null || player1WaitTime > 0;
         boolean player2Disabled = player2 == null || player2WaitTime > 0;
@@ -117,8 +117,9 @@ public class Match {
                 && (gameModel == null || !gameModel.isGameOver());
     }
 
-    protected String getWaitTimeMsg(float waitTime) {
-        return waitTime > 0 ? "Prepare " + Math.round(waitTime) + "" : "";
+    protected String getWaitTimeMsg(float waitTime, Player opponent) {
+        return waitTime > 0 ? "Prepare to play against " +
+                getPlayerNickname(opponent) + "\n" + Math.round(waitTime) + "" : "";
     }
 
     /**
@@ -252,8 +253,8 @@ public class Match {
         player1.score = new MatchInfo.ScoreInfo(gameModel.getScore());
         player2.score = new MatchInfo.ScoreInfo(gameModel.getSecondGameModel().getScore());
 
-        player1.nickname = this.player1 != null ? this.player1.nickName : "AI";
-        player2.nickname = this.player2 != null ? this.player2.nickName : "AI";
+        player1.nickname = getPlayerNickname(this.player1);
+        player2.nickname = getPlayerNickname(this.player2);
 
         player1.gameboard = gameModel.getSerializedGameboard();
         player2.gameboard = gameModel.getSecondGameModel().getSerializedGameboard();
@@ -271,6 +272,10 @@ public class Match {
             this.player1.send(server.serializer.serialize(matchInfo1));
         if (this.player2 != null)
             this.player2.send(server.serializer.serialize(matchInfo2));
+    }
+
+    protected String getPlayerNickname(Player p) {
+        return p != null ? p.nickName : "AI";
     }
 
     protected String serializeTetromino(Tetromino tetromino, boolean relative) {
