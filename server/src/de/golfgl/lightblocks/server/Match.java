@@ -62,6 +62,7 @@ public class Match {
 
         // update game model
         if (gameModel == null) {
+            server.serverStats.matchesStarted++;
             initGameModel();
             sendFullInformation();
             sendWaitMessageP1 = true;
@@ -96,6 +97,8 @@ public class Match {
         if (gameModel.isGameOver()) {
             boolean sendMessage;
             if (waitGameOver > 0) {
+                if (waitGameOver == WAIT_TIME_GAME_OVER)
+                    server.serverStats.matchesEnded++;
                 sendMessage = (MathUtils.floor(waitGameOver) != MathUtils.floor(waitGameOver - delta));
                 waitGameOver = waitGameOver - delta;
             } else {

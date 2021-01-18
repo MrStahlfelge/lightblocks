@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.server;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import org.java_websocket.WebSocket;
 
@@ -15,6 +16,7 @@ public class Player {
     public String token;
     public ConnectionState state = ConnectionState.CONNECTED;
     private Match match;
+    private long startedPlayingMs;
 
     public Player(LightblocksServer server, WebSocket conn) {
         this.server = server;
@@ -38,9 +40,12 @@ public class Player {
 
     void addPlayerToMatch(Match match) {
         if (match != null && this.match == null) {
-            Gdx.app.log("Player", "Successfully connected " + nickName + "/" + userId);
             this.match = match;
             state = ConnectionState.PLAYING;
+            server.serverStats.playerConnected();
+            startedPlayingMs = TimeUtils.millis();
+            Gdx.app.log("Player", "Successfully connected " + nickName + "/" + userId
+                    + " - " + server.serverStats.getPlayersCurrentlyConnected() + " connected overall");
             match.sendFullInformation();
         }
     }
@@ -53,6 +58,7 @@ public class Player {
         // dispose everything here
         if (match != null) {
             match.playerDisconnected(this);
+            server.serverStats.playerDisconnected((TimeUtils.millis() - startedPlayingMs) / 1000);
         }
     }
 

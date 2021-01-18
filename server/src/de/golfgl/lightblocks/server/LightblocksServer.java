@@ -27,6 +27,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
 
     final ServerConfiguration serverConfig;
     final Serializer serializer = new Serializer();
+    final ServerStats serverStats = new ServerStats();
     private final ServerInfo serverInfo;
     private final Match[] matches;
     private final Queue<Player> playerToConnectQueue = new Queue<>();
@@ -37,7 +38,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         super(address);
         this.serverConfig = serverConfiguration;
         this.serverInfo = serverConfiguration.getServerInfo();
-        this.matches = new Match[serverConfig.threadNum];
+        this.matches = new Match[serverConfig.threadNum - 1];
     }
 
     public static void main(String[] arg) {
@@ -70,7 +71,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         final long renderInterval = configRenderInterval > 0 ? (long) (configRenderInterval * 1000000000f) : (configRenderInterval < 0 ? -1 : 0);
         for (int i = 1; i < serverConfig.threadNum; i++) {
             final int threadNum = i;
-            matches[i] = new Match(this);
+            matches[i - 1] = new Match(this);
             new Thread("Render" + i) {
                 @Override
                 public void run() {
@@ -112,8 +113,6 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     @Override
     public void create() {
         Gdx.app.setLogLevel(serverConfig.loglevel);
-
-        matches[0] = new Match(this);
     }
 
     @Override
@@ -145,16 +144,21 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         // update game state here
         try {
             connectWaitingPlayers();
-            renderThread(0, Gdx.graphics.getDeltaTime());
+
+            serverStats.outputAndResetAfter(60 * 60 * 2);
         } catch (Throwable t) {
             Gdx.app.error("Server", "Uncaught error ", t);
         }
     }
 
     public void renderThread(int thread, float delta) {
-        // update corresponding game model
-        // Gdx.app.debug("Match" + thread, "update with delta " + delta);
-        matches[thread].update(delta);
+        try {
+            // update corresponding game model
+            // Gdx.app.debug("Match" + thread, "update with delta " + delta);
+            matches[thread - 1].update(delta);
+        } catch (Throwable t) {
+            Gdx.app.error("Server", "Uncaught error ", t);
+        }
     }
 
     public void findMatchForPlayer(Player player) {
@@ -172,10 +176,10 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
 
             Player first = playerToConnectQueue.first();
             boolean connected = false;
-            for (int i = 0; i < serverConfig.threadNum; i++) {
-                if (!connected && matches[i].connectPlayer(first)) {
+            for (int i = 1; i < serverConfig.threadNum; i++) {
+                if (!connected && matches[i - 1].connectPlayer(first)) {
                     Gdx.app.debug("Server", "Connected player to match " + i);
-                    first.addPlayerToMatch(matches[i]);
+                    first.addPlayerToMatch(matches[i - 1]);
                     connected = true;
                 }
             }

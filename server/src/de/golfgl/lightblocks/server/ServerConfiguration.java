@@ -73,7 +73,7 @@ public class ServerConfiguration {
 
         int threadNum = findInt("server.threads", 0);
         if (threadNum > 0) {
-            this.threadNum = threadNum;
+            this.threadNum = Math.max(2, threadNum);
             logger.info("Using " + this.threadNum + " thread(s).");
         } else {
             logger.info("Using " + this.threadNum + " threads. Configure with --server.threads=xxxx");
