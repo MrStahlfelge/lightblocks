@@ -68,9 +68,9 @@ public class Match {
             sendWaitMessageP2 = true;
         }
         if (sendWaitMessageP1)
-            sendMessageToPlayer(getWaitTimeMsg(player1WaitTime), player1);
+            sendGeneralMessageToPlayer(getWaitTimeMsg(player1WaitTime), player1);
         if (sendWaitMessageP2)
-            sendMessageToPlayer(getWaitTimeMsg(player2WaitTime), player2);
+            sendGeneralMessageToPlayer(getWaitTimeMsg(player2WaitTime), player2);
 
         boolean player1Disabled = player1 == null || player1WaitTime > 0;
         boolean player2Disabled = player2 == null || player2WaitTime > 0;
@@ -106,8 +106,8 @@ public class Match {
 
             if (sendMessage) {
                 String msg = "Stand by " + MathUtils.round(waitGameOver) + "";
-                sendMessageToPlayer(msg, player1);
-                sendMessageToPlayer(msg, player2);
+                sendGeneralMessageToPlayer(msg, player1);
+                sendGeneralMessageToPlayer(msg, player2);
             }
         }
     }
@@ -121,7 +121,11 @@ public class Match {
         return waitTime > 0 ? "Prepare " + Math.round(waitTime) + "" : "";
     }
 
-    private void sendMessageToPlayer(String s, Player player) {
+    /**
+     * Sends a general message to the player, presented in an overlay or dismisses it, if empty
+     * string is sent
+     */
+    private void sendGeneralMessageToPlayer(String s, Player player) {
         if (player != null)
             player.sendMessageToPlayer(s);
     }
