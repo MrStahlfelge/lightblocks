@@ -47,6 +47,7 @@ public class BackendManager {
     private BackendScore currentlySendingScore;
     private BackendWelcomeResponse lastWelcomeResponse;
     private boolean isFetchingWelcomes;
+    private boolean isFetchingMultiplayerServers;
     private long fetchWelcomesSinceTime;
     private long multiplayerMatchesLastFetchMs;
     private boolean isFetchingMultiplayerMatches;
@@ -165,6 +166,9 @@ public class BackendManager {
     }
 
     public List<ServerAddress> getMultiplayerServerAddressList() {
+        if (serverAddressList == null)
+            fetchMultiplayerServerList();
+
         return serverAddressList;
     }
 
@@ -307,7 +311,6 @@ public class BackendManager {
                         @Override
                         public void onFail(int statusCode, String errorMsg) {
                             isFetchingWelcomes = false;
-                            fetchMultiplayerServerList();
                         }
 
                         @Override
@@ -319,23 +322,26 @@ public class BackendManager {
                             // actions required or news available
                             if (lastWelcomeResponse.competitionNewsAvailable)
                                 invalidateCachedMatches();
-
-                            fetchMultiplayerServerList();
                         }
                     });
         }
     }
 
     private void fetchMultiplayerServerList() {
+        if (isFetchingMultiplayerServers)
+            return;
+
+        isFetchingMultiplayerServers = true;
         backendClient.fetchMultiplayerServers(osString, new BackendClient.IBackendResponse<List<ServerAddress>>() {
             @Override
             public void onFail(int statusCode, String errorMsg) {
-                // do nothing
+                isFetchingMultiplayerServers = false;
             }
 
             @Override
             public void onSuccess(List<ServerAddress> retrievedData) {
                 serverAddressList = retrievedData;
+                isFetchingMultiplayerServers = false;
             }
         });
     }
