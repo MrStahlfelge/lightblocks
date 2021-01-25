@@ -276,12 +276,12 @@ public abstract class GameModel implements Json.Serializable, AiAcessibleGameMod
 
         // Oder vielleicht x100 Tetrominos?
         final int drawnTetrominos = score.getDrawnTetrominos();
-        if (Math.floor(drawnTetrominos / 100) > Math.floor((drawnTetrominos - 1) / 100))
+        if (drawnTetrominos / 100 > (drawnTetrominos - 1) / 100)
             uiGameboard.showMotivation(IGameModelListener.MotivationTypes.hundredBlocksDropped, Integer.toString(
                     drawnTetrominos));
 
         // Alle 10 Tetros auch Ereignis an GPGS melden
-        if (Math.floor(drawnTetrominos / 10) > Math.floor((drawnTetrominos - 1) / 10))
+        if (drawnTetrominos / 10 > (drawnTetrominos - 1) / 10)
             submitEvent(GpgsHelper.EVENT_BLOCK_DROP, 10);
 
         // Highscores updaten

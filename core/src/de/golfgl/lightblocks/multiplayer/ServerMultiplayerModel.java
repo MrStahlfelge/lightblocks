@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Queue;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.input.PlayScreenInput;
 import de.golfgl.lightblocks.model.GameModel;
@@ -376,14 +377,31 @@ public class ServerMultiplayerModel extends GameModel {
         if (!gameOver) {
             uiGameboard.pinTetromino(ServerMultiplayerModel.this.activePiecePos);
             ServerMultiplayerModel.this.activePiecePos = null;
+            serverScore.incDrawnTetrominos();
+
+            if (isFirst) {
+                int drawnTetrominos = serverScore.getDrawnTetrominos();
+                totalScore.incDrawnTetrominos();
+                if (drawnTetrominos / 10 > (drawnTetrominos - 1) / 10)
+                    submitEvent(GpgsHelper.EVENT_BLOCK_DROP, 10);
+            }
         }
 
     }
 
     private void handleScore(final String payload) {
         if (!gameOver) {
-            serverScore.setScoreInformation(new JsonReader().parse(payload));
-            uiGameboard.updateScore(serverScore, 0);
+            int removedLinesBefore = serverScore.lines;
+            int gainedScore = serverScore.setScoreInformation(new JsonReader().parse(payload));
+            uiGameboard.updateScore(serverScore, gainedScore);
+
+            if (isFirst) {
+                int removedLines = Math.max(0, serverScore.lines - removedLinesBefore);
+                totalScore.addScore(gainedScore);
+                totalScore.addClearedLines(removedLines);
+                if (removedLines == 4)
+                    achievementFourLines();
+            }
         }
     }
 
@@ -493,11 +511,14 @@ public class ServerMultiplayerModel extends GameModel {
         int level;
         int lines;
 
-        public void setScoreInformation(JsonValue scoreJson) {
+        public int setScoreInformation(JsonValue scoreJson) {
             // {"score":0,"level":0,"lines":0}
-            score = scoreJson.getInt("score", 0);
+            int newScore = scoreJson.getInt("score", 0);
+            int gainedScore = Math.max(0, newScore - score);
+            score = newScore;
             level = scoreJson.getInt("level", 0);
             lines = scoreJson.getInt("lines", 0);
+            return gainedScore;
         }
 
         @Override
