@@ -17,6 +17,10 @@ import de.golfgl.lightblocks.server.model.InGameMessage;
 import de.golfgl.lightblocks.server.model.MatchInfo;
 import de.golfgl.lightblocks.state.InitGameParameters;
 
+/**
+ * Manages match between to players: Links game model and Player classes and manages state of the
+ * game model based on the connection states.
+ */
 public class Match {
     public static final float WAIT_TIME_GAME_OVER = 4f;
     public static final float WAIT_TIME_START_PLAYNG = 3f;
@@ -312,6 +316,7 @@ public class Match {
         private final boolean first;
         private int lastGarbageAmountReported = 0;
         private String lastSentScore;
+        private boolean hasWon = false;
 
         public Listener(boolean first) {
             this.first = first;
@@ -388,7 +393,7 @@ public class Match {
         @Override
         public void setGameOver() {
             if (hasPlayer()) {
-                sendPlayer("GOV");
+                sendPlayer("GOV-" + (hasWon ? "1" : "0"));
             }
         }
 
@@ -466,9 +471,11 @@ public class Match {
                     break;
                 case gameOver:
                     motivationMessage = "Game over";
+                    hasWon = false;
                     break;
                 case gameWon:
                     motivationMessage = "Won!";
+                    hasWon = true;
                     break;
                 case prepare:
                     motivationMessage = "Prepare to play!";

@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Queue;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.gpgs.GaHelper;
 import de.golfgl.lightblocks.gpgs.GpgsHelper;
 import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.input.PlayScreenInput;
@@ -246,8 +247,11 @@ public class ServerMultiplayerModel extends GameModel {
         ServerMultiplayerModel.this.activePiecePos = activePiecePos;
         uiGameboard.mergeFullInformation(gameboard, activePiecePos, activePieceType, nextPiecePos, nextPieceType,
                 holdPiecePos, holdPieceType, nickName);
+        if (gameOver && isFirst) {
+            GaHelper.startGameEvent(app, this, null);
+            playScreen.resumeMusicPlayback();
+        }
         gameOver = false;
-        playScreen.resumeMusicPlayback();
     }
 
     private int parsePieceString(String pieceString, Integer[][] boardBlockPositions) {
@@ -302,9 +306,13 @@ public class ServerMultiplayerModel extends GameModel {
         return retVal;
     }
 
-    private void handleGameOver() {
+    private void handleGameOver(String payload) {
         gameOver = true;
-        playScreen.setMusicGameOver();
+        if (isFirst) {
+            final String wonString = parseUntilNext(payload, 1, "-");
+            playScreen.setMusicGameOver();
+            GaHelper.endGameEvent(app.gameAnalytics, this, wonString.equals("1"));
+        }
     }
 
     private void handleNextTetro(String payload) {
@@ -461,7 +469,7 @@ public class ServerMultiplayerModel extends GameModel {
                 handleClearInsert(payload);
                 return true;
             case "GOV":
-                handleGameOver();
+                handleGameOver(payload);
                 return true;
             case "NXT":
                 handleNextTetro(payload);

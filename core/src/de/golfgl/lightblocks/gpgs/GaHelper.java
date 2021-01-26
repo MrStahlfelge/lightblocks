@@ -3,6 +3,8 @@ package de.golfgl.lightblocks.gpgs;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
+import javax.annotation.Nullable;
+
 import de.golfgl.gdxgameanalytics.GameAnalytics;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.model.GameModel;
@@ -17,11 +19,11 @@ public class GaHelper {
     public static final String GA_APP_KEY = "***REMOVED***";
     public static final String GA_SECRET_KEY = "***REMOVED***";
 
-    public static void startGameEvent(LightBlocksGame app, GameModel gameModel, PlayScreenInput inputAdapter) {
+    public static void startGameEvent(LightBlocksGame app, GameModel gameModel, @Nullable PlayScreenInput inputAdapter) {
         if (app.gameAnalytics != null) {
             app.gameAnalytics.submitProgressionEvent(GameAnalytics.ProgressionStatus.Start,
                     gameModel.getIdentifier(), "", "");
-            String analyticsKey = inputAdapter.getAnalyticsKey();
+            String analyticsKey = inputAdapter != null ? inputAdapter.getAnalyticsKey() : null;
             if (analyticsKey!= null) {
                 app.gameAnalytics.submitDesignEvent("inputType:" + analyticsKey);
             }

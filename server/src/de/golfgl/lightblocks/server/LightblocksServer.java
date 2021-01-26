@@ -25,6 +25,7 @@ import de.golfgl.lightblocks.server.model.ServerInfo;
 
 public class LightblocksServer extends WebSocketServer implements ApplicationListener {
     public static final int SERVER_VERSION = 2103; // reported to the clients, don't mess with it
+    public static final int STATS_AGGREGATION_TIME_HRS = 24;
 
     final ServerConfiguration serverConfig;
     final Serializer serializer = new Serializer();
@@ -146,7 +147,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         try {
             connectWaitingPlayers();
 
-            serverStats.outputAndResetAfter(60 * 60 * 2);
+            serverStats.outputAndResetAfter(60 * 60 * STATS_AGGREGATION_TIME_HRS);
         } catch (Throwable t) {
             Gdx.app.error("Server", "Uncaught error ", t);
         }
