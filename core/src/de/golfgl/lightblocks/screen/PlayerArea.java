@@ -258,6 +258,9 @@ public class PlayerArea extends Group implements IGameModelListener {
             int y = activePiecePos[i][1];
             insertNewBlock(x, y, activePieceType);
             blockMatrix[x][y].setEnlightened(true, true);
+            if (holdPiecePos == null) {
+                blockGroup.setGhostPiecePosition(i, x, y, 0);
+            }
         }
 
         showNextTetro(nextPiecePos, nextPieceType);
