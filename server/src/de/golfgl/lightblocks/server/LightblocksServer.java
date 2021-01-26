@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
+import com.badlogic.gdx.backends.headless.mock.graphics.MockGraphics;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -58,7 +59,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
             }
         };
 
-        server.startThreads(config.renderInterval);
+        server.startThreads();
 
         // this will block when successful, so don't do it inside create()
         server.run();
@@ -66,9 +67,9 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         Gdx.app.exit();
     }
 
-    private void startThreads(float configRenderInterval) {
+    private void startThreads() {
         // thread 1 was started by HeadlessApplication - start up the other threads
-        final long renderInterval = configRenderInterval > 0 ? (long) (configRenderInterval * 1000000000f) : (configRenderInterval < 0 ? -1 : 0);
+        final long renderInterval = ((MockGraphics) Gdx.graphics).getTargetRenderInterval();
         for (int i = 1; i < serverConfig.threadNum; i++) {
             final int threadNum = i;
             matches[i - 1] = new Match(this);

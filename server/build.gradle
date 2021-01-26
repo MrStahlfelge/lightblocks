@@ -12,7 +12,7 @@ repositories {
 }
 
 ext {
-    gdxVersionServer = '1.9.13'
+    gdxVersionServer = '1.9.14-SNAPSHOT'
     mainClassNameServer = "de.golfgl.lightblocks.server.LightblocksServer"
 }
 

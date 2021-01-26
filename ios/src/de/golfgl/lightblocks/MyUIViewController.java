@@ -2,6 +2,7 @@ package de.golfgl.lightblocks;
 
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSGraphics;
+import com.badlogic.gdx.backends.iosrobovm.IOSUIViewController;
 import com.badlogic.gdx.controllers.IosControllerManager;
 
 import org.robovm.apple.uikit.UIKeyCommand;
@@ -11,7 +12,7 @@ import org.robovm.objc.annotation.BindSelector;
 import org.robovm.objc.annotation.TypeEncoding;
 import org.robovm.rt.bro.annotation.Callback;
 
-public class MyUIViewController extends IOSGraphics.IOSUIViewController {
+public class MyUIViewController extends IOSUIViewController {
     protected MyUIViewController(IOSApplication app, IOSGraphics graphics) {
         super(app, graphics);
     }
