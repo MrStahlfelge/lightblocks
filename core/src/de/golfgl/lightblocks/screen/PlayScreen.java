@@ -421,7 +421,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
             app.theme.freezeBeginSound.play();
     }
 
-    public void endFreezeMode() {
+    public void resumeMusicPlayback() {
         music.play();
     }
 
@@ -448,16 +448,28 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
     }
 
     public void setGameOver() {
+        setGameOver(false);
+    }
+
+    public void setMusicGameOver() {
+        setGameOver(true);
+    }
+
+    private void setGameOver(boolean reuseScreen) {
         // might get called twice, avoid unnecessary operations
         if (isGameOver) {
             return;
         }
 
-        isGameOver = true;
-
         music.stop();
         if (app.localPrefs.isPlaySounds() && app.theme.gameOverSound != null)
             app.theme.gameOverSound.play();
+
+        if (reuseScreen)
+            return;
+
+        isGameOver = true;
+
         inputAdapter.setGameOver();
         saveGameState();
         app.savegame.gpgsSaveGameState(null);
@@ -539,6 +551,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
 
     /**
      * shows an overlay message. if changed, window disappears and reappears again
+     *
      * @param message message i18n key, or null to hide the window
      * @param params
      */

@@ -225,7 +225,7 @@ public class ModernFreezeModel extends GameModel {
             uiGameboard.showMotivation(IGameModelListener.MotivationTypes.endFreezeMode, String.valueOf(removedLineNum));
             clearAndInsertLines(removedLines, removedLineNum >= 8, null);
         }
-        playScreen.endFreezeMode();
+        playScreen.resumeMusicPlayback();
 
         setCurrentSpeed();
 

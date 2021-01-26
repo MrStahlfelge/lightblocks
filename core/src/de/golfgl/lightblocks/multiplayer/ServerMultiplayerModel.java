@@ -247,6 +247,7 @@ public class ServerMultiplayerModel extends GameModel {
         uiGameboard.mergeFullInformation(gameboard, activePiecePos, activePieceType, nextPiecePos, nextPieceType,
                 holdPiecePos, holdPieceType, nickName);
         gameOver = false;
+        playScreen.resumeMusicPlayback();
     }
 
     private int parsePieceString(String pieceString, Integer[][] boardBlockPositions) {
@@ -303,6 +304,7 @@ public class ServerMultiplayerModel extends GameModel {
 
     private void handleGameOver() {
         gameOver = true;
+        playScreen.setMusicGameOver();
     }
 
     private void handleNextTetro(String payload) {
@@ -379,7 +381,7 @@ public class ServerMultiplayerModel extends GameModel {
             ServerMultiplayerModel.this.activePiecePos = null;
             serverScore.incDrawnTetrominos();
 
-            if (isFirst) {
+            if (isFirst && !gameOver) {
                 int drawnTetrominos = serverScore.getDrawnTetrominos();
                 totalScore.incDrawnTetrominos();
                 if (drawnTetrominos / 10 > (drawnTetrominos - 1) / 10)
@@ -395,7 +397,7 @@ public class ServerMultiplayerModel extends GameModel {
             int gainedScore = serverScore.setScoreInformation(new JsonReader().parse(payload));
             uiGameboard.updateScore(serverScore, gainedScore);
 
-            if (isFirst) {
+            if (isFirst && !gameOver) {
                 int removedLines = Math.max(0, serverScore.lines - removedLinesBefore);
                 totalScore.addScore(gainedScore);
                 totalScore.addClearedLines(removedLines);
