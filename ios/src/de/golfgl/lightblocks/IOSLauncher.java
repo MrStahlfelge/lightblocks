@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
 import com.badlogic.gdx.backends.iosrobovm.IOSGraphics;
 import com.badlogic.gdx.backends.iosrobovm.IOSInput;
+import com.badlogic.gdx.backends.iosrobovm.IOSUIViewController;
 import com.badlogic.gdx.backends.iosrobovm.MyAppDelegate;
 import com.badlogic.gdx.controllers.ICadeController;
 import com.badlogic.gdx.controllers.IosControllerManager;
@@ -17,7 +18,6 @@ import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSString;
 import org.robovm.apple.foundation.NSURL;
-import org.robovm.apple.gamecontroller.GCKeyboard;
 import org.robovm.apple.uikit.UIActivityViewController;
 import org.robovm.apple.uikit.UIApplication;
 import org.robovm.apple.uikit.UIDevice;
@@ -152,7 +152,7 @@ public class IOSLauncher extends MyAppDelegate {
 
         IOSApplication app = new IOSApplication(game, config) {
             @Override
-            protected IOSGraphics.IOSUIViewController createUIViewController(IOSGraphics graphics) {
+            protected IOSUIViewController createUIViewController(IOSGraphics graphics) {
                 return new MyUIViewController(this, graphics);
             }
 
@@ -180,8 +180,6 @@ public class IOSLauncher extends MyAppDelegate {
                     public boolean isPeripheralAvailable(Peripheral peripheral) {
                         // pretend that the device has no vibrator to hide settings
                         if (peripheral == Peripheral.Vibrator) return false;
-                        if (peripheral == Peripheral.HardwareKeyboard && Foundation.getMajorSystemVersion() >= 14)
-                            return GCKeyboard.getCoalescedKeyboard() != null;
                         return super.isPeripheralAvailable(peripheral);
                     }
                 };
