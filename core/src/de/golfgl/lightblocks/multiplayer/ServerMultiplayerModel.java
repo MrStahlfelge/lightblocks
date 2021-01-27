@@ -22,6 +22,8 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 
 public class ServerMultiplayerModel extends GameModel {
     public static final String MODEL_ID = "serverMultiplayer";
+    public static final String MSG_ID_PIN_TETRO = "PIN";
+    public static final String MSG_ID_CLR_INS = "CLR";
     private final Queue<String> messageQueue = new Queue<>();
     private final ServerMultiplayerModel secondModel;
     private ServerMultiplayerManager serverMultiplayerManager;
@@ -32,6 +34,8 @@ public class ServerMultiplayerModel extends GameModel {
     private boolean isFirst;
     private boolean isModern;
     private boolean isClosed;
+    private Gameboard gameboard;
+    private boolean criticalFill;
 
     public ServerMultiplayerModel() {
         this(true);
@@ -164,6 +168,9 @@ public class ServerMultiplayerModel extends GameModel {
 
     }
 
+    /**
+     * MatchInfo is sent when new game starts or player connects or disconnects
+     */
     void handleMatchInfo(String matchInfo) {
         JsonValue json = new JsonReader().parse(matchInfo);
 
@@ -172,6 +179,8 @@ public class ServerMultiplayerModel extends GameModel {
 
         this.parsePlayerInformation(json.get("player1"));
         secondModel.parsePlayerInformation(json.get("player2"));
+        uiGameboard.setFillLevelNicknames("YOU", secondModel.nickName);
+        updateFillLevelAmounts();
     }
 
     @Override
@@ -243,6 +252,7 @@ public class ServerMultiplayerModel extends GameModel {
                     gameboard[y][x] = Gameboard.SQUARE_EMPTY;
             }
         }
+        this.gameboard = Gameboard.initFromArray(gameboard);
 
         ServerMultiplayerModel.this.activePiecePos = activePiecePos;
         uiGameboard.mergeFullInformation(gameboard, activePiecePos, activePieceType, nextPiecePos, nextPieceType,
@@ -291,7 +301,11 @@ public class ServerMultiplayerModel extends GameModel {
         }
 
         if (!gameOver) {
-            uiGameboard.clearAndInsertLines(linesToRemove, isSpecial, gapPos.toArray());
+            int[] garbageHolePosition = gapPos.toArray();
+            uiGameboard.clearAndInsertLines(linesToRemove, isSpecial, garbageHolePosition);
+            gameboard.clearLines(linesToRemove);
+            gameboard.insertLines(garbageHolePosition);
+            updateFillLevelAmounts();
         }
     }
 
@@ -386,8 +400,11 @@ public class ServerMultiplayerModel extends GameModel {
     private void handlePinTetro() {
         if (!gameOver) {
             uiGameboard.pinTetromino(ServerMultiplayerModel.this.activePiecePos);
+            gameboard.pinTetromino(activePiecePos, Gameboard.SQUARE_GARBAGE);
+
             ServerMultiplayerModel.this.activePiecePos = null;
             serverScore.incDrawnTetrominos();
+            updateFillLevelAmounts();
 
             if (isFirst && !gameOver) {
                 int drawnTetrominos = serverScore.getDrawnTetrominos();
@@ -451,10 +468,29 @@ public class ServerMultiplayerModel extends GameModel {
             String payload = packet.substring(4);
             if (!other) {
                 return processModelMessage(type, payload);
-            } else
-                return secondModel.processModelMessage(type, payload);
+            } else {
+                boolean handled = secondModel.processModelMessage(type, payload);
+                if (handled && (type.equals(MSG_ID_PIN_TETRO) || type.equals(MSG_ID_CLR_INS))) {
+                    updateFillLevelAmounts();
+                }
+                return handled;
+            }
         }
         return false;
+    }
+
+    private void updateFillLevelAmounts() {
+        if (isFirst) {
+            int myGbFill = gameboard.calcGameboardFill();
+            uiGameboard.setFillLevelAmounts(myGbFill, secondModel.gameboard.calcGameboardFill());
+
+            boolean gameboardCriticalFill = isGameboardCriticalFill(myGbFill);
+            if (criticalFill != gameboardCriticalFill) {
+                // only report changed values, Music can't handle multiple calls per frame
+                criticalFill = gameboardCriticalFill;
+                playScreen.setGameboardCriticalFill(gameboardCriticalFill);
+            }
+        }
     }
 
     private boolean processModelMessage(String type, String payload) {
@@ -465,7 +501,7 @@ public class ServerMultiplayerModel extends GameModel {
             case "ROT":
                 handleRotateTetro(payload);
                 return true;
-            case "CLR":
+            case MSG_ID_CLR_INS:
                 handleClearInsert(payload);
                 return true;
             case "GOV":
@@ -480,7 +516,7 @@ public class ServerMultiplayerModel extends GameModel {
             case "HLD":
                 handleSwapHoldAndActive(payload);
                 return true;
-            case "PIN":
+            case MSG_ID_PIN_TETRO:
                 handlePinTetro();
                 return true;
             case "SCO":

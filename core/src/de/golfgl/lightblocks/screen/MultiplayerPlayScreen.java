@@ -24,11 +24,12 @@ import de.golfgl.lightblocks.state.InitGameParameters;
 
 /**
  * PlayScreen for real time multiplayer games, to get this very special code out of PlayScreen.
- * Turn based battle mode does not use this.
+ * Turn based battle mode does not use this, and server multiplayer does not
  * <p>
  * Created by Benjamin Schulte on 01.03.2017.
  */
 
+@Deprecated
 public class MultiplayerPlayScreen extends PlayScreen implements IRoomListener {
 
     private HashMap<String, ScoreLabel> playerLabels;

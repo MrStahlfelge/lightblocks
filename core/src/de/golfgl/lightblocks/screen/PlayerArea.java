@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
@@ -53,17 +54,18 @@ public class PlayerArea extends Group implements IGameModelListener {
     private static final int NINE_PATCH_BORDER_SIZE = 5;
     protected final Image imGarbageIndicator;
     protected final BlockGroup blockGroup;
+    final Group labelGroup;
+    final PlayScreen.PlayScoreTable scoreTable;
+    final Label gameType;
     private final ParticleEffectActor weldEffect;
     private final Image imComboIndicator;
-    final Group labelGroup;
     private final BlockActor[][] blockMatrix;
     private final BlockActor[] nextTetro;
     private final BlockActor[] holdTetro;
     private final MotivationLabel motivatorLabel;
-    final PlayScreen.PlayScoreTable scoreTable;
-    final Label gameType;
     private final LightBlocksGame app;
     private final PlayScreen playScreen;
+    PlayerFillLevel fillLevelTable;
     GameModel gameModel;
     private ScaledLabel timeLabel;
     private boolean noLineClearAnimation;
@@ -226,6 +228,9 @@ public class PlayerArea extends Group implements IGameModelListener {
                     return gameModel.inputTimelabelTouched(new InputIdentifier.TouchscreenInput());
                 }
             });
+        } else if (gameModel.hasSecondGameboard() && gameModel.isSecondGameboardOptional()) {
+            fillLevelTable = new PlayerFillLevel(2);
+            addActor(fillLevelTable);
         }
         scoreTable.setLinesToClear(gameModel.getLinesToClear());
         scoreTable.validate();
@@ -244,10 +249,12 @@ public class PlayerArea extends Group implements IGameModelListener {
                                      int nextPieceType, Integer[][] holdPiecePos, int holdPieceType, String gameTypeLabel) {
         blockGroup.removeAllBlocks();
 
+        int blocksset = 0;
         for (int y = 0; y < Gameboard.GAMEBOARD_ALLROWS; y++) {
             for (int x = 0; x < Gameboard.GAMEBOARD_COLUMNS; x++) {
                 if (gameboard[y][x] != Gameboard.SQUARE_EMPTY) {
                     insertNewBlock(x, y, gameboard[y][x]);
+                    blocksset++;
                 }
             }
         }
@@ -258,7 +265,7 @@ public class PlayerArea extends Group implements IGameModelListener {
             int y = activePiecePos[i][1];
             insertNewBlock(x, y, activePieceType);
             blockMatrix[x][y].setEnlightened(true, true);
-            if (holdPiecePos == null) {
+            if (holdPiecePos == null && blocksset == 0) {
                 blockGroup.setGhostPiecePosition(i, x, y, 0);
             }
         }
@@ -740,6 +747,24 @@ public class PlayerArea extends Group implements IGameModelListener {
     }
 
     @Override
+    public void setFillLevelNicknames(String nickName, String nickOpponent) {
+        if (fillLevelTable != null) {
+            fillLevelTable.setPlayerName(0, nickName);
+            fillLevelTable.setPlayerName(1, nickOpponent);
+        }
+    }
+
+    @Override
+    public void setFillLevelAmounts(int gameboardFill, int opponentGameboardFill) {
+        if (fillLevelTable != null) {
+            fillLevelTable.setPlayerFill(0, gameboardFill * 100 /
+                    (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS));
+            fillLevelTable.setPlayerFill(1, opponentGameboardFill * 100 /
+                    (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS));
+        }
+    }
+
+    @Override
     public void pinTetromino(Integer[][] currentBlockPositions) {
         if (app.localPrefs.isPlaySounds() && app.theme.dropSound != null)
             app.theme.dropSound.play(volumeFactor);
@@ -910,6 +935,19 @@ public class PlayerArea extends Group implements IGameModelListener {
                 - MathUtils.clamp(xPosInArea / 2 - scoreTable.getPrefWidth() / 2,
                 scoreTable.getPrefHeight() / 2 + 5, scoreTable.getLinePrefHeight() * 2 + scoreTable.getPrefHeight() /
                         2));
+
+        if (fillLevelTable != null) {
+            fillLevelTable.pack();
+            fillLevelTable.setPosition(scoreTable.getX() - scoreTable.getPrefWidth() / 2 + scoreTable.firstColWidth,
+                    scoreTable.getY() - scoreTable.getPrefHeight() / 2 - fillLevelTable.getPrefHeight(),
+                    Align.bottomLeft);
+        }
+    }
+
+    public void setFillLevelsVisible(boolean visible) {
+        if (fillLevelTable != null) {
+            fillLevelTable.setVisible(visible);
+        }
     }
 
     public void switchedPause(boolean immediately, boolean isPaused) {
@@ -929,5 +967,51 @@ public class PlayerArea extends Group implements IGameModelListener {
 
     public void setSoundVolumeFactor(float volumeFactor) {
         this.volumeFactor = volumeFactor;
+    }
+
+    private class PlayerFillLevel extends Table {
+        Label[] playerName;
+        ScoreLabel[] playerFill;
+
+        public PlayerFillLevel(int playerNum) {
+            align(Align.bottomLeft);
+            playerName = new Label[playerNum];
+            playerFill = new ScoreLabel[playerNum];
+
+            for (int i = 0; i < playerNum; i++) {
+                ScaledLabel playerNameLabel = new ScaledLabel("", app.skin);
+                app.theme.setScoreColor(playerNameLabel);
+                add(playerNameLabel).top().padTop(2);
+                ScoreLabel lblFilling = new ScoreLabel(2, 100, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+                app.theme.setScoreColor(lblFilling);
+                lblFilling.setExceedChar('X');
+                add(lblFilling);
+                playerName[i] = playerNameLabel;
+                playerFill[i] = lblFilling;
+                ScaledLabel playerFillingPercent = new ScaledLabel("%", app.skin);
+                app.theme.setScoreColor(playerFillingPercent);
+                add(playerFillingPercent).padRight(10).bottom().padBottom(4);
+            }
+        }
+
+        public void setPlayerName(int i, String name) {
+            playerName[i].setText(name.length() > 15 ? name.substring(0, 15) : name);
+        }
+
+        public void setPlayerFill(int i, int fill) {
+            ScoreLabel lblPlayerFill = playerFill[i];
+
+            if (lblPlayerFill != null) {
+                boolean notInitialized = (lblPlayerFill.getScore() == 100);
+                lblPlayerFill.setScore(fill);
+
+                if (notInitialized) {
+                    lblPlayerFill.setEmphasizeTreshold(15, app.theme.emphasizeColor);
+                    lblPlayerFill.setCountingSpeed(30);
+                    lblPlayerFill.setMaxCountingTime(.3f);
+                }
+            }
+
+        }
     }
 }

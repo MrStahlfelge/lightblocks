@@ -633,6 +633,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         if (gameModel.hasSecondGameboard()) {
             secondPlayer.setPosition(maxWidthPerGameboard + playerArea.getX(), playerArea.getY());
             secondPlayer.setScoreTablePosition(gameboardAlignment, maxWidthPerGameboard);
+            playerArea.setFillLevelsVisible(secondPlayer.getX() + LightBlocksGame.nativeGameWidth * .6f > stage.getWidth());
         }
 
         pauseButton.getLabel().setFontScale(MathUtils.clamp((float) width / height, 1f, 2f));
@@ -681,6 +682,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         private ScoreLabel scoreNum;
         private ScoreLabel levelNum;
         private ScoreLabel linesNum;
+        final public float firstColWidth;
 
         public PlayScoreTable(LightBlocksGame app) {
             this.app = app;
@@ -703,6 +705,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
             Label scoreLabel = new ScaledLabel(app.TEXTS.get("labelScore").toUpperCase(), app.skin);
             app.theme.setScoreColor(scoreLabel);
             add(scoreLabel).right().bottom().padBottom(-2).spaceRight(3);
+            firstColWidth = 3 + scoreLabel.getPrefWidth();
             scoreNum = new ScoreLabel(8, 0, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
             app.theme.setScoreColor(scoreNum);
             scoreNum.setCountingSpeed(2000);

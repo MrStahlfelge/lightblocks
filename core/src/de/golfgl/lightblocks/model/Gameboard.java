@@ -137,7 +137,12 @@ public class Gameboard implements Json.Serializable {
             int y = (int) activeTetromino.getPosition().y + (int) coord.y;
             gameboardSquare[y][x] = activeTetromino.getTetrominoType();
         }
+    }
 
+    public void pinTetromino(Integer[][] activePiecePos, int type) {
+        for (Integer[] activePiecePo : activePiecePos) {
+            gameboardSquare[activePiecePo[1]][activePiecePo[0]] = type;
+        }
     }
 
     public void clearLines(IntArray linesToRemove) {
@@ -226,6 +231,16 @@ public class Gameboard implements Json.Serializable {
                 gameboardSquare[y][x] = gameboard[y * GAMEBOARD_COLUMNS + x];
             }
         }
+    }
+
+    public static Gameboard initFromArray(int[][] gameboardArray) {
+        Gameboard gameboard = new Gameboard();
+        for (int y = 0; y < GAMEBOARD_ALLROWS; y++) {
+            for (int x = 0; x < GAMEBOARD_COLUMNS; x++) {
+                gameboard.gameboardSquare[y][x] = gameboardArray[y][x];
+            }
+        }
+        return gameboard;
     }
 
     /**

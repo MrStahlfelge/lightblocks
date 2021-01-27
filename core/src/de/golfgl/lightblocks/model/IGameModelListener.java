@@ -4,8 +4,6 @@ import com.badlogic.gdx.utils.IntArray;
 
 import javax.annotation.Nullable;
 
-import de.golfgl.lightblocks.multiplayer.MultiPlayerObjects;
-
 /**
  * Created by Benjamin Schulte on 23.01.2017.
  */
@@ -58,6 +56,10 @@ public interface IGameModelListener {
     void mergeFullInformation(int[][] gameboard, Integer[][] activePiecePos, int activePieceType,
                               Integer[][] nextPiecePos, int nextPieceType, Integer[][] holdPiecePos,
                               int holdPieceType, String gameTypeLabel);
+
+    void setFillLevelNicknames(String nickName, String nickOpponent);
+
+    void setFillLevelAmounts(int gameboardFill, int opponentGameboardFill);
 
     enum MotivationTypes {
         newLevel, tSpin, doubleSpecial, tenLinesCleared, hundredBlocksDropped, dropSpeedLevel,
