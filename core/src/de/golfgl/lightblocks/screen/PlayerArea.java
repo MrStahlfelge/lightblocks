@@ -750,7 +750,12 @@ public class PlayerArea extends Group implements IGameModelListener {
     public void setFillLevelNicknames(String nickName, String nickOpponent) {
         if (fillLevelTable != null) {
             fillLevelTable.setPlayerName(0, nickName);
-            fillLevelTable.setPlayerName(1, nickOpponent);
+            boolean opponentChanged = fillLevelTable.setPlayerName(1, nickOpponent);
+            // not the perfect place to play the sound here for opponent change, but we have all
+            // information available here so why shouldn't we :-)
+            if (opponentChanged && app.localPrefs.isPlaySounds() && app.theme.freezeBeginSound != null) {
+                app.theme.freezeBeginSound.play(volumeFactor);
+            }
         }
     }
 
@@ -994,8 +999,19 @@ public class PlayerArea extends Group implements IGameModelListener {
             }
         }
 
-        public void setPlayerName(int i, String name) {
-            playerName[i].setText(name.length() > 15 ? name.substring(0, 15) : name);
+        public boolean setPlayerName(int i, String name) {
+            boolean changed = false;
+            String newName = name.length() > 15 ? name.substring(0, 15) : name;
+            if (!playerName[i].textEquals(name)) {
+                if (!playerName[i].hasActions() && !playerName[i].textEquals("")) {
+                    Color colorNow = new Color(playerName[i].getColor());
+                    playerName[i].setColor(app.theme.emphasizeColor);
+                    playerName[i].addAction(Actions.color(colorNow, 1f));
+                    changed = true;
+                }
+                playerName[i].setText(newName);
+            }
+            return changed;
         }
 
         public void setPlayerFill(int i, int fill) {
