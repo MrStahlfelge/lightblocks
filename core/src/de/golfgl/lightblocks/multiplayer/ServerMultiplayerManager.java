@@ -26,6 +26,8 @@ public class ServerMultiplayerManager {
     private JsonReader jsonReader = new JsonReader();
     private ServerModels.ServerInfo serverInfo;
     private ServerMultiplayerModel gameModel;
+    private long lastQueueProcessedMs;
+    private long lastMessageSendMs;
 
     public ServerMultiplayerManager(LightBlocksGame app) {
         this.app = app;
@@ -86,7 +88,8 @@ public class ServerMultiplayerManager {
         if (isConnected()) {
             pingMs = -1;
             startTimePing = TimeUtils.millis();
-            socket.sendKeepAlivePacket();
+            socket.send("PING");
+            lastMessageSendMs = startTimePing;
         }
     }
 
@@ -103,7 +106,18 @@ public class ServerMultiplayerManager {
         }
 
         socket.send(ID_PLAYERINFO + playerInfo.toJson(JsonWriter.OutputType.json));
+        lastMessageSendMs = TimeUtils.millis();
         state = PlayState.IN_GAME;
+        processedQueue();
+    }
+
+    public void processedQueue() {
+        long timeNow = TimeUtils.millis();
+        lastQueueProcessedMs = timeNow;
+        if (socket != null && (timeNow - lastMessageSendMs) > 1500L) {
+            socket.sendKeepAlivePacket();
+            lastMessageSendMs = timeNow;
+        }
     }
 
     public void doStopGame() {
@@ -139,6 +153,7 @@ public class ServerMultiplayerManager {
     public void doSendGameMessage(String message) {
         if (state == PlayState.IN_GAME) {
             socket.send("IGM" + message);
+            lastMessageSendMs = TimeUtils.millis();
         }
     }
 

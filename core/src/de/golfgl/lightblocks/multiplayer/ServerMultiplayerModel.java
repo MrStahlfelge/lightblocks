@@ -100,6 +100,7 @@ public class ServerMultiplayerModel extends GameModel {
                     Gdx.app.error("Server", "Error handling message: " + packet, t);
                 }
             }
+            serverMultiplayerManager.processedQueue();
         }
 
         if (!isClosed && !serverMultiplayerManager.isConnected()) {

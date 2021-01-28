@@ -6,9 +6,14 @@ import com.badlogic.gdx.utils.TimeUtils;
 import org.java_websocket.WebSocket;
 
 import de.golfgl.lightblocks.server.model.InGameMessage;
+import de.golfgl.lightblocks.server.model.KeepAliveMessage;
 import de.golfgl.lightblocks.server.model.PlayerInfo;
 
 public class Player {
+    public static final int SECONDS_TIMEOUT = 5;
+    public static final int SECONDS_INACTIVITY = 25;
+    public static final int SECONDS_INACTIVITY_WARNING = 10;
+    public static final String GAME_TIMEOUT_WARNING = "Continue playing or you will be disconnected...";
     private final LightblocksServer server;
     private final WebSocket conn;
     public String nickName;
@@ -17,6 +22,9 @@ public class Player {
     public ConnectionState state = ConnectionState.CONNECTED;
     private Match match;
     private long startedPlayingMs;
+    private long lastMessageReceived;
+    private long lastGameMessageReceived;
+    private String lastMessageToPlayer;
 
     public Player(LightblocksServer server, WebSocket conn) {
         this.server = server;
@@ -44,6 +52,8 @@ public class Player {
             state = ConnectionState.PLAYING;
             server.serverStats.playerConnected();
             startedPlayingMs = TimeUtils.millis();
+            lastMessageReceived = startedPlayingMs;
+            lastGameMessageReceived = startedPlayingMs;
             Gdx.app.log("Player", "Successfully connected " + nickName + "/" + userId
                     + " - " + server.serverStats.getPlayersCurrentlyConnected() + " connected overall");
             match.sendFullInformation();
@@ -63,6 +73,7 @@ public class Player {
     }
 
     public void onMessage(Object object) throws UnexpectedException {
+        lastMessageReceived = System.currentTimeMillis();
         if (object instanceof PlayerInfo && state == ConnectionState.CONNECTED) {
             doConnect((PlayerInfo) object);
 
@@ -71,8 +82,12 @@ public class Player {
                 conn.close(4101, "Could not add you to a match");
             }
         } else if (object instanceof InGameMessage && state == ConnectionState.PLAYING) {
+            lastGameMessageReceived = System.currentTimeMillis();
+            if (GAME_TIMEOUT_WARNING.equals(lastMessageToPlayer)) {
+                sendMessageToPlayer("");
+            }
             match.gotMessage(this, (InGameMessage) object);
-        } else
+        } else if (!(object instanceof KeepAliveMessage))
             throw new UnexpectedException();
     }
 
@@ -82,9 +97,30 @@ public class Player {
     }
 
     public void sendMessageToPlayer(String s) {
-        if (state != ConnectionState.DISCONNECTED) {
+        if (state != ConnectionState.DISCONNECTED && !s.equals(lastMessageToPlayer)) {
+            lastMessageToPlayer = s;
             send("YMSG" + s);
         }
+    }
+
+    public boolean checkTimeOuts() {
+        long time = System.currentTimeMillis();
+
+        if (time - lastGameMessageReceived > (SECONDS_INACTIVITY - SECONDS_INACTIVITY_WARNING) * 1000L) {
+            sendMessageToPlayer(GAME_TIMEOUT_WARNING);
+        }
+
+        if (time - lastMessageReceived > SECONDS_TIMEOUT * 1000L) {
+            Gdx.app.log("Player", "Timeout: " + (time - lastMessageReceived) + "/" + (time - lastGameMessageReceived));
+            conn.close(4102, "Timeout");
+        }
+
+        if (time - lastGameMessageReceived > SECONDS_INACTIVITY * 1000L) {
+            Gdx.app.log("Player", "Inactive: " + (time - lastMessageReceived) + "/" + (time - lastGameMessageReceived));
+            conn.close(4102, "Inactivity");
+        }
+
+        return false;
     }
 
     enum ConnectionState {CONNECTED, WAITING, PLAYING, DISCONNECTED}

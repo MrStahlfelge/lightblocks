@@ -117,6 +117,20 @@ public class Match {
                 sendGeneralMessageToPlayer(msg, player2);
             }
         }
+
+        checkPlayerActivity(player1);
+        checkPlayerActivity(player2);
+    }
+
+    /**
+     * checks if a player is active or should be disconnected
+     */
+    private void checkPlayerActivity(Player player) {
+        if (player == null)
+            return;
+
+        // check technical activity
+        if (player.checkTimeOuts());
     }
 
     protected boolean shouldShowWaitMessage(float delta, float waitTime) {

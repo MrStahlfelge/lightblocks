@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.golfgl.lightblocks.server.model.InGameMessage;
+import de.golfgl.lightblocks.server.model.KeepAliveMessage;
 import de.golfgl.lightblocks.server.model.MatchInfo;
 import de.golfgl.lightblocks.server.model.PlayerInfo;
 import de.golfgl.lightblocks.server.model.ServerInfo;
@@ -36,6 +37,8 @@ public class Serializer {
                 }
             } else if (message.startsWith(ID_IN_GAME_MSG)) {
                 return new InGameMessage(message.substring(ID_IN_GAME_MSG.length()));
+            } else if (message.isEmpty()) {
+                return new KeepAliveMessage();
             }
         } catch (Throwable t) {
             Gdx.app.error("Serializer", "Error deserializing message", t);
