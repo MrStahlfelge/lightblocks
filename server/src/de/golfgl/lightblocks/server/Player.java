@@ -10,10 +10,10 @@ import de.golfgl.lightblocks.server.model.KeepAliveMessage;
 import de.golfgl.lightblocks.server.model.PlayerInfo;
 
 public class Player {
-    public static final int SECONDS_TIMEOUT = 5;
-    public static final int SECONDS_INACTIVITY = 25;
-    public static final int SECONDS_INACTIVITY_WARNING = 10;
-    public static final String GAME_TIMEOUT_WARNING = "Continue playing or you will be disconnected...";
+    private static final int SECONDS_TIMEOUT = 5;
+    private static final int SECONDS_INACTIVITY = 25;
+    private static final int SECONDS_INACTIVITY_WARNING = 10;
+    private static final String GAME_TIMEOUT_WARNING = "Continue playing or you will be disconnected...";
     private final LightblocksServer server;
     private final WebSocket conn;
     public String nickName;
@@ -111,12 +111,12 @@ public class Player {
         }
 
         if (time - lastMessageReceived > SECONDS_TIMEOUT * 1000L) {
-            Gdx.app.log("Player", "Timeout: " + (time - lastMessageReceived) + "/" + (time - lastGameMessageReceived));
+            Gdx.app.log("Player", "Timeout: " + (time - lastMessageReceived));
             conn.close(4102, "Timeout");
         }
 
         if (time - lastGameMessageReceived > SECONDS_INACTIVITY * 1000L) {
-            Gdx.app.log("Player", "Inactive: " + (time - lastMessageReceived) + "/" + (time - lastGameMessageReceived));
+            Gdx.app.log("Player", "Inactive: " + (time - lastGameMessageReceived));
             conn.close(4102, "Inactivity");
         }
 

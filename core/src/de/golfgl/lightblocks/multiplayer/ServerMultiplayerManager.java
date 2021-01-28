@@ -16,6 +16,7 @@ public class ServerMultiplayerManager {
     public static final String ID_SERVERINFO = "HSH";
     public static final String ID_PLAYERINFO = "PIN";
     public static final String ID_MATCHINFO = "MCH";
+    private static final long SECONDS_TIMEOUT = 3000L;
     private final LightBlocksGame app;
 
     private WebSocket socket;
@@ -194,6 +195,12 @@ public class ServerMultiplayerManager {
                     return true;
                 } else if (gameModel != null) {
                     gameModel.queueMessage(packet);
+
+                    if (TimeUtils.timeSinceMillis(lastQueueProcessedMs) > SECONDS_TIMEOUT) {
+                        socket.close(WebSocketCloseCode.AWAY, "Timeout");
+                        gameModel.clearMessageQueue();
+                    }
+
                     return true;
                 }
                 Gdx.app.error("Server", "Unhandled message message: " + packet);

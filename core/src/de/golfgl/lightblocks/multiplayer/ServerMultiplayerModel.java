@@ -145,6 +145,7 @@ public class ServerMultiplayerModel extends GameModel {
 
         if (isFirst) {
             serverMultiplayerManager.doStartGame(this);
+            playScreen.setShowScoresWhenGameOver(false);
             playScreen.showFreeTextMessage("Connecting...");
         }
     }
@@ -454,6 +455,12 @@ public class ServerMultiplayerModel extends GameModel {
     public void queueMessage(String packet) {
         synchronized (messageQueue) {
             messageQueue.addLast(packet);
+        }
+    }
+
+    public void clearMessageQueue() {
+        synchronized (messageQueue) {
+            messageQueue.clear();
         }
     }
 
