@@ -36,6 +36,8 @@ public class ServerMultiplayerModel extends GameModel {
     private boolean isClosed;
     private Gameboard gameboard;
     private boolean criticalFill;
+    private boolean achTurnaroundSent;
+    private boolean filledOver85Perc;
 
     public ServerMultiplayerModel() {
         this(true);
@@ -497,6 +499,18 @@ public class ServerMultiplayerModel extends GameModel {
                 // only report changed values, Music can't handle multiple calls per frame
                 criticalFill = gameboardCriticalFill;
                 playScreen.setGameboardCriticalFill(gameboardCriticalFill);
+            }
+
+            if (!achTurnaroundSent) {
+                if (!filledOver85Perc && myGbFill * 100 /
+                        (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS) >= 80)
+                    filledOver85Perc = true;
+
+                if (filledOver85Perc && myGbFill * 100 /
+                        (Gameboard.GAMEBOARD_COLUMNS * Gameboard.GAMEBOARD_NORMALROWS) <= 15) {
+                    gpgsUpdateAchievement(GpgsHelper.ACH_COMPLETE_TURNAROUND);
+                    achTurnaroundSent = true;
+                }
             }
         }
     }
