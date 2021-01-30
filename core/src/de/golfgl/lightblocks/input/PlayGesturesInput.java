@@ -411,6 +411,8 @@ public class PlayGesturesInput extends PlayScreenInput {
     public int getRequestedGameboardAlignment() {
         if (isUsingOnScreenButtons() && gamepadOnScreenControls != null)
             return Align.top;
+        else if (isUsingOnScreenButtons())
+            return Align.center;
 
         return super.getRequestedGameboardAlignment();
     }

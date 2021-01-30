@@ -2,7 +2,6 @@ package de.golfgl.lightblocks.scene2d;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 /**
@@ -12,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 public class ParticleEffectActor extends Actor {
     private final boolean resetOnStart;
     ParticleEffect particleEffect;
-    Vector2 acc = new Vector2();
+    float lastDelta;
 
     boolean isComplete;
 
@@ -24,6 +23,11 @@ public class ParticleEffectActor extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        particleEffect.setPosition(getX() + getWidth() / 2, getY() + getHeight() / 2);
+        if (lastDelta > 0) {
+            particleEffect.update(lastDelta);
+            lastDelta = 0;
+        }
         if (!isComplete) {
             particleEffect.draw(batch);
             isComplete = particleEffect.isComplete();
@@ -33,18 +37,20 @@ public class ParticleEffectActor extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
-        acc.set(getWidth() / 2, getHeight() / 2);
-        localToStageCoordinates(acc);
-        particleEffect.setPosition(acc.x, acc.y);
-        particleEffect.update(delta);
+        lastDelta = delta;
     }
-
 
     public void start() {
         isComplete = false;
         if (resetOnStart)
             particleEffect.reset();
         particleEffect.start();
+    }
+
+    @Override
+    protected void scaleChanged() {
+        super.scaleChanged();
+        particleEffect.scaleEffect(getScaleX(), getScaleY(), getScaleY());
     }
 
     public void cancel() {

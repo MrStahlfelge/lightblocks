@@ -26,6 +26,7 @@ import de.golfgl.lightblocks.state.MultiplayerMatch;
  * Created by Benjamin Schulte on 08.02.2017.
  */
 
+@Deprecated
 public class MultiplayerModel extends GameModel {
 
     public static final String MODEL_ID = "multiplayer";

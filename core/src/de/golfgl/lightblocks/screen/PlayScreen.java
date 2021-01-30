@@ -614,13 +614,16 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
                 backgroundImage.setScaling(Scaling.none);
         }
 
-        float maxWidthPerGameboard = Math.max(gameModel.hasSecondGameboard() ? stage.getWidth() / 2 : stage.getWidth(),
+        int gameboardAlignment = inputAdapter != null ? inputAdapter.getRequestedGameboardAlignment() : 0;
+        boolean showTwoFullGameboards = gameModel.hasSecondGameboard() &&
+                (gameboardAlignment == 0 || !gameModel.isSecondGameboardOptional());
+
+        float maxWidthPerGameboard = Math.max(showTwoFullGameboards ? stage.getWidth() / 2 : stage.getWidth(),
                 LightBlocksGame.nativeGameWidth);
 
         playerArea.setPosition((maxWidthPerGameboard - LightBlocksGame.nativeGameWidth) / 2,
                 (stage.getHeight() - LightBlocksGame.nativeGameHeight) / 2);
 
-        int gameboardAlignment = inputAdapter != null ? inputAdapter.getRequestedGameboardAlignment() : Align.center;
 
         playerArea.setScoreTablePosition(gameboardAlignment, maxWidthPerGameboard);
 
@@ -631,8 +634,22 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
         }
 
         if (gameModel.hasSecondGameboard()) {
-            secondPlayer.setPosition(maxWidthPerGameboard + playerArea.getX(), playerArea.getY());
-            secondPlayer.setScoreTablePosition(gameboardAlignment, maxWidthPerGameboard);
+            if (showTwoFullGameboards || stage.getWidth() < LightBlocksGame.nativeGameWidth * 2) {
+                // if we show two full game boards, or there is no space to show a tiny second gameboard,
+                // we show the second game board at the right of the first one's max space
+                secondPlayer.setPosition(maxWidthPerGameboard + playerArea.getX(), playerArea.getY());
+                secondPlayer.setScoreTablePosition(gameboardAlignment, maxWidthPerGameboard);
+                secondPlayer.scoreTable.setVisible(true);
+                secondPlayer.setTransform(false);
+                secondPlayer.setScale(1f);
+            } else {
+                // we show a tiny second game board
+                secondPlayer.setTransform(true);
+                secondPlayer.setScale(.5f);
+                secondPlayer.setX(playerArea.getX() + LightBlocksGame.nativeGameWidth);
+                secondPlayer.setY((stage.getHeight() - LightBlocksGame.nativeGameHeight * .3f) / 2);
+                secondPlayer.scoreTable.setVisible(false);
+            }
             playerArea.setFillLevelsVisible(secondPlayer.getX() + LightBlocksGame.nativeGameWidth * .6f > stage.getWidth());
         }
 
@@ -678,11 +695,11 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
     }
 
     public static class PlayScoreTable extends Table {
+        final public float firstColWidth;
         private final LightBlocksGame app;
         private ScoreLabel scoreNum;
         private ScoreLabel levelNum;
         private ScoreLabel linesNum;
-        final public float firstColWidth;
 
         public PlayScoreTable(LightBlocksGame app) {
             this.app = app;

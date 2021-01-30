@@ -166,8 +166,11 @@ public abstract class PlayScreenInput extends InputAdapter {
         return null;
     }
 
+    /**
+     * @return preferred gameboard alignment for this input, or 0 if no alignment preferred
+     */
     public int getRequestedGameboardAlignment() {
-        return Align.center;
+        return 0;
     }
 
     /**
