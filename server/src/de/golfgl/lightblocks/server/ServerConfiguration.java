@@ -30,6 +30,8 @@ public class ServerConfiguration {
     public String name = "Lighblocks Server";
     public boolean enableNsd;
     public boolean resetEmptyRooms = true;
+    public int secondsInactivity = 25;
+    public int secondsTimeout = 5;
     private ServerInfo serverInfo;
 
     public ServerConfiguration(String[] arg) {
@@ -121,6 +123,8 @@ public class ServerConfiguration {
         serverInfo.version = LightblocksServer.SERVER_VERSION;
 
         modeType = prefs.getInteger(KEY_XML_GAMEMODES, InitGameParameters.TYPE_MIX);
+        secondsTimeout = Math.max(secondsTimeout, prefs.getInteger("disconnectTimeoutSeconds", secondsTimeout));
+        secondsInactivity = Math.max(secondsInactivity, prefs.getInteger("disconnectInactivitySeconds", secondsInactivity));
 
         if (!xmlExisted) {
             logger.info("You can set server information by editing server.xml file in the current working directory.");
