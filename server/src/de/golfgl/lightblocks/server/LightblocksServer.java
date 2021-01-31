@@ -24,7 +24,7 @@ import javax.jmdns.ServiceInfo;
 import de.golfgl.lightblocks.server.model.ServerInfo;
 
 public class LightblocksServer extends WebSocketServer implements ApplicationListener {
-    public static final int SERVER_VERSION = 2103; // reported to the clients, don't mess with it
+    public static final int SERVER_VERSION = 2104; // reported to the clients, don't mess with it
     public static final int STATS_AGGREGATION_TIME_HRS = 24;
 
     final ServerConfiguration serverConfig;

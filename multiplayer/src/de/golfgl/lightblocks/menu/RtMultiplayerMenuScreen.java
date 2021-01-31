@@ -46,6 +46,7 @@ import de.golfgl.lightblocks.state.MultiplayerMatch;
  * Created by Benjamin Schulte on 24.02.2017.
  */
 
+@Deprecated
 public class RtMultiplayerMenuScreen extends MultiplayerMenuScreen implements IRoomListener {
     protected Dialog waitForConnectionOverlay;
     private Button startGameButton;
