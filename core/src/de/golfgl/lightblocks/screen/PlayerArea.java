@@ -986,7 +986,8 @@ public class PlayerArea extends Group implements IGameModelListener {
             for (int i = 0; i < playerNum; i++) {
                 ScaledLabel playerNameLabel = new ScaledLabel("", app.skin);
                 app.theme.setScoreColor(playerNameLabel);
-                add(playerNameLabel).top().padTop(2);
+                playerNameLabel.setEllipsis(true);
+                add(playerNameLabel).top().padTop(2).maxWidth(75).right();
                 ScoreLabel lblFilling = new ScoreLabel(2, 100, app.skin, LightBlocksGame.SKIN_FONT_TITLE);
                 app.theme.setScoreColor(lblFilling);
                 lblFilling.setExceedChar('X');
@@ -1001,7 +1002,6 @@ public class PlayerArea extends Group implements IGameModelListener {
 
         public boolean setPlayerName(int i, String name) {
             boolean changed = false;
-            String newName = name.length() > 15 ? name.substring(0, 15) : name;
             if (!playerName[i].textEquals(name)) {
                 if (!playerName[i].hasActions() && !playerName[i].textEquals("")) {
                     Color colorNow = new Color(playerName[i].getColor());
@@ -1009,7 +1009,7 @@ public class PlayerArea extends Group implements IGameModelListener {
                     playerName[i].addAction(Actions.color(colorNow, 1f));
                     changed = true;
                 }
-                playerName[i].setText(newName);
+                playerName[i].setText(name);
             }
             return changed;
         }
