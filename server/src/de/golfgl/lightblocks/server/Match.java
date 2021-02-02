@@ -3,7 +3,8 @@ package de.golfgl.lightblocks.server;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.Queue;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.annotation.Nullable;
 
@@ -26,8 +27,8 @@ public class Match {
     public static final float WAIT_TIME_START_PLAYNG = 3f;
     private final InitGameParameters gameParams;
     private final LightblocksServer server;
-    private final Queue<InGameMessage> p1Queue = new Queue<>();
-    private final Queue<InGameMessage> p2Queue = new Queue<>();
+    private final ConcurrentLinkedQueue<InGameMessage> p1IncomingQueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<InGameMessage> p2IncomingQueue = new ConcurrentLinkedQueue<>();
     private Player player1;
     private float player1WaitTime;
     private Player player2;
@@ -83,20 +84,21 @@ public class Match {
         gameModel.getSecondGameModel().setAiEnabled(player2Disabled);
 
         // process the queues
-        synchronized (p1Queue) {
-            if (player1Disabled)
-                p1Queue.clear();
-            else
-                processQueue(gameModel, p1Queue);
-        }
-        synchronized (p2Queue) {
-            if (player2Disabled)
-                p2Queue.clear();
-            else
-                processQueue(gameModel.getSecondGameModel(), p2Queue);
-        }
+        if (player1Disabled)
+            p1IncomingQueue.clear();
+        else
+            processQueue(gameModel, p1IncomingQueue);
+        if (player2Disabled)
+            p2IncomingQueue.clear();
+        else
+            processQueue(gameModel.getSecondGameModel(), p2IncomingQueue);
 
         gameModel.update(delta);
+
+        if (player1 != null)
+            player1.sendQueue();
+        if (player2 != null)
+            player2.sendQueue();
 
         if (gameModel.isGameOver()) {
             boolean sendMessage;
@@ -130,7 +132,7 @@ public class Match {
             return;
 
         // check technical activity
-        if (player.checkTimeOuts());
+        if (player.checkTimeOuts()) ;
     }
 
     protected boolean shouldShowWaitMessage(float delta, float waitTime) {
@@ -152,13 +154,13 @@ public class Match {
             player.sendMessageToPlayer(s);
     }
 
-    private void processQueue(ServerMultiplayerModel gameModel, Queue<InGameMessage> queue) {
+    private void processQueue(ServerMultiplayerModel gameModel, ConcurrentLinkedQueue<InGameMessage> queue) {
         // ensure to make a single column move for movements that ended in same processing cycle
         boolean rightMoveStartedBefore = false;
         boolean leftMoveStartedBefore = false;
 
         while (!queue.isEmpty()) {
-            InGameMessage igm = queue.removeFirst();
+            InGameMessage igm = queue.remove();
             switch (igm.message) {
                 case "SML":
                     gameModel.inputStartMoveHorizontal(null, true);
@@ -290,9 +292,9 @@ public class Match {
         player2.nextPiece = serializeTetromino(gameModel.getSecondGameModel().getNextTetromino(), true);
 
         if (this.player1 != null)
-            this.player1.send(server.serializer.serialize(matchInfo1));
+            this.player1.enqueue(server.serializer.serialize(matchInfo1));
         if (this.player2 != null)
-            this.player2.send(server.serializer.serialize(matchInfo2));
+            this.player2.enqueue(server.serializer.serialize(matchInfo2));
     }
 
     protected String getPlayerNickname(Player p) {
@@ -317,13 +319,9 @@ public class Match {
 
     public void gotMessage(Player player, InGameMessage igm) {
         if (player == player1)
-            synchronized (p1Queue) {
-                p1Queue.addLast(igm);
-            }
+            p1IncomingQueue.add(igm);
         else if (player == player2)
-            synchronized (p2Queue) {
-                p2Queue.addLast(igm);
-            }
+            p2IncomingQueue.add(igm);
     }
 
     private class Listener implements IGameModelListener {
@@ -339,14 +337,14 @@ public class Match {
         private void sendPlayer(String msg) {
             if (first) {
                 if (player1 != null)
-                    player1.send("Y" + msg);
+                    player1.enqueue("Y" + msg);
                 if (player2 != null)
-                    player2.send("O" + msg);
+                    player2.enqueue("O" + msg);
             } else {
                 if (player1 != null)
-                    player1.send("O" + msg);
+                    player1.enqueue("O" + msg);
                 if (player2 != null)
-                    player2.send("Y" + msg);
+                    player2.enqueue("Y" + msg);
             }
         }
 

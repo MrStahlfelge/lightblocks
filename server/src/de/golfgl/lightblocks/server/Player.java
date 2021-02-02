@@ -1,6 +1,7 @@
 package de.golfgl.lightblocks.server;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import org.java_websocket.WebSocket;
@@ -23,6 +24,7 @@ public class Player {
     private long lastMessageReceived;
     private long lastGameMessageReceived;
     private String lastMessageToPlayer;
+    private final Queue<String> outgoingQueue = new Queue<>();
 
     public Player(LightblocksServer server, WebSocket conn) {
         this.server = server;
@@ -89,15 +91,32 @@ public class Player {
             throw new UnexpectedException();
     }
 
-    public void send(String string) {
+    public void sendImmediately(String string) {
         if (conn.isOpen())
             conn.send(string);
+    }
+
+    public void enqueue(String string) {
+        synchronized (outgoingQueue) {
+            outgoingQueue.addLast(string);
+        }
+    }
+
+    public void sendQueue() {
+        synchronized (outgoingQueue) {
+            if (conn.isOpen()) {
+                while (!outgoingQueue.isEmpty()) {
+                    conn.send(outgoingQueue.removeFirst());
+                }
+            } else
+                outgoingQueue.clear();
+        }
     }
 
     public void sendMessageToPlayer(String s) {
         if (state != ConnectionState.DISCONNECTED && !s.equals(lastMessageToPlayer)) {
             lastMessageToPlayer = s;
-            send("YMSG" + s);
+            sendImmediately("YMSG" + s);
         }
     }
 

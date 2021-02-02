@@ -174,7 +174,7 @@ public class ServerMultiplayerManager {
 
             if (closeCode != WebSocketCloseCode.NORMAL && reason != null) {
                 lastErrorMsg = "Server closed connection: " + reason;
-            } else {
+            } else if (closeCode != WebSocketCloseCode.NORMAL) {
                 lastErrorMsg = "Could not connect to server " + webSocket.getUrl() + "(" + closeCode + ")";
             }
 
