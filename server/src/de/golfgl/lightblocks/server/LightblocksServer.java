@@ -166,30 +166,40 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
 
     public void findMatchForPlayer(Player player) {
         synchronized (playerToConnectQueue) {
-            // not found, enqueue the player to the waitlist
+            // enqueue the player to the waitlist
             playerToConnectQueue.addLast(player);
             player.sendMessageToPlayer("Matchmaking...");
         }
     }
 
-    public void connectWaitingPlayers() {
+    private void connectWaitingPlayers() {
         synchronized (playerToConnectQueue) {
             if (playerToConnectQueue.isEmpty())
                 return;
 
             Player first = playerToConnectQueue.first();
-            boolean connected = false;
-            for (int i = 1; i < serverConfig.threadNum; i++) {
-                if (!connected && matches[i - 1].connectPlayer(first)) {
-                    Gdx.app.debug("Server", "Connected player to match " + i);
-                    first.addPlayerToMatch(matches[i - 1]);
-                    connected = true;
-                }
-            }
+            // try to connect to occupied matches first...
+            boolean connected = connectWaitingPlayer(first, false);
+            //... if not successful, use empty matches
+            if (!connected)
+                connected = connectWaitingPlayer(first, true);
 
             if (connected)
                 playerToConnectQueue.removeFirst();
         }
+    }
+
+    private boolean connectWaitingPlayer(Player first, boolean useEmptyMatches) {
+        boolean connected = false;
+        for (int i = 1; i < serverConfig.threadNum; i++) {
+            if (!connected && (useEmptyMatches || matches[i - 1].getConnectedPlayerNum() > 0)
+                    && matches[i - 1].connectPlayer(first)) {
+                Gdx.app.debug("Server", "Connected player to match " + i);
+                first.addPlayerToMatch(matches[i - 1]);
+                connected = true;
+            }
+        }
+        return connected;
     }
 
     @Override
