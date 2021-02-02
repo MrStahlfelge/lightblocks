@@ -63,6 +63,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         server.startThreads();
 
         // this will block when successful, so don't do it inside create()
+        server.setTcpNoDelay(true);
         server.run();
 
         Gdx.app.exit();
