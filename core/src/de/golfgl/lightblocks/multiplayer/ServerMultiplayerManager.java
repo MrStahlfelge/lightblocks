@@ -52,6 +52,7 @@ public class ServerMultiplayerManager {
                 state = PlayState.CONNECTING;
             } catch (Throwable t) {
                 lastErrorMsg = t.getMessage();
+                Gdx.app.error("WS", t.getMessage(), t);
                 clear();
             }
         }
@@ -167,14 +168,14 @@ public class ServerMultiplayerManager {
         }
 
         @Override
-        public boolean onClose(WebSocket webSocket, WebSocketCloseCode code, String reason) {
+        public boolean onClose(WebSocket webSocket, int closeCode, String reason) {
             Gdx.app.debug("WS", "Closed: " + webSocket.getUrl());
             clear();
 
-            if (code != WebSocketCloseCode.NORMAL && reason != null) {
+            if (closeCode != WebSocketCloseCode.NORMAL && reason != null) {
                 lastErrorMsg = "Server closed connection: " + reason;
-            } else if (code == WebSocketCloseCode.ABNORMAL) {
-                lastErrorMsg = "Could not connect to server " + webSocket.getUrl();
+            } else {
+                lastErrorMsg = "Could not connect to server " + webSocket.getUrl() + "(" + closeCode + ")";
             }
 
             return false;
@@ -197,7 +198,7 @@ public class ServerMultiplayerManager {
                     gameModel.queueMessage(packet);
 
                     if (TimeUtils.timeSinceMillis(lastQueueProcessedMs) > SECONDS_TIMEOUT) {
-                        socket.close(WebSocketCloseCode.AWAY, "Timeout");
+                        socket.close(3000, "Timeout");
                         gameModel.clearMessageQueue();
                     }
 
