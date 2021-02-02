@@ -1,7 +1,6 @@
 package de.golfgl.lightblocks.menu;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -34,10 +33,8 @@ public class AnimatedLightblocksLogo extends BlockGroup {
         setTransform(false);
         setHeight(BlockActor.blockWidth * 5.25f);
 
-        ParticleEffect pweldEffect = new ParticleEffect();
-        pweldEffect.load(Gdx.files.internal("raw/explode.p"), app.skin.getAtlas());
-        weldEffect = new ParticleEffectActor(pweldEffect, true);
-
+        weldEffect = new ParticleEffectActor(Gdx.files.internal("raw/explode.p"),
+                app.skin.getAtlas()).setResetOnStart(true);
     }
 
     @Override
