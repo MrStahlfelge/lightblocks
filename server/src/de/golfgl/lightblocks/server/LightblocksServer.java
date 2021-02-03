@@ -195,13 +195,14 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         }
     }
 
-    private boolean connectWaitingPlayer(Player first, boolean useEmptyMatches) {
+    private boolean connectWaitingPlayer(Player player, boolean useEmptyMatches) {
         boolean connected = false;
         for (int i = 1; i < serverConfig.threadNum; i++) {
             if (!connected && (useEmptyMatches || matches[i - 1].getConnectedPlayerNum() > 0)
-                    && matches[i - 1].connectPlayer(first)) {
-                Gdx.app.debug("Server", "Connected player to match " + i);
-                first.addPlayerToMatch(matches[i - 1]);
+                    && matches[i - 1].checkIfPlayerFitsMatch(player)
+                    && matches[i - 1].connectPlayer(player)) {
+                Gdx.app.log("Server", "Connected " + player.nickName + " to match " + i);
+                player.addPlayerToMatch(matches[i - 1]);
                 connected = true;
             }
         }

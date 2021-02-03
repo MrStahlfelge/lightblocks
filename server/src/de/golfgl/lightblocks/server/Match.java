@@ -224,6 +224,16 @@ public class Match {
 
     }
 
+    public boolean checkIfPlayerFitsMatch(Player player) {
+        // check if player has special needs for the mode
+        String playerParams = player.params;
+        if (playerParams.contains("/modern") && gameParams.getModeType() != InitGameParameters.TYPE_MODERN
+                || playerParams.contains("/classic") && gameParams.getModeType() != InitGameParameters.TYPE_CLASSIC)
+            return false;
+
+        return true;
+    }
+
     public boolean connectPlayer(Player player) {
         synchronized (this) {
             if (player1 == null) {
@@ -292,9 +302,9 @@ public class Match {
         player2.nextPiece = serializeTetromino(gameModel.getSecondGameModel().getNextTetromino(), true);
 
         if (this.player1 != null)
-            this.player1.enqueue(server.serializer.serialize(matchInfo1));
+            this.player1.enqueueMessage(server.serializer.serialize(matchInfo1));
         if (this.player2 != null)
-            this.player2.enqueue(server.serializer.serialize(matchInfo2));
+            this.player2.enqueueMessage(server.serializer.serialize(matchInfo2));
     }
 
     protected String getPlayerNickname(Player p) {
@@ -337,14 +347,14 @@ public class Match {
         private void sendPlayer(String msg) {
             if (first) {
                 if (player1 != null)
-                    player1.enqueue("Y" + msg);
+                    player1.enqueueMessage("Y" + msg);
                 if (player2 != null)
-                    player2.enqueue("O" + msg);
+                    player2.enqueueMessage("O" + msg);
             } else {
                 if (player1 != null)
-                    player1.enqueue("O" + msg);
+                    player1.enqueueMessage("O" + msg);
                 if (player2 != null)
-                    player2.enqueue("Y" + msg);
+                    player2.enqueueMessage("Y" + msg);
             }
         }
 

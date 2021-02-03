@@ -18,21 +18,26 @@ public class ServerAddress implements IRoomLocation {
             this.address = address;
         } else {
             int colonPos = address.indexOf(':');
-            String addressWithoutPort;
+            String contentPath;
+            int resPos = address.indexOf('/');
+            if (resPos > 0) {
+                contentPath = address.substring(resPos + 1);
+                address = address.substring(0, resPos);
+            } else {
+                contentPath = "";
+            }
             if (colonPos > 0) {
-                addressWithoutPort = address.substring(0, colonPos);
                 try {
                     port = Integer.parseInt(address.substring(colonPos + 1));
                 } catch (Throwable ignored) {
                 }
-            } else {
-                addressWithoutPort = address;
+                address = address.substring(0, colonPos);
             }
             if (secure)
-                this.address = WebSockets.toSecureWebSocketUrl(addressWithoutPort, port != 0 ? port : 443);
+                this.address = WebSockets.toSecureWebSocketUrl(address, port != 0 ? port : 443, contentPath);
             else
-                this.address = WebSockets.toWebSocketUrl(addressWithoutPort, port != 0 ? port : 80);
-            this.name = name != null ? name : addressWithoutPort;
+                this.address = WebSockets.toWebSocketUrl(address, port != 0 ? port : 80, contentPath);
+            this.name = name != null ? name : address;
         }
     }
 

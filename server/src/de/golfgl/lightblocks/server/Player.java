@@ -13,22 +13,26 @@ import de.golfgl.lightblocks.server.model.PlayerInfo;
 public class Player {
     private static final int SECONDS_INACTIVITY_WARNING = 10;
     private static final String GAME_TIMEOUT_WARNING = "Inactive players will be disconnected";
+    public final long connectedMs;
     private final LightblocksServer server;
     private final WebSocket conn;
+    private final Queue<String> outgoingQueue = new Queue<>();
     public String nickName;
     public String userId;
     public String token;
+    public String params;
     public ConnectionState state = ConnectionState.CONNECTED;
     private Match match;
     private long startedPlayingMs;
     private long lastMessageReceived;
     private long lastGameMessageReceived;
     private String lastMessageToPlayer;
-    private final Queue<String> outgoingQueue = new Queue<>();
 
     public Player(LightblocksServer server, WebSocket conn) {
         this.server = server;
         this.conn = conn;
+        this.params = conn.getResourceDescriptor();
+        this.connectedMs = System.currentTimeMillis();
     }
 
     private void doConnect(PlayerInfo playerInfo) {
@@ -87,6 +91,8 @@ public class Player {
                 sendMessageToPlayer("");
             }
             match.gotMessage(this, (InGameMessage) object);
+        } else if (object instanceof InGameMessage && state == ConnectionState.WAITING) {
+            // ignore in game matches while waiting for a match
         } else if (!(object instanceof KeepAliveMessage))
             throw new UnexpectedException();
     }
@@ -96,7 +102,7 @@ public class Player {
             conn.send(string);
     }
 
-    public void enqueue(String string) {
+    public void enqueueMessage(String string) {
         synchronized (outgoingQueue) {
             outgoingQueue.addLast(string);
         }
