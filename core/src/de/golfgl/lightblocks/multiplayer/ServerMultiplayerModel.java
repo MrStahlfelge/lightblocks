@@ -328,8 +328,11 @@ public class ServerMultiplayerModel extends GameModel {
         gameOver = true;
         if (isFirst) {
             final String wonString = parseUntilNext(payload, 1, "-");
+            boolean hasWon = wonString.equals("1");
             playScreen.setMusicGameOver();
-            GaHelper.endGameEvent(app.gameAnalytics, this, wonString.equals("1"));
+            GaHelper.endGameEvent(app.gameAnalytics, this, hasWon);
+            totalScore.incMultiPlayerMatchesWon();
+            totalScore.incMultiPlayerMatchesStarted();
         }
     }
 
