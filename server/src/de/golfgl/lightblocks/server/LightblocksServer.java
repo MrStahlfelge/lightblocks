@@ -164,7 +164,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         }
     }
 
-    public void findMatchForPlayer(Player player) {
+    public void enqueueToFindMatchForPlayer(Player player) {
         synchronized (playerToConnectQueue) {
             // enqueue the player to the waitlist
             playerToConnectQueue.addLast(player);
@@ -178,6 +178,12 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
                 return;
 
             Player first = playerToConnectQueue.first();
+            if (first.state != Player.ConnectionState.WAITING) {
+                playerToConnectQueue.removeFirst();
+                Gdx.app.log("Server", "Removed player in state " + first.state + " from connect queue");
+                return;
+            }
+
             // try to connect to occupied matches first...
             boolean connected = connectWaitingPlayer(first, false);
             //... if not successful, use empty matches

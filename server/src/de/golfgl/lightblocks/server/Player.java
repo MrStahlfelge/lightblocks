@@ -43,7 +43,7 @@ public class Player {
 
         state = ConnectionState.WAITING;
         // this will call addPlayerToMatch eventually
-        server.findMatchForPlayer(this);
+        server.enqueueToFindMatchForPlayer(this);
     }
 
     void addPlayerToMatch(Match match) {
