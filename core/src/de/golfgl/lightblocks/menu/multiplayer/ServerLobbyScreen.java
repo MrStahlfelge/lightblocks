@@ -19,6 +19,7 @@ import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.PlayButton;
 import de.golfgl.lightblocks.multiplayer.ServerModels;
 import de.golfgl.lightblocks.multiplayer.ServerMultiplayerManager;
+import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -121,11 +122,12 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
         return playButton != null ? playButton : super.getConfiguredDefaultActor();
     }
 
-    private void startGame() {
+    private void startGame(String gameMode) {
         try {
             InitGameParameters igp = new InitGameParameters();
             igp.setGameMode(InitGameParameters.GameMode.ServerMultiplayer);
             igp.setServerMultiplayerManager(serverMultiplayerManager);
+            serverMultiplayerManager.setGameMode(gameMode);
             PlayScreen.gotoPlayScreen(app, igp);
 
         } catch (VetoException e) {
@@ -138,6 +140,7 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
         private final Cell<Label> pingCell;
         private final Cell<Label> playersCell;
         private final RepeatAction pingWarn;
+        private final FaRadioButton<String> gameModeList;
         private int lastShownPing;
 
         public LobbyTable() {
@@ -158,6 +161,11 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             serverInfoTable.row();
             serverInfoTable.add("Active: ").right();
             playersCell = serverInfoTable.add("").left();
+            if (serverInfo.modes.size() == 1) {
+                serverInfoTable.row();
+                serverInfoTable.add("Type: ").right();
+                serverInfoTable.add(serverInfo.modes.get(0).toUpperCase()).left();
+            }
 
             add(serverInfoTable).expand();
 
@@ -169,14 +177,29 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
                 add(description).colspan(2).fill();
             }
 
+            if (serverInfo.modes.size() > 1) {
+                gameModeList = new FaRadioButton<>(app.skin, false);
+                for (String mode : serverInfo.modes) {
+                    gameModeList.addEntry(mode, null, mode.toUpperCase());
+                }
+                row().padTop(30);
+                add(new ScaledLabel(app.TEXTS.get("marathonChooseTypeLabel"),
+                        app.skin, LightBlocksGame.SKIN_FONT_BIG));
+                row().padBottom(30);
+                add(gameModeList);
+                addFocusableActor(gameModeList);
+            } else {
+                gameModeList = null;
+            }
+
             playButton = new PlayButton(app);
             row();
-            add(playButton);
+            add(playButton).minHeight(100);
             addFocusableActor(playButton);
             playButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    startGame();
+                    startGame(gameModeList != null ? gameModeList.getValue() : null);
                 }
             });
         }

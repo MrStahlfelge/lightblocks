@@ -10,6 +10,8 @@ import com.github.czyzby.websocket.WebSocketListener;
 import com.github.czyzby.websocket.WebSockets;
 import com.github.czyzby.websocket.data.WebSocketCloseCode;
 
+import java.util.ArrayList;
+
 import de.golfgl.lightblocks.LightBlocksGame;
 
 public class ServerMultiplayerManager {
@@ -23,6 +25,7 @@ public class ServerMultiplayerManager {
     private long startTimePing;
     private int pingMs = -1;
     private PlayState state;
+    private String gameMode;
     private String lastErrorMsg;
     private JsonReader jsonReader = new JsonReader();
     private ServerModels.ServerInfo serverInfo;
@@ -95,6 +98,14 @@ public class ServerMultiplayerManager {
         }
     }
 
+    public String getGameMode() {
+        return gameMode;
+    }
+
+    public void setGameMode(String gameMode) {
+        this.gameMode = gameMode;
+    }
+
     public void doStartGame(ServerMultiplayerModel serverMultiplayerModel) {
         this.gameModel = serverMultiplayerModel;
         // starting the game by sending player information
@@ -106,6 +117,9 @@ public class ServerMultiplayerManager {
             if (serverInfo.authRequired) {
                 playerInfo.addChild("authToken", new JsonValue(app.backendManager.getToken()));
             }
+        }
+        if (gameMode != null) {
+            playerInfo.addChild("gameMode", new JsonValue(gameMode));
         }
 
         socket.send(ID_PLAYERINFO + playerInfo.toJson(JsonWriter.OutputType.json));
@@ -148,6 +162,13 @@ public class ServerMultiplayerManager {
         serverInfo.owner = jsonValue.getString("owner", null);
         serverInfo.description = jsonValue.getString("description", null);
         serverInfo.version = jsonValue.getInt("version");
+        serverInfo.modes = new ArrayList<>();
+
+        if (jsonValue.has("modes")) {
+            for (JsonValue mode = jsonValue.get("modes").child; mode != null; mode = mode.next) {
+                serverInfo.modes.add(mode.asString());
+            }
+        }
 
         state = PlayState.LOBBY;
         doPing();

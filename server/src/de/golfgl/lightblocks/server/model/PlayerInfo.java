@@ -5,5 +5,5 @@ public class PlayerInfo {
     public int clientVersion;
     public String userId;
     public String authToken;
-
+    public String gameMode;
 }

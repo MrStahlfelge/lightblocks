@@ -46,6 +46,9 @@ public class Player {
         clientVersion = playerInfo.clientVersion;
         userId = playerInfo.userId;
         token = playerInfo.authToken;
+        if (playerInfo.gameMode != null) {
+            params = params + "/" + playerInfo.gameMode;
+        }
 
         state = ConnectionState.WAITING;
         // this will call addPlayerToMatch eventually

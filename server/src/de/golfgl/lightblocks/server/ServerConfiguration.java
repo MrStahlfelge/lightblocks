@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
@@ -121,8 +122,17 @@ public class ServerConfiguration {
         serverInfo.owner = prefs.getString(KEY_XML_SERVER_OWNER, "undefined");
         serverInfo.description = prefs.getString(KEY_XML_SERVER_DESC, "No server description given.");
         serverInfo.version = LightblocksServer.SERVER_VERSION;
+        serverInfo.modes = new ArrayList<>();
 
         modeType = prefs.getInteger(KEY_XML_GAMEMODES, InitGameParameters.TYPE_MIX);
+
+        if (modeType == InitGameParameters.TYPE_MIX)
+            serverInfo.modes.add("random");
+        if (modeType == InitGameParameters.TYPE_MIX || modeType == InitGameParameters.TYPE_CLASSIC)
+            serverInfo.modes.add("classic");
+        if (modeType == InitGameParameters.TYPE_MIX || modeType == InitGameParameters.TYPE_MODERN)
+            serverInfo.modes.add("modern");
+
         secondsTimeout = Math.max(secondsTimeout, prefs.getInteger("disconnectTimeoutSeconds", secondsTimeout));
         secondsInactivity = Math.max(secondsInactivity, prefs.getInteger("disconnectInactivitySeconds", secondsInactivity));
 
