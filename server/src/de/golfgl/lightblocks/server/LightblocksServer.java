@@ -6,6 +6,8 @@ import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.backends.headless.mock.graphics.MockGraphics;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -251,6 +253,14 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
         Gdx.app.debug("Server", "received message from " + conn.getRemoteSocketAddress() + ": " + message);
         if (message.equals("PING")) {
             conn.send("PONG");
+        } else if (message.startsWith("PING-")) {
+            int clientVersion = 0;
+            try {
+                clientVersion = Integer.parseInt(message.substring(5));
+            } catch (Throwable ignore) {
+                Gdx.app.error("Server", "Could not detect client version: " + message);
+            }
+            conn.send("PONG" + sendServerStats(clientVersion));
         } else if (conn.getAttachment() != null) {
             Object object = serializer.deserialize(message);
             if (object != null) try {
@@ -263,6 +273,12 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
                 conn.close(4101, "Message illegible.");
             }
         }
+    }
+
+    private String sendServerStats(int clientVersion) {
+        JsonValue json = new JsonValue(JsonValue.ValueType.object);
+        json.addChild("activePlayers", new JsonValue(serverStats.getPlayersCurrentlyConnected()));
+        return json.toJson(JsonWriter.OutputType.json);
     }
 
     @Override

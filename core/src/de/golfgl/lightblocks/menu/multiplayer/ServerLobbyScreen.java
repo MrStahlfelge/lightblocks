@@ -136,6 +136,7 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
     private class LobbyTable extends Table {
 
         private final Cell<Label> pingCell;
+        private final Cell<Label> playersCell;
         private final RepeatAction pingWarn;
         private int lastShownPing;
 
@@ -150,10 +151,13 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             serverInfoTable.defaults().padRight(5).padLeft(5);
             serverInfoTable.add("Server: ").right();
             String name = serverInfo.name;
-            serverInfoTable.add(name.length() <= 25 ? name : name.substring(0, 23) + "...");
+            serverInfoTable.add(name.length() <= 25 ? name : name.substring(0, 23) + "...").left();
             serverInfoTable.row();
             serverInfoTable.add("Ping: ").right();
             pingCell = serverInfoTable.add("").left();
+            serverInfoTable.row();
+            serverInfoTable.add("Active: ").right();
+            playersCell = serverInfoTable.add("").left();
 
             add(serverInfoTable).expand();
 
@@ -196,11 +200,14 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
                     pingLabel.clearActions();
                 }
 
+                int activePlayers = serverMultiplayerManager.getServerInfo().activePlayers;
+                playersCell.getActor().setText(activePlayers >= 0 ? activePlayers + " players" : "");
 
-                if (TimeUtils.millis() - lastDoPingTime >= 5000) {
-                    lastDoPingTime = TimeUtils.millis();
-                    serverMultiplayerManager.doPing();
-                }
+            }
+
+            if (TimeUtils.millis() - lastDoPingTime >= 5000) {
+                lastDoPingTime = TimeUtils.millis();
+                serverMultiplayerManager.doPing();
             }
             super.act(delta);
         }

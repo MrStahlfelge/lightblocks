@@ -19,6 +19,7 @@ public class Player {
     private final Queue<String> outgoingQueue = new Queue<>();
     public String nickName;
     public String userId;
+    public int clientVersion;
     public String token;
     public String params;
     public ConnectionState state = ConnectionState.CONNECTED;
@@ -42,6 +43,7 @@ public class Player {
         }
 
         nickName = playerInfo.nickName;
+        clientVersion = playerInfo.clientVersion;
         userId = playerInfo.userId;
         token = playerInfo.authToken;
 
@@ -54,7 +56,7 @@ public class Player {
         if (match != null && this.match == null) {
             this.match = match;
             state = ConnectionState.PLAYING;
-            server.serverStats.playerConnected();
+            server.serverStats.incPlayerConnected();
             startedPlayingMs = TimeUtils.millis();
             lastMessageReceived = startedPlayingMs;
             lastGameMessageReceived = startedPlayingMs;

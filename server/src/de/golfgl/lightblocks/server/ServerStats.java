@@ -37,7 +37,7 @@ public class ServerStats {
         resetMs = TimeUtils.millis();
     }
 
-    public void playerConnected() {
+    public void incPlayerConnected() {
         synchronized (this) {
             playersCurrentlyConnected++;
             playersConnectedOverall++;

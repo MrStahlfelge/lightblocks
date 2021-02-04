@@ -90,7 +90,7 @@ public class ServerMultiplayerManager {
         if (isConnected()) {
             pingMs = -1;
             startTimePing = TimeUtils.millis();
-            socket.send("PING");
+            socket.send("PING-" + LightBlocksGame.GAME_VERSIONNUMBER);
             lastMessageSendMs = startTimePing;
         }
     }
@@ -100,6 +100,7 @@ public class ServerMultiplayerManager {
         // starting the game by sending player information
         JsonValue playerInfo = new JsonValue(JsonValue.ValueType.object);
         playerInfo.addChild("nickName", new JsonValue(app.player.getName()));
+        playerInfo.addChild("clientVersion", new JsonValue(LightBlocksGame.GAME_VERSIONNUMBER));
         if (app.backendManager.hasUserId()) {
             playerInfo.addChild("userId", new JsonValue(app.backendManager.ownUserId()));
             if (serverInfo.authRequired) {
@@ -129,9 +130,13 @@ public class ServerMultiplayerManager {
         }
     }
 
-    protected void handlePong() {
+    protected void handlePong(String information) {
         pingMs = (int) (TimeUtils.millis() - startTimePing);
-        Gdx.app.log("WS", "Ping from " + socket.getUrl() + ": " + pingMs);
+        Gdx.app.debug("WS", "Ping from " + socket.getUrl() + ": " + pingMs + " " + information);
+        if (serverInfo != null && information != null) {
+            JsonValue jsonValue = this.jsonReader.parse(information);
+            serverInfo.activePlayers = jsonValue.getInt("activePlayers", -1);
+        }
     }
 
     private void handleServerInfo(String json) {
@@ -186,8 +191,8 @@ public class ServerMultiplayerManager {
             Gdx.app.debug("WS", "Received: " + packet);
 
             try {
-                if (pingMs < 0 && packet.equals("PONG")) {
-                    handlePong();
+                if (pingMs < 0 && packet.startsWith("PONG")) {
+                    handlePong(packet.length() > 4 ? packet.substring(4) : null);
                     return true;
                 }
 
