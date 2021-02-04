@@ -50,10 +50,6 @@ android {
     }
 }
 
-repositories {
-    maven { url "https://jcenter.bintray.com" }
-}
-
 dependencies {
     compile "androidx.appcompat:appcompat:1.1.0"
     googleCompile "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gamsvcsVersion"
