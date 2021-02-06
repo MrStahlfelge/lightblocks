@@ -22,6 +22,7 @@ public class Player {
     public int clientVersion;
     public String token;
     public String params;
+    public String roomName;
     public ConnectionState state = ConnectionState.CONNECTED;
     private Match match;
     private long startedPlayingMs;
@@ -48,6 +49,9 @@ public class Player {
         token = playerInfo.authToken;
         if (playerInfo.gameMode != null) {
             params = params + "/" + playerInfo.gameMode;
+        }
+        if (playerInfo.roomName != null) {
+            roomName = playerInfo.roomName;
         }
 
         state = ConnectionState.WAITING;

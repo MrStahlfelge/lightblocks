@@ -6,4 +6,5 @@ public class PlayerInfo {
     public String userId;
     public String authToken;
     public String gameMode;
+    public String roomName;
 }

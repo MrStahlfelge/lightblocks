@@ -9,4 +9,5 @@ public class ServerInfo {
     public String description;
     public boolean authRequired;
     public List<String> modes;
+    public boolean privateRooms;
 }

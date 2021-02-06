@@ -26,6 +26,7 @@ public class ServerMultiplayerManager {
     private int pingMs = -1;
     private PlayState state;
     private String gameMode;
+    private String roomName;
     private String lastErrorMsg;
     private JsonReader jsonReader = new JsonReader();
     private ServerModels.ServerInfo serverInfo;
@@ -106,6 +107,14 @@ public class ServerMultiplayerManager {
         this.gameMode = gameMode;
     }
 
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
     public void doStartGame(ServerMultiplayerModel serverMultiplayerModel) {
         this.gameModel = serverMultiplayerModel;
         // starting the game by sending player information
@@ -120,6 +129,9 @@ public class ServerMultiplayerManager {
         }
         if (gameMode != null) {
             playerInfo.addChild("gameMode", new JsonValue(gameMode));
+        }
+        if (roomName != null && !roomName.isEmpty()) {
+            playerInfo.addChild("roomName", new JsonValue(roomName));
         }
 
         socket.send(ID_PLAYERINFO + playerInfo.toJson(JsonWriter.OutputType.json));
@@ -163,6 +175,7 @@ public class ServerMultiplayerManager {
         serverInfo.description = jsonValue.getString("description", null);
         serverInfo.version = jsonValue.getInt("version");
         serverInfo.modes = new ArrayList<>();
+        serverInfo.privateRooms = jsonValue.getBoolean("privateRooms", false);
 
         if (jsonValue.has("modes")) {
             for (JsonValue mode = jsonValue.get("modes").child; mode != null; mode = mode.next) {

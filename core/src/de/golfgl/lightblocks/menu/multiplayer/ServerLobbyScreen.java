@@ -1,5 +1,6 @@
 package de.golfgl.lightblocks.menu.multiplayer;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -20,9 +21,11 @@ import de.golfgl.lightblocks.menu.PlayButton;
 import de.golfgl.lightblocks.multiplayer.ServerModels;
 import de.golfgl.lightblocks.multiplayer.ServerMultiplayerManager;
 import de.golfgl.lightblocks.scene2d.FaRadioButton;
+import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.TextInputDialog;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.screen.FontAwesome;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -190,6 +193,34 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
                 addFocusableActor(gameModeList);
             } else {
                 gameModeList = null;
+            }
+
+            if (serverInfo.privateRooms) {
+                final String title = "Set private room passphrase";
+                FaTextButton privateRoomButton = new FaTextButton(title, app.skin,
+                        LightBlocksGame.SKIN_BUTTON_CHECKBOX);
+                privateRoomButton.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        TextInputDialog.getTextInput(new Input.TextInputListener() {
+                                                         @Override
+                                                         public void input(final String text) {
+                                                             serverMultiplayerManager.setRoomName(text);
+                                                         }
+
+                                                         @Override
+                                                         public void canceled() {
+                                                             // do nothing
+                                                         }
+                                                     }, title, serverMultiplayerManager.getRoomName(), app.skin,
+                                getStage(), Input.OnscreenKeyboardType.Default);
+                    }
+                });
+                privateRoomButton.getLabel().setFontScale(.55f);
+
+                row().padBottom(30);
+                add(privateRoomButton);
+                addFocusableActor(privateRoomButton);
             }
 
             playButton = new PlayButton(app);

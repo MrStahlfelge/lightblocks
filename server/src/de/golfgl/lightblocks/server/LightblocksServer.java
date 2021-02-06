@@ -186,15 +186,53 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
                 return;
             }
 
-            // try to connect to occupied matches first...
-            boolean connected = connectWaitingPlayer(first, false);
-            //... if not successful, use empty matches
-            if (!connected)
-                connected = connectWaitingPlayer(first, true);
+            boolean connected;
+            if (serverInfo.privateRooms && first.roomName != null) {
+                // connect to a private room
+                connected = connectPlayerToPrivateRoom(first);
+
+            } else {
+                // try to connect to occupied matches first...
+                connected = connectWaitingPlayer(first, false);
+                //... if not successful, use empty matches
+                if (!connected)
+                    connected = connectWaitingPlayer(first, true);
+            }
 
             if (connected)
                 playerToConnectQueue.removeFirst();
         }
+    }
+
+    private boolean connectPlayerToPrivateRoom(Player player) {
+        boolean connected = false;
+        // is there a room with the name?
+        int roomNum = -1;
+        for (int i = 1; i < serverConfig.threadNum; i++) {
+            if (!connected && roomNum < 0 && player.roomName.equalsIgnoreCase(matches[i - 1].roomName)) {
+                roomNum = i - 1;
+                if (matches[i - 1].checkIfPlayerFitsMatch(player) && matches[i - 1].connectPlayer(player)) {
+                    Gdx.app.log("Server", "Connected " + player.nickName + " to room on match " + i);
+                    connected = true;
+                } else {
+                    Gdx.app.log("Server", "Room requested by " + player.nickName + " not connected.");
+                }
+            }
+        }
+
+        if (!connected && roomNum < 0) {
+            // room does not exist yet, assign a fitting and empty room
+            for (int i = 1; i < serverConfig.threadNum; i++) {
+                if (!connected && matches[i - 1].getConnectedPlayerNum() == 0
+                        && matches[i - 1].checkIfPlayerFitsMatch(player)
+                        && matches[i - 1].connectPlayer(player)) {
+                    Gdx.app.log("Server", "Created room and connected " + player.nickName + " on match " + i);
+                    matches[i - 1].roomName = player.roomName;
+                    connected = true;
+                }
+            }
+        }
+        return connected;
     }
 
     private boolean connectWaitingPlayer(Player player, boolean useEmptyMatches) {

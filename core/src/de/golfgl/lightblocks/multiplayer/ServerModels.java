@@ -10,6 +10,7 @@ public class ServerModels {
         public String owner;
         public String description;
         public boolean authRequired;
+        public boolean privateRooms;
         public List<String> modes;
 
         // sent on ping pong

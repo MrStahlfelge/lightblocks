@@ -38,7 +38,9 @@ public class TextInputDialog extends ControllerMenuDialog {
         contentTable.row().pad(0, 10, 0, 10);
 
         textField = new ControllerTextField(defaultText, skin);
-        textField.setSelection(0, defaultText.length());
+        if (defaultText != null) {
+            textField.setSelection(0, defaultText.length());
+        }
         contentTable.add(textField).expandX().fill().minWidth((LightBlocksGame.nativeGameWidth - 50));
 
         Table buttonTable = getButtonTable();

@@ -19,6 +19,7 @@ public class ServerConfiguration {
     public static final String KEY_XML_SERVER_NAME = "name";
     public static final String KEY_XML_SERVER_OWNER = "owner";
     public static final String KEY_XML_SERVER_DESC = "description";
+    public static final String KEY_XML_PRIVATE_ROOMS = "privateRooms";
     public static final String KEY_XML_GAMEMODES = "gamemodes";
 
     private final String[] args;
@@ -121,6 +122,7 @@ public class ServerConfiguration {
         serverInfo.name = prefs.getString(KEY_XML_SERVER_NAME, "Lightblocks Server");
         serverInfo.owner = prefs.getString(KEY_XML_SERVER_OWNER, "undefined");
         serverInfo.description = prefs.getString(KEY_XML_SERVER_DESC, "No server description given.");
+        serverInfo.privateRooms = prefs.getBoolean(KEY_XML_PRIVATE_ROOMS, false);
         serverInfo.version = LightblocksServer.SERVER_VERSION;
         serverInfo.modes = new ArrayList<>();
 
@@ -142,6 +144,7 @@ public class ServerConfiguration {
             prefs.putString(KEY_XML_SERVER_OWNER, serverInfo.owner);
             prefs.putString(KEY_XML_SERVER_DESC, serverInfo.description);
             prefs.putInteger(KEY_XML_GAMEMODES, modeType);
+            prefs.putBoolean(KEY_XML_PRIVATE_ROOMS, serverInfo.privateRooms);
             prefs.flush();
         }
 

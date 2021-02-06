@@ -29,6 +29,7 @@ public class Match {
     private final LightblocksServer server;
     private final ConcurrentLinkedQueue<InGameMessage> p1IncomingQueue = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<InGameMessage> p2IncomingQueue = new ConcurrentLinkedQueue<>();
+    String roomName;
     private Player player1;
     private float player1WaitTime;
     private Player player2;
@@ -49,6 +50,7 @@ public class Match {
 
     public void update(float delta) {
         if (getConnectedPlayerNum() == 0) {
+            roomName = null;
             if (server.serverConfig.resetEmptyRooms)
                 gameModel = null;
             return;
@@ -231,6 +233,10 @@ public class Match {
                 || playerParams.contains("/classic") && gameParams.getModeType() != InitGameParameters.TYPE_CLASSIC)
             return false;
 
+        // check if we have a room name
+        if (roomName != null && !roomName.equalsIgnoreCase(player.roomName))
+            return false;
+
         return true;
     }
 
@@ -239,11 +245,13 @@ public class Match {
             if (player1 == null) {
                 player1 = player;
                 player1WaitTime = WAIT_TIME_START_PLAYNG;
+                player.addPlayerToMatch(this);
                 return true;
             }
             if (player2 == null) {
                 player2 = player;
                 player2WaitTime = WAIT_TIME_START_PLAYNG;
+                player.addPlayerToMatch(this);
                 return true;
             }
             return false;
