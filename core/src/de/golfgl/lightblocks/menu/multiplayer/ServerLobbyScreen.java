@@ -142,13 +142,14 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
 
         private final Cell<Label> pingCell;
         private final Cell<Label> playersCell;
-        private final RepeatAction pingWarn;
+        private final RepeatAction pingWarningAction;
         private final FaRadioButton<String> gameModeList;
+        private final Label pingWarningLabel;
         private int lastShownPing;
 
         public LobbyTable() {
 
-            pingWarn = Actions.forever(Actions.sequence(Actions.delay(.4f),
+            pingWarningAction = Actions.forever(Actions.sequence(Actions.delay(.4f),
                     Actions.fadeOut(.4f, Interpolation.fade), Actions.fadeIn(.4f, Interpolation.fade)));
             Table serverInfoTable = new Table(app.skin);
 
@@ -160,7 +161,12 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             serverInfoTable.add(name.length() <= 25 ? name : name.substring(0, 23) + "...").left();
             serverInfoTable.row();
             serverInfoTable.add("Ping: ").right();
-            pingCell = serverInfoTable.add("").left();
+            Table pingTable = new Table(app.skin);
+            pingCell = pingTable.add("").minWidth(50);
+            pingWarningLabel = pingTable.add(app.TEXTS.get("highPingWarning")).padLeft(10).getActor();
+            pingWarningLabel.setColor(LightBlocksGame.EMPHASIZE_COLOR);
+            pingWarningLabel.addAction(pingWarningAction);
+            serverInfoTable.add(pingTable).left();
             serverInfoTable.row();
             serverInfoTable.add("Active: ").right();
             playersCell = serverInfoTable.add("").left();
@@ -241,18 +247,13 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             if (lastPing != lastShownPing && lastPing >= 0) {
                 Label pingLabel = pingCell.getActor();
                 lastShownPing = lastPing;
-                if (lastPing > 60) {
-                    pingLabel.setText(lastPing + " - " + app.TEXTS.get("highPingWarning"));
-                    pingLabel.setColor(LightBlocksGame.EMPHASIZE_COLOR);
-                    if (!pingLabel.hasActions()) {
-                        pingWarn.restart();
-                        pingLabel.addAction(pingWarn);
-                    }
-                } else {
-                    pingLabel.setText(String.valueOf(lastPing));
-                    pingLabel.setColor(Color.WHITE);
-                    pingLabel.clearActions();
+                pingLabel.setText(String.valueOf(lastPing));
+                boolean highPing = lastPing > 60;
+                pingLabel.setColor(highPing ? LightBlocksGame.EMPHASIZE_COLOR : Color.WHITE);
+                if (highPing && !pingWarningLabel.isVisible()) {
+                    pingWarningAction.restart();
                 }
+                pingWarningLabel.setVisible(highPing);
 
                 int activePlayers = serverMultiplayerManager.getServerInfo().activePlayers;
                 playersCell.getActor().setText(activePlayers >= 0 ? activePlayers + " players" : "");
