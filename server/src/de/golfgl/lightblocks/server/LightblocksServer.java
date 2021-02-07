@@ -39,7 +39,7 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
     private JmDNS jmdns;
 
     public LightblocksServer(InetSocketAddress address, ServerConfiguration serverConfiguration) {
-        super(address);
+        super(address, Math.max(1, serverConfiguration.threadNum / 2), null);
         this.serverConfig = serverConfiguration;
         this.serverInfo = serverConfiguration.getServerInfo();
         this.matches = new Match[serverConfig.threadNum - 1];
