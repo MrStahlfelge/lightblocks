@@ -164,6 +164,10 @@ public abstract class ListPublicServersDialog extends ControllerMenuDialog {
 
     protected void roomSelect(ServerAddress selectedRoom) {
         lastSelectedRoom = selectedRoom;
+
+        if (selectedRoom == null)
+            return;
+
         joinRoomButton.setDisabled(false);
         String shownRoomName = selectedRoom.getRoomName();
         if (shownRoomName.length() >= 13)

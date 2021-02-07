@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -335,6 +336,7 @@ public class BackendManager {
         backendClient.fetchMultiplayerServers(osString, new BackendClient.IBackendResponse<List<ServerAddress>>() {
             @Override
             public void onFail(int statusCode, String errorMsg) {
+                serverAddressList = new ArrayList<>();
                 isFetchingMultiplayerServers = false;
             }
 
