@@ -68,7 +68,7 @@ public class Match {
         }
 
         // update game model
-        if (gameModel == null) {
+        if (gameModel == null) synchronized (this) {
             server.serverStats.matchesStarted++;
             initGameModel();
             sendFullInformation();
@@ -242,19 +242,25 @@ public class Match {
 
     public boolean connectPlayer(Player player) {
         synchronized (this) {
+            boolean sendFullInformation = gameModel != null;
+            boolean connected = false;
             if (player1 == null) {
                 player1 = player;
                 player1WaitTime = WAIT_TIME_START_PLAYNG;
-                player.addPlayerToMatch(this);
-                return true;
-            }
-            if (player2 == null) {
+                connected = true;
+            } else if (player2 == null) {
                 player2 = player;
                 player2WaitTime = WAIT_TIME_START_PLAYNG;
-                player.addPlayerToMatch(this);
-                return true;
+                connected = true;
             }
-            return false;
+
+            if (connected) {
+                player.addPlayerToMatch(this);
+                if (sendFullInformation)
+                    sendFullInformation();
+            }
+
+            return connected;
         }
     }
 
@@ -273,7 +279,7 @@ public class Match {
         return (player1 != null ? 1 : 0) + (player2 != null ? 1 : 0);
     }
 
-    public void sendFullInformation() {
+    private void sendFullInformation() {
         if (gameModel == null || getConnectedPlayerNum() == 0)
             return;
 

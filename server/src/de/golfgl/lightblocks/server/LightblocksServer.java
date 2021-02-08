@@ -242,7 +242,6 @@ public class LightblocksServer extends WebSocketServer implements ApplicationLis
                     && matches[i - 1].checkIfPlayerFitsMatch(player)
                     && matches[i - 1].connectPlayer(player)) {
                 Gdx.app.log("Server", "Connected " + player.nickName + " to match " + i);
-                player.addPlayerToMatch(matches[i - 1]);
                 connected = true;
             }
         }

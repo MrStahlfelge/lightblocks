@@ -69,7 +69,6 @@ public class Player {
             lastGameMessageReceived = startedPlayingMs;
             Gdx.app.log("Player", "Successfully connected " + nickName + "/" + userId
                     + " - " + server.serverStats.getPlayersCurrentlyConnected() + " connected overall");
-            match.sendFullInformation();
         }
     }
 
