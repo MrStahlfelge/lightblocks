@@ -242,7 +242,6 @@ public class Match {
 
     public boolean connectPlayer(Player player) {
         synchronized (this) {
-            boolean sendFullInformation = gameModel != null;
             boolean connected = false;
             if (player1 == null) {
                 player1 = player;
@@ -256,8 +255,7 @@ public class Match {
 
             if (connected) {
                 player.addPlayerToMatch(this);
-                if (sendFullInformation)
-                    sendFullInformation();
+                sendFullInformation();
             }
 
             return connected;
@@ -271,8 +269,8 @@ public class Match {
             } else if (player == player2) {
                 player2 = null;
             }
+            sendFullInformation();
         }
-        sendFullInformation();
     }
 
     public int getConnectedPlayerNum() {
