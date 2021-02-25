@@ -30,4 +30,12 @@ public class ShareButton extends FaButton {
         this(app);
         this.shareText = shareMessage;
     }
+
+    public String getShareText() {
+        return shareText;
+    }
+
+    public void setShareText(String shareText) {
+        this.shareText = shareText;
+    }
 }

@@ -18,6 +18,7 @@ import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.menu.AbstractFullScreenDialog;
 import de.golfgl.lightblocks.menu.AbstractMenuDialog;
 import de.golfgl.lightblocks.menu.PlayButton;
+import de.golfgl.lightblocks.menu.ShareButton;
 import de.golfgl.lightblocks.multiplayer.ServerModels;
 import de.golfgl.lightblocks.multiplayer.ServerMultiplayerManager;
 import de.golfgl.lightblocks.scene2d.FaRadioButton;
@@ -153,7 +154,7 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
                     Actions.fadeOut(.4f, Interpolation.fade), Actions.fadeIn(.4f, Interpolation.fade)));
             Table serverInfoTable = new Table(app.skin);
 
-            ServerModels.ServerInfo serverInfo = serverMultiplayerManager.getServerInfo();
+            final ServerModels.ServerInfo serverInfo = serverMultiplayerManager.getServerInfo();
 
             serverInfoTable.defaults().padRight(5).padLeft(5);
             serverInfoTable.add("Server: ").right();
@@ -205,6 +206,8 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
                 final String title = "Set private room passphrase";
                 FaTextButton privateRoomButton = new FaTextButton(title, app.skin,
                         LightBlocksGame.SKIN_BUTTON_CHECKBOX);
+                final ShareButton sharePrivateRoom = new ShareButton(app);
+                sharePrivateRoom.setVisible(false);
                 privateRoomButton.addListener(new ChangeListener() {
                     @Override
                     public void changed(ChangeEvent event, Actor actor) {
@@ -212,6 +215,9 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
                                                          @Override
                                                          public void input(final String text) {
                                                              serverMultiplayerManager.setRoomName(text);
+                                                             sharePrivateRoom.setVisible(text != null && !text.isEmpty());
+                                                             sharePrivateRoom.setShareText("I am on server " + serverInfo.name + ", room passphrase: " +
+                                                                     serverMultiplayerManager.getRoomName());
                                                          }
 
                                                          @Override
@@ -224,9 +230,14 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
                 });
                 privateRoomButton.getLabel().setFontScale(.55f);
 
-                row().padBottom(30);
+                row();
                 add(privateRoomButton);
                 addFocusableActor(privateRoomButton);
+                addFocusableActor(sharePrivateRoom);
+
+                row().padBottom(30);
+                add(sharePrivateRoom);
+
             }
 
             playButton = new PlayButton(app);
