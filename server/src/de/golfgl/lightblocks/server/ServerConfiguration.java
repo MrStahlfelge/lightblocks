@@ -29,7 +29,6 @@ public class ServerConfiguration {
     public int loglevel = Application.LOG_INFO;
     public int beginningLevel = 0;
     public int modeType;
-    public String name = "Lighblocks Server";
     public boolean enableNsd;
     public boolean resetEmptyRooms = true;
     public int secondsInactivity = 25;
