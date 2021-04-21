@@ -22,7 +22,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "lightblocks"
-        gdxVersion = '1.9.14'
+        gdxVersion = '1.10.0'
         roboVMVersion = '2.3.12'
         gamsvcsVersion = '1.1.0'
         cuversion = '2.3.0'
