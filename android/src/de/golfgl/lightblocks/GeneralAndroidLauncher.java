@@ -6,12 +6,18 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Insets;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -22,9 +28,9 @@ import com.badlogic.gdx.controllers.android.AndroidControllers;
 import org.opensource.lightblocks.R;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import de.golfgl.gdxgameanalytics.AndroidGameAnalytics;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 import de.golfgl.lightblocks.multiplayer.AndroidNetUtils;
@@ -92,12 +98,14 @@ abstract class GeneralAndroidLauncher extends AndroidApplication {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 else
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                updateGestureExclusion(true);
                 return true;
             }
 
             @Override
             public void unlockOrientation() {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                updateGestureExclusion(false);
             }
 
             @Override
@@ -160,6 +168,19 @@ abstract class GeneralAndroidLauncher extends AndroidApplication {
                 }
             });
 
+    }
+
+    public void updateGestureExclusion(boolean deactivateGestures) {
+        if (Build.VERSION.SDK_INT < 29) return;
+        List<Rect> exclusionRects = new ArrayList<>();
+        if (deactivateGestures) {
+            Insets insets = getApplicationWindow().getDecorView().getRootWindowInsets().getMandatorySystemGestureInsets();
+            Rect rect = new Rect(insets.left, Math.max(insets.top, (int) (Gdx.graphics.getBackBufferHeight() * 0.5f)),
+                    Gdx.graphics.getBackBufferWidth() - insets.right, Math.min(Gdx.graphics.getBackBufferHeight(),
+                    (int) (Gdx.graphics.getBackBufferHeight())));
+            exclusionRects.add(rect);
+        }
+        getApplicationWindow().setSystemGestureExclusionRects(exclusionRects);
     }
 
     @Override
