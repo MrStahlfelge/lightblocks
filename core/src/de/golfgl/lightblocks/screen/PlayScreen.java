@@ -97,8 +97,7 @@ public class PlayScreen extends AbstractScreen implements OnScreenGamepad.IOnScr
             }
         });
         pauseButton.getLabel().setColor(app.theme.buttonColor);
-        pauseButton.setVisible(LightBlocksGame.isWebAppOnMobileDevice() ||
-                Gdx.app.getType() == Application.ApplicationType.iOS || LightBlocksGame.GAME_DEVMODE);
+        pauseButton.setVisible(true);
 
         pauseDialog = new PauseDialog(app, this);
 

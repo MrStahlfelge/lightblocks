@@ -79,6 +79,7 @@ abstract class GeneralAndroidLauncher extends AndroidApplication {
 
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.hideStatusBar = true;
+        config.useImmersiveMode = true;
         config.useAccelerometer = true;
         config.useCompass = false;
         config.useGyroscope = false;
@@ -175,9 +176,9 @@ abstract class GeneralAndroidLauncher extends AndroidApplication {
         List<Rect> exclusionRects = new ArrayList<>();
         if (deactivateGestures) {
             Insets insets = getApplicationWindow().getDecorView().getRootWindowInsets().getMandatorySystemGestureInsets();
-            Rect rect = new Rect(insets.left, Math.max(insets.top, (int) (Gdx.graphics.getBackBufferHeight() * 0.5f)),
-                    Gdx.graphics.getBackBufferWidth() - insets.right, Math.min(Gdx.graphics.getBackBufferHeight(),
-                    (int) (Gdx.graphics.getBackBufferHeight())));
+            Rect rect = new Rect(insets.left, insets.top,
+                    Gdx.graphics.getBackBufferWidth() - insets.right,
+                    Gdx.graphics.getBackBufferHeight() - insets.bottom);
             exclusionRects.add(rect);
         }
         getApplicationWindow().setSystemGestureExclusionRects(exclusionRects);
