@@ -609,7 +609,7 @@ public class SettingsScreen extends AbstractMenuDialog {
         }
 
         private void fillTvRemoteConfigTable(Table buttonConfig) {
-            buttonConfig.defaults().pad(0, 10, 0, 10).expandY();
+            buttonConfig.defaults().pad(-1, 10, 0, 10).expandY();
             defaultFocusedButton = addButtonRow(buttonConfig, 0, "configTvRemoteRight");
             addButtonRow(buttonConfig, 1, "configTvRemoteLeft");
             addButtonRow(buttonConfig, 2, "configTvRemoteRotateCw");
