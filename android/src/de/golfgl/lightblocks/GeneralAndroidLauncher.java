@@ -84,9 +84,6 @@ abstract class GeneralAndroidLauncher extends AndroidApplication {
         config.useCompass = false;
         config.useGyroscope = false;
         config.useWakelock = true;
-        //immersive Mode leider immer noch nicht möglich, weil es zwei Probleme gibt:
-        // nach Wechsel der Anwendung bleibt der Bereich manchmal schwarz, außerdem beim Runterziehen der Notifications
-        // mehrmaliges Resize
 
         AndroidControllers.ignoreNoGamepadButtons = false;
 
