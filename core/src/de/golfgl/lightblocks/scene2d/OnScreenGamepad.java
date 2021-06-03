@@ -85,7 +85,7 @@ public class OnScreenGamepad extends Group {
         if (playScreenInput == null || app.localPrefs.isShowHardDropButtonOnScreenGamepad())
             addActor(hardDropButton);
 
-        holdButton = new TextButton("HOLD", app.skin, LightBlocksGame.SKIN_BUTTON_GAMEPAD);
+        holdButton = new TextButton(app.TEXTS.get("labelHold").toUpperCase(), app.skin, LightBlocksGame.SKIN_BUTTON_GAMEPAD);
         addActor(holdButton);
 
         if (playScreenInput != null) {
@@ -126,7 +126,7 @@ public class OnScreenGamepad extends Group {
                 }
             });
 
-            String freezeButtonLabel = playScreen.gameModel.getShownTimeButtonDescription();
+            String freezeButtonLabel = playScreen.gameModel.getShownTimeButtonDescription(app.TEXTS);
             if (freezeButtonLabel != null) {
                 freezeButton = new TextButton(freezeButtonLabel, app.skin, LightBlocksGame.SKIN_BUTTON_GAMEPAD);
                 freezeButton.addListener(freezeButtonInputListener);
@@ -144,7 +144,7 @@ public class OnScreenGamepad extends Group {
         } else {
             // Configuration mode
 
-            freezeButton = new TextButton("FREEZE", app.skin, LightBlocksGame.SKIN_BUTTON_GAMEPAD);
+            freezeButton = new TextButton(app.TEXTS.get("labelFreeze").toUpperCase(), app.skin, LightBlocksGame.SKIN_BUTTON_GAMEPAD);
             rotateLeftButton.addListener(new MoveDragListener() {
                 @Override
                 protected void savePosDelta(int deltaX, int deltaY) {

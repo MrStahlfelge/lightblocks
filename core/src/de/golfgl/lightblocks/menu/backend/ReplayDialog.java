@@ -215,7 +215,7 @@ public class ReplayDialog extends AbstractFullScreenDialog {
         setCellSizeToGameboard(cell2, replayGameboard2);
 
         bothReplays.row();
-        ScaledLabel yourNickLabel = new ScaledLabel("YOU", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f);
+        ScaledLabel yourNickLabel = new ScaledLabel(app.TEXTS.get("competitionPlayerYou").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f);
         yourNickLabel.setAlignment(Align.center);
         yourNickLabel.setEllipsis(true);
         bothReplays.add(yourNickLabel).width(getGameboardWith(replayGameboard)).padRight(30);

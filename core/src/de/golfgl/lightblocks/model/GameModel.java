@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -1059,7 +1060,7 @@ public abstract class GameModel implements Json.Serializable, AiAcessibleGameMod
         return null;
     }
 
-    public String getShownTimeButtonDescription() {
+    public String getShownTimeButtonDescription(I18NBundle TEXTS) {
         return null;
     }
 
