@@ -183,7 +183,7 @@ public class ServerMultiplayerModel extends GameModel {
 
         this.parsePlayerInformation(json.get("player1"));
         secondModel.parsePlayerInformation(json.get("player2"));
-        uiGameboard.setFillLevelNicknames("YOU", secondModel.nickName);
+        uiGameboard.setFillLevelNicknames(app.TEXTS.get("competitionPlayerYou").toUpperCase(), secondModel.nickName);
         updateFillLevelAmounts();
     }
 

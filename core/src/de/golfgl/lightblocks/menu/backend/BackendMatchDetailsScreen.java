@@ -413,8 +413,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
             defaults().pad(5).right();
 
             add();
-            add(new ScaledLabel("YOU", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).expandX();
-            add(new ScaledLabel("OPPONENT", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).expandX().padLeft(15);
+            add(new ScaledLabel(app.TEXTS.get("competitionPlayerYou").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).expandX();
+            add(new ScaledLabel(app.TEXTS.get("competitionPlayerOther").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f)).expandX().padLeft(15);
 
             int linesSentYou = 0;
             int linesSentOpp = 0;
@@ -423,8 +423,8 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
             for (final MatchEntity.MatchTurn turn : match.turns) {
                 row();
-                add(new ScaledLabel("TURN #" + String.valueOf(turn.turnNum + 1), app.skin, LightBlocksGame
-                        .SKIN_FONT_REG));
+                add(new ScaledLabel(app.TEXTS.format("competitionTurnNum", String.valueOf(turn.turnNum + 1)).toUpperCase(),
+                        app.skin, LightBlocksGame.SKIN_FONT_REG));
                 String yourScoreText = turn.youPlayed ? String.valueOf(turn.yourScore) : "";
                 if (turn.youDroppedOut)
                     yourScoreText = "†" + yourScoreText;
@@ -446,7 +446,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
             if (match.opponentBonus > 0 || match.yourBonus > 0) {
                 row();
-                add(new ScaledLabel("BONUS", app.skin, LightBlocksGame.SKIN_FONT_REG));
+                add(new ScaledLabel(app.TEXTS.get("competitionBonusScore").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_REG));
 
                 if (match.yourBonus > 0)
                     add(new ScaledLabel(String.valueOf(match.yourBonus), app.skin, LightBlocksGame.SKIN_FONT_TITLE,
@@ -461,7 +461,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
                     add();
 
                 row();
-                add(new ScaledLabel("TOTAL", app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f));
+                add(new ScaledLabel(app.TEXTS.get("competitionTotalScore").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f));
                 add(new ScaledLabel(String.valueOf(yourScore + match.yourBonus), app.skin,
                         LightBlocksGame.SKIN_FONT_TITLE, .65f));
                 add(new ScaledLabel(String.valueOf(oppScore + match.opponentBonus), app.skin,
@@ -470,7 +470,7 @@ public class BackendMatchDetailsScreen extends WaitForBackendFetchDetailsScreen<
 
             if (linesSentYou > 0 || linesSentOpp > 0) {
                 row().padTop(10);
-                add(new ScaledLabel("LINES SENT", app.skin, LightBlocksGame.SKIN_FONT_REG));
+                add(new ScaledLabel(app.TEXTS.get("competitionLinesSent").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_REG));
                 add(new ScaledLabel(String.valueOf(linesSentYou), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f))
                         .uniform();
                 add(new ScaledLabel(String.valueOf(linesSentOpp), app.skin, LightBlocksGame.SKIN_FONT_TITLE, .5f))

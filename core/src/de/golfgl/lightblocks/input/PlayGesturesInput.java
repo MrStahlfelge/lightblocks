@@ -449,7 +449,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     public static class HoldButton extends Button {
         public HoldButton(LightBlocksGame app, PlayScreen playScreen, InputListener inputListener) {
             super(app.skin, LightBlocksGame.SKIN_BUTTON_SMOKE);
-            Label buttonLabel = new Label("HOLD", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            Label buttonLabel = new Label(app.TEXTS.get("labelHold").toUpperCase(), app.skin, LightBlocksGame.SKIN_FONT_TITLE);
             buttonLabel.setAlignment(Align.top);
             buttonLabel.setFontScale(.8f);
             add(buttonLabel).fill().expand();
@@ -754,7 +754,7 @@ public class PlayGesturesInput extends PlayScreenInput {
             if (app.localPrefs.isShowTouchHoldButton())
                 addActor(holdButton);
 
-            String freezeButtonLabel = playScreen.gameModel.getShownTimeButtonDescription();
+            String freezeButtonLabel = playScreen.gameModel.getShownTimeButtonDescription(app.TEXTS);
             if (freezeButtonLabel != null) {
                 freezeButton = new FreezeButton(app, freezeButtonLabel,
                         new FreezeButtonInputListener());

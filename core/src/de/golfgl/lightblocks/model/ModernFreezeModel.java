@@ -2,6 +2,7 @@ package de.golfgl.lightblocks.model;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -357,8 +358,8 @@ public class ModernFreezeModel extends GameModel {
     }
 
     @Override
-    public String getShownTimeButtonDescription() {
-        return "FREEZE";
+    public String getShownTimeButtonDescription(I18NBundle TEXTS) {
+        return TEXTS.get("labelFreeze").toUpperCase();
     }
 
     @Override
