@@ -151,6 +151,11 @@ public class AboutScreen extends AbstractMenuDialog {
         menuTable.row().padTop(5);
         menuTable.add(new ThisInfoButton(app.TEXTS.get("labelMusic"), app.TEXTS.get("labelMusicDesc"),
                 "https://www.youtube.com/watch?v=QDNHYF0Hp4U")).fill();
+        menuTable.row().padTop(5);
+        menuTable.add(new ThisInfoButton(app.TEXTS.get("labelTranslations"), app.TEXTS.get("labeli18NContributors")
+                + "\n\n" + app.TEXTS.get("i18NContributors"),
+                LightBlocksGame.SOURCECODE_URL + "/tree/master/android/assets/i18n")).fill();
+
     }
 
     @Override
