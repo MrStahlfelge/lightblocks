@@ -147,7 +147,7 @@ public class AboutScreen extends AbstractMenuDialog {
         menuTable.row().padTop(5);
         menuTable.add(new ThisInfoButton("Ray3k", app.TEXTS.get("labelRay3k"), "https://ray3k.wordpress.com/")).fill();
         menuTable.row().padTop(5);
-        menuTable.add(new ThisInfoButton("Sounds", app.TEXTS.get("labelSounds"), "http://freesound.org/")).fill();
+        menuTable.add(new ThisInfoButton(app.TEXTS.get("titleSounds"), app.TEXTS.get("labelSounds"), "http://freesound.org/")).fill();
         menuTable.row().padTop(5);
         menuTable.add(new ThisInfoButton(app.TEXTS.get("labelMusic"), app.TEXTS.get("labelMusicDesc"),
                 "https://www.youtube.com/watch?v=QDNHYF0Hp4U")).fill();

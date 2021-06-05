@@ -89,7 +89,7 @@ public class BackendUserDetailsScreen extends WaitForBackendFetchDetailsScreen<S
         mainTable.row().padTop(20);
         mainTable.add(new PlayerDetailsTable(retrievedData)).expand();
         mainTable.row().padTop(30);
-        mainTable.add(new ScaledLabel("Best scores", app.skin, LightBlocksGame.SKIN_FONT_TITLE));
+        mainTable.add(new ScaledLabel(app.TEXTS.get("labelBestScores"), app.skin, LightBlocksGame.SKIN_FONT_TITLE));
         mainTable.row().padTop(10);
         mainTable.add(new HighscoresTable(retrievedData)).top().expand();
 
