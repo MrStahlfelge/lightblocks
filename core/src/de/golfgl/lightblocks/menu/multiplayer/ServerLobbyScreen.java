@@ -203,7 +203,7 @@ public class ServerLobbyScreen extends AbstractFullScreenDialog {
             }
 
             if (serverInfo.privateRooms) {
-                final String title = "Set private room passphrase";
+                final String title = app.TEXTS.get("labelSetRoomPass");
                 FaTextButton privateRoomButton = new FaTextButton(title, app.skin,
                         LightBlocksGame.SKIN_BUTTON_CHECKBOX);
                 final ShareButton sharePrivateRoom = new ShareButton(app);

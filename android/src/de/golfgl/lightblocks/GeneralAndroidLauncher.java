@@ -138,14 +138,14 @@ abstract class GeneralAndroidLauncher extends AndroidApplication {
             }
         };
 
-        // Initialize Android dependant classesonba
+        // Initialize Android dependant classes
         game.share = new AndroidShareHandler();
         game.netUtils = new AndroidNetUtils(getContext());
         game.gameAnalytics = new AndroidGameAnalytics();
 
         initFlavor(game);
 
-        // Gerätemodell wird für den Spielernamen benötigt
+        // used for player name
         LightBlocksGame.modelNameRunningOn = Build.MODEL;
 
         // Network Serice Discovery
@@ -198,7 +198,7 @@ abstract class GeneralAndroidLauncher extends AndroidApplication {
         super.onResume();
         gameInForeground = true;
 
-        // etwaige Benachrichtigungen entfernen
+        // removes pending notifications from system bar
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.cancel(MULTIPLAYER_NOTIFICATION_ID);
 

@@ -75,7 +75,7 @@ public class BackendScoreDetailsScreen extends AbstractFullScreenDialog {
 
         if (score.replayUri != null || replay != null) {
             contentTable.row().pad(20);
-            FaTextButton showReplayButton = new FaTextButton(FontAwesome.CIRCLE_PLAY, "Watch replay", app.skin,
+            FaTextButton showReplayButton = new FaTextButton(FontAwesome.CIRCLE_PLAY, app.TEXTS.get("labelWatchReplay"), app.skin,
                     LightBlocksGame.SKIN_DEFAULT);
             contentTable.add(showReplayButton);
             addFocusableActor(showReplayButton);
