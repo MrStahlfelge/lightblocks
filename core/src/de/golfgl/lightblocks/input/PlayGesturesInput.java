@@ -38,7 +38,8 @@ public class PlayGesturesInput extends PlayScreenInput {
     public static final int SWIPEUP_PAUSE = 1;
     public static final int SWIPEUP_HARDDROP = 2;
     public static final int SWIPEUP_HOLD = 3;
-    private static final float TOUCHPAD_DEAD_RADIUS = .5f;
+    private static final float TOUCHPAD_STICK_DEAD_RADIUS = .5f;
+    private static final float TOUCHPAD_DPAD_DEAD_RADIUS = .35f;
     private static final float MAX_SOFTDROPBEGINNING_INTERVAL = .3f;
 
     private static final float SCREEN_BORDER_PERCENTAGE = 0.1f;
@@ -482,6 +483,12 @@ public class PlayGesturesInput extends PlayScreenInput {
         boolean rightPressed;
         boolean leftPressed;
 
+        final float deadRadius;
+
+        public TouchpadChangeListener() {
+            deadRadius = app.localPrefs.isShowDpadOnScreenGamepad() ? TOUCHPAD_DPAD_DEAD_RADIUS : TOUCHPAD_STICK_DEAD_RADIUS;
+        }
+
         @Override
         public void changed(ChangeListener.ChangeEvent event, Actor actor) {
             if (!(actor instanceof Touchpad))
@@ -489,10 +496,10 @@ public class PlayGesturesInput extends PlayScreenInput {
 
             Touchpad touchpad = (Touchpad) actor;
 
-            boolean upNowPressed = touchpad.getKnobPercentY() > TOUCHPAD_DEAD_RADIUS * 1.8f;
-            boolean downNowPressed = touchpad.getKnobPercentY() < -TOUCHPAD_DEAD_RADIUS;
-            boolean rightNowPressed = touchpad.getKnobPercentX() > TOUCHPAD_DEAD_RADIUS;
-            boolean leftNowPressed = touchpad.getKnobPercentX() < -TOUCHPAD_DEAD_RADIUS;
+            boolean upNowPressed = touchpad.getKnobPercentY() > deadRadius * 1.8f;
+            boolean downNowPressed = touchpad.getKnobPercentY() < -deadRadius;
+            boolean rightNowPressed = touchpad.getKnobPercentX() > deadRadius;
+            boolean leftNowPressed = touchpad.getKnobPercentX() < -deadRadius;
 
             // zwei Richtungen gleichzeitig: entscheiden welcher wichtiger ist
             if ((upNowPressed || downNowPressed) && (leftNowPressed || rightNowPressed)) {
