@@ -212,6 +212,10 @@ public class PagedScrollPane<T extends Actor> extends BetterScrollPane {
         return currentPageIndex;
     }
 
+    public int getPagesCount() {
+        return pages.size;
+    }
+
     public float getScrollPage() {
         return getScrollX() / (getWidth() + getPageSpacing());
     }

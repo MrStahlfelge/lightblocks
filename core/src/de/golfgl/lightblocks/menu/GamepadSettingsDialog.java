@@ -20,6 +20,7 @@ import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.FaButton;
 import de.golfgl.lightblocks.scene2d.FaCheckbox;
+import de.golfgl.lightblocks.scene2d.GlowLabelButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.RoundedTextButton;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
@@ -34,17 +35,20 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
 
     private final Button closeButton;
     private final LightBlocksGame app;
+    private final Runnable openKeyboardSettingsRunnable;
     private Actor defaultActor;
     private final FaCheckbox checkDisableTouchControls;
     private final FaCheckbox checkEnableVibration;
+    private final Button gotoKeyboardSettings;
 
     private int connectedControllersOnLastCheck;
     private float timeSinceLastControllerCheck;
 
-    public GamepadSettingsDialog(final LightBlocksGame app) {
+    public GamepadSettingsDialog(final LightBlocksGame app, final Runnable openKeyboardSettingsRunnable) {
         super("", app.skin);
 
         this.app = app;
+        this.openKeyboardSettingsRunnable = openKeyboardSettingsRunnable;
 
         getButtonTable().defaults().pad(0, 40, 10, 40);
         closeButton = new FaButton(FontAwesome.LEFT_ARROW, app.skin);
@@ -81,6 +85,16 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
         });
         addFocusableActor(checkEnableVibration);
 
+        gotoKeyboardSettings = new GlowLabelButton(app.TEXTS.get("configGamepadGotoKeyboard"), app.skin,
+                GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
+        addFocusableActor(gotoKeyboardSettings);
+        gotoKeyboardSettings.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                hide();
+                openKeyboardSettingsRunnable.run();
+            }
+        });
     }
 
     @Override
@@ -180,6 +194,11 @@ public class GamepadSettingsDialog extends ControllerMenuDialog {
         hint.setWrap(true);
         hint.setAlignment(Align.center);
         contentTable.add(hint).fill().minWidth(LightBlocksGame.nativeGameWidth * .7f);
+
+        if (openKeyboardSettingsRunnable != null && Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard)) {
+            contentTable.row().padTop(20);
+            contentTable.add(gotoKeyboardSettings);
+        }
     }
 
     private void startControllerConfiguration(Controller controller) {
