@@ -172,10 +172,7 @@ public class PlayGesturesInput extends PlayScreenInput {
         this.timeSinceTouchDown = 0;
         didHardDrop = false;
 
-        if (isPaused()) {
-            playScreen.switchPause(false);
-            didSomething = true;
-        } else {
+        if (!isPaused()) {
             if (!flippedMode)
                 playScreen.gameModel.setInputFreezeInterval(.1f);
 
