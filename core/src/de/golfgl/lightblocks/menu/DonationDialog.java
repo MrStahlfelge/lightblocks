@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Array;
 
 import de.golfgl.gdx.controllers.ControllerMenuDialog;
 import de.golfgl.gdxgameanalytics.GameAnalytics;
+import de.golfgl.lightblocks.DonationPurchaseManager;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.scene2d.InfoButton;
 import de.golfgl.lightblocks.scene2d.ProgressDialog;
@@ -46,6 +47,7 @@ public class DonationDialog extends ControllerMenuDialog {
     private DonationButton donateSponsor;
     private DonationButton donatePatron;
     private ScaledLabel doDonateLabel;
+    private ScaledLabel hintLabel;
     private boolean reclaimPressed;
     private boolean forcedMode = false;
     private float waitTimeseconds;
@@ -119,7 +121,7 @@ public class DonationDialog extends ControllerMenuDialog {
         donationButtonTable.row();
         donatePatron = new DonationButton(LIGHTBLOCKS_PATRON, 529);
         donationButtonTable.add(donatePatron);
-        ScaledLabel hintLabel = new ScaledLabel(app.TEXTS.get("donationHelp"), app.skin);
+        hintLabel = new ScaledLabel(app.TEXTS.get("donationHelp"), app.skin);
         hintLabel.setWrap(true);
         hintLabel.setAlignment(Align.center);
         donationButtonTable.add(hintLabel).fill();
@@ -211,17 +213,27 @@ public class DonationDialog extends ControllerMenuDialog {
                 donationLabelCell.setActor(errorLabel).fillX();
         }
 
-        Array<String> levels = app.localPrefs.getSupportLevels();
+        if (app.purchaseManager.installed() && app.purchaseManager.storeName().equals(DonationPurchaseManager.STORE_DONATIONS)) {
+            // some extra code for the DonationPurchaseManager
+            restoreButton.setVisible(false);
+            donateSupporter.setVisible(!donateSupporter.isDisabled());
+            donateSponsor.setVisible(!donateSponsor.isDisabled());
+            donatePatron.setVisible(!donatePatron.isDisabled());
+            doDonateLabel.remove();
+            hintLabel.remove();
+            waitTimeseconds = Math.max(waitTimeseconds, MIN_WAIT_TIME_FORCEDMODE);
+        } else {
+            Array<String> levels = app.localPrefs.getSupportLevels();
 
-        if (levels.contains(DonationDialog.LIGHTBLOCKS_SUPPORTER, false))
-            donateSupporter.setBought(true);
+            if (levels.contains(DonationDialog.LIGHTBLOCKS_SUPPORTER, false))
+                donateSupporter.setBought(true);
 
-        if (levels.contains(DonationDialog.LIGHTBLOCKS_SPONSOR, false))
-            donateSponsor.setBought(true);
+            if (levels.contains(DonationDialog.LIGHTBLOCKS_SPONSOR, false))
+                donateSponsor.setBought(true);
 
-        if (levels.contains(DonationDialog.LIGHTBLOCKS_PATRON, false))
-            donatePatron.setBought(true);
-
+            if (levels.contains(DonationDialog.LIGHTBLOCKS_PATRON, false))
+                donatePatron.setBought(true);
+        }
     }
 
     @Override
@@ -280,6 +292,9 @@ public class DonationDialog extends ControllerMenuDialog {
                 getDescLabel().setText("Not available");
             } else {
                 getDescLabel().setText(skuInfo.getLocalPricing());
+                if (app.purchaseManager.storeName().equals(DonationPurchaseManager.STORE_DONATIONS)) {
+                    getLabel().setText(skuInfo.getLocalName());
+                }
             }
         }
     }

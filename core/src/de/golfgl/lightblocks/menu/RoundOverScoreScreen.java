@@ -442,9 +442,7 @@ public class RoundOverScoreScreen extends AbstractMenuScreen {
     private void doRate() {
         app.localPrefs.setDontAskForRating(true);
 
-        if (LightBlocksGame.isOnFireTv()) {
-            showDialog(app.TEXTS.get("labelAskForRatingFire"));
-        } else if (LightBlocksGame.gameStoreUrl != null)
+        if (LightBlocksGame.gameStoreUrl != null)
             Gdx.net.openURI(LightBlocksGame.gameStoreUrl);
     }
 
