@@ -178,6 +178,9 @@ public class PlayGesturesInput extends PlayScreenInput {
 
             setTouchPanel(screenX, screenY);
             didSomething = false;
+        } else if (playScreen.gameModel.isGameOver()) {
+            playScreen.switchPause(false);
+            didSomething = true;
         }
 
         return true;
