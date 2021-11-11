@@ -198,7 +198,11 @@ public class IOSLauncher extends MyAppDelegate {
             NSString textShare = new NSString(message);
             NSArray<NSString> texttoshare = new NSArray<>(textShare);
             UIActivityViewController share = new UIActivityViewController(texttoshare, null);
-            ((IOSApplication) Gdx.app).getUIViewController().presentViewController(share, true, null);
+            UIViewController uiViewController = ((IOSApplication) Gdx.app).getUIViewController();
+            if (share.getPopoverPresentationController() != null)  {
+                share.getPopoverPresentationController().setSourceView(uiViewController.getView());
+            }
+            uiViewController.presentViewController(share, true, null);
         }
     }
 }
