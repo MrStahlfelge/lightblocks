@@ -187,9 +187,6 @@ abstract class GeneralAndroidLauncher extends AndroidApplication {
     }
 
     protected void initFlavor(LightBlocksGame game) {
-        LightBlocksGame.gameStoreUrl = "http://play.google.com/store/apps/details?id=de.golfgl" +
-                ".lightblocks&referrer=utm_source%3Dflb";
-
         game.gpgsClient = new NoGameServiceClient();
     }
 

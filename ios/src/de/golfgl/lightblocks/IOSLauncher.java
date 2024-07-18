@@ -13,21 +13,13 @@ import com.badlogic.gdx.controllers.ICadeController;
 import com.badlogic.gdx.controllers.IosControllerManager;
 import com.badlogic.gdx.pay.ios.apple.PurchaseManageriOSApple;
 
+import org.robovm.apple.coregraphics.CGRect;
 import org.robovm.apple.foundation.Foundation;
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.foundation.NSString;
 import org.robovm.apple.foundation.NSURL;
-import org.robovm.apple.uikit.UIActivityViewController;
-import org.robovm.apple.uikit.UIApplication;
-import org.robovm.apple.uikit.UIDevice;
-import org.robovm.apple.uikit.UIDocumentPickerDelegateAdapter;
-import org.robovm.apple.uikit.UIDocumentPickerMode;
-import org.robovm.apple.uikit.UIDocumentPickerViewController;
-import org.robovm.apple.uikit.UIInterfaceOrientationMask;
-import org.robovm.apple.uikit.UIKey;
-import org.robovm.apple.uikit.UIRectEdge;
-import org.robovm.apple.uikit.UIViewController;
+import org.robovm.apple.uikit.*;
 import org.robovm.objc.Selector;
 
 import java.io.FileInputStream;
@@ -198,7 +190,14 @@ public class IOSLauncher extends MyAppDelegate {
             NSString textShare = new NSString(message);
             NSArray<NSString> texttoshare = new NSArray<>(textShare);
             UIActivityViewController share = new UIActivityViewController(texttoshare, null);
-            ((IOSApplication) Gdx.app).getUIViewController().presentViewController(share, true, null);
+            UIViewController uiViewController = ((IOSApplication) Gdx.app).getUIViewController();
+            if (share.getPopoverPresentationController() != null)  {
+                UIView view = uiViewController.getView();
+                share.getPopoverPresentationController().setSourceView(view);
+                share.getPopoverPresentationController().setSourceRect(new CGRect(view.getFrame().getWidth() / 2,
+                        view.getFrame().getHeight() / 2, 0, 0));
+            }
+            uiViewController.presentViewController(share, true, null);
         }
     }
 }

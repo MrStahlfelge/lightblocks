@@ -1,18 +1,14 @@
 package de.golfgl.lightblocks;
 
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.pay.android.googlebilling.PurchaseManagerGoogleBilling;
 
+import de.golfgl.gdxgameanalytics.AndroidGameAnalytics;
 import de.golfgl.gdxpushmessages.FcmMessageProvider;
 import de.golfgl.lightblocks.gpgs.MyGpgsClient;
 
 public class AndroidLauncher extends GeneralAndroidLauncher {
-    public static final int RC_SELECT_PLAYERS = 10000;
-    public final static int RC_INVITATION_INBOX = 10001;
 
     //Google Play Games
     MyGpgsClient gpgsClient;
@@ -20,8 +16,6 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
 
     @Override
     protected void initFlavor(LightBlocksGame game) {
-        LightBlocksGame.gameStoreUrl = "http://play.google.com/store/apps/details?id=de.golfgl" +
-                ".lightblocks&referrer=utm_source%3Dflb";
 
         // Create the Google Api Client with access to the Play Games services
         gpgsClient = new MyGpgsClient();
@@ -32,26 +26,17 @@ public class AndroidLauncher extends GeneralAndroidLauncher {
         fcm = new FcmMessageProvider(this);
         game.pushMessageProvider = fcm;
 
+        // own donation purchase manager
+        game.purchaseManager = new DonationPurchaseManager();
 
-        // on Google Play Android TV, don't even try to open web links :-(
-        if (isOnGooglePlayAndroidTV())
-            game.setOpenWeblinks(false);
-
-        game.purchaseManager = new PurchaseManagerGoogleBilling(this);
+        // crash reports
+        if (game.gameAnalytics instanceof AndroidGameAnalytics)
+            ((AndroidGameAnalytics) game.gameAnalytics).registerUncaughtExceptionHandler();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Gdx.app.addLifecycleListener(fcm);
-    }
-
-    /**
-     * im Gegensatz zu LightBlocksGame.isOnAndroidTV() gibt diese hier nicht für FireTV true
-     */
-    private boolean isOnGooglePlayAndroidTV() {
-        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK)
-                || getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK_ONLY); //NON-NLS
-
     }
 }

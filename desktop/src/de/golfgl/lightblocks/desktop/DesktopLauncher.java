@@ -20,6 +20,7 @@ import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.MockGameServiceClient;
 import de.golfgl.gdxgamesvcs.achievement.IAchievement;
 import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
+import de.golfgl.lightblocks.DonationPurchaseManager;
 import de.golfgl.lightblocks.LightBlocksGame;
 import de.golfgl.lightblocks.gpgs.IMultiplayerGsClient;
 import de.golfgl.lightblocks.multiplayer.AbstractMultiplayerRoom;
@@ -68,28 +69,10 @@ public class DesktopLauncher {
         new LwjglApplication(game, config);
     }
 
-    private static class MyTestPurchaseManager implements PurchaseManager {
-        PurchaseObserver observer;
-
+    private static class MyTestPurchaseManager extends DonationPurchaseManager {
         @Override
         public String storeName() {
             return "TEST";
-        }
-
-        @Override
-        public void install(PurchaseObserver observer, PurchaseManagerConfig config, boolean autoFetchInformation) {
-            this.observer = observer;
-            observer.handleInstall();
-        }
-
-        @Override
-        public boolean installed() {
-            return true;
-        }
-
-        @Override
-        public void dispose() {
-
         }
 
         @Override
@@ -97,11 +80,6 @@ public class DesktopLauncher {
             Transaction transaction = new Transaction();
             transaction.setIdentifier(identifier);
             observer.handlePurchase(transaction);
-        }
-
-        @Override
-        public void purchaseRestore() {
-
         }
 
         @Override

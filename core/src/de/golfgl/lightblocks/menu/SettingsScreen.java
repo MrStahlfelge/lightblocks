@@ -59,6 +59,7 @@ public class SettingsScreen extends AbstractMenuDialog {
     private TouchInputSettings gesturesGroup;
 
     private boolean showsKeyboardPage;
+    private int idxKeyboardPage;
 
     public SettingsScreen(final LightBlocksGame app, Group toHide) {
         super(app, toHide);
@@ -108,6 +109,7 @@ public class SettingsScreen extends AbstractMenuDialog {
 
     private boolean addKeyboardPageIfNeeded() {
         if (LightBlocksGame.isOnAndroidTV() || Gdx.input.isPeripheralAvailable(Input.Peripheral.HardwareKeyboard)) {
+            idxKeyboardPage = groupPager.getPagesCount();
             groupPager.addPage(new TvRemoteSettings());
             return true;
         }
@@ -159,8 +161,8 @@ public class SettingsScreen extends AbstractMenuDialog {
 
     private class GeneralSettings extends Table implements ISettingsGroup {
         private final GlowLabelButton menuMusicButton;
-        private Slider gridIntensitySlider;
-        private Image gridPreview;
+        private final Slider gridIntensitySlider;
+        private final Image gridPreview;
 
         private GeneralSettings() {
             menuMusicButton = new GlowLabelButton(".", ".", app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
@@ -196,12 +198,17 @@ public class SettingsScreen extends AbstractMenuDialog {
             });
             showGhostpiece.focusToSouth =  colorModeCheck;
 
-            Button gamePadButton = new GlowLabelButton(FontAwesome.DEVICE_GAMEPAD, app.TEXTS.get
+            GlowLabelButton gamePadButton = new GlowLabelButton(FontAwesome.DEVICE_GAMEPAD, app.TEXTS.get
                     ("menuGamepadConfig"), app.skin, GlowLabelButton.FONT_SCALE_SUBMENU, 1f);
             gamePadButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    new GamepadSettingsDialog(app).show(getStage());
+                    new GamepadSettingsDialog(app, new Runnable() {
+                        @Override
+                        public void run() {
+                            groupPager.scrollToPage(idxKeyboardPage);
+                        }
+                    }).show(getStage());
                 }
             });
 
@@ -223,7 +230,7 @@ public class SettingsScreen extends AbstractMenuDialog {
                     new VibrationSettingsDialog(app).show(getStage());
                 }
             });
-            ((GlowLabelButton) gamePadButton).focusToSouth = vibrationButton;
+            gamePadButton.focusToSouth = vibrationButton;
 
             gridPreview = new Image(app.trBlock) {
                 @Override
@@ -304,10 +311,10 @@ public class SettingsScreen extends AbstractMenuDialog {
         private final Cell settingsTableCell;
         PlayGesturesInput pgi;
         Group touchPanel;
-        private Slider touchPanelSizeSlider;
-        private Table gestureSettings;
-        private Table onScreenGamepadSettings;
-        private Table onScreenButtonSettings;
+        private final Slider touchPanelSizeSlider;
+        private final Table gestureSettings;
+        private final Table onScreenGamepadSettings;
+        private final Table onScreenButtonSettings;
 
         public TouchInputSettings() {
             final FaRadioButton<LocalPrefs.TouchControlType> onScreenControlsButton = new FaRadioButton<>(app.skin,
