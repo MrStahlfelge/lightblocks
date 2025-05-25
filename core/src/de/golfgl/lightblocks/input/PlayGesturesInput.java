@@ -52,6 +52,7 @@ public class PlayGesturesInput extends PlayScreenInput {
     public Color rotateLeftColor = new Color(.2f, .8f, 1, .8f);
     boolean touchDownValid = false;
     boolean beganHorizontalMove;
+    boolean doneHorizontalMove;
     boolean beganSoftDrop;
     boolean didSomething;
     Group touchPanel;
@@ -169,6 +170,7 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         this.screenX = screenX;
         this.screenY = screenY;
+        this.doneHorizontalMove = false;
         this.timeSinceTouchDown = 0;
         didHardDrop = false;
 
@@ -308,23 +310,22 @@ public class PlayGesturesInput extends PlayScreenInput {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        // Bei mehr als dragThreshold Pixeln erkennen wir eine Bewegung an...
+        // If there are more than dragThreshold pixels, we recognise a movement...
         if (pointer != 0 || !touchDownValid)
             return false;
 
-        // Horizontale Bewegung  bemerken - aber nur wenn kein Hard Drop eingeleitet!
+        // Notice horizontal movement - but only if no hard drop is initiated!
         if (!didHardDrop) {
             if (!flippedMode) {
                 int currentHorizontalTreshold = (beganSoftDrop ? 2 * dragThreshold : dragThreshold);
-                if ((!beganHorizontalMove) && (Math.abs(screenX - this.screenX) > currentHorizontalTreshold)) {
+                if (Math.abs(screenX - this.screenX) > currentHorizontalTreshold) {
                     beganHorizontalMove = true;
-                    playScreen.gameModel.inputStartMoveHorizontal(inputId, screenX - this.screenX < 0);
+                    doneHorizontalMove = true;
+                    playScreen.gameModel.inputDoOneHorizontalMove(inputId, screenX - this.screenX < 0);
                     giveHapticFeedback();
-                }
-                if ((beganHorizontalMove) && (Math.abs(screenX - this.screenX) < currentHorizontalTreshold)) {
-                    playScreen.gameModel.inputEndMoveHorizontal(inputId, true);
-                    playScreen.gameModel.inputEndMoveHorizontal(inputId, false);
-                    beganHorizontalMove = false;
+                    // Measure next horizontal threshold from current position
+                    this.screenX = screenX;
+                    this.screenY = screenY;
                 }
             }
             if (flippedMode) {
@@ -384,9 +385,11 @@ public class PlayGesturesInput extends PlayScreenInput {
 
         if (!didSomething) {
             if (!flippedMode) {
-                boolean tappedRightScreenHalf = screenX >= Gdx.graphics.getWidth() / 2;
-                playScreen.gameModel.inputRotate(inputId, tappedRightScreenHalf && !invertRotation
+                if (!doneHorizontalMove) {
+                    boolean tappedRightScreenHalf = screenX >= Gdx.graphics.getWidth() / 2;
+                    playScreen.gameModel.inputRotate(inputId, tappedRightScreenHalf && !invertRotation
                         || !tappedRightScreenHalf && invertRotation);
+                }
                 giveHapticFeedback();
             } else
                 playScreen.gameModel.inputDoOneHorizontalMove(inputId, screenX <= Gdx.graphics.getWidth() / 2);
