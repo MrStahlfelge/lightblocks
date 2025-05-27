@@ -3,6 +3,7 @@ package de.golfgl.lightblocks.state;
 import de.golfgl.lightblocks.backend.MatchEntity;
 import de.golfgl.lightblocks.input.InputIdentifier;
 import de.golfgl.lightblocks.model.BackendBattleModel;
+import de.golfgl.lightblocks.model.CleanGarbageModel;
 import de.golfgl.lightblocks.model.DeviceMultiplayerModel;
 import de.golfgl.lightblocks.model.GameModel;
 import de.golfgl.lightblocks.model.MarathonModel;
@@ -30,6 +31,7 @@ public class InitGameParameters {
     private int beginningLevel;
     private String missionId;
     private GameMode gameMode;
+    private int initialGarbage;
     private int modeType;
 
     // for Multiplayer
@@ -77,6 +79,16 @@ public class InitGameParameters {
 
     public void setGameMode(GameMode gameMode) {
         this.gameMode = gameMode;
+    }
+
+    public int getInitialGarbage()
+    {
+        return initialGarbage;
+    }
+
+    public void setInitialGarbage(int initialGarbage)
+    {
+        this.initialGarbage = initialGarbage;
     }
 
     public AbstractMultiplayerRoom getMultiplayerRoom() {
@@ -158,6 +170,8 @@ public class InitGameParameters {
                 return new BackendBattleModel();
             case ModernFreeze:
                 return new ModernFreezeModel();
+            case Clean:
+                return new CleanGarbageModel();
             case DeviceMultiplayer:
                 return new DeviceMultiplayerModel();
             case ServerMultiplayer:
@@ -166,5 +180,5 @@ public class InitGameParameters {
         throw new IllegalStateException("Unsupported game mode");
     }
 
-    public enum GameMode {Multiplayer, Marathon, Tutorial, Sprint, MarathonRetro89, Practice, TurnbasedBattle, ModernFreeze, ServerMultiplayer, DeviceMultiplayer}
+    public enum GameMode {Multiplayer, Marathon, Tutorial, Sprint, MarathonRetro89, Practice, TurnbasedBattle, ModernFreeze, ServerMultiplayer, DeviceMultiplayer, Clean}
 }

@@ -66,6 +66,7 @@ public class SinglePlayerScreen extends AbstractMenuDialog {
         modePager.addPage(new MissionChooseGroup(this, app));
         modePager.addPage(new SimpleGameModeGroup.MarathonGroup(this, app));
         modePager.addPage(new SimpleGameModeGroup.PracticeModeGroup(this, app));
+        modePager.addPage(new SimpleGameModeGroup.CleanGarbageModeGroup(this, app));
         modePager.addPage(new SimpleGameModeGroup.SprintModeGroup(this, app));
         modePager.addPage(new SimpleGameModeGroup.ModernFreezeModeGroup(this, app));
         modePager.addListener(new ChangeListener() {
