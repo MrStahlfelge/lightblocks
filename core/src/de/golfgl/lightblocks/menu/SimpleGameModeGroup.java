@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 
 import de.golfgl.lightblocks.LightBlocksGame;
+import de.golfgl.lightblocks.model.CleanGarbageModel;
 import de.golfgl.lightblocks.model.MarathonModel;
 import de.golfgl.lightblocks.model.ModernFreezeModel;
 import de.golfgl.lightblocks.model.PracticeModel;
@@ -21,6 +22,7 @@ import de.golfgl.lightblocks.scene2d.FaRadioButton;
 import de.golfgl.lightblocks.scene2d.FaTextButton;
 import de.golfgl.lightblocks.scene2d.MyStage;
 import de.golfgl.lightblocks.scene2d.ScaledLabel;
+import de.golfgl.lightblocks.scene2d.TouchableSlider;
 import de.golfgl.lightblocks.scene2d.VetoDialog;
 import de.golfgl.lightblocks.input.PlayGesturesInput;
 import de.golfgl.lightblocks.screen.PlayScreen;
@@ -322,6 +324,86 @@ public abstract class SimpleGameModeGroup extends Table implements SinglePlayerS
         protected void savePreselectionSettings() {
             super.savePreselectionSettings();
             app.localPrefs.saveLastUsedModeType(modeType.getValue());
+        }
+    }
+
+    public static class CleanGarbageModeGroup extends SimpleGameModeGroup {
+        protected TouchableSlider garbageSizeSlider;
+
+        public CleanGarbageModeGroup(SinglePlayerScreen myParentScreen, LightBlocksGame app) {
+            super(myParentScreen, app);
+        }
+
+        @Override
+        public String getGameModelId() {
+            return CleanGarbageModel.MODEL_CLEAN_GARBAGE_ID;
+        }
+
+        @Override
+        protected String getGameModeTitle() {
+            return app.TEXTS.get("labelModel_typeB");
+        }
+
+        @Override
+        protected boolean isShowBestTime() {
+            return true;
+        }
+
+        @Override
+        protected void fillParamsTable(LightBlocksGame app) {
+            garbageSizeSlider = new TouchableSlider(1, 16, 1, false, app.skin);
+            garbageSizeSlider.setValue(5);
+
+            row().pad(40, 20, 0, 20);
+            ScaledLabel introLabel = new ScaledLabel(app.TEXTS.get("goalModelCleanGarbage"), app.skin,
+                LightBlocksGame.SKIN_FONT_REG, .75f);
+            introLabel.setWrap(true);
+            introLabel.setAlignment(Align.center);
+            add(introLabel).bottom().fillX().expandX();
+
+            params.row().padTop(15);
+            params.add(getGarbagParamTable()).expand().fill();
+
+            super.fillParamsTable(app);
+
+            menuScreen.addFocusableActor(playButton);
+        }
+
+        private Table getGarbagParamTable() {
+            final ScaledLabel beginningLevelLabel = new ScaledLabel("5 lines", app.skin, LightBlocksGame.SKIN_FONT_TITLE);
+            garbageSizeSlider.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    beginningLevelLabel.setText(String.valueOf((int)garbageSizeSlider.getValue()) + " lines");
+                }
+            });
+
+            Table paramTable = new Table();
+            paramTable.row();
+            paramTable.add(garbageSizeSlider).minHeight(30).minWidth(200).right().fill();
+            paramTable.add(beginningLevelLabel).left().spaceLeft(10).minWidth(beginningLevelLabel.getPrefWidth() * 1.1f);
+
+            return paramTable;
+        }
+
+        @Override
+        protected InitGameParameters getInitGameParameters() {
+            InitGameParameters initGameParametersParams = new InitGameParameters();
+            initGameParametersParams.setGameMode(InitGameParameters.GameMode.Clean);
+            initGameParametersParams.setBeginningLevel(0);
+            initGameParametersParams.setInputKey(PlayScreenInput.KEY_KEYORTOUCH);
+            initGameParametersParams.setInitialGarbage((int)garbageSizeSlider.getValue());
+            return initGameParametersParams;
+        }
+
+        @Override
+        protected int getMaxBeginningValue() {
+            return 0;
+        }
+
+        @Override
+        protected void savePreselectionSettings() {
+            // es gibt keine
         }
     }
 
