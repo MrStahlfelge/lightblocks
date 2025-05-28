@@ -100,7 +100,6 @@ project(":ios") {
 project(":html") {
     apply plugin: "gwt"
     apply plugin: "war"
-    apply plugin: "org.gretty"
 
 
     dependencies {

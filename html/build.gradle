@@ -1,3 +1,5 @@
+apply plugin: "org.gretty"
+
 gwt {
     gwtVersion='2.8.2' // Should match the gwt version used for building the gwt backend
     maxHeapSize="1G" // Default 256m is not enough for gwt compiler. GWT is HUNGRY
