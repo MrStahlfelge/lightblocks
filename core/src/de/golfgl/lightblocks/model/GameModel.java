@@ -786,6 +786,9 @@ public abstract class GameModel implements Json.Serializable, AiAcessibleGameMod
     public void startNewGame(InitGameParameters newGameParams) {
         gameboard = new Gameboard();
         initGameScore(newGameParams.getBeginningLevel());
+        if (newGameParams.getGameMode() == InitGameParameters.GameMode.Clean) {
+            getGameboard().initGarbage(newGameParams.getInitialGarbage());
+        }
         setCurrentSpeed();
         inputTypeKey = newGameParams.getInputKey();
 
