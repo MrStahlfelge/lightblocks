@@ -67,6 +67,8 @@ public class LocalPrefs {
     private Boolean playSounds;
     private Boolean showTouchPanel;
     private Integer swipeUpType;
+    private Boolean swipeDownHardDrop;
+    private Float swipeSensitivity;
     private Boolean gpgsAutoLogin;
     private Boolean dontAskForRating;
     private Integer blockColorMode;
@@ -239,6 +241,32 @@ public class LocalPrefs {
     public void setSwipeUpType(Integer swipeUpType) {
         this.swipeUpType = swipeUpType;
         prefs.putInteger("swipeUpType", swipeUpType);
+        prefs.flush();
+    }
+
+    public boolean isSwipeDownHardDrop() {
+        if (swipeDownHardDrop == null)
+            swipeDownHardDrop = prefs.getBoolean("swipeDownHardDrop", false);
+
+        return swipeDownHardDrop;
+    }
+
+    public void setSwipeDownHardDrop(boolean swipeDownHardDrop) {
+        this.swipeDownHardDrop = swipeDownHardDrop;
+        prefs.putBoolean("swipeDownHardDrop", swipeDownHardDrop);
+        prefs.flush();
+    }
+
+    public float getSwipeSensitivity() {
+        if (swipeSensitivity == null)
+            swipeSensitivity = prefs.getFloat("swipeSensitivity", 1f);
+
+        return swipeSensitivity;
+    }
+
+    public void setSwipeSensitivity(float swipeSensitivity) {
+        this.swipeSensitivity = swipeSensitivity;
+        prefs.putFloat("swipeSensitivity", swipeSensitivity);
         prefs.flush();
     }
 
@@ -757,7 +785,7 @@ public class LocalPrefs {
     }
 
     public enum TouchControlType {
-        gestures, onScreenButtonsGamepad, onScreenButtonsPortrait;
+        gestures, onScreenButtonsGamepad, onScreenButtonsPortrait, swipe;
 
         static TouchControlType fromInteger(int type) {
             switch (type) {
@@ -765,6 +793,8 @@ public class LocalPrefs {
                     return onScreenButtonsGamepad;
                 case 2:
                     return onScreenButtonsPortrait;
+                case 3:
+                    return swipe;
                 default:
                     return gestures;
             }
@@ -778,6 +808,8 @@ public class LocalPrefs {
                     return 1;
                 case onScreenButtonsPortrait:
                     return 2;
+                case swipe:
+                    return 3;
             }
             return -1;
         }
