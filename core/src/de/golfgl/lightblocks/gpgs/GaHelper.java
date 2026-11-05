@@ -31,6 +31,7 @@ public class GaHelper {
                 app.gameAnalytics.submitDesignEvent("swipeUpSetting:" + app.localPrefs.getSwipeUpType());
                 LocalPrefs.TouchControlType usedTouchControls = app.localPrefs.getUsedTouchControls();
                 app.gameAnalytics.submitDesignEvent("showOnScreenControls:" + (usedTouchControls == LocalPrefs.TouchControlType.gestures ? "false" :
+                        usedTouchControls == LocalPrefs.TouchControlType.swipe ? "swipe" :
                         usedTouchControls == LocalPrefs.TouchControlType.onScreenButtonsGamepad ? "gamepad" : "buttons"));
                 if (usedTouchControls == LocalPrefs.TouchControlType.gestures) {
                     app.gameAnalytics.submitDesignEvent("showVirtualPad:" + app.localPrefs.getShowTouchPanel());
